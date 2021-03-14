@@ -25,9 +25,6 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
     BevelOuter = bvNone
     Constraints.MinHeight = 140
     TabOrder = 0
-    ExplicitTop = 53
-    ExplicitWidth = 607
-    ExplicitHeight = 216
     object Splitter2: TSplitter
       Left = 298
       Top = 0
@@ -48,9 +45,6 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       Constraints.MinHeight = 80
       Constraints.MinWidth = 100
       TabOrder = 0
-      ExplicitLeft = 3
-      ExplicitWidth = 358
-      ExplicitHeight = 146
       object VstDuplicates: TVirtualStringTree
         Left = 2
         Top = 15
@@ -89,6 +83,7 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
         TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
         TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toRightClickSelect]
         OnChange = VstDuplicatesChange
+        OnColumnDblClick = VstDuplicatesColumnDblClick
         OnGetText = VstDuplicatesGetText
         Columns = <
           item
@@ -145,9 +140,6 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       Caption = 'Summary'
       Constraints.MinWidth = 100
       TabOrder = 1
-      ExplicitLeft = 386
-      ExplicitWidth = 276
-      ExplicitHeight = 154
       DesignSize = (
         292
         134)
@@ -225,8 +217,6 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitTop = 152
-    ExplicitWidth = 665
     object Splitter1: TSplitter
       Left = 295
       Top = 0
@@ -243,7 +233,7 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       Width = 289
       Height = 260
       Align = alLeft
-      Caption = 'Currently selected file (playlist)'
+      Caption = 'Currently selected file in the playlist'
       Constraints.MinWidth = 100
       TabOrder = 0
       DesignSize = (
@@ -399,9 +389,6 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       Caption = 'Currently selected possible duplicate'
       Constraints.MinWidth = 100
       TabOrder = 1
-      ExplicitLeft = 3
-      ExplicitWidth = 326
-      ExplicitHeight = 234
       DesignSize = (
         288
         260)
@@ -570,8 +557,6 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitTop = 400
-    ExplicitWidth = 665
     DesignSize = (
       592
       41)
@@ -585,7 +570,6 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       Caption = 'Ok'
       TabOrder = 0
       OnClick = BtnOKClick
-      ExplicitLeft = 582
     end
     object BtnRefresh: TButton
       Left = 5
@@ -608,7 +592,6 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 3
-    ExplicitWidth = 607
     object grpBoxPlaylist: TGroupBox
       AlignWithMargins = True
       Left = 3
@@ -618,8 +601,6 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       Align = alClient
       Caption = 'Selection in Nemp playlist'
       TabOrder = 0
-      ExplicitWidth = 601
-      ExplicitHeight = 47
       DesignSize = (
         586
         54)
@@ -669,7 +650,6 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
         Width = 30
         Height = 19
         Alignment = taRightJustify
-        Anchors = [akLeft, akTop, akRight]
         AutoSize = False
         Caption = '...'
         Font.Charset = DEFAULT_CHARSET

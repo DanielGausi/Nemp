@@ -59,14 +59,14 @@ citecolor = black] {hyperref}
 	\centering
 	{\scshape\LARGE Nemp - Noch ein mp3-Player\footnote{\emph{Noch ein mp3-Player} translates to \emph{Yet another mp3-player}} \par}
 	
-	Version 4.13 \par
+	Version 4.15 \par
 	\vspace{1cm}
 	\includegraphics[width=0.5\textwidth]{nemp.jpg}\par
 	\vspace{1cm}
 	{\Large Documentation and user guide\par}	
 	\emph{This documentation was mainly translated with the help of \emph{deepl.com}. I hope it is reasonably understandable and does not contain too much gibberish.}	
 	\vfill	
-	\copyright Daniel Gauﬂmann, 2005-2020
+	\copyright Daniel Gauﬂmann, 2005-2021
 \end{titlepage}
 
 \tableofcontents
@@ -166,7 +166,13 @@ To build up the media library simply drag your main music folder into the given 
 
 When you highlight a title in the media library or playlist, some information about that title is displayed in the \emph{File Information} area. Beside the cover picture or the lyrics some more (title, artist, album, genre, year, as well as \gf{extended tags}).
 
-About this part is also some browsing in the media library possible, as well as the creation of \gf{additional tags}. Read more in the \hyperref[sec_titleinformation]{Browse the Media Library} section.
+With Nemp 4.15 there is a choice available here, which can be controlled by the button with the lock symbol.
+\begin{itemize}
+ \item[] \inlinegraphics{TabBtnLockSummary.png} Always show the details of the currently selected track from playlist or media list.
+ \item[] \inlinegraphics{TabBtnLockSummary2.png} Only the details of the currently played track will be displayed.
+\end{itemize}
+
+By this part is also some browsing in the media library possible, as well as the creation of \gf{additional tags}. Read more in the \hyperref[sec_titleinformation]{Browse the Media Library} section.
 
 
 \subsection{Basic control}
@@ -386,12 +392,66 @@ The order in which the playlist is played back can be changed by pressing the bu
 \includegraphics[width=0.4\textwidth]{playlist.jpg} 
 \end{center}
 
+Depending on the use case, Nemp can remove the pause between individual tracks, or artificially extend it. For this Nemp has options to detect \textbf{silence at the end of tracks}, \textbf{crossfading} and since version 4.15 also the contrary option to insert an \textbf{artificial pause} between tracks. The first options are meant for parties where you want to have a a continuous playback. An artificial pause is probably desired at dance events where couples want to pause in the last pose for a few moments at the end of a dance before the next one begins.
+
 New in Nemp 4.7 is the \textbf{search in the playlist}. This works similar to the quick search in the media library - just focus the search box (also works with the key combination \texttt{Ctrl+F}, if the playlist has the focus) and start typing. The first hit is selected in the playlist. Pressing the \texttt{F3} key will highlight the next hit. With \texttt{Enter} all search hits are marked, and can be copied to the clipboard via Copy\texttt{Strg+C} or \texttt{Strg+Shift+C}. With \texttt{Shift+Enter} the currently selected title is played.
 
 Since version 4.13, Nemp ReplayGain supports ReplayGain for automatic adjustment of the Loudness. Titles with ReplayGain information are indicated in the playlist by a sound level symbol. When the automatic loudness adjustment is disabled in the settings, this icon is displayed in grayscale. More
 about this in the next section.
 
 A hidden feature is the prebook-list. You can use the \texttt{0...9} numeric keys to set a temporary individual sequence. Simply highlight the song you want to hear next and press the \texttt{1} button. Mark another one with \texttt{2} and so on. If you want to change the order, this works as well. If you want to remove a marker, press \texttt{0}.
+
+Since version 4.15 the display of the playlist can be configured. There is now an optional column with the continuous index, and the usual display \emph{Artist - Title} can be adjusted to your own preferences. More about this in section \hyperref[sec_extVis]{Advanced display settings}.
+
+\subsection{Favorite Playlists}
+
+Since version 4.14 Nemp has a quick access to a list of favorite playlists. This can be used to quickly switch between different playlists, each of which also saves the playback position.
+
+Access to the favorites is available via the new button \inlinegraphics{TabBtnFavorites.png} in the playlist header. A new favorites list can be created using the menu item \emph{Save current playlist as new favorite}. 
+
+Alternatively, the playlist editor can be used. There all favorites can be edited. Here, for example, a playlist can be prepared for the next party, while you listen to your usual playlist. Of course, this is only useful to a limited extent - no playback is currently possible in the editor.  The usual methods Drag\&Drop, Copy\&Paste as well as inserting via the file selection are available.
+The playlist editor is subject to some further restrictions besides the missing playback:
+\begin{itemize}
+\item Audio files can be inserted via Drag\&Drop from Windows Explorer, but no directories.
+\item No cuesheets are displayed.
+\end{itemize}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{playlist-editor.jpg} 
+\end{center}
+
+\subsubsection{behavior of favorite playlists}
+
+\begin{itemize}
+\item When a favorite list is loaded, the name of the list appears in the playlist header.
+\item If a favorite list is changed, then when \emph{save playlist} is called (also by \texttt{Ctrl+S}), the changes are automatically saved to that file. For the default playlist, a \emph{save-as} dialog always appears.
+\item If a favorite list is active and Nemp is closed, then these changes will be saved only in the default playlist for the time being. At the next start this default playlist will be loaded as this favorite list. If you then want to switch to another list, a dialog appears that points out the changes and asks you to save them.
+
+Changes to the favorites are not automatically saved unless you choose the appropriate option in the prompt dialog.
+\item If another favorite list is selected in the menu, the current playback position in the list is automatically saved (provided no other changes have been made) and restored the next time the list is loaded.
+\item If the currently active favorite list is selected again in the menu after (unsaved) changes to the list, then (after query) the last saved version is loaded. If the currently played title is also contained in the last saved version of the playlist, then playback will continue there. Otherwise the playback starts at the first title.
+\item When switching to the \emph{default playlist}, no other playlist is loaded. Only the current playlist will no longer be treated as \emph{favorites}, but as a normal playlist - as Nemp has always handled the playlist so far.
+\item The favorites are stored in the data directory (menu: \emph{Tools - Directories - Data}) in the subfolder \emph{Playlists}. The Nemp playlist format \texttt{*.npl} is used, which supports the same portability settings as the media library.
+\item If a playlist is deleted from favorites via the playlist editor, then the playlist file is not deleted immediately, but first renamed to \texttt{*.npl.backup}. This file can be renamed again if necessary to be able to import it again in a newly created favorites playlist.
+\item The list \emph{Recent playlists} also appears in the favorites menu. However, the playlists there are not treated the same way as the favorites - there is no quicksave for these lists, for example, and no saving of the playback position.
+\end{itemize}
+
+
+\subsection{Cleanup the playlist}
+\label{sec_CleanupPlaylist}
+A function that removes missing files from the playlist has been in Nemp for a while. With version 4.15 a search for duplicates is implemented as well.
+
+The playlist is scanned for potentially duplicate tracks. Nemp distinguishes between a possible duplicate and a definite duplicate. 
+
+\begin{itemize}
+ \item[] \inlinegraphics{duplicate1_16.png} An entry is a \emph{possible duplicate} if the file name matches (but in different directories), or if artist and title match.
+ \item[] \inlinegraphics{duplicate2_16.png} An entry is a \emph{definite duplicate} if both entries point to the same file. 
+\end{itemize}
+In the screenshot, the first song is highlighted in the playlist for which a duplicate was found at position 10 and 19. For the 10th song in the playlist the file name and artist and title match, the 19th track is a clear duplicate. \emph{(In fact, all possible duplicates here are the instrumental versions of the Earbook edition of the album)}
+\begin{center}
+\includegraphics[height=8cm]{playlist-duplicates.png} 
+\includegraphics[height=8cm]{playlist-duplicates-b.png} 
+\end{center}
+You can then step through all the possible duplicates and delete the original entry in each case, or delete the duplicates from the playlist.
 
 \subsection{ReplayGain - automatic loudness adjustment}
 \label{sec_ReplayGain}
@@ -450,19 +510,19 @@ And of course this applies even more to the \emph{as one album} option - applyin
 \item To calculate the AlbumGain value, all titles of the album must have the same sample rate. For example, if one title does not have the usual 44.1kHz, but 48kHz, then the calculation of the AlbumGain value is aborted.
 
 \item During my tests it turned out that Nemp (or the used program library) delivers slightly different values for some files than e.g. foobar2000 or Mp3Gain. The deviations become particularly clear with titles that have both very loud and very quiet passages. However, the tendency is correct, and for titles with strongly fluctuating volume (as a classic I refer to the \textit{Bolero}) an \gf{average} Volume anyway is a term difficult to define, resp. is such a value there only of very limited expressiveness.
-
-
 \end{itemize}
 
+\subsubsection{Combination with Mp3Gain}
 
+There are generally two methods to achieve a more uniform volume in music tracks. 
+\begin{itemize}
+\item \textbf{ReplayGain} used in Nemp leaves the audio data unchanged, and writes volume adjustment information in the metadata.
+\item The also widely used program \textbf{Mp3Gain} can change the audio data, and then writes in the metadata the information how to \emph{undo} these changes.
+\end{itemize}
 
+Both methods have advantages and disadvantages. ReplayGain works for all audio formats, but Mp3Gain works only for Mp3 files. On the other hand, ReplayGain only works if the metadata is evaluated accordingly by the audio player, Mp3Gain works with every player.
 
-
-
-
-
-
-
+It is important to note that only one of the two methods should be applied to each file or album at a time. Both together can cause undesirable results.
 
 
 
@@ -479,7 +539,7 @@ Over time, a few (more or less) useful functions and functionalities have been a
 
 The purpose of this additional playlist file is to allow the selected titles, which may have confused filenames, to be inserted into a playlist in the same order in which they are currently sorted in the playlist.
 
-\item If that's not enough, there is the menu item \textbf{Copy Playlist}. This will copy the titles in the playlist to a new directory with (if desired) new filenames.
+\item If that's not enough, there is the menu item \textbf{Copy Playlist}. This will copy the titles in the playlist to a new directory with (if desired) new filenames. The filenames can be defined (with some restrictions) using the same placeholders as the title display in the playlist. Details in the section \hyperref[sec_extVis]{Viewing settings}, \gf{Playlist formatting}.
 
 \item If an audio file (e.g. mix CDs) has a *.cue-file of the same name (so-called \textbf{Cue-Sheets}), then this file is evaluated, and the individual titles of the mix can be accessed directly. 
 
@@ -566,6 +626,8 @@ The request to last.fm was not executed, because another attempt failed recently
 \item[] \inlinegraphics{lastfmInvalid.png} This icon does not appear in the coverflow, but only in the cover view of the player. It indicates that no uniform album information can be found for the files in the same folder as the current track. In this case, the search at last.fm is skipped. 
 \end{itemize}
 
+With version 4.15 a small new feature has been added. Due to the general revision of the code, the cover selection became more accurate, i.e. it always scrolls to the exact cover you click on in the coverflow. Also, clicking on one of the (up to) 16 sample covers at \gf{your media library} at the beginning of the coverflow now scrolls to that album in the coverflow.
+
 \subsubsection{Tag cloud}
 \label{sec_tagwolke}
 In the tag cloud, all properties such as artist, album, genre, year, year, decade are thrown into one big pot and the most common properties are displayed - always as much as there is room in the window. If you click on such a \emph{tag}, you will get all titles with this tag displayed. If you double-click a tag, a new tag cloud is created, which only takes titles with that tag into account.
@@ -606,6 +668,8 @@ If you want to listen to a certain song, you can use the quick search function. 
 
 With \emph{*} you can search for all titles in the media library. If you really want to see all titles containing a \emph{*}, you must escape the asterisk with \emph{\textbackslash*}.
 
+In the \hyperref[sec_searchoptions]{search options} you can define which properties should be considered for the quick search. Since version 4.15, the genre can also be included here.
+
 Since Nemp 4.9.2 the last 10 search terms are logged and can be retrieved via the context menu of the quick search input field.
 
 \begin{tipp}
@@ -638,7 +702,7 @@ So don't worry about the exact spelling or typos - especially when searching for
 
 %With \textbf{Search} a new search is started. With \textbf{Refine search} is searched only in current search hits, and with \textbf{Extend search} new ones are added to current search hits.
 
-Restriction to \textbf{genre} or \textbf{year} is still in it for nostalgic reasons, but in most cases probably more obstructive than useful.
+Restriction to \textbf{genre} or \textbf{year} is still in it for nostalgic reasons, but in most cases probably more obstructive than useful.  In this context, however, I overlooked for a long time that not only the search for the predefined genres can be useful, but also a search for other genres that are not included in the list. Therefore, there is now (since version 4.15) also a field \gf{genre} in the form, which then works just like the other search fields, including the fault tolerance.
 
 As a bonus, the last search history is saved and can be called up again.
 
@@ -775,6 +839,8 @@ On this page you can find further information from the metadata. For MP3 files, 
 Data fields that do not only contain plain text are displayed as far as possible up to a certain length (non-printable characters as dots). Larger amounts of data are only displayed as \emph{Binary Data}, followed by the size of the data.
 
 To edit, double-click an entry or press the \texttt{F2} key. With the button \emph{New Frame} further text information can be inserted. Which information is possible depends on the format of the audio file. Even if some formats like Ogg or Flac allow any tags in principle, Nemp offers only a selection here.
+
+With version 4.15, support for various tag systems has been extended. In mp3 files, Apev2 tags can now also be processed (if they are present), and in file formats where an Apev2 tag is usually present, the ID3v1 tag is now also evaluated.
 
 \begin{hinweis}
 The access to the metadata is done here on a quite elementary level. If you are not sure what e.g. \gf{new frame} means in this context, or what the possible frames mean, then leave that alone. However, nothing should break the files, and other players should not have any problems with any of the data entered here - in the worst case they will simply be ignored.
@@ -1100,6 +1166,20 @@ The configurability of the fonts is a relic from the prototype Nemp, where I was
 \item \textbf{Change font according to constant/variable bitrate.} The font can be used to indicate whether the title has been encoded with a constant or variable bit rate. In most cases, this is not a particularly interesting indication that requires special emphasis.
 \end{itemize}
 
+\subsubsection{Coverflow}
+\label{sec_CoverflowSettings}
+Since version 4.15 the coverflow is configurable. The changes are visible directly in the coverflow, so all settings should be self-explanatory.
+Configurable are
+\begin{itemize}
+	\item Positions of the covers along the z-axis (i.e. further forward or further back)
+	\item The position of the current cover in the horizontal direction
+	\item The spacing between the covers
+	\item The angles at which the covers are lined up
+	\item The intensity and vertical gap of the reflection
+	\item The maximum number of covers displayed (older ones will be deleted from texture buffer) and then may need to be reloaded
+\end{itemize}
+For the optionally selectable 2D coverflow (which doesn't really deserve the name and only serves as a fallback in case of problems with the 3D rendering) all these settings do not apply. 
+
 \subsubsection{Extended viewing settings}
 \label{sec_extVis}
 Some other settings that are less useful, but don't do any harm by being in.
@@ -1119,7 +1199,35 @@ Some other settings that are less useful, but don't do any harm by being in.
 
 \item \textbf{Not available metadata.} Not all mp3-files are always completely tagged with ID3 tags. Nemp can then display other information in the overview list instead. Which ones are useful also depends on how your own music collection is organized.
 
-\item \textbf{Coverflow.} In some cases, the coverflow may cause some problems. The two settings here can be used to correct these in case of doubt.
+\item \textbf{Playlist Formatting.} Since version 4.15 the entries in the playlist can be configured. Nemp distinguishes between
+	\begin{itemize}
+		\item \textbf{Regular titles.} The normal case - just normal music files
+		\item \textbf{Fallback.} If some required information is not available for a track, this formatting is chosen as fallback.
+		\item \textbf{Cue (album/title).} For titles with a matching cue sheet, Nemp can vary the display. For example, in the main entry the \emph{album} is interesting, while in the individual cue entries the \emph{title} defined in the cue sheet is of interest.
+		\item \textbf{webradio.} Formatting for web radio stations.
+	\end{itemize}
+The formatting can be selected from some predefined ones, but can be further customized relatively freely. Nemp understands the following placeholders:
+
+\begin{tabular}{|l|l|}
+\hline
+Placeholder & Meaning \\
+\hline
+$<$artist$>$ & Artist \\
+$<$album$>$ & Album \\
+$<$title$>$ & Title \\ 
+$<$track$>$ & Track number \\
+$<$year$>$ & Year \\ 
+$<$genre$>$ & Genre \\  
+$<$station$>$ & Station (only for webradio) \\ 
+$<$filename$>$ & Filename \emph{without} extension \\ 
+$<$filenameExt$>$ & Filename \emph{with} extension \\   
+$<$ext$>$ & Filename extension \\ 
+$<$subdir$>$ & Last part of path before filename \\
+$<$dir$>$ & Directory \\  
+$<$fullpath$>$ & Full path \\                                       
+\hline
+\end{tabular}
+
 \end{itemize}
 
 
@@ -1142,6 +1250,8 @@ The threshold value specifies the volume at which Nemp should detect \emph{silen
 Since this detection is only started when the title is already running and can take a few seconds, it may happen that this function does not always work as expected for very short titles. \emph{Very short} means thereby less than 5-10 seconds, thus for the vast majority of cases that is no restriction. 
 
 Silence at the beginning of a piece is not recognized and therefore cannot be skipped.
+
+\item \textbf{Add silence.} \emph{Default: off.} If continuous playback is not desired, but on the contrary an extended pause between tracks, an artificial pause can be inserted between tracks.
 \end{itemize}
 
 
@@ -1433,6 +1543,7 @@ Some remarks about this:
 \end{itemize}
 
 \subsubsection{Search settings}
+\label{sec_searchoptions}
 A huge media library is of little use if you can't find anything in it. Therefore, Nemp contains a quite strong search function.
 
 \begin{itemize}
@@ -1440,7 +1551,7 @@ A huge media library is of little use if you can't find anything in it. Therefor
 
 With very, very large music collections (i.e. several hundred thousand titles) a problem can arise here, since Nemp is so far only available in a 32-bit version and therefore the usable memory is limited to 2GB. If this occurs, Nemp will automatically disable this option. However, this can still lead to undesired behavior or even a crash.
 
-\item \textbf{Including filenames/comments.} For accelerated search, a copy of all text information is created, which can be accessed more quickly. Depending on the structure of the music collection, it may be useful to include file names or comments in this copy. 
+\item \textbf{Including filenames/comments/genre.} For accelerated search, a copy of all text information is created, which can be accessed more quickly. Depending on the structure of the music collection, it may be useful to include file names, genre or comments in this copy. 
 
 Since the filename also contains the complete path, this option can be useful if, for example, the self compiled sampler \emph{Vacation 2016 in Barcelona} is located in a folder. Then a search for \emph{Barcelona} will find this folder, even if the ID3 tags are not set accordingly.
 
@@ -1675,6 +1786,38 @@ The Nemp Deskband for Windows XP and the display app for the Logitech G15 includ
 \section{Version history}
 
 The following is a summary of the new features in the individual versions - from the current version to the very first version of this program, which at that time was not even a player. In this section you will find the main new features and noteworthy bugfixes, but not a complete list of all changes.
+
+\subsection*{Version 4.15.0, April 2020}
+\textbf{New features and improvements}
+\begin{itemize}
+\item Search and mark duplicate entries in the playlist; option to quickly delete duplicate entries.
+\item The coverflow display can now be modified
+	\begin{itemize}
+	\item configurable positions and angles of each album, distance between them; configurable reflection (on/off, intensity, distance)
+	\item improved album selection when clicking on an album; the individual random covers at \gf{your media library} are now clickable
+	\end{itemize}
+\item Overhauled file overview in the main window
+	\begin{itemize}
+	\item Display can be limited to the current title in the player
+	\item Improved details displayed for cue sheets; display of file folder with double-click function to list all files in this folder
+	\end{itemize}
+\item Optional pause between two titles when playing the playlist
+\item Configurable title display in playlist (i.e. not always just \gf{Artist - Title}); optional column \gf{Index}
+\item Support for Apev2 tags in mp3 files; support for ID3v1 tags in file formats with Apev2 tags.
+\item For webstreams the current track is no longer saved in the playlist, since it is unlikely to be up to date the next time it is started
+\item Some windows now stay in the foreground (relative to the main window)
+\item A double click on title display in the player part scrolls now to this title in the playlist
+\item Checking for updates now uses a secure https connection
+\end{itemize}
+
+\textbf{Bug fixes}
+\begin{itemize}
+\item When changing skins, star graphics were not updated on all forms
+\item Webstreams were not saved or reloaded correctly in some cases
+\item Menu item \gf{Browse by - more} had no function
+\item Resetting media library cover via details window did not delete internal coverID from ID3 tags as intended
+
+\end{itemize}
 
 
 \subsection*{Version 4.14.0, Mai 2020}

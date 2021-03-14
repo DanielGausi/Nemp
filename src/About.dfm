@@ -34,14 +34,14 @@ object AboutForm: TAboutForm
       ''
       '[b]Nemp - Noch ein Mp3-Player[/b]'
       ''
-      'Copyright '#169' 2005-2020 Daniel '#39'Gausi'#39' Gaussmann'
+      'Copyright '#169' 2005-2021 Daniel '#39'Gausi'#39' Gaussmann'
       ' '
-      'Website: [url="http://www.gausi.de"]http://www.gausi.de[/url]'
+      'Website: [url="https://www.gausi.de"]https://www.gausi.de[/url]'
       'e-Mail: [url="mailto:mail@gausi.de"]mail@gausi.de[/url]'
       ''
       
-        '[url="http://www.facebook.com/pages/Nemp-Noch-ein-mp3-Player/172' +
-        '590512836097"]Nemp on Facebook[/url]'
+        '[url="https://www.facebook.com/pages/Nemp-Noch-ein-mp3-Player/17' +
+        '2590512836097"]Nemp on Facebook[/url]'
       ''
       ''
       '[row="250"]'
@@ -71,7 +71,9 @@ object AboutForm: TAboutForm
       ''
       'The [url="http://www.un4seen.com"]bass.dll[/url] and add-ons'
       ''
-      '[url="http://gausi.de/awb.html"]Audio Werkzeuge Bibliothek[/url]'
+      
+        '[url="https://gausi.de/awb.html"]Audio Werkzeuge Bibliothek[/url' +
+        ']'
       ''
       '[url="http://www.soft-gems.net/"]Virtual Treeview[/url]'
       ''
@@ -80,8 +82,8 @@ object AboutForm: TAboutForm
         'l] by Mat'#237'as Andr'#233's Moreno'
       ''
       
-        '[url="http://www.delphi-forum.de/viewtopic.php?t=48936"]SearchTo' +
-        'ols[/url] by Heiko Thiel'
+        '[url="https://www.delphi-forum.de/viewtopic.php?t=48936"]SearchT' +
+        'ools[/url] by Heiko Thiel'
       ''
       
         '[url="https://www.entwickler-ecke.de/viewtopic.php?t=100088"]Fas' +
@@ -90,13 +92,13 @@ object AboutForm: TAboutForm
       '[url="http://dybdahl.dk/dxgettext/"]GNU gettext for Delphi[/url]'
       ''
       
-        '[url="http://www.delphipraxis.net/topic114228.html"]TACredits[/u' +
-        'rl] (this scrolling thing)'
+        '[url="https://www.delphipraxis.net/topic114228.html"]TACredits[/' +
+        'url] (this scrolling thing)'
       ''
       
-        '[url="http://www.delphipraxis.net/topic116695_kompo+twindowsvers' +
-        'ionsinfo+kompo+zur+windowserkennung.html"]TWindowsVersionInfo[/u' +
-        'rl] by MagicAndre1981'
+        '[url="https://www.delphipraxis.net/topic116695_kompo+twindowsver' +
+        'sionsinfo+kompo+zur+windowserkennung.html"]TWindowsVersionInfo[/' +
+        'url] by MagicAndre1981'
       ''
       
         '[url="http://angusj.com/delphi/"]Drag&Drop-Component[/url] (modi' +
@@ -106,7 +108,7 @@ object AboutForm: TAboutForm
         '[url="http://delphi.fsprolabs.com/"]FSPro Windows 7 Taskbar Comp' +
         'onents[/url]'
       ''
-      '[url="http://www.last.fm/api/intro"]The LastFM API[/url]'
+      '[url="https://www.last.fm/api/intro"]The LastFM API[/url]'
       ''
       '[url="http://www.madshi.net/"]MadExcept[/url] by Mathias Rauen'
       ''

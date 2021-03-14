@@ -620,6 +620,8 @@ type
     Bevel2: TBevel;
     NempTaskbarManager: TTaskbar;
     PM_PL_ScanForDuplicates: TMenuItem;
+    PlaylistVST_HeaderPopup: TPopupMenu;
+    pmShowColumnIndex: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1122,6 +1124,7 @@ type
     procedure MM_T_PlaylistLogClick(Sender: TObject);
     procedure RefreshVSTCover(aAudioFile: TAudioFile);
     procedure RefreshVSTCoverTimerTimer(Sender: TObject);
+    procedure RefreshVSTDetailsTimerTimer(Sender: TObject);
     procedure TabBtn_MarkerMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure QuickSearchHistory_PopupMenuPopup(Sender: TObject);
@@ -1168,6 +1171,7 @@ type
     procedure OnDeletePlaylistDuplicate(Sender: TPlaylistDuplicateCollector; aFile: TAudioFile);
     procedure OnDeletePlaylistDuplicateOriginal(Sender: TPlaylistDuplicateCollector; aFile: TAudioFile);
     procedure OnAfterLastDuplicateDeleted(Sender: TPlaylistDuplicateCollector; aFile: TAudioFile);
+    procedure OnDuplicateDblClick(Sender: TPlaylistDuplicateCollector; aFile: TAudioFile);
     procedure OnAfterRefreshDuplicateScan(Sender: TObject);
     procedure PlaylistDeleteFile(Sender: TNempPlaylist; aFile: TAudioFile; aIndex: Integer);
     procedure PlaylistAddFile(Sender: TNempPlaylist; aFile: TAudioFile; aIndex: Integer);
@@ -1213,6 +1217,8 @@ type
     procedure NempTaskbarManagerThumbPreviewRequest(Sender: TObject; APreviewHeight,
       APreviewWidth: Integer; PreviewBitmap: TBitmap);
     procedure PM_PL_ScanForDuplicatesClick(Sender: TObject);
+    procedure pmShowColumnIndexClick(Sender: TObject);
+    procedure PlayerArtistLabelDblClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -1255,8 +1261,14 @@ type
 
     procedure HandleInsertHeadsetToPlaylist(aAction: Integer);
 
+    procedure PlaylistSelectNextFlagged(aFlag: Integer);
     procedure PlaylistSelectNextSearchresult;
+    procedure PlaylistSelectNextDuplicate;
+    procedure PlaylistScrollToPlayingFile;
+
     procedure PlaylistSelectAllSearchresults;
+
+
 
     procedure InitTaskBarIcons;
 
@@ -1307,6 +1319,7 @@ type
     VolTimer,
     DragDropTimer,
     RefreshVSTCoverTimer,
+    RefreshVSTDetailsTimer,
     CurrentSearchDirPlayistTimer,
     CurrentSearchDirMediaLibraryTimer,
     IncrementalCoverSearchTimer : TTimer;
@@ -1709,6 +1722,11 @@ begin
     RefreshVSTCoverTimer.Enabled := False;
     RefreshVSTCoverTimer.Interval := 1000;
     RefreshVSTCoverTimer.OnTimer := RefreshVSTCoverTimerTimer;
+
+    RefreshVSTDetailsTimer := TTimer.Create(self);
+    RefreshVSTDetailsTimer.Enabled := False;
+    RefreshVSTDetailsTimer.Interval := 100;
+    RefreshVSTDetailsTimer.OnTimer := RefreshVSTDetailsTimerTimer;
 
     CurrentSearchDirPlayistTimer := TTimer.Create(self);
     CurrentSearchDirPlayistTimer.Enabled := False;
@@ -2254,17 +2272,17 @@ begin
     if CoverScrollbar.Position <> Integer(Msg.WParam) then
     begin
         CoverScrollbar.Position := Msg.WParam;
-        if CoverScrollbar.Position <= MedienBib.Coverlist.Count -1 then
+        if CoverScrollbar.Position <= MedienBib.CoverViewList.Count -1 then
         begin
-            aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
+            aCover := MedienBib.CoverViewList[CoverScrollbar.Position];
             MedienBib.GenerateAnzeigeListeFromCoverID(aCover.key);
             Lbl_CoverFlow.Caption := aCover.InfoString;
         end;
     end else
     begin
-        if CoverScrollbar.Position <= MedienBib.Coverlist.Count -1 then
+        if CoverScrollbar.Position <= MedienBib.CoverViewList.Count -1 then
         begin
-            aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
+            aCover := MedienBib.CoverViewList[CoverScrollbar.Position];
             Lbl_CoverFlow.Caption := aCover.InfoString;
         end;
     end;
@@ -2287,7 +2305,7 @@ begin
   bmp := TBitmap.Create;
   try
     bmp.PixelFormat := pf24bit;
-    MedienBib.CoverArtSearcher.PaintMainPickCover(bmp, MedienBib.Coverlist);
+    MedienBib.CoverArtSearcher.PaintMainPickCover(bmp, MedienBib.CoverViewList);
     Medienbib.NewCoverFlow.SetMainPickCoverPreview( bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
   finally
     bmp.Free;
@@ -2308,9 +2326,9 @@ begin
   try
       bmp.PixelFormat := pf24bit;
 
-      if MedienBib.CoverList.Count > msg.Index then
+      if MedienBib.CoverViewList.Count > msg.Index then
       begin
-          aCover := TNempCover(MedienBib.CoverList[msg.Index]);
+          aCover := MedienBib.CoverViewList[msg.Index];
           case MedienBib.NewCoverFlow.Mode of
               cm_Classic: success := False; // we already failed during the painting process
               cm_OpenGL : begin
@@ -2326,7 +2344,7 @@ begin
           begin
               // file \coverSavepath\<id>.jpg is missing, even if it should exist (= it was manually deleted?)
               // try to recreate it from the image files already existing on the disc/id3Tag
-              success := RepairCoverFileVCL(aCover.ID, pic, newID);
+              success := RepairCoverFileVCL(aCover.ID, Nil, pic, newID);
               if success then
                   aCover.ID := newID;
           end;
@@ -3624,8 +3642,8 @@ begin
           // Quelle ist das Cover-Flow-Image
           tmpFileList := TAudioFileList.Create(False);
           try
-              if CoverScrollbar.Position <= MedienBib.Coverlist.Count -1 then
-                  MedienBib.GetTitelListFromCoverID(tmpFileList, TNempCover(MedienBib.Coverlist[CoverScrollbar.Position]).key);
+              if CoverScrollbar.Position <= MedienBib.CoverViewList.Count -1 then
+                  MedienBib.GetTitelListFromCoverID(tmpFileList, MedienBib.CoverViewList[CoverScrollbar.Position].key);
               // Sortieren
               if tmpFileList.Count <= 5000 then
                   tmpFileList.Sort(Sort_AlbumTrack_asc);
@@ -4945,7 +4963,11 @@ begin
       MedienListeStatusLBL.Caption := MedienListeStatusLBL.Caption + '; '
                                 + Format((MainForm_Summary_FileCountTotal), [c] );
 
-  aNode := VST.FocusedNode;
+
+  RefreshVSTDetailsTimer.Enabled := False;
+  RefreshVSTDetailsTimer.Enabled := True;
+  RefreshVSTDetailsTimer.Tag := SD_MEDIENBIB;
+  {aNode := VST.FocusedNode;
   if Assigned(aNode) then
   begin
       AudioFile := VST.GetNodeData<TAudioFile>(aNode);
@@ -4955,7 +4977,7 @@ begin
 
       ShowVSTDetails(AudioFile, SD_MEDIENBIB);
       AktualisiereDetailForm(AudioFile, SD_MEDIENBIB);
-  end
+  end}
 end;
 
 procedure TNemp_MainForm.FillBibDetailLabels(aAudioFile: TAudioFile);
@@ -5417,14 +5439,13 @@ end;
 
 procedure TNemp_MainForm.RefreshVSTCover(aAudioFile: TAudioFile);
 var CoverFileFound: Boolean;
-    originalID: String;
+    originalID, newID: String;
 begin
     if assigned(aAudioFile) then
     begin
         // clear current image  (needed because of Transparencies)
         ImgDetailCover.Picture.Assign(Nil);
         ImgDetailCover.Refresh;
-
         if (ImgDetailCover.Width * ImgDetailCover.Height) > 0 then
         begin
             ImgDetailCover.Picture.Bitmap.Width := ImgDetailCover.Width;
@@ -5437,18 +5458,7 @@ begin
             // Note: This will probably remove a manually set Cover for the library
             originalID := aAudioFile.CoverID;
             if (not CoverFileFound) and PreviewGraphicShouldExist(originalID) then
-            begin
-                  MedienBib.CoverArtSearcher.InitCover(aAudioFile, tm_VCL, INIT_COVER_FORCE_RESCAN);
-                  // try again getting the coverbitmap
-                  MedienBib.CoverArtSearcher.GetCoverBitmapFromID(aAudioFile.CoverID, ImgDetailCover.Picture);
-                  // if we found an image, but the ID has changed: Change it on the other files with that ID as well
-                  if (aAudioFile.CoverID <> originalID) then
-                  begin
-                      MedienBib.ChangeCoverIDUnsorted(originalID, aAudioFile.CoverID);
-                      if  MedienBib.NewCoverFlow.CurrentCoverID = originalID then
-                          MedienBib.NewCoverFlow.CurrentCoverID := aAudioFile.CoverID;
-                  end;
-            end;
+                RepairCoverFileVCL(originalID, aAudioFile, ImgDetailCover.Picture, newID);
 
             ImgDetailCover.Picture.Assign(ImgDetailCover.Picture);
             ImgDetailCover.Refresh;
@@ -5469,6 +5479,55 @@ begin
         CreateTagLabels(MedienBib.CurrentAudioFile);
 end;
 
+procedure TNemp_MainForm.RefreshVSTDetailsTimerTimer(Sender: TObject);
+var
+  aNode: PVirtualNode;
+  aVST: TVirtualStringTree;
+  AudioFile, CueParentFile: TAudioFile;
+begin
+  RefreshVSTDetailsTimer.Enabled := False;
+  if (RefreshVSTDetailsTimer.Tag = SD_MEDIENBIB) then
+    aVST := VST
+  else
+    aVST := PlaylistVST;
+
+  aNode := aVST.FocusedNode;
+  if not Assigned(aNode) then
+    exit;
+
+  AudioFile := aVST.GetNodeData<TAudioFile>(aNode);
+
+  if (RefreshVSTDetailsTimer.Tag = SD_MEDIENBIB) then
+  begin
+    // Show Details from Medialibrary
+
+    if AudioFile.IsLocalFile then
+        AudioFile.ReCheckExistence;
+
+    ShowVSTDetails(AudioFile, SD_MEDIENBIB);
+    AktualisiereDetailForm(AudioFile, SD_MEDIENBIB);
+
+  end else
+  begin
+    // Show Details from Playlist
+      if AudioFile.AudioType = at_Cue then
+        CueParentFile := AudioFile.Parent
+      else
+        CueParentFile := AudioFile;
+
+      if aVST.GetNodeLevel(aNode) = 0 then
+        NempPlaylist.RefreshAudioFile(aNode.Index, false);
+
+      ShowVSTDetails(AudioFile, SD_PLAYLIST);
+      AktualisiereDetailForm(CueParentFile, SD_PLAYLIST);
+
+      if assigned(FormPlaylistDuplicates)
+        and FormPlaylistDuplicates.Visible
+      then
+        FormPlaylistDuplicates.ShowDuplicateAnalysis(CueParentFile);
+  end;
+end;
+
 procedure TNemp_MainForm.ShowVSTDetails(aAudioFile: TAudioFile; Source: Integer = SD_MEDIENBIB);
 var DoShowDetails, SameFile: Boolean;
     MainFile: TAudioFile;
@@ -5478,6 +5537,8 @@ begin
   else
     MainFile :=  aAudioFile;
 
+  // SameFile: Show Information about different Cue, even if the display is locked
+  // to only the currently playing file
   SameFile := MedienBib.CurrentAudioFile = MainFile;
 
   case Source of
@@ -5857,11 +5918,11 @@ begin
             Pen.Color := clWindowText; //clGradientActiveCaption;
         pen.Width := 1;  //2 //3;  // 1 is enough, and looks better on some skins, imho.
 
-        Polyline([Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent) * Integer(PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1),
-              Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Bottom-1),
+        Polyline([Point(ItemRect.Left+1 {+ (Integer(PlaylistVST.Indent) * Integer(PlaylistVST.GetNodeLevel(Node)))}, ItemRect.Top+1),
+              Point(ItemRect.Left+1 {+ (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node)))}, ItemRect.Bottom-1),
               Point(ItemRect.Right-1, ItemRect.Bottom-1),
               Point(ItemRect.Right-1, ItemRect.Top+1),
-              Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1)]
+              Point(ItemRect.Left+1 {+ (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node)))}, ItemRect.Top+1)]
               );
       end;
   end;
@@ -5968,11 +6029,10 @@ begin
       end;
       1: begin
                 // Coverflow
-                If MedienBib.Coverlist.Count > 3 then
-                    CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
-                else
-                    CoverScrollbar.Max := 3;
-                MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
+                MedienBib.ReFillCoverViewList;
+                SetCoverFlowScrollbarRange(MedienBib.CoverViewList);
+
+                MedienBib.NewCoverFlow.SetNewList(MedienBib.CoverViewList, MedienBib.CoverCount);
                 CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
                 CoverScrollbarChange(Nil);
                 MedienBib.NewCoverFlow.Paint(10);
@@ -6007,15 +6067,16 @@ begin
     MedienBib.ReBuildCoverListFromList(MedienBib.AnzeigeListe);
 
     CoverScrollbar.OnChange := Nil;
-    If MedienBib.Coverlist.Count > 3 then
-        CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
-    else
-        CoverScrollbar.Max := 3;
+    SetCoverFlowScrollbarRange(MedienBib.CoverViewList);
 
-    MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist, True);
-    CoverScrollbar.OnChange := CoverScrollbarChange;
+    MedienBib.NewCoverFlow.ClearTextures;
+    MedienBib.NewCoverFlow.FindCurrentItemAgain(True);
+    //MedienBib.NewCoverFlow.SetNewList(MedienBib.CoverViewList, True);
+    {xx}CoverScrollbar.OnChange := CoverScrollbarChange;
 
     CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
+
+    CoverScrollbar.OnChange := CoverScrollbarChange;
     MedienBib.NewCoverFlow.Paint(10);
 end;
 
@@ -6448,8 +6509,9 @@ begin
   if not assigned(af) then exit;
 
   case Column of
-    0: CellText := IntToStr(Node.Index) +   NempDisplay.PlaylistTitle(af, True);
-    1: CellText := NempDisplay.TreeDuration(af)
+    0: CellText := NempDisplay.TreeAudioFileIndex(af, Node.Index + 1);
+    1: CellText := NempDisplay.PlaylistTitle(af, True);
+    2: CellText := NempDisplay.TreeDuration(af)
     // the NempDisplay methods will handle PrebookIndex/VoteCounter and start times for Cue-Entries
   end;
 end;
@@ -7227,7 +7289,9 @@ begin
   try
     aPlaylistDuplicateCollector.ScanForDuplicates(NempPlaylist.Playlist);
 
-    if aPlaylistDuplicateCollector.Count > 0 then
+    if aPlaylistDuplicateCollector.Count = 0 then
+      TranslateMessageDLG((PlaylistDuplicates_NoDuplicatesFound), mtInformation, [MBOK], 0)
+    else
     begin
       if not assigned(FormPlaylistDuplicates) then
       begin
@@ -7237,6 +7301,7 @@ begin
 
         FormPlaylistDuplicates.OnAfterLastDuplicateDeleted := OnAfterLastDuplicateDeleted;
         FormPlaylistDuplicates.OnAfterRefreshDuplicateScan := OnAfterRefreshDuplicateScan;
+        FormPlaylistDuplicates.OnDuplicateDblClick := OnDuplicateDblClick;
       end;
 
       // FormPlaylistDuplicates will free the Collector OnClose
@@ -7252,9 +7317,8 @@ begin
       end;
       FormPlaylistDuplicates.Show;
       FormPlaylistDuplicates.ShowDuplicateAnalysis(aPlaylistDuplicateCollector.DuplicateFiles[0]);
+    end;
 
-    end else
-      showmessage('keine Duplikate');
   finally
     if aPlaylistDuplicateCollector.Count = 0 then
       aPlaylistDuplicateCollector.Free;
@@ -7454,15 +7518,13 @@ end;
 procedure TNemp_MainForm.PlaylistVSTChange(Sender: TBaseVirtualTree;
   Node: PVirtualNode);
 var aNode: PVirtualNode;
-  AudioFile: TAudioFile;
+  AudioFile, CueParentFile: TAudioFile;
   c,i:integer;
   dauer:int64;
   groesse:int64;
   SelectedMP3s: TNodeArray;
   cueSelected: Boolean;
 begin
-
-
   c := PlaylistVST.SelectedCount;
   SelectedMP3s := PlaylistVST.GetSortedSelection(False);
   if c=0 then
@@ -7519,28 +7581,29 @@ begin
                                     + SekToZeitString(dauer);
   end;
 
-  aNode := PlaylistVST.FocusedNode;
+  RefreshVSTDetailsTimer.Tag := SD_Playlist;
+  RefreshVSTDetailsTimer.Enabled := False;
+  RefreshVSTDetailsTimer.Enabled := True;
+  {aNode := PlaylistVST.FocusedNode;
   if not Assigned(aNode) then Exit;
 
-  if PlaylistVST.GetNodeLevel(aNode) > 0 then
-  begin
-      // aNode := anode.Parent;
-      AudioFile := PlaylistVST.GetNodeData<TAudioFile>(aNode);
-      ShowVSTDetails(AudioFile, SD_PLAYLIST);
-  end else
-  begin
-      NempPlaylist.RefreshAudioFile(aNode.Index, false); // ActualizeNode(aNode, false);
+  AudioFile := PlaylistVST.GetNodeData<TAudioFile>(aNode);
+  if AudioFile.AudioType = at_Cue then
+    CueParentFile := AudioFile.Parent
+  else
+    CueParentFile := AudioFile;
 
-      AudioFile := PlaylistVST.GetNodeData<TAudioFile>(aNode);
-      ShowVSTDetails(AudioFile, SD_PLAYLIST);
-      AktualisiereDetailForm(AudioFile, SD_PLAYLIST);
+  if PlaylistVST.GetNodeLevel(aNode) = 0 then
+    NempPlaylist.RefreshAudioFile(aNode.Index, false); // ActualizeNode(aNode, false);
 
-      if assigned(FormPlaylistDuplicates)
-        and FormPlaylistDuplicates.Visible
-      then
-        FormPlaylistDuplicates.ShowDuplicateAnalysis(AudioFile);
+  ShowVSTDetails(AudioFile, SD_PLAYLIST);
+  AktualisiereDetailForm(CueParentFile, SD_PLAYLIST);
 
-  end;
+  if assigned(FormPlaylistDuplicates)
+    and FormPlaylistDuplicates.Visible
+  then
+    FormPlaylistDuplicates.ShowDuplicateAnalysis(CueParentFile);
+    }
 end;
 
 
@@ -7589,10 +7652,10 @@ begin
     SlidebarShape.Progress := aProgress;
 
     // during testing ....
-    NempTaskBarManager.ProgressState := TTaskBarProgressState.None;
-    NempTaskBarManager.ProgressState := TTaskBarProgressState.Normal;
-    NempTaskBarManager.ProgressValue := round(aProgress*100);
-    NempTaskBarManager.ApplyProgressChanges;
+    ///NempTaskBarManager.ProgressState := TTaskBarProgressState.None;
+    ///NempTaskBarManager.ProgressState := TTaskBarProgressState.Normal;
+    ///NempTaskBarManager.ProgressValue := round(aProgress*100);
+    ///NempTaskBarManager.ApplyProgressChanges;
 
     if (SlideBarButton.Tag = 0) then // d.h. der Button wird grade nicht gedraggt
     begin
@@ -7654,34 +7717,43 @@ begin
     spectrum.DrawClear;
 end;
 
-
-procedure TNemp_MainForm.PlaylistSelectNextSearchresult;
+procedure TNemp_MainForm.PlaylistSelectNextFlagged(aFlag: Integer);
 var af: TAudioFile;
     currentNode, StartNode: PVirtualNode;
 begin
-    // Select a new Node of the Search results
+    // Select a new Node flagged with "aFlag"
     // Begin with the currently focussed node, or the first node in the playlist
     if assigned(PlaylistVst.FocusedNode) then
         StartNode := PlaylistVst.FocusedNode
     else
         StartNode := PlaylistVst.GetFirst;
     PlaylistVST.Selected[StartNode] := False;
-    // we want the *next* result
+    // we want the *next* node
     // => begin with the next node (or the first one, if the current node is the last one in the playlist)
     currentNode := GetNextNodeOrFirst(PlaylistVST, StartNode);
     repeat
         // get an AudioFile which is marked as a current search result
         af := PlaylistVST.GetNodeData<TAudioFile>(currentNode);
-        if not af.IsSearchResult then
+        if not af.FlaggedWith(aFlag) then
         begin
             PlaylistVST.Selected[currentNode] := False;
             currentNode := GetNextNodeOrFirst(PlaylistVST, currentNode);
         end;
-    until af.IsSearchResult or (currentNode = StartNode);
+    until af.FlaggedWith(aFlag) or (currentNode = StartNode);
 
     PlaylistVST.Selected[currentNode] := true;
     PlaylistVST.ScrollIntoView(currentNode, True);
     PlaylistVST.FocusedNode := currentNode;
+end;
+
+procedure TNemp_MainForm.PlaylistSelectNextDuplicate;
+begin
+  PlaylistSelectNextFlagged(FLAG_DUPLICATE);
+end;
+
+procedure TNemp_MainForm.PlaylistSelectNextSearchresult;
+begin
+  PlaylistSelectNextFlagged(FLAG_SEARCHRESULT);
 end;
 
 procedure TNemp_MainForm.PlaylistSelectAllSearchresults;
@@ -7697,6 +7769,20 @@ begin
     end;
 end;
 
+procedure TNemp_MainForm.PlaylistScrollToPlayingFile;
+var aNode: PVirtualNode;
+begin
+    aNode := GetNodeWithAudioFile(PlaylistVST, NempPlaylist.PlayingFile);
+    // if there is a CueList attached: scroll into the active CueNode
+    if assigned(NempPlaylist.PlayingFile.CueList) then
+      aNode := GetNodeWithCueFile(PlaylistVST, aNode, NempPlayer.GetActiveCue);
+    PlaylistVST.ScrollIntoView(aNode, True);
+end;
+
+procedure TNemp_MainForm.PlayerArtistLabelDblClick(Sender: TObject);
+begin
+  PlaylistScrollToPlayingFile;
+end;
 
 // Event-Handler for the Playlist:
 // Refresh some captions when a new entry in the CueSheet is played
@@ -7720,16 +7806,9 @@ end;
 
 ///  Event-Handler for the Playlist:
 ///  -----------------------------------------------
-///
-
 procedure TNemp_MainForm.PlaylistUserChangedTitle(Sender: TNempPlaylist);
-var aNode: PVirtualNode;
 begin
-    aNode := GetNodeWithAudioFile(PlaylistVST, NempPlaylist.PlayingFile);
-    // if there is a CueList attached: scroll into the active CueNode
-    if assigned(NempPlaylist.PlayingFile.CueList) then
-      aNode := GetNodeWithCueFile(PlaylistVST, aNode, NempPlayer.GetActiveCue);
-    PlaylistVST.ScrollIntoView(aNode, True);
+  PlaylistScrollToPlayingFile;
 end;
 
 ///  PlaylistDeleteFile
@@ -7820,6 +7899,13 @@ begin
   PlaylistVST.Invalidate;
 end;
 
+procedure TNemp_MainForm.OnDuplicateDblClick(Sender: TPlaylistDuplicateCollector; aFile: TAudioFile);
+var
+  aNode: PVirtualNode;
+begin
+  aNode := GetNodeWithAudioFile(PlaylistVST, aFile);
+  PlaylistVST.ScrollIntoView(aNode, True);
+end;
 
 
 procedure TNemp_MainForm.PlaylistAddFile(Sender: TNempPlaylist; aFile: TAudioFile; aIndex: Integer);
@@ -7891,11 +7977,11 @@ end;
 procedure TNemp_MainForm.PlaylistPropertiesChanged(Sender: TNempPlaylist);
 begin
     if Sender.PlaylistManager.CurrentIndex = -1 then
-        PlaylistVST.Header.Columns[0].Text := Format('%s (%d)', [(TreeHeader_Playlist), Sender.Playlist.Count])
+        PlaylistVST.Header.Columns[1].Text := Format('%s (%d)', [(TreeHeader_Playlist), Sender.Playlist.Count])
     else
-        PlaylistVST.Header.Columns[0].Text := Format('%s - %s (%d)', [(TreeHeader_Playlist), Sender.PlaylistManager.CurrentPlaylistDescription,  Sender.Playlist.Count]);
+        PlaylistVST.Header.Columns[1].Text := Format('%s - %s (%d)', [(TreeHeader_Playlist), Sender.PlaylistManager.CurrentPlaylistDescription,  Sender.Playlist.Count]);
 
-    PlaylistVST.Header.Columns[1].Text := SekToZeitString(Sender.Dauer);
+    PlaylistVST.Header.Columns[2].Text := SekToZeitString(Sender.Dauer);
 end;
 
 ///  PlaylistSearchResultsChanged
@@ -8165,7 +8251,10 @@ begin
 
     VK_F3: begin
         if (EditPlaylistSearch.Tag = 1) and (Length(Trim(EditPlaylistSearch.Text)) >= 3) then // search is active
-            PlaylistSelectNextSearchresult;
+          PlaylistSelectNextSearchresult
+        else
+        if assigned(FormPlaylistDuplicates) and FormPlaylistDuplicates.Visible then
+          PlaylistSelectNextDuplicate
     end;
 
     VK_ESCAPE: begin
@@ -8750,12 +8839,12 @@ begin
         //Data := Sender.GetNodeData(Node);
         af := Sender.GetNodeData<TAudioFile>(Node);
 
-        if (Column = 0) and (af.PrebookIndex > 0) then
-             ImageIndex := 18 // timer image
-        else
+        //if (Column = 0) and (af.PrebookIndex > 0) then
+        //     ImageIndex := 18 // timer image
+        //else
         begin
             case Column of
-              0:  begin  // main column
+              1:  begin  // main column
                       //if Sender.GetNodeLevel(Node) = 0 then
                       //begin
                           if Not af.FileIsPresent then
@@ -8775,6 +8864,8 @@ begin
                               if af.FlaggedWith(FLAG_EXACTDUPLICATE) then
                                 ImageIndex := 23;
 
+                              if (af.PrebookIndex > 0) then
+                                ImageIndex := 18;
 
                               // play indicator: Highest priority
                               if (af = NempPlayList.PlayingFile)
@@ -8789,7 +8880,7 @@ begin
                           end;
                       //end;
                   end; // case Column 0
-                  1: begin
+                  2: begin
                         if (af.AudioType = at_File)
                         AND NOT (
                               IsZero(af.TrackGain)
@@ -9577,6 +9668,12 @@ begin
 
 end;
 
+procedure TNemp_MainForm.pmShowColumnIndexClick(Sender: TObject);
+begin
+  NempPlaylist.ShowIndexInTreeview := NOT NempPlaylist.ShowIndexInTreeview;
+  RefreshPlaylistVSTHeader;
+end;
+
 procedure TNemp_MainForm.EDITFastSearchEnter(Sender: TObject);
 begin
   if EditFastSearch.Tag = 0 then
@@ -9596,13 +9693,13 @@ begin
   then
   begin
       //restore last quicksearch
-      RefreshCoverFlowTimer.Enabled := False;
+      //RefreshCoverFlowTimer.Enabled := False;
       DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter);
       // Restart Timer
-      if MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow
-          AND (MedienBib.BrowseMode = 1)
-      then
-          RefreshCoverFlowTimer.Enabled := True;
+      //if MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow
+      //    AND (MedienBib.BrowseMode = 1)
+      //then
+      //    RefreshCoverFlowTimer.Enabled := True;
 
   end;
 end;
@@ -9647,6 +9744,8 @@ begin
     EditPlaylistSearch.Font.Color := clWindowText;
     EditPlaylistSearch.Font.Style := [];
     EditPlaylistSearch.Tag := 1;
+
+
 end;
 
 procedure TNemp_MainForm.EditPlaylistSearchExit(Sender: TObject);
@@ -11263,8 +11362,8 @@ begin
 
     FDetails.ShowDetails(aAudioFile, Source);
     //fDetails.BringToFront;
-    //if ForeGround then
-    //  SetForeGroundWindow(FDetails.Handle);
+    if ForeGround then
+      SetForeGroundWindow(FDetails.Handle);
   end;
 end;
 
@@ -11546,10 +11645,10 @@ end;
 procedure TNemp_MainForm.CoverScrollbarChange(Sender: TObject);
 var aCover: tNempCover;
 begin
-    if CoverScrollbar.Position <= MedienBib.Coverlist.Count -1 then
+    if CoverScrollbar.Position <= MedienBib.CoverViewList.Count -1 then
     begin
         MedienBib.NewCoverFlow.CurrentItem := CoverScrollbar.Position;
-        aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
+        aCover := MedienBib.CoverViewList[CoverScrollbar.Position];
         MedienBib.GenerateAnzeigeListeFromCoverID(aCover.key);
         Lbl_CoverFlow.Caption := aCover.InfoString;
     end;
@@ -11607,11 +11706,11 @@ end;
 procedure TNemp_MainForm.CoverFlowRefreshViewTimerTimer(Sender: TObject);
 var aCover: tNempCover;
 begin
+    CoverFlowRefreshViewTimer.Enabled := False;
     CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
-    aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
+    aCover := MedienBib.CoverViewList[CoverScrollbar.Position];
     MedienBib.GenerateAnzeigeListeFromCoverID(aCover.key);
     Lbl_CoverFlow.Caption := aCover.InfoString;
-    CoverFlowRefreshViewTimer.Enabled := False;
 end;
 
 
@@ -11658,7 +11757,7 @@ begin
     begin
         if OldSelectionPrefix = '' then Exit;
         ActualIndex := CoverScrollbar.Position;
-        Newindex := MedienBib.GetCoverWithPrefix(OldSelectionPrefix, (ActualIndex + 1) Mod MedienBib.Coverlist.Count);
+        Newindex := MedienBib.GetCoverWithPrefix(OldSelectionPrefix, (ActualIndex + 1) Mod MedienBib.CoverViewList.Count);
         CoverScrollbar.Position := NewIndex;
     end;
     VK_ESCAPE: begin

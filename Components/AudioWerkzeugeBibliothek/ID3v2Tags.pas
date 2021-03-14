@@ -1259,11 +1259,16 @@ begin
   if AudioFileExists(Filename) then
     try
       FFilename := Filename;
-      Stream := TAudioFileStream.Create(Filename, fmOpenReadWrite or fmShareDenyWrite);
-      try
-        result := WriteToStream(Stream);
-      finally
-        Stream.Free;
+      if Frames.Count = 0 then
+        result := RemoveFromFile(Filename)
+      else
+      begin
+        Stream := TAudioFileStream.Create(Filename, fmOpenReadWrite or fmShareDenyWrite);
+        try
+          result := WriteToStream(Stream);
+        finally
+          Stream.Free;
+        end;
       end;
     except
       result := FileErr_FileOpenRW;

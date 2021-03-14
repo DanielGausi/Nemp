@@ -35,7 +35,7 @@ unit ClassicCoverflowClass;
 interface
 
 uses Windows, Messages, SysUtils, Graphics, ExtCtrls, ContNrs, Classes,
-    Jpeg, PNGImage, dialogs;
+    Jpeg, PNGImage, dialogs, CoverHelper;
 
 const
     // the same as in FlyingCow
@@ -61,7 +61,7 @@ type
         public
             MainImage: TImage;
             ScrollImage: TImage;
-            CoverList: TObjectList;
+            CoverList: TNempCoverList;
 
             property CurrentItem: Integer read fGetCurrentItem write fSetCurrentItem;
            // property Caption: String read fcaption;
@@ -79,7 +79,7 @@ type
 
 implementation
 
-uses NempMainUnit, CoverHelper, Nemp_ConstantsAndTypes, gnuGettext, Nemp_RessourceStrings;
+uses NempMainUnit, Nemp_ConstantsAndTypes, gnuGettext, Nemp_RessourceStrings;
 
 { TClassicCoverFlow }
 
@@ -132,7 +132,7 @@ begin
 
     if fCurrentItem = -1 then exit;
 
-    aCover := TNempCover(CoverList[fCurrentItem]);
+    aCover := CoverList[fCurrentItem];
 
     fCurrentCoverID := aCover.ID;
 

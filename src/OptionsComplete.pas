@@ -572,6 +572,7 @@ type
     lblCoverflowTextures: TLabel;
     seCoverflowTextureCache: TSpinEdit;
     CB_AccelerateSearchIncludeGenre: TCheckBox;
+    cb_ShowIndexInTreeview: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1341,6 +1342,7 @@ begin
   CB_JumpToNextCue.Checked          := NempPlaylist.JumpToNextCueOnNextClick;
   cb_ReplayCue.Checked              := NempPlaylist.RepeatCueOnRepeatTitle;
   CB_RememberInterruptedPlayPosition.Checked := NempPlaylist.RememberInterruptedPlayPosition;
+  cb_ShowIndexInTreeview.Checked := NempPlaylist.ShowIndexInTreeview;
 
   // Settings for favorite Playlists
   cb_PlaylistManagerAutoSave.Checked := NempPlaylist.PlaylistManager.AutoSaveOnPlaylistChange;
@@ -2573,6 +2575,8 @@ begin
   NempPlaylist.JumpToNextCueOnNextClick        := CB_JumpToNextCue.Checked;
   NempPlaylist.RepeatCueOnRepeatTitle          := cb_ReplayCue.Checked;
   NempPlaylist.RememberInterruptedPlayPosition := CB_RememberInterruptedPlayPosition.Checked;
+  NempPlaylist.ShowIndexInTreeview := cb_ShowIndexInTreeview.Checked;
+  RefreshPlaylistVSTHeader;
 
   // Settings for favorite Playlists
   NempPlaylist.PlaylistManager.AutoSaveOnPlaylistChange  := cb_PlaylistManagerAutoSave.Checked;
@@ -2920,10 +2924,8 @@ begin
           end;
           1: begin
                 MedienBib.ReBuildCoverList;
-                If MedienBib.Coverlist.Count > 3 then
-                    Nemp_MainForm.CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
-                else
-                    Nemp_MainForm.CoverScrollbar.Max := 3;
+                MedienBib.NewCoverFlow.ClearTextures;
+                SetCoverFlowScrollbarRange(MedienBib.CoverViewList);
                 MedienBib.NewCoverFlow.FindCurrentItemAgain;
           end;
           2: begin
@@ -2966,7 +2968,7 @@ begin
       VST.Font.Size := NempOptions.DefaultFontSize;
 
       PlaylistVST.Canvas.Font.Size := maxFont;
-      PlaylistVST.Header.Columns[1].Width := PlaylistVST.Canvas.TextWidth('@99:99hm');
+      PlaylistVST.Header.Columns[2].Width := PlaylistVST.Canvas.TextWidth('@99:99hm');
       PlaylistVSTResize(Nil);
 
       PlaylistVST.Font.Size := NempOptions.DefaultFontSize;
@@ -3178,6 +3180,7 @@ begin
   if assigned(FDetails) then
     fDetails.BuildGetLyricButtonHint;
 
+
   NempOptions.SaveSettings;
   NempSettingsManager.WriteToDisk;
   ReArrangeToolImages;
@@ -3339,7 +3342,7 @@ end;
 procedure TOptionsCompleteForm.CreateParams(var Params: TCreateParams);
 begin
   inherited CreateParams(Params);
-  Params.WndParent := Application.Handle;
+  // Params.WndParent := Application.Handle;
 end;
 
 procedure TOptionsCompleteForm.LblWebserverUserURLClick(Sender: TObject);

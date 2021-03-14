@@ -452,6 +452,7 @@ type
         AutoCloseProgressWindow: Boolean;
         ShowSplashScreen: Boolean;
         MiniNempStayOnTop: Boolean;
+        DetailFormStayOnTop: Boolean;
         FullRowSelect: Boolean;
         TippSpeed: Integer;
 
@@ -555,8 +556,8 @@ const
     NEMP_CAPTION = 'Nemp - Noch ein MP3-Player';
     NEMP_NAME_TASK_LONG = '[ N e m p ]';
     NEMP_NAME_TASK = '[Nemp]';
-    NEMP_VERSION_SPLASH = 'version 4.14';// 'v3.3';
-    NEMP_BASS_DEFAULT_USERAGENT = 'Nemp/4.14';
+    NEMP_VERSION_SPLASH = 'version 4.15';// 'v3.3';
+    NEMP_BASS_DEFAULT_USERAGENT = 'Nemp/4.15';
 
     NEMP_TIPSIZE = 128;
 
@@ -2808,6 +2809,7 @@ begin
   UseCDDB                    := NempSettingsManager.ReadBool('Allgemein', 'UseCDDB', False);
 
   MiniNempStayOnTop := NempSettingsManager.ReadBool('Allgemein', 'MiniNempStayOnTop', False);
+  DetailFormStayOnTop := NempSettingsManager.ReadBool('Allgemein', 'DetailFormStayOnTop', False);
   // FixCoverFlowOnStart := NempSettingsManager.ReadBool('Allgemein', 'FixCoverFlowOnStart', False);
 
   ShutDownModeIniIdx     := NempSettingsManager.ReadInteger('Allgemein',  'ShutDownModeIniIdx'    , 4);
@@ -2897,6 +2899,7 @@ begin
   NempSettingsManager.WriteBool('Allgemein', 'UseCDDB', UseCDDB);
 
   NempSettingsManager.WriteBool('Allgemein', 'MiniNempStayOnTop', MiniNempStayOnTop);
+  NempSettingsManager.WriteBool('Allgemein', 'DetailFormStayOnTop', DetailFormStayOnTop);
   // NempSettingsManager.WriteBool('Allgemein', 'FixCoverFlowOnStart', FixCoverFlowOnStart);
 
   NempSettingsManager.WriteInteger('Allgemein',  'ShutDownModeIniIdx'    , ShutDownModeIniIdx    );

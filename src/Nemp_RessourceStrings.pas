@@ -1100,6 +1100,7 @@ PlaylistManager_Saved      = 'Playlist saved: "%s"';
 
 PlaylistAutoDelay = 'A little break before the next track starts.' + #13#10#13#10 + 'You can change this behavior in the player settings.';
 
+PlaylistDuplicates_NoDuplicatesFound = 'No duplicates found in the playlist.';
 PlaylistDuplicates_NoFileSelected = 'No file selected';
 PlaylistDuplicates_BetweenTracksCaption = 'Between these tracks:';
 PlaylistDuplicates_NoDuplicateInformation = 'No duplicate information available';

@@ -171,6 +171,8 @@ type
     procedure BtnOKClick(Sender: TObject);
     procedure btnDeleteOriginalClick(Sender: TObject);
     procedure btnDeleteDuplicateClick(Sender: TObject);
+    procedure VstDuplicatesColumnDblClick(Sender: TBaseVirtualTree;
+      Column: TColumnIndex; Shift: TShiftState);
   private
     { Private declarations }
     RatingHelper: TRatingHelper;
@@ -184,6 +186,7 @@ type
     fOnDeleteAudioFile: TDuplicateNotifyEvent;
     fOnDeleteOriginalAudioFile: TDuplicateNotifyEvent;
     fOnAfterLastDuplicateDeleted: TDuplicateNotifyEvent;
+    fOnDuplicateDblClick: TDuplicateNotifyEvent;
     fOnAfterRefreshScan: TNotifyEvent;
 
     fPlaylistInfoLabel,
@@ -213,6 +216,7 @@ type
     property OnDeleteOriginalAudioFile: TDuplicateNotifyEvent read fOnDeleteOriginalAudioFile write fOnDeleteOriginalAudioFile;
     property OnAfterLastDuplicateDeleted: TDuplicateNotifyEvent read fOnAfterLastDuplicateDeleted write fOnAfterLastDuplicateDeleted;
     property OnAfterRefreshDuplicateScan: TNotifyEvent read fOnAfterRefreshScan write fOnAfterRefreshScan;
+    property OnDuplicateDblClick: TDuplicateNotifyEvent read fOnDuplicateDblClick write fOnDuplicateDblClick;
 
     procedure RefreshStarGraphics;
     procedure RefreshAnalysisView; // after a Retranslate
@@ -380,6 +384,7 @@ procedure TPlaylistDuplicateCollector.ScanForDuplicates(aPlaylist: TAudioFileLis
 var
   i: Integer;
 begin
+  Clear;
   fPlaylist := aPlaylist;
   // runtime: O(n^2)
   for i := 0 to aPlaylist.Count - 1 do
@@ -390,6 +395,7 @@ procedure TPlaylistDuplicateCollector.RefreshScan;
 var
   i: Integer;
 begin
+  Clear;
   // runtime: O(n^2)
   if assigned(fPlaylist) then
     for i := 0 to fPlaylist.Count - 1 do
@@ -585,6 +591,21 @@ begin
   ShowWarnings(AudioFile);
 end;
 
+procedure TFormPlaylistDuplicates.VstDuplicatesColumnDblClick(
+  Sender: TBaseVirtualTree; Column: TColumnIndex; Shift: TShiftState);
+var
+  clickedFile: TAudioFile;
+  clickedNode: PVirtualNode;
+begin
+  clickedNode := VSTDuplicates.FocusedNode;
+  if assigned(clickedNode) then
+  begin
+    clickedFile := VSTDuplicates.GetNodeData<TAudioFile>(clickedNode);
+    if assigned(OnDuplicateDblClick) then
+      OnDuplicateDblClick(PlaylistDuplicateCollector, clickedFile);
+  end;
+end;
+
 procedure TFormPlaylistDuplicates.VstDuplicatesGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
   var CellText: string);
@@ -594,7 +615,7 @@ begin
   if not assigned(af) then exit;
 
   case Column of
-    0: CellText := IntToStr(PlaylistDuplicateCollector.fPlaylist.IndexOf(af));
+    0: CellText := IntToStr(PlaylistDuplicateCollector.fPlaylist.IndexOf(af)+1);
     1: CellText := NempDisplay.PlaylistTitle(af);
     2: CellText := NempDisplay.TreeDuration(af)
   end;
@@ -816,7 +837,7 @@ begin
     exit;
 
   dest.LblPlaylistPosition.Caption :=
-    Format(PlaylistDuplicates_PositionInPlaylist, [PlaylistDuplicateCollector.fPlaylist.IndexOf(af)]);
+    Format(PlaylistDuplicates_PositionInPlaylist, [PlaylistDuplicateCollector.fPlaylist.IndexOf(af)+1]);
 
   case af.AudioType of
 
@@ -887,7 +908,7 @@ begin
   fCurrentPlaylistFile := af;
   if assigned(af) then begin
     currentPlaylistRating := af.Rating;
-    lblPlaylistIndex.Caption := IntToStr(PlaylistDuplicateCollector.fPlaylist.IndexOf(af));
+    lblPlaylistIndex.Caption := IntToStr(PlaylistDuplicateCollector.fPlaylist.IndexOf(af) + 1);
     LblPlaylistTitle.Caption := NempDisplay.PlaylistTitle(af);
     LblPlaylistTime.Caption := NempDisplay.TreeDuration(af);
   end
@@ -915,10 +936,6 @@ end;
 
 procedure TFormPlaylistDuplicates.ShowDistanceDetails(PlaylistFile, DuplicateFile: TAudioFile);
 var
-  PlaylistIdx, DuplicateIdx, i: Integer;
-  streamFound: Boolean;
-  DurationBetween: Integer;
-  iFile: TAudioFile;
   DistanceData: TDuplicateDistance;
   timeStr: String;
 begin

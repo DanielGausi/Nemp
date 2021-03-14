@@ -598,7 +598,7 @@ begin
   aPlayer.EndFileProcReached := True;
 
   if aPlayer.DoPauseBetweenTracks then
-      SendMessage(aPlayer.MainWindowHandle, WM_PrepareNextFile, 0, 0)
+    SendMessage(aPlayer.MainWindowHandle, WM_PrepareNextFile, 0, 0)
   else
     SendMessage(aPlayer.MainWindowHandle, WM_NextFile, 0, 0);
 end;

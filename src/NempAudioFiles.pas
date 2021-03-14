@@ -209,10 +209,11 @@ type
     // some temporary Flags for AudioFiles
     // only(?) used for the Playlist
     FLAG_SEARCHRESULT = 1;
+    // "Exact Duplicates" (= the same file) must also be flagged as "Duplicates"
+    // otherwise the F3-stepping doesn't work properly
     FLAG_DUPLICATE = 2;
-    FLAG_EXACTDUPLICATE = 4;
-    FLAG_CURRENTDUPLICATE = 8;
-    FLAG_DUPLICATEGENERAL = 6; // 2+4 (??)
+    FLAG_EXACTDUPLICATE = 6; // = 2+4
+    FLAG_DUPLICATEGENERAL = 6; // 2+4
 
  type
     TAudioType = (at_Undef, at_File, at_Stream, at_CDDA, at_CUE);

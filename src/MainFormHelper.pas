@@ -34,7 +34,7 @@ unit MainFormHelper;
 interface
 
 uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTrees,
-    NempAudioFiles, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, dialogs,
+    NempAudioFiles, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, dialogs, CoverHelper,
     MyDialogs, System.UITypes, math, Vcl.ExtCtrls, Vcl.Graphics, RatingCtrls;
 
 type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
@@ -55,6 +55,7 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
 
     procedure FillTreeView(MP3Liste: TAudioFileList; AudioFile:TAudioFile);
     procedure FillTreeViewQueryTooShort;
+    procedure RefreshPlaylistVSTHeader;
 
     function GetDropWindowSection(aControl: TWinControl): TWindowSection;
 
@@ -73,6 +74,7 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     // SwitchBrowsePanel: entsprechendes Anzeigen der Liste
     procedure SwitchBrowsePanel(NewMode: Integer);
 
+    procedure SetCoverFlowScrollbarRange(aList: TNempCoverList);
     procedure RestoreCoverFlowAfterSearch(ForceUpdate: Boolean = False);
 
     procedure ReTranslateNemp(LanguageCode: String);
@@ -124,7 +126,7 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     NewPicture, NewStation, OptionsComplete, RandomPlaylist,
     Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow,
     spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB,
-    ErrorForm, CoverHelper, BasicSettingsWizard, DeleteSelect, CDSelection,
+    ErrorForm, BasicSettingsWizard, DeleteSelect, CDSelection,
     CDOpenDialogs, LowBattery, PlayWebstream, Taghelper, MedienbibliothekClass,
     PlayerLog, progressUnit, Hilfsfunktionen, EffectsAndEqualizer, MainFormBuilderForm,
     ReplayGainProgress, NewMetaFrame, WebQRCodes, PlaylistEditor, NewFavoritePlaylist,
@@ -262,10 +264,8 @@ begin
 
                           1: begin
                               MedienBib.ReBuildCoverList;
-                              If MedienBib.Coverlist.Count > 3 then
-                                CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
-                              else
-                                CoverScrollbar.Max := 3;
+                              MedienBib.NewCoverFlow.ClearTextures;
+                              SetCoverFlowScrollbarRange(MedienBib.CoverViewList);
                               CoverScrollbarChange(Nil);
                           end;
 
@@ -387,6 +387,19 @@ begin
         VST.EndUpdate;
         ShowVSTDetails(Nil);
     end;
+end;
+
+procedure RefreshPlaylistVSTHeader;
+begin
+  with Nemp_MainForm do
+  begin
+    pmShowColumnIndex.Checked := NempPlaylist.ShowIndexInTreeview;
+
+    if NempPlaylist.ShowIndexInTreeview then
+      PlaylistVST.Header.Columns[0].Options := PlaylistVST.Header.Columns[0].Options + [coVisible]
+    else
+      PlaylistVST.Header.Columns[0].Options := PlaylistVST.Header.Columns[0].Options - [coVisible];
+  end;
 end;
 
 // TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
@@ -667,12 +680,9 @@ begin
                     MedienBib.CurrentAlbum := BROWSE_ALL;
                     MedienBib.ReBuildCoverList;
 
-                    MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
+                    MedienBib.NewCoverFlow.SetNewList(MedienBib.CoverViewList, MedienBib.CoverCount);
 
-                    If MedienBib.Coverlist.Count > 3 then
-                        CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
-                    else
-                        CoverScrollbar.Max := 3;
+                    SetCoverFlowScrollbarRange(MedienBib.CoverViewList);
                     CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
                 end;
                 2: begin
@@ -770,6 +780,14 @@ begin
     end;
 end;
 
+procedure SetCoverFlowScrollbarRange(aList: TNempCoverList);
+begin
+  If aList.Count > 3 then
+    Nemp_MainForm.CoverScrollbar.Max := aList.Count - 1
+  else
+    Nemp_MainForm.CoverScrollbar.Max := 3;
+end;
+
 procedure RestoreCoverFlowAfterSearch(ForceUpdate: Boolean = False);
 var aCover: tNempCover;
 begin
@@ -781,19 +799,17 @@ begin
         begin
             RefreshCoverFlowTimer.Enabled := False;
             MedienBib.ReBuildCoverList(False);
-            MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
-            MedienBib.CoverArtSearcher.PrepareMainCover(MedienBib.Coverlist);
+            MedienBib.NewCoverFlow.ClearTextures;
+            // MedienBib.NewCoverFlow.SetNewList(MedienBib.CoverViewList);
+            MedienBib.CoverArtSearcher.PrepareMainCover(MedienBib.CoverViewList);
 
-            If MedienBib.Coverlist.Count > 3 then
-                CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
-            else
-                CoverScrollbar.Max := 3;
-
+            SetCoverFlowScrollbarRange(MedienBib.CoverViewList);
+            MedienBib.NewCoverFlow.FindCurrentItemAgain;
             CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
 
-            if (CoverScrollbar.Position > 0) and (CoverScrollbar.Position < MedienBib.CoverList.Count) then
+            if (CoverScrollbar.Position > 0) and (CoverScrollbar.Position < MedienBib.CoverViewList.Count) then
             begin
-                aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
+                aCover := MedienBib.CoverViewList[CoverScrollbar.Position];
                 Lbl_CoverFlow.Caption := aCover.InfoString;
             end else
                 Lbl_CoverFlow.Caption := '';

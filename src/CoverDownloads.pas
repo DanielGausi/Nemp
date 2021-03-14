@@ -1108,9 +1108,9 @@ end;
 function TCoverDownloadWorkerThread.DownloadItemStillMatchesCoverFlow: Boolean;
 var aCover: TNempCover;
 begin
-    if fCurrentDownloadItem.Index <= MedienBib.Coverlist.Count - 1 then
+    if fCurrentDownloadItem.Index <= MedienBib.CoverViewList.Count - 1 then
     begin
-        aCover := TNempCover(MedienBib.CoverList[fCurrentDownloadItem.Index]);
+        aCover := TNempCover(MedienBib.CoverViewList[fCurrentDownloadItem.Index]);
         result := (aCover.Artist = fCurrentDownloadItem.Artist)
                   and (aCover.Album = fCurrentDownloadItem.Album);
     end else
@@ -1248,19 +1248,38 @@ end;
 
 
 procedure TCoverDownloadWorkerThread.AddLogoToBitmap(aLogo: String; Target: TBitmap);
-var logoBmp: TBitmap;
+var logoPic: TPicture;
+    logoBmp: TBitmap;
     filename: String;
+    SizeX, relevantCoverSize: Integer;
 begin
     // Add Icon to Image
-    filename := ExtractFilePath(ParamStr(0)) + 'Images\' + aLogo + '.bmp';
+    filename := ExtractFilePath(ParamStr(0)) + 'Images\' + aLogo + '.png';
+    if not FileExists(filename) then
+      filename := ExtractFilePath(ParamStr(0)) + 'Images\' + aLogo + '.jpg';
+    if not FileExists(filename) then
+      filename := ExtractFilePath(ParamStr(0)) + 'Images\' + aLogo + '.bmp';
+
+    relevantCoverSize := Target.width;
+    if Target.Height > relevantCoverSize then
+      relevantCoverSize := Target.Height;
+    SizeX := relevantCoverSize Div 10;
+
     if FileExists(filename) then
     begin
+        logoPic := TPicture.Create;
         logoBmp := TBitmap.Create;
         try
-            logoBmp.LoadFromFile(filename);
-            Target.Canvas.Draw(Target.Width - LogoBmp.Width - 2, 3, logoBmp);
+            logoPic.LoadFromFile(filename);
+            logoBmp.Assign(logoPic.Graphic);
+            StretchBlt(Target.Canvas.Handle,
+                  Target.Width - SizeX, 0, SizeX, SizeX,
+                  logoBmp.Canvas.Handle,
+                  0, 0, logoBmp.Width, logoBmp.Height,
+                  SRCCopy);
         finally
             logoBmp.Free;
+            logoPic.Free;
         end;
     end;
 end;
@@ -1356,12 +1375,12 @@ begin
     begin
         NewID := Medienbib.CoverArtSearcher.InitCoverFromFilename(fNewCoverFilename, tm_VCL);
         // as DownloadItemStillMatchesCoverFlow, the access to this index is ok
-        OldID := TNempCover(MedienBib.CoverList[fCurrentDownloadItem.Index]).ID;
+        OldID := TNempCover(MedienBib.CoverViewList[fCurrentDownloadItem.Index]).ID;
 
         MedienBib.ChangeCoverID(OldID, NewID);
 
         // set the new ID on the NempCover-Object
-        TNempCover(MedienBib.CoverList[fCurrentDownloadItem.Index]).ID := NewID;
+        TNempCover(MedienBib.CoverViewList[fCurrentDownloadItem.Index]).ID := NewID;
 
         if  MedienBib.NewCoverFlow.CurrentCoverID = OldID then
             MedienBib.NewCoverFlow.CurrentCoverID := NewID;

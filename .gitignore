@@ -47,3 +47,9 @@ _Unused
 /_web
 /bin/Data/Playlists
 /bin/Data/testmusik/*.mp3
+/Components/AudioWerkzeugeBibliothek/__history
+*.mp3
+/src-help/nemp-help-de.pdf
+/src-help/nemp-help-en.pdf
+/bin/nemp-help-de.pdf
+/bin/nemp-help-en.pdf

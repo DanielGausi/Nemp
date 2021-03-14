@@ -125,7 +125,7 @@ begin
         //Playlist-Einstellungen laden
         NempPlaylist.LoadSettings;
         // MedienBib-Einstellungen laden
-        MedienBib.NewCoverFlow.InitList(MedienBib.Coverlist);
+        MedienBib.NewCoverFlow.InitList(MedienBib.CoverViewList, MedienBib.CoverCount);
         MedienBib.LoadSettings;
 
         VSTColumns_LoadSettings(VST);
@@ -324,10 +324,7 @@ begin
                     MedienBib.ReBuildCoverList;
                     MedienBib.CurrentArtist := BROWSE_ALL;
                     MedienBib.CurrentAlbum := BROWSE_ALL;
-                    If MedienBib.Coverlist.Count > 3 then
-                        CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
-                    else
-                        CoverScrollbar.Max := 3;
+                    SetCoverFlowScrollbarRange(MedienBib.CoverViewList);
                     CoverScrollbarChange(Nil);
                 end;
                 2: begin
@@ -421,7 +418,10 @@ begin
             maxFont := NempOptions.DefaultFontSize;
 
         PlaylistVST.Canvas.Font.Size := maxFont;
-        PlaylistVST.Header.Columns[1].Width := PlaylistVST.Canvas.TextWidth('@99:99hm');
+        PlaylistVST.Header.Columns[2].Width := PlaylistVST.Canvas.TextWidth('@99:99hm');
+        PlaylistVST.Header.Columns[0].Width := PlaylistVST.Canvas.TextWidth('1234');
+        RefreshPlaylistVSTHeader;
+
         VST.Font.Size := NempOptions.DefaultFontSize;
         PlaylistVST.Font.Size := NempOptions.DefaultFontSize;
         if Screen.Fonts.IndexOf(NempOptions.FontNameVBR) = -1 then

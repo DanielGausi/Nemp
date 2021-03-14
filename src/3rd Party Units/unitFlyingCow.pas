@@ -10,13 +10,19 @@
 { - Added support for Delphi 2007                                            }
 {                                                                            }
 { Modified: July-2009 by Daniel Gaussmann (mail@gausi.de)                    }
-{                                                                            }
 { - Added Semaphores for lower CPU-usage                                     }
 { - Added Methods for changing rendering context (switching panels for Nemp) }
 { - Added method "SelectItemAt" to browse the flow by clicking an item       }
 { - Deleted some stuff like Buttons and Captions                             }
 {   (this won't work well with Unicode)                                      }
 {                                                                            }
+{ Modified: 2020-2021 by Daniel Gaussmann (mail@gausi.de)                    }
+{ - improved Item selection                                                  }
+{ - configuration possible                                                   }
+{     X-Position of the middle cover                                         }
+{     angles                                                                 }
+{     gaps                                                                   }
+{     reflexions                                                             }
 {                                                                            }
 {****************************************************************************}
 {                                                                            }
@@ -162,6 +168,8 @@ type
     fQueryUpdateTexturePick_width : Integer;
     fQueryUpdateTexturePick_height : Integer;
 
+    fQueryUpdateItemCount: Integer;
+    fQueryUpdateItems: Boolean;
 
     fPendingPreview : Boolean;
     fEventsWindow : HWND;
@@ -183,6 +191,8 @@ type
 
     procedure InitRendering;
     procedure ReInitHandles;
+
+    procedure UpdateItemCount;
 
   protected
     procedure Execute; override;
@@ -220,31 +230,27 @@ type
     function getCurrentItem: Integer;
     procedure setCurrentItem(index: Integer);
   public
+    property Count : Integer read fCount;
+    property CurrentItem : Integer read getCurrentItem write setCurrentItem;
+
+
     constructor Create (window, events_window : HWND);
+    destructor Destroy; override;
+    procedure BeginUpdate;
+    procedure EndUpdate;
     procedure Clear;
     procedure Cleartextures;
-    // property Item [index : Integer] : TFlyingCowItem read getItem;
-    property Count : Integer read fCount;
-    // procedure Add (item : TFlyingCowItem);
     procedure AddItems(ItemCount: Integer);
 
-    //procedure Insert (index : Integer; item : TFlyingCowItem);
-    // procedure Delete (index : Integer);
     procedure DoSomeDrawing(value: Integer);
-    property CurrentItem : Integer read getCurrentItem write setCurrentItem;
     procedure SetPreview (index : Integer; width, height : Integer; pixels : PByteArray);
 
     procedure SetMainPickCoverPreview(width, height : Integer; pixels : PByteArray);
     procedure SelectItemAt(X,Y: Integer);
-    procedure BeginUpdate;
-    procedure EndUpdate;
 
     procedure SetNewHandle(aWnd: HWND);
     procedure SetColor(r,g,b: Integer);
-
     procedure ApplySettings(aSettings: TCoverFlowSettings);
-
-    destructor Destroy; override;
   end;
 
 
@@ -262,42 +268,20 @@ begin
   //fThread.Start;
 end;
 
-procedure TFlyingCow.AddItems(ItemCount: Integer);
-var
-  i: Integer;
+destructor TFlyingCow.Destroy;
 begin
-  if not fBeginUpdate then
-    fThread.PauseRender;
-  fCount := ItemCount;
-  SetLength (fThread.fItem, Count);
-  fThread.UpdateItems;
-  for i := 0 to ItemCount-1 do
-  begin
-    fThread.fItem[i].x := fThread.fItem[i].nx;
-    fThread.fItem[i].r := fThread.fItem[i].nr;
-    fThread.fItem[i].z := fThread.fItem[i].nz;
-    fThread.fItem[i].texture.handle := 0;
-  end;
-  fThread.fSelectedItem := 0;
-  if not fBeginUpdate then
-      fThread.ResumeRender;
+    BeginUpdate;
+    Clear;
+    try
+        fThread.Terminate;
+        fThread.WaitFor;
+        fThread.Free;
+    except
+        // nothing
+    end;
+    fThread := Nil;
+    inherited destroy;
 end;
-
-(*
-procedure TFlyingCow.Add(item: TFlyingCowItem);
-begin
-  If Not fBeginUpdate Then
-    fThread.PauseRender;
-  fItem.Add (item);
-  SetLength (fThread.fItem, Count);
-  fThread.UpdateItems;
-  fThread.fItem[Count-1].x := fThread.fItem[Count-1].nx;
-  fThread.fItem[Count-1].r := fThread.fItem[Count-1].nr;
-  fThread.fItem[Count-1].z := fThread.fItem[Count-1].nz;
-  fThread.fItem[Count-1].texture.handle := 0;
-  If Not fBeginUpdate Then
-      fThread.ResumeRender;
-end; *)
 
 procedure TFlyingCow.BeginUpdate;
 begin
@@ -315,20 +299,7 @@ end;
 
 procedure TFlyingCow.Clear;
 begin
-  If Not fBeginUpdate Then
-  begin
-    BeginUpdate;
-    fCount := 0;
-    Cleartextures;
-    SetLength (fThread.fItem, fCount);
-    EndUpdate;
-  end
-  else
-  begin
-    fCount := 0;
-    Cleartextures;
-    SetLength (fThread.fItem, fCount);
-  end;
+  AddItems(0);
 end;
 
 procedure TFlyingCow.Cleartextures;
@@ -342,40 +313,16 @@ begin
     fThread.ResumeRender;
 end;
 
-
-(*
-procedure TFlyingCow.Delete(index: Integer);
-var
-  i : Integer;
+procedure TFlyingCow.AddItems(ItemCount: Integer);
 begin
-  If Not fBeginUpdate Then
+  if not fBeginUpdate then
     fThread.PauseRender;
-  Item[index].Free;
-  fItem.Delete (index);
-  If fThread.fItem[index].texture.handle <> 0 Then
-    fThread.DeleteTexture (index);
-  For i := index To Count-1 do
-    fThread.fItem[i] := fThread.fItem[i+1];
-  fThread.UpdateItems;
-  SetLength (fThread.fItem, Count);
-  If Not fBeginUpdate Then
-    fThread.ResumeRender;
-end;
-*)
+  fCount := ItemCount;
+  fThread.fQueryUpdateItemCount := ItemCount;
+  // This will start TRenderThread.UpdateItemCount through RenderThread-MainMethod
 
-destructor TFlyingCow.Destroy;
-begin
-    BeginUpdate;
-    Clear;
-    try
-        fThread.Terminate;
-        fThread.WaitFor;
-        fThread.Free;
-    except
-        // nothing
-    end;
-    fThread := Nil;
-    inherited destroy;
+  if not fBeginUpdate then
+      fThread.ResumeRender;
 end;
 
 procedure TFlyingCow.DoSomeDrawing(value: Integer);
@@ -388,35 +335,6 @@ begin
 end;
 
 
-(*
-function TFlyingCow.getCount: Integer;
-begin
-  Result := fItem.Count;
-end;
-
-function TFlyingCow.getItem(index: Integer): TFlyingCowItem;
-begin
-  Result := fItem[index];
-end;
-
-
-
-procedure TFlyingCow.Insert(index: Integer; item: TFlyingCowItem);
-var
-  i : Integer;
-begin
-  fThread.PauseRender;
-  fItem.Insert (index, item);
-  SetLength (fThread.fItem, fItem.Count);
-  For i := fItem.Count-1 DownTo index+1 do
-    fThread.fItem[i] := fThread.fItem[i-1];
-  fThread.UpdateItems;
-  fThread.fItem[index].x := fThread.fItem[index].nx;
-  fThread.fItem[index].r := fThread.fItem[index].nr;
-  fThread.fItem[index].z := fThread.fItem[index].nz;
-  fThread.ResumeRender;
-end;    *)
-
 procedure TFlyingCow.SelectItemAt(X, Y: Integer);
 begin
   fThread.PauseRender;
@@ -427,12 +345,10 @@ begin
 end;
 
 
-
 function TFlyingCow.getCurrentItem: Integer;
 begin
   Result := fThread.fCurrentItem;
 end;
-
 
 procedure TFlyingCow.setCurrentItem (index: Integer);
 begin
@@ -448,15 +364,10 @@ end;
 procedure TFlyingCow.SetNewHandle(aWnd: HWND);
 begin
     fThread.PauseRender;
-
     fThread.fNewHandle := aWnd;
     fThread.fNewHandleNeeded := True;
-
-    // Clear Textures
-    //for i := 0 to self.Count - 1 do
-    //  If fThread.fItem[i].texture.handle <> 0 Then
+    // clear textures, we need to reinit rendering completeley
     fThread.QueryToClearTextures;
-
     fThread.ResumeRender;
     DoSomeDrawing(20);
 end;
@@ -488,7 +399,7 @@ begin
   fThread.Settings := aSettings;
   fThread.BL_Cover := -0.75;
   fThread.BL_Reflexion := -0.75 - (aSettings.GapReflexion / 100);
-  fThread.UpdateItems;
+  fThread.fQueryUpdateItems := True;
   fThread.ResumeRender;
   DoSomeDrawing(50);
 end;
@@ -498,21 +409,6 @@ begin
   fThread.SetMainPickCoverPreview(width, height, pixels);
 end;
 
-
-{ TFlyingCowItem }
-(*
-constructor TFlyingCowItem.Create(name, kind, tag: String);
-begin
-  self.Name := name;
-  self.Kind := kind;
-  self.Tag  := tag;
-end;
-
-function FlyingCowItem (name, kind, tag : String) : TFlyingCowItem;
-begin
-  Result := TFlyingCowItem.Create (name, kind, tag);
-end;
-*)
 
 { TRenderThread }
 
@@ -532,6 +428,8 @@ begin
   fQueryDeleteTexture := -1;
   fQueryUpdateTexture := -1;
   fQueryUpdateTexturePick := -1;
+  fQueryUpdateItemCount := -1;
+  fQueryUpdateItems := False;
   fPendingPreview := False;
   fEventsWindow := events_window;
   fXClicked := -1;
@@ -638,6 +536,22 @@ begin
                 end;
 
                 MoreNeeded := False;
+
+                if fQueryUpdateItemCount >= 0 then
+                begin
+                  // the itemCount of the Coverflow has been changed
+                  UpdateItemCount;
+                  localDoRender := True;
+                  MoreNeeded := True;
+                end;
+
+                if fQueryUpdateItems then
+                begin
+                  UpdateItems;
+                  localDoRender := True;
+                  MoreNeeded := True;
+                end;
+
                 // Petición de borrar una textura
                 If fQueryDeleteTexture >= 0 Then
                 begin
@@ -1045,8 +959,6 @@ procedure TRenderThread.RenderClick(check_missings : Boolean; rc: TRect);
 var
   modelMatrix, projMatrix : TGLMatrixd4;
   viewport : TGLVectori4;
-  //vx_nearest : Single;
-  //vx_index : Integer;
   i : Integer;
   vx, vy, vz : GLDouble;
   w, h : Single;
@@ -1058,8 +970,6 @@ begin
   glGetDoublev (GL_PROJECTION_MATRIX, @projMatrix);
   glGetIntegerv (GL_VIEWPORT, @viewport);
 
-  // vx_index := -1;
-  // vx_nearest := 0;
   For i := 0 To High(fItem) do
   begin
     // Determinar si el item cae dentro de la pantalla
@@ -1072,28 +982,6 @@ begin
     //If (vx >= (rc.Right-rc.Left) div 8) And (vx < (rc.Right-rc.Left)*7 div 8) Then
     If (vx >= -(rc.Right-rc.Left) div 2) And (vx < (rc.Right-rc.Left)*3 div 2) Then
     begin
-
-      {If fItem[i].texture.handle = 0 Then
-      begin
-        If check_missings Then
-        begin
-          // El item no tiene preview
-          If fItem[i].nx < -2.0 Then
-              gluProject (fItem[i].nx+Cos(fItem[i].nr), 0.0, -Abs(Sin(fItem[i].nr))-Abs(2.0*Sin(fItem[i].nr)), modelMatrix, projMatrix, viewport, @vx, @vy, @vz)
-          else If fItem[i].nx > 2.0 Then
-              gluProject (fItem[i].nx-Cos(fItem[i].nr), 0.0, -Abs(Sin(fItem[i].nr))-Abs(2.0*Sin(fItem[i].nr)), modelMatrix, projMatrix, viewport, @vx, @vy, @vz)
-          else
-              vx := (rc.Right - rc.Left) / 2.0;
-
-          If (vx_index = -1) Or (Abs(vx-(rc.Right-rc.Left) div 2) < vx_nearest) Then
-          begin
-              vx_index := i;
-              vx_nearest := Abs(vx-(rc.Right-rc.Left) div 2);
-          end;
-        end;
-      end
-      else  }
-      begin
         // Item preview
         if i = 0 then
         begin
@@ -1114,10 +1002,9 @@ begin
           glDisable(GL_Blend);
 
           glColor3f(
-          (i and $000000FF) / 255,
-          ((i and $0000FF00) shr 8) / 255,
-          ((i and $00FF0000) shr 16) / 255
-        );
+            (i and $000000FF) / 255,
+            ((i and $0000FF00) shr 8) / 255,
+            ((i and $00FF0000) shr 16) / 255 );
         end;
 
         aRenderItem.texture.age := 0;
@@ -1151,24 +1038,8 @@ begin
           glVertex3f (fItem[i].x-w*Cos(fItem[i].r), BL_Reflexion, -w*Sin(fItem[i].r) + fItem[i].z);
           glEnd;
         end;
-      end;
     end
   end;
-  {
-  // Pedir algún preview que aún no tenemos
-  If check_missings and (not Terminated) Then
-  begin
-    If (vx_index >= 0) And (Not fPendingPreview) Then
-    begin
-      fPendingPreview := True;
-      SendMessageCallback (fEventsWindow, WM_FC_NEEDPREVIEW, vx_index, 0, @previewCallback, Cardinal(@self.fPendingPreview));
-    end
-    else
-    begin
-      // The callback function is called only when the thread that called SendMessageCallback also calls GetMessage, PeekMessage, or WaitMessage.
-      PeekMessage (msg, 0, 0, 0, PM_NOREMOVE);
-    end;
-  end; }
 end;
 
 procedure TRenderThread.PauseRender;
@@ -1201,7 +1072,7 @@ begin
    {$ELSE}
     InterlockedCompareExchange (Pointer(fQueryUpdateTexture), Pointer(index), Pointer(-1));
    {$IFEND}
-   
+
   fQueryUpdateTexture_width := width;
   fQueryUpdateTexture_height := height;
   fQueryUpdateTexture_pixels := pixels;
@@ -1337,9 +1208,34 @@ begin
   fQueryUpdateTexturePick := -1;
 end;
 
+
+
+// The number of items in the coverflow has been changed
+// reinit Textures, Positions etc. of the fItem-Array
+// Thread: OpenGL-RenderThread
+procedure TRenderThread.UpdateItemCount;
+var i: Integer;
+begin
+  if fQueryUpdateItemCount < 0 then
+    exit;
+
+  ClearTextures; // ??
+
+  SetLength (fItem, fQueryUpdateItemCount);
+  UpdateItems;
+  for i := 0 to High(fItem) do
+  begin
+    fItem[i].x := fItem[i].nx;
+    fItem[i].r := fItem[i].nr;
+    fItem[i].z := fItem[i].nz;
+    fItem[i].texture.handle := 0;  // ?? ggf. doppelt gemacht
+  end;
+  fSelectedItem := 0;
+  fQueryUpdateItemCount := -1;
+end;
+
 // x,r,z: Aktuelle x/y-Position und Winkel
 // nx,nr,nz: Position, wo es hinsoll (next x, next y, next r (?))
-
 procedure TRenderThread.StepItems;
 var
   i : Integer;
@@ -1383,6 +1279,7 @@ begin
       fItem[i].nz := Settings.zMain/100;
     end;
   end;
+  fQueryUpdateItems := False;
 end;
 
 

@@ -168,16 +168,16 @@ const
     UPDATE_NEWERTEST_VERSION = 8;
     UPDATE_PRIVATE_VERSION = 9;
 
-    UPDATE_URL = 'http://www.gausi.de/nemp/update_summary.txt'; // new URL since 4.13
+    UPDATE_URL = 'https://www.gausi.de/nemp/update_summary.txt'; // new URL since 4.13
 
     // some RTF files with ReleaseNotes (new in 4.13)
-    RELEASENOTES_URL = 'http://www.gausi.de/nemp/updates.rtf';
-    RELEASENOTES_BETA_URL = 'http://www.gausi.de/nemp/updates_beta.rtf';
-    RELEASENOTES_DEV_URL = 'http://www.gausi.de/nemp/updates_dev.rtf';
+    RELEASENOTES_URL = 'https://www.gausi.de/nemp/updates.rtf';
+    RELEASENOTES_BETA_URL = 'https://www.gausi.de/nemp/updates_beta.rtf';
+    RELEASENOTES_DEV_URL = 'https://www.gausi.de/nemp/updates_dev.rtf';
 
-    RELEASENOTES_URL_DE = 'http://www.gausi.de/nemp/updates_de.rtf';
-    RELEASENOTES_BETA_URL_DE = 'http://www.gausi.de/nemp/updates_beta_de.rtf';
-    RELEASENOTES_DEV_URL_DE = 'http://www.gausi.de/nemp/updates_dev_de.rtf';
+    RELEASENOTES_URL_DE = 'https://www.gausi.de/nemp/updates_de.rtf';
+    RELEASENOTES_BETA_URL_DE = 'https://www.gausi.de/nemp/updates_beta_de.rtf';
+    RELEASENOTES_DEV_URL_DE = 'https://www.gausi.de/nemp/updates_dev_de.rtf';
 
 
 Var
@@ -589,9 +589,9 @@ end;
 procedure TUpdateForm.BtnDownloadClick(Sender: TObject);
 begin
     if (LeftStr(NempOptions.Language,2) = 'de') then
-        ShellExecute(Handle, 'open', 'http://www.gausi.de/nemp.html', nil, nil, SW_SHOW)
+        ShellExecute(Handle, 'open', 'https://www.gausi.de/nemp.html', nil, nil, SW_SHOW)
     else
-        ShellExecute(Handle, 'open', 'http://www.gausi.de/nemp-en.html', nil, nil, SW_SHOW);
+        ShellExecute(Handle, 'open', 'https://www.gausi.de/nemp-en.html', nil, nil, SW_SHOW);
 end;
 
 procedure TUpdateForm.FormCreate(Sender: TObject);

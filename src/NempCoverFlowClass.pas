@@ -53,7 +53,8 @@ type
             fFlyingCow: TFlyingCow;
             fMode: TCoverFlowMode;
 
-            fCoverList: TObjectList;
+            fCoverList: TNempCoverList;
+            fCoverCount: Integer;
 
             fDownloadThread: TCoverDownloadWorkerThread;
 
@@ -96,8 +97,8 @@ type
 
             // After a reinit of the library (swapping lists)
             // we need to correct the CoverList-Pointer
-            procedure SetNewList(aList: TObjectList; FallBackToZero: Boolean = False);
-            procedure InitList(aList: TObjectList);
+            procedure SetNewList(aList: TNempCoverList; CompleteCount: Integer; FallBackToZero: Boolean = False);
+            procedure InitList(aList: TNempCoverList; CompleteCount: Integer);
 
             // Clear Textures and force redrawing
             procedure ClearTextures;
@@ -139,7 +140,6 @@ uses NempMainUnit, Nemp_ConstantsAndTypes;
 { TNempCoverFlow }
 
 procedure TNempCoverFlow.fSetMode(aValue: TCoverFlowMode);
-var i: integer;
 begin
     // fallback to classic-mode, if opengl was not initialized
     if (aValue = cm_OpenGL) and (not OPENGL_InitOK) then
@@ -173,7 +173,6 @@ begin
             Nemp_MainForm.PanelCoverBrowse.DoubleBuffered := True;
             Nemp_MainForm.CoverScrollbar.DoubleBuffered := False;
 
-
             //FreeAndNil(fFlyingCow);
         end;
 
@@ -181,19 +180,11 @@ begin
         begin
             fMode := aValue;
             if Not Assigned(fFlyingCow) then
-            begin
                 fFlyingCow := tFlyingCow.Create(window, events_Window);
-            end;
-                fFlyingCow.BeginUpdate;
-                fFlyingCow.AddItems(fCoverList.Count);
-                {for i := 0 to fCoverList.Count - 1 do
-                begin
-                    fFlyingCow.Add(TFlyingCowItem.Create(TNempCover(fCoverList[i]).ID,
-                                      TNempCover(fCoverList[i]).Artist,
-                                      TNempCover(fCoverList[i]).Album));
-                end; }
-                fFlyingCow.EndUpdate;
 
+            fFlyingCow.BeginUpdate;
+            fFlyingCow.AddItems(fCoverCount);
+            fFlyingCow.EndUpdate;
 
             Nemp_MainForm.IMGMedienBibCover.Visible := False;
             Nemp_MainForm.Lbl_CoverFlow.Visible     := True;
@@ -206,7 +197,6 @@ begin
             SetNewHandle(Nemp_MainForm.PanelCoverBrowse.Handle);
 
             fFlyingCow.CurrentItem := fCurrentItem;
-
 
             //FreeAndNil(fClassicFlow);
         end;
@@ -446,37 +436,28 @@ begin
     end;
 end;
 
-procedure TNempCoverFlow.InitList(aList: TObjectList);
+procedure TNempCoverFlow.InitList(aList: TNempCoverList; CompleteCount: Integer);
 begin
     fCoverList := aList;
+    fCoverCount := CompleteCount;
     case fMode of
         cm_Classic : fClassicFlow.CoverList := aList;
         cm_OpenGL  : ;
     end;
 end;
 
-procedure TNempCoverFlow.SetNewList(aList: TObjectList; FallBackToZero: Boolean = False);
-var i: Integer;
+procedure TNempCoverFlow.SetNewList(aList: TNempCoverList; CompleteCount: Integer; FallBackToZero: Boolean = False);
 begin
     fCoverList := aList;
+    fCoverCount := CompleteCount;
     case fMode of
         cm_Classic : fClassicFlow.CoverList := aList;
         cm_OpenGL  : begin
               fFlyingCow.BeginUpdate;
-              fFlyingCow.Clear;
-              //fFlyingCow.Cleartextures;
-              fFlyingCow.AddItems(aList.Count);
-
-              {for i := 0 to aList.Count - 1 do
-              begin
-                  fFlyingCow.Add(TFlyingCowItem.Create(//'' , '' , ''
-                                      TNempCover(aList[i]).ID,
-                                      TNempCover(aList[i]).Artist,
-                                      TNempCover(aList[i]).Album
-                                      ));
-              end;}
+              // fFlyingCow.Clear;
+              // fFlyingCow.Cleartextures;
+              fFlyingCow.AddItems(fCoverCount); // aList.Count);
               fFlyingCow.EndUpdate;
-
               fFlyingCow.DoSomeDrawing(10);
         end;
     end;

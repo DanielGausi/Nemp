@@ -1608,6 +1608,7 @@ begin
 
     WM_PlayerDelayCompleted: begin
       RefreshPaintFrameHint(False);
+      PlaylistVST.Invalidate; // to refresh the Play/Stop-Image in the Treeview
     end;
 
     WM_StopPlaylist : begin

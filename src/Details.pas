@@ -220,6 +220,7 @@ type
     rgChangeCoverArt: TRadioGroup;
     cbFrameTypeSelection: TComboBox;
     VST_MetaData: TVirtualStringTree;
+    cbStayOnTop: TCheckBox;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -323,6 +324,8 @@ type
     procedure BtnRefreshCoverflowClick(Sender: TObject);
     procedure VST_MetaDataCompareNodes(Sender: TBaseVirtualTree; Node1,
       Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
+    procedure cbIDv1GenresChange(Sender: TObject);
+    procedure cbStayOnTopClick(Sender: TObject);
   protected
     procedure CreateParams(var Params: TCreateParams); override;
 
@@ -363,6 +366,8 @@ type
 
     CoverArtSearcher: TCoverArtSearcher;
 
+    // procedure SetStayOnTop(aValue: Boolean);
+
     procedure LoadPictureIntoImage(aFilename: String; aImage: TImage);
 
     // Show some information of the selected audiofile
@@ -380,6 +385,7 @@ type
     procedure ApplyEditsToTagObject;
     procedure ApplyTagListToTagObject;
     procedure RemoveNiledFrames;
+    procedure ApplyCoverIDChanges;
 
     procedure ShowMediaBibDetails;
     procedure ShowMPEGDetails(mp3: TMp3File);
@@ -395,11 +401,15 @@ type
     procedure ReloadDataAfterEdit(aERR: TNempAudioError);
     function CurrentFileHasBeenChanged: Boolean;
 
+    function GetID3v1TagfromBaseAudioFile(aBaseAudioFile: TBaseAudioFile): TID3v1Tag;
+
   public
     CurrentTagObject: TBaseAudioFile;
     CurrentTagObjectWriteAccessPossible: Boolean;
     CurrentAudioFile : TAudioFile;
-    NewLibraryCoverID: String;
+    NewLibraryCoverID,
+    NewLibraryCoverID_FileSave: String;
+
     MetaTagType: TTagType;
 
     procedure RefreshStarGraphics;
@@ -526,6 +536,9 @@ begin
 
   VST_MetaData.NodeDataSize := sizeOf(TTagEditItem);
   CoverArtSearcher := TCoverArtSearcher.Create;
+
+  cbStayOnTop.Checked := NempOptions.DetailFormStayOnTop;
+  // SetStayOnTop(NempOptions.DetailFormStayOnTop);
 end;
 
 
@@ -548,6 +561,7 @@ begin
 //    MainPageControl.ActivePage := Tab_General;
     BuildGetLyricButtonHint;
     // refresh;
+
 end;
 
 
@@ -573,6 +587,32 @@ begin
     end;
 end;
 {$ENDREGION}
+
+procedure TFDetails.cbStayOnTopClick(Sender: TObject);
+begin
+  NempOptions.DetailFormStayOnTop := cbStayOnTop.Checked;
+  RecreateWnd;
+  //SetStayOnTop(NempOptions.DetailFormStayOnTop);
+end;
+procedure TFDetails.CreateParams(var Params: TCreateParams);
+begin
+  inherited CreateParams(Params);
+  if not NempOptions.DetailFormStayOnTop then
+    Params.WndParent := Application.Handle;
+end;
+(*
+procedure TFDetails.SetStayOnTop(aValue: Boolean);
+begin
+  //RecreateWnd;
+  //if aValue then
+    //FormStyle := fsStayOnTop
+    //SetWindowPos (Handle, HWND_TOPMOST, -1, -1, -1, -1, SWP_NOMOVE + SWP_NOSIZE)
+ //   self.PopupParent := Nemp_MainForm
+  //else
+    //FormStyle := fsNormal;
+    //SetWindowPos (Handle, HWND_NOTOPMOST, -1, -1, -1, -1, SWP_NOMOVE + SWP_NOSIZE)
+  //  self.PopupParent := Nil;
+end; *)
 
 
 {
@@ -841,6 +881,68 @@ begin
     end;
 end;
 
+procedure TFDetails.ApplyCoverIDChanges;
+var
+  aErr: TNempAudioError;
+  oldCoverID: String;
+  CoverIDFiles: TAudioFileList;
+  loopAudioFile: TAudioFile;
+  i: Integer;
+begin
+  OldCoverID := CurrentAudioFile.CoverID;
+
+  CurrentAudioFile.CoverID := NewLibraryCoverID;
+  //  Change also all the files in the library
+  //  Note: Setting the Value to CurrentAudioFile is still useful, as this file may be in the Playlist only
+  if rgChangeCoverArt.ItemIndex > 0 then
+  begin
+      ///  We don't need to do a InitCover for the currentAudioFile,
+      ///  but we may need it for the other files with the oldCoverID, as
+      ///  they may have been grouped together by the same User-CoverID before.
+      ///  Now they should be separated again, if needed.
+      CoverArtSearcher.StartNewSearch;
+      CoverIDFiles := TAudioFileList.create(False);
+      try
+          // get the list of files which need to be changed
+          case rgChangeCoverArt.ItemIndex of
+              1: MedienBib.GetTitelListFromCoverIDUnsorted(CoverIDFiles, OldCoverID);
+              2: MedienBib.GetTitelListFromDirectoryUnsorted(CoverIDFiles, CurrentAudioFile.Ordner);
+          end;
+
+          for i := 0 to CoverIDFiles.Count - 1 do
+          begin
+              loopAudioFile := CoverIDFiles[i];
+              loopAudioFile.CoverID := NewLibraryCoverID_FileSave;
+
+              aErr := loopAudioFile.WriteUserCoverIDToMetaData(AnsiString(NewLibraryCoverID_FileSave), True);
+              if aErr <> AUDIOERR_None then
+                  HandleError(afa_EditingDetails, CurrentAudioFile, aErr, True);
+
+              /// get a "new valid" Cover-ID with the usual Nemp methods
+              ///  In most cases this should be the same as NewLibraryCoverID
+              if NewLibraryCoverID_FileSave = '' then
+                CoverArtSearcher.InitCover(loopAudioFile, tm_VCL, INIT_COVER_DEFAULT);
+          end;
+      finally
+          CoverIDFiles.Free;
+      end;
+
+      // also: Set the Cover-ID of all Playlist-Files
+      // But do not write the MetaTags again. That should have been done in the Library-Loop
+      for i := 0 to NempPlayList.Playlist.count - 1 do
+      begin
+          loopAudioFile := NempPlaylist.Playlist.Items[i];
+          if loopAudioFile.IsFile and (loopAudioFile.CoverID = OldCoverID) then
+          begin
+            if NewLibraryCoverID_FileSave = '' then
+              CoverArtSearcher.InitCover(loopAudioFile, tm_VCL, INIT_COVER_DEFAULT)
+            else
+              loopAudioFile.CoverID := NewLibraryCoverID;
+          end;
+      end;
+  end;
+end;
+
 procedure TFDetails.RemoveNiledFrames;
 var aNode, nextNode: PVirtualNode;
     aTagEditItem: TTagEditItem;
@@ -912,12 +1014,9 @@ end;
 
 procedure TFDetails.BtnApplyClick(Sender: TObject);
 var aErr: TNempAudioError;
-    oldCoverID: String;
-    i: Integer;
-    CoverIDFiles: TAudioFileList;
-    loopAudioFile: TAudioFile;
     ApeFile: TBaseApeFile;
     mp3File: TMp3File;
+    DataWritten: Boolean;
 begin
 
     if not CurrentTagObject.Valid then
@@ -967,7 +1066,7 @@ begin
             ApplyEditsToTagObject;
 
         aErr := AUDIOERR_None;
-
+        DataWritten := False;
         case currenttagObject.FileType of
             ///  Apetags are now supported in mp3Files
             ///  However, Lyrics and Pictures are only stored in ID3v2. There will be no duplicates
@@ -976,23 +1075,33 @@ begin
                   mp3File := TMP3File(CurrentTagObject);
                   // we need to take care of ID3v1 vs. ID3v2 vs. APEv2 here.
                   if ID3v1HasChanged or (LibraryPropertyChanged and mp3File.ID3v1Tag.Exists) then
+                  begin
                       // this will also remove the ID3v1-Tag, if all Edits are empty
                       aErr := AudioToNempAudioError(UpdateID3v1InFile(mp3File.ID3v1Tag));
+                      DataWritten := aErr = AUDIOERR_None;
+                  end;
 
                   // New in 4.15.: ApeTags are supported as well for mp3-files
                   // (but only rudimentary)
                   if  (LibraryPropertyChanged AND mp3File.ApeTag.Exists)
                       or MetaFramesHasChanged
-                  then
+                  then begin
                       // if ApeTag contains no data any more, it will be removed by "WriteToFile".
                       aErr := AudioToNempAudioError(mp3File.ApeTag.WriteToFile(CurrentAudioFile.Pfad));
+                      DataWritten := aErr = AUDIOERR_None;
+                  end;
 
                   if  (LibraryPropertyChanged AND mp3File.ID3v2Tag.Exists)
                       or CurrentTagRatingChanged or MetaFramesHasChanged or LyricsHasChanged
                       or TagCloudTagsChanged or PictureHasChanged or CoverArtHasChanged
-                  then
+                  then begin
                       // write the ID3v2-MetaFrames into the file now
                       aErr := AudioToNempAudioError(mp3File.ID3v2Tag.WriteToFile(CurrentAudioFile.Pfad));
+                      DataWritten := aErr = AUDIOERR_None;
+                  end;
+
+                  if LibraryPropertyChanged and (not DataWritten) then
+                    mp3File.WriteToFile(CurrentAudioFile.Pfad);
             end;
 
             at_Monkey,
@@ -1002,15 +1111,23 @@ begin
             at_TrueAudio: begin
                   ApeFile := TBaseApeFile(CurrentTagObject);
                   if ID3v1HasChanged or (LibraryPropertyChanged and ApeFile.ID3v1Tag.Exists) then
+                  begin
                       // this will also remove the ID3v1-Tag, if all Edits are empty
                       aErr := AudioToNempAudioError(UpdateID3v1InFile(ApeFile.ID3v1Tag));
+                      DataWritten := aErr = AUDIOERR_None;
+                  end;
 
                   if  (LibraryPropertyChanged AND ApeFile.ApeTag.Exists)
                       or CurrentTagRatingChanged or MetaFramesHasChanged or LyricsHasChanged
                       or TagCloudTagsChanged or PictureHasChanged or CoverArtHasChanged
-                  then
+                  then begin
                       // write the Apev2-Tag into the file
                       aErr := AudioToNempAudioError(ApeFile.ApeTag.WriteToFile(CurrentAudioFile.Pfad));
+                      DataWritten := aErr = AUDIOERR_None;
+                  end;
+
+                  if LibraryPropertyChanged and (not DataWritten) then
+                    ApeFile.WriteToFile(CurrentAudioFile.Pfad);
             end;
 
         else
@@ -1025,54 +1142,8 @@ begin
 
         if CoverArtHasChanged then
         begin
-            OldCoverID := CurrentAudioFile.CoverID;
+          ApplyCoverIDChanges;
 
-            CurrentAudioFile.CoverID := NewLibraryCoverID;
-            //  Change also all the files in the library
-            //  Note: Setting the Value to CurrentAudioFile is still useful, as this file may be in the Playlist only
-            if rgChangeCoverArt.ItemIndex > 0 then
-            begin
-                ///  We don't need to do a InitCover for the currentAudioFile,
-                ///  but we may need it for the other files with the oldCoverID, as
-                ///  they may have been grouped together by the same User-CoverID before.
-                ///  Now they should be separated again, if needed.
-                CoverArtSearcher.StartNewSearch;
-                CoverIDFiles := TAudioFileList.create(False);
-                try
-                    // get the list of files which need to be changed
-                    case rgChangeCoverArt.ItemIndex of
-                        1: MedienBib.GetTitelListFromCoverIDUnsorted(CoverIDFiles, OldCoverID);
-                        2: MedienBib.GetTitelListFromDirectoryUnsorted(CoverIDFiles, CurrentAudioFile.Ordner);
-                    end;
-
-                    for i := 0 to CoverIDFiles.Count - 1 do
-                    begin
-                        loopAudioFile := CoverIDFiles[i];
-                        loopAudioFile.CoverID := NewLibraryCoverID;
-
-                        aErr := loopAudioFile.WriteUserCoverIDToMetaData(AnsiString(NewLibraryCoverID), True);
-                        if aErr <> AUDIOERR_None then
-                            HandleError(afa_EditingDetails, CurrentAudioFile, aErr, True);
-
-                        /// get a "new valid" Cover-ID with the usual Nemp methods
-                        ///  In most cases this should be the same as NewLibraryCoverID
-                        if NewLibraryCoverID = '' then
-                            CoverArtSearcher.InitCover(loopAudioFile, tm_VCL, INIT_COVER_DEFAULT);
-                    end;
-                finally
-                    CoverIDFiles.Free;
-                end;
-
-                // also: Set the Cover-ID of all Playlist-Files
-                // But do not write the MetaTags again. That should have been done in the Library-Loop
-                for i := 0 to NempPlayList.Playlist.count - 1 do
-                begin
-                    loopAudioFile := NempPlaylist.Playlist.Items[i];
-                    if loopAudioFile.IsFile and (loopAudioFile.CoverID = OldCoverID) then
-                        loopAudioFile.CoverID := NewLibraryCoverID;
-                end;
-
-            end;
         end;
 
         // Show the Refresh-Coverflow-Button, if CoverArt has been changed
@@ -1502,7 +1573,6 @@ begin
 
                 // ShowMessage(Lyrics.PriorityString);
                 LyricString := Lyrics.GetLyrics(CurrentAudioFile.Artist, CurrentAudioFile.Titel);
-
                 if LyricString = '' then
                 begin
                     // no lyrics found
@@ -1826,6 +1896,7 @@ begin
         LblReplayGainAlbum  .Caption := '';
         DetailRatingHelper.DrawRatingInStarsOnBitmap(0, IMG_LibraryRating.Picture.Bitmap, IMG_LibraryRating.Width, IMG_LibraryRating.Height);
         NewLibraryCoverID := '';
+        NewLibraryCoverID_FileSave := '';
   end else
   begin
         if not CurrentAudioFile.ReCheckExistence then
@@ -2016,6 +2087,7 @@ begin
         LoadLibraryCoverIntoImage(CoverLibrary2);
 
         NewLibraryCoverID := CurrentAudioFile.CoverID;
+        NewLibraryCoverID_FileSave := CurrentAudioFile.CoverID;
   end;
 end;
 
@@ -2302,7 +2374,7 @@ begin
 
     if CurrentTagObject.FileType = at_Mp3 then
     begin
-        if cbFrameTypeSelection.ItemIndex = 1 then
+        if cbFrameTypeSelection.Visible and (cbFrameTypeSelection.ItemIndex = 1) then
             NewMetaFrameForm.TagType := TT_APE
         else
             NewMetaFrameForm.TagType := TT_ID3v2
@@ -2408,7 +2480,7 @@ begin
     GrpBox_Mpeg.Visible := (CurrentTagObject.FileType = at_Mp3);
 
     // FrameTypeSelection only for mp3Files, and only if there is already an APEv2Tag
-    // if not: Nemp should not try to push Aoe-Tags into mp3Files. It's not standard.
+    // if not: Nemp should not try to push Ape-Tags into mp3Files. It's not standard.
     cbFrameTypeSelection.Visible := (CurrentTagObject.FileType = at_Mp3)
                           AND (TMp3File(CurrentTagObject).ApeTag.ContainsData);
 
@@ -2831,23 +2903,27 @@ end;
     - Live-Checking for valid inputs
     --------------------------------------------------------
 }
+function TFDetails.GetID3v1TagfromBaseAudioFile(aBaseAudioFile: TBaseAudioFile): TID3v1Tag;
+begin
+  case aBaseAudioFile.FileType of
+    at_Mp3: result := TMP3File(aBaseAudioFile).ID3v1Tag;
+    at_Monkey,
+    at_WavPack,
+    at_MusePack,
+    at_OptimFrog,
+    at_TrueAudio: result := TBaseApeFile(aBaseAudioFile).ID3v1Tag;
+  else
+    result := Nil;
+  end;
+end;
+
 procedure TFDetails.Lblv1Change(Sender: TObject);
 var ID3v1Tag: TID3v1Tag;
 begin
     if not CurrentTagObject.Valid then
         exit;
 
-    case CurrentTagObject.FileType of
-        at_Mp3: ID3v1Tag := TMP3File(CurrentTagObject).ID3v1Tag;
-        at_Monkey,
-        at_WavPack,
-        at_MusePack,
-        at_OptimFrog,
-        at_TrueAudio: ID3v1Tag := TBaseApeFile(CurrentTagObject).ID3v1Tag;
-    else
-        ID3v1Tag := Nil;
-    end;
-
+    ID3v1Tag := GetID3v1TagfromBaseAudioFile(CurrentTagObject);
     if assigned(ID3v1Tag) then
     begin
         ID3v1HasChanged := True;
@@ -2858,13 +2934,24 @@ begin
             3: Id3v1Tag.Album   := Lblv1Album.Text   ;
             4: Id3v1Tag.Comment := Lblv1Comment.Text ;
             5: Id3v1Tag.Track   := Lblv1Track.Text   ;
-            6: Id3v1Tag.Genre   := cbIDv1Genres.Text ;
+            //6: Id3v1Tag.Genre   := cbIDv1Genres.Text ;
             7: Id3v1Tag.Year    := AnsiString(Lblv1Year.Text);
         end;
     end;
 end;
 
+procedure TFDetails.cbIDv1GenresChange(Sender: TObject);
+var ID3v1Tag: TID3v1Tag;
+begin
+    if not CurrentTagObject.Valid then
+        exit;
+    ID3v1Tag := GetID3v1TagfromBaseAudioFile(CurrentTagObject);
+    if assigned(ID3v1Tag) then
+      Id3v1Tag.Genre := cbIDv1Genres.Text ;
+end;
+
 procedure TFDetails.Lblv1TrackChange(Sender: TObject);
+var ID3v1Tag: TID3v1Tag;
 begin
   if NOT Lblv1Artist.ReadOnly then
   begin
@@ -2875,20 +2962,16 @@ begin
       else
         Lblv1Track.Font.Color := clred;
 
-      case CurrentTagObject.FileType of
-        at_Invalid: ;
-        at_Mp3: TMp3File(CurrentTagObject).Id3v1Tag.Track := Lblv1Track.Text;
-        at_Monkey,
-        at_WavPack,
-        at_MusePack,
-        at_OptimFrog,
-        at_TrueAudio: TBaseApeFile(CurrentTagObject).Id3v1Tag.Track := Lblv1Track.Text;
-      end;
+      ID3v1Tag := GetID3v1TagfromBaseAudioFile(CurrentTagObject);
+      if assigned(ID3v1Tag) then
+        Id3v1Tag.Track := Lblv1Track.Text;
     end;
     ID3v1HasChanged := True;
   end;
 end;
+
 procedure TFDetails.Lblv1YearChange(Sender: TObject);
+var ID3v1Tag: TID3v1Tag;
 begin
   if NOT Lblv1Artist.ReadOnly then
   begin
@@ -2900,15 +2983,9 @@ begin
       else
         Lblv1Year.Font.Color := clRed;
 
-      case CurrentTagObject.FileType of
-        at_Invalid: ;
-        at_Mp3: TMp3File(CurrentTagObject).Id3v1Tag.Year := AnsiString(Lblv1Year.Text);
-        at_Monkey,
-        at_WavPack,
-        at_MusePack,
-        at_OptimFrog,
-        at_TrueAudio: TBaseApeFile(CurrentTagObject).Id3v1Tag.Year := AnsiString(Lblv1Year.Text)
-      end;
+      ID3v1Tag := GetID3v1TagfromBaseAudioFile(CurrentTagObject);
+      if assigned(ID3v1Tag) then
+        Id3v1Tag.Year := AnsiString(Lblv1Year.Text);
     end;
     ID3v1HasChanged := True;
   end;
@@ -3347,6 +3424,8 @@ begin
 end;
 
 
+
+
 procedure TFDetails.Btn_NewPictureClick(Sender: TObject);
 begin
     if Not Assigned(FNewPicture) then
@@ -3458,7 +3537,7 @@ begin
         end;
 
         // Save the Picture
-        if SaveDialog1.execute then
+        if SaveDialog1.execute(Handle) then
         begin
             try
                 Stream.SaveToFile(saveDialog1.FileName);
@@ -3551,6 +3630,12 @@ begin
         CoverLibrary2.Refresh;
         NewLibraryCoverID := AudioFileCopy.CoverID;
     end;
+
+    if (aNewID = '') then
+      NewLibraryCoverID_FileSave := ''
+    else
+      NewLibraryCoverID_FileSave := NewLibraryCoverID;
+
 end;
 
 
@@ -3577,8 +3662,14 @@ end;
 procedure TFDetails.BtnLoadAnotherImageClick(Sender: TObject);
 var newID: String;
     fs: TFileStream;
+    aHandle: HWND;
 begin
-    if OpenDlgCoverArt.Execute then
+    if  not NempOptions.DetailFormStayOnTop then
+      aHandle := fDetails.Handle
+    else
+      aHandle := Application.Handle;
+
+    if OpenDlgCoverArt.Execute(self.Handle) then
     begin
         fs := TFileStream.Create(OpenDlgCoverArt.FileName, fmOpenread);
         try
@@ -3610,6 +3701,9 @@ procedure TFDetails.Btn_OpenImageClick(Sender: TObject);
 begin
   ShellExecute(Handle, nil {'open'}, PChar(Coverpfade[cbCoverArtFiles.itemindex]), nil, nil, SW_SHOWNORMAl)
 end;
+
+
+
 procedure TFDetails.CoverIMAGEDblClick(Sender: TObject);
 begin
     if FileExists(TCoverArtSearcher.Savepath + currentAudioFile.CoverID + '.jpg') then
@@ -3617,11 +3711,7 @@ begin
 end;
 
 
-procedure TFDetails.CreateParams(var Params: TCreateParams);
-begin
-  inherited CreateParams(Params);
-  Params.WndParent := Application.Handle;
-end;
+
 
 {
     --------------------------------------------------------

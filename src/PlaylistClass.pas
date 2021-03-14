@@ -90,6 +90,8 @@ type
 
       fFileSearchCounter: Integer;        // used during a search for new files to display the progress
 
+      fShowIndexInTreeview: Boolean;
+
       // PrebookList: Stores the prebooked AudioFiles,
       // i.e. the files that are marked as "play next"
       PrebookList: TAudioFileList;
@@ -239,6 +241,7 @@ type
       property JumpToNextCueOnNextClick: Boolean read fJumpToNextCueOnNextClick write fJumpToNextCueOnNextClick;
       property RepeatCueOnRepeatTitle: Boolean read fRepeatCueOnRepeatTitle write fRepeatCueOnRepeatTitle;
       property RememberInterruptedPlayPosition: Boolean read fRememberInterruptedPlayPosition write fRememberInterruptedPlayPosition;
+      property ShowIndexInTreeview: Boolean read fShowIndexInTreeview write fShowIndexInTreeview;
 
       property ShowHintsInPlaylist: Boolean read fShowHintsInPlaylist write fShowHintsInPlaylist;
 
@@ -448,7 +451,7 @@ begin
   PositionInTrack       := NempSettingsManager.ReadInteger('Playlist', 'PositionInTrack', 0);
   BassHandlePlaylist    := NempSettingsManager.ReadBool('Playlist', 'BassHandlePlaylist', True);
   InitialDialogFolder   := NempSettingsManager.ReadString('Playlist', 'InitialDialogFolder', '');
-
+  ShowIndexInTreeview := NempSettingsManager.ReadBool('Playlist', 'ShowIndexInTreeview', True);
 
   fUseWeightedRNG := NempSettingsManager.ReadBool   ('Playlist', 'UseWeightedRNG', False);
   RNGWeights[1]   := NempSettingsManager.ReadInteger('Playlist', 'RNGWeights05', 0  );
@@ -509,6 +512,7 @@ begin
   NempSettingsManager.WriteInteger('Playlist', 'RandomRepeat', RandomRepeat);
   NempSettingsManager.WriteBool('Playlist', 'BassHandlePlaylist', BassHandlePlaylist);
   NempSettingsManager.WriteString('Playlist', 'InitialDialogFolder', InitialDialogFolder);
+  NempSettingsManager.WriteBool('Playlist', 'ShowIndexInTreeview', ShowIndexInTreeview);
 
   NempSettingsManager.WriteBool   ('Playlist', 'UseWeightedRNG', fUseWeightedRNG);
   NempSettingsManager.WriteInteger('Playlist', 'RNGWeights05', RNGWeights[1]  );

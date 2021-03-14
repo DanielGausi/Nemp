@@ -35,7 +35,7 @@ unit BibHelper;
 interface
 
 uses Windows, Classes, SysUtils, ContNrs, Math, Nemp_ConstantsAndTypes,
-    NempAudioFiles;
+    NempAudioFiles, CoverHelper;
 
 
 Const SO_Pfad = 0;
@@ -80,42 +80,26 @@ Const SO_Pfad = 0;
       WholeBib: Boolean;
     end;
 
-  function CoverSort_Artist(item1,item2:pointer):integer;
-  function CoverSort_Album(item1,item2:pointer):integer;
-  function CoverSort_Genre(item1,item2:pointer):integer;
-  function CoverSort_GenreYear(item1,item2:pointer):integer;
-  function CoverSort_Jahr(item1,item2:pointer):integer;
-  function CoverSort_FileAgeAlbum(item1,item2:pointer):integer;
-  function CoverSort_FileAgeArtist(item1,item2:pointer):integer;
+  function CoverSearch_ID(Liste: TNempCoverList; aID: String; l, r: Integer): Integer;
+  // presort-functions
+  function CoverSort_ID(const item1, item2: TNempCover): Integer;
+  function PreCoverSort_Default(item1, item2: TNempCover): Integer;
+  function PreCoverSort_MissingFirst(item1, item2: TNempCover): Integer;
+  function PreCoverSort_MissingLast(item1, item2: TNempCover): Integer;
+
+  function ActualCoverSort_Artist(item1, item2: TNempCover): Integer;
+  function ActualCoverSort_Album(item1, item2: TNempCover): Integer;
+  function ActualCoverSort_Genre(item1, item2: TNempCover): Integer;
+  function ActualCoverSort_GenreYear(item1, item2: TNempCover): Integer;
+  function ActualCoverSort_Jahr(item1, item2: TNempCover): Integer;
+  function ActualCoverSort_FileAgeAlbum(item1, item2: TNempCover): Integer;
+  function ActualCoverSort_FileAgeArtist(item1, item2: TNempCover): Integer;
   // Note: These two coversort-Methods are almost the same, as
   //       in one Directory there is (almost everytime) only one
   //       "cover" (except covers are set by the ID3.tag)
   //       Used for the BrowseBy-Menu in MainForm
-  function CoverSort_DirectoryArtist(item1,item2:pointer):integer;
-  function CoverSort_DirectoryAlbum(item1,item2:pointer):integer;
-
-  // Same as above, but missing cover will be collected at the beginning
-  function CoverSort_ArtistMissingFirst(item1,item2:pointer):integer;
-  function CoverSort_AlbumMissingFirst(item1,item2:pointer):integer;
-  function CoverSort_GenreMissingFirst(item1,item2:pointer):integer;
-  function CoverSort_GenreYearMissingFirst(item1,item2:pointer):integer;
-  function CoverSort_JahrMissingFirst(item1,item2:pointer):integer;
-  function CoverSort_FileAgeAlbumMissingFirst(item1,item2:pointer):integer;
-  function CoverSort_FileAgeArtistMissingFirst(item1,item2:pointer):integer;
-  function CoverSort_DirectoryArtistMissingFirst(item1,item2:pointer):integer;
-  function CoverSort_DirectoryAlbumMissingFirst(item1,item2:pointer):integer;
-
-    // Same as above, but missing cover will be collected at the end
-  function CoverSort_ArtistMissingLast(item1,item2:pointer):integer;
-  function CoverSort_AlbumMissingLast(item1,item2:pointer):integer;
-  function CoverSort_GenreMissingLast(item1,item2:pointer):integer;
-  function CoverSort_GenreYearMissingLast(item1,item2:pointer):integer;
-  function CoverSort_JahrMissingLast(item1,item2:pointer):integer;
-  function CoverSort_FileAgeAlbumMissingLast(item1,item2:pointer):integer;
-  function CoverSort_FileAgeArtistMissingLast(item1,item2:pointer):integer;
-  function CoverSort_DirectoryArtistMissingLast(item1,item2:pointer):integer;
-  function CoverSort_DirectoryAlbumMissingLast(item1,item2:pointer):integer;
-
+  function ActualCoverSort_DirectoryArtist(item1, item2: TNempCover): Integer;
+  function ActualCoverSort_DirectoryAlbum(item1, item2: TNempCover): Integer;
 
 
   function PlaylistSort_Pfad(item1,item2:pointer):integer;
@@ -137,7 +121,7 @@ Const SO_Pfad = 0;
 
 implementation
 
-uses AudioFileHelper, StringHelper, CoverHelper;
+uses AudioFileHelper, StringHelper;
 
 
 constructor TJustaString.create(aDataString: UnicodeString; aAnzeigeString: UnicodeString ='' );
@@ -155,314 +139,173 @@ begin
 end;
 
 
-function CoverSort_Artist(item1,item2:pointer):integer;
-var tmp1:integer;
+function CoverSearch_ID(Liste: TNempCoverList; aID: String; l, r: Integer): Integer;
+var
+  c, m: integer;
 begin
-  if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
-  if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
-  if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
-  if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
-  if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
-  if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
+  if (r < l) or (r = -1) then
+    result := -1
+  else
   begin
-      tmp1:= AnsiCompareText_Nemp(TNempCover(item1).Artist, TNempCover(item2).Artist);
-      if tmp1=0 then
-        result := AnsiCompareText_Nemp(TNempCover(item1).Album, TNempCover(item2).Album)
+    m := (l+r) DIV 2;
+    c := AnsiCompareStr(aID, Liste[m].ID);
+
+    if l = r then
+    begin
+      if c = 0 then
+        result := l
       else
-        result:= tmp1;
-  end;
-end;
-
-function CoverSort_Album(item1,item2:pointer):integer;
-var tmp1:integer;
-begin
-  if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
-  if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
-  if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
-  if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
-  if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
-  if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
-  begin
-    tmp1:= AnsiCompareText_Nemp(TNempCover(item1).Album, TNempCover(item2).Album);
-    if tmp1=0 then
-      result := AnsiCompareText_Nemp(TNempCover(item1).Artist, TNempCover(item2).Artist)
-    else
-      result:= tmp1;
+        result := -1;
+    end else
+    begin
+      if c = 0 then
+        result := m
+      else
+        if c > 0 then
+          result := CoverSearch_ID(Liste, aID, m+1, r)
+        else
+          result := CoverSearch_ID(Liste, aID, l, m-1);
     end;
-end;
-
-function CoverSort_Genre(item1,item2:pointer):integer;
-begin
-  if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
-  if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
-  if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
-  if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
-  if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
-  if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
-  begin
-    result := AnsiCompareText_Nemp(TNempCover(item1).Genre, TNempCover(item2).Genre);
-    if result = 0 then
-      result := CoverSort_Artist(item1, item2);
-  end;
-end;
-function CoverSort_GenreYear(item1,item2:pointer):integer;
-begin
-  if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
-  if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
-  if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
-  if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
-  if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
-  if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
-  begin
-    result := AnsiCompareText_Nemp(TNempCover(item1).Genre, TNempCover(item2).Genre);
-    if result = 0 then
-      result := CoverSort_Jahr(item1, item2);
-  end;
-end;
-function CoverSort_Jahr(item1,item2:pointer):integer;
-begin
-  if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
-  if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
-  if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
-  if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
-  if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
-  if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
-  begin
-    result := CompareValue(TNempCover(item2).Year,TNempCover(item1).Year); // umgekehrt sortieren - neuere zuerst
-    if result = 0 then
-      result := CoverSort_Artist(item1, item2);
-  end;
-end;
-function CoverSort_FileAgeAlbum(item1,item2:pointer):integer;
-begin
-  if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
-  if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
-  if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
-  if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
-  if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
-  if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
-  begin
-    result := CompareValue(TNempCover(item2).FileAge,TNempCover(item1).FileAge); // umgekehrt sortieren - neuere zuerst
-    if result = 0 then
-      result := CoverSort_Album(item1, item2);
-  end;
-end;
-function CoverSort_FileAgeArtist(item1,item2:pointer):integer;
-begin
-  if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
-  if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
-  if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
-  if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
-  if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
-  if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
-  begin
-    result := CompareValue(TNempCover(item2).FileAge,TNempCover(item1).FileAge); // umgekehrt sortieren - neuere zuerst
-    if result = 0 then
-      result := CoverSort_Artist(item1, item2);
-  end;
-end;
-function CoverSort_DirectoryArtist(item1,item2:pointer):integer;
-begin
-  if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
-  if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
-  if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
-  if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
-  if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
-  if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
-  begin
-    result := AnsiCompareText_Nemp(TNempCover(item1).Directory, TNempCover(item2).Directory);
-    if result = 0 then
-      result := CoverSort_Artist(item1, item2);
-  end;
-end;
-function CoverSort_DirectoryAlbum(item1,item2:pointer):integer;
-begin
-  if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
-  if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
-  if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
-  if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
-  if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
-  if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
-  begin
-    result := AnsiCompareText_Nemp(TNempCover(item1).Directory, TNempCover(item2).Directory);
-    if result = 0 then
-      result := CoverSort_Album(item1, item2);
   end;
 end;
 
 
-function MissingFirstHelper(item1,item2:pointer):integer;
+function CoverSort_ID(const item1, item2: TNempCover): Integer;
 begin
-    if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
-    if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
-    if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
-    if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
-
-    if (TNempCover(item1).ID <> '') and (TNempCover(item1).ID[1] = '_') then
-    begin
-        // item1 is a missing cover
-        if (TNempCover(item2).ID <> '') and (TNempCover(item2).ID[1] = '_') then
-            // both cover are missing
-            result := 0
-        else
-            result := -1;
-    end else
-        if (TNempCover(item2).ID <> '') and (TNempCover(item2).ID[1] = '_') then
-        begin
-            // item2 is missing
-            if (TNempCover(item1).ID <> '') and (TNempCover(item1).ID[1] = '_') then
-                // both are missing
-                result := 0
-            else
-                result := 1;
-        end else
-            // none is missing
-            result := 0;
+  result := AnsiCompareStr(item1.ID, item2.ID);
 end;
 
-function CoverSort_ArtistMissingFirst(item1,item2:pointer):integer;
+function PreCoverSort_Default(item1, item2: TNempCover): Integer;
 begin
-    result := MissingFirstHelper(item1,item2);
-    if result = 0 then
-        result := CoverSort_Artist(item1, item2);
-end;
-function CoverSort_AlbumMissingFirst(item1,item2:pointer):integer;
-begin
-    result := MissingFirstHelper(item1,item2);
-    if result = 0 then
-        result := CoverSort_Album(item1, item2);
-end;
-function CoverSort_GenreMissingFirst(item1,item2:pointer):integer;
-begin
-    result := MissingFirstHelper(item1,item2);
-    if result = 0 then
-        result := CoverSort_Genre(item1, item2);
-end;
-function CoverSort_GenreYearMissingFirst(item1,item2:pointer):integer;
-begin
-    result := MissingFirstHelper(item1,item2);
-    if result = 0 then
-        result := CoverSort_GenreYear(item1, item2);
-end;
-function CoverSort_JahrMissingFirst(item1,item2:pointer):integer;
-begin
-    result := MissingFirstHelper(item1,item2);
-    if result = 0 then
-        result := CoverSort_Jahr(item1, item2);
-end;
-function CoverSort_FileAgeAlbumMissingFirst(item1,item2:pointer):integer;
-begin
-    result := MissingFirstHelper(item1,item2);
-    if result = 0 then
-        result := CoverSort_FileAgeAlbum(item1, item2);
-end;
-function CoverSort_FileAgeArtistMissingFirst(item1,item2:pointer):integer;
-begin
-    result := MissingFirstHelper(item1,item2);
-    if result = 0 then
-        result := CoverSort_FileAgeArtist(item1, item2);
-end;
-function CoverSort_DirectoryArtistMissingFirst(item1,item2:pointer):integer;
-begin
-    result := MissingFirstHelper(item1,item2);
-    if result = 0 then
-        result := CoverSort_DirectoryArtist(item1, item2);
-end;
-function CoverSort_DirectoryAlbumMissingFirst(item1,item2:pointer):integer;
-begin
-    result := MissingFirstHelper(item1,item2);
-    if result = 0 then
-        result := CoverSort_DirectoryAlbum(item1, item2);
+  result := 0;
+  if (item1.ID = 'all') and (item2.ID <> 'all') then result := -1 else
+  if (item2.ID = 'all') and (item1.ID <> 'all') then result := 1 else
+  if (item1.ID = 'searchresult') and (item2.ID <> 'searchresult') then result := -1 else
+  if (item2.ID = 'searchresult') and (item1.ID <> 'searchresult') then result := 1 else
+  if (item1.ID = '') and (item2.ID <> '') then result := -1 else
+  if (item2.ID = '') and (item1.ID <> '') then result := 1;
 end;
 
-
-
-
-function MissingLastHelper(item1,item2:pointer):integer;
+function PreCoverSort_MissingFirst(item1, item2: TNempCover): Integer;
 begin
-    if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
-    if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
-    if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
-    if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
+  if (item1.ID = 'all') and (item2.ID <> 'all') then result := -1 else
+  if (item2.ID = 'all') and (item1.ID <> 'all') then result := 1 else
+  if (item1.ID = 'searchresult') and (item2.ID <> 'searchresult') then result := -1 else
+  if (item2.ID = 'searchresult') and (item1.ID <> 'searchresult') then result := 1 else
 
-    if (TNempCover(item1).ID <> '') and (TNempCover(item1).ID[1] = '_') then
-    begin
-        // item1 is a missing cover
-        if (TNempCover(item2).ID <> '') and (TNempCover(item2).ID[1] = '_') then
-            // both cover are missing
-            result := 0
-        else
-            result := 1;
-    end else
-        if (TNempCover(item2).ID <> '') and (TNempCover(item2).ID[1] = '_') then
-        begin
-            // item2 is missing
-            if (TNempCover(item1).ID <> '') and (TNempCover(item1).ID[1] = '_') then
-                // both are missing
-                result := 0
-            else
-                result := -11;
-        end else
-            // none is missing
-            result := 0;
+  if (item1.ID <> '') and (item1.ID[1] = '_') then
+  begin
+      // item1 is a missing cover
+      if (item2.ID <> '') and (item2.ID[1] = '_') then
+          // both cover are missing
+          result := 0
+      else
+          result := -1;
+  end else
+      if (item2.ID <> '') and (item2.ID[1] = '_') then
+      begin
+          // item2 is missing
+          if (item1.ID <> '') and (item1.ID[1] = '_') then
+              // both are missing
+              result := 0
+          else
+              result := 1;
+      end else
+          // none is missing
+          result := 0;
 end;
 
-function CoverSort_ArtistMissingLast(item1,item2:pointer):integer;
+function PreCoverSort_MissingLast(item1, item2: TNempCover): Integer;
 begin
-    result := MissingLastHelper(item1,item2);
-    if result = 0 then
-        result := CoverSort_Artist(item1, item2);
-end;
-function CoverSort_AlbumMissingLast(item1,item2:pointer):integer;
-begin
-    result := MissingLastHelper(item1,item2);
-    if result = 0 then
-        result := CoverSort_Album(item1, item2);
-end;
-function CoverSort_GenreMissingLast(item1,item2:pointer):integer;
-begin
-    result := MissingLastHelper(item1,item2);
-    if result = 0 then
-        result := CoverSort_Genre(item1, item2);
-end;
-function CoverSort_GenreYearMissingLast(item1,item2:pointer):integer;
-begin
-    result := MissingLastHelper(item1,item2);
-    if result = 0 then
-        result := CoverSort_GenreYear(item1, item2);
-end;
-function CoverSort_JahrMissingLast(item1,item2:pointer):integer;
-begin
-    result := MissingLastHelper(item1,item2);
-    if result = 0 then
-        result := CoverSort_Jahr(item1, item2);
-end;
-function CoverSort_FileAgeAlbumMissingLast(item1,item2:pointer):integer;
-begin
-    result := MissingLastHelper(item1,item2);
-    if result = 0 then
-        result := CoverSort_FileAgeAlbum(item1, item2);
-end;
-function CoverSort_FileAgeArtistMissingLast(item1,item2:pointer):integer;
-begin
-    result := MissingLastHelper(item1,item2);
-    if result = 0 then
-        result := CoverSort_FileAgeArtist(item1, item2);
-end;
-function CoverSort_DirectoryArtistMissingLast(item1,item2:pointer):integer;
-begin
-    result := MissingLastHelper(item1,item2);
-    if result = 0 then
-        result := CoverSort_DirectoryArtist(item1, item2);
-end;
-function CoverSort_DirectoryAlbumMissingLast(item1,item2:pointer):integer;
-begin
-    result := MissingLastHelper(item1,item2);
-    if result = 0 then
-        result := CoverSort_DirectoryAlbum(item1, item2);
+  if (item1.ID = 'all') and (item2.ID <> 'all') then result := -1 else
+  if (item2.ID = 'all') and (item1.ID <> 'all') then result := 1 else
+  if (item1.ID = 'searchresult') and (item2.ID <> 'searchresult') then result := -1 else
+  if (item2.ID = 'searchresult') and (item1.ID <> 'searchresult') then result := 1 else
+
+  if (item1.ID <> '') and (item1.ID[1] = '_') then
+  begin
+      // item1 is a missing cover
+      if (item2.ID <> '') and (item2.ID[1] = '_') then
+          // both cover are missing
+          result := 0
+      else
+          result := 1;
+  end else
+      if (item2.ID <> '') and (item2.ID[1] = '_') then
+      begin
+          // item2 is missing
+          if (item1.ID <> '') and (item1.ID[1] = '_') then
+              // both are missing
+              result := 0
+          else
+              result := -11;
+      end else
+          // none is missing
+          result := 0;
 end;
 
+function ActualCoverSort_Artist(item1, item2: TNempCover): Integer;
+begin
+  result := AnsiCompareText_Nemp(item1.Artist, item2.Artist);
+  if result = 0 then
+    result := AnsiCompareText_Nemp(item1.Album, item2.Album)
+end;
 
+function ActualCoverSort_Album(item1, item2: TNempCover): Integer;
+begin
+  result := AnsiCompareText_Nemp(item1.Album, item2.Album);
+  if result = 0 then
+    result := AnsiCompareText_Nemp(item1.Artist, item2.Artist)
+end;
+
+function ActualCoverSort_Genre(item1, item2: TNempCover): Integer;
+begin
+  result := AnsiCompareText_Nemp(item1.Genre, item2.Genre);
+  if result = 0 then
+    result := ActualCoverSort_Artist(item1, item2);
+end;
+
+function ActualCoverSort_GenreYear(item1, item2: TNempCover): Integer;
+begin
+  result := AnsiCompareText_Nemp(item1.Genre, item2.Genre);
+  if result = 0 then
+    result := ActualCoverSort_Jahr(item1, item2);
+end;
+
+function ActualCoverSort_Jahr(item1, item2: TNempCover): Integer;
+begin
+  result := CompareValue(item2.Year, item1.Year); // umgekehrt sortieren - neuere zuerst
+  if result = 0 then
+    result := ActualCoverSort_Artist(item1, item2);
+end;
+
+function ActualCoverSort_FileAgeAlbum(item1, item2: TNempCover): Integer;
+begin
+  result := CompareValue(item2.FileAge, item1.FileAge); // umgekehrt sortieren - neuere zuerst
+  if result = 0 then
+    result := ActualCoverSort_Album(item1, item2);
+end;
+
+function ActualCoverSort_FileAgeArtist(item1, item2: TNempCover): Integer;
+begin
+  result := CompareValue(item2.FileAge, item1.FileAge); // umgekehrt sortieren - neuere zuerst
+  if result = 0 then
+    result := ActualCoverSort_Artist(item1, item2);
+end;
+
+function ActualCoverSort_DirectoryArtist(item1, item2: TNempCover): Integer;
+begin
+  result := AnsiCompareText_Nemp(item1.Directory, item2.Directory);
+  if result = 0 then
+    result := ActualCoverSort_Artist(item1, item2);
+end;
+
+function ActualCoverSort_DirectoryAlbum(item1, item2: TNempCover): Integer;
+begin
+  result := AnsiCompareText_Nemp(item1.Directory, item2.Directory);
+  if result = 0 then
+    result := ActualCoverSort_Album(item1, item2);
+end;
 
 
 function PlaylistSort_Pfad(item1,item2:pointer):integer;
@@ -682,9 +525,6 @@ begin
   for i := idxS to Source.Count -1 do
     Target.Add(Source[i]);
 end;
-
-
-
 
 
 end.

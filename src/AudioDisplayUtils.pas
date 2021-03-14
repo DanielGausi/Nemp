@@ -15,6 +15,7 @@ resourcestring
   rsFormatTreeBitrate     = '%d kbit/s';
   rsFormatTreeBitrateVBR  = '%d kbit/s (vbr)';
   rsFormatTreeCuePosition = '»%d:%.2d ';
+  rsFormatTreeCueIndex    = '»%d';
   rsFormatTreeDuration    = '%d:%.2d ';
   rsFormatTreeFileSize    = '%.2f MB';
   rsFormatTreeSamplerate  = '%s kHz';
@@ -227,6 +228,7 @@ type
       function TreeAlbum(af: TAudioFile): String;
       function TreeTitle(af: TAudioFile): String;
       function TreeDuration(af: TAudioFile): String;
+      function TreeAudioFileIndex(af: TAudioFile; aIndex: Integer): String;
       function TreeBitrate(af: TAudioFile): String;
       function TreeFileSize(af: tAudioFile): String;
       function TreeSamplerate(af: TAudioFile): String;
@@ -713,6 +715,14 @@ begin
     at_Stream : result := rsTreeUnlimitedDuration;
     at_Cue    : result := Format(rsFormatTreeCuePosition, [Round(af.Index01) Div 60, Round(af.Index01) mod 60] );
   end;
+end;
+
+function TAudioDisplay.TreeAudioFileIndex(af: TAudioFile; aIndex: Integer): String;
+begin
+  if af.AudioType = at_CUE then
+    result := Format(rsFormatTreeCueIndex, [aIndex])
+  else
+    result := IntToStr(aIndex);
 end;
 
 function TAudioDisplay.TreeFileSize(af: tAudioFile): String;
