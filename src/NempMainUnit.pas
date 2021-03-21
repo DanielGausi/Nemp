@@ -7518,7 +7518,7 @@ end;
 procedure TNemp_MainForm.PlaylistVSTChange(Sender: TBaseVirtualTree;
   Node: PVirtualNode);
 var aNode: PVirtualNode;
-  AudioFile, CueParentFile: TAudioFile;
+  AudioFile: TAudioFile;
   c,i:integer;
   dauer:int64;
   groesse:int64;

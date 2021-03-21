@@ -7,9 +7,9 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear / Embarcadero Delphi 2009 bis 10.3
-      Januar 2005 - Mai 2020
+      Januar 2005 - April 2021
 
-      Version: 4.14
+      Version: 4.15
 
 
    -----------------------------------------------------------

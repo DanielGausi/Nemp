@@ -962,7 +962,6 @@ var
   i : Integer;
   vx, vy, vz : GLDouble;
   w, h : Single;
-  msg : TMSG;
   aRenderItem: TRenderItem;
 
 begin

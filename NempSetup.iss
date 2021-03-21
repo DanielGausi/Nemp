@@ -2,9 +2,9 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Nemp - Noch ein MP3-Player"
-#define MyAppVersion "4.14.0"
+#define MyAppVersion "4.15.0"
 #define MyAppPublisher "Daniel Gauﬂmann"
-#define MyAppURL "http://www.gausi.de"
+#define MyAppURL "https://www.gausi.de"
 #define MyAppExeName "nemp.exe"
 
 [Setup]

@@ -3662,13 +3662,7 @@ end;
 procedure TFDetails.BtnLoadAnotherImageClick(Sender: TObject);
 var newID: String;
     fs: TFileStream;
-    aHandle: HWND;
 begin
-    if  not NempOptions.DetailFormStayOnTop then
-      aHandle := fDetails.Handle
-    else
-      aHandle := Application.Handle;
-
     if OpenDlgCoverArt.Execute(self.Handle) then
     begin
         fs := TFileStream.Create(OpenDlgCoverArt.FileName, fmOpenread);
@@ -3707,8 +3701,8 @@ end;
 procedure TFDetails.CoverIMAGEDblClick(Sender: TObject);
 begin
     if FileExists(TCoverArtSearcher.Savepath + currentAudioFile.CoverID + '.jpg') then
-        ShellExecute(Handle, 'open', PChar(TCoverArtSearcher.Savepath + currentAudioFile.CoverID + '.jpg'), nil, nil, SW_SHOWNORMAl);
-end;
+        ShellExecute(Handle, Nil, PChar(TCoverArtSearcher.Savepath + currentAudioFile.CoverID + '.jpg'), '', nil, SW_SHOWNORMAl);
+end;                      {'open'}
 
 
 

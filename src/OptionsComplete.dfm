@@ -66,7 +66,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 3
       Width = 454
       Height = 612
-      ActivePage = TabFiles3
+      ActivePage = TabView4
       Align = alClient
       TabOrder = 1
       TabStop = False
@@ -3988,7 +3988,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Align = alTop
           Caption = 'Default actions'
           TabOrder = 1
-          ExplicitTop = 173
           object Label10: TLabel
             Left = 12
             Top = 19
@@ -4062,7 +4061,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Align = alTop
           Caption = 'Deleting and mixing'
           TabOrder = 2
-          ExplicitTop = 340
           object CB_AutoMixPlaylist: TCheckBox
             Left = 8
             Top = 56
@@ -4101,7 +4099,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Align = alTop
           Caption = 'Playlist Log'
           TabOrder = 3
-          ExplicitTop = 427
           object LblLogDuration: TLabel
             Left = 28
             Top = 43
@@ -5488,24 +5485,23 @@ object OptionsCompleteForm: TOptionsCompleteForm
             101)
           object lblCoverFlowGapLeft: TLabel
             Left = 16
-            Top = 24
+            Top = 20
             Width = 19
             Height = 13
             Caption = 'Left'
           end
           object lblCoverFlowGapRight: TLabel
             Left = 250
-            Top = 24
+            Top = 20
             Width = 25
             Height = 13
             Anchors = [akTop, akRight]
             Caption = 'Right'
-            ExplicitLeft = 240
           end
           object tbCoverGapFirstLeft: TNempTrackBar
             AlignWithMargins = True
             Left = 16
-            Top = 38
+            Top = 34
             Width = 185
             Height = 22
             Max = 500
@@ -5520,7 +5516,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object tbCoverGapFirstRight: TNempTrackBar
             AlignWithMargins = True
             Left = 246
-            Top = 38
+            Top = 34
             Width = 185
             Height = 22
             Anchors = [akTop, akRight]
@@ -5536,7 +5532,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object tbCoverGapLeft: TNempTrackBar
             AlignWithMargins = True
             Left = 16
-            Top = 68
+            Top = 64
             Width = 185
             Height = 22
             Max = 500
@@ -5551,7 +5547,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object tbCoverGapRight: TNempTrackBar
             AlignWithMargins = True
             Left = 246
-            Top = 68
+            Top = 64
             Width = 185
             Height = 22
             Anchors = [akTop, akRight]
@@ -5586,12 +5582,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object lblCoverFlowAngleRight: TLabel
             Left = 298
-            Top = 11
+            Top = 16
             Width = 25
             Height = 13
             Anchors = [akTop, akRight]
             Caption = 'Right'
-            ExplicitLeft = 288
           end
           object lblCoverFlowAngleMain: TLabel
             Left = 159

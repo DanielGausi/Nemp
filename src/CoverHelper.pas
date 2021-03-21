@@ -615,7 +615,6 @@ end;
 
 function RepairCoverFileVCL(oldID: string; aAudioFile: TAudioFile; aPic: TPicture; out newID: String): Boolean;
 var
-  i: Integer;
   lCoverArtSearcher: TCoverArtSearcher;
 begin
   result := false;
@@ -1546,6 +1545,12 @@ begin
                     aCoverBmp.Height := PickCoverSize;
                     TileSize := PickCoverSize Div 4;
                 end;
+            else
+                begin
+                    aCoverBmp.Width  := PickCoverSize;
+                    aCoverBmp.Height := PickCoverSize;
+                    TileSize := PickCoverSize;
+                end;
             end;
 
             for i := 0 to min(15, RandomCoverList.Count - 1) do
@@ -1563,6 +1568,11 @@ begin
                   8,16: begin
                     x1 := ((i mod 4) * TileSize);
                     y1 := ((i Div 4) * TileSize);
+                  end;
+              else
+                  begin
+                    x1 := 0;
+                    y1 := 0;
                   end;
               end;
               aCoverBmp.Canvas.Rectangle(x1, y1, x1+TileSize, y1+TileSize);

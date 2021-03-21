@@ -2274,14 +2274,12 @@ end;
 
 
 function TID3v2Tag.GetAllowedTextFrames: TList;
-var i: TFrameIDs;
 begin
     result := TList.Create;
     GetAllowedTextFrames(result);
 end;
 
 function TID3v2Tag.GetAllowedURLFrames: TList;
-var i: TFrameIDs;
 begin
     result := TList.Create;
     GetAllowedURLFrames(result);
