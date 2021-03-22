@@ -172,7 +172,9 @@ end;
 
 function CoverSort_ID(const item1, item2: TNempCover): Integer;
 begin
-  result := AnsiCompareStr(item1.ID, item2.ID);
+  result := PreCoverSort_Default(item1, item2);
+  if result = 0 then
+    result := AnsiCompareStr(item1.ID, item2.ID);
 end;
 
 function PreCoverSort_Default(item1, item2: TNempCover): Integer;
