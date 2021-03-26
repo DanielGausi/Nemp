@@ -71,7 +71,7 @@ uses Systemhelper;
 procedure TAboutForm.BtnDonateClick(Sender: TObject);
 begin
 ShellExecute(Handle, 'open'
-                      ,PChar('http://www.gausi.de/spenden.html')
+                      ,PChar('https://www.gausi.de/spenden.html')
                       , nil, nil, SW_SHOWNORMAl);
 end;
 
