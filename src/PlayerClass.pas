@@ -1123,7 +1123,7 @@ begin
   DoSilenceDetection    := NempSettingsManager.ReadBool('Player', 'DoSilenceDetection', True);
   SilenceThreshold      := NempSettingsManager.ReadInteger('Player', 'SilenceThreshold', -40);
 
-  DoPauseBetweenTracks  :=  NempSettingsManager.ReadBool('Player', 'DoPauseBetweenTracks', True);
+  DoPauseBetweenTracks  :=  NempSettingsManager.ReadBool('Player', 'DoPauseBetweenTracks', False);
   PauseBetweenTracksDuration :=  NempSettingsManager.ReadInteger('Player', 'PauseBetweenTracksDuration', 2000);
 
   ApplyReplayGain       := NempSettingsManager.ReadBool('Player', 'ApplyReplayGain', True);
