@@ -75,6 +75,10 @@ function SecToStr(Value: Double):String;
 function SizeToString(Value: Int64): String;
 function SizeToString2(Value: Int64): String;
 function SecondsUntil(aTime: TTime): Integer;
+function AddLeadingZeroes(const aNumber, Length : integer) : string;
+function YearToDecade(aYear: Integer): Integer;
+function YearToDecadeString(aYear: Integer): String;
+
 
 function EscapeAmpersAnd(aWs: UnicodeString): UnicodeString;
 
@@ -86,6 +90,10 @@ function PeakStringToSingle(aPeakString: String): Single;
 
 function GainValueToString(aGainValue: Single): String;
 function PeakValueToString(aPeakValue: Single): String;
+
+function AnsiCompareText_Nemp(const S1, S2: string): Integer;
+function AnsiCompareText_NempIgnoreCase(const S1, S2: string): Integer;
+function AnsiStartsText_Nemp(const ASubText, AText: string): Boolean;
 
 
 procedure Wuppdi(i: Integer = 0);
@@ -605,7 +613,19 @@ begin
   Result := SecondsBetween(aNow, aTime);
 end;
 
+function AddLeadingZeroes(const aNumber, Length : integer) : string;
+begin
+   result := Format('%.*d', [Length, aNumber]) ;
+end;
 
+function YearToDecade(aYear: Integer): Integer;
+begin
+  result := (aYear div 10) * 10;
+end;
+function YearToDecadeString(aYear: Integer): String;
+begin
+  result := AddLeadingZeroes(YearToDecade(aYear), 4);
+end;
 
 
 function EscapeAmpersAnd(aWs: UnicodeString): UnicodeString;
@@ -731,6 +751,36 @@ begin
         ShowMessage('Wuppdi')
     else
         ShowMessage('Wuppdi '+ IntToStr(i));
+end;
+
+// AnsiCompareText_Nemp
+// An version of AnsiCompareText which treats strings like "-sampler" and "--sampler" differently
+// With the regular AnsiCompareText function browsing by Directory won't work with such folder names
+// also: SORT_DIGITSASNUMBERS for a better sorting of sampler series (like "Bravo Hits 1,2,3,..,10" instead of "1,10,2,3,..")
+function AnsiCompareText_Nemp(const S1, S2: string): Integer;
+begin
+  Result := CompareString(LOCALE_USER_DEFAULT, SORT_STRINGSORT or SORT_DIGITSASNUMBERS, PChar(S1),
+    Length(S1), PChar(S2), Length(S2)) - CSTR_EQUAL;
+end;
+
+function AnsiCompareText_NempIgnoreCase(const S1, S2: string): Integer;
+begin
+  Result := CompareString(LOCALE_USER_DEFAULT, SORT_STRINGSORT or LINGUISTIC_IGNORECASE or SORT_DIGITSASNUMBERS, PChar(S1),
+    Length(S1), PChar(S2), Length(S2)) - CSTR_EQUAL;
+end;
+
+// the same for AnsiStartsText
+function AnsiStartsText_Nemp(const ASubText, AText: string): Boolean;
+var
+  L, L2: Integer;
+begin
+  L := Length(ASubText);
+  L2 := Length(AText);
+  if L > L2 then
+    Result := False
+  else
+    Result := CompareString(LOCALE_USER_DEFAULT, SORT_STRINGSORT or SORT_DIGITSASNUMBERS,
+      PChar(AText), L, PChar(ASubText), L) = 2;
 end;
 
 

@@ -60,7 +60,8 @@ uses NempMainUnit, Splash, gnugettext, PlaylistClass, PlayerClass,
     SplitForm_Hilfsfunktionen, DriveRepairTools,
 
     MedienListeUnit, AuswahlUnit, ExtendedControlsUnit, PlaylistUnit,
-    WindowsVersionInfo, AudioDisplayUtils;
+    WindowsVersionInfo, AudioDisplayUtils,
+    Cover.ViewCache;
 
 
 procedure UpdateSplashScreen(status: String);
@@ -125,7 +126,9 @@ begin
         //Playlist-Einstellungen laden
         NempPlaylist.LoadSettings;
         // MedienBib-Einstellungen laden
-        MedienBib.NewCoverFlow.InitList(MedienBib.CoverViewList, MedienBib.CoverCount);
+
+        // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        //  MedienBib.NewCoverFlow.InitList(MedienBib.CoverViewList, MedienBib.CoverCount);
         MedienBib.LoadSettings;
 
         VSTColumns_LoadSettings(VST);
@@ -143,6 +146,9 @@ begin
 
         NempUpdater.LoadSettings;
         NempSkin.NempPartyMode.LoadSettings;
+
+        CoverManager.LoadSettings;
+        DummyImageList.Width := CoverManager.CoverSize;
 
         Tag := -1;
 
@@ -318,26 +324,14 @@ begin
         else
         begin
             LblEmptyLibraryHint.Caption := MainForm_LibraryIsEmpty;
-            case MedienBib.BrowseMode of
-                0: MedienBib.ReBuildBrowseLists;
-                1: begin
-                    MedienBib.ReBuildCoverList;
-                    MedienBib.CurrentArtist := BROWSE_ALL;
-                    MedienBib.CurrentAlbum := BROWSE_ALL;
-                    SetCoverFlowScrollbarRange(MedienBib.CoverViewList);
-                    CoverScrollbarChange(Nil);
-                end;
-                2: begin
-                    MedienBib.ReBuildTagCloud;
-                    MedienBib.TagCloud.ShowTags(True);
-                    MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.ClearTag, True);
-                end;
-            end;
+
             if FileExists(ExtractFilePath(ParamStr(0)) + 'Data\default.nwl') then
                 MedienBib.ImportFavorites(ExtractFilePath(ParamStr(0)) + 'Data\default.nwl')
             else
                 if FileExists(SavePath + 'default.nwl') then
                     MedienBib.ImportFavorites(SavePath + 'default.nwl');
+
+            MedienBib.ReBuildCategories;
             ReFillBrowseTrees(False);
         end;
     end;

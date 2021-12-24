@@ -35,7 +35,7 @@ unit ClassicCoverflowClass;
 interface
 
 uses Windows, Messages, SysUtils, Graphics, ExtCtrls, ContNrs, Classes,
-    Jpeg, PNGImage, dialogs, CoverHelper;
+    Jpeg, PNGImage, dialogs, CoverHelper, LibraryOrganizer.Base;
 
 const
     // the same as in FlyingCow
@@ -47,26 +47,28 @@ type
         private
             fEventsWindow : HWND;
             fCurrentItem: Integer;  // Index of the current selected cover
-            fCurrentCoverID: String;     // currently selected coverID
-            // Note: I'm not using a NempCover-object here to remember the idx
-            //       Otherwise AVs could occur when deleting covers ;-)
+            // fCurrentCoverID: String;     // currently selected coverID
+            fCurrentCoverKey: String;
 
-           // fCaption: String; // caption for the current Cover
+            function GetCollection(Index: Integer): TAudioCollection;
 
             function fGetCurrentItem: Integer;
             // SetCurrentItem: Set the current Item and draws cover and scrollcover
             procedure fSetCurrentItem(aValue: Integer);
 
             procedure DrawScrollCover(aIdx: Integer; aWidth, aHeight: Integer);
+        protected
+          property Collection[Index: Integer]: TAudioCollection read GetCollection;
         public
             MainImage: TImage;
             ScrollImage: TImage;
-            CoverList: TNempCoverList;
+
+            CoverCategory: TLibraryCategory;
+            CoverCount: Integer;
 
             property CurrentItem: Integer read fGetCurrentItem write fSetCurrentItem;
-           // property Caption: String read fcaption;
 
-           constructor Create(events_window : HWND);
+            constructor Create(events_window : HWND);
 
             // ScrollToCurrentItem:
             // Searches the cover with fCurrentCoverID and shows it
@@ -88,20 +90,43 @@ begin
     result := fCurrentItem;
 end;
 
+
+function TClassicCoverFlow.GetCollection(Index: Integer): TAudioCollection;
+begin
+  if (Index < 0) or (Index >= CoverCount) then begin
+    result := Nil;
+    exit;
+  end;
+
+  if Index = 0 then
+    result := CoverCategory.Collections[0]
+  else
+  begin
+    // Index >= 1, and valid
+    if CoverCategory.CollectionCount = 1 then
+      result := CoverCategory.Collections[0].SubCollections[Index-1]
+    else
+      result := CoverCategory.Collections[Index];
+  end;
+end;
+
+
 procedure TClassicCoverFlow.ScrollToCurrentItem;
 var i, newItem: Integer;
 begin
     newItem := -1;
-    for i := 0 to Coverlist.Count -  1 do
-    if tNempCover(Coverlist[i]).ID = fCurrentCoverID then
-    begin
+    for i := 0 to CoverCount - 1 do begin
+      if Collection[i].Key = fCurrentCoverKey then
+      begin
         newItem := i;
         break;
+      end;
     end;
+
     if newItem = -1 then
-        newItem := fCurrentItem;
-    if newItem >= Coverlist.Count then
-        newItem := 0;
+      newItem := fCurrentItem;
+    if newItem >= CoverCount then
+      newItem := 0;
 
     // Set item and draw the stuff.
     Currentitem := newItem;
@@ -117,37 +142,39 @@ begin
     newItem := fCurrentItem + ((x - mitte) Div 85) - 1;
 
   // Set item and draw the stuff.
-  if (newItem >= 0) and (newItem <= Coverlist.Count-1) then
+  if (newItem >= 0) and (newItem <= CoverCount-1) then
       Currentitem := newItem;
 end;
 
+
 procedure TClassicCoverFlow.fSetCurrentItem(aValue: Integer);
-var aCover: tNempCover;
+var
+  aCollection: TAudioCollection;
 begin
     fCurrentItem := aValue;
     if fCurrentItem < 0 then
         fCurrentItem := 0;
-    if fCurrentItem >= CoverList.Count then
-        fCurrentItem := CoverList.Count-1;
+    if fCurrentItem >= CoverCount then
+        fCurrentItem := CoverCount-1;
+    if fCurrentItem = -1 then
+      exit;
 
-    if fCurrentItem = -1 then exit;
-
-    aCover := CoverList[fCurrentItem];
-
-    fCurrentCoverID := aCover.ID;
+    aCollection := Collection[fCurrentItem];
+    //fCurrentCoverID := aCollection.CoverID;
+    fCurrentCoverKey := aCollection.Key;
 
     // Set the bitmap size (is this really necessary?)
     MainImage.Picture.Bitmap.Height := MainImage.Height;
     MainImage.Picture.Bitmap.Width := MainImage.Width;
 
-    if not MedienBib.CoverArtSearcher.GetCoverBitmapFromID(aCover.ID, MainImage.Picture) then
+    if not MedienBib.CoverArtSearcher.GetCoverBitmapFromID(aCollection.CoverID, MainImage.Picture) then
         // cover is missing - try again to get it ?
         SendMessage(fEventsWindow, WM_FC_NEEDPREVIEW, fCurrentItem, 0);
 
     // after that: try again
     // yes, we called this in the MessageHandler for WM_FC_NEEDPREVIEW as well
     // not the best solution, but I hope the classic flow is not used that often^^
-    MedienBib.CoverArtSearcher.GetCoverBitmapFromID(aCover.ID, MainImage.Picture);
+    MedienBib.CoverArtSearcher.GetCoverBitmapFromID(aCollection.CoverID, MainImage.Picture);
 
     DrawScrollCover(fCurrentItem, ScrollImage.Width, ScrollImage.Height);
 end;
@@ -166,14 +193,14 @@ var mitte, minidx, maxidx, i: Integer;
     xfactor, yfactor:double;
     NewHeight, NewWidth: Integer;
     bigbmp, tmpBmp: TBitmap;
-    aCover: TNempCover;
+    aCollection: TAudioCollection;
 begin
   mitte := aWidth Div 2;
 
   minidx := aIdx - ((Mitte Div 75) + 1);
   maxidx := aIdx + ((Mitte Div 75) + 1);
   if minidx < 0 then minidx := 0;
-  if maxidx >= Coverlist.Count-1 then maxidx := Coverlist.Count - 1;
+  if maxidx >= CoverCount-1 then maxidx := CoverCount - 1;
 
   aPicture := TPicture.Create;
   bigbmp := TBitmap.Create;
@@ -191,8 +218,8 @@ begin
       try
           for i := minidx to maxidx do
           begin
-              aCover := TNempCover(Coverlist[i]);
-              MedienBib.CoverArtSearcher.GetCoverBitmapFromID(aCover.ID, aPicture);
+              aCollection := Collection[i];
+              MedienBib.CoverArtSearcher.GetCoverBitmapFromID(aCollection.CoverID, aPicture);
               AssignBitmap(tmpBmp, aPicture);
 
               if (tmpBmp.Width > 0) AND (tmpBmp.Height > 0) then

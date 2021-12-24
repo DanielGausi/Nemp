@@ -68,8 +68,6 @@ type
 
     TEDefaultCoverType = (dcFile, dcWebRadio, dcCDDA, dcNoCover_deprecated, dcError);
 
-    TNempSortArray = Array[1..2] of TAudioFileStringIndex;
-
     TSpalte = record
       Bezeichnung: string;
       Inhalt: integer;
@@ -625,6 +623,7 @@ const
     MB_BlockReadAccess =  3;
     // Update ist fertig. Jetzt müssen die Trees neu befüllt werden
     MB_RefillTrees = 4;
+    MB_ClearEmptyNodes = 8;
     // Aufräumen ist auch erledigt. Controls wieder entsperren
     MB_Unblock =  5;
     // AnzeigeListe kontrollieren, ob gelöschte Dateien enthalten sind

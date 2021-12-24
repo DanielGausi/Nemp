@@ -51,18 +51,11 @@ var Sort_Pfad_asc,
     Sort_AlbumTrack_asc           ,
     Sort_Jahr_asc                 ,
     Sort_Genre_asc                ,
-    Sort_String1String2Titel_asc  ,
-    Sort_String2String1Titel_asc  ,
+    //Sort_String1String2Titel_asc  ,
+    //Sort_String2String1Titel_asc  ,
     Sort_CoverID                  : IComparer<TAudioFile>;
 
 function binaersuche(Liste: TAudioFileList; FilePath, FileName: UnicodeString; l,r:integer):integer;
-function BinaerAlbumSuche(Liste: TAudioFileList; album: UnicodeString; l,r:integer):integer;
-function BinaerArtistSuche(Liste: TAudioFileList; artist: UnicodeString; l,r:integer):integer;
-function BinaerCoverIDSuche(Liste: TAudioFileList; CoverID: String; l,r: Integer): Integer;
-
-{Note: Parameter SortArray: TNempSortArray not needed any longer, as search is done by Key1/Key2}
-function BinaerArtistSuche_JustContains(Liste: TAudioFileList; artist: UnicodeString; l,r:integer):integer;
-function BinaerAlbumSuche_JustContains(Liste: TAudioFileList; album: UnicodeString; l,r:integer):integer;
 
 // Gets the Data for a new created AudioFile
 // First: GetAudiodata.
@@ -121,9 +114,6 @@ function AFCompareTrackPeak(a1,a2: tAudioFile): Integer;
 
 var MainSort: IComparer<TAudioFile>;
 
-function AnsiCompareText_Nemp(const S1, S2: string): Integer;
-function AnsiStartsText_Nemp(const ASubText, AText: string): Boolean;
-
 
 implementation
 
@@ -135,30 +125,6 @@ uses NempMainUnit, CoverHelper, MedienbibliothekClass;
 // need some properties from the MedienBib, from where
 // the sort-method is called
 
-
-// AnsiCompareText_Nemp
-// An version of AnsiCompareText which treats strings like "-sampler" and "--sampler" differently
-// With the regular AnsiCompareText function browsing by Directory won't work with such folder names
-// also: SORT_DIGITSASNUMBERS for a better sorting of sampler series (like "Bravo Hits 1,2,3,..,10" instead of "1,10,2,3,..")
-function AnsiCompareText_Nemp(const S1, S2: string): Integer;
-begin
-  Result := CompareString(LOCALE_USER_DEFAULT, SORT_STRINGSORT or SORT_DIGITSASNUMBERS, PChar(S1),
-    Length(S1), PChar(S2), Length(S2)) - CSTR_EQUAL;
-end;
-
-// the same for AnsiStartsText
-function AnsiStartsText_Nemp(const ASubText, AText: string): Boolean;
-var
-  L, L2: Integer;
-begin
-  L := Length(ASubText);
-  L2 := Length(AText);
-  if L > L2 then
-    Result := False
-  else
-    Result := CompareString(LOCALE_USER_DEFAULT, SORT_STRINGSORT or SORT_DIGITSASNUMBERS,
-      PChar(AText), L, PChar(ASubText), L) = 2;
-end;
 
 
 function AFCompareArtist(a1,a2: tAudioFile): Integer;
@@ -321,7 +287,6 @@ begin
 end;
 
 
-
 function Sortieren_ArtistTitel_asc(item1,item2: TAudioFile):integer;
 var tmp:integer;
 begin
@@ -330,110 +295,6 @@ begin
         result := AnsiCompareText_Nemp(item1.Titel, item2.Titel)
     else result:= tmp;
 end;
-
-(*
-function Sortieren_ArtistAlbumTrackTitel_asc(item1,item2:pointer):integer;
-begin
-    result := AnsiCompareText_Nemp(TAudioFile(item1).Artist, TAudioFile(item2).Artist);
-    if result=0 then
-        result := AnsiCompareText_Nemp(TAudioFile(item1).Album, TAudioFile(item2).Album);
-    if result = 0 then
-        result := AnsiCompareText_Nemp(TAudioFile(item1).CD, TAudioFile(item2).CD);
-    if result=0 then
-        result := CompareValue(TAudioFile(item1).Track,TAudioFile(item2).Track);
-    if result=0 then
-        result := AnsiCompareText_Nemp(TAudioFile(item1).Dateiname, TAudioFile(item2).Dateiname);
-    if result=0 then
-        result := AnsiCompareText_Nemp(TAudioFile(item1).Titel, TAudioFile(item2).Titel);
-end;
-
-function Sortieren_TitelArtist_asc(item1,item2:pointer):integer;
-var tmp:integer;
-begin
-    tmp := AnsiCompareText_Nemp(TAudioFile(item1).Titel, TAudioFile(item2).Titel);
-    if tmp = 0 then
-        result := AnsiCompareText_Nemp(TAudioFile(item1).Artist, TAudioFile(item2).Artist)
-    else result:=tmp;
-end;
-
-function Sortieren_Pfad_asc(item1,item2:pointer):integer;
-begin
-  result := AnsiCompareText_Nemp(TAudioFile(item1).Ordner, TAudioFile(item2).Ordner);
-  if result = 0 then
-      result := AnsiCompareText_Nemp(TAudioFile(item1).Dateiname, TAudioFile(item2).Dateiname);
-end;
-
-function Sortieren_AlbumTrack_asc(item1,item2:pointer):integer;
-begin
-  result := AnsiCompareText_Nemp(TAudioFile(item1).Album,TAudioFile(item2).Album);
-  if result = 0 then
-      result := AnsiCompareText_Nemp(TAudioFile(item1).CD, TAudioFile(item2).CD);
-  if result = 0 then
-      result := AnsiCompareText_Nemp(TAudioFile(item1).Ordner, TAudioFile(item2).Ordner);
-  if result = 0 then
-      result := CompareValue(TAudioFile(item1).Track,TAudioFile(item2).Track);
-  if result = 0 then
-      result := AnsiCompareText_Nemp(TAudioFile(item1).Dateiname, TAudioFile(item2).Dateiname);
-end;
-function Sortieren_Jahr_asc(item1,item2:pointer):integer;
-begin
-    result := AnsiCompareText_Nemp(TAudioFile(item1).Year,TAudioFile(item2).Year);
-    if result = 0 then
-      result := Sortieren_ArtistTitel_asc(item1,item2); //Sortieren_ArtistAlbumTitel_asc
-end;
-function Sortieren_Genre_asc(item1,item2:pointer):integer;
-begin
-    result := AnsiCompareText_Nemp(TAudioFile(item1).Genre, TAudioFile(item2).Genre)
-end;
-
-
-function Sortieren_String1String2Titel_asc(item1,item2:pointer):integer;
-var tmp1,tmp2: Integer;
-begin
-    if MedienBib.NempSortArray[1] = siFileAge then
-        tmp1 := AnsiCompareText_Nemp(TAudioFile(item1).FileAgeSortString, TAudioFile(item2).FileAgeSortString)
-    else
-        tmp1 := AnsiCompareText_Nemp(TAudioFile(item1).Strings[MedienBib.NempSortArray[1]], TAudioFile(item2).Strings[MedienBib.NempSortArray[1]]);
-    if tmp1=0 then
-    begin
-        if MedienBib.NempSortArray[2] = siFileAge then
-            tmp2 := AnsiCompareText_Nemp(TAudioFile(item1).FileAgeSortString, TAudioFile(item2).FileAgeSortString)
-        else
-            tmp2 := AnsiCompareText_Nemp(TAudioFile(item1).Strings[MedienBib.NempSortArray[2]], TAudioFile(item2).Strings[MedienBib.NempSortArray[2]]);
-        if tmp2 = 0 then
-        begin
-            result:= AnsiCompareText_Nemp(TAudioFile(item1).Titel, TAudioFile(item2).Titel)
-        end else result:=tmp2;
-    end
-    else result:= tmp1;
-end;
-function Sortieren_String2String1Titel_asc(item1,item2:pointer):integer;
-var tmp1,tmp2:integer;
-begin
-    if MedienBib.NempSortArray[2] = siFileAge then
-        tmp1 := AnsiCompareText_Nemp(TAudioFile(item1).FileAgeSortString, TAudioFile(item2).FileAgeSortString)
-    else
-        tmp1:= AnsiCompareText_Nemp(TAudioFile(item1).Strings[MedienBib.NempSortArray[2]], TAudioFile(item2).Strings[MedienBib.NempSortArray[2]]);
-    if tmp1=0 then
-    begin
-        if MedienBib.NempSortArray[1] = siFileAge then
-            tmp2 := AnsiCompareText_Nemp(TAudioFile(item1).FileAgeSortString, TAudioFile(item2).FileAgeSortString)
-        else
-            tmp2 := AnsiCompareText_Nemp(TAudioFile(item1).Strings[MedienBib.NempSortArray[1]], TAudioFile(item2).Strings[MedienBib.NempSortArray[1]]);
-        if tmp2 = 0 then
-        begin
-            result:= AnsiCompareText_Nemp(TAudioFile(item1).Titel, TAudioFile(item2).Titel)
-        end else result:=tmp2;
-    end
-    else result:= tmp1;
-end;
-
-function Sortieren_CoverID(item1,item2:pointer):integer;
-begin
-  result := AnsiCompareText_Nemp(TAudioFile(item1).CoverID,TAudioFile(item2).CoverID);
-end;
-
-*)
 
 
 function binaersuche(Liste: TAudioFileList; FilePath, FileName: UnicodeString; l,r:integer):integer;
@@ -466,153 +327,6 @@ begin
         end;
     end;
 end;
-
-
-function BinaerAlbumSuche(Liste: TAudioFileList; album: UnicodeString; l,r:integer):integer;
-var m:integer;
-    strm: UnicodeString;
-    c:integer;
-begin
-    if (r < l) or (r = -1) then
-    begin
-        result:=-1;
-    end else
-    begin
-        m:=(l+r) DIV 2;
-
-        strm := Liste[m].Key2;
-        c := AnsiCompareText_Nemp(album,strm);
-        if l=r then
-        begin
-            if c=0 then result:=l
-            else result:=-1;
-        end else
-        begin
-            if  c=0 then
-                result:=m
-            else if c > 0 then
-                result := BinaerAlbumSuche(Liste,album,m+1,r)
-                else
-                    result := BinaerAlbumSuche(Liste,album,l,m-1);
-        end;
-    end;
-end;
-
-function BinaerArtistSuche(Liste: TAudioFileList; artist: UnicodeString; l,r:integer):integer;
-var m:integer;
-    strm: UnicodeString;
-    c:integer;
-begin
-    if (r < l) or (r = -1) then
-    begin
-        result:=-1;
-    end else
-    begin
-        m:=(l+r) DIV 2;
-        strm := Liste[m].Key1;
-        c := AnsiCompareText_Nemp(artist,strm);
-        if l=r then
-        begin
-            if c=0 then result:=l
-            else result:=-1;
-        end else
-        begin
-            if  c=0 then
-                result:=m
-            else if c > 0 then
-                result := BinaerArtistSuche(Liste,artist,m+1,r)
-                else
-                    result := BinaerArtistSuche(Liste,artist,l,m-1);
-        end;
-    end;
-end;
-
-function BinaerCoverIDSuche(Liste: TAudioFileList; CoverID: String; l,r: Integer): Integer;
-var m:integer;
-    strm:String;
-    c:integer;
-begin
-    if (r < l) or (r = -1) then
-    begin
-        result := -1;
-    end else
-    begin
-        m := (l+r) DIV 2;
-        strm := Liste[m].Key1;
-        c := AnsiCompareText_Nemp(CoverID, strm);
-        if l = r then
-        begin
-            if c = 0 then result := l
-            else result := -1;
-        end else
-        begin
-            if c = 0 then
-                result := m
-            else if c > 0 then
-                result := BinaerCoverIDSuche(Liste, CoverID, m+1, r)
-                else
-                    result := BinaerCoverIDSuche(Liste, CoverID, l, m-1);
-        end;
-    end;
-end;
-
-function BinaerArtistSuche_JustContains(Liste: TAudioFileList; artist: UnicodeString; l,r:integer):integer;
-var m:integer;
-    strm: UnicodeString;
-    c:integer;
-begin
-    if (r < l) or (r = -1) then
-    begin
-        result:=-1;
-    end else
-    begin
-        m:=(l+r) DIV 2;
-        strm := Liste[m].Key1;
-        c := AnsiCompareText_Nemp(artist,strm);
-        if l=r then
-        begin
-            if (c=0) OR (AnsiStartsText_Nemp(artist + '\' ,strm)) then result:=l
-            else result:=-1;
-        end else
-        begin
-            if  (c=0) OR (AnsiStartsText_Nemp(artist + '\', strm)) then
-                result:=m
-            else if c > 0 then
-                result := BinaerArtistSuche_JustContains(Liste,artist,m+1,r)
-                else
-                    result := BinaerArtistSuche_JustContains(Liste,artist,l,m-1);
-        end;
-    end;
-end;
-function BinaerAlbumSuche_JustContains(Liste: TAudioFileList; album: UnicodeString; l,r:integer):integer;
-var m:integer;
-    strm: UnicodeString;
-    c:integer;
-begin
-    if (r < l) or (r = -1) then
-    begin
-        result:=-1;
-    end else
-    begin
-        m:=(l+r) DIV 2;
-        strm:=Liste[m].Key2;
-        c := AnsiCompareText_Nemp(album,strm);
-        if l=r then
-        begin
-            if (c=0) OR (AnsiStartsText_Nemp(album + '\',strm)) then result:=l
-            else result:=-1;
-        end else
-        begin
-            if  (c=0)  OR (AnsiStartsText_Nemp(album + '\',strm)) then
-                result:=m
-            else if c > 0 then
-                result := BinaerAlbumSuche_JustContains(Liste,album,m+1,r)
-                else
-                    result := BinaerAlbumSuche_JustContains(Liste,album,l,m-1);
-        end;
-    end;
-end;
-
 
 {
     --------------------------------------------------------
@@ -1283,48 +997,6 @@ begin
     result := AnsiCompareText_Nemp(item1.Genre, item2.Genre)
 end);
 
-Sort_String1String2Titel_asc := TComparer<TAudioFile>.Construct(function (const item1,item2: TAudioFile): Integer
-var tmp1,tmp2: Integer;
-begin
-    if MedienBib.NempSortArray[1] = siFileAge then
-        tmp1 := AnsiCompareText_Nemp(item1.FileAgeSortString, item2.FileAgeSortString)
-    else
-        tmp1 := AnsiCompareText_Nemp(item1.Strings[MedienBib.NempSortArray[1]], item2.Strings[MedienBib.NempSortArray[1]]);
-    if tmp1=0 then
-    begin
-        if MedienBib.NempSortArray[2] = siFileAge then
-            tmp2 := AnsiCompareText_Nemp(item1.FileAgeSortString, item2.FileAgeSortString)
-        else
-            tmp2 := AnsiCompareText_Nemp(item1.Strings[MedienBib.NempSortArray[2]], item2.Strings[MedienBib.NempSortArray[2]]);
-        if tmp2 = 0 then
-        begin
-            result:= AnsiCompareText_Nemp(item1.Titel, item2.Titel)
-        end else result:=tmp2;
-    end
-    else result:= tmp1;
-end);
-
-Sort_String2String1Titel_asc := TComparer<TAudioFile>.Construct( function (const item1,item2: TAudioFile): Integer
-var tmp1,tmp2:integer;
-begin
-    if MedienBib.NempSortArray[2] = siFileAge then
-        tmp1 := AnsiCompareText_Nemp(item1.FileAgeSortString, item2.FileAgeSortString)
-    else
-        tmp1:= AnsiCompareText_Nemp(item1.Strings[MedienBib.NempSortArray[2]], item2.Strings[MedienBib.NempSortArray[2]]);
-    if tmp1=0 then
-    begin
-        if MedienBib.NempSortArray[1] = siFileAge then
-            tmp2 := AnsiCompareText_Nemp(item1.FileAgeSortString, item2.FileAgeSortString)
-        else
-            tmp2 := AnsiCompareText_Nemp(item1.Strings[MedienBib.NempSortArray[1]], item2.Strings[MedienBib.NempSortArray[1]]);
-        if tmp2 = 0 then
-        begin
-            result:= AnsiCompareText_Nemp(item1.Titel, item2.Titel)
-        end else result:=tmp2;
-    end
-    else result:= tmp1;
-end
-);
 
 
 Sort_CoverID := TComparer<TAudioFile>.Construct( function (const item1,item2: TAudioFile): Integer

@@ -1230,6 +1230,10 @@ begin
     fItem[i].texture.handle := 0;  // ?? ggf. doppelt gemacht
   end;
   fSelectedItem := 0;
+  // the following lines are needed for swapping Categories
+  if fCurrentItem > fQueryUpdateItemCount then // xxxxxxxxxxxxxxxxxx
+    fCurrentItem := 0;   // xxxxxxxxxxxxxxxxxx
+
   fQueryUpdateItemCount := -1;
 end;
 

@@ -81,10 +81,10 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MajorVer>4</VerInfo_MajorVer>
         <VerInfo_MinorVer>15</VerInfo_MinorVer>
-        <VerInfo_Build>704</VerInfo_Build>
+        <VerInfo_Build>712</VerInfo_Build>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=4.15.0.704;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=4.15.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=4.15.0.712;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=4.15.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <DCC_Define>madExcept;$(DCC_Define)</DCC_Define>
         <DCC_MapFile>3</DCC_MapFile>
         <DCC_DebugInformation>2</DCC_DebugInformation>
@@ -301,6 +301,19 @@
         </DCCReference>
         <DCCReference Include="PlaylistDuplicates.pas">
             <Form>FormPlaylistDuplicates</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="LibraryOrganizer.Base.pas"/>
+        <DCCReference Include="Cover.ViewCache.pas"/>
+        <DCCReference Include="LibraryOrganizer.Playlists.pas"/>
+        <DCCReference Include="LibraryOrganizer.Files.pas"/>
+        <DCCReference Include="LibraryOrganizer.Webradio.pas"/>
+        <DCCReference Include="LibraryOrganizer.Configuration.pas">
+            <Form>FormLibraryConfiguration</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="LibraryOrganizer.Configuration.NewLayer.pas">
+            <Form>FormNewLayer</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Debug">

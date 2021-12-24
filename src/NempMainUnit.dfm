@@ -131,8 +131,8 @@ object Nemp_MainForm: TNemp_MainForm
           end
           object PanelCoverBrowse: TNempPanel
             Tag = 2
-            Left = 2
-            Top = -9
+            Left = 98
+            Top = 6
             Width = 167
             Height = 175
             Anchors = []
@@ -140,6 +140,7 @@ object Nemp_MainForm: TNemp_MainForm
             PopupMenu = Medialist_Browse_PopupMenu
             TabOrder = 1
             Visible = False
+            OnDblClick = PanelCoverBrowseDblClick
             OnMouseDown = PanelCoverBrowseMouseDown
             OnMouseMove = IMGMedienBibCoverMouseMove
             OnMouseUp = IMGMedienBibCoverMouseUp
@@ -213,9 +214,9 @@ object Nemp_MainForm: TNemp_MainForm
                 100
                 33)
               object Lbl_CoverFlow: TLabel
-                Left = 0
-                Top = 8
-                Width = 100
+                Left = 38
+                Top = 10
+                Width = 62
                 Height = 13
                 Alignment = taCenter
                 Anchors = [akLeft, akTop, akRight]
@@ -224,7 +225,28 @@ object Nemp_MainForm: TNemp_MainForm
                 Transparent = True
                 StyleElements = [seClient, seBorder]
                 OnMouseDown = Lbl_CoverFlowMouseDown
-                ExplicitWidth = 233
+              end
+              object TabBtnCoverCategory: TSkinButton
+                Tag = 1
+                Left = 8
+                Top = 5
+                Width = 24
+                Height = 24
+                Hint = 'Select category'
+                ParentShowHint = False
+                PopupMenu = Medialist_Browse_Categories_PopupMenu
+                ShowHint = True
+                TabOrder = 0
+                TabStop = False
+                OnClick = TabBtnCoverCategoryClick
+                DrawMode = dm_Skin
+                NumGlyphsX = 5
+                NumGlyphsY = 1
+                GlyphLine = 0
+                CustomRegion = False
+                FocusDrawMode = fdm_Windows
+                Color1 = clBlack
+                Color2 = clBlack
               end
             end
           end
@@ -259,7 +281,7 @@ object Nemp_MainForm: TNemp_MainForm
               BorderStyle = bsNone
               Constraints.MinWidth = 20
               DefaultNodeHeight = 14
-              DragMode = dmAutomatic
+              DragOperations = []
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
               Font.Height = -11
@@ -284,14 +306,13 @@ object Nemp_MainForm: TNemp_MainForm
               OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
               OnAfterItemErase = VSTAfterItemErase
               OnClick = ArtistsVSTClick
+              OnDragAllowed = ArtistsVSTDragAllowed
               OnFocusChanged = ArtistsVSTFocusChanged
               OnGetText = StringVSTGetText
               OnPaintText = ArtistsVSTPaintText
               OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
               OnIncrementalSearch = ArtistsVSTIncrementalSearch
-              OnKeyDown = StringVSTKeyDown
               OnResize = ArtistsVSTResize
-              OnStartDrag = ArtistsVSTStartDrag
               Columns = <
                 item
                   MinWidth = 0
@@ -310,8 +331,6 @@ object Nemp_MainForm: TNemp_MainForm
               BevelOuter = bvNone
               BorderStyle = bsNone
               Constraints.MinWidth = 20
-              DefaultNodeHeight = 14
-              DragMode = dmAutomatic
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
               Font.Height = -11
@@ -319,8 +338,9 @@ object Nemp_MainForm: TNemp_MainForm
               Font.Style = []
               Header.AutoSizeIndex = 0
               Header.Background = clWindow
-              Header.Height = 21
+              Header.Height = 22
               Header.Options = [hoAutoResize, hoDrag, hoVisible]
+              Images = DummyImageList
               IncrementalSearch = isAll
               Indent = 14
               Margin = 0
@@ -331,18 +351,23 @@ object Nemp_MainForm: TNemp_MainForm
               TabOrder = 1
               TextMargin = 2
               TreeOptions.AutoOptions = [toAutoDropExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
+              TreeOptions.MiscOptions = [toAcceptOLEDrop, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning, toVariableNodeHeight, toEditOnClick]
               TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
               TreeOptions.SelectionOptions = [toFullRowSelect, toRightClickSelect]
               OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
               OnAfterItemErase = VSTAfterItemErase
               OnClick = AlbenVSTClick
               OnColumnDblClick = AlbenVSTColumnDblClick
+              OnDragAllowed = AlbenVSTDragAllowed
+              OnDrawText = AlbenVSTDrawText
               OnFocusChanged = AlbenVSTFocusChanged
-              OnGetText = StringVSTGetText
+              OnGetText = AlbenVSTGetText
               OnPaintText = ArtistsVSTPaintText
+              OnGetImageIndex = AlbenVSTGetImageIndex
               OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
-              OnIncrementalSearch = ArtistsVSTIncrementalSearch
+              OnIncrementalSearch = AlbenVSTIncrementalSearch
               OnKeyDown = StringVSTKeyDown
+              OnMeasureItem = AlbenVSTMeasureItem
               OnResize = AlbenVSTResize
               OnStartDrag = AlbenVSTStartDrag
               Columns = <
@@ -355,8 +380,8 @@ object Nemp_MainForm: TNemp_MainForm
           end
           object PanelTagCloudBrowse: TNempPanel
             Tag = 2
-            Left = 175
-            Top = 20
+            Left = 318
+            Top = 46
             Width = 119
             Height = 160
             BevelOuter = bvNone
@@ -5025,23 +5050,26 @@ object Nemp_MainForm: TNemp_MainForm
   object Medialist_View_PopupMenu: TPopupMenu
     Images = MenuImages
     OnPopup = Medialist_View_PopupMenuPopup
-    Left = 192
-    Top = 128
+    Left = 480
+    Top = 120
     object PM_ML_Enqueue: TMenuItem
       Caption = 'Enqueue (at the end of the playlist)'
-      OnClick = EnqueueTBClick
+      OnClick = PM_ML_FilesPlayEnqueueClick
     end
     object PM_ML_Play: TMenuItem
+      Tag = 1
       Caption = 'Play (and clear current playlist)'
-      OnClick = PM_ML_PlayClick
+      OnClick = PM_ML_FilesPlayEnqueueClick
     end
     object PM_ML_PlayNext: TMenuItem
+      Tag = 2
       Caption = 'Enqueue (after the current title)'
-      OnClick = PM_ML_PlayNextClick
+      OnClick = PM_ML_FilesPlayEnqueueClick
     end
     object PM_ML_PlayNow: TMenuItem
+      Tag = 3
       Caption = 'Just play focussed file (don'#39't change the playlist)'
-      OnClick = PM_ML_PlayNowClick
+      OnClick = PM_ML_FilesPlayNowClick
     end
     object N14: TMenuItem
       Caption = '-'
@@ -6594,83 +6622,125 @@ object Nemp_MainForm: TNemp_MainForm
   object Medialist_Browse_PopupMenu: TPopupMenu
     Images = MenuImages
     OnPopup = Medialist_Browse_PopupMenuPopup
-    Left = 192
-    Top = 78
+    Left = 400
+    Top = 46
     object PM_ML_EnqueueBrowse: TMenuItem
       Caption = 'Enqueue (at the end of the playlist)'
-      OnClick = EnqueueTBClick
+      OnClick = PM_ML_CollectionPlayEnqueueClick
     end
     object PM_ML_PlayBrowse: TMenuItem
+      Tag = 1
       Caption = 'Play (and clear current playlist)'
-      OnClick = PM_ML_PlayClick
+      OnClick = PM_ML_CollectionPlayEnqueueClick
     end
     object PM_ML_PlayNextBrowse: TMenuItem
+      Tag = 2
       Caption = 'Enqueue (after the current title)'
-      OnClick = PM_ML_PlayNextClick
+      OnClick = PM_ML_CollectionPlayEnqueueClick
     end
     object N27: TMenuItem
       Caption = '-'
     end
-    object PM_ML_BrowseBy: TMenuItem
-      Caption = 'Browse by'
-      object PM_ML_BrowseByArtistsAlbums: TMenuItem
-        Caption = 'Artists - Albums'
+    object PM_ML_SortCollectionBy: TMenuItem
+      Caption = 'Sort Collection by'
+      object PM_ML_SortCollectionByName: TMenuItem
+        Caption = 'Name'
         RadioItem = True
-        OnClick = SortierAuswahl1POPUPClick
+        OnClick = PM_ML_SortCollectionByClick
       end
-      object PM_ML_BrowseByDirectoriesArtists: TMenuItem
+      object PM_ML_SortCollectionByAlbum: TMenuItem
         Tag = 1
-        Caption = 'Directories - Artists'
+        Caption = 'Album'
         RadioItem = True
-        OnClick = SortierAuswahl1POPUPClick
+        OnClick = PM_ML_SortCollectionByClick
       end
-      object PM_ML_BrowseByDirectoriesAlbums: TMenuItem
+      object PM_ML_SortCollectionByArtistAlbum: TMenuItem
         Tag = 2
-        Caption = 'Directories - Albums'
+        Caption = 'Artist and Album'
         RadioItem = True
-        OnClick = SortierAuswahl1POPUPClick
+        OnClick = PM_ML_SortCollectionByClick
       end
-      object PM_ML_BrowseByGenresArtists: TMenuItem
+      object PM_ML_SortCollectionByCount: TMenuItem
         Tag = 3
-        Caption = 'Genres - Artists'
+        Caption = 'Count'
         RadioItem = True
-        OnClick = SortierAuswahl1POPUPClick
+        OnClick = PM_ML_SortCollectionByClick
       end
-      object PM_ML_BrowseByGenresYears: TMenuItem
+      object PM_ML_SortCollectionByReleaseYear: TMenuItem
         Tag = 4
-        Caption = 'Genres - Years'
+        Caption = 'Release Year'
         RadioItem = True
-        OnClick = SortierAuswahl1POPUPClick
+        OnClick = PM_ML_SortCollectionByClick
       end
-      object PM_ML_BrowseByAlbumArtists: TMenuItem
+      object PM_ML_SortCollectionByFileage: TMenuItem
+        Tag = 5
+        Caption = 'Fileage'
+        OnClick = PM_ML_SortCollectionByClick
+      end
+      object PM_ML_SortCollectionByGenre: TMenuItem
         Tag = 6
-        Caption = 'Album - Artists'
-        OnClick = SortierAuswahl1POPUPClick
+        Caption = 'Genre'
+        OnClick = PM_ML_SortCollectionByClick
       end
-      object PM_ML_BrowseByYearArtist: TMenuItem
+      object PM_ML_SortCollectionByDirectory: TMenuItem
         Tag = 7
-        Caption = 'Year - Artist'
-        OnClick = SortierAuswahl1POPUPClick
+        Caption = 'Directory'
+        OnClick = PM_ML_SortCollectionByClick
       end
-      object PM_ML_BrowseByFileageAlbum: TMenuItem
-        Tag = 8
-        Caption = 'Fileage - Album'
-        OnClick = SortierAuswahl1POPUPClick
-      end
-      object PM_ML_BrowseByFileageArtist: TMenuItem
-        Tag = 9
-        Caption = 'Fileage - Artist'
-        OnClick = SortierAuswahl1POPUPClick
-      end
-      object N11: TMenuItem
-        Caption = '-'
-      end
-      object PM_ML_BrowseByMore: TMenuItem
-        Tag = 100
-        Caption = 'More...'
+    end
+    object PM_ML_SortLayerBy: TMenuItem
+      Caption = 'Sort layer by'
+      object PM_ML_SortLayerByName: TMenuItem
+        Caption = 'Name'
         RadioItem = True
-        OnClick = PM_ML_BrowseByMoreClick
+        OnClick = SortierAuswahl1POPUPClick
       end
+      object PM_ML_SortLayerByAlbum: TMenuItem
+        Tag = 1
+        Caption = 'Album'
+        RadioItem = True
+        OnClick = SortierAuswahl1POPUPClick
+      end
+      object PM_ML_SortLayerByArtistAlbum: TMenuItem
+        Tag = 2
+        Caption = 'Artist and Album'
+        RadioItem = True
+        OnClick = SortierAuswahl1POPUPClick
+      end
+      object PM_ML_SortLayerByCount: TMenuItem
+        Tag = 3
+        Caption = 'Count'
+        RadioItem = True
+        OnClick = SortierAuswahl1POPUPClick
+      end
+      object PM_ML_SortLayerByReleaseYear: TMenuItem
+        Tag = 4
+        Caption = 'Release Year'
+        RadioItem = True
+        OnClick = SortierAuswahl1POPUPClick
+      end
+      object PM_ML_SortLayerByFileAge: TMenuItem
+        Tag = 5
+        Caption = 'Fileage'
+        RadioItem = True
+        OnClick = SortierAuswahl1POPUPClick
+      end
+      object PM_ML_SortLayerByGenre: TMenuItem
+        Tag = 6
+        Caption = 'Genre'
+        RadioItem = True
+        OnClick = SortierAuswahl1POPUPClick
+      end
+      object PM_ML_SortLayerByDirectory: TMenuItem
+        Tag = 7
+        Caption = 'Directory'
+        RadioItem = True
+        OnClick = SortierAuswahl1POPUPClick
+      end
+    end
+    object PM_ML_ConfigureMedialibrary: TMenuItem
+      Caption = 'Configure Media library'
+      OnClick = PM_ML_ConfigureMedialibraryClick
     end
     object N16: TMenuItem
       Caption = '-'
@@ -6889,5 +6959,14 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Show column "Index"'
       OnClick = pmShowColumnIndexClick
     end
+  end
+  object DummyImageList: TImageList
+    Width = 128
+    Left = 464
+    Top = 40
+  end
+  object Medialist_Browse_Categories_PopupMenu: TPopupMenu
+    Left = 456
+    Top = 180
   end
 end

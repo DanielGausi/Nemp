@@ -182,7 +182,7 @@ begin
   CloseImageA.Parent := Auswahlform.ContainerPanelAuswahlform;
   if MedienlisteForm.Visible then
   begin
-    MedienBib.GenerateAnzeigeListe(BROWSE_ALL, BROWSE_ALL);
+    MedienBib.GenerateAnzeigeListe(Nil);
   end;
 end;
 

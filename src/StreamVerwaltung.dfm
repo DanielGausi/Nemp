@@ -70,6 +70,10 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     TabOrder = 3
     object Tab_Favourites: TTabSheet
       Caption = 'Favorites'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         684
         377)
@@ -97,23 +101,23 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         Columns = <
           item
             Position = 0
-            Text = 'Name'
             Width = 240
+            WideText = 'Name'
           end
           item
             Position = 1
-            Text = 'Format'
             Width = 100
+            WideText = 'Format'
           end
           item
             Position = 2
-            Text = 'Genre'
             Width = 100
+            WideText = 'Genre'
           end
           item
             Position = 3
-            Text = 'URL'
             Width = 240
+            WideText = 'URL'
           end>
       end
       object BtnExport: TButton
@@ -190,6 +194,10 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     object Tab_Shoutcast: TTabSheet
       Caption = 'Shoutcast.com'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         684
         377)
@@ -236,28 +244,28 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         Columns = <
           item
             Position = 0
-            Text = 'Name'
             Width = 200
+            WideText = 'Name'
           end
           item
             Position = 1
-            Text = 'Current title'
             Width = 200
+            WideText = 'Current title'
           end
           item
             Position = 2
-            Text = 'Format'
             Width = 100
+            WideText = 'Format'
           end
           item
             Position = 3
-            Text = 'Genre'
             Width = 100
+            WideText = 'Genre'
           end
           item
             Position = 4
-            Text = 'Listener'
             Width = 60
+            WideText = 'Listener'
           end>
       end
       object GrpBox_GeneralSearch: TGroupBox

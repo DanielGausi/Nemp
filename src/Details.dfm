@@ -28,7 +28,7 @@ object FDetails: TFDetails
     Top = 3
     Width = 615
     Height = 503
-    ActivePage = Tab_General
+    ActivePage = Tab_MetaData
     Align = alClient
     TabOrder = 0
     OnChange = MainPageControlChange
@@ -37,10 +37,6 @@ object FDetails: TFDetails
       Caption = 'Summary'
       DoubleBuffered = False
       ParentDoubleBuffered = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GrpBox_File: TGroupBox
         Left = 0
         Top = 0
@@ -57,17 +53,18 @@ object FDetails: TFDetails
         object LBLName: TLabel
           Left = 103
           Top = 31
-          Width = 340
+          Width = 335
           Height = 13
           AutoSize = False
           Caption = '...'
+          EllipsisPosition = epWordEllipsis
           ShowAccelChar = False
           Transparent = True
         end
         object LBLSize: TLabel
           Left = 103
           Top = 47
-          Width = 340
+          Width = 335
           Height = 13
           AutoSize = False
           Caption = '...'
@@ -123,12 +120,13 @@ object FDetails: TFDetails
           Transparent = True
         end
         object LBLPfad: TLabel
-          Left = 104
+          Left = 103
           Top = 16
-          Width = 339
+          Width = 335
           Height = 13
           AutoSize = False
           Caption = '...'
+          EllipsisPosition = epPathEllipsis
           ParentShowHint = False
           ShowAccelChar = False
           ShowHint = True
@@ -138,7 +136,7 @@ object FDetails: TFDetails
         object LBLSamplerate: TLabel
           Left = 103
           Top = 79
-          Width = 340
+          Width = 335
           Height = 13
           AutoSize = False
           Caption = '...'
@@ -180,7 +178,7 @@ object FDetails: TFDetails
         object LblFormat: TLabel
           Left = 103
           Top = 111
-          Width = 340
+          Width = 335
           Height = 13
           AutoSize = False
           Caption = '...'
@@ -206,7 +204,7 @@ object FDetails: TFDetails
         object LBLBitrate: TLabel
           Left = 103
           Top = 95
-          Width = 340
+          Width = 335
           Height = 13
           AutoSize = False
           Caption = '...'
@@ -232,7 +230,7 @@ object FDetails: TFDetails
         object LblDuration: TLabel
           Left = 103
           Top = 63
-          Width = 340
+          Width = 335
           Height = 13
           AutoSize = False
           Caption = '...'
@@ -268,15 +266,15 @@ object FDetails: TFDetails
           OnClick = Btn_PropertiesClick
         end
         object PnlWarnung: TPanel
-          Left = 262
-          Top = 112
-          Width = 181
-          Height = 41
+          Left = 235
+          Top = 128
+          Width = 208
+          Height = 35
           BevelOuter = bvNone
           TabOrder = 2
           object Image1: TImage
-            Left = 8
-            Top = 0
+            Left = 0
+            Top = 4
             Width = 24
             Height = 24
             Picture.Data = {
@@ -336,10 +334,10 @@ object FDetails: TFDetails
             Transparent = True
           end
           object Lbl_Warnings: TLabel
-            Left = 48
-            Top = 2
-            Width = 121
-            Height = 31
+            Left = 30
+            Top = 0
+            Width = 170
+            Height = 35
             AutoSize = False
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
@@ -767,10 +765,6 @@ object FDetails: TFDetails
     object Tab_Lyrics: TTabSheet
       Caption = 'Lyrics'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GrpBox_Lyrics: TGroupBox
         Left = 0
         Top = 0
@@ -848,10 +842,6 @@ object FDetails: TFDetails
     object Tab_Pictures: TTabSheet
       Caption = 'Pictures (cover art)'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object PanelCoverArtFile: TPanel
         AlignWithMargins = True
         Left = 3
@@ -1084,10 +1074,6 @@ object FDetails: TFDetails
     object Tab_MetaData: TTabSheet
       Caption = 'Metadata'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GrpBox_TextFrames: TGroupBox
         Left = 0
         Top = 0

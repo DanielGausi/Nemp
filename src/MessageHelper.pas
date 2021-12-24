@@ -35,7 +35,7 @@ interface
 
 uses Windows, Classes, Forms, Messages, SysUtils, Controls, Graphics, Dialogs, myDialogs,
     ContNrs, StrUtils, ShellApi, hilfsfunktionen, VirtualTrees, DeleteHelper, SilenceDetection,
-    System.UITypes;
+    System.UITypes, NempFileUtils;
 
 
 function Handle_NempAPI_UserCommands(Var aMSG: tMessage): Boolean;
@@ -60,7 +60,7 @@ implementation
 
 
 uses NempMainUnit, Nemp_ConstantsAndTypes, NempAPI, NempAudioFiles, Details,
-    MainFormHelper, CoverHelper, AudioFileHelper, CreateHelper,
+    MainFormHelper, CoverHelper, AudioFileHelper, CreateHelper, TreeHelper,
     Nemp_RessourceStrings, ShoutCastUtils, WebServerClass,
     UpdateUtils, SystemHelper, ScrobblerUtils, OptionsComplete,
     DriveRepairTools, ShutDown, Spectrum_Vis, PlayerClass, BirthdayShow,
@@ -529,15 +529,20 @@ begin
         end;
 
         MB_BlockWriteAccess: begin
-            if aMsg.LParam = 0 then BlockGUI(2);
+            if aMsg.LParam = 0 then BlockGUI(3);
+            // Changed 2021 from 2 to 3, because of the new Category-System. Block everything when Nemp
+            // starts to merge new files from the "UpdateList" into the Library
         end;
 
         MB_BlockReadAccess: begin
           if aMsg.LParam = 0 then BlockGUI(3);
         end;
 
-        MB_RefillTrees: begin
+        MB_ClearEmptyNodes: begin
+          ClearEmptyCollectionNodes(AlbenVST);
+        end;
 
+        MB_RefillTrees: begin
           ReFillBrowseTrees(LongBool(aMsg.LParam));
           ResetBrowsePanels;
          { if MedienBib.BrowseMode = 1 then
@@ -673,6 +678,8 @@ begin
                 HandleError(afa_RefreshingFileInformation, af, aErr);
 
             MedienBib.CoverArtSearcher.InitCover(af, tm_VCL, INIT_COVER_DEFAULT);
+            // Relocate the File in the Categories, update Collections
+            aMsg.Result := Integer(MedienBib.RelocateAudioFile(af));
         end;
 
         MB_ProgressCurrentFileOrDirUpdate: begin
@@ -2092,7 +2099,7 @@ end;
 procedure Handle_STNewFile(var Msg: TMessage);
 var NewFile: UnicodeString;
   audioFile: TAudiofile;
-  jas: TJustaString;
+  newPlaylist: TLibraryPlaylist;
   ext: String;
   aErr: TNempAudioError;
 begin
@@ -2111,8 +2118,8 @@ begin
             then begin
                 if Not MedienBib.PlaylistFileExists(NewFile) then
                 begin
-                    jas := TJustaString.create(NewFile, ExtractFileName(NewFile));
-                    MedienBib.PlaylistUpdateList.Add(jas);
+                    newPlaylist := TLibraryPlaylist.Create(NewFile);
+                    MedienBib.PlaylistUpdateList.Add(newPlaylist);
                 end;
             end else
                 if Not MedienBib.AudioFileExists(NewFile) then

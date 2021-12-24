@@ -34,7 +34,8 @@ unit NempFileUtils;
 
 interface
 
-uses WinApi.Windows, System.Classes;
+uses WinApi.Windows, System.Classes, System.SysUtils,
+  System.Generics.Collections, System.Generics.Defaults, Hilfsfunktionen;
 
     const
         DT_Byte     = 1;
@@ -56,6 +57,9 @@ uses WinApi.Windows, System.Classes;
 
         MP3DB_PL_Path    = 1;
         MP3DB_PL_DriveID = 2;
+        MP3DB_PL_COVERID = 27;
+
+        MP3DB_PL_CATEGORY = 39;
 
     type
         {
@@ -64,19 +68,30 @@ uses WinApi.Windows, System.Classes;
         *--------------------
         * a little class for saving/loading the List of Playlists into
         * the Medialibray file (*.gmp).
-        * Ot is only used temporary during the loading/saving process
         }
         TLibraryPlaylist = class
             private
                 fPath: String;
                 fDriveID: Integer;
+                fCategory: Cardinal;
+                function GetFilename: String;
             public
                 property Path   : String  read fPath    write fPath    ;
+                property Filename: String read GetFilename;
                 property DriveID: Integer read fDriveID write fDriveID ;
+                property Category: Cardinal read fCategory write fCategory; //write: todo
+
+                constructor Create(aFilename: String = '');
                 procedure LoadFromStream(aStream: TStream);
                 function SaveToStream(aStream: TStream): LongInt;
                 procedure SetNewDriveChar(aChar: Char);
+
+                function IsCategory(aCatIdx: Byte): Boolean;
+                procedure AddToCategory(aCatIdx: Byte);
+                procedure RemoveFromCategory(aCatIdx: Byte);
         end;
+
+        TLibraryPlaylistList = class(TObjectList<TLibraryPlaylist>);
 
 
     // write little chunks of Data into a Stream
@@ -134,6 +149,11 @@ uses WinApi.Windows, System.Classes;
     function ReadInt64FromStream(aStream: TStream): Int64;
     function ReadCardinalFromStream(aStream: TStream): Cardinal;
     function ReadDateTimeFromStream(aStream: TStream): TDateTime;
+
+var
+  SortPlaylists_Path,
+  SortPlaylists_Name : IComparer<TLibraryPlaylist>;
+
 
 implementation
 
@@ -402,6 +422,17 @@ end;
 
 { TLibraryPlaylist }
 
+constructor TLibraryPlaylist.Create(aFilename: String);
+begin
+  inherited create;
+  fPath := aFilename;
+end;
+
+function TLibraryPlaylist.GetFilename: String;
+begin
+  result := ExtractFilename(fPath);
+end;
+
 procedure TLibraryPlaylist.LoadFromStream(aStream: TStream);
 var c: Integer;
     dataID: Byte;
@@ -413,6 +444,7 @@ begin
         case dataID of
               MP3DB_PL_Path    : fPath    := ReadTextFromStream(aStream);
               MP3DB_PL_DriveID : fDriveID := ReadIntegerFromStream(aStream);
+              MP3DB_PL_CATEGORY: fCategory:= ReadCardinalFromStream(aStream);
               DATA_END_ID      : ; // Explicitly do Nothing -  because of the ELSE path ;-)
         else
             begin
@@ -428,7 +460,7 @@ function TLibraryPlaylist.SaveToStream(aStream: TStream): LongInt;
 begin
     result :=          WriteIntegerToStream(aStream, MP3DB_PL_DriveID, fDriveID );
     result := result + WriteTextToStream   (aStream, MP3DB_PL_Path   , fPath    );
-
+    result := result + WriteCardinalToStream(aStream, MP3DB_PL_CATEGORY, fCategory);
     result := result + WriteDataEnd(aStream);
 end;
 
@@ -437,5 +469,39 @@ begin
     if (length(fPath) > 1) and (fPath[1] <> '\') then
         fPath[1] := aChar;
 end;
+
+function TLibraryPlaylist.IsCategory(aCatIdx: Byte): Boolean;
+begin
+  result := (fCategory shr aCatIdx) AND 1 = 1;
+end;
+
+procedure TLibraryPlaylist.AddToCategory(aCatIdx: Byte);
+begin
+  fCategory := fCategory or (1 shl aCatIdx);
+end;
+
+procedure TLibraryPlaylist.RemoveFromCategory(aCatIdx: Byte);
+begin
+  fCategory := fCategory and (not (1 shl aCatIdx));
+end;
+
+initialization
+
+
+{
+  SortPlaylists_Path,
+  SortPlaylists_Name : IComparer<TLibraryPlaylist>;
+
+}
+
+SortPlaylists_Path := TComparer<TLibraryPlaylist>.Construct( function (const item1,item2: TLibraryPlaylist): Integer
+begin
+  result := AnsiCompareText_Nemp(Item1.fPath, Item2.fPath);
+end);
+
+SortPlaylists_Name := TComparer<TLibraryPlaylist>.Construct( function (const item1,item2: TLibraryPlaylist): Integer
+begin
+  result := AnsiCompareText_Nemp(Item1.fPath, Item2.fPath);
+end);
 
 end.

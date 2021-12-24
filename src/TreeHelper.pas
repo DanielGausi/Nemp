@@ -34,16 +34,9 @@ interface
 
 uses Windows, Graphics, SysUtils, VirtualTrees, Forms, Controls, NempAudioFiles, Types, StrUtils,
   Contnrs, Classes, Jpeg, PNGImage, uDragFilesSrc, math,
-  Id3v2Frames, dialogs, Hilfsfunktionen,
+  Id3v2Frames, dialogs, Hilfsfunktionen, LibraryOrganizer.Base, LibraryOrganizer.Files,
   Nemp_ConstantsAndTypes, CoverHelper, MedienbibliothekClass, BibHelper,
   gnuGettext, Nemp_RessourceStrings;
-
-
-type
-  TStringTreeData = record
-      FString : TJustaString;
-  end;
-  PStringTreeData = ^TStringTreeData;
 
   function LengthToSize(len:integer; def:integer):integer;
   function MaxFontSize(default: Integer): Integer;
@@ -58,12 +51,10 @@ type
   function GetColumnIDfromPosition(aVST:TVirtualStringTree; position:LongWord):integer;
   function GetColumnIDfromContent(aVST:TVirtualStringTree; content:integer):integer;
 
-  function AddVSTString(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aString: TJustaString): PVirtualNode;
+  function GetOldNode(ac: TAudioCollection; aTree: TVirtualStringTree): PVirtualNode; overload;
+  function GetOldNode(lc: TLibraryCategory; aTree: TVirtualStringTree): PVirtualNode; overload;
 
-  procedure FillStringTree(Liste: TObjectList; aTree: TVirtualStringTree; Playlist: Boolean = False);
-  procedure FillStringTreeWithSubNodes(Liste: TObjectList; aTree: TVirtualStringTree; Playlist: Boolean = False);
-
-  function GetOldNode(aString: UnicodeString; aTree: TVirtualStringTree): PVirtualNode;
+  procedure ClearEmptyCollectionNodes(aTree: TVirtualStringTree);
 
   function GetNextNodeOrFirst(aTree: TVirtualStringTree; aNode: PVirtualNode): PVirtualNode;
   function GetNodeWithAudioFile(aTree: TVirtualStringTree; aAudioFile: TAudioFile): PVirtualNode;
@@ -77,12 +68,7 @@ type
 
 implementation
 
-Uses  NempMainUnit, PlayerClass,  MainFormHelper;
-
-// Diese Listen brauche ich bei der Ordner-Ansicht:
-// Da gibts ja u.U. mehr Knoten, als ich tatsächlich Ordner habe, um die Unterordner-Struktur mit aufzubauen
-var  ZusatzJustaStringsArtists: TObjectlist;
-     ZusatzJustaStringsAlben: TObjectlist;
+uses  NempMainUnit, PlayerClass,  MainFormHelper;
 
 
 function MaxFontSize(default: Integer): Integer;
@@ -264,274 +250,102 @@ begin
 end;
 
 
-function AddVSTString(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aString: TJustaString): PVirtualNode;
-var Data: PStringTreeData;
-begin
-  Result:= AVST.AddChild(aNode); // meistens wohl Nil
-  AVST.ValidateNode(Result,false); // ?? was macht das??
-  Data:=AVST.GetNodeData(Result);
-  Data^.FString := aString;
-end;
+procedure ClearEmptyCollectionNodes(aTree: TVirtualStringTree);
+var
+  ac: TAudioCollection;
+  nextNode, currentNode: PVirtualNode;
 
-
-procedure FillStringTree(Liste: TObjectList; aTree: TVirtualStringTree; Playlist: Boolean = False);
-var i, cAdd, startIdx: integer;
-  HeaderStr: String;
-  rn: PVirtualNode;
-begin
-  aTree.BeginUpdate;
-  aTree.Clear;
-
-  if aTree = Nemp_MainForm.ArtistsVST then
+  function NextNodeNoChilds(aNode: PVirtualNode): PVirtualNode;
   begin
-      startIdx := 3;
-      if Liste.Count > 0 then
-          AddVSTString(aTree, Nil, TJustaString(Liste[0])); // All Playlists
-      if Liste.Count > 1 then
-          AddVSTString(aTree, Nil, TJustaString(Liste[1])); // <Webradio>
-      if Liste.Count > 2 then
-          rn := AddVSTString(aTree, Nil, TJustaString(Liste[2])) // <All>
-      else
-          rn := NIL;  // Dann ist aber was falsch!!!
-  end else
-  begin
-      startIdx := 1;
-      if Liste.Count > 0 then
-        AddVSTString(aTree,Nil,TJustaString(Liste[0]));
-      //else
-        rn := NIL; // Das sollte aber niemals auftreten!!
-  end;
-
-  for i := startIdx to Liste.Count-1 do
-    AddVSTString(aTree, rn, TJustaString(Liste[i]));
-
-  if (MedienBib.CurrentArtist = BROWSE_PLAYLISTS) and (aTree.Tag = 2) then // d.h. es ist der alben-Tree
-  begin
-      HeaderStr := TreeHeader_Playlists;
-      cAdd := 1;
-  end else
-  if (MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS) and (aTree.Tag = 2) then
-  begin
-      HeaderStr := TreeHeader_Webradio;
-      cAdd := 1;
-  end
-  else
-  begin
-      cAdd := 0;
-      case MedienBib.NempSortArray[aTree.Tag] of
-        siAlbum:  HeaderStr := (TreeHeader_Albums);
-        siArtist: HeaderStr := (TreeHeader_Artists);
-        siOrdner: HeaderStr := (TreeHeader_Directories);
-        siGenre:  HeaderStr := (TreeHeader_Genres);
-        siJahr:   HeaderStr := (TreeHeader_Years);
-        siFileAge:HeaderStr := (TreeHeader_FileAges);
-        else HeaderStr := '(N/A)';
-      end;
-  end;
-  if Liste.Count > 0 then
-    aTree.Header.Columns[0].Text := HeaderStr + ' (' + inttostr(Liste.Count-1 + cAdd) + ')'
-  else
-    aTree.Header.Columns[0].Text := HeaderStr;
-
-  //aTree.FullExpand;  --> this requires a lot of time ???
-  aTree.EndUpdate;
-end;
-
-procedure FillStringTreeWithSubNodes(Liste: TObjectList; aTree: TVirtualStringTree; Playlist: Boolean = False);
-var i,n,ncount,max, cAdd, startIdx: integer;
-  NewOrdner: UnicodeString;
-  Ordnerstruktur: TStringList;
-  NewCheckNode, CheckNode, rn: PVirtualNode;
-  Data : PStringTreeData;
-  subOrdner: UnicodeString;
-  jas: TJustAString;
-  HeaderStr: String;
-  aObjectList: TObjectlist;
-begin
-  aTree.BeginUpdate;
-  aTree.Clear;
-  if aTree = Nemp_MainForm.ArtistsVST then
-    aObjectlist := ZusatzJustaStringsArtists
-  else
-    aObjectList := ZusatzJustaStringsAlben;
-
-  aObjectList.Clear;
-
-  if aTree = Nemp_MainForm.ArtistsVST then
-  begin
-      startIdx := 3;
-      if Liste.Count > 0 then
-          AddVSTString(aTree, Nil, TJustaString(Liste[0])); // All Playlists
-      if Liste.Count > 1 then
-          AddVSTString(aTree, Nil, TJustaString(Liste[1])); // Webradio
-      if Liste.Count > 2 then
-          rn := AddVSTString(aTree, Nil, TJustaString(Liste[2])) // <All>
-      else
-          rn := NIL;  // Dann ist aber was falsch!!!
-  end else
-  begin
-      startIdx := 1;
-      if Liste.Count > 0 then
-        rn := AddVSTString(aTree,Nil,TJustaString(Liste[0]))
-      else
-        rn := NIL; // Das sollte aber niemals auftreten!!
-  end;
-
-  for i := startIdx to Liste.Count - 1 do
-  begin
-    // Newordner ist der neue Ordner, der in die Baumansicht eingefügt werden soll
-    NewOrdner := TJustaString(Liste[i]).DataString;
-
-    Ordnerstruktur := Explode('\', NewOrdner);
-
-    if (Ordnerstruktur.Count >= 3) and (Ordnerstruktur[0] = '') and (Ordnerstruktur[1] = '') then
-    begin
-        Ordnerstruktur[2] := '\\' + Ordnerstruktur[2];
-        Ordnerstruktur.Delete(0); // die beiden ersten wieder löschen
-        Ordnerstruktur.Delete(0); // die beiden ersten wieder löschen
-    end;
-
-    max := Ordnerstruktur.Count - 1;
-
-    // Das ist der Knoten, an den ich anhängen muss
-    CheckNode := rn;
-    n := 0;
-
-    subOrdner := '';
-    // Das ist der Knoten, mit dem ich vergleichen muss
-    // stimmen die Daten dort überein, kann ich dort (oder weiter unten anhängen)
-    NewCheckNode := atree.GetLastChild(CheckNode);
-
-    if assigned(NewChecknode) then
-    begin
-        Data := aTree.GetNodeData(NewCheckNode);
-        // solange der Ordner übereinstimmt, kann ich eine Stufe tiefer gehen.
-        while (n <= max) AND (assigned(NewChecknode)) AND (Data^.FString.AnzeigeString = Ordnerstruktur[n] + '\') do
-        begin
-            SubOrdner := SubOrdner + Ordnerstruktur[n] + '\';
-            Checknode := NewChecknode;
-            NewChecknode := aTree.GetLastChild(CheckNode);
-            if assigned(NewChecknode) then
-              Data := aTree.GetNodeData(NewCheckNode);
-            inc(n);
+    result := aNode;
+    // same method than in "GetNext" from the VirtualTrees.pas
+    repeat
+      // Is there a next sibling?
+      if assigned(aTree.GetNextSibling(result)) then begin
+        result := aTree.GetNextSibling(result);
+        break
+      end
+      else begin
+        // No sibling anymore, so use the parent's next sibling.
+        if assigned(result.Parent) then
+          result := result.Parent
+        else begin
+          // There are no further nodes to examine, hence there is no further visible node.
+          result := Nil;
+          break;
         end;
-    end;
-
-    // n kann eigentlich niemals gleich max werden. Denke ich zumindest.
-
-    // Jetzt ist checknode der Knoten, an den ich anhängen muss
-    // Aber: nicht einfach den neuen String, sondern erstmal ggf. Unterverzeichnisse
-
-    // Ordnerstruktur[n] ist der erste Ordner in der Hierarchie, der noch nicht im Baum ist
-    for ncount := n to max-1 do
-    begin
-      //hier müssen wird noch JustaStrings erzeugen.
-      SubOrdner := SubOrdner + Ordnerstruktur[ncount] + '\';
-      jas := TJustaString.create(SubOrdner, Ordnerstruktur[ncount] + '\');
-      aObjectList.Add(jas);
-      CheckNode := AddVSTString(aTree,Checknode,jas);
-    end;
-    // am Ende das richtige einfürgen
-    jas := TJustaString.create(NewOrdner, Ordnerstruktur[max] + '\');
-    aObjectList.Add(jas);
-    AddVSTString(aTree,Checknode,jas);
-    Ordnerstruktur.Free;
-  end;
-  if rn <> NIl then
-      aTree.Expanded[rn] := True;
-
-  if (MedienBib.CurrentArtist = BROWSE_PLAYLISTS) and (aTree.Tag = 2) then // d.h. es ist der alben-Tree
-  begin
-      HeaderStr := TreeHeader_Playlists;
-      cAdd := 1;
-  end else
-  if (MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS) and (aTree.Tag = 2) then
-  begin
-      HeaderStr := TreeHeader_Webradio;
-      cAdd := 1;
-  end
-  else
-  begin
-      cAdd := 0;
-      case MedienBib.NempSortArray[aTree.Tag] of
-        siAlbum:  HeaderStr := (TreeHeader_Albums); 
-        siArtist: HeaderStr := (TreeHeader_Artists);
-        siOrdner: HeaderStr := (TreeHeader_Directories);
-        siGenre:  HeaderStr := (TreeHeader_Genres);
-        siJahr:   HeaderStr := (TreeHeader_Years);
-        siFileAge:HeaderStr := (TreeHeader_FileAges);
-        else HeaderStr := '(N/A)';
       end;
+    until False;
   end;
-  if Liste.Count > 0 then
-    aTree.Header.Columns[0].Text := HeaderStr + ' (' + inttostr(Liste.Count-1 + cAdd) + ')'
-  else
-    aTree.Header.Columns[0].Text := HeaderStr;
 
-  aTree.EndUpdate;
+begin
+  currentNode := aTree.GetFirst;
+
+  while assigned(currentNode) do begin
+    ac := aTree.GetNodeData<TAudioCollection>(currentNode);
+    if (ac is TRootCollection) then
+      currentNode := aTree.GetNext(currentNode)
+    else begin
+      if ac.Count > 0 then
+        currentNode := aTree.GetNext(currentNode)
+      else begin
+        // currentNode contains NOT a RootCollection, and it's Count is zero => remove the Node (and all it's children)
+
+        // 1. Get the next node we have to check
+        nextNode := NextNodeNoChilds(currentNode);
+
+        // 2. delete the current (empty) node
+        aTree.DeleteNode(currentNode);
+        // 3. check the next one (we may check a previous node again, but this shouldn't matter that much)
+        currentNode := nextNode;
+      end;
+    end;
+  end;
 end;
 
 
-function GetOldNode(aString: UnicodeString; aTree: TVirtualStringTree): PVirtualNode;
-var aData: PStringTreeData;
-    currentString: UnicodeString;
-    c: Integer;
-    found: Boolean;
+function GetOldNode(ac: TAudioCollection; aTree: TVirtualStringTree): PVirtualNode; overload;
+var
+  currentAC: TAudioCollection;
 begin
+  result := aTree.GetFirst;
+  currentAC := Nil;
+  if not assigned(ac) then
+    exit;
+
+  if assigned(result) then
+    currentAC := aTree.GetNodeData<TAudioCollection>(result);
+
+  while assigned(result) and (currentAC <> ac) do begin
+    result := aTree.GetNext(result);
+    if assigned(result) then
+      currentAC := aTree.GetNodeData<TAudioCollection>(result);
+  end;
+  if not assigned(result) then
     result := aTree.GetFirst;
-
-    // Search for the empty-DataString
-    // If it is not in the first 5 Nodes, it surely doesnt exist any longer.
-    // return first node then
-    if aString = '' then
-    begin
-        if assigned(result) then
-        begin
-            c := 1;
-            found := False;
-            repeat
-                aData := aTree.GetNodeData(result);
-                if TJustAstring(aData^.FString).DataString = '' then
-                    found := True
-                else
-                begin
-                    inc(c);
-                    result := aTree.GetNext(result);
-                end;
-            until (Not assigned(result)) OR Found OR (C > 5);
-            if Not Found then
-                result := aTree.GetFirst;
-        end;
-    end else
-    begin
-        // some "real"-DataString. Search until Current >= aString
-        if assigned(result) then
-        begin
-            repeat
-                aData := aTree.GetNodeData(result);
-                currentString := TJustAstring(aData^.FString).DataString;
-                if AnsiCompareText(currentString, aString) < 0 then
-                    result := aTree.GetNext(result);
-            until (Not assigned(result)) OR
-                              (AnsiCompareText(currentString, aString) >= 0);
-
-          {  if assigned(result) and ((currentString = AUDIOFILE_UNKOWN) and (aString <> AUDIOFILE_UNKOWN) )  then
-            begin
-                result := aTree.GetNext(result);
-                aData := aTree.GetNodeData(result);
-                currentString := TJustAstring(aData^.FString).DataString;
-                // weitersuchen
-                while Assigned(result) and (AnsiCompareText(currentString, aString) < 0) do
-                begin
-                    result := aTree.GetNext(result);
-                    aData := aTree.GetNodeData(result);
-                    currentString := TJustAstring(aData^.FString).DataString;
-                end;
-            end;
-            }
-        end
-    end;
 end;
+
+function GetOldNode(lc: TLibraryCategory; aTree: TVirtualStringTree): PVirtualNode; overload;
+var
+  currentLC: TLibraryCategory;
+begin
+  result := aTree.GetFirst;
+  currentLC := Nil;
+  if not assigned(lc) then
+    exit;
+
+  if assigned(result) then
+    currentLC := aTree.GetNodeData<TLibraryCategory>(result);
+
+  while assigned(result) and (currentLC <> lc) do begin
+    result := aTree.GetNext(result);
+    if assigned(result) then
+      currentLC := aTree.GetNodeData<TLibraryCategory>(result);
+  end;
+  if not assigned(result) then
+    result := aTree.GetFirst;
+end;
+
 
 function GetNextNodeOrFirst(aTree: TVirtualStringTree; aNode: PVirtualNode): PVirtualNode;
 begin
@@ -639,15 +453,5 @@ begin
 end;
 
 
-initialization
-  ZusatzJustaStringsArtists := TObjectlist.Create;
-  ZusatzJustaStringsAlben := TObjectlist.Create;
-
-
-finalization
-  try
-  ZusatzJustaStringsArtists.Free;
-  ZusatzJustaStringsAlben.Free;
-  except end;
 
 end.

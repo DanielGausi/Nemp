@@ -128,7 +128,14 @@ uses
   AudioDisplayUtils in 'AudioDisplayUtils.pas',
   BaseForms in 'BaseForms.pas',
   DuplicateFilesDialogs in 'DuplicateFilesDialogs.pas' {DuplicateFilesDialog},
-  PlaylistDuplicates in 'PlaylistDuplicates.pas' {FormPlaylistDuplicates};
+  PlaylistDuplicates in 'PlaylistDuplicates.pas' {FormPlaylistDuplicates},
+  LibraryOrganizer.Base in 'LibraryOrganizer.Base.pas',
+  Cover.ViewCache in 'Cover.ViewCache.pas',
+  LibraryOrganizer.Playlists in 'LibraryOrganizer.Playlists.pas',
+  LibraryOrganizer.Files in 'LibraryOrganizer.Files.pas',
+  LibraryOrganizer.Webradio in 'LibraryOrganizer.Webradio.pas',
+  LibraryOrganizer.Configuration in 'LibraryOrganizer.Configuration.pas' {FormLibraryConfiguration},
+  LibraryOrganizer.Configuration.NewLayer in 'LibraryOrganizer.Configuration.NewLayer.pas' {FormNewLayer};
 
 {$R *.res}
 
@@ -138,7 +145,7 @@ var EVILHACKX, EVILHACKY: INTEGER;
 
 begin
 
-    ReportMemoryLeaksOnShutdown := False;
+    ReportMemoryLeaksOnShutdown := True; //False;
 
     Application.Initialize;
     Application.MainFormOnTaskbar := True;

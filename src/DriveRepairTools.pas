@@ -39,7 +39,8 @@ unit DriveRepairTools;
 
 interface
 
-uses Windows, Messages, Classes, ContNrs, SysUtils, dialogs, Forms, Generics.Collections, NempAudioFiles;
+uses Windows, Messages, Classes, ContNrs, SysUtils, dialogs, Forms, Generics.Collections,
+  NempAudioFiles, NempFileUtils;
 
 
 const DriveTypeTexts: array[DRIVE_UNKNOWN..DRIVE_RAMDISK] of String =
@@ -150,7 +151,7 @@ type
 
           // Add Drives used by Audiofiles or PlaylistFiles to the list of ManaggedDrives
           procedure AddDrivesFromAudioFiles(aList: TAudioFileList);
-          procedure AddDrivesFromPlaylistFiles(aList: TObjectList);
+          procedure AddDrivesFromPlaylistFiles(aList: TLibraryPlaylistList);
 
           function GetPhysicalDriveBySerialNr(aSerial: DWord): TDrive;
           function GetManagedDriveBySerialNr(aSerial: DWord): TDrive;
@@ -175,7 +176,7 @@ type
 
 
           procedure RepairDriveCharsAtAudioFiles(AudiFiles: TAudioFileList);
-          procedure RepairDriveCharsAtPlaylistFiles(Playlists: TObjectList);
+          procedure RepairDriveCharsAtPlaylistFiles(Playlists: TLibraryPlaylistList);
 
   end;
 
@@ -194,7 +195,7 @@ type
   
 implementation
 
-uses NempFileUtils, BibHelper, Nemp_RessourceStrings, Nemp_ConstantsAndTypes;
+uses BibHelper, Nemp_RessourceStrings, Nemp_ConstantsAndTypes;
 
 
 {$REGION 'TDrive, Class for handling a single Drive'}
@@ -558,7 +559,7 @@ end;
 // Used only by the MediaLibrary
 // Note: This has nothing to do with the files inside the Playlists,
 //       just with the location of the playlists itself (*.m3u, *.pls, or maybe even *.npl)
-procedure TDriveManager.AddDrivesFromPlaylistFiles(aList: TObjectList);
+procedure TDriveManager.AddDrivesFromPlaylistFiles(aList: TLibraryPlaylistList);
 var i: Integer;
     CurrentDrive: Char;
     NewDrive: TDrive;
@@ -566,9 +567,9 @@ begin
     CurrentDrive := '-';
     for i := 0 to aList.Count - 1 do
     begin
-        if TJustaString(aList[i]).DataString[1] <> CurrentDrive then
+        if aList[i].Path[1] <> CurrentDrive then
         begin
-            CurrentDrive := TJustaString(aList[i]).DataString[1];
+            CurrentDrive := aList[i].Path[1];
             if CurrentDrive <> '\' then
             begin
                 if not Assigned(GetManagedDriveByChar(CurrentDrive)) then
@@ -835,29 +836,27 @@ begin
 end;
 
 
-procedure TDriveManager.RepairDriveCharsAtPlaylistFiles(Playlists: TObjectList);
+procedure TDriveManager.RepairDriveCharsAtPlaylistFiles(Playlists: TLibraryPlaylistList);
 var i: Integer;
     CurrentDriveChar, CurrentReplaceChar: WideChar;
-    aString: TJustaString;
     aDrive: TDrive;
 begin
     CurrentDriveChar := '-';
     CurrentReplaceChar := '-';
     for i := 0 to Playlists.Count - 1 do
     begin
-        aString := TJustaString(Playlists[i]);
-        if (aString.DataString[1] <> CurrentDriveChar) then
+        if (Playlists[i].Path[1] <> CurrentDriveChar) then
         begin
-            if (aString.DataString[1] <> '\') then
+            if (Playlists[i].Path[1] <> '\') then
             begin
                 // Neues Laufwerk - Infos dazwischenschieben
-                aDrive := self.GetManagedDriveByOldChar(aString.DataString[1]);
+                aDrive := self.GetManagedDriveByOldChar(Playlists[i].Path[1]);
                     // GetDriveFromListByOldChar(fUsedDrives, Char(aString.DataString[1]));
                 if assigned(aDrive) and (aDrive.Drive <> '') then
                 begin
                     // aktuelle Buchstaben merken
                     // und replaceChar neu setzen
-                    CurrentDriveChar := aString.DataString[1];
+                    CurrentDriveChar := Playlists[i].Path[1];
                     CurrentReplaceChar := WideChar(aDrive.Drive[1]);
                 end else
                 begin
@@ -870,7 +869,7 @@ begin
                 CurrentReplaceChar := '\';
             end;
         end;
-        aString.DataString[1] := CurrentReplaceChar;
+        Playlists[i].SetNewDriveChar(CurrentReplaceChar);
     end;
 end;
 

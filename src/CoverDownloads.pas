@@ -38,6 +38,7 @@ uses
   Dialogs, StrUtils, ContNrs, Jpeg, PNGImage,  math, DateUtils,
   CoverHelper, ID3v2Tags, ID3v2Frames, NempAudioFiles, cddaUtils,
   Nemp_ConstantsAndTypes, SyncObjs, System.Types,
+  LibraryOrganizer.Base, LibraryOrganizer.Files,
   // new method for downloading stuff
   System.Net.URLClient, System.Net.HttpClient;
 
@@ -55,10 +56,16 @@ type
 
     TPicType = (ptNone, ptJPG, ptPNG);
 
-    TQueryType = (qtCoverFlow, qtPlayer);
+    TQueryType = (qtCoverFlow, qtPlayer, qtTreeView);
     TSubQueryType = (sqtFile, sqtCDDA);
 
+
+
+
+
     TCoverDownloadItem = class
+        ArchiveID: Integer;
+
         Artist: String;
         Album: String;
         Directory: String;
@@ -73,12 +80,15 @@ type
         distance: Integer;      // distance to MostImportantIndex
         lastChecked: TDateTime; // time of last query for this Item
         queryCount: Integer;    // Used to increase the Cache-Interval
-
+        Status: String;
+        newFilename: String;
 
         procedure LoadFromStream(aStream: TStream); // loading/saving in Thread-Context
         procedure SaveToStream(aStream: TStream);
     end;
 
+    TDownloadCompleteEvent = procedure(DownloadItem: TCoverDownloadItem; Bitmap: TBitmap) of object;
+    TDownloadEvent = procedure(DownloadItem: TCoverDownloadItem) of object;
 
     TCoverDownloadWorkerThread = class(TThread)
         private
@@ -93,6 +103,8 @@ type
             fCurrentDownloadComplete: Boolean;
             FWorkToDo: Boolean;
 
+            fArchiveList: TAudioCollectionList;
+            fArchiveIDCounter: Integer;
             // LastFM allows only 5 calls per Second
             // The GetTag-Method will be calles very often - so we need a speed-limit here!
             fLastCall: DWord;
@@ -109,11 +121,15 @@ type
             fCacheFilename: String;
             fCacheList: TObjectList;   // Always use CriticalSection CSAccessCacheList to access this List!
                                        // The List is mainly used by the secondary thread, but can be deleted by the Settings-dialog.
-                                       // ... which will directly cause a f*cking Deadlock m(
+                                       // ... which will directly cause a Deadlock m(
                                        // therefore: change it to ...
             fUserWantToClearCacheList: LongBool;
 
             fMostImportantIndex: Integer;
+
+            fOnDownloadComplete: TDownloadCompleteEvent;
+            fOnDownloadSaved: TDownloadEvent;
+
             procedure SetMostImportantIndex(Value: Integer);    // VCL
 
             // for player-picture: Get proper Album-Information
@@ -146,8 +162,8 @@ type
 
             procedure SetProperBitmapSize(aBmp: TBitmap; aQueryType: TQueryType);
 
-            function DownloadItemStillMatchesCoverFlow: Boolean;  // VCL (called in Sync-methods)
-            function DownloadItemStillMatchesPlayer: Boolean;  // VCL (called in Sync-methods)
+            //function DownloadItemStillMatchesCoverFlow: Boolean;  // VCL (called in Sync-methods)
+            //function DownloadItemStillMatchesPlayer: Boolean;  // VCL (called in Sync-methods)
 
             // Get next job, i.e. information about the next queried cover
             procedure SyncGetFirstJob; // VCL
@@ -160,6 +176,9 @@ type
             // Update CoverFlow-Data in Medialibrary
             procedure SyncUpdateMedialib;
 
+            procedure DisregardCollection(aID: Integer);
+            procedure DisregardCurrentCollection;
+
         protected
 
             procedure Execute; override;
@@ -168,11 +187,17 @@ type
             property MostImportantIndex: Integer read fMostImportantIndex write SetMostImportantIndex;
             property UserWantToClearCacheList: LongBool read GetUserWantToClearCacheList write SetUserWantToClearCacheList;
 
+            property OnDownloadComplete: TDownloadCompleteEvent read fOnDownloadComplete write fOnDownloadComplete;
+            property OnDownloadSaved: TDownloadEvent read fOnDownloadSaved write fOnDownloadSaved;
+
             constructor Create;
             destructor Destroy; override;
 
-            procedure AddJob(aCover: TNempCover; Idx: Integer); overload;     // VCL
+            // procedure AddJob(aCover: TNempCover; Idx: Integer); overload;     // VCL
             procedure AddJob(aAudioFile: TAudioFile; Idx: Integer); overload; // VCL
+            procedure AddJob(aCollection: TAudioCollection; Idx: Integer; QuerySource: TQueryType); overload; // VCL
+
+            function GetArchivedCollection(aID: Integer): TAudioCollection;
 
             procedure ClearCacheList; // VCL
     end;
@@ -181,7 +206,7 @@ type
 
 implementation
 
-uses NempMainUnit, ScrobblerUtils, HtmlHelper, SystemHelper, Nemp_RessourceStrings, OneInst;
+uses ScrobblerUtils, HtmlHelper, SystemHelper, Nemp_RessourceStrings, OneInst;
 
 
 function SortDownloadPriority(item1,item2: Pointer): Integer;
@@ -288,11 +313,19 @@ begin
     fHttpClient.ConnectionTimeout := 5000;
     fHttpClient.SecureProtocols := [THTTPSecureProtocol.TLS12, THTTPSecureProtocol.TLS11];
 
+    fArchiveList := TAudioCollectionList.Create(False);
+    fArchiveIDCounter := 1;
+
     UserWantToClearCacheList := False;
 end;
 
 destructor TCoverDownloadWorkerThread.Destroy;
+var
+  i: Integer;
 begin
+    for i := 0 to fArchiveList.Count - 1 do
+      fArchiveList[i].Disregard;
+    fArchiveList.Free;
     fHttpClient.Free;
     fDataStream.Free;
     fJobList.Free;
@@ -420,6 +453,8 @@ begin
                             if not terminated then
                                 Synchronize(SyncUpdateInvalidCover);
                         end;
+
+                        Synchronize(DisregardCurrentCollection);
                     end;
                 end;
             end;
@@ -574,6 +609,7 @@ begin
         Target.Add(newAudioFile);
     end;
 end;
+
 function TCoverDownloadWorkerThread.IsProperAlbum(aAudioFileList: TAudioFileList): Boolean;
 var tmpCover: TNempCover;
 begin
@@ -599,6 +635,7 @@ begin
         tmpCover.Free;
     end;
 end;
+
 {
     --------------------------------------------------------
     CollectAlbumInformation:
@@ -731,7 +768,7 @@ var //url: UTF8String;
     aResponse: IHttpResponse;
 begin
     url := 'https://ws.audioscrobbler.com/2.0/?method=album.getinfo'
-        + '&api_key=' + String(NempPlayer.NempScrobbler.ApiKey)
+        + '&api_key=' + '542ec0c3e5e7b84030181176f3d0f264' //String(NempPlayer.NempScrobbler.ApiKey)
         //+ '&artist=' + StringToURLStringAnd(UTF8String(AnsiLowerCase(fCurrentDownloadItem.Artist)))
         //+ '&album='  + StringToURLStringAnd(UTF8String(AnsiLowerCase(fCurrentDownloadItem.Album)));
         + '&artist=' + URLEncode_LastFM(AnsiLowerCase(fCurrentDownloadItem.Artist))
@@ -1019,6 +1056,7 @@ end;
     VCL-THREAD ONLY !!!
     --------------------------------------------------------
 }
+(*
 procedure TCoverDownloadWorkerThread.AddJob(aCover: TNempCover; Idx: Integer);
 var NewDownloadItem: TCoverDownloadItem;
 begin
@@ -1036,6 +1074,7 @@ begin
 
     StartWorking;
 end;
+*)
 
 procedure TCoverDownloadWorkerThread.AddJob(aAudioFile: TAudioFile;
   Idx: Integer);
@@ -1065,6 +1104,70 @@ begin
         fJobList.Delete(fJobList.Count-1);
 
     StartWorking;
+end;
+
+
+procedure TCoverDownloadWorkerThread.AddJob(aCollection: TAudioCollection; Idx: Integer; QuerySource: TQueryType);
+var NewDownloadItem: TCoverDownloadItem;
+  afc: tAudioFileCollection;
+begin
+    if not (aCollection is TAudioFileCollection) then
+      exit;
+
+    afc := tAudioFileCollection(aCollection);
+    if not (afc.CollectionType = ctAlbum) then
+      exit;
+
+    if (afc.Album = CoverFlowText_VariousArtists)
+      or UnKownInformation(afc.Artist)
+      or UnKownInformation(afc.Album)
+    then
+      exit;
+
+    NewDownloadItem := TCoverDownloadItem.Create;
+    NewDownloadItem.Artist    := afc.Artist;
+    NewDownloadItem.Album     := afc.Album;
+    NewDownloadItem.Directory := IncludeTrailingPathDelimiter(afc.Directory);
+    NewDownloadItem.QueryType := QuerySource; //qtCoverFlow;
+    NewDownloadItem.SubQueryType := sqtFile;
+    NewDownloadItem.FileType  := '';
+    NewDownloadItem.Index     := Idx;
+    inc(fArchiveIDCounter);
+    NewDownloadItem.ArchiveID := fArchiveIDCounter;
+    afc.Archive(fArchiveList, fArchiveIDCounter);
+    fJobList.Insert(0, NewDownloadItem);
+    if fJobList.Count > 50 then begin
+        DisregardCollection(TCoverDownloadItem(fJobList[fJobList.Count-1]).ArchiveID);
+        fJobList.Delete(fJobList.Count-1);
+    end;
+    StartWorking;
+end;
+
+procedure TCoverDownloadWorkerThread.DisregardCurrentCollection;
+begin
+  if assigned(fCurrentDownloadItem) then
+    DisregardCollection(fCurrentDownloadItem.ArchiveID);
+end;
+
+procedure TCoverDownloadWorkerThread.DisregardCollection(aID: Integer);
+var
+  ac: TAudioCollection;
+begin
+  ac := GetArchivedCollection(aID);
+  if assigned(ac) then
+    ac.Disregard;
+end;
+
+function TCoverDownloadWorkerThread.GetArchivedCollection(aID: Integer): TAudioCollection;
+var
+  i: Integer;
+begin
+  result := Nil;
+  for i := 0 to fArchiveList.Count - 1 do
+    if fArchiveList[i].ArchiveID = aID then begin
+      result := fArchiveList[i];
+      break;
+    end;
 end;
 
 procedure TCoverDownloadWorkerThread.StartWorking;
@@ -1098,7 +1201,7 @@ begin
     end;
 end;
 
-
+(*
 {
     --------------------------------------------------------
     DownloadItemStillMatchesCoverFlow
@@ -1106,13 +1209,14 @@ end;
     --------------------------------------------------------
 }
 function TCoverDownloadWorkerThread.DownloadItemStillMatchesCoverFlow: Boolean;
-var aCover: TNempCover;
+var
+  aCollection: TAudioFileCollection;
 begin
-    if fCurrentDownloadItem.Index <= MedienBib.CoverViewList.Count - 1 then
+    if fCurrentDownloadItem.Index <= MedienBib.NewCoverFlow.CoverCount - 1 then
     begin
-        aCover := TNempCover(MedienBib.CoverViewList[fCurrentDownloadItem.Index]);
-        result := (aCover.Artist = fCurrentDownloadItem.Artist)
-                  and (aCover.Album = fCurrentDownloadItem.Album);
+        aCollection := TAudioFileCollection(MedienBib.NewCoverFlow.Collection[fCurrentDownloadItem.Index]);
+        result := (aCollection.Artist = fCurrentDownloadItem.Artist)
+                  and (aCollection.Album = fCurrentDownloadItem.Album);
     end else
         result := False;
 end;
@@ -1127,7 +1231,7 @@ begin
     else
         result := assigned(NempPlayer.MainAudioFile)
             and (CddbIDFromCDDA(NempPlayer.MainAudioFile.Pfad) = fCurrentDownloadItem.FileType)
-end;
+end; *)
 
 {
     --------------------------------------------------------
@@ -1151,6 +1255,7 @@ begin
         fCurrentDownloadItem.QueryType    := fi.QueryType   ;
         fCurrentDownloadItem.SubQueryType := fi.SubQueryType;
         fCurrentDownloadItem.FileType     := fi.FileType    ;
+        fCurrentDownloadItem.ArchiveID    := fi.ArchiveID   ;
         fJobList.Delete(0);
     end else
         fEvent.ResetEvent;
@@ -1191,12 +1296,12 @@ end;
 
 procedure TCoverDownloadWorkerThread.SyncUpdateCover;
 var bmp: TBitmap;
-    HintString: String;
+    // HintString: String;
 
 begin
     bmp := TBitmap.Create;
     try
-        HintString := '';
+        fCurrentDownloadItem.Status := '';
         bmp.PixelFormat := pf24bit;
         SetProperBitmapSize(bmp, fCurrentDownloadItem.QueryType);
 
@@ -1206,7 +1311,7 @@ begin
             GetDefaultPic(dcFile, bmp);
             AddLogoToBitmap('lastfmConnectError', bmp);
             fCurrentDownloadComplete := False;
-            HintString := CoverFlowLastFM_HintConnectError;
+            fCurrentDownloadItem.Status := CoverFlowLastFM_HintConnectError;
         end else
         begin
             fCurrentDownloadComplete := StreamToBitmap(bmp);
@@ -1216,31 +1321,17 @@ begin
                 //GetDefaultCover(dcFile, pic, 0);
                 GetDefaultPic(dcFile, bmp);
                 AddLogoToBitmap('lastfmFail', bmp);
-                HintString := CoverFlowLastFM_HintFail;
+                fCurrentDownloadItem.Status := CoverFlowLastFM_HintFail;
             end else
             begin
                 AddLogoToBitmap('lastfmOK', bmp);
-                HintString := CoverFlowLastFM_HintOK;
+                fCurrentDownloadItem.Status := CoverFlowLastFM_HintOK;
             end;
         end;
 
-        if fCurrentDownloadItem.QueryType = qtPlayer then
-        begin
-            if DownloadItemStillMatchesPlayer then
-            begin
-                NempPlayer.MainPlayerPicture.Assign(bmp);
-                Nemp_MainForm.CoverImage.Picture.Assign(NempPlayer.MainPlayerPicture);
-                Nemp_MainForm.CoverImage.Hint := HintString;
-            end;
-        end
-        else
-        begin
-            if DownloadItemStillMatchesCoverFlow then
-            begin
-                Medienbib.NewCoverFlow.SetPreview (fCurrentDownloadItem.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
-                MedienBib.NewCoverFlow.Paint(1);
-            end;
-        end;
+        if assigned(fOnDownloadComplete) then
+          fOnDownloadComplete(fCurrentDownloadItem, bmp);
+
     finally
         bmp.free;
     end;
@@ -1295,34 +1386,19 @@ begin
         SetProperBitmapSize(bmp, fCurrentDownloadItem.QueryType);
 
         GetDefaultPic(dcFile, bmp);
-
         AddLogoToBitmap('lastfmCache', bmp);
 
         //bmp.Canvas.Brush.Style := bsClear;
         //bmp.Canvas.Font.Size := 6;
         //bmp.Canvas.TextOut(5,5, 'Cover-download blocked by cache');
+        fCurrentDownloadItem.Status := CoverFlowLastFM_HintCache;
 
-        if fCurrentDownloadItem.QueryType = qtPlayer then
-        begin
-            if DownloadItemStillMatchesPlayer then
-            begin
-                NempPlayer.MainPlayerPicture.Assign(bmp);
-                Nemp_MainForm.CoverImage.Picture.Assign(NempPlayer.MainPlayerPicture);
-                Nemp_MainForm.CoverImage.Hint := CoverFlowLastFM_HintCache;
-            end;
-        end
-        else
-        begin
-            if DownloadItemStillMatchesCoverFlow then
-            begin
-                Medienbib.NewCoverFlow.SetPreview (fCurrentDownloadItem.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
-                MedienBib.NewCoverFlow.Paint(1);
-            end;
-        end;
+        if assigned(fOnDownloadComplete) then
+          fOnDownloadComplete(fCurrentDownloadItem, bmp);
+
     finally
         bmp.free;
     end;
-
 end;
 
 procedure TCoverDownloadWorkerThread.SyncUpdateInvalidCover;
@@ -1333,18 +1409,26 @@ begin
         bmp.PixelFormat := pf24bit;
         SetProperBitmapSize(bmp, fCurrentDownloadItem.QueryType);
 
+        GetDefaultPic(dcFile, bmp);
+        AddLogoToBitmap('lastfmInvalid', bmp);
+        fCurrentDownloadItem.Status := CoverFlowLastFM_HintInvalid;
+
+        if assigned(fOnDownloadComplete) then
+          fOnDownloadComplete(fCurrentDownloadItem, bmp);
+
+        (*
         if (fCurrentDownloadItem.QueryType = qtPlayer)
             and DownloadItemStillMatchesPlayer
         then
         begin
             //GetDefaultCover(dcFile, pic, 0);
-            GetDefaultPic(dcFile, bmp);
-            AddLogoToBitmap('lastfmInvalid', bmp);
+
 
             NempPlayer.MainPlayerPicture.Assign(bmp);
             Nemp_MainForm.CoverImage.Picture.Assign(NempPlayer.MainPlayerPicture);
             Nemp_MainForm.CoverImage.Hint := CoverFlowLastFM_HintInvalid;
         end;
+        *)
     finally
         bmp.Free;
     end;
@@ -1365,26 +1449,45 @@ end;
     --------------------------------------------------------
 }
 procedure TCoverDownloadWorkerThread.SyncUpdateMedialib;
-var OldID, NewID: String;
+//var OldID, NewID: String;
+//  ArchivedCollection: TAudioCollection;
 begin
-    if  (MedienBib.BrowseMode = 1)         // we are still in CoverFlow
-        and (fCurrentDownloadItem.QueryType = qtCoverFlow)
-        and FileExists(fNewCoverFilename)  // the downloaded file exists
-        and DownloadItemStillMatchesCoverFlow
+    if  // (MedienBib.BrowseMode = 1)         // we are still in CoverFlow
+        // and (fCurrentDownloadItem.QueryType = qtCoverFlow)
+        // and
+        FileExists(fNewCoverFilename)  // the downloaded file exists
+        //and DownloadItemStillMatchesCoverFlow
     then
     begin
-        NewID := Medienbib.CoverArtSearcher.InitCoverFromFilename(fNewCoverFilename, tm_VCL);
-        // as DownloadItemStillMatchesCoverFlow, the access to this index is ok
-        OldID := TNempCover(MedienBib.CoverViewList[fCurrentDownloadItem.Index]).ID;
+        fCurrentDownloadItem.newFilename := fNewCoverFilename;
 
-        MedienBib.ChangeCoverID(OldID, NewID);
+        {NewID := Medienbib.CoverArtSearcher.InitCoverFromFilename(fNewCoverFilename, tm_VCL);
+        // as DownloadItemStillMatchesCoverFlow, the access to this index is ok
+        // OldID := TAudioFileCollection(MedienBib.NewCoverFlow.Collection[fCurrentDownloadItem.Index]).CoverID;
+        //TNempCover(MedienBib.CoverViewList[fCurrentDownloadItem.Index]).ID;
+
+        ArchivedCollection := GetArchivedCollection(fCurrentDownloadItem.ArchiveID);
+        if assigned(ArchivedCollection) then
+          ArchivedCollection.ChangeCoverIDAfterDownload(newID);
+          }
+
+        if assigned(fOnDownloadSaved) then
+          fOnDownloadSaved(fCurrentDownloadItem);
+
+
+        //if (MedienBib.BrowseMode = 0) and (fCurrentDownloadItem.QueryType = qtTreeView) then
+        //  Nemp_MainForm.AlbenVST.Invalidate;
+
+        //MedienBib.ChangeCoverID(OldID, NewID);
+        //das umbauen in Files der Collection ändern?
+        // ArchivedCollection.  ChangeCoverIDAfterDownload(newID);
 
         // set the new ID on the NempCover-Object
-        TNempCover(MedienBib.CoverViewList[fCurrentDownloadItem.Index]).ID := NewID;
+        // TAudioFileCollection(MedienBib.NewCoverFlow.Collection[fCurrentDownloadItem.Index]).CoverID := NewID;
+        // TNempCover(MedienBib.CoverViewList[fCurrentDownloadItem.Index]).ID := NewID;
 
-        if  MedienBib.NewCoverFlow.CurrentCoverID = OldID then
-            MedienBib.NewCoverFlow.CurrentCoverID := NewID;
-
+        //if  MedienBib.NewCoverFlow.CurrentCoverID = OldID then
+        //    MedienBib.NewCoverFlow.CurrentCoverID := NewID;
     end;
 end;
 

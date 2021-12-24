@@ -101,7 +101,7 @@ implementation
 
 {$R *.dfm}
 
-uses Nemp_RessourceStrings, NempMainUnit, BibHelper, TreeHelper, Nemp_SkinSystem;
+uses Nemp_RessourceStrings, NempMainUnit, BibHelper, TreeHelper, Nemp_SkinSystem, NempFileUtils;
 
 
 procedure TDeleteSelection.FormCreate(Sender: TObject);
@@ -109,7 +109,7 @@ var filename: String;
 begin
     TranslateComponent (self);
 
-    VSTPlaylistFiles.NodeDataSize  := SizeOf(TStringTreeData);
+    VSTPlaylistFiles.NodeDataSize  := SizeOf(TLibraryPlaylist);
     VSTFiles.NodeDataSize  := SizeOf(TAudioFile);
     VSTDrives.NodeDataSize := SizeOf(TDeleteTreeData);
 
@@ -317,12 +317,11 @@ end;
 procedure TDeleteSelection.VSTPlaylistFilesGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
   var CellText: string);
-var Data: PStringTreeData;
+var pl: TLibraryPlaylist;
 begin
-    Data:=Sender.GetNodeData(Node);
-    if not assigned(Data) then exit;
-
-    CellText := TJustAstring(Data^.FString).AnzeigeString;
+    pl := Sender.GetNodeData<TLibraryPlaylist>(Node);
+    if assigned(pl) then
+      CellText := pl.Path;
 end;
 
 procedure TDeleteSelection.AddPngToImageList(aFilename: String;
@@ -369,7 +368,7 @@ begin
         // Fill Playlist Files
         VSTPlaylistFiles.BeginUpdate;
         for i := 0 to currentData.PlaylistFiles.Count-1 do
-            AddVSTString(VSTPlaylistFiles,Nil,TJustAString(currentData.PlaylistFiles.Items[i]));
+          VSTPlaylistFiles.AddChild(Nil, currentData.PlaylistFiles[i]);
         VSTPlaylistFiles.EndUpdate;
     end;
 end;

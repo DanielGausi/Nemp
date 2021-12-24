@@ -35,7 +35,8 @@ interface
 
 uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTrees,
     NempAudioFiles, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, dialogs, CoverHelper,
-    MyDialogs, System.UITypes, math, Vcl.ExtCtrls, Vcl.Graphics, RatingCtrls;
+    MyDialogs, System.UITypes, math, Vcl.ExtCtrls, Vcl.Graphics, RatingCtrls,
+    LibraryOrganizer.Base, LibraryOrganizer.Files, LibraryOrganizer.Playlists, LibraryOrganizer.Webradio;
 
 type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
 
@@ -74,7 +75,7 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     // SwitchBrowsePanel: entsprechendes Anzeigen der Liste
     procedure SwitchBrowsePanel(NewMode: Integer);
 
-    procedure SetCoverFlowScrollbarRange(aList: TNempCoverList);
+    procedure SetCoverFlowScrollbarRange(aCount: Integer); overload;
     procedure RestoreCoverFlowAfterSearch(ForceUpdate: Boolean = False);
 
     procedure ReTranslateNemp(LanguageCode: String);
@@ -112,6 +113,7 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     procedure HandleError(aAction: TAudioFileAction; aFile: String; aErr: TNempAudioError; Important: Boolean = false); overload;
     procedure HandleError(aAction: TAudioFileAction; aFile: TAudioFile; aErr: TNempAudioError; Important: Boolean = false); overload;
 
+    procedure CollectionDblClick(ac: TAudioCollection);
 
     function GetSpecialPermissionToChangeMetaData:Boolean;
 
@@ -258,6 +260,14 @@ begin
                       FSplash.StatusLBL.Caption := (SplashScreen_NewDriveConnected2);
                       FSplash.Update;
 
+
+                      MedienBib.ReBuildCategories;
+                      {
+
+                      jetzt weniger zu tun?
+                      einfach nur den "C:\"-Key der Collections ändern (falls Verzeichnis-Anzeige)?
+
+                      // todo xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
                       // Anzeige aktualisieren
                       case MedienBib.BrowseMode of
                           0 : MedienBib.ReBuildBrowseLists;
@@ -270,6 +280,7 @@ begin
                           end;
 
                       end;
+                      }
 
                   FSplash.Close;
                   Nemp_MainForm.Enabled := True;
@@ -337,16 +348,17 @@ begin
             if assigned(Newnode) then
             begin
                 tmpAudioFile := VST.GetNodeData<TAudioFile>(NewNode);
-
-                if Not SameFile(tmpAudioFile, AudioFile) then
-                repeat
-                    NewNode := VST.GetNext(NewNode);
-                    if assigned(NewNode) then
-                    begin
-                        // Data := VST.GetNodeData(NewNode);
-                        tmpAudioFile := VST.GetNodeData<TAudioFile>(NewNode);
-                    end;
-                until SameFile(tmpAudioFile, AudioFile) OR (NewNode=NIL);
+                if assigned(AudioFile) then begin
+                    if Not SameFile(tmpAudioFile, AudioFile) then
+                    repeat
+                        NewNode := VST.GetNext(NewNode);
+                        if assigned(NewNode) then
+                        begin
+                            // Data := VST.GetNodeData(NewNode);
+                            tmpAudioFile := VST.GetNodeData<TAudioFile>(NewNode);
+                        end;
+                    until SameFile(tmpAudioFile, AudioFile) OR (NewNode=NIL);
+                end;
 
                 // Ok, we didn't found our AudioFile.
                 // get the first one in the list.
@@ -671,19 +683,16 @@ begin
         FSplash.Update;
 
             MedienBib.BrowseMode := NewMode;
+
+            ///  Swapping the mode may cause deleting temporary created Audiofiles from Playlists
+            ///  If such a tmporary File was currently selected, it may result in access violations later. => Nil it.
+            MedienBib.CurrentAudioFile := Nil;
+
             case NewMode of
-                0: begin
-                    MedienBib.ReBuildBrowseLists;
-                end;
-                1: begin
-                    MedienBib.CurrentArtist := BROWSE_ALL;
-                    MedienBib.CurrentAlbum := BROWSE_ALL;
-                    MedienBib.ReBuildCoverList;
-
-                    MedienBib.NewCoverFlow.SetNewList(MedienBib.CoverViewList, MedienBib.CoverCount);
-
-                    SetCoverFlowScrollbarRange(MedienBib.CoverViewList);
-                    CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
+                0,1: begin
+                    //MedienBib.ReBuildBrowseLists;
+                    MedienBib.ReBuildCategories;
+                    ReFillBrowseTrees(True);
                 end;
                 2: begin
                     // 1. Backup Breadcrumbs (current navigation)
@@ -734,6 +743,7 @@ begin
                 TabBtn_CoverFlow.Refresh;
             end;
             1: begin
+                AlbenVST.Clear;
                 // Zeige CoverFlow
                 PanelStandardBrowse.Visible := False;
                 PanelTagCloudBrowse.Visible := False;
@@ -754,7 +764,7 @@ begin
                 TabBtn_CoverFlow.Refresh;
             end;
             2: begin
-
+                AlbenVST.Clear;
                 PanelStandardBrowse.Visible := False;
                 PanelTagCloudBrowse.Visible := MedienBib.Count > 0;
                 PanelCoverBrowse.Visible := False;
@@ -780,16 +790,18 @@ begin
     end;
 end;
 
-procedure SetCoverFlowScrollbarRange(aList: TNempCoverList);
+procedure SetCoverFlowScrollbarRange(aCount: Integer);
 begin
-  If aList.Count > 3 then
-    Nemp_MainForm.CoverScrollbar.Max := aList.Count - 1
+  If aCount > 3 then
+    Nemp_MainForm.CoverScrollbar.Max := aCount - 1
   else
     Nemp_MainForm.CoverScrollbar.Max := 3;
 end;
 
+
 procedure RestoreCoverFlowAfterSearch(ForceUpdate: Boolean = False);
-var aCover: tNempCover;
+var
+  aCollection: TAudioCollection;
 begin
     with Nemp_MainForm do
     begin
@@ -798,24 +810,29 @@ begin
         then
         begin
             RefreshCoverFlowTimer.Enabled := False;
-            MedienBib.ReBuildCoverList(False);
             MedienBib.NewCoverFlow.ClearTextures;
-            // MedienBib.NewCoverFlow.SetNewList(MedienBib.CoverViewList);
-            MedienBib.CoverArtSearcher.PrepareMainCover(MedienBib.CoverViewList);
 
-            SetCoverFlowScrollbarRange(MedienBib.CoverViewList);
-            MedienBib.NewCoverFlow.FindCurrentItemAgain;
-            CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
+            MedienBib.NewCoverFlow.SetNewList(MedienBib.CurrentCategory);
+            MedienBib.CoverArtSearcher.PrepareMainCover(MedienBib.CurrentCategory);
 
-            if (CoverScrollbar.Position > 0) and (CoverScrollbar.Position < MedienBib.CoverViewList.Count) then
+            SetCoverFlowScrollbarRange(MedienBib.NewCoverFlow.CoverCount);
+            CoverScrollbar.Position :=
+              MedienBib.NewCoverFlow.GetCollectionIndex(MedienBib.CurrentCategory.FindLastCollectionAgain);
+              // other method for this:
+              // MedienBib.NewCoverFlow.FindCurrentItemAgain;
+              // CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
+
+            if CoverScrollbar.Position <= MedienBib.NewCoverFlow.CoverCount - 1 then
             begin
-                aCover := MedienBib.CoverViewList[CoverScrollbar.Position];
-                Lbl_CoverFlow.Caption := aCover.InfoString;
-            end else
-                Lbl_CoverFlow.Caption := '';
+                aCollection := MedienBib.NewCoverFlow.Collection[MedienBib.NewCoverFlow.CurrentItem];
+                if assigned(aCollection) then begin
+                  MedienBib.GenerateAnzeigeListe(aCollection);
+                  Lbl_CoverFlow.Caption := aCollection.Caption;
+                end else
+                  Lbl_CoverFlow.Caption := '';
+            end;
         end;
     end;
-
 end;
 
 procedure ReTranslateNemp(LanguageCode: String);
@@ -826,7 +843,10 @@ begin
         Uselanguage(LanguageCode);
 
         //c := Nemp_MainForm.CBHeadSetControlInsertMode.ItemIndex;
+        //BackupComboboxes(Nemp_MainForm);
         ReTranslateComponent (Nemp_MainForm);
+        //RestoreComboboxes(Nemp_MainForm);
+
         //Nemp_MainForm.CBHeadSetControlInsertMode.ItemIndex := c;
 
         DisplayPlayerMainTitleInformation(True);
@@ -970,50 +990,16 @@ begin
            VST.Header.Columns[i].Text := _(DefaultSpalten[VST.Header.Columns[i].Tag].Bezeichnung);
         VST.Invalidate;
 
-        if MedienBib.AlleArtists.Count = 0 then
-          c := 0
-        else
-          c := MedienBib.AlleArtists.Count - 1;
-
-        case MedienBib.NempSortArray[1] of
-            siAlbum:  ArtistsVST.Header.Columns[0].Text := (TreeHeader_Albums)      + ' (' + inttostr(c) + ')' ;
-            siArtist: ArtistsVST.Header.Columns[0].Text := (TreeHeader_Artists)     + ' (' + inttostr(c) + ')' ;
-            siOrdner: ArtistsVST.Header.Columns[0].Text := (TreeHeader_Directories) + ' (' + inttostr(c) + ')' ;
-            siGenre:  ArtistsVST.Header.Columns[0].Text := (TreeHeader_Genres)      + ' (' + inttostr(c) + ')' ;
-            siJahr:   ArtistsVST.Header.Columns[0].Text := (TreeHeader_Years)       + ' (' + inttostr(c) + ')' ;
-            siFileage:ArtistsVST.Header.Columns[0].Text := (TreeHeader_FileAges)    + ' (' + inttostr(c) + ')' ;
-          else ArtistsVST.Header.Columns[0].Text := '(N/A)';
-        end;
-        ArtistsVST.Invalidate;
-
-        if MedienBib.Alben.Count = 0 then
-          c := 0
-        else
-          c := MedienBib.Alben.Count - 1;
-
-        if MedienBib.CurrentArtist = BROWSE_PLAYLISTS then
-            AlbenVST.Header.Columns[0].Text := TreeHeader_Playlists + ' (' + inttostr(c) + ')'
-        else
-        if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
-            AlbenVST.Header.Columns[0].Text := TreeHeader_Webradio + ' (' + inttostr(c) + ')'
-        else
-        case MedienBib.NempSortArray[2] of
-            siAlbum:  AlbenVST.Header.Columns[0].Text := (TreeHeader_Albums)      + ' (' + inttostr(c) + ')' ;
-            siArtist: AlbenVST.Header.Columns[0].Text := (TreeHeader_Artists)     + ' (' + inttostr(c) + ')' ;
-            siOrdner: AlbenVST.Header.Columns[0].Text := (TreeHeader_Directories) + ' (' + inttostr(c) + ')' ;
-            siGenre:  AlbenVST.Header.Columns[0].Text := (TreeHeader_Genres)      + ' (' + inttostr(c) + ')' ;
-            siJahr:   AlbenVST.Header.Columns[0].Text := (TreeHeader_Years)       + ' (' + inttostr(c) + ')' ;
-            siFileage:AlbenVST.Header.Columns[0].Text := (TreeHeader_FileAges)    + ' (' + inttostr(c) + ')' ;
-          else AlbenVST.Header.Columns[0].Text := '(N/A)';
-        end;
-        AlbenVST.Invalidate;
+        // Categories
+        ArtistsVST.Header.Columns[0].Text := TreeHeader_Categories;
+        // Collections
+        RefreshCollectionTreeHeader(MedienBib.CurrentCategory);
 
         // refill playlist headers
         PlaylistPropertiesChanged(NempPlaylist);
 
         if Medienbib.BrowseMode = 1 then
             CoverScrollbarChange(Nil); // trigger redraw of label
-
 
         if Medienbib.BrowseMode = 2 then
             MedienBib.TagCloud.CloudPainter.Paint(MedienBib.TagCloud.CurrentTagList);
@@ -1453,8 +1439,8 @@ begin
         bibFile := MedienBib.GetAudioFileWithFilename(aFile.Pfad);
         if SameFile(bibFile) then
         begin
-            if Not MedienBib.ValidKeys(bibFile) then
-                SetBrowseTabWarning(True);
+            if MedienBib.CollectionKeyHasChanged(bibFile) then
+              SetBrowseTabWarning(True);
         end;
     end;
 end;
@@ -1940,6 +1926,16 @@ begin
       u.Free;
   end;
 end;
+
+procedure CollectionDblClick(ac: TAudioCollection);
+begin
+  case ac.CollectionClass of
+    ccFiles: MedienBib.GenerateReverseAnzeigeListe(ac);
+    ccPlaylists: MedienBib.GenerateAnzeigeListe(ac);
+    ccWebStations: TAudioWebradioCollection(ac).Station.TuneIn(NempPlaylist.BassHandlePlaylist);
+  end;
+end;
+
 
 
 end.

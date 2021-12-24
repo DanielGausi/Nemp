@@ -48,7 +48,7 @@ uses
   Nemp_ConstantsAndTypes, filetypes, Buttons, gnuGettext, languageCodes,
   Nemp_RessourceStrings,  ScrobblerUtils, ExtDlgs, NempCoverFlowClass,
   SkinButtons, NempPanel, MyDialogs, Vcl.Mask, System.UITypes, Generics.Collections,
-  System.Generics.Defaults, NempTrackBar
+  System.Generics.Defaults, NempTrackBar, LibraryOrganizer.Base
   {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF};
 
 type
@@ -1439,7 +1439,7 @@ begin
   end;
 
   cbHideNACover.Checked := MedienBib.HideNACover;
-  cbMissingCoverMode.ItemIndex := MedienBib.MissingCoverMode;
+  cbMissingCoverMode.ItemIndex := Integer(MedienBib.MissingCoverMode);
 
   CB_CoverSearch_inDir.Checked       := TCoverArtSearcher.UseDir;
   CB_CoverSearch_inParentDir.Checked := TCoverArtSearcher.UseParentDir;
@@ -1470,9 +1470,9 @@ begin
   cb_EnableCloudMode.Checked := TDrivemanager.EnableCloudMode;
 
 
-  CBSortArray1.ItemIndex := integer(MedienBib.NempSortArray[1]);
-  CBSortArray2.ItemIndex := integer(MedienBib.NempSortArray[2]);
-  cbCoverSortOrder.ItemIndex := MedienBib.CoverSortOrder - 1;
+  //CBSortArray1.ItemIndex := integer(MedienBib.NempSortArray[1]);
+  //CBSortArray2.ItemIndex := integer(MedienBib.NempSortArray[2]);
+  //cbCoverSortOrder.ItemIndex := MedienBib.CoverSortOrder - 1;
 
   cbReplaceArtistBy.ItemIndex := Integer(NempDisplay.ArtistSubstitute); //Nemp_MainForm.NempOptions.ReplaceNAArtistBy;
   cbReplaceTitleBy .ItemIndex := Integer(NempDisplay.TitleSubstitute) ; //Nemp_MainForm.NempOptions.ReplaceNATitleBy ;
@@ -2695,7 +2695,7 @@ begin
   //begin
       // check for some critical updates for the medialibrary (done later in this procedure)
       // --------------------------------------------------------
-      if      (((CBSortArray1.ItemIndex <> integer(MedienBib.NempSortArray[1]))
+      (*if      (((CBSortArray1.ItemIndex <> integer(MedienBib.NempSortArray[1]))
                     OR (CBSortArray2.ItemIndex <> integer(MedienBib.NempSortArray[2])))
               AND
               (MedienBib.BrowseMode = 0))
@@ -2703,10 +2703,11 @@ begin
               ( ((cbCoverSortOrder.ItemIndex + 1) <> MedienBib.CoverSortOrder)
               AND (MedienBib.BrowseMode = 1) )
           OR
-              ( ((cbMissingCoverMode.ItemIndex) <> MedienBib.MissingCoverMode)
+              ( ((cbMissingCoverMode.ItemIndex) <> Integer(MedienBib.MissingCoverMode))
               AND (MedienBib.BrowseMode = 1) )
       then
           NeedUpdate := True;
+      *)
 
       if (MedienBib.BrowseMode = 1)  AND
           (cb_ChangeCoverflowOnSearch.Checked <> MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow)
@@ -2728,10 +2729,10 @@ begin
       end else
       begin
           // everthings fine
-          MedienBib.NempSortArray[1] := TAudioFileStringIndex(CBSortArray1.ItemIndex);
-          MedienBib.NempSortArray[2] := TAudioFileStringIndex(CBSortArray2.ItemIndex);
-          MedienBib.CoverSortOrder := cbCoverSortOrder.ItemIndex + 1;
-          MedienBib.MissingCoverMode := cbMissingCoverMode.ItemIndex;
+          //MedienBib.NempSortArray[1] := TAudioFileStringIndex(CBSortArray1.ItemIndex);
+          //MedienBib.NempSortArray[2] := TAudioFileStringIndex(CBSortArray2.ItemIndex);
+          //MedienBib.CoverSortOrder := cbCoverSortOrder.ItemIndex + 1;
+          MedienBib.MissingCoverMode := teMissingCoverPreSorting(cbMissingCoverMode.ItemIndex);
 
           NempDisplay.ArtistSubstitute := TESubstituteValue(cbReplaceArtistBy.ItemIndex);
           NempDisplay.TitleSubstitute  := TESubstituteValue(cbReplaceTitleBy .ItemIndex);
@@ -2918,15 +2919,17 @@ begin
   if NeedUpdate then
   begin
       // Browse-Listen neu aufbauen
+      // todo  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      // oder das auslagern in neue form?
       case MedienBib.BrowseMode of
           0: begin
               MedienBib.ReBuildBrowseLists;
           end;
           1: begin
-                MedienBib.ReBuildCoverList;
-                MedienBib.NewCoverFlow.ClearTextures;
-                SetCoverFlowScrollbarRange(MedienBib.CoverViewList);
-                MedienBib.NewCoverFlow.FindCurrentItemAgain;
+                //MedienBib.ReBuildCoverList;
+                //MedienBib.NewCoverFlow.ClearTextures;
+                //SetCoverFlowScrollbarRange(MedienBib.CoverViewList);
+                //MedienBib.NewCoverFlow.FindCurrentItemAgain;
           end;
           2: begin
               // nothing to do.
@@ -2939,15 +2942,8 @@ begin
     begin
         // Artist/Alben-Bäume nur neu füllen
         // (aber nur bei anderen Zeilenhöhen - sonst ist auch das nicht nötig.)
-        if MedienBib.NempSortArray[1] = siOrdner then
-          FillStringTreeWithSubNodes(MedienBib.AlleArtists, Nemp_MainForm.ArtistsVST)
-        else
-          FillStringTree(MedienBib.AlleArtists, Nemp_MainForm.ArtistsVST);
-
-        if MedienBib.NempSortArray[2] = siOrdner then
-          FillStringTreeWithSubNodes(Medienbib.Alben, Nemp_MainForm.AlbenVST)
-        else
-          FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
+        Nemp_MainForm.ReFillCategoryTree(True);
+        Nemp_MainForm.FillCollectionTree(Nil ,True);
     end;
   end;
 
@@ -3476,7 +3472,8 @@ end;
 
 procedure TOptionsCompleteForm.BtnClearCoverCacheClick(Sender: TObject);
 begin
-    MedienBib.NewCoverFlow.ClearCoverCache;
+    //MedienBib.NewCoverFlow.ClearCoverCache;
+    CoverDownloadThread.ClearCacheList;
     MedienBib.NewCoverFlow.ClearTextures;
 end;
 

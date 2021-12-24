@@ -117,7 +117,7 @@ object DeleteSelection: TDeleteSelection
       Columns = <
         item
           Position = 0
-          Width = 236
+          Width = 232
           WideText = 'Playlists on the selected drive'
         end>
     end
@@ -136,7 +136,7 @@ object DeleteSelection: TDeleteSelection
       Columns = <
         item
           Position = 0
-          Width = 429
+          Width = 425
           WideText = 'Audio files on the selected drive'
         end>
     end
@@ -212,7 +212,7 @@ object DeleteSelection: TDeleteSelection
       Columns = <
         item
           Position = 0
-          Width = 193
+          Width = 189
           WideText = 'Files'
         end>
     end

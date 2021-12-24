@@ -170,8 +170,7 @@ type
               'Invalid Ape File',
               'Invalid Apev2Tag' ,
               //
-
-              'Invalid Top-Level Atom (probably a video file?)',
+              'Invalid M4A file (maybe a video file?)', // 'Invalid Top-Level Atom (probably a video file?)',
               'Invalid UDTA Atom',
               'Invalid META Version',
               'Invalid MDHD Atom',
@@ -294,6 +293,8 @@ type
 
         fAudioType: TAudioType; // undef, File, Stream, CD-Audio
 
+        fCategory: Cardinal; // BitMask storing to which of the MediaLibrary-Categories the file belongs to
+
         // In the playlist, every AudioFile can have a list
         // of TAudiofiles (CueList), if there is a cuefile present
         // These subfiles starts at position Index01
@@ -319,6 +320,9 @@ type
         // List of all Tags for this Audiofile
         // This List is managed in class TTagCloud
         fTagList: TObjectList;
+
+        // new Nemp 4.15: Index of the category in the Library
+        fCategoryIndex: Integer;
 
         // Some Flags marking the File (for example: matches the current search key words whil searching in the Playlist)
         // Use constants FLAG_***
@@ -463,6 +467,8 @@ type
         property Pfad: UnicodeString read GetPath write SetPath;
         // property FilenameForUSBCopy: UnicodeString read fGetProperFilename;
 
+        property CategoryIndex: Integer read fCategoryIndex write fCategoryIndex;
+
         property Key1: UnicodeString read fKey1 write fKey1;
         property Key2: UnicodeString read fKey2 write fKey2;
 
@@ -479,6 +485,7 @@ type
 
         property VoteCounter: Integer read fVoteCounter write fVoteCounter;
         property Favorite: Byte read fFavorite write fFavorite;
+        property Category: Cardinal read fCategory write fCategory; // writing will be more complicated, using Bit-operators ..... // todo
 
         property DriveID: Integer read fDriveID write fDriveID;
 
@@ -574,6 +581,10 @@ type
         // creates a copy of the Audiofile and adds the copy to the list
         procedure AddCopyToList(aList: TAudioFileList);
 
+        function IsCategory(aCatIdx: Byte): Boolean;
+        procedure AddToCategory(aCatIdx: Byte);
+        procedure RemoveFromCategory(aCatIdx: Byte);
+
 
     end;
 
@@ -667,6 +678,7 @@ const
       // note: some of them are already in use
       //MP3DB_DUMMY_Byte2  = 29;
       MP3DB_FAVORITE  = 29;
+      MP3DB_CATEGORY = 39;
 
       //MP3DB_DUMMY_Int1   = 30;
       // MP3DB_DUMMY_Int2   = 31;
@@ -947,6 +959,7 @@ begin
     Pfad               := aAudioFile.Pfad                ;
     RawTagLastFM       := aAudioFile.RawTagLastFM        ;
     Favorite           := aAudioFile.fFavorite           ;
+    fCategory          := aAudioFile.fCategory           ;
     TrackGain          := aAudioFile.TrackGain           ;
     AlbumGain          := aAudioFile.AlbumGain           ;
     TrackPeak          := aAudioFile.TrackPeak           ;
@@ -980,6 +993,7 @@ begin
     fAudioType         := aAudioFile.fAudioType          ;
     Pfad               := aAudioFile.Pfad                ;
     Favorite           := aAudioFile.fFavorite           ;
+    fCategory          := aAudioFile.fCategory           ;
     TrackGain          := aAudioFile.TrackGain           ;
     AlbumGain          := aAudioFile.AlbumGain           ;
     TrackPeak          := aAudioFile.TrackPeak           ;
@@ -1136,6 +1150,20 @@ begin
     result := trim(Genre) <> '';
 end;
 
+function TAudioFile.IsCategory(aCatIdx: Byte): Boolean;
+begin
+  result := (fCategory shr aCatIdx) AND 1 = 1;
+end;
+
+procedure TAudioFile.AddToCategory(aCatIdx: Byte);
+begin
+  fCategory := fCategory or (1 shl aCatIdx);
+end;
+
+procedure TAudioFile.RemoveFromCategory(aCatIdx: Byte);
+begin
+  fCategory := fCategory and (not (1 shl aCatIdx));
+end;
 
 
 {
@@ -3019,6 +3047,7 @@ begin
                                           GetCueList;
                                  end;
             MP3DB_FAVORITE :     fFavorite    := ReadByteFromStream(aStream);
+            MP3DB_CATEGORY :     fCategory    := ReadCardinalFromStream(aStream);
             MP3DB_PLAYCOUNTER :  fPlayCounter := ReadCardinalFromStream(aStream);
             MP3DB_DRIVE_ID  :    fDriveID     := ReadIntegerFromStream(aStream);
 
@@ -3295,6 +3324,8 @@ begin
     if fRating <> 0      then result := result + WriteByteToStream(aStream, MP3DB_RATING, fRating);
     if fPlayCounter <> 0 then result := result + WriteCardinalToStream(aStream, MP3DB_PLAYCOUNTER, fPlayCounter);
     if fFavorite <> 0    then result := result + WriteByteToStream(aStream, MP3DB_FAVORITE, fFavorite);
+    if fCategory <> 0    then result := result + WriteCardinalToStream(aStream, MP3DB_CATEGORY, fCategory);
+
     if Year <> ''        then result := result + WriteWordToStream(aStream, MP3DB_YEAR, StrToIntDef(Year, 0));
 
     GenreIDXint := ID3Genres.IndexOf(Genre);

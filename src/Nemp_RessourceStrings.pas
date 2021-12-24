@@ -60,20 +60,35 @@ OptionsTree_Playlist = 'Playlist';
 OptionsTree_LastFM = 'LastFM (scrobble)';
 OptionsTree_Extended = 'Extended settings';
 
-                                               
+
+TreeHeader_Categories = 'Categories';
+TreeHeader_CatFiles = 'Music files';
+TreeHeader_CatPlaylists = 'Playlists';
+TreeHeader_CatWebRadio = 'Webradio stations';
+
 TreeHeader_Artists = 'Artists';
 TreeHeader_Albums= 'Albums';
 TreeHeader_Directories = 'Directories';
 TreeHeader_Genres = 'Genres';
 TreeHeader_Years = 'Years';
+TreeHeader_Decades = 'Decades';
 TreeHeader_Titles = 'Titles';
 TreeHeader_FileAges = 'Fileage';
+TreeHeader_FileAgesMonth = 'Fileage (by month)';
 TreeHeader_PlayCounter = 'Play counter';
 TreeHeader_Playlists = 'Playlists';
 TreeHeader_Playlist = 'Playlist';
 TreeHeader_Webradio = 'Webradio';
 TreeHeader_Marker = 'Marker';
 
+CollectionSorting_Default  = 'Name';
+CollectionSorting_ByAlbum  = 'Album';
+CollectionSorting_ByArtistAlbum  = 'Artist and Album';
+CollectionSorting_ByCount  = 'Count';
+CollectionSorting_ByYear  = 'Release year';
+CollectionSorting_ByFileAge  = 'Fileage';
+CollectionSorting_ByGenre  = 'Genre';
+CollectionSorting_ByDirectory  = 'Directory';
 
 Time_HoursLong = 'hours';
 Time_DaysLong = 'days';
@@ -126,7 +141,8 @@ Warning_Coverbox_NoCover = 'No coverfile found';
 Error_CoverInvalid = 'Can''t open file.';
 
 Warning_ReadError = 'Read error';
-Warning_ReadError_Hint = 'The file could not be opened to get information. The file is maybe in use by another program.';
+Warning_ReadError_Hint = 'Nemp can''t gather any further information from the file.';
+//'The file could not be opened to get information. The file is maybe in use by another program.';
 
 Warning_InvalidMp3file = 'Invalid mp3-file';
 Warning_InvalidMp3file_Hint = 'The specified file with the extension ".mp3" is not a valid mp3-file.';
@@ -208,6 +224,7 @@ Error_ID3EditDenied = 'Edit of ID3-Tags denied. You can allow this by Preference
 // automatisch übersetzt werden!!!
 CoverFlowText_VariousArtists    = 'Various artists';
 CoverFlowText_UnkownCompilation = 'Unknown compilation';
+CoverFlowText_VariousGenres     = 'Various genres';
 //CoverFlowText_NoCover           = 'Albums without cover';
 CoverFlowText_AllArtists        = 'All artists';
 CoverFlowText_WholeLibrary      = 'Your media library';
@@ -479,6 +496,7 @@ MainForm_GlobalQuickSearch    = 'Quicksearch (library)';
 // MainForm_LocalQuickSearch     = 'Quicksearch (current list)';
 /// MainForm_MoreSearchresults  = 'Additional results (not limited to current preselection)';
 MainForm_NoSearchresults    = 'Nothing found. Try another search.';
+MainForm_EmptyCategory      = 'There are no files in the current category.';
 MainForm_SearchQueryTooShort = 'Search query too short. Please enter at least 2 characters.';
 MainForm_NoFavorites = 'No files flagged with this marker.';
 // DummyFile for browsing Playlists/Webradio
@@ -604,7 +622,10 @@ MainForm_MenuCaptionsPlay      = 'Play (and clear current playlist)';
 MainForm_MenuCaptionsEnqueue   = 'Enqueue (at the end of the playlist)';
 MainForm_MenuCaptionsPlayNext  = 'Enqueue (after the current title)'; //'Enqueue (at the end of the prebook-list)';
 MainForm_MenuCaptionsPlayNow   = 'Just play focussed file (no playlist change)';
+MainForm_MenuCaptionsSortLayerBy = 'Sort layer "%s" by';
+MainForm_MenuCaptionsSortDirectoriesBy = 'Sort Directories by';
 
+MainForm_MenuCaptionsSortCollectionBy = 'Sort "%s" by';
 
 MainForm_MenuCaptionsPlayAllArtist      = 'Play all tracks of this artist (and delete current playlist)';
 MainForm_MenuCaptionsPlayAllAlbum       = 'Play all tracks of this album (and delete current playlist)';
@@ -625,6 +646,11 @@ MainForm_MenuCaptionsEnqueueAllGenre       = 'Enqueue all tracks of this genre (
 MainForm_MenuCaptionsEnqueueAllYear        = 'Enqueue all tracks of this year (at the end of the playlist)';
 MainForm_MenuCaptionsEnqueueAllTag         = 'Enqueue all tracks with this tag (at the end of the playlist)';
 MainForm_MenuCaptionsEnqueueAllDate        = 'Enqueue all tracks from this month (at the end of the playlist)';
+
+MainForm_MenuCaptionEnqueueAll = 'Enqueue all tracks in category "%s"';
+MainForm_MenuCaptionEnqueueCollection = 'Enqueue all tracks from "%s"';
+MainForm_MenuCaptionEnqueuePlaylistCollection = 'Enqueue playlist "%s"';
+MainForm_MenuCaptionEnqueueWebradioCollection = 'Enqueue webradio station "%s"';
 
 MainForm_MenuCaptionsEnqueueAllPlaylist = 'Enqueue all tracks of this playlist (at the end of the playlist)';
 MainForm_MenuCaptionsEnqueueAllWebradio = 'Enqueue all tracks of this webradio station (at the end of the playlist)';
@@ -1117,6 +1143,11 @@ PlaylistDuplicates_TimeBetweenStream = 'At least %s play time (+ webstream)';
 PlaylistDuplicates_TimeBetweenOnlyStream = 'Unknown play time (only webstream)';
 PlaylistDuplicates_PositionInPlaylist = 'Position in playlist: %d';
 
+LibraryOrganizer_NoMoreCategoriesPossible =
+  'There is a limit of 32 categories, and currently all available slots are used. '
+  + #13#10+#13#10
+  + 'If you want to reuse one of the category slots you have just deleted, you need to apply the current settings first. After Nemp has rebuilt the Media Library, there should be a category slot available again.';
+  // Note that the category-system is not intended for tagging your music files.
 
 implementation
 

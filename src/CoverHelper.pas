@@ -44,7 +44,9 @@ uses
   Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, math,
   NempAudioFiles, Nemp_ConstantsAndTypes,
   cddaUtils, basscd, oneinst, md5, AudioFiles.Base, AudioFiles.Declarations, AudioFiles.Factory,
-  Winapi.Wincodec, Winapi.ActiveX, System.Generics.Defaults, System.Generics.Collections;
+  Winapi.Wincodec, Winapi.ActiveX, System.Generics.Defaults, System.Generics.Collections,
+  LibraryOrganizer.Base, LibraryOrganizer.Files
+  ;
 
 const
     // some Flags for initialising CoverArt
@@ -94,8 +96,8 @@ type
       procedure GetCoverInfos(AudioFileList: TAudioFileList);
     end;
 
-    TNempCoverList = class(TObjectList<TNempCover>);
-    TNempCoverCompare = function(a1,a2: TNempCover): Integer;
+    //TNempCoverList = class(TObjectList<TNempCover>);
+    //TNempCoverCompare = function(a1,a2: TNempCover): Integer;
 
     TCoverArtSearcher = class
     private
@@ -114,7 +116,7 @@ type
         var fCurrentPath,                      // the last Path a CoverList was created for
             fCurrentCoverName,                 // the last Filename for the Coverart used as "FrontCover"
             fCurrentCoverID:  UnicodeString;   // the last calculated CoverID
-        var RandomCoverList: TStringlist;      // Randomly selected cover. Used for customized painting
+        var RandomCoverList: TAudioCollectionList;      // Randomly selected cover. Used for customized painting
 
         class function fGetUseDir       : LongBool      ; static;
         class function fGetUseParentDir : LongBool      ; static;
@@ -212,7 +214,8 @@ type
         function InitCoverFromMetaData(aAudioFile: TAudioFile; ScanMode: CoverScanThreadMode; Flags: Integer): String;
         procedure InitCover(aAudioFile: TAudioFile; ScanMode: CoverScanThreadMode; Flags: Integer);
 
-        class function GetCover_Fast(aAudioFile: TAudioFile; aCoverbmp: TPicture): boolean;
+        class function GetCover_Fast(aAudioFile: TAudioFile; aCoverbmp: TPicture): boolean; overload;
+        class function GetCover_Fast(aCoverID: String; aCoverbmp: TPicture): boolean; overload;
         function GetCover_Complete(aAudioFile: TAudioFile; aCoverbmp: TPicture): boolean;
 
         // Get the Default-Cover
@@ -223,12 +226,13 @@ type
         // GetCoverBitmapFromID:
         // Get the Bitmap for a specified Cover-ID
         function GetCoverBitmapFromID(aCoverID: String; aCoverBmp: TPicture): Boolean;
+        function GetCoverBitmapFromCollection(aCollection: TAudioCollection; aCoverBmp: TPicture): Boolean;
 
         // Randomly select some covers from the list and store it in the RandomCoverList
-        procedure PrepareMainCover(SourceCoverlist: TNempCoverList);
+        procedure PrepareMainCover(aCategory: TLibraryCategory);
 
         // Paint a customized cover "Your Library", but using only ColorIDs for the picking algorithm
-        procedure PaintMainPickCover(aCoverBmp: TBitmap; MainCoverList: TNempCoverList);
+        procedure PaintMainPickCover(aCoverBmp: TBitmap; aRootCollection: TRootCollection);
 
         // Save a Graphic in a resized file. Used for all the little md5-named jpgs
         // in <NempDir>\Cover
@@ -618,7 +622,7 @@ var
   lCoverArtSearcher: TCoverArtSearcher;
 begin
   result := false;
-  newID := '';
+  newID := oldID;
 
   if MedienBib.StatusBibUpdate >= 2 then
     exit;
@@ -632,11 +636,19 @@ begin
   lCoverArtSearcher := TCoverArtSearcher.create;
   try
     lCoverArtSearcher.InitCover(aAudioFile, tm_VCL, INIT_COVER_FORCE_RESCAN);
-    result := lCoverArtSearcher.GetCoverBitmapFromID(aAudioFile.CoverID, aPic);
+    if assigned(aPic) then
+      result := lCoverArtSearcher.GetCoverBitmapFromID(aAudioFile.CoverID, aPic)
+    else
+      result := True; // check for success will be done otherwise after this method
+
+     // das true versaut es ggf. zumindest dann, wenn oben newID auf '' gesetzt wurde
+
 
     // if we found an image, but the ID has changed: Change it on the other files with that ID as well
     if (aAudioFile.CoverID <> oldID) then
     begin
+        if aAudioFile.CoverID = '' then
+          aAudioFile.CoverID := 'kaputt repaired';
         MedienBib.ChangeCoverID(oldID, aAudioFile.CoverID);
         if  MedienBib.NewCoverFlow.CurrentCoverID = oldID then
             MedienBib.NewCoverFlow.CurrentCoverID := aAudioFile.CoverID;
@@ -653,7 +665,7 @@ end;
 
 constructor TCoverArtSearcher.create;
 begin
-    RandomCoverList := TStringlist.Create;
+    RandomCoverList := TAudioCollectionList.Create(False);
 end;
 
 destructor TCoverArtSearcher.Destroy;
@@ -1297,6 +1309,42 @@ begin
   end;
 end;
 
+class function TCoverArtSearcher.GetCover_Fast(aCoverID: String; aCoverbmp: TPicture): boolean;
+var aGraphic: TPicture;
+begin
+  try
+    if (aCoverID <> '') And FileExists(TCoverArtSearcher.Savepath + aCoverID + '.jpg') then
+    begin
+        aGraphic := TPicture.Create;
+        try
+            aGraphic.LoadFromFile(TCoverArtSearcher.Savepath + aCoverID + '.jpg');
+
+            if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
+                FitPictureIn(aCoverbmp, aGraphic.Graphic)
+            else
+                //AssignBitmap(aCoverBmp, aGraphic);
+                aCoverbmp.Assign(aGraphic);
+            result := True;
+        finally
+            aGraphic.Free;
+        end;
+    end
+    else
+      result := false;
+  except
+    result := false;
+  end;
+end;
+
+function TCoverArtSearcher.GetCoverBitmapFromCollection(aCollection: TAudioCollection; aCoverBmp: TPicture): Boolean;
+begin
+  if (aCollection is TRootCollection) then begin
+    PaintMainCover(aCoverBmp);
+    result := True;
+  end else
+    result := GetCoverBitmapFromID(aCollection.CoverID, aCoverBmp);
+end;
+
 function TCoverArtSearcher.GetCoverBitmapFromID(aCoverID: String; aCoverBmp: TPicture): Boolean;
 var aJpg: TJpegImage;
 begin
@@ -1394,10 +1442,11 @@ begin
     end;
 end;
 
-procedure TCoverArtSearcher.PrepareMainCover(SourceCoverlist: TNempCoverList);
+procedure TCoverArtSearcher.PrepareMainCover(aCategory: TLibraryCategory);
 var i: Integer;
     CoverArray: Array of Integer;
-    GoodCoverList: TNempCoverList;
+    GoodCoverList: TAudioCollectionList;
+    RC: TRootCollection;
 
     procedure ShuffleFisherYates;
     var
@@ -1415,47 +1464,58 @@ var i: Integer;
       end;
     end;
 
+    function IsFileFlow: Boolean;
+    begin
+      result := (aCategory.CollectionCount = 1) and (aCategory.Collections[0] is TRootCollection);
+    end;
+
 begin
     // Alte Liste löschen
     EnterCriticalSection(CSAccessRandomCoverlist);
     RandomCoverList.Clear;
 
-    GoodCoverList := TNempCoverList.Create(False);
-    try
-        // fill GoodCoverList with "good covers", i.e. a cover-bitmap exists
-        for i := 1 to SourceCoverList.Count - 1 do
-        begin
-            if (SourceCoverlist[i].ID <> '')
-                and(SourceCoverlist[i].ID[1] <> '_')
-            then
-                GoodCoverList.Add(SourceCoverlist[i]);
-        end;
+    if IsFileFlow then begin
+          RC := TRootCollection(aCategory.Collections[0]);
 
-        if GoodCoverList.Count >= 1 then
-        begin
-                Setlength(CoverArray, GoodCoverList.Count);
-                for i := 0 to GoodCoverList.Count - 1 do
-                    CoverArray[i] := i;
-                ShuffleFisherYates;
+          GoodCoverList := TAudioCollectionList.Create(False);
+          try
+              // fill GoodCoverList with "good covers", i.e. a cover-bitmap exists
+              for i := 1 to RC.CollectionCount - 1 do  //SourceCoverList.Count - 1 do
+              begin
+                  //if (SourceCoverlist[i].ID <> '')
+                  //    and(SourceCoverlist[i].ID[1] <> '_')
+                  if (RC.SubCollections[i].CoverID <> '')
+                    and (RC.SubCollections[i].CoverID[1] <> '_')
+                  then
+                      GoodCoverList.Add(RC.SubCollections[i]);
+              end;
 
-                case Length(CoverArray) of
-                    0: ; // empty list
-                    1: RandomCoverList.Add(GoodCoverList[CoverArray[0]].ID); // Ein Cover - das draufmalen
-                    2..3: for i := 0 to 1  do
-                              RandomCoverList.Add(GoodCoverList[CoverArray[i]].ID);
-                    4..7: for i := 0 to 3  do
-                              RandomCoverList.Add(GoodCoverList[CoverArray[i]].ID);
-                    8..15: for i := 0 to 7  do
-                              RandomCoverList.Add(GoodCoverList[CoverArray[i]].ID);
-                else
-                    for i := 0 to 15 do
-                        RandomCoverList.Add(GoodCoverList[CoverArray[i]].ID);
-                end;
-        end
-        else
-            ;// leere Liste, nichts zu tun.
-    finally
-        GoodCoverList.Free;
+              if GoodCoverList.Count >= 1 then
+              begin
+                      Setlength(CoverArray, GoodCoverList.Count);
+                      for i := 0 to GoodCoverList.Count - 1 do
+                          CoverArray[i] := i;
+                      ShuffleFisherYates;
+
+                      case Length(CoverArray) of
+                          0: ; // empty list
+                          1: RandomCoverList.Add(GoodCoverList[CoverArray[0]]); // Ein Cover - das draufmalen
+                          2..3: for i := 0 to 1  do
+                                    RandomCoverList.Add(GoodCoverList[CoverArray[i]]);
+                          4..7: for i := 0 to 3  do
+                                    RandomCoverList.Add(GoodCoverList[CoverArray[i]]);
+                          8..15: for i := 0 to 7  do
+                                    RandomCoverList.Add(GoodCoverList[CoverArray[i]]);
+                      else
+                          for i := 0 to 15 do
+                              RandomCoverList.Add(GoodCoverList[CoverArray[i]]);
+                      end;
+              end
+              else
+                  ;// leere Liste, nichts zu tun.
+          finally
+              GoodCoverList.Free;
+          end;
     end;
   LeaveCriticalSection(CSAccessRandomCoverlist);
 end;
@@ -1469,7 +1529,7 @@ begin
 end;
 
 
-procedure TCoverArtSearcher.PaintMainPickCover(aCoverBmp: TBitmap; MainCoverList: TNempCoverList);
+procedure TCoverArtSearcher.PaintMainPickCover(aCoverBmp: TBitmap; aRootCollection: TRootCollection);
 var
   i: Integer;
   TileSize: Integer;
@@ -1487,15 +1547,20 @@ const
       aCanvas.Pen.Color := aColor;
     end;
 
-    function GetCoverIndexByID(aCoverID: String): Integer;
+    function GetCoverIndexByKey(aKey: String): Integer;
     var j: Integer;
     begin
       result := 0;
-      for j := 0 to MainCoverList.Count -1 do
+      for j := 0 to aRootCollection.CollectionCount - 1 do
       begin
-        if TNempCover(MainCoverList[j]).ID = aCoverID then
+        //if TNempCover(MainCoverList[j]).ID = aCoverID then
+        if aRootCollection.SubCollections[j].Key = aKey then
         begin
-          result := j;
+          result := j + 1;
+          {
+            j + 1 instead of just j, because the Coverflow Contains an additional Cover at the beginning,
+            containing the RootCollection itself.
+          }
           break;
         end;
       end;
@@ -1555,7 +1620,7 @@ begin
 
             for i := 0 to min(15, RandomCoverList.Count - 1) do
             begin
-              SetColorByID(aCoverBmp.Canvas, GetCoverIndexByID(RandomCoverList[i]) );
+              SetColorByID(aCoverBmp.Canvas, GetCoverIndexByKey(RandomCoverList[i].Key) );
               case RandomCoverList.Count of
                   1: begin
                     x1 := 0;
@@ -1643,12 +1708,12 @@ begin
 
                 aGraphic := TPicture.Create;
                 try
-                      success := GetCoverBitmapFromID(RandomCoverList[i], aGraphic);
+                      success := GetCoverBitmapFromID(RandomCoverList[i].CoverID, aGraphic);
                       // if there is no file for this coverID (probably because of some recent change in CoverSize:
                       // try to get it again
 
-                      if (not success) and PreviewGraphicShouldExist(RandomCoverList[i]) then
-                          success := RepairCoverFileVCL(RandomCoverList[i], Nil, aGraphic, newID);
+                      if (not success) and PreviewGraphicShouldExist(RandomCoverList[i].CoverID) then
+                          success := RepairCoverFileVCL(RandomCoverList[i].CoverID, Nil, aGraphic, newID);
 
                       // if we still get no proper cover art: Get the default one
                       if not success then

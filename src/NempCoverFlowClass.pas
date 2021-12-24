@@ -38,9 +38,9 @@ unit NempCoverFlowClass;
 
 interface
 
-uses Windows, Messages, SysUtils, Graphics, ExtCtrls, ContNrs, Classes,
+uses Windows, Messages, SysUtils, Graphics, ExtCtrls, ContNrs, Classes, System.StrUtils,
     ClassicCoverFlowClass, unitFlyingCow, CoverHelper, dialogs, CoverDownloads,
-    NempAudioFiles;
+    NempAudioFiles, LibraryOrganizer.Base, LibraryOrganizer.Files, LibraryOrganizer.Playlists;
 
 type
 
@@ -53,7 +53,7 @@ type
             fFlyingCow: TFlyingCow;
             fMode: TCoverFlowMode;
 
-            fCoverList: TNempCoverList;
+            fCoverCategory: TLibraryCategory;
             fCoverCount: Integer;
 
             fDownloadThread: TCoverDownloadWorkerThread;
@@ -61,6 +61,7 @@ type
             fCurrentItem: Integer;  // Index of the current selected cover
 
             fCurrentCoverID: String;     // currently selected coverID
+            fCurrentCoverKey: String;
             // Note: I'm not using a NempCover-object here, to remember the idx, even
             //       if a Cover is deleted.
 
@@ -69,6 +70,8 @@ type
             procedure fSetCurrentItem(aValue: Integer);
 
             procedure fSetMode(aValue: TCoverFlowMode);
+
+            function GetCollection(Index: Integer): TAudioCollection;
 
 
         public
@@ -84,8 +87,13 @@ type
 
             property Mode: TCoverFlowMode read fMode write fSetMode;
 
+            property CoverCount: Integer read fCoverCount;
             property CurrentItem: Integer read fGetCurrentItem write fSetCurrentItem;
             property CurrentCoverID: String read fCurrentCoverID write fCurrentCoverID;
+
+            property Collection[Index: Integer]: TAudioCollection read GetCollection;
+
+            property DownloadThread: TCoverDownloadWorkerThread read fDownloadThread write fDownloadThread;
 
             Constructor Create;
             Destructor Destroy; override;
@@ -95,10 +103,7 @@ type
             Procedure SaveSettings;
             procedure ApplySettings;
 
-            // After a reinit of the library (swapping lists)
-            // we need to correct the CoverList-Pointer
-            procedure SetNewList(aList: TNempCoverList; CompleteCount: Integer; FallBackToZero: Boolean = False);
-            procedure InitList(aList: TNempCoverList; CompleteCount: Integer);
+            procedure SetNewList(aCategory: TLibraryCategory; FallBackToZero: Boolean = False); Overload;
 
             // Clear Textures and force redrawing
             procedure ClearTextures;
@@ -113,6 +118,10 @@ type
             // again. FindCurrentItemAgain finds it in the List and Set the CurrentItem properly
             procedure FindCurrentItemAgain(FallBackToZero: Boolean = False);
 
+            function FindItemWithPrefix(aPrefix: UnicodeString; Startidx: Integer): Integer;
+
+            function GetCollectionIndex(aCollection: TAudioCollection): Integer;
+
             // ReInitAfterSort: Used by ClassicMode.
             // FlyingCow doesnt need a sorted copy of the NempCoverList
             procedure ReInitAfterSort;
@@ -126,16 +135,16 @@ type
             procedure SetNewHandle(aWnd: HWND);
             procedure SetColor(aColor: TColor);
 
-            procedure DownloadCover(aCover: TNempCover; aIdx: Integer);
-            procedure DownloadPlayerCover(aAudioFile: TAudioFile);
-
-            procedure ClearCoverCache;
+            //procedure DownloadCover(aCover: TNempCover; aIdx: Integer); overload;
+            //procedure DownloadCover(aCollection: TAudioCollection; aIdx: Integer; QuerySource: TQueryType); overload;
+            //procedure DownloadPlayerCover(aAudioFile: TAudioFile);
+            // procedure ClearCoverCache;
 
     end;
 
 implementation
 
-uses NempMainUnit, Nemp_ConstantsAndTypes;
+uses NempMainUnit, Nemp_ConstantsAndTypes, Nemp_RessourceStrings;
 
 { TNempCoverFlow }
 
@@ -164,7 +173,8 @@ begin
             end;
                 fClassicFlow.MainImage := MainImage;
                 fClassicFlow.ScrollImage := ScrollImage;
-                fClassicFlow.CoverList := fCoverList;
+                fClassicFlow.CoverCategory := fCoverCategory;
+                fClassicFlow.CoverCount := fCoverCount;
 
             fClassicFlow.CurrentItem := fCurrentItem;
             Nemp_MainForm.IMGMedienBibCover.Visible := True;
@@ -212,12 +222,34 @@ begin
     end;
 end;
 
+function TNempCoverFlow.FindItemWithPrefix(aPrefix: UnicodeString; Startidx: Integer): Integer;
+var nextidx: Integer;
+    aCollection: TAudioCollection;
+    erfolg: Boolean;
+begin
+  nextIdx := Startidx;
+  result := StartIdx;
+
+  erfolg := False;
+  repeat
+    aCollection := Collection[nextIdx];
+    if aCollection.MatchPrefix(aPrefix) then
+    begin
+      result := nextIdx;
+      erfolg := True;
+    end;
+    nextIdx := (nextIdx + 1) Mod fCoverCount;
+  until erfolg or (nextIdx = StartIdx);
+
+end;
+
+
 procedure TNempCoverFlow.FindCurrentItemAgain(FallBackToZero: Boolean = False);
 var i, newItem: Integer;
 begin
     newItem := -1;
-    for i := 0 to fCoverlist.Count -  1 do
-        if tNempCover(fCoverlist[i]).key = fCurrentCoverID then
+    for i := 0 to fCoverCount - 1 do
+        if Collection[i].key = fCurrentCoverKey then
         begin
             newItem := i;
             break;
@@ -230,7 +262,7 @@ begin
         else
         begin
             newItem := fCurrentItem; // - 1;  2019: change: Just show the "currentitem" again.
-            if (newItem >= fCoverlist.Count) or (newItem < 0) then
+            if (newItem >= fCoverCount) or (newItem < 0) then
                 newItem := 0;
         end;
     end;
@@ -256,7 +288,7 @@ end;
 procedure TNempCoverFlow.Clear;
 begin
     case fMode of
-      cm_Classic : fClassicFlow.CoverList := NIL;  // nothing more to do (?)
+      cm_Classic : ;// fClassicFlow.CoverList := NIL;  // nothing more to do (?)
       cm_OpenGL  : fFlyingCow.Clear;
     end;
 end;
@@ -268,14 +300,14 @@ begin
   fClassicFlow := Nil;
   fFlyingCow := Nil;
   fMode := cm_None;
-  fDownloadThread := TCoverDownloadWorkerThread.Create;
+  fDownloadThread := Nil; // TCoverDownloadWorkerThread.Create;
 end;
 
 destructor TNempCoverFlow.Destroy;
 begin
-    fDownloadThread.Terminate;
-    fDownloadThread.WaitFor;
-    fDownloadThread.Free;
+    //fDownloadThread.Terminate;
+    //fDownloadThread.WaitFor;
+    //fDownloadThread.Free;
 
     Mode := cm_None; // This will also free the sub-coverflows
     inherited Destroy;
@@ -337,7 +369,7 @@ begin
         end;
     end;
 end;
-
+(*
 procedure TNempCoverFlow.DownloadCover(aCover: TNempCover; aIdx: Integer);
 begin
     if (aCover.Album <> 'Unknown compilation')
@@ -345,6 +377,22 @@ begin
         and (not UnKownInformation(aCover.Album))
     then
         fDownloadThread.AddJob(aCover, aIdx);
+end;
+
+procedure TNempCoverFlow.DownloadCover(aCollection: TAudioCollection;
+  aIdx: Integer; QuerySource: TQueryType);
+var
+  afc: TAudioFileCollection;
+begin
+  if (aCollection is TAudioFileCollection) then begin
+    afc := TAudioFileCollection(aCollection);
+    if  (afc.CollectionType = ctAlbum)
+        and (afc.Album <> CoverFlowText_VariousArtists)
+        and (not UnKownInformation(afc.Artist))
+        and (not UnKownInformation(afc.Album))
+    then
+      fDownloadThread.AddJob(afc, aIdx, QuerySource);
+  end;
 end;
 
 procedure TNempCoverFlow.DownloadPlayerCover(aAudioFile: TAudioFile);
@@ -355,20 +403,55 @@ end;
 procedure TNempCoverFlow.ClearCoverCache;
 begin
     // this will set a flag to delete the list inside the context of the thread before downloading the next cover.
-    fDownloadThread.ClearCacheList;
+    if assigned(fDownloadThread) then
+      fDownloadThread.ClearCacheList;
+end;      *)
+
+function TNempCoverFlow.GetCollection(Index: Integer): TAudioCollection;
+begin
+  if (Index < 0) or (Index >= fCoverCount) then begin
+    result := Nil;
+    exit;
+  end;
+
+  if Index = 0 then
+    result := fCoverCategory.Collections[0]
+  else
+  begin
+    // Index >= 1, and valid
+    if fCoverCategory.CollectionCount = 1 then
+      result := fCoverCategory.Collections[0].SubCollections[Index-1]
+    else
+      result := fCoverCategory.Collections[Index];
+  end;
+end;
+
+function TNempCoverFlow.GetCollectionIndex(aCollection: TAudioCollection): Integer;
+begin
+  result := 0;
+  if not assigned(aCollection) then
+    exit;
+
+  case aCollection.CollectionClass of
+    ccFiles: begin
+          if fCoverCategory.CollectionCount = 1 then
+            result := 1 + fCoverCategory.Collections[0].GetCollectionIndex(aCollection)
+          else
+            result := 0; // invalid/empty
+    end;
+    ccPlaylists,
+    ccWebStations: begin
+      result := fCoverCategory.IndexOf(aCollection);
+      if result = -1 then
+        result := 0;
+    end;
+  end;
+
 end;
 
 function TNempCoverFlow.fGetCurrentItem: Integer;
 begin
-    result := fCurrentItem;
-{    case fMode of
-        cm_Classic : result := fClassicFlow.CurrentItem;
-        cm_OpenGL  : result := fFlyingCow.CurrentItem;
-    else
-        begin
-            result := 0;
-        end;
-    end;  }
+  result := fCurrentItem;
 end;
 
 procedure TNempCoverFlow.fSetCurrentItem(aValue: Integer);
@@ -377,24 +460,23 @@ begin
     begin
         if aValue < 0 then
             aValue := 0;
-        if aValue > fCoverList.Count - 1 then
-            aValue := fCoverList.Count - 1;
+        if aValue > fCoverCount - 1 then
+            aValue := fCoverCount - 1;
 
         case fMode of
             cm_Classic : fClassicFlow.CurrentItem := aValue;
             cm_OpenGL  : fFlyingCow.CurrentItem := aValue;
         end;
-
-        fDownloadThread.MostImportantIndex := aValue;
+        if assigned(fDownloadThread) then
+          fDownloadThread.MostImportantIndex := aValue;
         fCurrentitem := aValue;
-        if (aValue >= 0) and (aValue <= fCoverList.Count-1) then
+        if (aValue >= 0) and (aValue <= fCoverCount - 1) then
         begin
-            fCurrentCoverID := TNempCover(fCoverList[aValue]).ID;
-        end //else
-            //fCurrentCoverID := 'all';
+            fCurrentCoverKey := Collection[aValue].Key;
+            fCurrentCoverID := Collection[aValue].CoverID;
+        end
     end;
 end;
-
 
 
 procedure TNempCoverFlow.SelectItemAt(x, y: Integer);
@@ -436,32 +518,39 @@ begin
     end;
 end;
 
-procedure TNempCoverFlow.InitList(aList: TNempCoverList; CompleteCount: Integer);
-begin
-    fCoverList := aList;
-    fCoverCount := CompleteCount;
-    case fMode of
-        cm_Classic : fClassicFlow.CoverList := aList;
-        cm_OpenGL  : ;
-    end;
-end;
+procedure TNempCoverFlow.SetNewList(aCategory: TLibraryCategory; FallBackToZero: Boolean = False);
 
-procedure TNempCoverFlow.SetNewList(aList: TNempCoverList; CompleteCount: Integer; FallBackToZero: Boolean = False);
+    function LCItemCount: Integer;
+    begin
+      case aCategory.CollectionCount of
+        0: result := 0; // empty;
+        1: begin
+          // Files: [RootCollection] + [List of Albums]
+          result := 1 + aCategory.Collections[0].CollectionCount;
+        end
+      else
+        // Playlists: [Lists of Playlist]
+        result := aCategory.CollectionCount;
+      end;
+    end;
+
 begin
-    fCoverList := aList;
-    fCoverCount := CompleteCount;
-    case fMode of
-        cm_Classic : fClassicFlow.CoverList := aList;
+  fCoverCategory := aCategory;
+  fCoverCount := LCItemCount;
+
+  case fMode of
+        cm_Classic : begin
+          fClassicFlow.CoverCategory := aCategory;
+          fClassicFlow.CoverCount := fCoverCount;
+        end;
         cm_OpenGL  : begin
               fFlyingCow.BeginUpdate;
-              // fFlyingCow.Clear;
-              // fFlyingCow.Cleartextures;
-              fFlyingCow.AddItems(fCoverCount); // aList.Count);
+              fFlyingCow.AddItems(fCoverCount);
               fFlyingCow.EndUpdate;
               fFlyingCow.DoSomeDrawing(10);
         end;
     end;
-    FindCurrentItemAgain(FallBackToZero);
+    // FindCurrentItemAgain(FallBackToZero);
 end;
 
 procedure TNempCoverFlow.ClearTextures;

@@ -402,11 +402,11 @@ begin
 
 
         Medienbib.Changed := True;
-        if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
+        //if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
         begin
             // Anzeige im Tree der MainForm neu füllen
-            Medienbib.GetAlbenList(MedienBib.CurrentArtist);
-            FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
+            // Medienbib.GetAlbenList(MedienBib.CurrentArtist);
+            // FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
         end;
     end;
 end;
@@ -469,11 +469,11 @@ begin
         AddVSTStation(VST_Favorites, NIL, (FavoriteList[i] as TStation));
 
     Medienbib.Changed := True;
-    if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
+    //if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
     begin
         // Anzeige im Tree der MainForm neu füllen
-        Medienbib.GetAlbenList(MedienBib.CurrentArtist);
-        FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
+        //Medienbib.GetAlbenList(MedienBib.CurrentArtist);
+        //FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
     end;
 
     udSortFavorites.Enabled := cbSortMode.ItemIndex = 4;
@@ -669,11 +669,11 @@ begin
   end;
 
   Medienbib.Changed := True;
-  if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
+  //if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
   begin
         // Anzeige im Tree der MainForm neu füllen
-        Medienbib.GetAlbenList(MedienBib.CurrentArtist);
-        FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
+        //Medienbib.GetAlbenList(MedienBib.CurrentArtist);
+        //FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
   end;
 end;
 
@@ -750,11 +750,11 @@ begin
         AddVSTStation(VST_Favorites, NIL, NewStation);
 
         Medienbib.Changed := True;
-        if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
+        //if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
         begin
             // Anzeige im Tree der MainForm neu füllen
-            Medienbib.GetAlbenList(MedienBib.CurrentArtist);
-            FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
+            //Medienbib.GetAlbenList(MedienBib.CurrentArtist);
+            //FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
         end;
 
     end;
@@ -792,7 +792,7 @@ begin
             begin
                 bibStation := TStation(MedienBib.RadioStationList[idx]);
                 bibStation.Assign(Station);
-                if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
+                //if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
                     Nemp_MainForm.AlbenVST.Invalidate;
             end;
             MedienBib.Changed := True;
@@ -824,11 +824,11 @@ begin
           VST_Favorites.DeleteNode(SelectedStations[i]);
     end;
 
-    if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
+    //if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
     begin
         // Anzeige im Tree der MainForm neu füllen
-        Medienbib.GetAlbenList(MedienBib.CurrentArtist);
-        FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
+        //Medienbib.GetAlbenList(MedienBib.CurrentArtist);
+        //FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
     end;
 
     if assigned(NewSelectNode) then
@@ -970,11 +970,11 @@ begin
             AddVSTStation(VST_Favorites, NIL, (FavoriteList[i] as TStation));
 
 
-        if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
+        //if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
         begin
             // Anzeige im Tree der MainForm neu füllen
-            Medienbib.GetAlbenList(MedienBib.CurrentArtist);
-            FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
+            //Medienbib.GetAlbenList(MedienBib.CurrentArtist);
+            //FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
         end;
     end;
 end;

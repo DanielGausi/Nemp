@@ -596,17 +596,8 @@ begin
         PlaylistVST.DefaultNodeHeight := ChangeProc(NempOptions.RowHeight);
 
 
-
-        if MedienBib.NempSortArray[1] = siOrdner then
-            FillStringTreeWithSubNodes(MedienBib.AlleArtists, Nemp_MainForm.ArtistsVST)
-        else
-            FillStringTree(MedienBib.AlleArtists, Nemp_MainForm.ArtistsVST);
-
-        if MedienBib.NempSortArray[2] = siOrdner then
-            FillStringTreeWithSubNodes(Medienbib.Alben, Nemp_MainForm.AlbenVST)
-        else
-            FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
-
+        ReFillCategoryTree(True);
+        FillCollectionTree(Nil ,True);
         FillTreeView(MedienBib.AnzeigeListe, Nil); //1);
 
         // Call the eventHandler for "Fill PlaylistView again"

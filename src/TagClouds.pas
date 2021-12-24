@@ -313,11 +313,11 @@ type
           procedure UpdateAudioFile(aAudioFile: TAudioFile);
 
           // Rename a Tag
-          procedure RenameTag(oldTag: TTag; NewKey: String);
+          //procedure RenameTag(oldTag: TTag; NewKey: String);
 
           // Delete a Tag
           // (this will not destroy the TTag-Object, just clear the audiofiles)
-          procedure DeleteTag(aTag: TTag);
+          //procedure DeleteTag(aTag: TTag);
 
           // Reset the Tag to zero, i.e. Clear the Tag.AudioFileList
           procedure Reset;
@@ -1498,7 +1498,7 @@ end;
     RenameTag
     - Rename a Tag (i.e. create a new tag Object and move Audiofiles to the new one)
     --------------------------------------------------------
-}
+}(*
 procedure TTagCloud.RenameTag(oldTag: TTag; NewKey: String);
 var NewTag: TTag;
     i, oi: Integer;
@@ -1560,14 +1560,14 @@ begin
     end;
     // clear the oldTag
     oldTag.AudioFiles.Clear;
-end;
+end;    *)
 
 {
     --------------------------------------------------------
     DeleteTag
     - Clear a Tags AudioFile-List
     --------------------------------------------------------
-}
+}          (*
 procedure TTagCloud.DeleteTag(aTag: TTag);
 var i, oi: Integer;
     af: TAudioFile;
@@ -1616,7 +1616,7 @@ begin
         }
     end;
     aTag.AudioFiles.Clear;
-end;
+end;    *)
 
 
 procedure TTagCloud.DeleteAudioFile(aAudioFile: TAudioFile);

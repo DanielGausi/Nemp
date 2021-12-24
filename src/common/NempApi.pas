@@ -291,6 +291,7 @@ const
         PLAYER_PLAY_NEXT = 2;
         PLAYER_PLAY_NOW = 3;
         PLAYER_PLAY_DEFAULT = 4;
+        PLAYER_PLAY_ABORT = 5;
 
         NEMP_API_STOPPED = 0;
         NEMP_API_PLAYING = 1;

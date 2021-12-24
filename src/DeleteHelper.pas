@@ -3,7 +3,7 @@ unit DeleteHelper;
 interface
 
 uses windows, classes, SysUtils, Contnrs, strUtils,
-    Nemp_ConstantsAndTypes, NempAudioFiles;
+    Nemp_ConstantsAndTypes, NempAudioFiles, NempFileUtils;
 
 type
 
@@ -16,7 +16,7 @@ type
             DriveType   : String ;   // 'Removable drive', 'Harddisk', 'Shared directory', ...
             Hint: TDeleteHint;                      // ... and why?
             Files: TAudioFileList;
-            PlaylistFiles: TObjectList;
+            PlaylistFiles: TLibraryPlaylistList;
 
             constructor Create;
             destructor Destroy; override;
@@ -30,7 +30,7 @@ implementation
 constructor TDeleteData.Create;
 begin
     Files := TAudioFileList.Create(False);
-    PlaylistFiles := TObjectList.Create(False);
+    PlaylistFiles := TLibraryPlaylistList.Create(False);
 end;
 
 destructor TDeleteData.Destroy;
