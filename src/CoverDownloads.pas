@@ -162,9 +162,6 @@ type
 
             procedure SetProperBitmapSize(aBmp: TBitmap; aQueryType: TQueryType);
 
-            //function DownloadItemStillMatchesCoverFlow: Boolean;  // VCL (called in Sync-methods)
-            //function DownloadItemStillMatchesPlayer: Boolean;  // VCL (called in Sync-methods)
-
             // Get next job, i.e. information about the next queried cover
             procedure SyncGetFirstJob; // VCL
             // Update the Cover in Coverflow (or: in Player?)
@@ -1201,38 +1198,6 @@ begin
     end;
 end;
 
-(*
-{
-    --------------------------------------------------------
-    DownloadItemStillMatchesCoverFlow
-    - After a Resort of the Coverflow, our downloaded data may be useless/wrong
-    --------------------------------------------------------
-}
-function TCoverDownloadWorkerThread.DownloadItemStillMatchesCoverFlow: Boolean;
-var
-  aCollection: TAudioFileCollection;
-begin
-    if fCurrentDownloadItem.Index <= MedienBib.NewCoverFlow.CoverCount - 1 then
-    begin
-        aCollection := TAudioFileCollection(MedienBib.NewCoverFlow.Collection[fCurrentDownloadItem.Index]);
-        result := (aCollection.Artist = fCurrentDownloadItem.Artist)
-                  and (aCollection.Album = fCurrentDownloadItem.Album);
-    end else
-        result := False;
-end;
-
-function TCoverDownloadWorkerThread.DownloadItemStillMatchesPlayer: Boolean;
-begin
-    if (fCurrentDownloadItem.SubQueryType = sqtFile) then
-        result := assigned(NempPlayer.MainAudioFile)
-            and
-            (IncludeTrailingPathDelimiter(NempPlayer.MainAudioFile.Ordner)
-             = IncludeTrailingPathDelimiter(fCurrentDownloadItem.Directory))
-    else
-        result := assigned(NempPlayer.MainAudioFile)
-            and (CddbIDFromCDDA(NempPlayer.MainAudioFile.Pfad) = fCurrentDownloadItem.FileType)
-end; *)
-
 {
     --------------------------------------------------------
     SyncGetFirstJob
@@ -1416,19 +1381,6 @@ begin
         if assigned(fOnDownloadComplete) then
           fOnDownloadComplete(fCurrentDownloadItem, bmp);
 
-        (*
-        if (fCurrentDownloadItem.QueryType = qtPlayer)
-            and DownloadItemStillMatchesPlayer
-        then
-        begin
-            //GetDefaultCover(dcFile, pic, 0);
-
-
-            NempPlayer.MainPlayerPicture.Assign(bmp);
-            Nemp_MainForm.CoverImage.Picture.Assign(NempPlayer.MainPlayerPicture);
-            Nemp_MainForm.CoverImage.Hint := CoverFlowLastFM_HintInvalid;
-        end;
-        *)
     finally
         bmp.Free;
     end;
