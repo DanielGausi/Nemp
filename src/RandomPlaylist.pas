@@ -36,9 +36,10 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Spin, CheckLst,  iniFiles, ContNrs, MyDialogs,
-  Menus,   Hilfsfunktionen, NempAudioFiles,
-  Nemp_ConstantsAndTypes,
-  gnuGettext, Nemp_RessourceStrings, ExtCtrls, ImgList, RatingCtrls, System.UITypes;
+  Menus,   Hilfsfunktionen, NempAudioFiles, BibHelper, math,
+  Nemp_ConstantsAndTypes, LibraryOrganizer.Base, LibraryOrganizer.Files,
+  gnuGettext, Nemp_RessourceStrings, ExtCtrls, ImgList, RatingCtrls, System.UITypes,
+  System.Generics.Collections, System.Generics.Defaults;
 
 type
   TTagSetting = class
@@ -87,6 +88,7 @@ type
     LblTagViewCount: TLabel;
     cbTagMatchType: TComboBox;
     LblTagMatchType: TLabel;
+    BtnRefreshTags: TButton;
     procedure FormCreate(Sender: TObject);
     procedure cbRestrictTimeClick(Sender: TObject);
     procedure cbRestrictTagsClick(Sender: TObject);
@@ -109,6 +111,8 @@ type
     procedure FormResize(Sender: TObject);
     procedure cbTagCountSelectionChange(Sender: TObject);
     procedure Btn_CancelClick(Sender: TObject);
+    procedure CBWholeBibChange(Sender: TObject);
+    procedure BtnRefreshTagsClick(Sender: TObject);
   private
     { Private-Deklarationen }
     //GenreSettings: Array [0..9] of TGenreSetting;
@@ -119,7 +123,7 @@ type
     ActualRating: Integer;
     RandomRatingHelper : TRatingHelper;
 
-    LocalTopTags: TObjectList;
+    TagRoot: TRootCollection;
 
     procedure SetLastCheckedTags;
     procedure RecheckLastCheckedTags;
@@ -127,13 +131,14 @@ type
     procedure FillTagList;
     procedure RefillTagList;
 
-
-
   public
     { Public-Deklarationen }
     //procedure ShowRating(Value: Integer);
     // procedure LoadStarGraphics;
     procedure RefreshStarGraphics;
+
+
+    procedure RefillTagListFromMainWindow;
   end;
 
 
@@ -242,8 +247,10 @@ begin
   cbGenres.Items.Clear;
 
   RandomRatingHelper := TRatingHelper.Create;
-  LocalTopTags := TObjectList.Create(False);
   LastCheckedTags := TStringList.Create;
+
+  TagRoot := TRootCollection.Create(Nil);
+  TagRoot.AddSubCollectionType(ctTagCloud, csCount);
 
   LoadStarGraphics(RandomRatingHelper);
 
@@ -252,10 +259,11 @@ begin
     ini.Encoding := TEncoding.UTF8;
     LastSelection := Ini.ReadInteger('Allgemein', 'LastSelection', 0);
     seMaxCount.Value := Ini.ReadInteger('Allgemein', 'MaxAnzahl', 100);
-    if Ini.ReadBool('Allgemein', 'GanzeBib', True) then
-      CBWholeBib.ItemIndex := 0
-    else
-      CBWholeBib.ItemIndex := 1;
+    CBWholeBib.ItemIndex := (Ini.ReadInteger('Allgmein', 'SelectionRange', Integer(rprLibrary))) mod 3 ;
+    //if Ini.ReadBool('Allgemein', 'GanzeBib', True) then
+    //  CBWholeBib.ItemIndex := 0
+    //else
+    //  CBWholeBib.ItemIndex := 1;
 
     cbRestrictTime.Checked := NOT Ini.ReadBool('Allgemein', 'IgnoreYear', True);
     cbRestrictTimeClick(Nil);
@@ -384,7 +392,7 @@ begin
       TagSettings[i].Free;
 
   RandomRatingHelper.Free;
-  LocalTopTags.Free;
+  TagRoot.Free;
   LastCheckedTags.Free;
 end;
 
@@ -399,7 +407,7 @@ begin
     LastCheckedTags.Clear;
     for i := 0 to cbGenres.Count - 1 do
         if cbGenres.Checked[i] then
-            LastCheckedTags.Add(String(TTag(cbGenres.Items.Objects[i]).Key));
+            LastCheckedTags.Add(TAudioCollection(cbGenres.Items.Objects[i]).Key);
 end;
 
 procedure TRandomPlaylistForm.RecheckLastCheckedTags;
@@ -407,25 +415,48 @@ var i: Integer;
 begin
     for i := 0 to cbGenres.Count - 1 do
     begin
-        cbGenres.Checked[i] := LastCheckedTags.IndexOf(String(TTag(cbGenres.Items.Objects[i]).Key)) >= 0;
+        cbGenres.Checked[i] := LastCheckedTags.IndexOf(TAudioCollection(cbGenres.Items.Objects[i]).Key) >= 0;
     end;
 end;
 
 procedure TRandomPlaylistForm.FillTagList;
-var i: Integer;
-    aTag: TTag;
+var
+  i, maxC: Integer;
+  tmpCollections: TAudioCollectionList;
 begin
-      // clear ChecklistBox
     cbGenres.Clear;
-    LocalTopTags.Clear;
-    // Get new tags
-    MedienBib.GetTopTags(StrToIntDef(cbTagCountSelection.Text, 150), 10, LocalTopTags);
-    // Show Tags
-    for i := 0 to LocalTopTags.Count - 1 do
-    begin
-        aTag := TTag(LocalTopTags[i]);
-        cbGenres.AddItem(String(aTag.key) + ' (' + IntToStr(aTag.TotalCount)+')', aTag);
+    TagRoot.Clear;
+    case teRandomPlaylistRange(CBWholeBib.ItemIndex) of
+      rprLibrary: MedienBib.FillRootCollection(TagRoot, Nil);
+      rprCategory: MedienBib.FillRootCollection(TagRoot, MedienBib.CurrentCategory);
+      rprView: for i := 0 to MedienBib.AnzeigeListe.Count - 1 do
+                  TagRoot.AddAudioFile(MedienBib.AnzeigeListe[i]);
     end;
+
+    tmpCollections := TAudioCollectionList.Create(False);
+    try
+      // Add TopTags to tmpCollections
+      maxC := min(StrToIntDef(cbTagCountSelection.Text, 150), TagRoot.CollectionCount);
+      for i := 0 to maxC - 1 do
+        tmpCollections.Add(TagRoot.SubCollections[i]);
+      // Sort tmpCollections by Key
+      tmpCollections.Sort(TComparer<TAudioCollection>.Construct(
+        function (const item1, item2: TAudioCollection): Integer
+        begin
+          result := AnsiCompareText(item1.Key, item2.Key);
+        end));
+      // add tmpCollections in this order to the view
+      for i := 0 to tmpCollections.Count - 1 do
+        cbGenres.AddItem(Format( '%s (%d)', [tmpCollections[i].key, tmpCollections[i].Count]), tmpCollections[i]);
+    finally
+      tmpCollections.Free;
+    end;
+end;
+
+procedure TRandomPlaylistForm.RefillTagListFromMainWindow;
+begin
+  if CBWholeBib.ItemIndex <> 0 then
+    RefillTagList;
 end;
 
 procedure TRandomPlaylistForm.RefillTagList;
@@ -439,8 +470,8 @@ end;
 
 procedure TRandomPlaylistForm.FormShow(Sender: TObject);
 begin
-    if MedienBib.BrowseMode <> 2 then
-        MedienBib.ReBuildTagCloud;
+    //if MedienBib.BrowseMode <> 2 then
+    //    MedienBib.ReBuildTagCloud;
 
     FillTagList;
     RecheckLastCheckedTags;
@@ -545,7 +576,7 @@ begin
         begin
             Ini.WriteString('GenreSetting' + IntToStr(idx),
                             'Check' + IntToStr(GenresCount),
-                            String(TTag(cbGenres.Items.Objects[i]).Key) );
+                            TAudioCollection(cbGenres.Items.Objects[i]).Key );
             inc(GenresCount);
         end;
     end;
@@ -588,7 +619,8 @@ begin
     ini.Encoding := TEncoding.UTF8;
     Ini.WriteInteger('Allgemein', 'LastSelection', LastSelection);
     Ini.WriteInteger('Allgemein', 'MaxAnzahl', seMaxCount.Value);
-    Ini.WriteBool('Allgemein', 'GanzeBib', CBWholeBib.ItemIndex = 0);
+    // Ini.WriteBool('Allgemein', 'GanzeBib', CBWholeBib.ItemIndex = 0);
+    Ini.WriteInteger('Allgmein', 'SelectionRange', CBWholeBib.ItemIndex);
     Ini.WriteBool('Allgemein', 'IgnoreYear', NOT cbRestrictTime.Checked);
 
     Ini.WriteInteger('Allgemein', 'MinYear', SE_PeriodFrom.Value);
@@ -630,6 +662,11 @@ end;
 
 
 
+procedure TRandomPlaylistForm.BtnRefreshTagsClick(Sender: TObject);
+begin
+  RefillTagList;
+end;
+
 procedure TRandomPlaylistForm.Btn_CancelClick(Sender: TObject);
 begin
     close;
@@ -638,7 +675,7 @@ end;
 procedure TRandomPlaylistForm.Btn_OkClick(Sender: TObject);
 var i: Integer;
     DateiListe: TAudioFileList;
-    tmpTagList: TObjectList;
+    tmpTagList: TStringList;
 
 begin
   if MedienBib.StatusBibUpdate <> 0 then
@@ -650,7 +687,7 @@ begin
   SetLastCheckedTags;
   SaveSettings;
 
-  tmpTagList := TObjectList.Create(False);
+  tmpTagList := TStringList.Create(False);
   try
       //Medienbib.PlaylistFillOptions.GenreStrings    := cbGenres.Items;
       // Setlength(Medienbib.PlaylistFillOptions.GenreChecked, Medienbib.PlaylistFillOptions.GenreStrings.Count);
@@ -663,9 +700,9 @@ begin
       begin
           for i := 0 to cbGenres.Count - 1 do
               if cbGenres.Checked[i] then
-                  tmpTagList.Add(cbGenres.Items.Objects[i]);
+                  tmpTagList.Add(TAudioCollection(cbGenres.Items.Objects[i]).Key);
           if tmpTagList.Count > 0 then
-              Medienbib.PlaylistFillOptions.WantedTags := tmpTagList    // !!!!!
+              Medienbib.PlaylistFillOptions.WantedTags := tmpTagList
           else
               Medienbib.PlaylistFillOptions.Wantedtags := Nil;
 
@@ -687,7 +724,8 @@ begin
       Medienbib.PlaylistFillOptions.MinYear       := SE_PeriodFrom.Value;
       Medienbib.PlaylistFillOptions.MaxYear       := SE_PeriodTo.Value;
       Medienbib.PlaylistFillOptions.MaxCount      := seMaxCount.Value;
-      Medienbib.PlaylistFillOptions.WholeBib      := CBWholeBib.ItemIndex = 0;
+      //Medienbib.PlaylistFillOptions.WholeBib      := CBWholeBib.ItemIndex = 0;
+      MedienBib.PlaylistFillOptions.SelectionRange := teRandomPlaylistRange(CBWholeBib.ItemIndex);
       Medienbib.PlaylistFillOptions.RatingMode    := CBRating.ItemIndex;
       Medienbib.PlaylistFillOptions.Rating        := ActualRating;
 
@@ -726,6 +764,11 @@ end;
 procedure TRandomPlaylistForm.cbTagCountSelectionChange(Sender: TObject);
 begin
     RefillTagList;
+end;
+
+procedure TRandomPlaylistForm.CBWholeBibChange(Sender: TObject);
+begin
+  RefillTagList;
 end;
 
 procedure TRandomPlaylistForm.cb_PreselectionChange(Sender: TObject);

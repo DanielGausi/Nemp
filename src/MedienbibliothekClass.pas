@@ -54,6 +54,7 @@ uses Windows, Contnrs, Sysutils,  Classes, Inifiles, RTLConsts,
      Nemp_RessourceStrings, DriveRepairTools, ShoutcastUtils, BibSearchClass,
      NempCoverFlowClass, TagClouds, ScrobblerUtils, CustomizedScrobbler,
      LibraryOrganizer.Base, LibraryOrganizer.Files, LibraryOrganizer.Playlists, LibraryOrganizer.Webradio,
+     PlaylistManagement,
      DeleteHelper, TagHelper, Generics.Collections, unFastFileStream, System.Types, System.UITypes,
      {Winapi.Wincodec, Winapi.ActiveX,} System.Generics.Defaults;
 
@@ -120,6 +121,7 @@ type
 
         Mp3ListePfadSort: TAudioFileList;           // List of all files in the library. Sorted by Path.
         AllPlaylistsPfadSort: TLibraryPlaylistList; // Lists for Playlists.
+        FavoritePlaylists: TLibraryPlaylistList; // imported from the PlaylistManager
 
         DeadFiles: TAudioFileList;             // Two lists, that collect dead files
         DeadPlaylists: TLibraryPlaylistList;
@@ -164,8 +166,9 @@ type
 
         fDefaultFileCategory: TLibraryFileCategory;
         fNewFilesCategory: TLibraryFileCategory;
-        fCollectionMetaInfo: TCollectionMetaInfo;
+        // fCollectionMetaInfo: TCollectionMetaInfo;
         fCurrentCategoryIdx: Integer;
+        fTargetCategory: Cardinal;
         //fArtist: UnicodeString;    // currently selected artist/album
         //fAlbum: UnicodeString;     // Note: OnChange-Events of the trees MUST set these!
         //fArtistIndex: Cardinal;
@@ -235,6 +238,8 @@ type
         procedure SetBrowseMode(Value: Integer);
         function GetCoverSortOrder: Integer;
         procedure SetCoverSortOrder(Value: Integer);
+        procedure SetTargetCategory(Value: Cardinal);
+        function GetTargetCategory: Cardinal;
 
         procedure fSetIgnoreLyrics(aValue: Boolean);
 
@@ -290,13 +295,15 @@ type
         procedure SetNewFilesCategory(Value: TLibraryFileCategory);
 
         function GetDefaultPlaylistCategory: TLibraryPlaylistCategory;
+        function GetFavoritePlaylistCategory: TLibraryPlaylistCategory;
 
         // Helper for "FillRandomList"
         function CheckYearRange(Year: UnicodeString): Boolean;
         //function CheckGenrePL(Genre: UnicodeString): Boolean;
         function CheckRating(aRating: Byte): Boolean;
         function CheckLength(aLength: Integer): Boolean;
-        function CheckTags(aTagList: TObjectList): Boolean;
+        function CheckTags(aAudioFile: TAudioFile): Boolean;
+        function CheckCategory(aAudioFile: TAudioFile): Boolean;
 
         // Synch a List of TDrives with the current situation on the PC
         // i.e. Search the Drive-IDs in the system and adjust the drive-letters
@@ -343,6 +350,7 @@ type
         procedure MergeFileIntoCategories(aFileList: TAudioFileList);
         procedure MergePlaylistsIntoCategories(aPlaylistList: TLibraryPlaylistList);
         procedure MergeWebradioIntoCategories(aStationList: TObjectList);
+        procedure MergeNempDefaultPlaylists;
 
         procedure FinishCategories;
 
@@ -469,7 +477,7 @@ type
 
         NewCoverFlow: TNempCoverFlow;
 
-        TagCloud: TTagCloud;
+        TagCloud: TCloudPainter;
         TagPostProcessor: TTagPostProcessor;
         AskForAutoResolveInconsistencies: Boolean;
         ShowAutoResolveInconsistenciesHints: Boolean;
@@ -482,11 +490,17 @@ type
         // BibScrobbler: Link to Player.NempScrobbler
         BibScrobbler: TNempScrobbler;
 
-
         CoverArtSearcher: TCoverArtSearcher;
 
-        // frage, noch zu entscheiden:   x xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        // nur eine Liste TLibraryCategoryList, die File- und Playlist-Kategorien aufnehmen kann?
+        {
+          Categories for the Media Library
+          - FileCategories are customizable by the user (up to 32)
+          - PlaylistCategories are fixed
+            - DefaultCategory: all "normal Playlists" found during scanning for music files
+            - FavoriteCategory: Import of the QuickLoadPlaylists from the PlaylistManager
+          - WebradioCategory: Fixed, only 1 Category
+          - CoverSearchCategory: reduced to the QuickSearch-Results
+        }
         FileCategories: TLibraryCategoryList;
         PlaylistCategories: TLibraryCategoryList;
         WebRadioCategory: TLibraryWebradioCategory;
@@ -511,6 +525,7 @@ type
 
         property UpdateFortsetzen: LongBool read GetUpdateFortsetzen Write SetUpdateFortsetzen;
         property FileSearchAborted: LongBool read GetFileSearchAborted write SetFileSearchAborted;
+        property TargetCategory: Cardinal read GetTargetCategory write SetTargetCategory;
 
         property SavePath: UnicodeString read fSavePath write fSavePath;
 
@@ -524,6 +539,7 @@ type
 
 
         property DefaultPlaylistCategory: TLibraryPlaylistCategory read GetDefaultPlaylistCategory;
+        property FavoritePlaylistCategory: TLibraryPlaylistCategory read GetFavoritePlaylistCategory;
 
         // Basic Operations. Create, Destroy, Clear, Copy
         constructor Create(aWnd: DWord; CFHandle: DWord);
@@ -538,6 +554,8 @@ type
         // Load/Save options into IniFile
         procedure LoadSettings;
         procedure SaveSettings;
+
+        procedure LoadLastSelectionData;
 
         // Managing the Library
         // - Merging new Files into the library (Param NewBib=True on loading a new library
@@ -602,10 +620,13 @@ type
         procedure ReBuildCategories;
         Procedure ReBuildBrowseLists;     // Complete Rebuild
         procedure ReFillFileCategories;
+        procedure FillRootCollection(Dest: TRootCollection; SourceCategory: TLibraryCategory);
+        procedure InitTargetCategory(lc: TLibraryCategory);
         //procedure ReBuildCoverList(FromScratch: Boolean = True);       // -"- of CoverLists
+        procedure ChangeCategory(Current, Target: TLibraryCategory; Files: TAudioFileList; Action: teCategoryAction);
 
         procedure GenerateCoverCategoryFromSearchresult(Source: TAudioFileList);
-        procedure ReBuildTagCloud;        // -"- of the TagCloud
+        //procedure ReBuildTagCloud;        // -"- of the TagCloud
 
         // CleanUp: remove all empty Collections
         // procedure CleanUpCategories;
@@ -615,8 +636,8 @@ type
 
         procedure ChangeFileCollectionSorting(RCIndex, Layer: Integer; newSorting: teCollectionSorting);
 
-        procedure GetTopTags(ResultCount: Integer; Offset: Integer; Target: TObjectList; HideAutoTags: Boolean = False);
-        procedure RestoreTagCloudNavigation;
+        // procedure GetTopTags(ResultCount: Integer; Offset: Integer; Target: TObjectList; HideAutoTags: Boolean = False);
+        //procedure RestoreTagCloudNavigation;
 
         procedure GenerateAnzeigeListe(aCollection: TAudioCollection);
         procedure GenerateReverseAnzeigeListe(aCollection: TAudioCollection);
@@ -625,8 +646,8 @@ type
         procedure GetTitelListFromDirectoryUnsorted(Target: TAudioFileList; aDirectory: String);
         function GetAudioFileWithCoverID(aCoverID: String): TAudioFile;
 
-        procedure GenerateAnzeigeListeFromTagCloud(aTag: TTag; BuildNewCloud: Boolean);
-        procedure GenerateDragDropListFromTagCloud(aTag: TTag; Target: TAudioFileList);
+        // procedure GenerateAnzeigeListeFromTagCloud(aTag: TTag; BuildNewCloud: Boolean);
+        // procedure GenerateDragDropListFromTagCloud(aTag: TTag; Target: TAudioFileList);
 
         procedure RestoreAnzeigeListeAfterQuicksearch;
 
@@ -679,6 +700,8 @@ type
         procedure ExportFavorites(aFilename: UnicodeString);
         procedure ImportFavorites(aFilename: UnicodeString);
         function AddRadioStation(aStation: TStation): Integer;
+
+        procedure ImportFavoritePlaylists(Source: TPlaylistManager);
 
         // Saving/Loading
         // a. Export as CSV, to get the library to Excel or whatever.
@@ -781,7 +804,7 @@ begin
   PlaylistCategories := TLibraryCategoryList.Create(True);
   CoverSearchCategory := TLibraryFileCategory.Create;
   WebRadioCategory := TLibraryWebradioCategory.Create;
-  fCollectionMetaInfo := TCollectionMetaInfo.Create;
+  // fCollectionMetaInfo := TCollectionMetaInfo.Create;
   InitFileCategories;
 
   DeadFiles := TAudioFileList.create(False);
@@ -815,6 +838,7 @@ begin
 
   AllPlaylistsPfadSort := TLibraryPlaylistList.Create(False);
   PlaylistUpdateList := TLibraryPlaylistList.Create(False);
+  FavoritePlaylists := TLibraryPlaylistList.Create(True);
 
   //SortParam := CON_ARTIST;
   //SortAscending := True;
@@ -834,7 +858,7 @@ begin
 
   CoverArtSearcher := TCoverArtSearcher.Create;
 
-  TagCloud := TTagCloud.Create;
+  TagCloud := TCloudPainter.Create;
   TagPostProcessor := TTagPostProcessor.Create; // Data files are loaded automatically
 
   fJobList := TJobList.Create;
@@ -867,7 +891,7 @@ begin
   PlaylistCategories.Free;
   CoverSearchCategory.Free;
   WebRadioCategory.Free;
-  fCollectionMetaInfo.Free;
+  // fCollectionMetaInfo.Free;
 
   for i := 0 to AllPlaylistsPfadSort.Count - 1 do
       AllPlaylistsPfadSort[i].Free;
@@ -879,6 +903,7 @@ begin
       fPlaylistDriveManager.Free;
       LeaveCriticalSection(CSAccessDriveList);
   AllPlaylistsPfadSort.Free;
+  FavoritePlaylists.Free;
 
   RadioStationList.Free;
 
@@ -934,6 +959,7 @@ begin
       AllPlaylistsPfadSort[i].Free;
 
   AllPlaylistsPfadSort.Clear;
+  FavoritePlaylists.Clear;
 
   LastBrowseResultList      .Clear;
   LastQuickSearchResultList .Clear;
@@ -954,10 +980,10 @@ end;
 
 procedure TMedienBibliothek.ClearFileCategories;
 begin
-  CurrentCategory := Nil;
   FileCategories.Clear;
   // CoverSearchCategory.Clear;
   SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, 0);
+  CurrentCategory := Nil;
 end;
 {
     --------------------------------------------------------
@@ -1125,6 +1151,17 @@ procedure TMedienBibliothek.SetFileSearchAborted(Value: LongBool);
 begin
     InterLockedExchange(Integer(fFileSearchAborted), Integer(Value));
 end;
+
+procedure TMedienBibliothek.SetTargetCategory(Value: Cardinal);
+begin
+  InterlockedExchange(Integer(fTargetCategory), Integer(Value));
+end;
+
+function TMedienBibliothek.GetTargetCategory: Cardinal;
+begin
+  InterLockedExchange(Integer(Result), Integer(fTargetCategory));
+end;
+
 function TMedienBibliothek.GetFileSearchAborted: LongBool;
 begin
     InterLockedExchange(Integer(Result), Integer(fFileSearchAborted));
@@ -1281,17 +1318,17 @@ begin
         LyricPriorities[LYR_CHARTLYRICS] := NempSettingsManager.ReadInteger('MedienBib', 'PriorityChartLyrics', 2);
 
         BibSearcher.LoadFromIni(NempSettingsManager);
-        TagCloud.LoadFromIni(NempSettingsManager);
+        // TagCloud.LoadFromIni(NempSettingsManager);
 
         // Read Info "current selection"
         fCurrentCategoryIdx := NempSettingsManager.ReadInteger('LibraryOrganizerSelection', 'CollectionIndex', 0);
-        fCollectionMetaInfo.LoadSettings;
+        //fCollectionMetaInfo.LoadSettings;
 
         NempOrganizerSettings.LoadSettings;
 end;
 
 procedure TMedienBibliothek.SaveSettings;
-var i, categoryCount: Integer;
+var i, catIdx, categoryCount: Integer;
 begin
         NempSettingsManager.WriteBool('MedienBib', 'AlwaysSortAnzeigeList', AlwaysSortAnzeigeList);
         NempSettingsManager.WriteBool('MedienBib', 'limitMarkerToCurrentFiles', limitMarkerToCurrentFiles);
@@ -1369,13 +1406,18 @@ begin
         NempSettingsManager.WriteInteger('MedienBib', 'PriorityChartLyrics', LyricPriorities[LYR_CHARTLYRICS] );
 
         BibSearcher.SaveToIni(NempSettingsManager);
-        TagCloud.SaveToIni(NempSettingsManager);
+        // TagCloud.SaveToIni(NempSettingsManager);
 
         // Write Info "current selection"
         NempSettingsManager.EraseSection('LibraryOrganizerSelection');
         NempSettingsManager.WriteInteger('LibraryOrganizerSelection', 'CollectionIndex', GetCategoryIndexByCategory(CurrentCategory));
-        fCollectionMetaInfo.Assign(CurrentCategory.LastSelectedCollectionData);
-        fCollectionMetaInfo.SaveSettings;
+        for i := 0 to 2 do begin
+          NempSettingsManager.EraseSection ('LibraryOrganizerSelection' + OrganizerSelectionSuffix[i]);
+          for catIdx := 0 to FileCategories.Count - 1 do
+            FileCategories[catIdx].LastSelectedCollectionData[i].SaveSettings(i, catIdx);
+          // fCollectionMetaInfo.Assign(CurrentCategory.LastSelectedCollectionData[BrowseMode]);
+          // fCollectionMetaInfo.SaveSettings;
+        end;
 
         NempSettingsManager.WriteBool('MedienBib', 'UseNewFileScanMethod', UseNewFileScanMethod);
 
@@ -1395,7 +1437,7 @@ begin
         fHND_ScanFilesAndUpdateThread  := BeginThread(Nil, 0, @fScanNewFilesAndUpdateBib, Self, 0, Dummy);
     end else
     begin
-        // the search for new files has beem cancelled by the user.
+        // the search for new files has been cancelled by the user.
         // Discard files in the UpdateList and cleanUP Progress-GUI
         for i := 0 to UpdateList.Count - 1 do
             UpdateList[i].Free;
@@ -1497,6 +1539,7 @@ begin
               begin
                   AudioFile.FileIsPresent:=True;
                   AudioFile.GetAudioData(AudioFile.Pfad, GAD_Rating or IgnoreLyricsFlag);
+                  AudioFile.Category := TargetCategory;
                   CoverArtSearcher.InitCover(AudioFile, tm_Thread, INIT_COVER_DEFAULT);
               end
               else
@@ -1660,6 +1703,9 @@ begin
       end;
 
       2: begin
+          MergeFileIntoCategories(UpdateList);
+          MergePlaylistsIntoCategories(PlaylistUpdateList);
+
         // ToDo !!!!!!!!!!!!!!!!!!!!!!!!!  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
           // TagCloud: Just put all files into the tmp-Lists
           // we do not need them really, but at least the file therein should be the same as in the PfadSortList
@@ -1674,7 +1720,11 @@ begin
       end;
   end;
 
-  MergeWebradioIntoCategories(RadioStationList);
+  if assigned(FavoritePlaylistCategory) and (FavoritePlaylistCategory.CollectionCount = 0) then
+    MergeNempDefaultPlaylists;
+
+  if WebRadioCategory.CollectionCount = 0 then
+    MergeWebradioIntoCategories(RadioStationList);
 
 
   // Check for Duplicates
@@ -2431,6 +2481,14 @@ end;
 function TMedienBibliothek.GetDefaultPlaylistCategory: TLibraryPlaylistCategory;
 begin
   result := TLibraryPlaylistCategory(PlaylistCategories[0]);
+end;
+
+function TMedienBibliothek.GetFavoritePlaylistCategory: TLibraryPlaylistCategory;
+begin
+  if PlaylistCategories.Count > 1 then
+    result := TLibraryPlaylistCategory(PlaylistCategories[1])
+  else
+    result := Nil;
 end;
 
 {
@@ -3836,21 +3894,23 @@ end;
     - update the TagCloud
     --------------------------------------------------------
 }
+(*
 procedure TMedienBibliothek.ReBuildTagCloud;
 begin
     // Build the Tagcloud.
     TagCloud.BuildCloud(Mp3ListePfadSort, Nil, True);
 end;
 
+
 procedure TMedienBibliothek.RestoreTagCloudNavigation;
 begin
-//    TagCloud.RestoreNavigation(Mp3ListeArtistSort);
+    TagCloud.RestoreNavigation(Mp3ListePfadSort);
 end;
 
 procedure TMedienBibliothek.GetTopTags(ResultCount: Integer; Offset: Integer; Target: TObjectList; HideAutoTags: Boolean = False);
 begin
-//    TagCloud.GetTopTags(ResultCount, Offset, Mp3ListeArtistSort, Target, HideAutoTags);
-end;
+    TagCloud.GetTopTags(ResultCount, Offset, Mp3ListePfadSort, Target, HideAutoTags);
+end;  *)
 
 
 function TMedienBibliothek.IsAutoSortWanted: Boolean;
@@ -3922,6 +3982,9 @@ begin
     SetBaseMarkerList(LastBrowseResultList);
 
     afc.GetReverseFiles(AnzeigeListe);
+    if IsAutoSortWanted then
+      SortAnzeigeliste;
+
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList, 0);
   end;
 end;
@@ -3983,7 +4046,7 @@ end;
       not in the breadcrumb-navigation
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.GenerateAnzeigeListeFromTagCloud(aTag: TTag; BuildNewCloud: Boolean);
+(*procedure TMedienBibliothek.GenerateAnzeigeListeFromTagCloud(aTag: TTag; BuildNewCloud: Boolean);
 var i: Integer;
 begin
   if not assigned(aTag) then exit;
@@ -4017,6 +4080,7 @@ begin
   SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0);
 end;
 
+
 procedure TMedienBibliothek.GenerateDragDropListFromTagCloud(aTag: TTag; Target: TAudioFileList);
 var i: Integer;
 begin
@@ -4031,7 +4095,7 @@ begin
         // we need no binary search or stuff here. The Tag saves all its AudioFiles.
         for i := 0 to aTag.AudioFiles.Count - 1 do
             Target.Add(aTag.AudioFiles[i]);
-end;
+end;  *)
 
 
 {
@@ -4304,9 +4368,42 @@ begin
             AND
              ((Not PlaylistFillOptions.UseMaxLength) or (aLength <= PlaylistFillOptions.MaxLength))
 end;
-function TMedienBibliothek.CheckTags(aTagList: TObjectList): Boolean;
+function TMedienBibliothek.CheckTags(aAudioFile: TAudioFile): Boolean;
 var i, c: Integer;
+  AutoTags, LastFMTags, UniqueTags: TStringList;
 begin
+  if PlaylistFillOptions.SkipTagCheck or (not assigned(PlaylistFillOptions.WantedTags)) then
+    result := true
+  else
+  begin
+    AutoTags := TStringList.Create;
+    LastFMTags := TStringList.Create;
+    UniqueTags := TStringList.Create;
+    try
+      aAudioFile.GetAllTags(AutoTags, LastFMTags);
+      UniqueTags.Sorted := True;
+      UniqueTags.Duplicates := dupIgnore;
+      for i := 0 to AutoTags.Count - 1 do
+        UniqueTags.Add(Autotags[i]);
+      for i := 0 to LastFMTags.Count - 1 do
+        UniqueTags.Add(LastFMTags[i]);
+
+      c := 0;
+      for i := 0 to PlaylistFillOptions.WantedTags.Count - 1 do begin
+        if UniqueTags.IndexOf(PlaylistFillOptions.WantedTags[i]) >= 0 then
+          inc(c);
+      end;
+      result := c >= PlaylistFillOptions.MinTagMatchCount;
+    finally
+      AutoTags.Free;
+      LastFMtags.Free;
+      UniqueTags.Free;
+    end;
+  end;
+
+
+    {
+    neu machen, Param muss das AudioFile selbst sein, nicht dessen TagList
     if PlaylistFillOptions.SkipTagCheck or (not assigned(PlaylistFillOptions.WantedTags)) then
         result := true
     else
@@ -4319,6 +4416,14 @@ begin
         end;
         result := c >= PlaylistFillOptions.MinTagMatchCount;
     end;
+    }
+end;
+function TMedienBibliothek.CheckCategory(aAudioFile: TAudioFile): Boolean;
+begin
+  if not PlaylistFillOptions.CheckCategory then
+    result := True
+  else
+    result := (aAudioFile.IsCategory(PlaylistFillOptions.CategoryIdx))
 end;
 
 {
@@ -4334,10 +4439,22 @@ var sourceList, tmpFileList: TAudioFileList;
 begin
     EnterCriticalSection(CSUpdate);
 
-    if PlaylistFillOptions.WholeBib then
-        SourceList := Mp3ListePfadSort
-    else
-        SourceList := AnzeigeListe;
+    case PlaylistFillOptions.SelectionRange of
+      rprLibrary,
+      rprCategory: SourceList := Mp3ListePfadSort;
+      rprView: SourceList := AnzeigeListe;
+    end;
+
+
+    PlaylistFillOptions.CheckCategory := PlaylistFillOptions.SelectionRange = rprCategory;
+    if assigned(CurrentCategory) and (CurrentCategory.CategoryType = ccFiles) then
+      PlaylistFillOptions.CategoryIdx := CurrentCategory.Index
+    else begin
+      if assigned(DefaultFileCategory) then
+        PlaylistFillOptions.CategoryIdx := DefaultFileCategory.Index
+      else
+        PlaylistFillOptions.CheckCategory := False; // Something is wrong with categories: Skip check
+    end;
 
     // passende Stücke zusammensuchen
     tmpFileList := TAudioFileList.Create(False);
@@ -4347,9 +4464,10 @@ begin
             aAudioFile := SourceList[i];
             if CheckYearRange(aAudioFile.Year)
                 //and CheckGenrePL(aAudioFile.Genre)
+                and CheckCategory(aAudioFile)
                 and CheckRating(aAudioFile.Rating)
                 and CheckLength(aAudioFile.Duration)
-                and CheckTags(aAudioFile.Taglist)
+                and CheckTags(aAudioFile)
                 then
               tmpFileList.Add(aAudioFile);
         end;
@@ -5354,7 +5472,7 @@ procedure TMedienBibliothek.EnsureCategoriesExist;
     NewCategory := TLibraryFileCategory.Create;
     NewCategory.Name := aName;
     NewCategory.Index := aIndex;
-    NewCategory.SortIndex := aIndex;
+    //NewCategory.SortIndex := aIndex;
     FileCategories.Add(NewCategory);
   end;
 
@@ -5365,7 +5483,7 @@ procedure TMedienBibliothek.EnsureCategoriesExist;
     NewCategory := TLibraryPlaylistCategory.Create;
     NewCategory.Name := aName;
     NewCategory.Index := aIndex;
-    NewCategory.SortIndex := aIndex;
+    //NewCategory.SortIndex := aIndex;
     NewCategory.CaptionMode := 0; // Oder was anderes?
     PlaylistCategories.Add(NewCategory);
   end;
@@ -5396,11 +5514,40 @@ end;
 procedure TMedienBibliothek.InitLastSelectedCollection;
 var tmpCat: TLibraryCategory;
 begin
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_LoadLastSelectionData, 0);
+  {
   tmpCat := GetCategoryByCategoryIndex(CurrentCategoryIdx);
   if assigned(tmpCat) then begin
     CurrentCategory := tmpCat;
-    CurrentCategory.LastSelectedCollectionData.Assign(fCollectionMetaInfo);
+    CurrentCategory.LastSelectedCollectionData[BrowseMode].Assign(fCollectionMetaInfo);
   end;
+  }
+end;
+
+procedure TMedienBibliothek.LoadLastSelectionData;
+var
+  i, catidx: Integer;
+  tmpCat: TLibraryCategory;
+
+begin
+  // Read Info "current selection"
+  fCurrentCategoryIdx := NempSettingsManager.ReadInteger('LibraryOrganizerSelection', 'CollectionIndex', 0);
+  tmpCat := GetCategoryByCategoryIndex(fCurrentCategoryIdx);
+  if assigned(tmpCat) then
+    CurrentCategory := tmpCat;
+
+  for i := 0 to 2 do begin
+    for catIdx := 0 to FileCategories.Count - 1 do begin
+      FileCategories[catIdx].LastSelectedCollectionData[i].LoadSettings(i, catIdx);
+
+      //ShowMessage (FileCategories[catIdx].LastSelectedCollectionData[i].KeyPath);
+    end;
+    // fCollectionMetaInfo.Assign(CurrentCategory.LastSelectedCollectionData[BrowseMode]);
+    // fCollectionMetaInfo.SaveSettings;
+  end;
+  // fCollectionMetaInfo.LoadSettings;
+  //ShowMessage('LoadLastSelectionData ' +  CurrentCategory.Name);
+
 end;
 
 procedure TMedienBibliothek.CreateRootCollections;
@@ -5431,7 +5578,11 @@ begin
       newRoot.MissingCoverMode := MissingCoverMode;
     end;
     2: begin
-      // TagCloud; ToDo
+      // TagCloud
+      for i := 0 to FileCategories.Count - 1 do begin
+        TLibraryFileCategory(FileCategories[i]).Clear;
+        newRoot := TLibraryFileCategory(FileCategories[i]).AddRootCollection(NempOrganizerSettings.TagCloudCollectionConfig);
+      end;
     end;
   end;
 
@@ -5443,6 +5594,9 @@ var
 begin
   EnsureCategoriesExist;
   CreateRootCollections;
+
+  for i := 0 to self.FileCategories.Count - 1 do
+    FileCategories[i].BrowseMode := BrowseMode;
 
   // Playlists: The same in every case (?)
   for i := 0 to PlaylistCategories.Count - 1 do begin
@@ -5503,20 +5657,50 @@ begin
   SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, LParam(True));
 end;
 
+procedure TMedienBibliothek.FillRootCollection(Dest: TRootCollection; SourceCategory: TLibraryCategory);
+var
+  i, CatIdx: Integer;
+  CheckCat: Boolean;
+begin
+  CheckCat := assigned(SourceCategory);
+  if CheckCat then begin
+    if SourceCategory.CategoryType = ccFiles then
+      CatIdx := CurrentCategory.Index
+    else begin
+      if assigned(DefaultFileCategory) then
+        CatIdx := DefaultFileCategory.Index
+      else
+        CheckCat := False; // Something is wrong with categories: Skip check
+    end;
+  end;
+
+  if CheckCat then begin
+    for i := 0 to Mp3ListePfadSort.Count - 1 do
+      if Mp3ListePfadSort[i].IsCategory(CatIdx) then
+        Dest.AddAudioFile(Mp3ListePfadSort[i]);
+  end else
+  begin
+    for i := 0 to Mp3ListePfadSort.Count - 1 do
+      Dest.AddAudioFile(Mp3ListePfadSort[i]);
+  end;
+
+  Dest.SortCollection(False);
+end;
 
 procedure TMedienBibliothek.ReBuildCategories;
 begin
   InitFileCategories;
   MergeFileIntoCategories(Mp3ListePfadSort);
   MergePlaylistsIntoCategories(AllPlaylistsPfadSort);
-  SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, 0);
+  // SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, 0);
 end;
 
 procedure TMedienBibliothek.ReFillFileCategories;
 begin
   CreateRootCollections;
   MergeFileIntoCategories(Mp3ListePfadSort);
-  SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, 0);
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, 1);
+  //000 oder doch 1 als letzten Param? Test, ob sich was geändert hat in der Config-Form (denn nur da wird das gebacuht)
 end;
 
 procedure TMedienBibliothek.FinishCategories;
@@ -5534,6 +5718,64 @@ begin
   end;
 end;
 
+procedure TMedienBibliothek.InitTargetCategory(lc: TLibraryCategory);
+var
+  CategoryMask: Cardinal;
+begin
+  CategoryMask := 0;
+  if assigned(lc) and (lc.CategoryType = ccFiles) then
+    CategoryMask := 1 shl lc.Index
+  else
+    if assigned(DefaultFileCategory) then
+      CategoryMask := 1 shl DefaultFileCategory.Index;
+  if  NempOrganizerSettings.UseNewCategory and assigned(NewFilesCategory) then
+    CategoryMask := CategoryMask or (1 shl NewFilesCategory.Index);
+
+  TargetCategory := Categorymask;
+end;
+
+procedure TMedienBibliothek.ChangeCategory(Current, Target: TLibraryCategory; Files: TAudioFileList; Action: teCategoryAction);
+var
+  i, catIdx: Integer;
+  curIdx, targetIdx: Byte;
+begin
+  if Action = caNone then
+    exit;
+
+  curIdx := Current.Index;
+  targetIdx := Target.Index;
+  // remove Files from the current Category
+  if (Action = caCategoryMove) and (Current is TLibraryFileCategory) then begin
+    for i := 0 to Files.Count - 1 do begin
+      Files[i].RemoveFromCategory(curIdx);
+      TLibraryFileCategory(Current).RemoveAudioFile(Files[i]);
+    end;
+  end;
+
+  if (Target is TLibraryFileCategory) then begin
+    for i := 0 to Files.Count - 1 do begin
+      if not Files[i].IsCategory(targetIdx) then begin // do not add it again, if it is already in the TargetCategory
+        Files[i].AddToCategory(targetIdx);
+        TLibraryFileCategory(Target).AddAudioFile(Files[i]);
+      end;
+    end;
+  end;
+
+   // this method may be called by VCL- and background-Threads
+  case BrowseMode of
+    // ClearEmptyNodes first: Otherwise we get some access violations (e.g. on GetImageIndex)
+    0: SendMessage(MainWindowHandle, WM_MedienBib, MB_ClearEmptyNodes, 0);
+    1: ;
+    2: ;
+  end;
+  DeleteEmptyFileCollections;
+
+  for catIdx := 0 to FileCategories.Count - 1 do begin
+    FileCategories[catIdx].AnalyseCollections(True);
+    FileCategories[catIdx].SortCollections(True);
+  end;
+
+end;
 
 function TMedienBibliothek.LoadFileCategoriesFromStream(aStream: TStream): Boolean;
 var
@@ -5869,6 +6111,9 @@ begin
         SaveAudioFilesToStream(str, aFileName);
         SavePlaylistsToStream(str, aFileName);
         SaveRadioStationsToStream(str);
+        SaveFileCategoriesToStream(str);
+        SavePlaylistCategoriesToStream(str);
+
         str.Size := str.Position;
       finally
         LeaveCriticalSection(CSAccessDriveList);
@@ -6034,8 +6279,12 @@ begin
         added := True;
       end;
     end;
-    if not added then
+    if not added then begin
       DefaultFileCategory.AddAudioFile(aFileList[i]);
+      // explicitly add the file to this category, and ONLY this one (i.e. remove other Bits from removed Categories)
+      // (invalid Category-Bits are still possible, but less likely)
+      aFileList[i].SetExclusiveCategory(DefaultFileCategory.Index);
+    end;
   end;
 
   // Analysing and sorting the Collections in FileCategories will only be done,
@@ -6078,6 +6327,28 @@ var
 begin
   for i := 0 to aStationlist.Count - 1 do
     WebRadioCategory.AddStation(TStation(aStationlist[i]));
+end;
+
+procedure TMedienBibliothek.MergeNempDefaultPlaylists;
+begin
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_ImportFavoritePlaylists, 0);
+end;
+
+procedure TMedienBibliothek.ImportFavoritePlaylists(Source: TPlaylistManager);
+var
+  i: Integer;
+  newLibPL: TLibraryPlaylist;
+begin
+  FavoritePlaylistCategory.Clear;
+  FavoritePlaylists.Clear;
+
+  FavoritePlaylistCategory.DriveManager := Source.DriveManager;
+  for i := 0 to Source.Count - 1 do begin
+    newLibPL := TLibraryPlaylist.Create(Source.UserSavePath + Source.QuickLoadPlaylists[i].FileName);
+    newLibPL.Name := Source.QuickLoadPlaylists[i].Description;
+    FavoritePlaylists.Add(newLibPL);
+    FavoritePlaylistCategory.AddPlaylist(newLibPL);
+  end;
 end;
 
 

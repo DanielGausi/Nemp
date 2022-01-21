@@ -8,29 +8,16 @@ uses
   gnuGettext, Nemp_RessourceStrings, MyDialogs, NempAudioFiles, LibraryOrganizer.Configuration.NewLayer,
   LibraryOrganizer.Base, LibraryOrganizer.Files, LibraryOrganizer.Playlists,
   Vcl.StdCtrls, Vcl.ExtCtrls, VirtualTrees, Vcl.ComCtrls, System.Actions,
-  Vcl.ActnList, Vcl.Menus;
+  Vcl.ActnList, Vcl.Menus, ActiveX;
 
 type
-  (*TDisplayRootCollectionConfig = class
-    private
-
-      FRootCollectionConfig: TRootCollectionConfig;
-    public
-      constructor create(aRootCollectionConfig: TRootCollectionConfig);
-      destructor Destroy; override;
-
-  end;
-
-  TDisplayRootCollectionConfigList = class(TObjectList<TDisplayRootCollectionConfig>);
-  *)
+ 
+  teMoveDirection = (mdUp, mdDown);
 
   TFormLibraryConfiguration = class(TForm)
     PnlButtons: TPanel;
     BtnOK: TButton;
     BtnCancel: TButton;
-    PageControl1: TPageControl;
-    tsCategories: TTabSheet;
-    tsSettings: TTabSheet;
     VSTCategories: TVirtualStringTree;
     BtnAddCategory: TButton;
     BtnDeleteCategory: TButton;
@@ -49,8 +36,6 @@ type
     ActionAddRootLayer: TAction;
     ActionAddLayer: TAction;
     ActionDeleteLayer: TAction;
-    BtnMoveLayer: TUpDown;
-    BtnMoveCategories: TUpDown;
     BtnDeleteLayer: TButton;
     PnlSettings: TPanel;
     grpBoxAlbumSettings: TGroupBox;
@@ -81,6 +66,18 @@ type
     cbCoverFlowSorting: TComboBox;
     pnlCategoryButtons: TPanel;
     pnlCategoryAdds: TPanel;
+    PnlMain: TPanel;
+    ActionLayerMoveDown: TAction;
+    ActionLayerMoveUp: TAction;
+    Moveup1: TMenuItem;
+    Movedown1: TMenuItem;
+    N1: TMenuItem;
+    ActionMoveCategoryUp: TAction;
+    ActionMoveCategoryDown: TAction;
+    N2: TMenuItem;
+    Moveup2: TMenuItem;
+    Movedown2: TMenuItem;
+    Splitter1: TSplitter;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -92,9 +89,6 @@ type
       Column: TColumnIndex; var Allowed: Boolean);
     procedure VSTCategoriesNewText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; NewText: string);
-    procedure VSTCategoriesPaintText(Sender: TBaseVirtualTree;
-      const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
-      TextType: TVSTTextType);
     procedure cbDefaultCategoryChange(Sender: TObject);
     procedure cbNewFilesCategoryChange(Sender: TObject);
     procedure ActionAddCategoryExecute(Sender: TObject);
@@ -102,23 +96,44 @@ type
     procedure ActionAddRootLayerExecute(Sender: TObject);
     procedure ActionAddLayerExecute(Sender: TObject);
     procedure ActionDeleteLayerExecute(Sender: TObject);
-    procedure BtnMoveLayerClick(Sender: TObject; Button: TUDBtnType);
     procedure BtnApplyClick(Sender: TObject);
     procedure VSTSortingsFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
-    procedure BtnMoveCategoriesClick(Sender: TObject; Button: TUDBtnType);
     procedure ActionEditLayerExecute(Sender: TObject);
     procedure BtnCancelClick(Sender: TObject);
     procedure ActionEditCategoryExecute(Sender: TObject);
     procedure BtnOKClick(Sender: TObject);
-    //procedure VSTSortingsFocusChanged(Sender: TBaseVirtualTree;
-    //  Node: PVirtualNode; Column: TColumnIndex);
+    procedure checkBoxNewFilesCategoryClick(Sender: TObject);
+    procedure VSTSortingsDragOver(Sender: TBaseVirtualTree; Source: TObject;
+      Shift: TShiftState; State: TDragState; Pt: TPoint; Mode: TDropMode;
+      var Effect: Integer; var Accept: Boolean);
+    procedure VSTCategoriesDragAllowed(Sender: TBaseVirtualTree;
+      Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
+    procedure VSTCategoriesDragOver(Sender: TBaseVirtualTree; Source: TObject;
+      Shift: TShiftState; State: TDragState; Pt: TPoint; Mode: TDropMode;
+      var Effect: Integer; var Accept: Boolean);
+    procedure VSTCategoriesDragDrop(Sender: TBaseVirtualTree; Source: TObject;
+      DataObject: IDataObject; Formats: TFormatArray; Shift: TShiftState;
+      Pt: TPoint; var Effect: Integer; Mode: TDropMode);
+    procedure VSTSortingsDragAllowed(Sender: TBaseVirtualTree;
+      Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
+    procedure VSTSortingsDragDrop(Sender: TBaseVirtualTree; Source: TObject;
+      DataObject: IDataObject; Formats: TFormatArray; Shift: TShiftState;
+      Pt: TPoint; var Effect: Integer; Mode: TDropMode);
+    procedure ActionLayerMoveUpExecute(Sender: TObject);
+    procedure ActionLayerMoveDownExecute(Sender: TObject);
+    procedure ActionMoveCategoryUpExecute(Sender: TObject);
+    procedure ActionMoveCategoryDownExecute(Sender: TObject);
+    procedure PopupCategoriesPopup(Sender: TObject);
+    procedure PopupLayersPopup(Sender: TObject);
+    procedure cbCoverFlowSortingChange(Sender: TObject);
   private
     { Private declarations }
     FileCategories: TLibraryCategoryList;
     RootCollections: TAudioCollectionList;
     OrganizerSettings: TOrganizerSettings;
-    //DisplayRootCollectionConfigList: TDisplayRootCollectionConfigList;
+    fCategoriesChanged: Boolean;
+    fCollectionsChanged: Boolean;
 
     procedure FillCategoryTree;
     procedure FillCategoryComboBoxes;
@@ -128,10 +143,8 @@ type
     procedure RefreshLayerActions(Node: PVirtualNode; rc: TRootCollection);
 
 
-
     procedure PrepareNewLayerForm(isRoot: Boolean);
     procedure PrepareEditLayerForm(AllowDirectory: Boolean; aType: teCollectionType; aSorting: teCollectionSorting);
-
 
     function CategoryNameExists(aName: String; Categories: TLibraryCategoryList): Boolean;
     function NewUniqueCategoryName(Categories: TLibraryCategoryList): String;
@@ -144,32 +157,31 @@ type
     procedure EnsureDefaultCategoryIsSet;
     procedure EnsureNewCategoryIsSet;
 
+    procedure MoveLayer(Direction: teMoveDirection);
+    procedure MoveCategory(Direction: teMoveDirection);
+
 
   public
     { Public declarations }
   end;
 
-  {
-  Benötigt wird:
-  - Eine Liste mit Categorien (wie in der medienbibliothek, mit diesen Werten initialisiert)
-  - Eine kopie vom globalen Objekt NempOrganizerSettings, inkl. "Assign"
-
-  }
 
 var
   FormLibraryConfiguration: TFormLibraryConfiguration;
 
 implementation
 
-uses NempMainUnit;
+uses NempMainUnit, Hilfsfunktionen;
 
 {$R *.dfm}
 
-function getNextIdx(const aIdx: Integer; Button: TUDBtnType): Integer;
+function getNextIdx(const aIdx: Integer; Button: teMoveDirection): Integer;
 begin
   case Button of
-    btNext: result := aIdx - 1;
-    btPrev: result := aIdx + 1;
+    mdUp:   result := aIdx - 1;
+    mdDown: result := aIdx + 1;
+  else
+    result := aIdx + 1;
   end;
 end;
 
@@ -180,12 +192,15 @@ begin
 end;
 
 
-
 procedure TFormLibraryConfiguration.FormCreate(Sender: TObject);
 begin
-  FileCategories := TLibraryCategoryList.Create(True);
+  BackUpComboBoxes(self);
+  TranslateComponent (self);
+  RestoreComboboxes(self);
+
+  FileCategories := TLibraryCategoryList.Create(False);
   OrganizerSettings := TOrganizerSettings.create;
-  RootCollections := TAudioCollectionList.Create(True);
+  RootCollections := TAudioCollectionList.Create(False);
 
   VSTCategories.NodeDataSize := SizeOf(TLibraryCategory);
   VSTSortings.NodeDataSize := SizeOf(TAudioCollection);
@@ -205,8 +220,10 @@ end;
 
 procedure TFormLibraryConfiguration.FormDestroy(Sender: TObject);
 begin
+  FileCategories.OwnsObjects := True;
   FileCategories.Free;
   OrganizerSettings.Free;
+  RootCollections.OwnsObjects := True;
   RootCollections.Free;
 end;
 
@@ -218,7 +235,10 @@ var
   aRootConfig: TCollectionTypeList;
 begin
   OrganizerSettings.Assign(NempOrganizerSettings);
+  fCategoriesChanged  := False;
+  fCollectionsChanged := False;
 
+  RootCollections.OwnsObjects := True;
   RootCollections.Clear;
   for iRC := 0 to OrganizerSettings.RootCollectionCount - 1 do begin
     aRootConfig := OrganizerSettings.RootCollectionConfig[iRC];
@@ -228,13 +248,16 @@ begin
     end;
     RootCollections.Add(newRoot);
   end;
+  RootCollections.OwnsObjects := False;
 
+  FileCategories.OwnsObjects := True;
   FileCategories.Clear;
   for i := 0 to MedienBib.FileCategories.Count - 1 do begin
     newCat := TLibraryFileCategory.Create;
     newCat.AssignSettings(MedienBib.FileCategories[i]);
     FileCategories.Add(newCat);
   end;
+  FileCategories.OwnsObjects := False;
 
   FillCategoryTree;
   FillCategoryComboBoxes;
@@ -249,7 +272,10 @@ begin
   editCDNames.Text := OrganizerSettings.CDNames.DelimitedText;
   cbShowCount.Checked := OrganizerSettings.ShowCollectionCount;
   cbShowCoverForAlbum.Checked := OrganizerSettings.ShowCoverArtOnAlbum;
+  checkBoxNewFilesCategory.Checked := OrganizerSettings.UseNewCategory;
   cbPlaylistCaptionMode.ItemIndex := Integer(OrganizerSettings.PlaylistCaptionMode);
+
+  cbNewFilesCategory.Enabled := checkBoxNewFilesCategory.Checked;
 end;
 
 procedure TFormLibraryConfiguration.FillCategoryComboBoxes;
@@ -321,7 +347,7 @@ var
   lc: TLibraryCategory;
 begin
   lc := Sender.GetNodeData<TLibraryCategory>(Node);
-  CellText := lc.Name + ' ' + IntToStr(lc.Index) ;
+  CellText := lc.Name;
 end;
 
 procedure TFormLibraryConfiguration.VSTCategoriesNewText(
@@ -332,21 +358,8 @@ var
 begin
   lc := Sender.GetNodeData<TLibraryCategory>(Node);
   lc.Name := NewText;
+  fCategoriesChanged := True;
 end;
-
-procedure TFormLibraryConfiguration.VSTCategoriesPaintText(
-  Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode;
-  Column: TColumnIndex; TextType: TVSTTextType);
-var
-  lc: TLibraryCategory;
-begin
-  lc := Sender.GetNodeData<TLibraryCategory>(Node);
-  if lc.IsDefault then
-    TargetCanvas.Font.Style := TargetCanvas.Font.Style + [fsBold];
-  if lc.IsNew then
-    TargetCanvas.Font.Style := TargetCanvas.Font.Style + [fsItalic];
-end;
-
 
 procedure TFormLibraryConfiguration.VSTSortingsGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
@@ -366,7 +379,7 @@ begin
     if rc.GetCollectionCompareType(level-1) <> csDefault then
       CellText := CellText
         + ' ('
-        + CollectionSortingNames[rc.GetCollectionCompareType(level-1)]
+        + _(CollectionSortingNames[rc.GetCollectionCompareType(level-1)])
         + ')';
   end;
 end;
@@ -397,6 +410,11 @@ begin
     end;
 end;
 
+procedure TFormLibraryConfiguration.cbCoverFlowSortingChange(Sender: TObject);
+begin
+  fCollectionsChanged := True;
+end;
+
 procedure TFormLibraryConfiguration.cbDefaultCategoryChange(Sender: TObject);
 begin
   SetDefaultCategoryIndex(FileCategories, cbDefaultCategory.ItemIndex);
@@ -407,6 +425,12 @@ procedure TFormLibraryConfiguration.cbNewFilesCategoryChange(Sender: TObject);
 begin
   SetNewCategoryIndex(FileCategories, cbNewFilesCategory.ItemIndex);
   VSTCategories.Invalidate;
+end;
+
+procedure TFormLibraryConfiguration.checkBoxNewFilesCategoryClick(
+  Sender: TObject);
+begin
+  cbNewFilesCategory.Enabled := checkBoxNewFilesCategory.Checked;
 end;
 
 function TFormLibraryConfiguration.CategoryIndexExists(aIndex: Integer; CatEdit, CatLibrary: TLibraryCategoryList): Boolean;
@@ -457,28 +481,94 @@ begin
   ActionDeleteLayer.Enabled := (nLevel = 0) or (rc.LayerDepth > 1)
 end;
 
-procedure TFormLibraryConfiguration.BtnMoveCategoriesClick(Sender: TObject;
-  Button: TUDBtnType);
+procedure TFormLibraryConfiguration.PopupCategoriesPopup(Sender: TObject);
 var
   aNode: PVirtualNode;
   curIdx, newIdx: Integer;
 begin
   aNode := VSTCategories.FocusedNode;
+  if not assigned(aNode) then begin
+    ActionMoveCategoryUp.Enabled := False;
+    ActionMoveCategoryDown.Enabled := False;
+  end else
+  begin
+    curIdx := aNode.Index;
+    newIdx := getNextIdx(curIdx, mdUp);
+    ActionMoveCategoryUp.Enabled := ValidRange(curIdx, newIdx, FileCategories.Count-1);
+    newIdx := getNextIdx(curIdx, mdDown);
+    ActionMoveCategoryDown.Enabled := ValidRange(curIdx, newIdx, FileCategories.Count-1);
+  end;
+end;
+
+
+procedure TFormLibraryConfiguration.MoveCategory(Direction: teMoveDirection);
+var
+  aNode: PVirtualNode;
+  curIdx, newIdx: Integer;
+begin
+  fCategoriesChanged := True;
+  aNode := VSTCategories.FocusedNode;
   curIdx := aNode.Index;
-  newIdx := getNextIdx(curIdx, Button);
+  newIdx := getNextIdx(curIdx, Direction);
 
   if ValidRange(curIdx, newIdx, FileCategories.Count-1) then begin
     FileCategories.Move(curIdx, newIdx);
-    case Button of
-      btNext: VSTCategories.MoveTo(aNode, VSTCategories.GetPreviousSibling(aNode), amInsertBefore, false );
-      btPrev: VSTCategories.MoveTo(aNode, VSTCategories.GetNextSibling(aNode), amInsertAfter, false );
+    case Direction of
+      mdUp: VSTCategories.MoveTo(aNode, VSTCategories.GetPreviousSibling(aNode), amInsertBefore, false );
+      mdDown: VSTCategories.MoveTo(aNode, VSTCategories.GetNextSibling(aNode), amInsertAfter, false );
     end;
     VSTCategories.Invalidate;
   end;
 end;
 
-procedure TFormLibraryConfiguration.BtnMoveLayerClick(Sender: TObject;
-  Button: TUDBtnType);
+procedure TFormLibraryConfiguration.ActionMoveCategoryDownExecute(
+  Sender: TObject);
+begin
+  MoveCategory(mdDown);
+end;
+
+procedure TFormLibraryConfiguration.ActionMoveCategoryUpExecute(
+  Sender: TObject);
+begin
+  MoveCategory(mdUp);
+end;
+
+
+procedure TFormLibraryConfiguration.PopupLayersPopup(Sender: TObject);
+var
+  aNode: PVirtualNode;
+  level, curIdx, newIdx: Integer;
+  rc: TRootCollection;
+begin
+  aNode := VSTSortings.FocusedNode;
+  if not assigned(aNode) then begin
+    ActionLayerMoveUp.Enabled := False;
+    ActionLayerMoveDown.Enabled := False;
+    ActionAddLayer.Enabled := False;
+    ActionEditLayer.Enabled := False;
+    ActionDeleteLayer.Enabled := False;
+  end else begin
+    rc := VSTSortings.GetNodeData<TRootCollection>(aNode);
+    level := VSTSortings.GetNodeLevel(aNode);
+
+    if level = 0 then begin
+      curIdx := aNode.Index;
+      newIdx := getNextIdx(curIdx, mdUp);
+      ActionLayerMoveUp.Enabled := ValidRange(curIdx, newIdx, RootCollections.Count-1);
+      newIdx := getNextIdx(curIdx, mdDown);
+      ActionLayerMoveDown.Enabled := ValidRange(curIdx, newIdx, RootCollections.Count-1);
+    end
+    else begin
+      curIdx := level - 1;
+      newIdx := getNextIdx(curIdx, mdUp);
+      ActionLayerMoveUp.Enabled := ValidRange(curIdx, newIdx, rc.LayerDepth-1);
+      newIdx := getNextIdx(curIdx, mdDown);
+      ActionLayerMoveDown.Enabled := ValidRange(curIdx, newIdx, rc.LayerDepth-1)
+    end;
+  end;
+end;
+
+procedure TFormLibraryConfiguration.MoveLayer(Direction: teMoveDirection);
 var
   aNode: PVirtualNode;
   level, curIdx, newIdx: Integer;
@@ -488,31 +578,32 @@ begin
   if not assigned(aNode) then
     exit;
 
+  fCollectionsChanged := True;
   rc := VSTSortings.GetNodeData<TRootCollection>(aNode);
   level := VSTSortings.GetNodeLevel(aNode);
 
   if level = 0 then begin
     curIdx := aNode.Index;
-    newIdx := getNextIdx(curIdx, Button);
+    newIdx := getNextIdx(curIdx, Direction);
 
     if ValidRange(curIdx, newIdx, RootCollections.Count-1) then begin
       RootCollections.Move(curIdx, newIdx);
-      case Button of
-        btNext: VSTSortings.MoveTo(aNode, VSTSortings.GetPreviousSibling(aNode), amInsertBefore, false );
-        btPrev: VSTSortings.MoveTo(aNode, VSTSortings.GetNextSibling(aNode), amInsertAfter, false );
+      case Direction of
+        mdUp: VSTSortings.MoveTo(aNode, VSTSortings.GetPreviousSibling(aNode), amInsertBefore, false );
+        mdDown: VSTSortings.MoveTo(aNode, VSTSortings.GetNextSibling(aNode), amInsertAfter, false );
       end;
       VSTSortings.Invalidate;
     end;
   end
   else begin
     curIdx := level - 1;
-    newIdx := getNextIdx(curIdx, Button);
+    newIdx := getNextIdx(curIdx, Direction);
     if ValidRange(curIdx, newIdx, rc.LayerDepth-1) then begin
       rc.MoveSubCollectionType(curIdx, newIdx);
 
-      case Button of
-        btNext: VSTSortings.FocusedNode := aNode.Parent;
-        btPrev: VSTSortings.FocusedNode := aNode.FirstChild;
+      case Direction of
+        mdUp: VSTSortings.FocusedNode := aNode.Parent;
+        mdDown: VSTSortings.FocusedNode := aNode.FirstChild;
       end;
       VSTSortings.Selected[aNode] := False;
       VSTSortings.Selected[VSTSortings.FocusedNode] := True;
@@ -522,45 +613,21 @@ begin
   end;
 end;
 
+procedure TFormLibraryConfiguration.ActionLayerMoveDownExecute(Sender: TObject);
+begin
+  MoveLayer(mdDown);
+end;
+
+procedure TFormLibraryConfiguration.ActionLayerMoveUpExecute(Sender: TObject);
+begin
+  MoveLayer(mdUp);
+end;
+
 procedure TFormLibraryConfiguration.BtnOKClick(Sender: TObject);
 begin
   BtnApply.Click;
   Close;
 end;
-
-(*
-procedure TFormLibraryConfiguration.VSTSortingsFocusChanged(
-  Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
-var
-  level, curIdx, newIdx: Integer;
-  rc: TRootCollection;
-begin
-  if not assigned(Node) then
-    exit;
-
-  rc := VSTSortings.GetNodeData<TRootCollection>(Node);
-  level := VSTSortings.GetNodeLevel(Node);
-
-  if level = 0 then begin
-    BtnMoveLayer.Min := 0;
-    BtnMoveLayer.Max := RootCollections.Count;
-    BtnMoveLayer.Position := Node.Index
-  end
-  else begin
-    curIdx := level - 1;
-
-    BtnMoveLayer.Min := 0;
-    BtnMoveLayer.Max := rc.LayerDepth;
-    BtnMoveLayer.Position := level-1;
-  end;
-
-  Caption := IntToStr(BtnMoveLayer.Min) + ' - ' +
-             IntToStr(BtnMoveLayer.Position) + ' - ' +
-             IntToStr(BtnMoveLayer.Max);
-
-end;
-*)
-
 
 function TFormLibraryConfiguration.NewUniqueCategoryIndex(CatEdit, CatLibrary: TLibraryCategoryList): Integer;
 begin
@@ -590,10 +657,10 @@ procedure TFormLibraryConfiguration.ActionAddCategoryExecute(Sender: TObject);
 var
   newCat: TLibraryFileCategory;
 begin
+  fCategoriesChanged := True;
   newCat := TLibraryFileCategory.Create;
   newCat.Name := NewUniqueCategoryName(FileCategories);
   newCat.Index := NewUniqueCategoryIndex(self.FileCategories, MedienBib.FileCategories);
-  newCat.SortIndex := FileCategories.Count; //SortIndex; actually needed? Or remove it from the code at all?
 
   if newCat.Index < 32 then begin
     FileCategories.Add(newCat);
@@ -621,6 +688,7 @@ begin
   aNode := VSTCategories.FocusedNode;
   if not assigned(aNode) then
     exit;
+  fCategoriesChanged := True;
   // get the next node that should be selected after the current one is removed
   reselectNode := VSTCategories.GetNextSibling(aNode);
   if not assigned(reselectNode) then
@@ -667,6 +735,7 @@ var
 begin
   PrepareNewLayerForm(True);
   if FormNewLayer.ShowModal = mrOk then begin
+    fCollectionsChanged := True;
     newRoot := TRootCollection.Create(Nil);
     newRoot.AddSubCollectionType(FormNewLayer.CollectionType, FormNewLayer.SortingType);
     RootCollections.Add(newRoot);
@@ -687,6 +756,7 @@ begin
 
   PrepareNewLayerForm(False);
   if FormNewLayer.ShowModal = mrOk then begin
+    fCollectionsChanged := True;
     rc := VSTSortings.GetNodeData<TRootCollection>(aNode);
     rc.InsertSubCollectionType(VSTSortings.GetNodeLevel(aNode), FormNewLayer.CollectionType, FormNewLayer.SortingType);
     // The data assigned to each node under one RootCollectionNode is all the same, so we can just add a new child
@@ -709,6 +779,7 @@ begin
   aNode := VSTSortings.FocusedNode;
   if not assigned(aNode) then
     exit;
+  fCollectionsChanged := True;
   level := VSTSortings.GetNodeLevel(aNode);
   if level = 0 then begin
     // delete the RootCollection
@@ -737,7 +808,7 @@ begin
   aNode := VSTCategories.FocusedNode;
   if not assigned(aNode) then
     exit;
-
+  fCategoriesChanged := True;
   VSTCategories.EditNode(aNode, 0);
 end;
 
@@ -750,6 +821,7 @@ begin
   aNode := VSTSortings.FocusedNode;
   if not assigned(aNode) then
     exit;
+  fCollectionsChanged := True;
   level := VSTSortings.GetNodeLevel(aNode);
   if level > 0 then begin
     rc := VSTSortings.GetNodeData<TRootCollection>(aNode);
@@ -768,60 +840,49 @@ begin
       );
 
       RefreshLayerActions(aNode, rc);
-
-      //rc.CollectionTypeList[level-1].CollectionType := FormNewLayer.CollectionType;
-      //rc.CollectionTypeList[level-1].CollectionSorting :=  FormNewLayer.SortingType;
-
-{      rc.InsertSubCollectionType(VSTSortings.GetNodeLevel(aNode), FormNewLayer.CollectionType, FormNewLayer.SortingType);
-      // The data assigned to each node under one RootCollectionNode is all the same, so we can just add a new child
-      // at the end of the current subtree and trigger a repaint of the Tree
-      while aNode.ChildCount > 0 do
-        aNode := aNode.FirstChild;
-      VSTSortings.AddChild(aNode, rc);
-      VSTSortings.Expanded[aNode] := True;}
       VSTSortings.Invalidate;
     end;
-
-
-
   end;
 end;
+
 
 procedure TFormLibraryConfiguration.BtnApplyClick(Sender: TObject);
 var
   i: Integer;
   newCat: TLibraryFileCategory;
 begin
-  MedienBib.ClearFileCategories;
-
-  // create new Categories in Medienbib
-  for i := 0 to FileCategories.Count - 1 do begin
-    newCat := TLibraryFileCategory.Create;
-    newCat.AssignSettings(FileCategories[i]);
-    MedienBib.FileCategories.Add(newCat);
+  if fCategoriesChanged then begin
+    MedienBib.ClearFileCategories;
+    // create new Categories in Medienbib
+    for i := 0 to FileCategories.Count - 1 do begin
+      newCat := TLibraryFileCategory.Create;
+      newCat.AssignSettings(FileCategories[i]);
+      MedienBib.FileCategories.Add(newCat);
+    end;
+    MedienBib.DefaultFileCategory := TLibraryFileCategory(GetDefaultCategory(MedienBib.FileCategories));
+    MedienBib.NewFilesCategory := TLibraryFileCategory(GetNewCategory(MedienBib.FileCategories));
   end;
 
-  MedienBib.DefaultFileCategory := TLibraryFileCategory(GetDefaultCategory(MedienBib.FileCategories));
-  MedienBib.NewFilesCategory := TLibraryFileCategory(GetNewCategory(MedienBib.FileCategories));
-
-
-  // Convert RootCollections to OrganizerSettings
-  OrganizerSettings.Clear;
-  for i := 0 to RootCollections.Count - 1 do begin
-    OrganizerSettings.AddConfig(TRootCollection(RootCollections[i]).CollectionTypeList);
+  if fCollectionsChanged then begin
+    // Convert RootCollections to OrganizerSettings
+    OrganizerSettings.Clear;
+    for i := 0 to RootCollections.Count - 1 do begin
+      OrganizerSettings.AddConfig(TRootCollection(RootCollections[i]).CollectionTypeList);
+    end;
+    OrganizerSettings.ChangeCoverFlowSorting(
+      teCollectionSorting(cbCoverFlowSorting.Items.Objects[cbCoverFlowSorting.ItemIndex])
+    );
   end;
-  OrganizerSettings.ChangeCoverFlowSorting(
-    teCollectionSorting(cbCoverFlowSorting.Items.Objects[cbCoverFlowSorting.ItemIndex])
-  );
 
   OrganizerSettings.AlbumKeyMode := teAlbumKeyMode(cbAlbumKeymode.ItemIndex);
   OrganizerSettings.TrimCDFromDirectory := cbIgnoreCDDirectories.Checked;
   OrganizerSettings.CDNames.DelimitedText := editCDNames.Text;
   OrganizerSettings.ShowCollectionCount := cbShowCount.Checked;
   OrganizerSettings.ShowCoverArtOnAlbum := cbShowCoverForAlbum.Checked;
+  OrganizerSettings.UseNewCategory := checkBoxNewFilesCategory.Checked;
   OrganizerSettings.PlaylistCaptionMode := tePlaylistCaptionMode(cbPlaylistCaptionMode.ItemIndex);
-
   NempOrganizerSettings.Assign(OrganizerSettings);
+
   MedienBib.ReFillFileCategories;
 end;
 
@@ -829,5 +890,163 @@ procedure TFormLibraryConfiguration.BtnCancelClick(Sender: TObject);
 begin
   Close;
 end;
+
+{
+  ------------------------------
+  Drag&Drop of Categories
+  ------------------------------
+}
+procedure TFormLibraryConfiguration.VSTCategoriesDragAllowed(
+  Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+  var Allowed: Boolean);
+begin
+  Allowed := True;
+end;
+
+procedure TFormLibraryConfiguration.VSTCategoriesDragOver(
+  Sender: TBaseVirtualTree; Source: TObject; Shift: TShiftState;
+  State: TDragState; Pt: TPoint; Mode: TDropMode; var Effect: Integer;
+  var Accept: Boolean);
+begin
+  Accept := Source = VSTCategories;
+end;
+
+procedure TFormLibraryConfiguration.VSTCategoriesDragDrop(
+  Sender: TBaseVirtualTree; Source: TObject; DataObject: IDataObject;
+  Formats: TFormatArray; Shift: TShiftState; Pt: TPoint; var Effect: Integer;
+  Mode: TDropMode);
+var
+  aNode, focusNode: PVirtualNode;
+  lc: TLibraryCategory;
+begin
+  fCategoriesChanged := True;
+  focusNode := VSTCategories.FocusedNode;
+  case Mode of
+    dmNowhere: VSTCategories.MoveTo(focusNode, VSTCategories.RootNode, amInsertAfter, False);
+    dmAbove: VSTCategories.MoveTo(focusNode, VSTCategories.DropTargetNode, amInsertBefore, False);
+    dmOnNode,
+    dmBelow: VSTCategories.MoveTo(focusNode, VSTCategories.DropTargetNode, amInsertAfter, False);
+  end;
+  VSTCategories.Invalidate;
+
+  // Fill the FileCategories according to the new Node order.
+  // Don't use "Move" here, as Index-Calculation would be a lot trickier here
+  aNode := Sender.GetFirst;
+  while assigned(aNode) do begin
+    lc := Sender.GetNodeData<TLibraryCategory>(aNode);
+    FileCategories[aNode.Index] := lc;
+    aNode := Sender.GetNextSibling(aNode);
+  end;
+end;
+
+
+{
+  ------------------------------
+  Drag&Drop of Category Layers
+  ------------------------------
+}
+procedure TFormLibraryConfiguration.VSTSortingsDragAllowed(
+  Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+  var Allowed: Boolean);
+var
+  rcD: TRootCollection;
+begin
+  rcD := Sender.GetNodeData<TRootCollection>(Node);
+  Allowed := (Sender.GetNodeLevel(Node) = 0) or (rcD.LayerDepth > 1);
+end;
+
+procedure TFormLibraryConfiguration.VSTSortingsDragOver(
+  Sender: TBaseVirtualTree; Source: TObject; Shift: TShiftState;
+  State: TDragState; Pt: TPoint; Mode: TDropMode; var Effect: Integer;
+  var Accept: Boolean);
+var
+  rcF, rcD: TRootCollection;
+begin
+  Accept := Source = VSTSortings;
+  if not accept then
+    exit;  // nothing more to test
+
+  rcF := Sender.GetNodeData<TRootCollection>(Sender.FocusedNode);
+  if assigned(Sender.DropTargetNode) then
+    rcD := Sender.GetNodeData<TRootCollection>(Sender.DropTargetNode)
+  else
+    rcD := Sender.GetNodeData<TRootCollection>(Sender.GetLast);
+
+  // Accept within the same RootCollection ( => change Layer order)
+  // or move the complete RootCollection (=> Change order of RootCollections)
+  accept := (rcF = rCD) or (Sender.GetNodeLevel(Sender.FocusedNode) = 0);
+end;
+
+procedure TFormLibraryConfiguration.VSTSortingsDragDrop(
+  Sender: TBaseVirtualTree; Source: TObject; DataObject: IDataObject;
+  Formats: TFormatArray; Shift: TShiftState; Pt: TPoint; var Effect: Integer;
+  Mode: TDropMode);
+var
+  rcF, rcD: TRootCollection;
+  focusNode, aNode, DropRoot: PVirtualNode;
+  curIdx, targetIdx, idxModifier: Cardinal;
+begin
+  rcF := Sender.GetNodeData<TRootCollection>(Sender.FocusedNode);
+  fCollectionsChanged := True;
+
+  focusNode := Sender.FocusedNode;
+  DropRoot := VSTSortings.DropTargetNode;
+  while Sender.GetNodeLevel(DropRoot) > 0 do
+    DropRoot := DropRoot.Parent;
+
+  if (Sender.GetNodeLevel(focusNode) = 0) then begin
+    // correct DropMode if the user drops a "Level-0-Node" over a node which higher level
+    if assigned(VSTSortings.DropTargetNode) then begin
+      if (DropRoot.Index < focusNode.Index) and (Sender.GetNodeLevel(VSTSortings.DropTargetNode) > 0)  then
+        Mode := dmAbove;
+      if (DropRoot.Index > focusNode.Index) and (Sender.GetNodeLevel(VSTSortings.DropTargetNode) > 0) then
+        Mode := dmBelow;
+    end;
+    // Move the RootCollection to another position in the list
+    case Mode of
+      dmNowhere: VSTSortings.MoveTo(focusNode, VSTSortings.RootNode, amInsertAfter, False);
+      dmAbove: VSTSortings.MoveTo(focusNode, DropRoot, amInsertBefore, False);
+      dmOnNode,
+      dmBelow: VSTSortings.MoveTo(focusNode, DropRoot, amInsertAfter, False);
+    end;
+    // Fill the Category-Layers according to the new Node order.
+    aNode := Sender.GetFirst;
+    while assigned(aNode) do begin
+      rcD := Sender.GetNodeData<tRootCollection>(aNode);
+      RootCollections[aNode.Index] := rcD;
+      aNode := Sender.GetNextSibling(aNode);
+    end;
+
+  end else
+  begin
+    // we are moving a Layer within the same RootCollection
+    curIdx := Sender.GetNodeLevel(focusNode) - 1;
+    targetIdx := Sender.GetNodeLevel(VSTSortings.DropTargetNode) - 1;
+    // modify the targetIdx according to Drop-Direction
+    if (targetIdx < curIdx) then
+      idxModifier := 1
+    else
+      idxModifier := 0;
+
+    case Mode of
+      dmNowhere: targetIdx := rcF.LayerDepth - 1;
+      dmAbove: targetIdx := targetIdx + idxModifier - 1;
+      dmOnNode,
+      dmBelow: targetIdx := targetIdx + idxModifier;
+    end;
+
+    rcF.MoveSubCollectionType(curIdx, targetIdx);
+
+    // Repaint the tree and set the focussed node to the just moved node
+    VSTSortings.Invalidate;
+    aNode := DropRoot;
+    while assigned(aNode) and (Sender.GetNodeLevel(aNode) <= targetIdx) do
+      aNode := aNode.FirstChild;
+    Sender.FocusedNode := aNode;
+    Sender.Selected[aNode] := True;
+  end;
+
+end;
+
 
 end.

@@ -53,6 +53,7 @@ type
 
     protected
       function GetItemCount: Integer; override;
+      function GetCaption: String; override;
 
     public
       constructor Create;
@@ -73,7 +74,7 @@ type
 implementation
 
 uses
-  Hilfsfunktionen, StringHelper, AudioFileHelper;
+  Hilfsfunktionen, StringHelper, AudioFileHelper, gnugettext;
 
 { TAudioWebradioCollection }
 
@@ -172,7 +173,7 @@ begin
   if MatchPrefix(aPrefix) then
     result := 0
   else
-    result := -1;
+    result := 1;
 end;
 
 procedure TAudioWebradioCollection.RemoveEmptyCollections;
@@ -209,6 +210,11 @@ destructor TLibraryWebradioCategory.Destroy;
 begin
 
   inherited;
+end;
+
+function TLibraryWebradioCategory.GetCaption: String;
+begin
+  result := _(Name);
 end;
 
 function TLibraryWebradioCategory.GetItemCount: Integer;
@@ -268,9 +274,10 @@ end;
 procedure TLibraryWebradioCategory.RememberLastCollection(aCollection: TAudioCollection);
 begin
   inherited;
-  fLastSelectedCollectionData.Clear;
-  fLastSelectedCollectionData.RootIndex := -1;
-  fLastSelectedCollectionData.AddKey(aCollection.Key);
+
+  fLastSelectedCollectionData[fBrowseMode].Clear;
+  fLastSelectedCollectionData[fBrowseMode].RootIndex := -1;
+  fLastSelectedCollectionData[fBrowseMode].AddKey(aCollection.Key);
 end;
 
 function TLibraryWebradioCategory.FindLastCollectionAgain: TAudioCollection;
@@ -278,10 +285,10 @@ var
   i: Integer;
 begin
   result := Nil;
-  if fLastSelectedCollectionData.KeyCount = 0 then
+  if fLastSelectedCollectionData[fBrowseMode].KeyCount = 0 then
     exit;
   for i := 0 to fCollections.Count - 1 do begin
-    if fCollections[i].Key = fLastSelectedCollectionData.Keys[0] then begin
+    if fCollections[i].Key = fLastSelectedCollectionData[fBrowseMode].Keys[0] then begin
       result := fCollections[i];
       break;
     end;

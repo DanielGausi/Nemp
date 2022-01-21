@@ -113,7 +113,7 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     procedure HandleError(aAction: TAudioFileAction; aFile: String; aErr: TNempAudioError; Important: Boolean = false); overload;
     procedure HandleError(aAction: TAudioFileAction; aFile: TAudioFile; aErr: TNempAudioError; Important: Boolean = false); overload;
 
-    procedure CollectionDblClick(ac: TAudioCollection);
+    procedure CollectionDblClick(ac: TAudioCollection; Node: PVirtualNode);
 
     function GetSpecialPermissionToChangeMetaData:Boolean;
 
@@ -132,7 +132,7 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     CDOpenDialogs, LowBattery, PlayWebstream, Taghelper, MedienbibliothekClass,
     PlayerLog, progressUnit, Hilfsfunktionen, EffectsAndEqualizer, MainFormBuilderForm,
     ReplayGainProgress, NewMetaFrame, WebQRCodes, PlaylistEditor, NewFavoritePlaylist,
-    AudioDisplayUtils, PlaylistDuplicates;
+    AudioDisplayUtils, PlaylistDuplicates, LibraryOrganizer.Configuration, LibraryOrganizer.Configuration.NewLayer;
 
 procedure CorrectVolButton;
 begin
@@ -262,6 +262,7 @@ begin
 
 
                       MedienBib.ReBuildCategories;
+                      ReFillBrowseTrees(True);
                       {
 
                       jetzt weniger zu tun?
@@ -689,12 +690,17 @@ begin
             MedienBib.CurrentAudioFile := Nil;
 
             case NewMode of
-                0,1: begin
+                0,1,2: begin
                     //MedienBib.ReBuildBrowseLists;
                     MedienBib.ReBuildCategories;
                     ReFillBrowseTrees(True);
                 end;
-                2: begin
+                {2: begin
+                    // new 2022
+                    MedienBib.ReBuildCategories;
+
+                    // old stuff, delete
+
                     // 1. Backup Breadcrumbs (current navigation)
                     MedienBib.TagCloud.BackUpNavigation;
                     // 2. Rebuild TagCloud
@@ -702,8 +708,9 @@ begin
                     // 3. Restore BreadCrumbs
                     MedienBib.RestoreTagCloudNavigation;
                     // 4. Show Files for the current Tag
-                    MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, False);
-                end;
+                    // xxxxxxxxxxxxxxxx MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, False);
+
+                end; }
             end;
 
             if NempSkin.isActive then
@@ -718,6 +725,11 @@ end;
 
 procedure SwitchBrowsePanel(NewMode: Integer);
 begin
+    MedienBib.TagCloud.Clear;
+    MedienBib.NewCoverFlow.Clear;
+    Nemp_MainForm.ArtistsVST.Clear;
+    Nemp_MainForm.AlbenVST.Clear;
+
     with Nemp_MainForm do
     begin
 
@@ -743,7 +755,7 @@ begin
                 TabBtn_CoverFlow.Refresh;
             end;
             1: begin
-                AlbenVST.Clear;
+                //AlbenVST.Clear;
                 // Zeige CoverFlow
                 PanelStandardBrowse.Visible := False;
                 PanelTagCloudBrowse.Visible := False;
@@ -764,7 +776,7 @@ begin
                 TabBtn_CoverFlow.Refresh;
             end;
             2: begin
-                AlbenVST.Clear;
+                //AlbenVST.Clear;
                 PanelStandardBrowse.Visible := False;
                 PanelTagCloudBrowse.Visible := MedienBib.Count > 0;
                 PanelCoverBrowse.Visible := False;
@@ -982,6 +994,17 @@ begin
         if assigned(PlaylistEditorForm) then ReTranslateComponent(PlaylistEditorForm);
         if assigned(NewFavoritePlaylistForm) then ReTranslateComponent(NewFavoritePlaylistForm);
 
+        if assigned(FormLibraryConfiguration) then begin
+            BackUpComboBoxes(FormLibraryConfiguration);
+            ReTranslateComponent(FormLibraryConfiguration);
+            RestoreComboboxes(FormLibraryConfiguration);
+        end;
+        if assigned(FormNewLayer) then begin
+            BackUpComboBoxes(FormNewLayer);
+            ReTranslateComponent(FormNewLayer);
+            RestoreComboboxes(FormNewLayer);
+        end;
+
          // Todo:
         // - Alle Comboboxen auf ihren alten Itemindex zurücksetzen (also die, die schon zu Beginn gefüllt sind)
         // - Einige Comboboxen ggf. neu füllen ("Alte suchergebnisse")
@@ -992,6 +1015,8 @@ begin
 
         // Categories
         ArtistsVST.Header.Columns[0].Text := TreeHeader_Categories;
+        ArtistsVST.Invalidate; // to translate Captions of Playlist- and Webradio-Category
+        AlbenVST.Invalidate; // Translate RootColelction-Captions
         // Collections
         RefreshCollectionTreeHeader(MedienBib.CurrentCategory);
 
@@ -1001,8 +1026,8 @@ begin
         if Medienbib.BrowseMode = 1 then
             CoverScrollbarChange(Nil); // trigger redraw of label
 
-        if Medienbib.BrowseMode = 2 then
-            MedienBib.TagCloud.CloudPainter.Paint(MedienBib.TagCloud.CurrentTagList);
+        //if Medienbib.BrowseMode = 2 then
+        //    MedienBib.TagCloud.Paint(MedienBib.TagCloud.CurrentTagList);
 
     end;
 end;
@@ -1374,8 +1399,8 @@ begin
         CorrectVCLAfterAudioFileEdit(aAudioFile);
         // Update the TagCloud
         BibFile := MedienBib.GetAudioFileWithFilename(aAudioFile.Pfad);
-        if assigned(BibFile) then
-            MedienBib.TagCloud.UpdateAudioFile(BibFile);
+        //if assigned(BibFile) then
+        //    MedienBib.TagCloud.UpdateAudioFile(BibFile);
     end else
     begin
         aAudioFile.RawTagLastFM := backupTag;
@@ -1927,10 +1952,26 @@ begin
   end;
 end;
 
-procedure CollectionDblClick(ac: TAudioCollection);
+procedure CollectionDblClick(ac: TAudioCollection; Node: PVirtualNode);
 begin
   case ac.CollectionClass of
-    ccFiles: MedienBib.GenerateReverseAnzeigeListe(ac);
+    ccFiles: begin
+        if (TAudioFileCollection(ac).CollectionType = ctRoot) and (TAudioFileCollection(ac).SubCollectionType = ctTagCloud) then
+        begin
+          TRootCollection(ac).ResetTagCloud;
+          Nemp_MainForm.FillCollectionTree(Nil, True);
+        end else
+        begin
+          if TAudioFileCollection(ac).CollectionType = ctTagCloud then begin
+            Nemp_MainForm.AlbenVST.DeleteChildren(Node);
+            TAudioFileCollection(ac).ExpandTagCloud;
+            Nemp_MainForm.AddCollection(ac, Node);
+          end
+          else
+            MedienBib.GenerateReverseAnzeigeListe(ac);
+        end;
+
+    end;
     ccPlaylists: MedienBib.GenerateAnzeigeListe(ac);
     ccWebStations: TAudioWebradioCollection(ac).Station.TuneIn(NempPlaylist.BassHandlePlaylist);
   end;

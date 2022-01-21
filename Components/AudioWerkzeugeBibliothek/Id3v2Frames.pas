@@ -1136,6 +1136,9 @@ begin
                     setlength(result, alength DIV 2);
                     move(fData[start], result[1], 2*length(result));
                 end;
+            // some Files seem to have a "double BOM" for whatever reasons
+            // This BOM is nowhere displayed, but it will result in "two strings that look the same are actually different"
+            if (result <> '') and ((result[1] = #$FEFF) or (result[1] = #$FFFE)) then delete(result, 1, 1);
             result := trim(result);
         end;
         TE_UTF16BE: begin

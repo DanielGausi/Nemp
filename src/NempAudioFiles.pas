@@ -52,6 +52,8 @@ type
     TTagType = ( TT_ID3v2, TT_OggVorbis, TT_Flac, TT_Ape, TT_M4A);
 
 const
+    MIN_CUESHEET_DURATION = 600; // no automatic scanning for cue sheets for short tracks
+
     TagTypeDescriptions: Array[TTagType] of string =
       ( 'ID3v2',
         'OggVorbis',
@@ -216,6 +218,7 @@ type
 
  type
     TAudioType = (at_Undef, at_File, at_Stream, at_CDDA, at_CUE);
+    TNempFileType = (nftSupported, nftCDDA, nftPlaylist, nftCUE, nftUnknown);
 
     TAudioFile = class;
     TAudioFileList = class(TObjectList<TAudioFile>);
@@ -314,21 +317,21 @@ type
 
         // key1, key2: Used for the Browse-Lists
         // These values must be set when building the "AllArtist-Lists" and so on
-        fKey1: UnicodeString;
-        fKey2: UnicodeString;
+        //fKey1: UnicodeString;
+        //fKey2: UnicodeString;
 
         // List of all Tags for this Audiofile
         // This List is managed in class TTagCloud
-        fTagList: TObjectList;
+        //fTagList: TObjectList;
 
         // new Nemp 4.15: Index of the category in the Library
-        fCategoryIndex: Integer;
+        // fCategoryIndex: Integer;
 
         // Some Flags marking the File (for example: matches the current search key words whil searching in the Playlist)
         // Use constants FLAG_***
         fFlags: Cardinal;
 
-        function fGetTagList: TObjectList;
+        //function fGetTagList: TObjectList;
 
         // Checks whether lyrics exist or not
         function fGetLyricsExisting: Boolean;
@@ -467,12 +470,12 @@ type
         property Pfad: UnicodeString read GetPath write SetPath;
         // property FilenameForUSBCopy: UnicodeString read fGetProperFilename;
 
-        property CategoryIndex: Integer read fCategoryIndex write fCategoryIndex;
+        //property CategoryIndex: Integer read fCategoryIndex write fCategoryIndex;
 
-        property Key1: UnicodeString read fKey1 write fKey1;
-        property Key2: UnicodeString read fKey2 write fKey2;
+        //property Key1: UnicodeString read fKey1 write fKey1;
+        //property Key2: UnicodeString read fKey2 write fKey2;
 
-        property Taglist: TObjectList read fgetTagList;
+        //property Taglist: TObjectList read fgetTagList;
         // property NonEmptyTitle: UnicodeString read fGetNonEmptyTitle;
 
         property AudioType: TAudioType read fAudioType write fAudioType;
@@ -573,6 +576,8 @@ type
         function ContainsTag(aTag: String): Boolean;
         function RemoveTag(aTag: String): Boolean;
 
+        procedure GetAllTags(AutoTags, LastFMTags: TStringList);
+
         //function RenameTag(oldTag, newTag: String): Boolean;
         procedure SetFlag(aFlag: Integer);
         procedure UnSetFlag(aFlag: Integer);
@@ -583,6 +588,7 @@ type
 
         function IsCategory(aCatIdx: Byte): Boolean;
         procedure AddToCategory(aCatIdx: Byte);
+        procedure SetExclusiveCategory(aCatIdx: Byte);
         procedure RemoveFromCategory(aCatIdx: Byte);
 
 
@@ -909,6 +915,7 @@ begin
     TrackPeak := 1;
     AlbumPeak := 1;
     fParent := Nil;
+    fCategory := 0;
 end;
 destructor TAudioFile.Destroy;
 begin
@@ -918,8 +925,8 @@ begin
       CueList.Clear;
       CueList.Free;
   end;
-  if assigned(fTagList) then
-      fTagList.Free;
+  //if assigned(fTagList) then
+  //    fTagList.Free;
 
   inherited destroy;
 end;
@@ -1159,6 +1166,10 @@ procedure TAudioFile.AddToCategory(aCatIdx: Byte);
 begin
   fCategory := fCategory or (1 shl aCatIdx);
 end;
+procedure TAudioFile.SetExclusiveCategory(aCatIdx: Byte);
+begin
+  fCategory := (1 shl aCatIdx);
+end;
 
 procedure TAudioFile.RemoveFromCategory(aCatIdx: Byte);
 begin
@@ -1257,12 +1268,12 @@ begin
 end;
 *)
 
-function TAudioFile.fGetTagList: TObjectList;
+(*function TAudioFile.fGetTagList: TObjectList;
 begin
     if not Assigned(fTagList) then
         fTagList := TObjectList.Create(False);
     result := fTagList;
-end;
+end;*)
 
 {
     --------------------------------------------------------
@@ -2182,6 +2193,40 @@ begin
     finally
         currenttagList.Free;
     end;
+end;
+
+procedure TAudioFile.GetAllTags(AutoTags, LastFMTags: TStringList);
+var
+  i, tmpInt, decade: Integer;
+  tmpTags: TStringList;
+begin
+  if Not UnKownInformation(Artist) then
+    AutoTags.Add(AnsiLowerCase(Artist));
+  if not UnKownInformation(Album) then
+    AutoTags.Add(AnsiLowerCase(Album));
+  if (Year <> '0') and (trim(Year) <> '')  then
+  begin
+    AutoTags.Add(Year);
+    tmpInt := StrToIntDef(Year, -1);
+    if (tmpInt <> -1) and (tmpInt < 10000) then
+    begin
+      decade := tmpInt div 10;
+      AutoTags.Add(IntToStr(decade) + '0s'); // e.g. 1980s, 1990s, 2010s
+    end;
+  end;
+  if Genre <> '' then
+    AutoTags.Add(AnsiLowerCase(Genre));
+
+  // Add Tags from LastFM
+  tmpTags := TStringList.Create;
+  try
+    tmpTags.Text := AnsiLowerCase(String(RawTagLastFM));
+    for i := 0 to tmpTags.Count - 1 do
+      if trim(tmpTags[i]) <> '' then
+        LastFMTags.Add(trim(tmpTags[i]));
+  finally
+    tmpTags.Free;
+  end;
 end;
 
 

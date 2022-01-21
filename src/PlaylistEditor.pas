@@ -39,7 +39,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, VirtualTrees, Vcl.StdCtrls, Generics.Collections,
   WinApi.ShellApi, WinApi.ActiveX, MyDialogs,
   NempAudioFiles, PlayerClass, PlaylistClass, PlaylistManagement, AudioFileHelper, DriveRepairTools,
-  uDragFilesSrc, Vcl.Menus, VCL.Clipbrd;
+  uDragFilesSrc, Vcl.Menus, VCL.Clipbrd, NempDragFiles;
 
 type
   TPlaylistEditorForm = class(TForm)
@@ -50,8 +50,6 @@ type
     BtnRemove: TButton;
     PnlPlaylistFiles: TPanel;
     PlaylistFilesVST: TVirtualStringTree;
-    DragFilesSrc1: TDragFilesSrc;
-    DragDropTimer: TTimer;
     BtnSave: TButton;
     BtnImport: TButton;
     PlayListOpenDialog: TOpenDialog;
@@ -87,8 +85,6 @@ type
       Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
     procedure PlaylistFilesVSTStartDrag(Sender: TObject;
       var DragObject: TDragObject);
-    procedure DragFilesSrc1Dropping(Sender: TObject);
-    procedure DragDropTimerTimer(Sender: TObject);
     procedure PlaylistFilesVSTEndDrag(Sender, Target: TObject; X, Y: Integer);
     procedure PM_PL_ImportClick(Sender: TObject);
     procedure PM_PL_ShowinExplorerClick(Sender: TObject);
@@ -127,6 +123,12 @@ type
       Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
     procedure PlaylistSelectionVSTStartDrag(Sender: TObject;
       var DragObject: TDragObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure PlaylistFilesVSTGetUserClipboardFormats(Sender: TBaseVirtualTree;
+      var Formats: TFormatEtcArray);
+    procedure PlaylistFilesVSTRenderOLEData(Sender: TBaseVirtualTree;
+      const FormatEtcIn: tagFORMATETC; out Medium: tagSTGMEDIUM;
+      ForClipboard: Boolean; var Result: HRESULT);
   private
     { Private declarations }
     currentQuickPlaylist: TQuickLoadPlaylist;
@@ -135,9 +137,8 @@ type
     MostRecentInsertNodeForPlaylist: PVirtualNode;
 
     procedure FillPlaylistTree;
-    Procedure WMDropFiles (Var aMsg: tMessage);  message WM_DROPFILES;
-    procedure LBWindowProc(var Message: TMessage);
-
+    function Handle_DropFilesForEditorPlaylist(FileList: TStringList;
+      TargetNode: PVirtualNode; Mode: TDropMode): Boolean;
     procedure InsertFile(aFileName: String; var InsertIndex: Integer);
     procedure RefreshPlaylistHeader;
 
@@ -153,7 +154,7 @@ type
 
 var
   PlaylistEditorForm: TPlaylistEditorForm;
-  OldLBWindowProc: TWndMethod;
+  // OldLBWindowProc: TWndMethod;
 
 implementation
 
@@ -179,13 +180,7 @@ begin
     currentQuickPlaylist := Nil;
     currentPlaylistChanged := False;
 
-    // Allow Drop of Files only in the PlaylistVST
-    // Modify the WindowProc Method of the PlaylistFilesVST
-    // https://www.swissdelphicenter.ch/de/showcode.php?id=493
-    OldLBWindowProc := PlaylistFilesVST.WindowProc;
-    PlaylistFilesVST.WindowProc := LBWindowProc;
-    DragAcceptFiles(PlaylistFilesVST.Handle, True);
-
+    RegisterDragDrop(PlaylistFilesVST.Handle, Nemp_MainForm.fDropManager as IDropTarget);
     TranslateComponent (self);
 end;
 
@@ -195,17 +190,9 @@ begin
     LocalPlaylistManager.Free;
     DriveManager.Free;
 
-    PlaylistFilesVST.WindowProc := OldLBWindowProc;
-    DragAcceptFiles(PlaylistFilesVST.Handle, False);
+    RevokeDragDrop(PlaylistFilesVST.Handle);
 end;
 
-procedure TPlaylistEditorForm.LBWindowProc(var Message: TMessage);
-begin
-  if Message.Msg = WM_DROPFILES then
-      WMDROPFILES(Message); // handle WM_DROPFILES message
-  OldLBWindowProc(Message);
-  // call default ListBox1 WindowProc method to handle all other messages
-end;
 
 ///  FormShow
 ///  Fill the Treeview with the list of Managed Playlists
@@ -242,6 +229,18 @@ end;
 
 ///  OnCloseQuery:
 ///  * Check for Changes in the current playlist
+procedure TPlaylistEditorForm.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+    MedienBib.ImportFavoritePlaylists(NempPlaylist.PlaylistManager);
+    Nemp_MainForm.ArtistsVST.Invalidate;
+
+    if MedienBib.CurrentCategory = MedienBib.FavoritePlaylistCategory then
+      Nemp_MainForm.FillCollectionTree(MedienBib.FavoritePlaylistCategory, True);
+
+    //Nemp_MainForm.ReFillBrowseTrees(True);
+end;
+
 procedure TPlaylistEditorForm.FormCloseQuery(Sender: TObject;
   var CanClose: Boolean);
 begin
@@ -346,6 +345,7 @@ begin
     if NOT AudioFile.FileIsPresent then
         TargetCanvas.Font.Style := TargetCanvas.Font.Style + [fsStrikeOut]
 end;
+
 ///  * GetText for the Selection Treeview
 procedure TPlaylistEditorForm.PlaylistSelectionVSTGetText(
   Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
@@ -461,95 +461,6 @@ end;
 
 
 
-
-///  Editing a single Playlist
-///  HandleDropFiles (from within Nemp or from the Explorer)
-///  Note: limited features here:
-///        * no support for dropped directories
-///        * no Cue-Sheets
-procedure TPlaylistEditorForm.WMDropFiles(var aMsg: tMessage);
-Var Idx, Size, FileCount, NodeTop, InsertIndex: Integer;
-    Filename: PChar;
-    p: TPoint;
-    aNode : PVirtualNode;
-    extension: String;
-begin
-    p := PlayListFilesVST.ScreenToClient(Mouse.CursorPos);
-    aNode := PlayListFilesVST.GetNodeAt(p.x, p.y, True,  NodeTop);
-    if not assigned(aNode) then
-        InsertIndex := -1
-    else
-    begin
-        // DropTarget is an actual AudioFile
-        // Determine whether we want to insert new files before or after the DropNode
-        if p.y - NodeTop < (PlayListFilesVST.NodeHeight[aNode] Div 2) then
-            InsertIndex := aNode.Index
-        else
-            InsertIndex := aNode.Index + 1;
-        if InsertIndex >= self.EditorPlaylist.Count then
-            InsertIndex := -1;
-    end;
-
-    MostRecentInsertNodeForPlaylist := Nil;
-    if (Nemp_MainForm.DragSource = DS_EXTERN) then
-    begin
-        FileCount := DragQueryFile (aMsg.WParam, $FFFFFFFF, nil, 255);
-        for Idx := 0 To FileCount - 1 do
-        begin
-            Size := DragQueryFile (aMsg.WParam, Idx, nil, 0) + 2;
-            Filename := StrAlloc(Size);
-            DragQueryFile(aMsg.WParam, Idx, Filename, Size);
-
-            if (FileGetAttr(UnicodeString(Filename)) AND faDirectory = 0) then
-            begin
-                extension := AnsiLowerCase(ExtractFileExt(filename));
-                if NempPlayer.ValidExtensions.IndexOf(extension) > -1 then
-                    InsertFile(Filename, InsertIndex)
-                else
-                if    ((extension = '.m3u')
-                    or (extension = '.m3u8')
-                    OR (extension = '.pls')
-                    OR (extension = '.npl')
-                    OR (extension = '.asx')
-                    OR (extension = '.wax'))
-                    AND (FileCount = 1)
-                then
-                begin
-                    LoadPlaylistFromFile(filename, EditorPlaylist, True, DriveManager);
-                    FillPlaylistTree;
-                    currentPlaylistChanged := True;
-                end;
-            end;
-            StrDispose(Filename);
-        end;
-    end
-    else
-    begin
-        for idx := 0 to Nemp_MainForm.DragDropList.Count - 1 do
-            InsertFile(Nemp_MainForm.DragDropList[idx], InsertIndex);
-    end;
-    // Clear Drag&Drop stuff
-    Nemp_MainForm.DragDropList.Clear;
-    DragFinish(aMsg.WParam);
-    Nemp_MainForm.DragSource := DS_EXTERN;
-    RefreshPlaylistHeader;
-    PlaylistFilesVST.Invalidate;
-end;
-
-procedure TPlaylistEditorForm.DragFilesSrc1Dropping(Sender: TObject);
-begin
-    // Note: it ssems, that this event is NEVER triggered any more ...
-    // (maybe a conflict with VST Drag&Drop stuff?)
-    DragDropTimer.Enabled := True;
-end;
-procedure TPlaylistEditorForm.DragDropTimerTimer(Sender: TObject);
-begin
-    DragDropTimer.Enabled := False;
-    Nemp_MainForm.DragSource := DS_EXTERN;
-    Nemp_MainForm.DragDropList.Clear;
-end;
-
-
 ///  Drag&Drop inside the VST
 procedure TPlaylistEditorForm.PlaylistFilesVSTDragAllowed(
   Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
@@ -560,29 +471,144 @@ end;
 
 procedure TPlaylistEditorForm.PlaylistFilesVSTStartDrag(Sender: TObject;
   var DragObject: TDragObject);
-var State: TKeyboardState;
 begin
-    Nemp_MainForm.DragSource := DS_INTERN;
+  InitiateDragDrop(PlaylistFilesVST, Nemp_MainForm.fDropManager, False);
+end;
 
+procedure TPlaylistEditorForm.PlaylistFilesVSTGetUserClipboardFormats(
+  Sender: TBaseVirtualTree; var Formats: TFormatEtcArray);
+var
+  i: Integer;
+  State: TKeyboardState;
+begin
     GetKeyboardState(State);
-    if (State[VK_CONTROL] and 128) <> 0 then
-        InitiateDragDrop(PlaylistFilesVST, Nemp_MainForm.DragDropList, DragFilesSrc1, 2500);
+    if ((State[VK_CONTROL] and 128) = 0)
+      and ((State[VK_RButton] and 128) = 0)
+    then
+      (Sender as TVirtualStringTree).DragOperations := [doCopy, doMove]
+    else
+    begin
+      (Sender as TVirtualStringTree).DragOperations := [doCopy];
+      i := Length(Formats);
+      SetLength(Formats, i + 1);
+      Formats[i].cfFormat := CF_HDROP;
+      Formats[i].ptd := nil;
+      Formats[i].dwAspect := DVASPECT_CONTENT;
+      Formats[i].lindex := -1;
+      Formats[i].tymed := TYMED_HGLOBAL;
+    end;
+end;
+
+procedure TPlaylistEditorForm.PlaylistFilesVSTRenderOLEData(
+  Sender: TBaseVirtualTree; const FormatEtcIn: tagFORMATETC;
+  out Medium: tagSTGMEDIUM; ForClipboard: Boolean; var Result: HRESULT);
+begin
+  if FormatEtcIn.cfFormat = CF_HDROP then begin
+    result := OLERenderFilenames(Nemp_MainForm.fDropManager.Files, Medium);
+  end;
 end;
 
 procedure TPlaylistEditorForm.PlaylistFilesVSTDragOver(Sender: TBaseVirtualTree;
   Source: TObject; Shift: TShiftState; State: TDragState; Pt: TPoint;
   Mode: TDropMode; var Effect: Integer; var Accept: Boolean);
+var
+  szMessage: String;
+
+  procedure SetFeedBackParams(vEffect: Integer; vAccept: Boolean; vHint: String);
+  begin
+    Effect := vEffect;
+    Accept := vAccept;
+    szMessage := vhint;
+  end;
+
 begin
-    if Source <> PlaylistFilesVST then
-        exit;
-    Effect := DROPEFFECT_MOVE;
-    accept := True;
+  if State = dsDragLeave then begin
+    SetDragHint(Sender.DragManager.DataObject, '', '', Effect);
+    Accept := True;
+    exit;
+  end;
+
+  if Source = PlaylistSelectionVST then begin
+    accept := False;
+    exit;
+  end;
+
+  if Nemp_MainForm.fDropManager.DragSource = PlaylistFilesVST then begin
+    // Drag&Drop within the Playlist
+    // The Effect will be set automatically by the Treeview according to Keyboard-Modifiers
+    // But we have to set the DragHint again
+    case Effect of
+      DROPEFFECT_MOVE: szMessage := DragDropPlaylistMove;
+      DROPEFFECT_COPY: szMessage := DragDropPlaylistCopy;
+    else
+      szMessage := DragDropPlaylistMove; // this case shouldn't happen
+    end;
+    Accept := True;
+  end else
+  begin
+      // DragSource is NOT the Playlist, so we are expecting new Files for the Playlist
+      // Either from the Library or from external sources
+      if assigned(Nemp_MainForm.fDropManager.DragSource) then
+        // From internal sources: Always Accept  (except on cueNodes)
+        SetFeedBackParams(DROPEFFECT_COPY, TRUE {ValidNode}, DragDropPlaylistAdd)
+      else begin
+        // From external sources: Do accept only "Files", but not things like "Text"
+        // Note: Some other stuff like "E-Mails" dragged from Thunderbird are also considered as "Files"
+        if ObjContainsFiles(Sender.DragManager.DataObject) then
+          SetFeedBackParams(DROPEFFECT_COPY, True, DragDropPlaylistAdd)
+        else
+          // Definitely no Files - don't accept
+          SetFeedBackParams(DROPEFFECT_NONE, False, '')
+      end;
+  end;
+  // correct Efect/Hintstr if Accept is False
+  if not Accept then
+    SetFeedBackParams(DROPEFFECT_NONE, False, '');
+
+  SetDragHint(Sender.DragManager.DataObject, szMessage, '', Effect);
+
 end;
 
 procedure TPlaylistEditorForm.PlaylistFilesVSTEndDrag(Sender, Target: TObject;
   X, Y: Integer);
 begin
-    DragDropTimer.Enabled := True;
+  Nemp_MainForm.FDropManager.FinishDrag;
+end;
+
+function TPlaylistEditorForm.Handle_DropFilesForEditorPlaylist(FileList: TStringList;
+  TargetNode: PVirtualNode; Mode: TDropMode): Boolean;
+var
+  i, InsertIndex: Integer;
+  Filename: String;
+begin
+    result := True;
+    InsertIndex := -1;
+
+    if assigned(TargetNode)  then begin
+      case Mode of
+        dmNowhere: InsertIndex := -1;
+        dmAbove: InsertIndex := TargetNode.Index;
+        dmOnNode,
+        dmBelow: InsertIndex := TargetNode.Index + 1;
+      end;
+    end;
+
+    for i := 0 to FileList.Count - 1 do begin
+      Filename := FileList[i];
+      if (FileGetAttr(UnicodeString(Filename)) AND faDirectory = faDirectory) then
+        // nothing
+      else
+      begin
+        case Nemp_MainForm.NempFileType(Filename) of
+          nftPlaylist, nftCUE: ; // nothing
+          nftSupported, nftCDDA: InsertFile(FileName, InsertIndex);
+          nftUnknown: begin
+              if FileList.Count = 1 then
+                InsertFile(FileName, InsertIndex);
+          end;
+        end;
+      end;
+    end;
 end;
 
 procedure TPlaylistEditorForm.PlaylistFilesVSTDragDrop(Sender: TBaseVirtualTree;
@@ -592,59 +618,81 @@ var Attachmode: TVTNodeAttachMode;
     Nodes: TNodeArray;
     aNode: PVirtualNode;
     i: Integer;
+    FileList: TStringList;
 begin
-    // If we used Ctrl+Mouse during the start off the Drag&Drop operation, we
-    // have filled DragDropList with the dragged files.
-    // In that case: Do not *move* the nodes, but insert new copies of these files
-    // into the target location. This will be handled by WMDropFiles.
-    if (Nemp_MainForm.DragSource = DS_EXTERN) or (Nemp_MainForm.DragDropList.Count > 0) then
-        exit;
-
-    // Translate the drop position into an node attach mode.
-    case Mode of
-        dmAbove : AttachMode := amInsertBefore;
-        dmOnNode: AttachMode := amInsertAfter;
-        dmBelow : AttachMode := amInsertAfter;
-    else
-        AttachMode := amNowhere;
-    end;
-
-    // Get the selected Nodes
-    Nodes := PlaylistFilesVST.GetSortedSelection(True);
-
-    // move the selected Nodes to Target
-    if not assigned(PlaylistFilesVST.DropTargetNode) then
-    begin
-        // DropTarget is the empty space below the (small) Playlist
-        // => Move files to the end of the Playlist
-        aNode := PlaylistFilesVST.GetLastChild(Nil);
-        for i := High(Nodes) downto 0 do
-            PlaylistFilesVST.MoveTo(Nodes[i], aNode, amInsertAfter, False)
+    if NOT assigned(Nemp_MainForm.fDropManager.DragSource) then begin
+      // Drop from an external Source.
+      // Try to get Files from the OLEDrag-Object and insert it into the Playlist
+      FileList := TStringList.Create;
+      try
+        if ObjContainsFiles(Nemp_MainForm.fDropManager.DataObject) then begin
+          GetFileListFromObj(DataObject, FileList);
+          Handle_DropFilesForEditorPlaylist(FileList, PlaylistFilesVST.DropTargetNode, Mode);
+        end;
+      finally
+        FileList.Free;
+      end;
     end else
     begin
-        if AttachMode = amInsertBefore then
-            for i := 0 to High(Nodes) do
-                PlaylistFilesVST.MoveTo(Nodes[i], PlaylistFilesVST.DropTargetNode, AttachMode, False)
+      // Internal Drop.
+      // In DragOver we have decided whether we want MOVE or COPY the selected tracks
+      if Effect = DROPEFFECT_COPY then begin
+        // Use the Filenames stored in the DropManager
+        FileList := TStringList.Create;
+        try
+          for i := 0 to Nemp_MainForm.FDropManager.FileNameCount - 1 do
+            FileList.Add(Nemp_MainForm.FDropManager.FileNames[i]);
+          Handle_DropFilesForEditorPlaylist(FileList, PlaylistFilesVST.DropTargetNode, Mode);
+        finally
+          FileList.Free;
+        end;
+      end else
+      begin
+        // Just move the Nodes
+        Nodes := PlaylistFilesVST.GetSortedSelection(True);
+        // Translate the drop position into an node attach mode.
+        case Mode of
+          dmAbove : AttachMode := amInsertBefore;
+          dmOnNode: AttachMode := amInsertAfter;
+          dmBelow : AttachMode := amInsertAfter;
         else
-            for i := High(Nodes) downto 0 do
-                PlaylistFilesVST.MoveTo(Nodes[i], PlaylistFilesVST.DropTargetNode, AttachMode, False);
-    end;
+          AttachMode := amNowhere;
+        end;
 
-    // put the current sorting of AudioFiles in the EditorPlaylist again
-    EditorPlaylist.OwnsObjects := False;
-    EditorPlaylist.Clear;
-    EditorPlaylist.OwnsObjects := True;
-    aNode := PlaylistFilesVST.GetFirst;
-    while assigned(aNode)  do
-    begin
+        // move the selected Nodes to Target
+        if not assigned(PlaylistFilesVST.DropTargetNode) then
+        begin
+          // DropTarget is the empty space below the (small) Playlist
+          // => Move files to the end of the Playlist
+          aNode := PlaylistFilesVST.GetLastChild(Nil);
+          for i := High(Nodes) downto 0 do
+              PlaylistFilesVST.MoveTo(Nodes[i], aNode, amInsertAfter, False)
+        end else
+        begin
+          if AttachMode = amInsertBefore then
+            for i := 0 to High(Nodes) do
+              PlaylistFilesVST.MoveTo(Nodes[i], PlaylistFilesVST.DropTargetNode, AttachMode, False)
+          else
+            for i := High(Nodes) downto 0 do
+              PlaylistFilesVST.MoveTo(Nodes[i], PlaylistFilesVST.DropTargetNode, AttachMode, False);
+        end;
+      end;
+      // put the current sorting of AudioFiles in the EditorPlaylist again
+      EditorPlaylist.OwnsObjects := False;
+      EditorPlaylist.Clear;
+      EditorPlaylist.OwnsObjects := True;
+      aNode := PlaylistFilesVST.GetFirst;
+      while assigned(aNode)  do
+      begin
         EditorPlaylist.Add(PlaylistFilesVST.GetNodeData<TAudioFile>(aNode));
         aNode := PlaylistFilesVST.GetNextSibling(aNode);
+      end;
     end;
-
     currentPlaylistChanged := True;
-    Nemp_MainForm.DragSource := DS_EXTERN;
+    Nemp_MainForm.fDropManager.FinishDrag;
     PlaylistFilesVST.Invalidate;
 end;
+
 
 ///  Drag&Drop Operations for Selection
 ///  DragAllowed
@@ -658,7 +706,7 @@ end;
 procedure TPlaylistEditorForm.PlaylistSelectionVSTStartDrag(Sender: TObject;
   var DragObject: TDragObject);
 begin
-    Nemp_MainForm.DragSource := DS_INTERN;
+
 end;
 ///  DragOver
 procedure TPlaylistEditorForm.PlaylistSelectionVSTDragOver(
@@ -727,14 +775,14 @@ begin
     // Change Menu Items in mainForm
     Nemp_MainForm.OnFavouritePlaylistsChange(Self);
 
-    Nemp_MainForm.DragSource := DS_EXTERN;
+    // Nemp_MainForm.DragSource := DS_EXTERN;
     PlaylistSelectionVST.Invalidate;
 end;
 ///  DragEnd
 procedure TPlaylistEditorForm.PlaylistSelectionVSTEndDrag(Sender,
   Target: TObject; X, Y: Integer);
 begin
-    DragDropTimer.Enabled := True;
+
 end;
 
 

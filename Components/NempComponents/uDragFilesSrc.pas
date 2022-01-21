@@ -71,11 +71,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  OLE2; //, TNTClasses, tntsysutils, TntWidestrUtils;
+  ActiveX,  SHLOBJ, OLE2, math; //, TNTClasses, tntsysutils, TntWidestrUtils;
 
 type
   TDragResult = (drInvalid, drCancelled, drDropped);
-  TDropEffect = (deCopy, deMove);
+  TDropEffect = (deCopy, deMove, deBoth);
 
   //From SHLOBJ unit
   PDropFiles = ^TDropFiles;
@@ -567,7 +567,7 @@ begin
 	 DataObject:=TMyDataObject.create(fFileList);
     DataObject.AddRef;
     try
-    	DropSource:=TMyDropSource.create(self);
+     DropSource:=TMyDropSource.create(self);
        DropSource.AddRef;
        //Note: DROPEFFECT_COPY =1, DROPEFFECT_MOVE =2
        //      hence the following is a crude typecast...

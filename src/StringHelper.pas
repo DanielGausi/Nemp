@@ -200,7 +200,7 @@ begin
   end
   else
   begin
-      result := '<N/A>'; // = AUDIOFILE_UNKOWN;
+      result := '';// '<N/A>'; // = AUDIOFILE_UNKOWN;
       Fehlstelle := 0;
   end;
 

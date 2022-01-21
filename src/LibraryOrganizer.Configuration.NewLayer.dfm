@@ -13,6 +13,7 @@ object FormNewLayer: TFormNewLayer
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -24,8 +25,6 @@ object FormNewLayer: TFormNewLayer
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitTop = 152
-    ExplicitWidth = 398
     DesignSize = (
       400
       41)
@@ -39,7 +38,6 @@ object FormNewLayer: TFormNewLayer
       Default = True
       ModalResult = 1
       TabOrder = 0
-      ExplicitLeft = 204
     end
     object BtnCancel: TButton
       Left = 305
@@ -51,7 +49,6 @@ object FormNewLayer: TFormNewLayer
       Caption = 'Cancel'
       ModalResult = 2
       TabOrder = 1
-      ExplicitLeft = 303
     end
   end
   object MainPanel: TPanel
@@ -62,8 +59,6 @@ object FormNewLayer: TFormNewLayer
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitWidth = 398
-    ExplicitHeight = 152
     DesignSize = (
       400
       129)
@@ -103,7 +98,6 @@ object FormNewLayer: TFormNewLayer
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
       OnChange = cbPropertiesChange
-      ExplicitWidth = 358
     end
     object cbSortings: TComboBox
       Left = 16
@@ -113,7 +107,6 @@ object FormNewLayer: TFormNewLayer
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 1
-      ExplicitWidth = 358
     end
   end
 end

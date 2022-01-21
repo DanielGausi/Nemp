@@ -34,7 +34,8 @@ unit Taghelper;
 interface
 
 uses windows, classes, SysUtils, Contnrs, Messages, IniFiles, strUtils, dialogs,
-  NempAudioFiles, System.Types, System.UITypes;
+  NempAudioFiles, System.Types, System.UITypes,
+  System.Generics.Collections, System.Generics.Defaults;
 
 // Flag constants for consistency-checking
 const
@@ -78,6 +79,9 @@ type
             property ReplaceKey : String read fReplaceKey;
             constructor Create(OriginalKey, ReplaceKey: String);
     end;
+
+    TIgnoreTagStringList = class(TObjectList<TIgnoreTagString>);
+    TTagMergeItemList = class(TObjectList<TTagMergeItem>);
 
 
     TTagPostProcessor = class

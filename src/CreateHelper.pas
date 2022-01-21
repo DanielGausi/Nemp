@@ -43,7 +43,7 @@ unit CreateHelper;
 interface
 
     uses Forms, Windows, Graphics, Classes, Menus, Controls, SysUtils, IniFiles, VirtualTrees, Messages,
-    dialogs, shellApi, ID3GenreList
+    dialogs, shellApi, ID3GenreList, ActiveX
     {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF};
 
 
@@ -526,6 +526,14 @@ begin
                     ProcessCommandline(paramstr(1), True, True);
             end;
         end;
+
+       { case
+    RegisterDragDrop(_ControlPanel.Handle, fDropManager as IDropTarget) of
+      DRAGDROP_E_INVALIDHWND : ShowMessage('invalid');
+      DRAGDROP_E_ALREADYREGISTERED : ShowMessage('already reg');
+      E_OUTOFMEMORY : ShowMessage('outofmem');
+       S_OK: ShowMessage('ok');
+    end;  }
 
     end;
 end;

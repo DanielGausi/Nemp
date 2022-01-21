@@ -20,6 +20,7 @@ type
     cbSortings: TComboBox;
     procedure FormShow(Sender: TObject);
     procedure cbPropertiesChange(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
     function GetCollectionType: teCollectionType;
@@ -51,7 +52,21 @@ resourcestring
 
 implementation
 
+uses gnugettext, Hilfsfunktionen;
+
 {$R *.dfm}
+
+procedure TFormNewLayer.FormCreate(Sender: TObject);
+begin
+  BackUpComboBoxes(self);
+  TranslateComponent (self);
+  RestoreComboboxes(self);
+end;
+
+procedure TFormNewLayer.FormShow(Sender: TObject);
+begin
+//
+end;
 
 procedure TFormNewLayer.cbPropertiesChange(Sender: TObject);
 begin
@@ -65,8 +80,10 @@ begin
 
   cbProperties.Items.AddObject(TreeHeader_Artists, TObject(ctArtist));
   cbProperties.Items.AddObject(TreeHeader_Albums, TObject(ctAlbum));
-  if IsRoot then
+  if IsRoot then begin
     cbProperties.Items.AddObject(TreeHeader_Directories, TObject(ctDirectory));
+    cbProperties.Items.AddObject('TagCloud', TObject(ctTagCloud));
+  end;
   cbProperties.Items.AddObject(TreeHeader_Genres, TObject(ctGenre));
   cbProperties.Items.AddObject(TreeHeader_Decades, TObject(ctDecade));
   cbProperties.Items.AddObject(TreeHeader_Years, TObject(ctYear));
@@ -138,10 +155,6 @@ begin
   end;
 end;
 
-procedure TFormNewLayer.FormShow(Sender: TObject);
-begin
-//
-end;
 
 function TFormNewLayer.GetCollectionType: teCollectionType;
 begin

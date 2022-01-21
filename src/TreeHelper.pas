@@ -33,7 +33,8 @@ unit TreeHelper;
 interface
 
 uses Windows, Graphics, SysUtils, VirtualTrees, Forms, Controls, NempAudioFiles, Types, StrUtils,
-  Contnrs, Classes, Jpeg, PNGImage, uDragFilesSrc, math,
+  Contnrs, Classes, Jpeg, PNGImage, {uDragFilesSrc,} NempDragFiles, math, WinApi.ActiveX, ShlObj, ComObj,
+  ShellApi,
   Id3v2Frames, dialogs, Hilfsfunktionen, LibraryOrganizer.Base, LibraryOrganizer.Files,
   Nemp_ConstantsAndTypes, CoverHelper, MedienbibliothekClass, BibHelper,
   gnuGettext, Nemp_RessourceStrings;
@@ -61,9 +62,73 @@ uses Windows, Graphics, SysUtils, VirtualTrees, Forms, Controls, NempAudioFiles,
   function GetNodeWithCueFile(aTree: TVirtualStringTree; aRootNode: PVirtualNode; aAudioFile: TAudioFile): PVirtualNode;
   function GetNodeWithIndex(aTree: TVirtualStringTree; aIndex: Cardinal; StartNode: PVirtualNode): PVirtualNode;
 
-  procedure InitiateDragDrop(aTree: TVirtualStringTree; aList: TStringList; DragDrop: TDragFilesSrc; maxFiles: Integer);
+  // function AutoDecideExternalDrag: Boolean;
+  //function LimitFileCount(actualCount, maxCount: Integer): Integer;
+  procedure PrepareDragImage(DragDrop: TNempDragManager; aFile: TAudioFile);
+  //procedure InitiateDragDrop(SourceTree: TVirtualStringTree; Dest: TStringList; DragDrop: TDragFilesSrc; maxFiles: Integer); overload;
+  // procedure InitiateDragDrop(Source, Dest: TAudioFileList; DragDrop: TDragFilesSrc; maxFiles: Integer); overload;
+
+  procedure InitiateDragDrop(SourceTree: TVirtualStringTree; DragDrop: TNempDragManager; DoExecute: Boolean); overload;
+  procedure InitiateDragDrop(Source: TAudioFileList; SourceControl: TControl; DragDrop: TNempDragManager; DoExecute: Boolean); overload;
+
+  function ValidPlaylistDropNode(Source: TVirtualStringTree; Node: PVirtualNode): Boolean;
 
   function InitiateFocussedPlay(aTree: TVirtualStringTree): Boolean;
+
+  // function ObjContainsFiles(const DataObj: IDataObject): Boolean;
+  // procedure GetFileListFromObj(const DataObj: IDataObject; FileList: TStringList);
+  // procedure SetDragHint(DataObject: IDataObject; const szMessage, szInsert: string; Effect: Integer);
+
+type
+
+  TNempDragOverEvent = procedure(Shift: TShiftState; State: TDragState;
+    Pt: TPoint; var Effect: Integer; var Accept: Boolean) of object;
+
+     (*
+  TNempDropManager = class(TInterfacedObject, IDropTarget)
+  private
+    FOwner: TComponent;                            // The tree which is responsible for drag management.
+    // FDragSource: TBaseVirtualTree;     // Reference to the source tree if the source was a VT, might be different than
+                                       // the owner tree.
+    // FIsDropTarget: Boolean;            // True if the owner is currently the drop target.
+    // FDataObject: IDataObject;          // A reference to the data object passed in by DragEnter (only used when the owner
+                                       // tree is the current drop target).
+    FDropTargetHelper: IDropTargetHelper; // Win2k > Drag image support
+    FFullDragging: BOOL;               // True, if full dragging is currently enabled in the system.
+
+    fValidSource: Boolean;
+    FDataObject: IDataObject;
+
+    fOnDragOver: TNempDragOverEvent;
+
+    function DoDragOver(KeyState: Integer; Pt: TPoint; State: TDragState; var Effect: LongInt): HResult;
+
+    // function GetDataObject: IDataObject; stdcall;
+    // function GetDragSource: TBaseVirtualTree; stdcall;
+    // function GetDropTargetHelperSupported: Boolean; stdcall;
+    // function GetIsDropTarget: Boolean; stdcall;
+  public
+    property OnDragOver: TNempDragOverEvent read fOnDragOver write fOnDragOver;
+    property DataObject: IDataObject read FDataObject;
+
+    constructor Create(AOwner: TComponent); virtual;
+    destructor Destroy; override;
+
+    function DragEnter(const DataObject: IDataObject; KeyState: Integer; Pt: TPoint;
+      var Effect: Longint): HResult; stdcall;
+    function DragLeave: HResult; stdcall;
+    function DragOver(KeyState: Integer; Pt: TPoint; var Effect: LongInt): HResult; stdcall;
+    function Drop(const DataObject: IDataObject; KeyState: Integer; Pt: TPoint; var Effect: Integer): HResult; stdcall;
+    // procedure ForceDragLeave; stdcall;
+    // function GiveFeedback(Effect: Integer): HResult; stdcall;
+    // function QueryContinueDrag(EscapePressed: BOOL; KeyState: Integer): HResult; stdcall;
+
+
+
+    //function _AddRef: Integer; stdcall;
+    //function _Release: Integer; stdcall;
+  end;
+  *)
 
 
 implementation
@@ -261,7 +326,7 @@ var
     // same method than in "GetNext" from the VirtualTrees.pas
     repeat
       // Is there a next sibling?
-      if assigned(aTree.GetNextSibling(result)) then begin
+      if {(result <> aTree.RootNode) and} assigned(aTree.GetNextSibling(result)) then begin
         result := aTree.GetNextSibling(result);
         break
       end
@@ -275,13 +340,16 @@ var
           break;
         end;
       end;
-    until False;
+    until False or (result = aTree.RootNode);
+
+    if (result = aNode) or (result = aTree.RootNode) then
+      result := Nil;
   end;
 
 begin
   currentNode := aTree.GetFirst;
 
-  while assigned(currentNode) do begin
+  while assigned(currentNode) and (currentNode <> aTree.RootNode) do begin
     ac := aTree.GetNodeData<TAudioCollection>(currentNode);
     if (ac is TRootCollection) then
       currentNode := aTree.GetNext(currentNode)
@@ -420,38 +488,163 @@ begin
 end;
 
 
-procedure InitiateDragDrop(aTree: TVirtualStringTree; aList: TStringList; DragDrop: TDragFilesSrc; maxFiles: Integer);
-var i, maxC: Integer;
-    SelectedMp3s: TNodeArray;
-    af: TAudioFile;
-    cueFile: String;
+procedure PrepareDragImage(DragDrop: TNempDragManager; aFile: TAudioFile);
+var
+  DragPicture: TPicture;
 begin
-    // Add files selected to DragFilesSrc1 list
-    DragDrop.ClearFiles;
-    aList.Clear;
-    SelectedMp3s := aTree.GetSortedSelection(False);
-    maxC := min(maxFiles, length(SelectedMp3s));
-    if length(SelectedMp3s) > maxFiles then
-        AddErrorLog(Format(Warning_TooManyFiles, [maxFiles]));
-
-    for i := 0 to maxC - 1 do
-    begin
-        //Data := aVST.GetNodeData(SelectedMP3s[i]);
-        af := aTree.GetNodeData<TAudioFile>(SelectedMp3s[i]);
-        DragDrop.AddFile(af.Pfad);
-        aList.Add(af.Pfad);
-        if (af.Duration > MIN_CUESHEET_DURATION) then
-        begin
-            cueFile := ChangeFileExt(af.Pfad, '.cue');
-            if FileExists(ChangeFileExt(af.Pfad, '.cue')) then
-                // We dont need internal dragging of cue-Files, so only Addfile
-                DragDrop.AddFile(cueFile);
-        end;
+  if assigned(aFile) then begin
+    DragPicture := TPicture.Create;
+    try
+      DragPicture.Bitmap.Width := 80;
+      DragPicture.Bitmap.Height := 80;
+      TCoverArtSearcher.GetCover_Fast(aFile, DragPicture);
+      DragDrop.SetDragGraphic(DragPicture)
+    finally
+      DragPicture.Free;
     end;
-    // This is the START of the drag (FROM) operation.
-    DragDrop.Execute;
+  end else
+    DragDrop.SetDragGraphic(Nil);
 end;
 
 
+(*function LimitFileCount(actualCount, maxCount: Integer): Integer;
+begin
+  result := min(maxCount, actualCount);
+  if actualCount > maxCount then
+    AddErrorLog(Format(Warning_TooManyFiles, [maxCount]));
+end; *)
+
+function AutoDecideExternalDrag: Boolean;
+var
+  State: TKeyboardState;
+begin
+  GetKeyboardState(State);
+  // Allow dragging to the explorer, when Ctrl is pressed or Right MouseButton
+  result := ((State[VK_CONTROL] and 128) <> 0)
+         or ((State[VK_RButton] and 128) <> 0);
+end;
+
+function ValidPlaylistDropNode(Source: TVirtualStringTree; Node: PVirtualNode): Boolean;
+begin
+  result := (assigned(Node) and (Source.GetNodeLevel(Node) = 0))
+              or (not assigned(Node));
+end;
+
+
+procedure InitiateDragDrop(SourceTree: TVirtualStringTree; DragDrop: TNempDragManager; DoExecute: Boolean);
+var
+  i, maxC: Integer;
+  SelectedMp3s: TNodeArray;
+  State: TKeyboardState;
+begin
+    DragDrop.InitDrag(SourceTree);
+
+    SelectedMp3s := SourceTree.GetSortedSelection(False);
+    // maxC := LimitFileCount(length(SelectedMp3s), maxFiles);
+    for i := 0 to length(SelectedMp3s) - 1 do //maxC - 1 do
+      DragDrop.AddFile(SourceTree.GetNodeData<TAudioFile>(SelectedMp3s[i]), True);
+
+    if DoExecute and (DragDrop.FileNameCount > 0) then
+    begin
+      //if maxFiles > 0 then begin
+      // DragDrop.MaxDropFiles := LimitFileCount(length(SelectedMp3s), maxFiles);
+
+      PrepareDragImage(DragDrop, SourceTree.GetNodeData<TAudioFile>(SelectedMp3s[0]));
+      DragDrop.Execute;
+    end;
+end;
+
+
+procedure InitiateDragDrop(Source: TAudioFileList; SourceControl: TControl; DragDrop: TNempDragManager; DoExecute: Boolean);
+var
+  i, maxC: Integer;
+  State: TKeyboardState;
+begin
+    DragDrop.InitDrag(SourceControl);
+    for i := 0 to Source.Count - 1 do // maxC - 1 do
+      DragDrop.AddFile(Source[i], True);
+
+    if DoExecute and (DragDrop.FileNameCount > 0) then
+    begin
+      //if maxFiles > 0 then begin
+      // DragDrop.MaxDropFiles := LimitFileCount(Source.Count, maxFiles);
+      //end;
+
+      PrepareDragImage(DragDrop, Source[0]);
+      DragDrop.Execute;
+    end;
+end;
+
+
+
+
+(*
+procedure SetDragHint(DataObject: IDataObject; const szMessage, szInsert: string; Effect: Integer);
+var
+  FormatEtc: TFormatEtc;
+  Medium: TStgMedium;
+  Data: Pointer;
+  Descr: DROPDESCRIPTION;
+  s: WideString;
+  maxL: Integer;
+begin
+  ZeroMemory(@Descr, SizeOf(DROPDESCRIPTION));
+  {Do not set Descr.&type to DROPIMAGE_INVALID - this value ignore any custom hint}
+  {use same image as dropeffect type}
+  Descr.&type := DROPIMAGE_LABEL;
+  case Effect of
+    DROPEFFECT_NONE:
+      Descr.&type := DROPIMAGE_NONE;
+    DROPEFFECT_COPY:
+      Descr.&type := DROPIMAGE_COPY;
+    DROPEFFECT_MOVE:
+      Descr.&type := DROPIMAGE_MOVE;
+    DROPEFFECT_LINK:
+      Descr.&type := DROPIMAGE_LINK;
+  end;
+  {format message for system}
+
+  maxL := min(Length(szMessage), MAX_PATH-1);
+  s := Copy(szMessage, 1, maxL);
+  Move(s[1], Descr.szMessage[0], maxL * SizeOf(WideChar));
+
+  maxL := min(Length(szInsert), MAX_PATH-1);
+  s := Copy(szInsert, 1, maxL);
+  Move(s[1], Descr.szInsert[0], maxL * SizeOf(WideChar));
+  {
+  if Length(szMessage) <= MAX_PATH then
+  begin
+    s := szMessage + '%1 dumdii';
+    Move(s[1], Descr.szMessage[0], Length(s) * SizeOf(WideChar));
+
+    s := 'wuppdi';
+    Move(s[1], Descr.szInsert[0], Length(s) * SizeOf(WideChar));
+    //Descr.szInsert := 'wuppdi';
+  end
+  else
+  begin
+    s := Copy(szMessage, 1, MAX_PATH - 2) + '%1';
+    Move(s[1], Descr.szMessage[0], Length(s) * SizeOf(WideChar));
+
+    s := Copy(szMessage, MAX_PATH - 1, MAX_PATH);
+    Move(s[1], Descr.szInsert[0], Length(s) * SizeOf(WideChar));
+  end;
+  }
+  {prepare structures to set DROPDESCRIPTION data}
+  FormatEtc.cfFormat := FDragDescriptionFormat; {registered clipboard format}
+  FormatEtc.ptd := nil;
+  FormatEtc.dwAspect := DVASPECT_CONTENT;
+  FormatEtc.lindex := -1;
+  FormatEtc.tymed := TYMED_HGLOBAL;
+
+  ZeroMemory(@Medium, SizeOf(TStgMedium));
+  Medium.tymed := TYMED_HGLOBAL;
+  Medium.HGlobal := GlobalAlloc(GHND or GMEM_SHARE, SizeOf(DROPDESCRIPTION));
+  Data := GlobalLock(Medium.HGlobal);
+  Move(Descr, Data^, SizeOf(DROPDESCRIPTION));
+  GlobalUnlock(Medium.HGlobal);
+
+  DataObject.SetData(FormatEtc, Medium, True);
+end; *)
 
 end.

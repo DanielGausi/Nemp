@@ -47,11 +47,13 @@ uses Windows, SysUtils, Classes, StrUtils, System.Contnrs, System.UITypes, IniFi
                                      // note: just the filename, not the full path
               fPlayIndex           : Integer  ;
               fPlayPositionInTrack : Integer  ;
+              function GetPath: String;
           public
               property Description: String read fDescription write fDescription ;
               property Filename   : String read fFileName   write fFileName   ;
               property PlayIndex           : Integer  read fPlayIndex           write fPlayIndex          ;
               property PlayPositionInTrack : Integer  read fPlayPositionInTrack write fPlayPositionInTrack;
+              property Path: String read getPath;
 
               procedure LoadSettings(aListIndex: Integer);
               procedure SaveSettings(aListIndex: Integer);
@@ -103,6 +105,7 @@ uses Windows, SysUtils, Classes, StrUtils, System.Contnrs, System.UITypes, IniFi
 
               property SavePath: String read fSavePathDefault write fSetSavePath;
               property UserSavePath: String read fSavePathUserDefined;
+              property DriveManager: TDrivemanager read fDriveManager;
               property QuickLoadPlaylists: TQuickLoadPlaylistCollection read fQuickLoadPlaylists;
               property Count: Integer read fGetCount;
               // CurrentIndex: The Index of the current Playlist in QuickLoadPlaylists
@@ -196,6 +199,11 @@ begin
     NempSettingsManager.WriteString('PlaylistManager', 'Filename'    + IntToStr(aListIndex), Filename    );
     NempSettingsManager.WriteInteger('PlaylistManager', 'PlayIndex' + IntToStr(aListIndex)          , PlayIndex           );
     NempSettingsManager.WriteInteger('PlaylistManager', 'PlayPositionInTrack' + IntToStr(aListIndex), PlayPositionInTrack );
+end;
+
+function TQuickLoadPlaylist.GetPath: String;
+begin
+  //
 end;
 
 

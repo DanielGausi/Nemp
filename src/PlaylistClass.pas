@@ -336,6 +336,7 @@ type
       function SuggestSaveLocation(out Directory: String; out Filename: String): Boolean;
       // load/save playlist
       procedure LoadFromFile(aFilename: UnicodeString);
+      procedure LoadCueSheet(filename: UnicodeString);
       procedure LoadManagedPlayList(aIndex: Integer);
 
       procedure SaveToFile(aFilename: UnicodeString; Silent: Boolean = True);
@@ -1548,6 +1549,34 @@ begin
     // Trigger events
     if assigned(self.fOnPropertiesChanged) then
         fOnPropertiesChanged(self);
+end;
+
+procedure TNempPlaylist.LoadCueSheet(filename: UnicodeString);
+var tmplist: TStringList;
+    i: Integer;
+    AudioFilename: UnicodeString;
+begin
+  if Not FileExists(filename) then
+    exit;
+  tmplist := TStringList.Create;
+  try
+      tmplist.LoadFromFile(filename);
+      for i:=0 to tmplist.Count - 1 do
+      begin
+          // nach einem "FILE"-Eintrag suchen
+          if (GetCueID(tmplist[i]) = CUE_ID_FILE) then
+          begin
+            // FILE-Eintrag gefunden.
+            AudioFilename := ExtractFilePath(filename) + GetFileNameFromCueString(tmplist[i]);
+            // Wenn diese Datei existiert, dann Audiofile createn und in die Playlist einfügen
+            // Sämtliches Einfügen wird in der Insert-Prozedur erledigt!
+            if FileExists(AudioFilename) then
+              AddFileToPlaylist(AudioFilename, filename);
+          end;
+      end;
+  finally
+      tmplist.Free;
+  end;
 end;
 
 procedure TNempPlaylist.LoadManagedPlayList(aIndex: Integer);

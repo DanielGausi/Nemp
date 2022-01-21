@@ -1401,8 +1401,13 @@ end;
 
 procedure TFDetails.Btn_TagCloudEditorClick(Sender: TObject);
 begin
+    {
+    Neu machen ....
+
     if MedienBib.BrowseMode <> 2 then
         MedienBib.ReBuildTagCloud;
+
+    }
 
     if not assigned(CloudEditorForm) then
         Application.CreateForm(TCloudEditorForm, CloudEditorForm);

@@ -287,6 +287,8 @@ end;
 
 procedure TNempCoverFlow.Clear;
 begin
+  fCoverCount := 0;
+
     case fMode of
       cm_Classic : ;// fClassicFlow.CoverList := NIL;  // nothing more to do (?)
       cm_OpenGL  : fFlyingCow.Clear;

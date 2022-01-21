@@ -33,15 +33,21 @@ unit TagClouds;
 
 interface
 
-uses windows, classes, SysUtils, Controls, Contnrs, NempAudioFiles, Math, stdCtrls,
-    ComCtrls, Graphics, Messages, NempPanel, IniFiles, dialogs, StrUtils, System.Types;
+uses windows, classes, Forms, SysUtils, Controls, Contnrs, NempAudioFiles, Math, stdCtrls,
+    ComCtrls, Graphics, Messages, NempPanel, IniFiles, dialogs, StrUtils, System.Types,
+    System.Generics.Collections, System.Generics.Defaults,
+    LibraryOrganizer.Base, LibraryOrganizer.Files, MainFormHelper;
 
 const
 
     BORDER_WIDTH = 4;
     BORDER_HEIGHT = 1;
 
-    BREADCRUMB_GAP = 5;
+    BREADCRUMB_VGAP = 4;
+    BREADCRUMB_HGAP = 4;
+
+    FONTSIZE_BREADCRUMB = 10;
+    FIRST_BREADCRUMB_MARGIN = 24;
 
 type
 
@@ -81,56 +87,72 @@ type
           procedure AlphaBlendCloud(TargetCanvas: TCanvas; Width, Height, Left, Top: Integer; Mode: TBlendMode);
   end;
 
-  TTagLine = class; // forward declaration
+  TTagLine = class;
+  TPaintTag = class;
+  TPaintTagList = class(TObjectList<TPaintTag>);
+  TTagLineList = class(TObjectList<TTagLine>);
 
   // a single Tag on a Paintbox
-  TPaintTag = class(TTag)
+  {
+    Gedanken:
+    Im alten Nemp wwaren die painttags "recht dauerhafte" Objekte.
+    Da wir hier jetzt Collections als Datenbasis haben (Root- und normale FileCollections),
+    können wir nicht sinnvoll davon ableiten.
+    Stattdessen sollten wir die "PaintObjekte" sehr dynmisch erstellen, und die DatenCollection im Create übergeben
+  }
+  TPaintTag = class (TObject)
       private
-          fLeft: Integer;    // left-position in a Tag-Line
-          fTop: Integer;
-          fWidth: Integer;
-          fHeight: Integer;
-          FontSize: Integer;
+        fLeft: Integer;    // left-position in a Tag-Line
+        fTop: Integer;
+        fWidth: Integer;
+        fHeight: Integer;
+        FontSize: Integer;
 
-          fHover: Boolean;
-          fFocussed: Boolean;
+        fHover: Boolean;
+        fFocussed: Boolean;
 
-          fLine: TTagLine;
+        fParentLine: TTagLine;
+        fIsBreadCrumb: Boolean;
+        fCollection: TAudioFileCollection;
 
-          procedure PaintNormal(aCanvas: TCanvas);
-          procedure PaintHover(aCanvas: TCanvas);
-          procedure PaintFocussed(aCanvas: TCanvas);
+        procedure PaintNormal(aCanvas: TCanvas);
+        procedure PaintHover(aCanvas: TCanvas);
+        procedure PaintFocussed(aCanvas: TCanvas);
+        procedure Erase(aCanvas: TCanvas; Blend:Boolean);
 
-          procedure Erase(aCanvas: TCanvas; Blend:Boolean);
+        function GetCaption: String;
+        function GetCount: Integer;
+      protected
+        property Caption: String read GetCaption;
+        property Count: Integer read GetCount;
 
 
       public
-          property Width: Integer read fWidth;
-          property Height: Integer read fheight;
+        property Width: Integer read fWidth;
+        property Height: Integer read fHeight;
+        // Tags in the Breadcrumb-Line are painted differently
+        property IsBreadCrumb: Boolean read fIsBreadCrumb write fIsBreadCrumb;
 
-          constructor Create(aKey: String; aTranslate: Boolean);
+        //constructor Create(aKey: String; aTranslate: Boolean); overload;
+        constructor Create(aCollection: TAudioFileCollection);
 
-          procedure MeasureOutput(aCanvas: TCanvas);
-          procedure Paint(aCanvas: TCanvas);
-
-
+        procedure MeasureOutput(aCanvas: TCanvas);
+        procedure SetPosition(x, y: Integer);
+        procedure Paint(aCanvas: TCanvas);
 
   end;
 
   // a Line of Tags in a Paintbox
   TTagLine = class
       private
-          fGap: Integer;   // the needed gap between two tags for justification (Blocksatz)
+          fGap: Integer;   // the needed gap between two tags for justification ("Blocksatz")
           fCanvasWidth: Integer;
-
           fWidth: Integer;
           fHeight: Integer;
-
           function fGetBreadCrumbline: Boolean;
 
       public
-          Tags: TObjectList;     // the Tags in this line
-
+          Tags: TPaintTagList;     // the Tags in this line
           Top: Integer;
           property Width: Integer read fWidth;      // the width (of all Tags together)
           property Height: Integer read fheight;    // the Height (of the biggest Tag)
@@ -138,6 +160,8 @@ type
 
           constructor Create(CanvasWidth: Integer);
           destructor Destroy; override;
+          procedure FreeContainedTags;
+          procedure Add(PaintTag: TPaintTag);
           procedure Paint(aCanvas: TCanvas);
   end;
 
@@ -145,66 +169,113 @@ type
       private
           fWidth: Integer;
           fHeight: Integer;
-
+          fTotalBreadCrumbHeight: Integer;
           lastFontChangeAt: Integer;
           currentFontSize: Integer;
-          visibleTags: TObjectList;
+          // visibleTags: TObjectList;  // wird nicht mehr benötigt ...
 
-          // used do determine the forced LineBreak between Breadcrumb-tags
-          // and "new" tags
-          fForcedBreakDone: Boolean;
+          fCurrentCollection: TAudioFileCollection;
+          fBreadCrumbLines: TTagLineList;
+          fTagLines: TTagLineList;
+          fPaintBreadCrumbs: TPaintTagList;
+          fPaintTags: TPaintTagList;
+
+
+          fMouseOverTag: TPaintTag;
+          fFocussedTag: TPaintTag;
+          fLastKeypressTick: Int64;           // TickCount when the last keypress occured
+          fSearchString: String;
+
+          procedure SetMouseOverTag(Value: TPaintTag);
+          procedure SetFocussedTag(Value: TPaintTag);
+
+          function GetFocussedCollection: TAudioFileCollection;
+          procedure SetFocussedCollection(Value: TAudioFileCollection);
+
 
           function GetProperFontSize(aTag: TPaintTag):Integer;
+          // function GetMaxCount(Source: TObjectList): Integer;
+          // function ForceLineBreak(currentTag: TPaintTag): Boolean;
 
-          function GetMaxCount(Source: TObjectList): Integer;
-
-          function ForceLineBreak(currentTag: TPaintTag): Boolean;
+          procedure PreparePaintBreadCrumbs;
           // first Stage: Choose as many tags as possible from
           // the Count-Sorted Source
           // Line-Object not needed
-          procedure RawPaint1(Source: TObjectList);
-
+          procedure RawPaint1(SearchTerm: String);
           // second Stage: Paint tags String-Sorted
           // use source for additional tags, if new painting requires less space
           // create Line-Objects
-          procedure RawPaint2(Source: TObjectList);
-
+          procedure RawPaint2(SearchTerm: String);
           procedure DoPaint;
+
+          function GetOverLap(TagA, TagB: TPaintTag): Integer;
+          function GetDefaultTag: TPainttag;
+          function GetPreviousLine(aLine: TTagLine): TTagline;
+          function GetNextLine(aLine: TTagLine): TTagline;
+
+          function GetLeftTag: TPaintTag;
+          function GetRightTag: TPaintTag;
+          function GetOverlapTag(Source: TPaintTag; Dest: TTagLine): TPaintTag;
+          function GetUpTag: TPaintTag;
+          function GetDownTag: TPaintTag;
+
+          function GetFirstTag: TPaintTag;
+          function GetLastTag: TPaintTag;
+          function GetFirstTagOfLine: TPaintTag;
+          function GetLastTagOfLine: TPaintTag;
+
+          function GetTopTag: TPaintTag;
+          function GetBottomTag: TPaintTag;
+
+          function GetNextMatchingTag(aKey: Word; f3pressed: Boolean): TPaintTag;
+          function GetNextMatchingTagInLine(aLine: TTagLine; Offset: Integer): TPaintTag;
 
           procedure SetHeight(Value: Integer);
           procedure SetWidth(Value: Integer);
-
       public
-          TagLines: TObjectList;
-          Tags: TObjectList;
-
-          maxCount: Integer;
-
+          // TagLines: TObjectList;
+          // Tags: TObjectList;
+          //maxCount: Integer;
 
           Canvas: TCanvas;
           property Width: Integer read fWidth write SetWidth;
           property Height: Integer read fHeight write SetHeight;
 
+          property MouseOverTag: TPaintTag read fMouseOverTag write SetMouseOverTag;
+          property FocussedTag: TPaintTag read fFocussedTag write SetFocussedTag;
+          property FocussedCollection: TAudioFileCollection read GetFocussedCollection write SetFocussedCollection;
+
           constructor Create;
           destructor Destroy; override;
+          procedure Clear;
 
+          procedure SetCollection(Collection: TAudioFileCollection);
 
-          procedure Paint(Source: TObjectList);
+          // Paint the TagCloud.
+          // Optional Parameter: Do not Paint "all of the Collection"
+          // (but, maybe todo: a part of the Collections which matches a search term)
+          procedure Paint(SearchTerm: String = '');
+
+          //procedure Paint(Source: TObjectList);
 
           procedure PaintAgain;
-
           procedure RePaintTag(aTag: TPaintTag; Active: Boolean);
 
           // Determine, whether a given Tag is visible tight now
           function IsVisible(aTag: TPaintTag): Boolean;
 
+          // Navigate through the Cloud
+          procedure NavigateCloud(aKey: Word; Shift: TShiftState);
+
+
           function GetTagAtMousePos(x,y: Integer): TPaintTag;
 
           function GetFirstNewTag: TPaintTag;
+          function GetFirstNewCollection: TAudioFileCollection;
 
   end;
 
-
+  (*
   TTagCloud = class
       private
           // the main list with all Tags in the Cloud.
@@ -223,63 +294,26 @@ type
           fInitialising: Boolean;
           fBreadCrumbDepth: Integer;
 
-          fMouseOverTag: TPaintTag;
-          fFocussedTag: TPaintTag;
-
-          fLastKeypressTick: Int64;           // TickCount when the last keypress occured
-          fSearchString: String;
-
-          procedure SetMouseOverTag(Value: TPaintTag);
-          procedure SetFocussedTag(Value: TPaintTag);
 
           procedure ClearBreadCrumbs(Above: Integer);
-
           // Get a TTag-Object with a matching key
           function GetTag(aKey: String): TTag;
-
           function fGetTagList: TObjectList;
-
-          procedure InitHashMap;
 
           // Insert all Tags from the AudioFile into the Taglist
           procedure AddAudioFileTags(aAudioFile: TAudioFile);
-
           // Generate a TagList from RawTag-Strings of the Audiofile.
           procedure AddAudioFileRAWTags(aAudioFile: TAudioFile; InsertInBreadcrumbs: Boolean=False);
-
           // Set Default-RawTags (like genre, artist, year)
           procedure GenerateAutoRawTags(aAudioFile: TAudioFile; Dest: TStringList);
-
           //
           procedure SetActivetags;
-
-          function GetOverLap(TagA, TagB: TPaintTag): Integer;
-
-          function GetDefaultTag: TPainttag;
-
-          function GetLeftTag: TPaintTag;
-          function GetRightTag: TPaintTag;
-          function GetUpTag: TPaintTag;
-          function GetDownTag: TPaintTag;
-
-          function GetFirstTag: TPaintTag;
-          function GetLastTag: TPaintTag;
-          function GetFirstTagOfLine: TPaintTag;
-          function GetLastTagOfLine: TPaintTag;
-
-          function GetTopTag: TPaintTag;
-          function GetBottomTag: TPaintTag;
-
-          function GetNextMatchingTag(aKey: Word; f3pressed: Boolean): TPaintTag;
-          function GetNextMatchingTagInLine(aLine: TTagLine; Offset: Integer): TPaintTag;
-
 
       public
 
           CloudPainter: TCloudPainter;
 
-          property MouseOverTag: TPaintTag read fMouseOverTag write SetMouseOverTag;
-          property FocussedTag: TPaintTag read fFocussedTag write SetFocussedTag;
+
           property CurrentTagList: TObjectList read fGetTagList;
           property ClearTag: TTag read fCleartag;
 
@@ -301,14 +335,11 @@ type
           // a rebuild of the cloud (~RemarkOldNodes in Classic browsing)
           procedure BackUpNavigation;
           procedure RestoreNavigation(aList: TAudioFileList);
-          procedure NavigateCloud(aKey: Word; Shift: TShiftState);
 
           // Add a file to the TagCloud
           procedure AddAudioFile(aAudioFile: TAudioFile);
-
           // Delete a File from the Cloud
           procedure DeleteAudioFile(aAudioFile: TAudioFile);
-
           // Update a File (change the Tags) in the Cloud
           procedure UpdateAudioFile(aAudioFile: TAudioFile);
 
@@ -329,16 +360,20 @@ type
           // Note: Only references are copied, not the Tag-Objects themself!
           procedure CopyTags(Target: TObjectList; HideAutotags: Boolean; MinCount: Integer);
 
-  end;
+  end;   *)
 
   TCloudViewer = class(TNempPanel)
   protected
-      procedure CMWantspecialKey(var Msg : TWMKey); message CM_WANTSpecialKey;
+    FLastHintCursorRect: TRect;
+
+    procedure CMWantspecialKey(var Msg : TWMKey); message CM_WANTSpecialKey;
+
+    procedure CMHintShow(var Message: TCMHintShow); message CM_HINTSHOW;
+    procedure CMHintShowPause(var Message: TCMHintShowPause); message CM_HINTSHOWPAUSE;
 
   published
-      property OnKeypress;
-      property OnKeyDown;
-
+    property OnKeypress;
+    property OnKeyDown;
   end;
 
 
@@ -432,6 +467,7 @@ begin
         result := AnsiCompareText(TTag(item1).Key ,TTag(item2).Key);
 end;
 
+(*
 // ELF-Hash by alzaimar
 // http://www.delphi-forum.de/viewtopic.php?p=590514#590514
 function HashFromStr(Const Value: String): Cardinal; // ELF-Hash
@@ -451,12 +487,1393 @@ begin
     // modification: Use only the last 10 bits (= 1024 values)
     Result := Result AND $3FF;
 end;
+*)
+
+{ TPaintTag }
+(*
+constructor TPaintTag.Create(aKey: String; aTranslate: Boolean);
+begin
+    inherited Create;
+    fHover := False;
+    fFocussed := False;
+    if fTranslate then
+        fKey := aKey;
+end;*)
+
+constructor TPaintTag.Create(aCollection: TAudioFileCollection);
+begin
+  inherited create;
+  fHover := False;
+  fFocussed := False;
+  fCollection := aCollection;
+end;
+
+function TPaintTag.GetCaption: String;
+begin
+  if fCollection.CollectionType = ctRoot then
+    result := fCollection.CategoryCaption
+  else
+    result := fCollection.Key;
+
+  if result = '' then
+    result := '- ? -';
+end;
+
+function TPaintTag.GetCount: Integer;
+begin
+  result := fCollection.Count;
+end;
+
+
+procedure TPaintTag.MeasureOutput(aCanvas: TCanvas);
+begin
+  aCanvas.Font.Size := FontSize;
+  fWidth := aCanvas.TextWidth(Caption) + 4 * BORDER_WIDTH;
+  fHeight := aCanvas.TextHeight(Caption + '!') + 4 * BORDER_HEIGHT;
+end;
+
+procedure TPaintTag.SetPosition(x, y: Integer);
+begin
+  fLeft := x;
+  fTop := y;
+end;
+
+{
+  Erase:
+  Erase the Tag-Rect and draw the matching part of the Background-Image
+}
+procedure TPaintTag.Erase(aCanvas: TCanvas; Blend:Boolean);
+var tmp: TBitmap;
+begin
+  if not TagCustomizer.UseBackGround then begin
+    aCanvas.Brush.Style := bsSolid;
+    aCanvas.Brush.Color := TagCustomizer.BackgroundColor;
+    aCanvas.FillRect(Rect(fLeft, fTop, fLeft + fWidth, fTop + fHeight));
+  end else
+  begin
+    tmp := TBitmap.Create;
+    try
+      tmp.Width := fWidth;
+      tmp.Height := fHeight;
+      TagCustomizer.TileGraphic(tmp.Canvas, TagCustomizer.OffSetX + fLeft, TagCustomizer.OffSetY + fTop );
+      aCanvas.Draw(fLeft, fTop, tmp);
+    finally
+      tmp.Free;
+    end;
+  end;
+  if Blend then
+    TagCustomizer.AlphaBlendCloud(aCanvas, fWidth, fHeight, fLeft, fTop, bm_Cloud);
+end;
+
+procedure TPaintTag.Paint(aCanvas: TCanvas);
+begin
+  aCanvas.Brush.Style := bsClear;
+  Erase(aCanvas, (Not fFocussed) and TagCustomizer.TagUseAlphablend);
+  if not (fFocussed or fHover) then
+    PaintNormal(aCanvas)
+  else
+    if fFocussed then
+      PaintFocussed(aCanvas)
+    else
+      PaintHover(aCanvas);
+end;
+
+procedure TPaintTag.PaintNormal(aCanvas: TCanvas);
+begin
+  // Draw a roundrect around the Breadcrumb-Tags
+  if IsBreadCrumb then begin
+    aCanvas.Pen.Color := TagCustomizer.FocusBorderColor;
+    aCanvas.RoundRect(fLeft, fTop, fLeft + fWidth , fTop + fHeight , 6, 6);
+
+    if TagCustomizer.TagUseAlphablend then
+      TagCustomizer.AlphaBlendCloud(aCanvas, fWidth - 2, fHeight - 2,
+                                  fLeft + 1, fTop + 1, bm_Tag)
+    else
+    begin
+      aCanvas.Brush.Color := TagCustomizer.TagBlendColor;
+      aCanvas.FillRect (Rect(fLeft + 1, fTop + 1, fLeft + fWidth - 1, fTop + fHeight - 1));
+    end;
+  end;
+
+  aCanvas.Font.Color := TagCustomizer.FontColor;
+  aCanvas.Font.Style := [];
+  aCanvas.Font.Size := FontSize;
+  aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, Caption);
+end;
+
+
+procedure TPaintTag.PaintHover(aCanvas: TCanvas);
+begin
+  if IsBreadCrumb then begin
+    aCanvas.Pen.Color := TagCustomizer.FocusBorderColor;
+    aCanvas.RoundRect(fLeft, fTop, fLeft + fWidth , fTop + fHeight , 6, 6);
+
+    if TagCustomizer.TagUseAlphablend then
+      TagCustomizer.AlphaBlendCloud(aCanvas, fWidth - 2, fHeight - 2,
+                                  fLeft + 1, fTop + 1, bm_Tag)
+    else
+    begin
+      aCanvas.Brush.Color := TagCustomizer.TagBlendColor;
+      aCanvas.FillRect (Rect(fLeft + 1, fTop + 1, fLeft + fWidth - 1, fTop + fHeight - 1));
+    end;
+  end;
+
+  // Draw the text
+  aCanvas.Font.Color := TagCustomizer.HoverFontColor;
+  aCanvas.Font.Style := [fsUnderline];
+  aCanvas.Font.Size := FontSize;
+  aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, Caption)
+end;
+
+procedure TPaintTag.PaintFocussed(aCanvas: TCanvas);
+begin
+  // Draw a roundrect (always)
+  aCanvas.Pen.Color := TagCustomizer.FocusBorderColor;
+  aCanvas.RoundRect(fLeft, fTop, fLeft + fWidth , fTop + fHeight , 6, 6);
+
+  if TagCustomizer.TagUseAlphablend then
+    TagCustomizer.AlphaBlendCloud(aCanvas, fWidth - 2, fHeight - 2,
+                                fLeft + 1, fTop + 1, bm_Tag)
+  else
+  begin
+    aCanvas.Brush.Color := TagCustomizer.TagBlendColor;
+    aCanvas.FillRect (Rect(fLeft + 1, fTop + 1, fLeft + fWidth - 1, fTop + fHeight - 1));
+  end;
+
+  // Draw the text
+  aCanvas.Font.Color := TagCustomizer.FocusFontColor;
+  aCanvas.Font.Style := [];
+  aCanvas.Font.Size := FontSize;
+  aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, Caption);
+end;
+
+
+{ TTagLine }
+
+constructor TTagLine.Create(CanvasWidth: Integer);
+begin
+  fCanvasWidth := CanvasWidth;
+  Tags := TPaintTagList.Create(False);
+end;
+
+destructor TTagLine.Destroy;
+begin
+  Tags.Free;
+  inherited;
+end;
+
+procedure TTagLine.FreeContainedTags;
+var
+  i: Integer;
+begin
+  for i := 0 to Tags.Count - 1 do
+    Tags[i].Free;
+end;
+
+procedure TTagLine.Add(PaintTag: TPaintTag);
+begin
+  Tags.add(PaintTag);
+  PaintTag.fParentLine := Self;
+end;
+
+function TTagLine.fGetBreadCrumbline: Boolean;
+begin
+  result := (Tags.Count > 0) and (Tags[0].IsBreadCrumb);
+end;
+
+{
+  ------------------------------------
+  Tagline.Paint
+  - Paint all the Tags of the line.
+    This is done in the final step of the drawing
+  ------------------------------------
+}
+procedure TTagLine.Paint(aCanvas: TCanvas);
+var i, x: Integer;
+    pt: TPaintTag;
+begin
+  // determine horizontal gap for the alignment
+  if (Tags.Count > 1) and (not Tags[0].IsBreadCrumb)  then
+    fGap := (fCanvasWidth - Width) div (Tags.Count - 1)
+  else
+    fGap := BREADCRUMB_HGAP;
+
+  x := 0;
+  for i := 0 to Tags.Count - 1 do
+  begin
+    // Paint the tags and set their coordinates accoding to the draw coordinates
+    pt := Tags[i];
+    pt.fTop := Top + ((fHeight - pt.Height) div 2);
+    pt.fLeft := x;
+    pt.Paint(aCanvas);
+    x := x + pt.Width + fGap;
+  end;
+end;
+
+
+{ TCloudPainter }
+
+constructor TCloudPainter.Create;
+begin
+  fCurrentCollection := Nil;
+  fBreadCrumbLines := TTagLineList.Create(True); // OwnsObjects: TRUE
+  fTagLines := TTagLineList.Create(True);  // OwnsObjects: True as well, but the contained Painttags are NOT freed automatically!
+
+  fPaintBreadCrumbs := TPaintTagList.Create(True);
+  fPaintTags := TPaintTagList.Create(True);
+end;
+
+destructor TCloudPainter.Destroy;
+begin
+  fBreadCrumbLines.Free;
+  fTagLines.Free;
+
+  fPaintBreadCrumbs.Free;
+  fPaintTags.Free;
+
+  inherited;
+end;
+
+procedure TCloudPainter.Clear;
+begin
+  fMouseOverTag := Nil;
+  fFocussedTag := Nil;
+  fBreadCrumbLines.Clear;
+  fTagLines.Clear;
+  fPaintBreadCrumbs.Clear;
+  fPaintTags.Clear;
+end;
+
+procedure TCloudPainter.SetCollection(Collection: TAudioFileCollection);
+begin
+  fCurrentCollection := Collection;
+end;
+
+
+procedure TCloudPainter.DoPaint;
+var y, i: Integer;
+  Buffer: TBitmap;
+begin
+
+//    Canvas.Brush.Color := TagCustomizer.BackgroundColor;
+//    Canvas.Brush.Style := bsSolid;
+//    Canvas.FillRect(Rect(0,0,width, Height));
+
+    Buffer := TBitmap.Create;
+    try
+        Buffer.Width := Width;
+        Buffer.Height := Height;
+
+          if TagCustomizer.UseBackGround and assigned(TagCustomizer.BackgroundImage) then
+          begin
+              TagCustomizer.TileGraphic(Buffer.Canvas,
+                    TagCustomizer.OffSetX, TagCustomizer.OffSetY);
+              // Height of the actual Cloud
+              y := fTotalBreadCrumbHeight;
+              for i := 0 to fTagLines.Count - 1 do
+                y := y + fTaglines[i].Height;
+
+              TagCustomizer.AlphaBlendCloud(Buffer.Canvas, Width, y, 0, 0, bm_Cloud);
+          end else
+          begin
+              Buffer.Canvas.Brush.Color := TagCustomizer.BackgroundColor;
+              Buffer.Canvas.FillRect(Buffer.Canvas.ClipRect);
+          end;
+
+          // Paint BreadCrumbs
+          for i := 0 to fPaintBreadCrumbs.Count - 1 do
+            fPaintBreadCrumbs[i].Paint(Buffer.Canvas);
+
+          // Paint other tags
+          y := fTotalBreadCrumbHeight;
+          for i := 0 to fTagLines.Count - 1 do
+          begin
+              fTaglines[i].Top := y;
+              fTaglines[i].Paint(Buffer.Canvas);
+              y := y + fTaglines[i].Height;
+          end;
+
+          Canvas.Draw(0,0, Buffer);
+    finally
+      Buffer.Free;
+    end;
+
+
+    // visibleTags.Sort(Sort_Count);
+end;
+
+
+procedure TCloudPainter.Paint(SearchTerm: String = '');
+begin
+  PreparePaintBreadCrumbs;
+
+  RawPaint1(SearchTerm);
+  RawPaint2(SearchTerm);
+  DoPaint;
+  {
+compute Top-offset
+drawlines
+}
+end;
+
+
+procedure TCloudPainter.PaintAgain;
+begin
+  DoPaint;
+end;
+
+(*function TCloudPainter.GetMaxCount(Source: TObjectList): Integer;
+var i: integer;
+begin
+    result := 0;
+    for i := 0 to Source.Count - 1 do
+        if TTag(Source[i]).BreadCrumbIndex = High(Integer) then
+        begin
+            result := TTag(Source[i]).count;
+            break;
+        end;
+end;*)
+
+function TCloudPainter.GetProperFontSize(aTag: TPaintTag): Integer;
+begin
+    //if aTag.BreadCrumbIndex = High(Integer)  then
+    //begin
+        if (aTag.count < (0.9 * lastFontChangeAt)) then
+        begin
+            if currentFontSize > 8 then
+                currentFontSize := currentFontSize - 1;
+            lastFontChangeAt := aTag.count;
+        end;
+        result := currentFontSize;
+    //end else
+    //    result := 10;
+end;
+
+
+function TCloudPainter.GetTagAtMousePos(x, y: Integer): TPaintTag;
+var
+  line: TTagLine;
+  i: Integer;
+  CheckLines: TTagLineList;
+begin
+    result := Nil;
+    line  := Nil;
+    if y < self.fTotalBreadCrumbHeight then
+      CheckLines := fBreadCrumbLines
+    else
+      CheckLines := fTaglines;
+
+    for i := CheckLines.Count - 1 downto 0 do
+      if CheckLines[i].Top <= y then
+      begin
+          line := CheckLines[i];
+          break;
+      end;
+
+    if assigned(line) then
+      for i := line.Tags.Count - 1 downto 0 do begin
+        if line.Tags[i].fLeft <= x then begin
+          result := line.Tags[i];
+          break;
+        end;
+      end;
+end;
+
+function TCloudPainter.IsVisible(aTag: TPaintTag): Boolean;
+begin
+    //result := visibleTags.IndexOf(aTag) >= 0;
+    result := True;  // todo: Remove method?
+end;
+
+function TCloudPainter.GetFirstNewCollection: TAudioFileCollection;
+var
+  aTag: TPaintTag;
+begin
+  aTag := GetFirstNewTag;
+  if assigned(aTag) then
+    result := aTag.fCollection
+  else
+    result := Nil;
+end;
+
+function TCloudPainter.GetFirstNewTag: TPaintTag;
+begin
+  if fPaintBreadCrumbs.Count > 0 then
+    result := self.fPaintBreadCrumbs[fPaintBreadCrumbs.Count - 1]
+  else
+    result := Nil; // should never happen
+
+    {if visibleTags.Count > 0 then
+        Result := TPaintTag(visibleTags[0])
+    else
+        Result := Nil;
+
+    for i := 1 to visibleTags.Count - 1 do
+        if TPainttag(visibleTags[i]).BreadCrumbIndex = High(Integer) then
+        begin
+            // Change in 2017. Focus on the last Breadcrumb-tag
+            result := TPainttag(visibleTags[i-1]);
+            break;
+        end;
+    }
+end;
+
+
+{
+  ------------------------------------
+  TCloudPainter.PreparePaintBreadCrumbs
+  - Initial Step of the Painting.
+    Measure the space needed for the Breadcrumbs, store the PaintObjects
+    in fBreadCrumbLines.
+  Executed only once after a new Collection is set
+
+  ------------------------------------
+}
+procedure TCloudPainter.PreparePaintBreadCrumbs;
+var
+  i, x, y, lineHeight: Integer;
+  colList: TAudioFileCollectionList;
+  loopCollection: TAudioFileCollection;
+  newTag: TPaintTag;
+  newLine: TTagLine;
+
+begin
+  // Free the PaintObjects within the BreadCrumbLines
+  fMouseOverTag := Nil;
+  fFocussedTag := Nil;
+
+  fBreadCrumbLines.Clear;
+  fPaintBreadCrumbs.Clear;
+
+  //for i := 0 to fBreadCrumbLines.Count - 1 do
+  //  fBreadCrumbLines[i].FreeContainedTags;
+  // Clear the Lines (and free the TagLine-Objects automatically)
+
+
+  loopCollection := fCurrentCollection;
+  if not assigned(loopCollection) then
+    exit;     // nothing to do yet
+
+  // get the BreadCrumb-Collection we need to Paint
+  colList := TAudioFileCollectionList.Create(False);
+  try
+
+    colList.add(loopCollection);
+    while assigned(loopCollection) and (loopCollection.CollectionType <> ctRoot) do
+    begin
+      loopCollection := loopCollection.ParentCollection;
+      colList.add(loopCollection);
+    end;
+
+    // The very first Breadcrumb should be painted with a little margin for the Category-MenuButton
+    x := FIRST_BREADCRUMB_MARGIN;
+    y := 0;
+
+    newLine := TTagLine.Create(Width);
+    newLine.Top := 0;
+    fBreadCrumbLines.Add(newLine);
+
+    newTag := TPaintTag.Create(colList[colList.Count - 1]);
+    newTag.IsBreadCrumb := True;
+    newTag.FontSize := FONTSIZE_BREADCRUMB;
+    newTag.MeasureOutput(Canvas);
+    newTag.SetPosition(x, y);
+    newLine.Add(newTag);
+    fPaintBreadCrumbs.Add(newTag);
+    x := x + newTag.Width + BREADCRUMB_HGAP;
+    lineHeight := newTag.Height;
+
+    for i := colList.Count - 2 downto 0 do begin
+      newTag := TPaintTag.Create(colList[i]);
+      newTag.IsBreadCrumb := True;
+      newTag.FontSize := FONTSIZE_BREADCRUMB;
+      newTag.MeasureOutput(Canvas);
+
+      // Does the newTag fit into the current Line?
+      // If not: Start a new one
+      if ((x + newTag.Width <= Width) or (x = 0)) then begin
+        newTag.SetPosition(x, y);
+        x := x + newTag.Width + BREADCRUMB_HGAP;
+      end
+      else begin
+        // Tag does NOT fit in the current line => start a new one
+        newLine := TTagLine.Create(Width);
+        fBreadCrumbLines.Add(newLine);
+        y := y + lineHeight + BREADCRUMB_VGAP;
+        newTag.SetPosition(FIRST_BREADCRUMB_MARGIN, y);
+        newLine.Top := y;
+        x := FIRST_BREADCRUMB_MARGIN + newTag.Width + BREADCRUMB_HGAP;
+      end;
+
+
+      newLine.Add(newTag);
+      fPaintBreadCrumbs.Add(newTag);
+    end;
+    fTotalBreadCrumbHeight := y + lineHeight + BREADCRUMB_VGAP;
+  finally
+    colList.Free;
+  end;
+end;
+{
+  ------------------------------------
+  TCloudPainter.RawPaint1
+  - First Step of the Painting.
+    Sort SubCollections by Count and add as many as fit into the Canvas
+    to the list of fPaintTags
+
+  ------------------------------------
+}
+procedure TCloudPainter.RawPaint1(SearchTerm: String);
+var x, y, i, lineHeight, maxCount: Integer;
+    newTag: TPaintTag;
+    CanvasFull: Boolean;
+begin
+  if not assigned(fCurrentCollection) then
+    exit;
+
+  // Sort CurrentCollection by Count: We want to paint the collections with the highest Count
+  fCurrentCollection.ReSortCollection(csCount);
+
+  // Clear all existing PaintObjects
+  fMouseOverTag := Nil;
+  fFocussedTag := Nil;
+
+  fPaintTags.Clear;
+  fTagLines.Clear;
+
+  // init local variables
+  CanvasFull := False;
+  i := 0;
+  x := 0;
+  y := fTotalBreadCrumbHeight;
+  lineHeight := 0;
+  if fCurrentCollection.CollectionCount > 0 then
+    maxCount := fCurrentCollection.SubCollections[0].Count
+  else
+    maxCount := 0;
+  lastFontChangeAt := maxCount;
+  case maxCount of
+    0..10: currentFontSize := 12;
+    11..25: currentFontSize := 13;
+    26..50: currentFontSize := 14;
+    51..75: currentFontSize := 15;
+    76..100: currentFontSize := 16;
+    101..125: currentFontSize := 17;
+    126..150: currentFontSize := 18;
+    151..175: currentFontSize := 19;
+  else
+    currentFontSize := 20;
+  end;
+
+
+    while (i < fCurrentCollection.CollectionCount) and not CanvasFull do
+    begin
+      if (searchTerm <> '') and (not AnsiContainsText(fCurrentCollection.SubCollections[i].Key, SearchTerm)) then begin
+        inc(i);
+        continue;
+      end;
+
+      newTag := TPaintTag.Create(TAudioFileCollection(fCurrentCollection.SubCollections[i]));
+      inc(i);
+
+      // Set the FontSize used to display the tag
+      newTag.FontSize := GetProperFontSize(newTag);
+      // get the size of the Tag on the Canvas
+      newTag.MeasureOutput(Canvas);
+
+      // Does the newTag fit into the current Line?
+      if ((x + newTag.Width <= Width) or (x = 0)) then begin
+        x := x + newTag.Width;
+        lineHeight := max(lineHeight, newTag.Height);
+        fPaintTags.add(newTag);
+      end
+      else begin
+        // Tag does NOT fit in the current line => start a new one
+        y := y + lineHeight;
+        if (y + newTag.Height < Height - 8) then
+        begin
+            lineHeight := newTag.Height;
+            x := newTag.Width;
+            fPaintTags.add(newTag);
+        end else
+        begin
+            // Canvas is full, stop adding more SubCollections/Tags
+            newTag.Free;
+            CanvasFull := True;
+        end;
+      end;
+    end;  // while
+end;
+
+procedure TCloudPainter.RawPaint2(SearchTerm: String);
+var i, x, y: Integer;
+    currentLine: TTagLine;
+    currentTag: TPaintTag;
+    CanvasFull: Boolean;
+    SuccessfullyPaintItems: Integer;
+    Fail: Boolean;
+begin
+
+    fTagLines.Clear;
+    // Sort the List of PaintTags (collected in the first painting stage) by Name
+    fPaintTags.Sort(TComparer<TPaintTag>.Construct(
+        function (const item1, item2: TPaintTag): Integer
+        begin
+          result := AnsiCompareText(item1.Caption, item2.Caption);
+        end));
+
+    x := 0;
+    y := fTotalBreadCrumbHeight;
+    i := 0;
+    CanvasFull := False;
+    Fail := False;
+    SuccessfullyPaintItems := 0;
+
+    currentLine := TTagLine.Create(Width);
+    fTagLines.Add(currentLine);
+
+    //for i := 0 to Tags.Count - 1 do
+    while (i < fPaintTags.Count) and Not CanvasFull do
+    begin
+        currentTag := fPaintTags[i];
+
+        if (x + currentTag.Width <= Width) or (x = 0) then
+        begin
+            // Tag fits in currentLine, so add it to it
+            currentLine.Add(currentTag);
+            currentLine.fHeight := max(currentLine.Height, currentTag.Height);
+            currentLine.fWidth := currentLine.Width + currentTag.Width;
+            x := x + currentTag.Width;
+        end else
+        begin
+            // Tag does not fit any more, start a new TagLine
+            y := y + currentLine.Height;
+            if y > Height - 8 then
+            begin
+                // The currentLine has grown to much in Height
+                // => it cannot be painted on the canvas
+                CanvasFull := True;
+                Fail := True;
+            end else
+            begin
+                // The currentLine fits into the Canvas
+                SuccessfullyPaintItems := i-1;
+                // Start a new one
+                currentLine := TTagLine.Create(Width);
+                fTagLines.Add(currentLine);
+                currentLine.Add(currentTag);
+                currentLine.fHeight := currentTag.Height;
+                currentLine.fWidth := currentTag.Width;
+                x := currentTag.Width ;
+            end;
+        end;
+        inc(i);
+    end;
+
+    if y + currentLine.Height > Height - 8 then
+        Fail := True;
+
+    if Fail and (fPaintTags.Count > 0) then
+    begin
+        // we have to much in our TagList. So: Delete some tags
+        // - Sort the PaintedTags by Count again and remove the ones with the smallest Values
+        // - Try again
+        fPaintTags.Sort(TComparer<TPaintTag>.Construct(
+        function (const item1, item2: TPaintTag): Integer
+        begin
+          result := CompareValue(item2.Count, item1.Count); // reverse sort order
+        end));
+
+        for i := fPaintTags.Count - 1 downto SuccessfullyPaintItems do
+          fPaintTags.Delete(i);
+
+        RawPaint2(SearchTerm);
+    end;
+end;
+
+procedure TCloudPainter.RePaintTag(aTag: TPaintTag; Active: Boolean);
+begin
+    if assigned(aTag) then
+    begin
+        aTag.Paint(Canvas);
+    end;
+end;
+
+procedure TCloudPainter.SetHeight(Value: Integer);
+begin
+ //   if Value > 10 then
+ //       fHeight := Value - 10
+ //   else
+        fHeight := value; //0;
+end;
+
+procedure TCloudPainter.SetWidth(Value: Integer);
+begin
+  //  if Value > 10 then
+  //      fWidth := Value - 10
+  //  else
+        fWidth := value; //0;
+end;
+
+
+
+procedure TCloudPainter.SetFocussedTag(Value: TPaintTag);
+begin
+    if assigned(fFocussedTag) then
+    begin
+        fFocussedTag.fFocussed := False;
+        fFocussedTag.Paint(Canvas);
+    end;
+
+    fFocussedTag := Value;
+    if assigned(fFocussedTag) then
+    begin
+        fFocussedTag.fFocussed := True;
+        fFocussedTag.Paint(Canvas);
+    end;
+end;
+
+procedure TCloudPainter.SetMouseOverTag(Value: TPaintTag);
+begin
+    if assigned(fMouseOverTag) then
+    begin
+        fMouseOverTag.fHover := False;
+        fMouseOverTag.Paint(Canvas);
+    end;
+
+    fMouseOverTag := Value;
+    if assigned(fMouseOverTag) then
+    begin
+        fMouseOverTag.fHover := True;
+        fMouseOverTag.Paint(Canvas);
+    end;
+end;
+
+function TCloudPainter.GetFocussedCollection: TAudioFileCollection;
+begin
+  if assigned(fFocussedTag) then
+    result := fFocussedTag.fCollection
+  else
+    result := Nil;
+end;
+
+procedure TCloudPainter.SetFocussedCollection(Value: TAudioFileCollection);
+var
+  i: Integer;
+begin
+  if not assigned(Value) then
+    exit;
+
+  for i := 0 to fPaintTags.Count - 1 do begin
+    if fPaintTags[i].fCollection.Key = Value.Key then begin
+      FocussedTag := fPaintTags[i];
+      break;
+    end;
+  end;
+end;
+
+function TCloudPainter.GetOverLap(TagA, TagB: TPaintTag): Integer;
+var aRight, bRight, aLeft, bLeft: Integer;
+begin
+    aLeft := TagA.fLeft;
+    bLeft := TagB.fLeft;
+
+    aRight := TagA.fLeft + TagA.fWidth;
+    bRight := TagB.fLeft + TagB.fWidth;
+
+    if (aLeft <= bLeft) and (aRight >= bLeft) and (aRight <= bRight)  then
+        result := aRight - bLeft
+
+    else
+
+    if (aLeft >= bLeft) and (aRight <= bRight)  then
+        result := 10000 //aRight - aLeft
+
+    else
+
+    if (aLeft >= bLeft) and (aLeft <= bRight) and (aRight >= bRight)  then
+        result := bRight - aLeft
+
+    else
+
+    if (aLeft <= bLeft) and (aRight >= bRight)  then
+        result := 10000 //bRight - bLeft
+
+    else
+        result := 0;
+
+end;
+
+function TCloudPainter.GetDefaultTag: TPainttag;
+begin
+  if fPaintBreadCrumbs.Count > 0 then
+    result := fPaintBreadCrumbs[0]
+  else
+    result := Nil;
+end;
+
+function TCloudPainter.GetPreviousLine(aLine: TTagLine): TTagline;
+var
+  idx: Integer;
+begin
+  idx := fTagLines.IndexOf(aLine);
+  if idx = 0 then
+    result := fBreadCrumbLines[fBreadCrumbLines.Count-1]
+  else
+    if idx > 0 then
+      result := fTagLines[idx - 1]
+    else begin
+      idx := fBreadCrumbLines.IndexOf(aLine);
+      if idx > 0 then
+        result := fBreadCrumbLines[idx - 1]
+      else
+        result := Nil; // or fBreadCrumbLines[0]; // or NIL?
+    end;
+end;
+
+function TCloudPainter.GetNextLine(aLine: TTagLine): TTagline;
+var
+  idx: Integer;
+begin
+  idx := fBreadCrumbLines.IndexOf(aLine);
+
+  if (idx = fBreadCrumbLines.Count - 1) then begin
+    if fTagLines.Count > 0 then
+      result := fTagLines[0]
+    else
+      result := Nil;
+  end else
+    if idx >= 0 then begin
+      result := fBreadCrumbLines[idx + 1]
+    end else
+    begin
+      idx := fTagLines.IndexOf(aLine);
+      if (idx >= 0) and (idx < fTagLines.Count - 1) then
+        result := fTagLines[idx + 1]
+      else
+        result := Nil;
+    end;
+end;
+
+
+function TCloudPainter.GetLeftTag: TPaintTag;
+var aLine, bLine: TTagLine;
+    aIdx: Integer;
+begin
+  if assigned(fFocussedTag) then
+  begin
+    aLine := fFocussedTag.fParentLine;
+    aIdx := aLine.Tags.IndexOf(fFocussedTag);
+    if aIdx > 0 then
+      // get the tag left of the current Tag in this line
+      result := aLine.Tags[aIdx - 1]
+    else
+    begin
+      // Go one line up and select the last one there
+      bline := GetPreviousLine(aLine);
+      if assigned(bLine) and (bLine.Tags.Count > 0) then
+        result := bline.Tags[bLine.Tags.Count - 1]
+      else
+        result := GetDefaultTag;
+    end;
+  end
+  else
+    result := GetDefaultTag;
+end;
+
+
+function TCloudPainter.GetRightTag: TPaintTag;
+var aLine, bLine: TTagLine;
+    aIdx: Integer;
+begin
+  if assigned(fFocussedTag) then
+  begin
+    aLine := fFocussedTag.fParentLine;
+    aIdx := aLine.Tags.IndexOf(fFocussedTag);
+    if aIdx < aLine.Tags.Count - 1 then
+      // get the tag right of the current Tag in this line
+      result := TPainttag(aLine.Tags[aIdx + 1])
+    else
+    begin
+      // Go one line down and select the first one there
+      bLine := GetNextLine(aLine);
+      if assigned(bLine) and (bLine.Tags.Count > 0) then
+        result := bLine.Tags[0]
+      else
+        result := fFocussedTag;
+    end;
+  end
+  else
+    result := GetDefaultTag;
+end;
+
+function TCloudPainter.GetOverlapTag(Source: TPaintTag; Dest: TTagLine): TPaintTag;
+var
+  oMax, oCurrent, i: Integer;
+begin
+  result := Nil;
+  oMax := -1;
+  for i := 0 to Dest.Tags.Count - 1 do
+  begin
+    oCurrent := GetOverLap(Source, Dest.Tags[i]);
+    if oCurrent > oMax then
+    begin
+      result := Dest.Tags[i];
+      oMax := oCurrent;
+    end;
+  end;
+end;
+
+function TCloudPainter.GetUpTag: TPaintTag;
+var
+  bLine: TTagLine;
+begin
+  if assigned(fFocussedTag) then
+  begin
+    bLine := GetPreviousLine(fFocussedTag.fParentLine);
+    if assigned(bLine) and (bLine.Tags.Count > 0)  then
+      result := GetOverlapTag(fFocussedTag, bLine)
+    else
+      result := fFocussedTag
+  end else
+    result := GetDefaultTag;
+end;
+
+
+function TCloudPainter.GetDownTag: TPaintTag;
+var
+  bLine: TTagLine;
+begin
+  if assigned(fFocussedTag) then
+  begin
+    bLine := GetNextLine(fFocussedTag.fParentLine);
+    if assigned(bLine) and (bLine.Tags.Count > 0)  then
+      result := GetOverlapTag(fFocussedTag, bLine)
+    else
+      result := fFocussedTag
+  end else
+    result := GetDefaultTag;
+end;
+
+function TCloudPainter.GetFirstTag: TPaintTag;
+var aLine: TTagline;
+begin
+    if fTagLines.Count > 0 then
+    begin
+        aLine := fTagLines[0];
+        if aLine.Tags.Count > 0 then
+            result := aLine.Tags[0]
+        else
+            result := GetDefaultTag
+    end else
+        result := GetDefaultTag;
+end;
+function TCloudPainter.GetLastTag: TPaintTag;
+var aLine: TTagline;
+begin
+    if fTagLines.Count > 0 then
+    begin
+        aLine := fTagLines[fTagLines.Count-1];
+        if aLine.Tags.Count > 0 then
+            result := aLine.Tags[aLine.Tags.Count - 1]
+        else
+            result := GetDefaultTag
+    end else
+        result := GetDefaultTag;
+end;
+
+function TCloudPainter.GetFirstTagOfLine: TPaintTag;
+var aLine: TTagline;
+begin
+    if assigned(fFocussedTag) then
+    begin
+        aLine := fFocussedTag.fParentLine;
+
+        if aLine.Tags.Count > 0 then
+            result := aLine.Tags[0]
+        else
+            result := GetDefaultTag
+    end else
+        result := GetDefaultTag;
+end;
+function TCloudPainter.GetLastTagOfLine: TPaintTag;
+var aLine: TTagline;
+begin
+    if assigned(fFocussedTag) then
+    begin
+        aLine := fFocussedTag.fParentLine;
+        if aLine.Tags.Count > 0 then
+            result := aLine.Tags[aLine.Tags.Count - 1]
+        else
+            result := GetDefaultTag
+    end else
+        result := GetDefaultTag;
+end;
+
+function TCloudPainter.GetTopTag: TPaintTag;
+var
+  bLine: TTagLine;
+begin
+    if assigned(fFocussedTag) then
+    begin
+      result := fFocussedTag;
+      if fTagLines.Count > 0 then
+      begin
+        bLine := fTagLines[0];
+        if bLine.Tags.Count = 0 then
+          result := Nil
+        else
+          result := GetOverlapTag(fFocussedTag, bLine)
+      end else
+        result := GetDefaultTag;
+    end else
+      result := GetDefaultTag;
+end;
+
+
+function TCloudPainter.GetBottomTag: TPaintTag;
+var
+  bLine: TTagLine;
+begin
+  if assigned(fFocussedTag) then
+  begin
+    result := fFocussedTag;
+    if fTagLines.Count > 0 then
+    begin
+      bLine := fTagLines[fTagLines.Count - 1];
+      if bLine.Tags.Count = 0 then
+        result := Nil
+      else
+        result := GetOverlapTag(fFocussedTag, bLine)
+    end else
+      result := GetDefaultTag;
+  end else
+    result := GetDefaultTag;
+end;
+
+function TCloudPainter.GetNextMatchingTagInLine(aLine: TTagLine; Offset: Integer): TPaintTag;
+var
+  i: integer;
+  aTag: TPaintTag;
+begin
+  result := Nil;
+  for i := Offset to aLine.Tags.Count - 1 do
+  begin
+    aTag := aLine.Tags[i];
+    //if AnsiStartsText(fSearchString, aTag.Key) then
+    if AnsiContainsText(aTag.Caption, fSearchString) then
+    begin
+      result := aTag;
+      break;
+    end;
+  end;
+end;
+function TCloudPainter.GetNextMatchingTag(aKey: Word; f3pressed: Boolean): TPaintTag;
+var aLine: TTagLine;
+    tc: Int64;
+    LineCount, LineIdx, TagIdx: Integer;
+
+begin
+    tc := GetTickCount;
+    if not f3pressed then
+    begin
+        if (tc - fLastKeypressTick < 1000) then
+            fSearchString := fSearchString + Char(aKey)
+        else
+            fSearchString := Char(aKey);
+    end;
+    fLastKeypressTick := tc;
+
+    if assigned(fFocussedTag) then
+    begin
+        aLine := fFocussedTag.fParentLine;
+        LineIdx := fTagLines.IndexOf(aLine);
+        TagIdx := aLine.Tags.IndexOf(fFocussedTag);
+        if f3pressed then
+            inc(TagIdx);
+        result := GetNextMatchingTagInLine(aLine, TagIdx);
+        LineCount := 0;
+        while (not assigned(result)) and (LineCount <= fTagLines.Count - 1) do
+        begin
+            inc(LineCount);
+            LineIdx := (LineIdx + 1) mod (fTagLines.Count);
+            aLine := fTagLines[LineIdx];
+            result := GetNextMatchingTagInLine(aLine, 0);
+        end;
+        if not assigned(result) then
+            result := fFocussedTag;  //
+    end else
+        result := GetDefaultTag;
+end;
+
+
+procedure TCloudPainter.NavigateCloud(aKey: Word; Shift: TShiftState);
+begin
+  case aKey of
+        vk_up:    FocussedTag := GetUpTag;
+        vk_Down:  FocussedTag := GetDownTag;
+        vk_Left:  FocussedTag := GetLeftTag;
+        vk_right: FocussedTag := GetRightTag;
+
+        vk_Escape: FocussedTag := GetDefaultTag;
+
+        vk_home: begin
+                    if ssCtrl in Shift then
+                        FocussedTag := GetFirstTag
+                    else
+                        FocussedTag := GetFirstTagOfLine
+        end;
+
+        vk_end: begin
+                    if ssCtrl in Shift then
+                        FocussedTag := GetLastTag
+                    else
+                        FocussedTag := GetLastTagOfLine;
+        end;
+
+        vk_Prior: FocussedTag := GetTopTag;
+
+        vk_Next: FocussedTag := GetBottomTag;
+
+        vk_Back: begin
+              if fPaintBreadCrumbs.Count > 1 then
+                FocussedTag := fPaintBreadCrumbs[fPaintBreadCrumbs.Count - 2]
+              else
+                FocussedTag := GetDefaultTag;
+              {if (fBreadCrumbDepth > 0) then
+                  FocussedTag := TPaintTag(ActiveTags[fbreadCrumbDepth-1])
+              else
+                  FocussedTag := Nil;}
+        end;
+        vk_F3: FocussedTag := GetNextMatchingTag(aKey, True);
+    else
+        FocussedTag := GetNextMatchingTag(aKey, False);
+    end;
+end;
+
+
+
+{ TCloudViewer }
+
+procedure TCloudViewer.CMWantspecialKey(var Msg: TWMKey);
+begin
+  inherited;
+  with msg do
+    case Charcode of
+        vk_left, vk_up, vk_right, vk_down : Result := 1;
+    end;
+end;
+
+
+procedure TCloudViewer.CMHintShow(var Message:TCMHintShow);
+var
+   // HintTile:TVirtualTile; // Ein Hint-Referenzobjekt
+   MinHintPosY:Integer;
+begin
+   Message.Result:=1; // 1 verhindert und 0 erlaubt die Erstellung des Hints
+   {**
+    * Verhindern, dass der Hint bei jeder Mausbewegung ausgeblendet wird
+    *}
+   if PtInRect(FLastHintCursorRect, Message.HintInfo.CursorPos) then
+      Exit;
+   {**
+    * Das Referenzobjekt unter dem Mauszeiger ermitteln
+    *}
+   //HintTile:=GetTileAt(Message.HintInfo.CursorPos.X, Message.HintInfo.CursorPos.Y);
+   //if not (Assigned(HintTile) and HintTile.ShowHint) then
+   //   Exit;
+
+   // FLastHintCursorRect:=MakeRect(HintTile.GetAdjustedRect(HintTile.Location));
+
+
+   Message.HintInfo.CursorRect:=FLastHintCursorRect;
+   Message.HintInfo.HintWindowClass:= THintWindow; //GetHintWindowClass; // Beliebige THintWindow-Klasse
+
+
+   Message.HintInfo.HintStr:='Der Hint-String ' + IntToStr(Random(1000));
+
+   // Beliebiger Pointer: siehe 3. Parameter von THintWindow.ActivateHintData
+   Message.HintInfo.HintData:=Nil; //Pointer(HintTile);
+
+   Message.HintInfo.HideTimeout:=-1; // -1 = kein Timeout
+   Message.HintInfo.ReshowTimeout:=0;
+
+   Message.HintInfo.HintPos.X:=FLastHintCursorRect.Right;
+   Message.HintInfo.HintPos.Y:=FLastHintCursorRect.Top;
+   Message.HintInfo.HintPos:=ClientToScreen(Message.HintInfo.HintPos);
+   MinHintPosY:=ClientToScreen(Point(0, 0)).Y;
+   Message.HintInfo.HintPos.Y:=Max(Message.HintInfo.HintPos.Y, MinHintPosY);
+
+   Message.Result:=0; // Erstellung erlauben
+end;
+
+procedure TCloudViewer.CMHintShowPause(var Message:TCMHintShowPause);
+begin
+   Message.Pause^:=500; // Pause in Millisekunden bevor der Hint angezeigt wird
+end;
+                        (*
+procedure TCloudViewer.WMEraseBkGnd(var Message: TWMEraseBkGnd);
+begin
+  if Assigned(FOnPaint) then
+      Message.Result := 1
+  else
+      inherited
+end;
+
+procedure TCloudViewer.WMPaint(var Message: TWMPaint);
+begin
+  if Message.DC = 0 then
+    // WM_PAINT sent for normal painting
+    inherited
+  else
+  begin
+      if Assigned(FOnPaint) then
+        FOnPaint(Self)
+  end;
+
+end;     *)
+
+
+{ TTagCustomizer }
+
+constructor TTagCustomizer.Create;
+begin
+    inherited;
+    {Color := 0;
+    ActiveColor := clRed;
+
+    FocusColor := clGray;
+    FocusBorderColor := clBlue;}
+    //BackgroundImage := TBitmap.Create;
+end;
+
+destructor TTagCustomizer.Destroy;
+begin
+    //BackgroundImage.Free;
+    inherited destroy;
+end;
+
+// This is (almost) a copy of NempSkin.TileGraphic,
+// but without the Stretch-stuff
+procedure TTagCustomizer.TileGraphic(
+  const ATarget: TCanvas; X, Y: Integer);
+var
+  xstart, xloop, yloop: Integer;
+begin
+  if BackgroundImage.Width * BackgroundImage.Height = 0 then exit;
+
+  if TileBackground then
+  begin
+      xloop := X Mod BackgroundImage.Width;
+      if xloop < 0 then xloop := xloop + BackgroundImage.Width;
+
+      xloop := -xloop;
+      xstart := xloop;
+
+      Yloop := Y Mod BackgroundImage.Height;
+      if yloop < 0 then yloop := yloop + BackgroundImage.Height;
+
+      yloop := - yloop;
+
+      while Yloop < ATarget.ClipRect.Bottom  do
+      begin
+        Xloop := xstart;
+        while Xloop < ATarget.ClipRect.Right do
+        begin
+            ATarget.StretchDraw(Rect(XLoop, YLoop, XLoop + Round(BackgroundImage.Width), yLoop + Round(BackgroundImage.Height) ), BackgroundImage);
+            Inc(Xloop, Round(BackgroundImage.Width));
+        end;
+        Inc(Yloop, Round(BackgroundImage.Height));
+      end;
+  end else
+  begin
+    ATarget.Brush.Color := BackgroundColor;
+    ATarget.FillRect(ATarget.ClipRect);
+    ATarget.Draw(-x, -y, BackgroundImage);
+  end;
+end;
+
+procedure TTagCustomizer.AlphaBlendCloud(TargetCanvas: TCanvas; Width, Height, Left, Top: Integer; Mode: TBlendMode);
+var lBlendParams: TBlendFunction;
+    AlphaBlendBMP: TBitmap;
+    localIntensity: Integer;
+    localBlendColor: TColor;
+    localDoBlend: Boolean;
+begin
+
+
+    case Mode of
+        bm_Cloud: begin
+            localIntensity  := CloudBlendIntensity;
+            localBlendColor := CloudBlendColor;
+            localDoBlend    := CloudUseAlphaBlend
+        end;
+        bm_Tag: begin
+            localIntensity  := TagBlendIntensity;
+            localBlendColor := TagBlendColor;
+            localDoBlend    := TagUseAlphaBlend;
+        end;
+    else
+        begin
+            localIntensity  := 0;
+            localBlendColor := clWhite;
+            localDoBlend    := False;
+        end;
+    end;
+
+    if localDoBlend then
+    begin
+        // correction. This does not work with clBlack - I don't know why...
+        if localBlendColor = clBlack then
+            localBlendColor := localBlendColor + 1;
+
+        AlphaBlendBMP := TBitmap.Create;
+        try
+            with lBlendParams do
+            begin
+                BlendOp := AC_SRC_OVER;
+                BlendFlags := 0;
+                SourceConstantAlpha := localIntensity;
+                AlphaFormat := 0;
+            end;
+
+
+            AlphaBlendBMP.Canvas.Brush.Color := localBlendColor;
+
+            // Bitmap-Größe einstellen, Bitmap einfärben
+            AlphaBlendBMP.Width := Width;
+            AlphaBlendBMP.Height := Height;
+            AlphaBlendBMP.Canvas.FillRect (Rect(0, 0, Width, Height));
+            // Alphablending durchführen
+            Windows.AlphaBlend(TargetCanvas.Handle, Left, Top, Width, Height,
+                               AlphaBlendBMP.Canvas.Handle, 0, 0, AlphaBlendBMP.Width, AlphaBlendBMP.Height, lBlendParams);
+
+        finally
+            AlphaBlendBMP.Free;
+        end;
+    end;
+end;
+
+
+initialization
+
+    TagCustomizer := TTagCustomizer.Create;
+
+finalization
+
+    TagCustomizer.Free;
+
+end.
+
+
+
+
+
+
+
 
 
 { TTagCloud }
-
-
-
 constructor TTagCloud.Create;
 begin
     fInitialising := True;
@@ -591,332 +2008,8 @@ begin
             Activetags.Add(Tags[i]);
 end;
 
-procedure TTagCloud.SetFocussedTag(Value: TPaintTag);
-begin
-    if assigned(fFocussedTag) then
-    begin
-        fFocussedTag.fFocussed := False;
-        fFocussedTag.Paint(CloudPainter.Canvas);
-    end;
-
-    fFocussedTag := Value;
-    if assigned(fFocussedTag) then
-    begin
-        fFocussedTag.fFocussed := True;
-        fFocussedTag.Paint(CloudPainter.Canvas);
-    end;
-end;
-
-procedure TTagCloud.SetMouseOverTag(Value: TPaintTag);
-begin
-    if assigned(fMouseOverTag) then
-    begin
-        fMouseOverTag.fHover := False;
-        fMouseOverTag.Paint(CloudPainter.Canvas);
-    end;
-
-    fMouseOverTag := Value;
-    if assigned(fMouseOverTag) then
-    begin
-        fMouseOverTag.fHover := True;
-        fMouseOverTag.Paint(CloudPainter.Canvas);
-    end;
-end;
 
 
-function TTagCloud.GetOverLap(TagA, TagB: TPaintTag): Integer;
-var aRight, bRight, aLeft, bLeft: Integer;
-begin
-    aLeft := TagA.fLeft;
-    bLeft := TagB.fLeft;
-
-    aRight := TagA.fLeft + TagA.fWidth;
-    bRight := TagB.fLeft + TagB.fWidth;
-
-    if (aLeft <= bLeft) and (aRight >= bLeft) and (aRight <= bRight)  then
-        result := aRight - bLeft
-
-    else
-
-    if (aLeft >= bLeft) and (aRight <= bRight)  then
-        result := 10000 //aRight - aLeft
-
-    else
-
-    if (aLeft >= bLeft) and (aLeft <= bRight) and (aRight >= bRight)  then
-        result := bRight - aLeft
-
-    else
-
-    if (aLeft <= bLeft) and (aRight >= bRight)  then
-        result := 10000 //bRight - bLeft
-
-    else
-        result := 0;
-
-end;
-
-function TTagCloud.GetDefaultTag: TPainttag;
-begin
-    if Tags.Count > 0 then
-        result := TPaintTag(Tags[0])
-    else
-        result := Nil;
-end;
-
-function TTagCloud.GetLeftTag: TPaintTag;
-var aLine, bLine: TTagLine;
-    aIdx, bIdx: Integer;
-begin
-    if assigned(fFocussedTag) then
-    begin
-        aLine := fFocussedTag.fLine;
-        aIdx := aLine.Tags.IndexOf(fFocussedTag);
-        if aIdx > 0 then
-            // get the tag left of the current Tag in this line
-            result := TPainttag(aLine.Tags[aIdx - 1])
-        else
-        begin
-            // Go one line Up and select the last one there
-            bIdx := CloudPainter.TagLines.IndexOf(aLine);
-            if  bIdx > 0  then
-            begin
-                bLine := TTagLine(CloudPainter.TagLines[bIdx - 1]);
-                if bLine.Tags.Count > 0 then
-                    result := TPainttag(bline.Tags[bLine.Tags.Count - 1])
-                else
-                    result := GetDefaultTag
-            end else
-                result := GetDefaultTag;
-        end;
-    end
-    else
-        result := GetDefaultTag;
-end;
-
-
-function TTagCloud.GetRightTag: TPaintTag;
-var aLine, bLine: TTagLine;
-    aIdx, bIdx: Integer;
-begin
-    if assigned(fFocussedTag) then
-    begin
-        aLine := fFocussedTag.fLine;
-        aIdx := aLine.Tags.IndexOf(fFocussedTag);
-        if aIdx < aLine.Tags.Count - 1 then
-            // get the tag right of the current Tag in this line
-            result := TPainttag(aLine.Tags[aIdx + 1])
-        else
-        begin
-            // Go one line Down and select the last one there
-            bIdx := CloudPainter.TagLines.IndexOf(aLine);
-            if  bIdx < CloudPainter.TagLines.Count - 1  then
-            begin
-                bLine := TTagLine(CloudPainter.TagLines[bIdx + 1]);
-                if bLine.Tags.Count > 0 then
-                    result := TPainttag(bLine.Tags[0])
-                else
-                    result := fFocussedTag
-            end else
-                result := fFocussedTag;
-        end;
-    end
-    else
-        result := GetDefaultTag;
-end;
-
-function TTagCloud.GetUpTag: TPaintTag;
-var aLine, bLine: TTagLine;
-    oMax, oCurrent, aIdx, i: Integer;
-begin
-    if assigned(fFocussedTag) then
-    begin
-        oMax := -1;
-        aLine := fFocussedTag.fLine;
-        aIdx := CloudPainter.TagLines.IndexOf(aLine);
-        result := fFocussedTag;
-        if aIdx > 0 then
-        begin
-            bLine := TTagLine(CloudPainter.TagLines[aIdx-1]);
-            if bLine.Tags.Count = 0 then
-                result := Nil
-            else
-            begin
-                for i := 0 to bLine.Tags.Count - 1 do
-                begin
-                    oCurrent := GetOverLap(fFocussedTag, TPaintTag(bLine.Tags[i]));
-                    if oCurrent > oMax then
-                    begin
-                        result := TPaintTag(bLine.Tags[i]);
-                        oMax := oCurrent;
-                    end;
-                end;
-            end;
-        end;
-    end else
-        result := GetDefaultTag;
-end;
-
-procedure TTagCloud.InitHashMap;
-var i: Integer;
-begin
-    if Not assigned(HashedTags[0]) then
-    begin
-            // This should be done only once per Nemp-Instance!
-            for i := 0 to 1023 do
-                HashedTags[i] := TObjectList.Create(False);
-    end;
-end;
-
-function TTagCloud.GetDownTag: TPaintTag;
-var aLine, bLine: TTagLine;
-    oMax, oCurrent, aIdx, i: Integer;
-begin
-    if assigned(fFocussedTag) then
-    begin
-        oMax := -1;
-        aLine := fFocussedTag.fLine;
-        aIdx := CloudPainter.TagLines.IndexOf(aLine);
-        result := fFocussedTag;
-        if aIdx < CloudPainter.TagLines.Count - 1 then
-        begin
-            bLine := TTagLine(CloudPainter.TagLines[aIdx+1]);
-            if bLine.Tags.Count = 0 then
-                result := Nil
-            else
-            begin
-                for i := 0 to bLine.Tags.Count - 1 do
-                begin
-                    oCurrent := GetOverLap(fFocussedTag, TPaintTag(bLine.Tags[i]));
-                    if oCurrent > oMax then
-                    begin
-                        result := TPaintTag(bLine.Tags[i]);
-                        oMax := oCurrent;
-                    end;
-                end;
-            end;
-        end;
-    end else
-        result := GetDefaultTag;
-end;
-
-function TTagCloud.GetFirstTag: TPaintTag;
-var aLine: TTagline;
-begin
-    if CloudPainter.TagLines.Count > 0 then
-    begin
-        aLine := TTagLine(CloudPainter.TagLines[0]);
-        if aLine.Tags.Count > 0 then
-            result := TPaintTag(aLine.Tags[0])
-        else
-            result := GetDefaultTag
-    end else
-        result := GetDefaultTag;
-end;
-function TTagCloud.GetLastTag: TPaintTag;
-var aLine: TTagline;
-begin
-    if CloudPainter.TagLines.Count > 0 then
-    begin
-        aLine := TTagLine(CloudPainter.TagLines[CloudPainter.TagLines.Count-1]);
-        if aLine.Tags.Count > 0 then
-            result := TPaintTag(aLine.Tags[aLine.Tags.Count - 1])
-        else
-            result := GetDefaultTag
-    end else
-        result := GetDefaultTag;
-end;
-
-function TTagCloud.GetFirstTagOfLine: TPaintTag;
-var aLine: TTagline;
-begin
-    if assigned(fFocussedTag) then
-    begin
-        aLine := fFocussedTag.fLine;
-
-        if aLine.Tags.Count > 0 then
-            result := TPaintTag(aLine.Tags[0])
-        else
-            result := GetDefaultTag
-    end else
-        result := GetDefaultTag;
-end;
-function TTagCloud.GetLastTagOfLine: TPaintTag;
-var aLine: TTagline;
-begin
-    if assigned(fFocussedTag) then
-    begin
-        aLine := fFocussedTag.fLine;
-        if aLine.Tags.Count > 0 then
-            result := TPaintTag(aLine.Tags[aLine.Tags.Count - 1])
-        else
-            result := GetDefaultTag
-    end else
-        result := GetDefaultTag;
-end;
-
-function TTagCloud.GetTopTag: TPaintTag;
-var bLine: TTagLine;
-    oMax, oCurrent, i: Integer;
-begin
-    if assigned(fFocussedTag) then
-    begin
-        oMax := -1;
-        result := fFocussedTag;
-        if CloudPainter.TagLines.Count > 0 then
-        begin
-            bLine := TTagLine(CloudPainter.TagLines[0]);
-            if bLine.Tags.Count = 0 then
-                result := Nil
-            else
-            begin
-                for i := 0 to bLine.Tags.Count - 1 do
-                begin
-                    oCurrent := GetOverLap(fFocussedTag, TPaintTag(bLine.Tags[i]));
-                    if oCurrent > oMax then
-                    begin
-                        result := TPaintTag(bLine.Tags[i]);
-                        oMax := oCurrent;
-                    end;
-                end;
-            end;
-        end else
-            result := GetDefaultTag;
-    end else
-        result := GetDefaultTag;
-end;
-
-
-function TTagCloud.GetBottomTag: TPaintTag;
-var bLine: TTagLine;
-    oMax, oCurrent, i: Integer;
-begin
-    if assigned(fFocussedTag) then
-    begin
-        oMax := -1;
-        result := fFocussedTag;
-        if CloudPainter.TagLines.Count > 0 then
-        begin
-            bLine := TTagLine(CloudPainter.TagLines[CloudPainter.TagLines.Count - 1]);
-            if bLine.Tags.Count = 0 then
-                result := Nil
-            else
-            begin
-                for i := 0 to bLine.Tags.Count - 1 do
-                begin
-                    oCurrent := GetOverLap(fFocussedTag, TPaintTag(bLine.Tags[i]));
-                    if oCurrent > oMax then
-                    begin
-                        result := TPaintTag(bLine.Tags[i]);
-                        oMax := oCurrent;
-                    end;
-                end;
-            end;
-        end else
-            result := GetDefaultTag;
-    end else
-        result := GetDefaultTag;
-end;
 
 {
     --------------------------------------------------------
@@ -924,59 +2017,7 @@ end;
     - Get a tag with Prefix "fSearchString" in the given line
     --------------------------------------------------------
 }
-function TTagCloud.GetNextMatchingTagInLine(aLine: TTagLine; Offset: Integer): TPaintTag;
-var i: integer;
-    aTag: TPaintTag;
-begin
-    result := Nil;
-    for i := Offset to aLine.Tags.Count - 1 do
-    begin
-        aTag := TPaintTag(aLine.Tags[i]);
-        //if AnsiStartsText(fSearchString, aTag.Key) then
-        if AnsiContainsText(aTag.Key, fSearchString) then
-        begin
-            result := aTag;
-            break;
-        end;
-    end;
-end;
-function TTagCloud.GetNextMatchingTag(aKey: Word; f3pressed: Boolean): TPaintTag;
-var aLine: TTagLine;
-    tc: Int64;
-    LineCount, LineIdx, TagIdx: Integer;
 
-begin
-    tc := GetTickCount;
-    if not f3pressed then
-    begin
-        if (tc - fLastKeypressTick < 1000) then
-            fSearchString := fSearchString + Char(aKey)
-        else
-            fSearchString := Char(aKey);
-    end;
-    fLastKeypressTick := tc;
-
-    if assigned(fFocussedTag) then
-    begin
-        aLine := fFocussedTag.fLine;
-        LineIdx := CloudPainter.TagLines.IndexOf(aLine);
-        TagIdx := aLine.Tags.IndexOf(fFocussedTag);
-        if f3pressed then
-            inc(TagIdx);
-        result := GetNextMatchingTagInLine(aLine, TagIdx);
-        LineCount := 0;
-        while (not assigned(result)) and (LineCount <= CloudPainter.TagLines.Count - 1) do
-        begin
-            inc(LineCount);
-            LineIdx := (LineIdx + 1) mod (CloudPainter.TagLines.Count);
-            aLine := TTagLine(CloudPainter.TagLines[LineIdx]);
-            result := GetNextMatchingTagInLine(aLine, 0);
-        end;
-        if not assigned(result) then
-            result := fFocussedTag;  //
-    end else
-        result := GetDefaultTag;
-end;
 
 
 procedure TTagCloud.ShowTags(Refocus: Boolean);
@@ -1300,54 +2341,6 @@ begin
 end;
 
 
-
-procedure TTagCloud.NavigateCloud(aKey: Word; Shift: TShiftState);
-begin
-    case aKey of
-        vk_up:    FocussedTag := GetUpTag;
-        vk_Down:  FocussedTag := GetDownTag;
-        vk_Left:  FocussedTag := GetLeftTag;
-        vk_right: FocussedTag := GetRightTag;
-
-        vk_Escape: begin
-              if (fBreadCrumbDepth > 0) then
-                  FocussedTag := GetDefaultTag
-              else
-                  FocussedTag := Nil;
-        end;
-
-        vk_home: begin
-                    if ssCtrl in Shift then
-                        FocussedTag := GetFirstTag
-                    else
-                        FocussedTag := GetFirstTagOfLine
-        end;
-
-        vk_end: begin
-                    if ssCtrl in Shift then
-                        FocussedTag := GetLastTag
-                    else
-                        FocussedTag := GetLastTagOfLine;
-        end;
-
-        vk_Prior: FocussedTag := GetTopTag;
-
-        vk_Next: FocussedTag := GetBottomTag;
-
-        vk_Back: begin
-              if (fBreadCrumbDepth > 0) then
-                  FocussedTag := TPaintTag(ActiveTags[fbreadCrumbDepth-1])
-              else
-                  FocussedTag := Nil;
-        end;
-        vk_F3: FocussedTag := GetNextMatchingTag(aKey, True);
-    else
-        FocussedTag := GetNextMatchingTag(aKey, False);
-    end;
-
-    //CloudPainter.DoPaint;
-end;
-
 {
     --------------------------------------------------------
     GenerateAutoRawTags
@@ -1658,752 +2651,4 @@ begin
 
 end;
 
-{ TPaintTag }
 
-constructor TPaintTag.Create(aKey: String; aTranslate: Boolean);
-begin
-    inherited Create(aKey, aTranslate);
-    fHover := False;
-    fFocussed := False;
-    fTranslate := aTranslate;
-    if fTranslate then
-        fKey := aKey;
-end;
-
-
-procedure TPaintTag.MeasureOutput(aCanvas: TCanvas);
-begin
-    aCanvas.Font.Size := FontSize;
-    if self.fTranslate then
-    begin
-        fWidth := aCanvas.TextWidth(_(Key)) + 4 * BORDER_WIDTH;
-        fHeight := aCanvas.TextHeight(_(Key)) + 4 * BORDER_HEIGHT;
-    end else
-    begin
-        fWidth := aCanvas.TextWidth(Key) + 4 * BORDER_WIDTH;
-        fHeight := aCanvas.TextHeight(Key) + 4 * BORDER_HEIGHT;
-    end;
-end;
-
-{
-  Erase:
-  Erase the Tag-Rect and Draw the matching part of the background-image
-}
-procedure TPaintTag.Erase(aCanvas: TCanvas; Blend:Boolean);
-var tmp: TBitmap;
-begin
-    if Not TagCustomizer.UseBackGround then
-    begin
-        aCanvas.Brush.Style := bsSolid;
-        aCanvas.Brush.Color := TagCustomizer.BackgroundColor;
-        aCanvas.FillRect(Rect(fLeft, fTop, fLeft + fWidth, fTop + fHeight));
-    end else
-    begin
-        tmp := TBitmap.Create;
-        try
-            tmp.Width := fWidth;
-            tmp.Height := fHeight;
-            TagCustomizer.TileGraphic(tmp.Canvas, TagCustomizer.OffSetX + fLeft, TagCustomizer.OffSetY + fTop );
-            aCanvas.Draw(fLeft, fTop, tmp);
-        finally
-            tmp.Free;
-        end;
-    end;
-    if Blend then
-        TagCustomizer.AlphaBlendCloud(aCanvas, fWidth, fHeight, fLeft, fTop, bm_Cloud);
-end;
-
-procedure TPaintTag.Paint(aCanvas: TCanvas);
-begin
-    aCanvas.Brush.Style := bsClear;
-    Erase(aCanvas, (Not fFocussed) and TagCustomizer.TagUseAlphablend);
-
-    if not (fFocussed or fHover) then
-        PaintNormal(aCanvas)
-    else
-        if self.fFocussed then
-            PaintFocussed(aCanvas)
-        else
-            PaintHover(aCanvas);
-end;
-
-procedure TPaintTag.PaintNormal(aCanvas: TCanvas);
-begin
-    // Draw a roundrect
-    if self.BreadCrumbIndex < High(Integer) then
-    begin
-        aCanvas.Pen.Color := TagCustomizer.FocusBorderColor;
-        aCanvas.RoundRect(fLeft, fTop, fLeft + fWidth , fTop + fHeight , 6, 6);
-
-        if TagCustomizer.TagUseAlphablend then
-            TagCustomizer.AlphaBlendCloud(aCanvas, fWidth - 2, fHeight - 2,
-                                      fLeft + 1, fTop + 1, bm_Tag)
-        else
-        begin
-            aCanvas.Brush.Color := TagCustomizer.TagBlendColor;
-            aCanvas.FillRect (Rect(fLeft + 1, fTop + 1, fLeft + fWidth - 1, fTop + fHeight - 1));
-        end;
-    end;
-
-    aCanvas.Font.Color := TagCustomizer.FontColor;
-    aCanvas.Font.Style := [];
-    aCanvas.Font.Size := FontSize;
-    if fTranslate then
-        aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, _(Key))
-    else
-        aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, Key);
-end;
-
-
-procedure TPaintTag.PaintHover(aCanvas: TCanvas);
-begin
-    // Draw a roundrect
-    if self.BreadCrumbIndex < High(Integer) then
-    begin
-        aCanvas.Pen.Color := TagCustomizer.FocusBorderColor;
-        aCanvas.RoundRect(fLeft, fTop, fLeft + fWidth , fTop + fHeight , 6, 6);
-
-        if TagCustomizer.TagUseAlphablend then
-            TagCustomizer.AlphaBlendCloud(aCanvas, fWidth - 2, fHeight - 2,
-                                      fLeft + 1, fTop + 1, bm_Tag)
-        else
-        begin
-            aCanvas.Brush.Color := TagCustomizer.TagBlendColor;
-            aCanvas.FillRect (Rect(fLeft + 1, fTop + 1, fLeft + fWidth - 1, fTop + fHeight - 1));
-        end;
-    end;
-
-    // Draw the text
-    aCanvas.Font.Color := TagCustomizer.HoverFontColor;
-    aCanvas.Font.Style := [fsUnderline];
-    aCanvas.Font.Size := FontSize;
-    if fTranslate then
-        aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, _(Key))
-    else
-        aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, Key)
-end;
-
-procedure TPaintTag.PaintFocussed(aCanvas: TCanvas);
-begin
-    // Draw a roundrect
-    aCanvas.Pen.Color := TagCustomizer.FocusBorderColor;
-    aCanvas.RoundRect(fLeft, fTop, fLeft + fWidth , fTop + fHeight , 6, 6);
-
-    if TagCustomizer.TagUseAlphablend then
-        TagCustomizer.AlphaBlendCloud(aCanvas, fWidth - 2, fHeight - 2,
-                                  fLeft + 1, fTop + 1, bm_Tag)
-    else
-    begin
-        aCanvas.Brush.Color := TagCustomizer.TagBlendColor;
-        aCanvas.FillRect (Rect(fLeft + 1, fTop + 1, fLeft + fWidth - 1, fTop + fHeight - 1));
-    end;
-
-    // Draw the text
-    aCanvas.Font.Color := TagCustomizer.FocusFontColor;
-    aCanvas.Font.Style := [];
-    aCanvas.Font.Size := FontSize;
-    if fTranslate then
-        aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, _(Key))
-    else
-        aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, Key);
-end;
-
-
-{ TTagLine }
-
-constructor TTagLine.Create(CanvasWidth: Integer);
-begin
-  fCanvasWidth := CanvasWidth;
-  Tags := TObjectList.Create(False);
-end;
-
-destructor TTagLine.Destroy;
-begin
-  Tags.Free;
-  inherited;
-end;
-
-function TTagLine.fGetBreadCrumbline: Boolean;
-begin
-    result := (Tags.Count > 0) and (TPaintTag(Tags[0]).BreadCrumbIndex < High(Integer));
-end;
-
-{
-  ------------------------------------
-  Tagline.Paint
-  - Paint all the Tags of the line.
-    This is done in the final step of the drawing
-  ------------------------------------
-}
-procedure TTagLine.Paint(aCanvas: TCanvas);
-var i, x: Integer;
-    pt: TPaintTag;
-begin
-    if (Tags.Count > 1) And (TPaintTag(Tags[0]).BreadCrumbIndex = High(Integer))  then
-        fGap := (fCanvasWidth - Width) Div (Tags.Count - 1)
-    else
-        fGap := 0;
-
-    x := 0;
-    for i := 0 to Tags.Count - 1 do
-    begin
-        pt := TPaintTag(Tags[i]);
-        pt.fTop := Top;
-        pt.fLeft := x;
-
-        pt.Paint(aCanvas);
-
-        x := x + pt.Width + fGap ;
-    end;
-
-end;
-
-{ TCloudPainter }
-
-constructor TCloudPainter.Create;
-begin
-    TagLines := TObjectList.Create;
-    Tags := TObjectList.Create(False);
-    visibleTags := TObjectList.Create(False);
-end;
-
-destructor TCloudPainter.Destroy;
-begin
-    visibleTags.Free;
-    TagLines.Free;
-    Tags.Free;
-    inherited;
-end;
-
-
-procedure TCloudPainter.DoPaint;
-var y, i, t: Integer;
-begin
-
-//    Canvas.Brush.Color := TagCustomizer.BackgroundColor;
-//    Canvas.Brush.Style := bsSolid;
-//    Canvas.FillRect(Rect(0,0,width, Height));
-
-    if TagCustomizer.UseBackGround and assigned(TagCustomizer.BackgroundImage) then
-    begin
-        TagCustomizer.TileGraphic(Canvas,
-              TagCustomizer.OffSetX, TagCustomizer.OffSetY);
-
-        y := BREADCRUMB_GAP;
-        for i := 0 to TagLines.Count - 1 do
-            y := y + TTagLine(Taglines[i]).Height;
-
-
-        TagCustomizer.AlphaBlendCloud(Canvas, Width, y, 0, 0, bm_Cloud);
-    end else
-    begin
-        Canvas.Brush.Color := TagCustomizer.BackgroundColor;
-        Canvas.FillRect(Canvas.ClipRect);
-    end;
-
-    visibleTags.Clear;
-
-    y := 0;
-    for i := 0 to TagLines.Count - 1 do
-    begin
-        TTagLine(Taglines[i]).Top := y;
-        TTagLine(Taglines[i]).Paint(Canvas);
-        for t := 0 to TTagLine(Taglines[i]).Tags.Count - 1 do
-            visibleTags.Add(TTagLine(Taglines[i]).Tags[t]);
-
-        y := y + TTagLine(Taglines[i]).Height;
-        if (TTagLine(Taglines[i]).BreadCrumbline)
-           and ((i < TagLines.Count - 1) and Not (TTagLine(Taglines[i+1]).BreadCrumbline))
-        then
-            y := y + BREADCRUMB_GAP;
-    end;
-
-    visibleTags.Sort(Sort_Count);
-end;
-
-
-procedure TCloudPainter.Paint(Source: TObjectList);
-
-begin
-
-if not assigned(source) then Exit;
-
-
-    RawPaint1(Source);
-    RawPaint2(Source);
-    DoPaint;
-
-  {
-compute Top-offset
-drawlines
-
-}
-
-end;
-
-
-
-procedure TCloudPainter.PaintAgain;
-begin
-  DoPaint;
-end;
-
-function TCloudPainter.GetMaxCount(Source: TObjectList): Integer;
-var i: integer;
-begin
-    result := 0;
-    for i := 0 to Source.Count - 1 do
-        if TTag(Source[i]).BreadCrumbIndex = High(Integer) then
-        begin
-            result := TTag(Source[i]).count;
-            break;
-        end;
-end;
-
-function TCloudPainter.GetProperFontSize(aTag: TPaintTag): Integer;
-begin
-    if aTag.BreadCrumbIndex = High(Integer)  then
-    begin
-        if (aTag.count < (0.9 * lastFontChangeAt)) then
-        begin
-            if currentFontSize > 8 then
-                currentFontSize := currentFontSize - 1;
-            lastFontChangeAt := aTag.count;
-        end;
-        result := currentFontSize;
-    end else
-        result := 10;
-end;
-
-
-function TCloudPainter.GetTagAtMousePos(x, y: Integer): TPaintTag;
-var line: TTagLine;
-  i: Integer;
-begin
-    result := Nil;
-    line  := Nil;
-    for i := Taglines.Count - 1 downto 0 do
-      if TTagLine(TagLines[i]).Top <= y then
-      begin
-          line := TTagLine(TagLines[i]);
-          break;
-      end;
-
-    if assigned(line) then
-
-    for i := line.Tags.Count - 1 downto 0 do
-    begin
-        if TPaintTag(line.Tags[i]).fLeft <= x then
-        begin
-            result := TPaintTag(line.Tags[i]);
-            break;
-        end;
-    end;
-
-end;
-
-function TCloudPainter.IsVisible(aTag: TPaintTag): Boolean;
-begin
-    result := visibleTags.IndexOf(aTag) >= 0;
-end;
-
-function TCloudPainter.GetFirstNewTag: TPaintTag;
-var i: Integer;
-begin
-    if visibleTags.Count > 0 then
-        Result := TPaintTag(visibleTags[0])
-    else
-        Result := Nil;
-
-    for i := 1 to visibleTags.Count - 1 do
-        if TPainttag(visibleTags[i]).BreadCrumbIndex = High(Integer) then
-        begin
-            // Change in 2017. Focus on the last Breadcrumb-tag
-            result := TPainttag(visibleTags[i-1]);
-            break;
-        end;
-end;
-
-
-function TCloudPainter.ForceLineBreak(currentTag: TPaintTag): Boolean;
-begin
-    if fForcedBreakDone then
-        result := False
-    else
-    begin
-        result := currentTag.BreadCrumbIndex = High(Integer);
-        if result then
-            fForcedBreakDone := True;
-    end;
-end;
-
-{
-  ------------------------------------
-  TCloudPainter.RawPaint1
-  - First Step of the Painting.
-    Measure all Tags and fill the canvas
-    Note: The tags are sorted by Count here!
-  ------------------------------------
-}
-procedure TCloudPainter.RawPaint1(Source: TObjectList);
-var x, y, i, lineHeight: Integer;
-    aTag: TPaintTag;
-    CanvasFull: Boolean;
-    BreadCrumbEnd: Boolean;
-begin
-    Tags.Clear;
-    CanvasFull := False;
-    i := 0;
-    x := 0;     // current x-Position
-    y := 0;     // current y-Position
-    lineHeight := 0;   // Height of the current "line"
-    fForcedBreakDone := False;
-
-    maxCount := GetMaxCount(Source);
-
-    lastFontChangeAt := maxCount;
-    case maxCount of
-        0..10: currentFontSize := 12;
-        11..25: currentFontSize := 13;
-        26..50: currentFontSize := 14;
-        51..75: currentFontSize := 15;
-        76..100: currentFontSize := 16;
-        101..125: currentFontSize := 17;
-        126..150: currentFontSize := 18;
-        151..175: currentFontSize := 19;
-    else
-        currentFontSize := 20;
-    end;
-
-
-    while (i < Source.Count) and Not CanvasFull do
-    begin
-        aTag := TPaintTag(Source[i]);
-        // Set the FontSize used to display the tag          // !!!!!!!!!!!!!!!!!!!!!!!
-        aTag.FontSize := GetProperFontSize(aTag);
-
-        // get the size of the Tag on the Canvas
-        aTag.MeasureOutput(Canvas);
-
-        BreadCrumbEnd := ForceLineBreak(aTag);
-        if (Not BreadCrumbEnd) and ((x + aTag.Width <= Width) or (x = 0)) then
-        begin
-            // Tag fits in the current line
-            x := x + aTag.Width;
-            lineHeight := max(lineHeight, aTag.Height);
-            Tags.Add(aTag);
-        end else
-        begin
-            // Tag does NOT fit in the current line => start a new one
-            y := y + lineHeight;
-            if BreadCrumbEnd then
-                y := y + BREADCRUMB_GAP;
-
-            if (y + aTag.Height < Height - 8) then
-            begin
-                lineHeight := aTag.Height;
-                x := aTag.Width;
-                Tags.Add(aTag);
-            end else
-            begin
-                // Canvas is full.
-                // Note: following Tags will have a smaller size, so this check
-                // should be ok.
-                CanvasFull := True;
-            end;
-        end;
-        // get the next Tag in Source.
-        inc(i);
-    end;  // while
-end;
-
-procedure TCloudPainter.RawPaint2(Source: TObjectList);
-var i, x, y: Integer;
-    currentLine: TTagLine;
-    currentTag: TPaintTag;
-    CanvasFull: Boolean;
-    SuccessfullyPaintItems: Integer;
-    Fail: Boolean;
-    BreadCrumbEnd: Boolean;
-begin
-    TagLines.Clear;
-    // Sort Tags by Name
-    Tags.Sort(Sort_Name);
-
-    x := 0;
-    y := 0;
-    i := 0;
-    CanvasFull := False;
-    Fail := False;
-    SuccessfullyPaintItems := 0;
-    fForcedBreakDone := False;
-
-    currentLine := TTagLine.Create(Width);
-    TagLines.Add(currentLine);
-
-    //for i := 0 to Tags.Count - 1 do
-    while (i < Tags.Count) and Not CanvasFull do
-    begin
-        currentTag := TPaintTag(Tags[i]);
-        BreadCrumbEnd := ForceLineBreak(currentTag);
-        if (Not BreadCrumbEnd) and  ((x + currentTag.Width <= Width) or (x = 0)) then
-        begin
-            // Tag fits in currentLine
-            currentLine.Tags.Add(currentTag);
-            currentTag.fLine := currentLine;
-            currentLine.fHeight := max(currentLine.Height, currentTag.Height);
-            currentLine.fWidth := currentLine.Width + currentTag.Width;
-            x := x + currentTag.Width;
-        end else
-        begin
-
-            y := y + currentLine.Height;
-            if BreadCrumbEnd then
-                y := y + BREADCRUMB_GAP;
-
-            // line is full. We need to start a new line
-            // But: Maybe the currentline was to high for Canvas!
-            if y > Height - 8 then
-            begin
-                // currentline has grown to much in Height
-                // and so it cannot be painted on the canvas
-                CanvasFull := True;
-                Fail := True;
-            end else
-            begin
-                SuccessfullyPaintItems := i-1;  // last line can be painted
-
-                /////y := y + currentLine.Height;
-                currentLine := TTagLine.Create(Width);
-                TagLines.Add(currentLine);
-                currentLine.Tags.Add(currentTag);
-                currentTag.fLine := currentLine;
-                currentLine.fHeight := currentTag.Height;
-                currentLine.fWidth := currentLine.Width + currentTag.Width;
-                x := currentTag.Width ;
-            end;
-        end;
-        inc(i);
-    end;
-
-    if y + currentLine.Height > Height - 8 then
-        Fail := True;
-
-    if Fail and (Tags.Count > 0) then
-    begin
-        // we have to much in our TagList. So: Delete some tags
-        Tags.Sort(Sort_Count);
-        for i := Tags.Count - 1 downto SuccessfullyPaintItems do
-            Tags.Delete(i);
-
-        RawPaint2(Source);
-    end;
-
-
-
-    {
-    ToDo: Check, ob das so ins canvas passt
-    }
-    {
-    sort self.tags by Key
-    Get a Tag from self.tags, insert it into a TTagLine-Object
-
-    (+)
-    if "passt noch mehr" fill canvas with source, starting at tags.count
-    Do Rawpaint again
-
-    (-)
-    if "passt nicht" delete some Tags from self.tags
-    Do RawPaint again (but set Stop-Flag, i.e. do not do (+) again)
-    }
-
-end;
-
-procedure TCloudPainter.RePaintTag(aTag: TPaintTag; Active: Boolean);
-begin
-    if assigned(aTag) then
-    begin
-        aTag.Paint(Canvas);
-    end;
-end;
-
-procedure TCloudPainter.SetHeight(Value: Integer);
-begin
- //   if Value > 10 then
- //       fHeight := Value - 10
- //   else
-        fHeight := value; //0;
-end;
-
-procedure TCloudPainter.SetWidth(Value: Integer);
-begin
-  //  if Value > 10 then
-  //      fWidth := Value - 10
-  //  else
-        fWidth := value; //0;
-end;
-
-{ TCloudViewer }
-
-procedure TCloudViewer.CMWantspecialKey(var Msg: TWMKey);
-begin
-  inherited;
-      with msg do
-        case Charcode of
-            vk_left, vk_up, vk_right, vk_down : Result:=1;
-        end;
-
-end;
-                        (*
-procedure TCloudViewer.WMEraseBkGnd(var Message: TWMEraseBkGnd);
-begin
-  if Assigned(FOnPaint) then
-      Message.Result := 1
-  else
-      inherited
-end;
-
-procedure TCloudViewer.WMPaint(var Message: TWMPaint);
-begin
-  if Message.DC = 0 then
-    // WM_PAINT sent for normal painting
-    inherited
-  else
-  begin
-      if Assigned(FOnPaint) then
-        FOnPaint(Self)
-  end;
-
-end;     *)
-
-
-
-{ TTagCustomizer }
-
-constructor TTagCustomizer.Create;
-begin
-    inherited;
-    {Color := 0;
-    ActiveColor := clRed;
-
-    FocusColor := clGray;
-    FocusBorderColor := clBlue;}
-    //BackgroundImage := TBitmap.Create;
-end;
-
-destructor TTagCustomizer.Destroy;
-begin
-    //BackgroundImage.Free;
-    inherited destroy;
-end;
-
-// This is (almost) a copy of NempSkin.TileGraphic,
-// but without the Stretch-stuff
-procedure TTagCustomizer.TileGraphic(
-  const ATarget: TCanvas; X, Y: Integer);
-var
-  xstart, xloop, yloop: Integer;
-begin
-  if BackgroundImage.Width * BackgroundImage.Height = 0 then exit;
-
-  if TileBackground then
-  begin
-      xloop := X Mod BackgroundImage.Width;
-      if xloop < 0 then xloop := xloop + BackgroundImage.Width;
-
-      xloop := -xloop;
-      xstart := xloop;
-
-      Yloop := Y Mod BackgroundImage.Height;
-      if yloop < 0 then yloop := yloop + BackgroundImage.Height;
-
-      yloop := - yloop;
-
-      while Yloop < ATarget.ClipRect.Bottom  do
-      begin
-        Xloop := xstart;
-        while Xloop < ATarget.ClipRect.Right do
-        begin
-            ATarget.StretchDraw(Rect(XLoop, YLoop, XLoop + Round(BackgroundImage.Width), yLoop + Round(BackgroundImage.Height) ), BackgroundImage);
-            Inc(Xloop, Round(BackgroundImage.Width));
-        end;
-        Inc(Yloop, Round(BackgroundImage.Height));
-      end;
-  end else
-  begin
-    ATarget.Brush.Color := BackgroundColor;
-    ATarget.FillRect(ATarget.ClipRect);
-    ATarget.Draw(-x, -y, BackgroundImage);
-  end;
-end;
-
-procedure TTagCustomizer.AlphaBlendCloud(TargetCanvas: TCanvas; Width, Height, Left, Top: Integer; Mode: TBlendMode);
-var lBlendParams: TBlendFunction;
-    AlphaBlendBMP: TBitmap;
-    localIntensity: Integer;
-    localBlendColor: TColor;
-    localDoBlend: Boolean;
-begin
-
-
-    case Mode of
-        bm_Cloud: begin
-            localIntensity  := CloudBlendIntensity;
-            localBlendColor := CloudBlendColor;
-            localDoBlend    := CloudUseAlphaBlend
-        end;
-        bm_Tag: begin
-            localIntensity  := TagBlendIntensity;
-            localBlendColor := TagBlendColor;
-            localDoBlend    := TagUseAlphaBlend;
-        end;
-    else
-        begin
-            localIntensity  := 0;
-            localBlendColor := clWhite;
-            localDoBlend    := False;
-        end;
-    end;
-
-    if localDoBlend then
-    begin
-        // correction. This does not work with clBlack - I don't know why...
-        if localBlendColor = clBlack then
-            localBlendColor := localBlendColor + 1;
-
-        AlphaBlendBMP := TBitmap.Create;
-        try
-            with lBlendParams do
-            begin
-                BlendOp := AC_SRC_OVER;
-                BlendFlags := 0;
-                SourceConstantAlpha := localIntensity;
-                AlphaFormat := 0;
-            end;
-
-
-            AlphaBlendBMP.Canvas.Brush.Color := localBlendColor;
-
-            // Bitmap-Größe einstellen, Bitmap einfärben
-            AlphaBlendBMP.Width := Width;
-            AlphaBlendBMP.Height := Height;
-            AlphaBlendBMP.Canvas.FillRect (Rect(0, 0, Width, Height));
-            // Alphablending durchführen
-            Windows.AlphaBlend(TargetCanvas.Handle, Left, Top, Width, Height,
-                               AlphaBlendBMP.Canvas.Handle, 0, 0, AlphaBlendBMP.Width, AlphaBlendBMP.Height, lBlendParams);
-
-        finally
-            AlphaBlendBMP.Free;
-        end;
-    end;
-end;
-
-initialization
-
-    TagCustomizer := TTagCustomizer.Create;
-
-finalization
-
-    TagCustomizer.Free;
-
-end.

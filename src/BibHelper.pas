@@ -57,6 +57,8 @@ Const SO_Pfad = 0;
     end;
     *)
 
+    teRandomPlaylistRange = (rprLibrary, rprCategory, rprView);
+
 
     TPlaylistFillOptions = record
       // SkipGenreCheck: boolean;
@@ -65,7 +67,7 @@ Const SO_Pfad = 0;
       // GenreStrings: TStrings;
       // GenreChecked: Array of boolean;
       SkipTagCheck: boolean;
-      WantedTags: TObjectList;
+      WantedTags: TStringList;
       MinTagMatchCount: Integer;   // <= WantedTags.Count
       SkipYearCheck: Boolean;
       MinYear: Word;
@@ -80,6 +82,9 @@ Const SO_Pfad = 0;
       // general settings
       MaxCount: Integer;
       WholeBib: Boolean;
+      SelectionRange: teRandomPlaylistRange;
+      CheckCategory: Boolean;
+      CategoryIdx: Byte;
     end;
 
 

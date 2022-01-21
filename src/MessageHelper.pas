@@ -35,7 +35,7 @@ interface
 
 uses Windows, Classes, Forms, Messages, SysUtils, Controls, Graphics, Dialogs, myDialogs,
     ContNrs, StrUtils, ShellApi, hilfsfunktionen, VirtualTrees, DeleteHelper, SilenceDetection,
-    System.UITypes, NempFileUtils;
+    System.UITypes, NempAudioFiles, NempFileUtils, LibraryOrganizer.Base, LibraryOrganizer.Files;
 
 
 function Handle_NempAPI_UserCommands(Var aMSG: tMessage): Boolean;
@@ -46,9 +46,14 @@ function Handle_UpdaterMessage(Var aMsg: TMessage): Boolean;
 function Handle_ScrobblerMessage(Var aMsg: TMessage): Boolean;
 function Handle_WndProc(var Message: TMessage): Boolean;
 
-function Handle_DropFilesForPlaylist(Var aMsg: TMessage; UseDefaultInsertMode: Boolean): Boolean;
-function Handle_DropFilesForLibrary(Var aMsg: TMessage): Boolean;
-function Handle_DropFilesForHeadPhone(Var aMsg: TMessage): Boolean;
+function Handle_DropFilesForPlaylist(Var aMsg: TMessage; UseDefaultInsertMode: Boolean): Boolean; overload;
+function Handle_DropFilesForLibrary(Var aMsg: TMessage): Boolean; overload;
+function Handle_DropFilesForHeadPhone(Var aMsg: TMessage): Boolean; overload;
+
+// new Drag&Drop-Handling
+function Handle_DropFilesForPlaylist(FileList: TStringList; UseDefaultInsertMode: Boolean; TargetNode: PVirtualNode; Mode: TDropMode; ForcePlay: Boolean): Boolean; overload;
+function Handle_DropFilesForLibrary(FileList: TStringList; TargetCategory: TLibraryCategory): Boolean; overload
+function Handle_DropFilesForHeadPhone(FileList: TStringList): Boolean; overload;
 
 procedure StartMediaLibraryFileSearch(AutoCloseProgressForm: Boolean = False);
 procedure Handle_STStart(var Msg: TMessage);
@@ -59,7 +64,7 @@ procedure Handle_STFinish(var Msg: TMessage);
 implementation
 
 
-uses NempMainUnit, Nemp_ConstantsAndTypes, NempAPI, NempAudioFiles, Details,
+uses NempMainUnit, Nemp_ConstantsAndTypes, NempAPI, Details,
     MainFormHelper, CoverHelper, AudioFileHelper, CreateHelper, TreeHelper,
     Nemp_RessourceStrings, ShoutCastUtils, WebServerClass,
     UpdateUtils, SystemHelper, ScrobblerUtils, OptionsComplete,
@@ -553,7 +558,11 @@ begin
           end;
           }
           //MedienBib.NewCoverFlow.DoSomeDrawing(10);
+        end;
 
+        MB_ImportFavoritePlaylists: begin
+          // todo
+          MedienBib.ImportFavoritePlaylists(NempPlaylist.PlaylistManager);
         end;
 
         MB_FixAudioFilePaths: begin
@@ -586,11 +595,15 @@ begin
             ShowSummary;
         end;
 
+        MB_LoadLastSelectionData: begin
+          Medienbib.LoadLastSelectionData;
+        end;
+
         MB_ReFillAnzeigeList: begin
             FillTreeView(MedienBib.AnzeigeListe, Nil);
             ShowSummary;
             if aMsg.LParam <> 0 then
-                MedienListeStatusLBL.Caption := Warning_FileNotFound;
+              MedienListeStatusLBL.Caption := Warning_FileNotFound;
         end;
 
         MB_ShowQuickSearchResults,
@@ -1777,6 +1790,175 @@ begin
   end;
 end;
 
+function Handle_DropFilesForPlaylist(FileList: TStringList; UseDefaultInsertMode: Boolean;
+  TargetNode: PVirtualNode; Mode: TDropMode; ForcePlay: Boolean): Boolean;
+Var
+  i: Integer;
+  Filename: String;
+  abspielen: Boolean;
+  PlayIdx: Integer;
+Begin
+    result := True;
+
+    // Größe der Playlist und Status des Players merken
+    // abspielen := NempPlaylist.Count = 0;
+    abspielen := ForcePlay or ((NempPlaylist.Count = 0) and (NempPlayer.MainStream = 0));
+    PlayIdx := NempPlaylist.Count;
+
+    if assigned(TargetNode) and not UseDefaultInsertMode then begin
+      if Nemp_MainForm.PlaylistVST.GetNodeLevel(TargetNode) = 0 then
+      begin
+        case Mode of
+          dmNowhere: NempPlaylist.ResetInsertIndex;
+          dmAbove: NempPlaylist.InsertIndex := TargetNode.Index;
+          dmOnNode,
+          dmBelow: NempPlaylist.InsertIndex := TargetNode.Index + 1;
+        end;
+      end else
+      begin
+          // DropTarget is a CueSheet-Entry: Insert new files always *after* it
+          TargetNode := TargetNode.Parent;
+          NempPlaylist.InsertIndex := TargetNode.Index + 1;
+      end;
+    end else
+    begin
+      // Add to the Playlist (use Default-Mode from the Settings)
+      if NempPlaylist.DefaultAction = 2 then begin
+        NempPlaylist.InitInsertIndexFromPlayPosition(True);
+        PlayIdx := NempPlaylist.InsertIndex;
+      end
+      else
+        NempPlaylist.ResetInsertIndex;
+    end;
+
+    // new: Handle intern/extern the same way - we have a StringList with Filenames anyway
+    ST_Playlist.Mask := Nemp_MainForm.GeneratePlaylistSTFilter;
+    for i := 0 to FileList.Count - 1 do begin
+      Filename := FileList[i];
+      if (FileGetAttr(UnicodeString(Filename)) AND faDirectory = faDirectory) then
+        NempPlaylist.ST_Ordnerlist.Add(filename)  // SEARCHTOOL
+      else
+      begin
+        case Nemp_MainForm.NempFileType(Filename) of
+          nftPlaylist: if FileList.Count = 1 then
+                          NempPlaylist.LoadFromFile(filename);
+          nftCUE: if FileList.Count = 1 then
+                        NempPlaylist.LoadCueSheet(filename);
+          //else
+          nftSupported, nftCDDA: NempPlaylist.InsertFileToPlayList(filename);
+          nftUnknown: begin
+              if FileList.Count = 1 then
+                NempPlaylist.InsertFileToPlayList(filename);
+          end;
+        end;
+      end;
+
+      if (NempPlaylist.ST_Ordnerlist.Count > 0) And (Not ST_Playlist.IsSearching) then
+      begin
+          NempPlaylist.Status := 1;
+          NempPlaylist.FileSearchCounter := 0;
+          ProgressFormPlaylist.AutoClose := True;
+          ProgressFormPlaylist.InitiateProcess(True, pa_SearchFilesForPlaylist);
+
+          ST_Playlist.SearchFiles(NempPlaylist.ST_Ordnerlist[0]);
+          // note: autoplay will be done in message-handler for "new file", if the player is not already playing
+      end;
+    end;
+
+    // play (change 2019: always, also when dropping from extern)
+    if abspielen AND (NempPlaylist.Count > 0) then
+    begin
+        NempPlayer.LastUserWish := USER_WANT_PLAY;
+        NempPlaylist.Play(PlayIdx, 0, True);
+    end;
+
+End;
+
+function Handle_DropFilesForLibrary(FileList: TStringList; TargetCategory: TLibraryCategory): Boolean;
+var
+  i: Integer;
+  AudioFile: TAudioFile;
+  aErr: tNempAudioError;
+  CategoryMask: Cardinal;
+begin
+  if Nemp_MainForm.NempSkin.NempPartyMode.DoBlockBibOperations then
+  begin
+      Nemp_MainForm.fDropManager.FinishDrag;
+      exit;
+  end;
+
+  if MedienBib.StatusBibUpdate <> 0 then
+  begin
+    MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+    Nemp_MainForm.fDropManager.FinishDrag;
+    exit;
+  end;
+
+
+  MedienBib.InitTargetCategory(TargetCategory);
+
+              ST_Medienliste.Mask := Nemp_MainForm.GenerateMedienBibSTFilter;
+              MedienBib.StatusBibUpdate := 1;
+
+
+              for i := 0 to FileList.Count -1 do
+              begin
+                  if (FileGetAttr(FileList[i]) AND faDirectory = faDirectory) then
+                    // ein Ordner in der gedroppten Liste gefunden
+                    MedienBib.ST_Ordnerlist.Add(FileList[i]) // SEARCHTOOL
+                  else // eine Datei in der gedroppten Liste gefunden
+                      if Nemp_MainForm.ValidAudioFile(FileList[i], False) then
+                      begin // Musik-Datei
+                          if Not MedienBib.AudioFileExists(FileList[i]) then
+                          begin
+                              AudioFile:=TAudioFile.Create;
+                              aErr := AudioFile.GetAudioData(FileList[i], GAD_Rating or MedienBib.IgnoreLyricsFlag);
+                              AudioFile.Category := MedienBib.TargetCategory;
+                              HandleError(afa_DroppedFiles, AudioFile, aErr);
+                              MedienBib.CoverArtSearcher.InitCover(AudioFile, tm_VCL, INIT_COVER_DEFAULT);
+                              MedienBib.UpdateList.Add(AudioFile);
+                          end;
+                      end;
+              end;
+
+              Nemp_MainForm.fDropManager.FinishDrag;
+
+              if MedienBib.ST_Ordnerlist.Count > 0 then
+              begin
+                  Nemp_MainForm.PutDirListInAutoScanList(MedienBib.ST_Ordnerlist);
+                  BlockGUI(1);
+                  StartMediaLibraryFileSearch;
+              end
+              else
+                  // Die Dateien einpflegen, die evtl. einzeln in die Updatelist geaten sind
+                  MedienBib.NewFilesUpdateBib;
+
+end;
+
+function Handle_DropFilesForHeadPhone(FileList: TStringList): Boolean;
+var
+  AudioFile: TAudioFile;
+  aErr: TNempAudioError;
+begin
+  if FileList.Count = 0 then
+    exit;
+
+  AudioFile := TAudioFile.Create;
+  try
+      aErr := AudioFile.GetAudioData(FileList[0], GAD_Rating or MedienBib.IgnoreLyricsFlag);  // GAD_COVER ???
+      HandleError(afa_DroppedFiles, AudioFile, aErr);
+      // Play new song in headset
+      NempPlayer.PlayInHeadset(AudioFile);
+
+      // Show Headset Controls and File Details
+      Nemp_MainForm.TabBtn_Headset.GlyphLine := 1; // (TabBtn_Headset.GlyphLine + 1) mod 2;
+      Nemp_MainForm.TabBtn_MainPlayerControl.GlyphLine := 0;
+      Nemp_MainForm.MainPlayerControlsActive := False;
+      Nemp_MainForm.ShowMatchingControls;//(0);
+  finally
+      AudioFile.Free
+  end;
+end;
 
 function Handle_DropFilesForPlaylist(Var aMsg: TMessage; UseDefaultInsertMode: Boolean): Boolean;
 Var
@@ -1832,7 +2014,16 @@ Begin
 
     end;
 
-    if (DragSource = DS_EXTERN) then    // Files kommen von Außerhalb
+
+
+    if assigned(fDropManager.DragSource) then begin
+      for idx := 0 to fDropManager.FileNameCount - 1 do
+        NempPlaylist.InsertFileToPlayList(fDropManager.FileNames[idx]);
+
+      fDropManager.FinishDrag;
+      IMGMedienBibCover.EndDrag(true);
+      DragFinish (aMsg.WParam);
+    end else
     begin
         ST_Playlist.Mask := GeneratePlaylistSTFilter;
         FileCount := DragQueryFile (aMsg.WParam, $FFFFFFFF, nil, 255);
@@ -1864,12 +2055,12 @@ Begin
                     if (AnsiLowerCase(ExtractFileExt(filename))='.cue')
                        AND (FileCount = 1)
                     then
-                        LoadCueSheet(filename);
+                        NempPlaylist.LoadCueSheet(filename);
 
             StrDispose(Filename);
         end;
         DragFinish (aMsg.WParam);
-        DragSource := DS_EXTERN;
+        fDropManager.FinishDrag;
 
         if (NempPlaylist.ST_Ordnerlist.Count > 0) And (Not ST_Playlist.IsSearching) then
         begin
@@ -1881,17 +2072,7 @@ Begin
             ST_Playlist.SearchFiles(NempPlaylist.ST_Ordnerlist[0]);
             // note: autoplay will be done in message-handler for "new file", if the player is not already playing
         end;
-    end
-    else
-        begin
-            for idx := 0 to DragDropList.Count - 1 do
-                NempPlaylist.InsertFileToPlayList(DragDropList[idx]);
-
-            DragDropList.Clear;
-            IMGMedienBibCover.EndDrag(true);
-            DragFinish (aMsg.WParam);
-            DragSource := DS_EXTERN;
-        end;
+    end;
 
     // play (change 2019: always, also when dropping from extern)
     if abspielen AND (NempPlaylist.Count > 0) then
@@ -1910,18 +2091,30 @@ Var
   Filename: PChar;
   AudioFile:TAudioFile;
   aErr: TNempAudioError;
+  lc: TLibraryCategory;
 Begin
     result := True;
 
     if Nemp_MainForm.NempSkin.NempPartyMode.DoBlockBibOperations then
     begin
         DragFinish (aMsg.WParam);
-        Nemp_MainForm.DragSource := DS_EXTERN;
+        Nemp_MainForm.fDropManager.FinishDrag;
         exit;
     end;
 
     with Nemp_MainForm do
     begin
+      {if (DragSource = DS_EXTERN) then begin
+            lc := ArtistsVST.GetNodeData<TLibraryCategory>(ArtistsVST.DropTargetNode);
+            if assigned(lc) then begin
+              caption := lc.Name;
+              ShowMessage('Drop auf ' + lc.Name);
+            end else
+              ShowMessage('Drop sonst wohin');
+            }
+      end;
+     (*
+
           if (DragSource = DS_EXTERN) then    // Files kommen von Außerhalb
           begin
               if MedienBib.StatusBibUpdate <> 0 then
@@ -1978,7 +2171,8 @@ Begin
                   // Die Dateien einpflegen, die evtl. einzeln in die Updatelist geaten sind
                   MedienBib.NewFilesUpdateBib;
           end;
-    end;
+
+    end;   *)
 end;
 
 function Handle_DropFilesForHeadPhone(Var aMsg: TMessage): Boolean;
@@ -2012,7 +2206,19 @@ begin
     result := True;
     with Nemp_MainForm do
     begin
-        if (DragSource = DS_EXTERN) then    // Files kommen von Außerhalb
+        //if (DragSource = DS_EXTERN) then    // Files kommen von Außerhalb
+
+        if assigned(Nemp_MainForm.fDropManager.DragSource) then begin
+            if fDropManager.FileNameCount = 1 then
+            begin
+                // AudioFile found, put it into the HeadPhone
+                AddFileToHeadSet(fDropManager.FileNames[0]);
+            end;
+            fDropManager.FinishDrag;
+            IMGMedienBibCover.EndDrag(true);
+            DragFinish (aMsg.WParam);
+        end else
+
         begin
             FileCount := DragQueryFile (aMsg.WParam, $FFFFFFFF, nil, 255);
 
@@ -2046,20 +2252,8 @@ begin
             end;
 
             DragFinish (aMsg.WParam);
-            DragSource := DS_EXTERN;
+            fDropManager.FinishDrag;
         end
-        else
-        begin   // Quelle ist der VST -> in die Playlist einfügen
-            if DragDropList.Count = 1 then
-            begin
-                // AudioFile found, put it into the HeadPhone
-                AddFileToHeadSet(DragDropList[0]);
-            end;
-            DragDropList.Clear;
-            IMGMedienBibCover.EndDrag(true);
-            DragFinish (aMsg.WParam);
-            DragSource := DS_EXTERN;
-        end;
     end;
 end;
 
@@ -2129,6 +2323,7 @@ begin
                         AudioFile.Pfad := NewFile
                     else begin
                         aErr := AudioFile.GetAudioData(NewFile, GAD_Rating or MedienBib.IgnoreLyricsFlag);
+                        AudioFile.Category := MedienBib.TargetCategory;
                         HandleError(afa_NewFile, AudioFile, aErr);
                         MedienBib.CoverArtSearcher.InitCover(AudioFile, tm_VCL, INIT_COVER_DEFAULT);
                     end;

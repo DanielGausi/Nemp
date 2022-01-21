@@ -20,6 +20,7 @@ type
       // temporary AudioFiles, loaded from a PlaylistFile to display them
       fPlaylistFiles: TAudioFileList;
       fFileName: String;
+      fName: String;
       fCaptionMode: tePlaylistCaptionMode;
       fLibraryPlaylist: TLibraryPlaylist;
     protected
@@ -54,10 +55,14 @@ type
   TLibraryPlaylistCategory = class(TLibraryCategory)
     private
       fLoadedPlaylistCounter: Integer;
+      fDriveManager: TDriveManager;
       procedure NotifyLoading;
     protected
       function GetItemCount: Integer; override;
+      function GetCaption: String; override;
     public
+      property DriveManager: TDriveManager read fDriveManager write fDriveManager;
+
       constructor Create;
       destructor Destroy; override;
       procedure Clear; override;
@@ -77,7 +82,7 @@ type
 implementation
 
 uses
-  Hilfsfunktionen, StringHelper, AudioFileHelper;
+  Hilfsfunktionen, StringHelper, AudioFileHelper, gnugettext;
 
 
 
@@ -88,6 +93,7 @@ begin
   fCollectionClass := ccPlaylists;
   fKey := aPlaylist.Path;
   fFileName := ExtractFilename(fKey);
+  fName := aPlaylist.Name;
   fLibraryPlaylist := aPlaylist;
   fCount := 1;
 
@@ -117,11 +123,16 @@ begin
   // Frage: hier ggf. nach CollectionType (muss noch eingeführt werden) unterscheiden?
   // z.B. Playlist, die man so in der Bib hat im Modus "Folder"
   // aber einen Ordner mit selbstgemachten Playlists im Modus "Filename"
-  //case fCaptionMode of
-  case NempOrganizerSettings.PlaylistCaptionMode of
-    pcmFilename: result := ExtractFileName(fKey);
-    pcmFolder: result := ExtractFileName(ExtractFileDir(fKey)) + '\' + ExtractFileName(fKey);
-    pcmPath: result := fKey;
+  if fName <> '' then
+    result := fName
+  else
+  begin
+    case NempOrganizerSettings.PlaylistCaptionMode of
+      pcmFilename: result := ExtractFileName(fKey);
+      pcmFolder: result := ExtractFileName(ExtractFileDir(fKey)); // + '\' + ExtractFileName(fKey);
+      pcmFolderFilename: result := ExtractFileName(ExtractFileDir(fKey)) + '\' + ExtractFileName(fKey);
+      pcmPath: result := fKey;
+    end;
   end;
 end;
 
@@ -151,7 +162,7 @@ begin
   if MatchPrefix(aPrefix) then
     result := 0
   else
-    result := -1; // or 1, doesn't matter
+    result := 1; // or 1, doesn't matter
 end;
 
 function TAudioPlaylistCollection.GetCollectionCount: Integer;
@@ -180,7 +191,7 @@ begin
   // do not Clear and relod the List, if not necessary!
   // reason: GetFiles will be called to view all files, and to handle drag&drop and play/enque
   if fPlaylistFiles.Count = 0 then
-    LoadPlaylistFromFile(fKey, fPlaylistFiles, True, NIL);
+    LoadPlaylistFromFile(fKey, fPlaylistFiles, True, TLibraryPlaylistCategory(fOwnerCategory).DriveManager);
   for i := 0 to fPlaylistFiles.Count - 1 do
     dest.Add(fPlaylistFiles[i]);
 end;
@@ -234,6 +245,11 @@ begin
 end;
 
 
+function TLibraryPlaylistCategory.GetCaption: String;
+begin
+  result := _(Name);
+end;
+
 function TLibraryPlaylistCategory.GetItemCount: Integer;
 begin
   result := CollectionCount;
@@ -260,6 +276,7 @@ procedure TLibraryPlaylistCategory.Clear;
 begin
   inherited;
 
+  DriveManager := Nil;
   self.fCollections.Clear;
 end;
 
@@ -343,9 +360,9 @@ procedure TLibraryPlaylistCategory.RememberLastCollection(
   aCollection: TAudioCollection);
 begin
   inherited;
-  fLastSelectedCollectionData.Clear;
-  fLastSelectedCollectionData.RootIndex := -1;
-  fLastSelectedCollectionData.AddKey(aCollection.Key);
+  fLastSelectedCollectionData[fBrowseMode].Clear;
+  fLastSelectedCollectionData[fBrowseMode].RootIndex := -1;
+  fLastSelectedCollectionData[fBrowseMode].AddKey(aCollection.Key);
 end;
 
 function TLibraryPlaylistCategory.FindLastCollectionAgain: TAudioCollection;
@@ -353,11 +370,11 @@ var
   i: Integer;
 begin
   result := Nil;
-  if fLastSelectedCollectionData.KeyCount = 0 then
+  if fLastSelectedCollectionData[fBrowseMode].KeyCount = 0 then
     exit;
 
   for i := 0 to fCollections.Count - 1 do begin
-    if fCollections[i].Key = fLastSelectedCollectionData.Keys[0] then begin
+    if fCollections[i].Key = fLastSelectedCollectionData[fBrowseMode].Keys[0] then begin
       result := fCollections[i];
       break;
     end;

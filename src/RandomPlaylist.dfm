@@ -157,7 +157,7 @@ object RandomPlaylistForm: TRandomPlaylistForm
     end
     object cbTagCountSelection: TComboBox
       Left = 412
-      Top = 292
+      Top = 290
       Width = 65
       Height = 21
       Style = csDropDownList
@@ -194,6 +194,16 @@ object RandomPlaylistForm: TRandomPlaylistForm
         '~50% of the tags'
         'some tags'
         'one tag')
+    end
+    object BtnRefreshTags: TButton
+      Left = 376
+      Top = 19
+      Width = 101
+      Height = 25
+      Anchors = [akTop, akRight]
+      Caption = 'Refresh'
+      TabOrder = 6
+      OnClick = BtnRefreshTagsClick
     end
   end
   object GrpBox_General: TGroupBox
@@ -236,10 +246,12 @@ object RandomPlaylistForm: TRandomPlaylistForm
       Style = csDropDownList
       ItemIndex = 0
       TabOrder = 0
-      Text = 'whole media library'
+      Text = 'Media library'
+      OnChange = CBWholeBibChange
       Items.Strings = (
-        'whole media library'
-        'actual listed titles')
+        'Media library'
+        'Current category'
+        'Current titles in main view')
     end
   end
   object Btn_Ok: TButton

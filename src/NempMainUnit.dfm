@@ -141,6 +141,7 @@ object Nemp_MainForm: TNemp_MainForm
             TabOrder = 1
             Visible = False
             OnDblClick = PanelCoverBrowseDblClick
+            OnEndDrag = PanelCoverBrowseEndDrag
             OnMouseDown = PanelCoverBrowseMouseDown
             OnMouseMove = IMGMedienBibCoverMouseMove
             OnMouseUp = IMGMedienBibCoverMouseUp
@@ -281,7 +282,7 @@ object Nemp_MainForm: TNemp_MainForm
               BorderStyle = bsNone
               Constraints.MinWidth = 20
               DefaultNodeHeight = 14
-              DragOperations = []
+              DragImageKind = diMainColumnOnly
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
               Font.Height = -11
@@ -289,7 +290,7 @@ object Nemp_MainForm: TNemp_MainForm
               Font.Style = []
               Header.AutoSizeIndex = 0
               Header.Background = clWindow
-              Header.Height = 21
+              Header.Height = 22
               Header.Options = [hoAutoResize, hoDrag, hoVisible]
               IncrementalSearch = isAll
               Indent = 14
@@ -300,13 +301,15 @@ object Nemp_MainForm: TNemp_MainForm
               StyleElements = [seClient, seBorder]
               TabOrder = 0
               TextMargin = 2
-              TreeOptions.AutoOptions = [toAutoDropExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
+              TreeOptions.AutoOptions = [toAutoDropExpand, toAutoTristateTracking]
               TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
               TreeOptions.SelectionOptions = [toFullRowSelect, toRightClickSelect]
               OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
               OnAfterItemErase = VSTAfterItemErase
               OnClick = ArtistsVSTClick
               OnDragAllowed = ArtistsVSTDragAllowed
+              OnDragOver = CategoryVSTDragOver
+              OnDragDrop = CategoryVSTDragDrop
               OnFocusChanged = ArtistsVSTFocusChanged
               OnGetText = StringVSTGetText
               OnPaintText = ArtistsVSTPaintText
@@ -331,6 +334,7 @@ object Nemp_MainForm: TNemp_MainForm
               BevelOuter = bvNone
               BorderStyle = bsNone
               Constraints.MinWidth = 20
+              DragOperations = [doCopy]
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
               Font.Height = -11
@@ -338,7 +342,7 @@ object Nemp_MainForm: TNemp_MainForm
               Font.Style = []
               Header.AutoSizeIndex = 0
               Header.Background = clWindow
-              Header.Height = 22
+              Header.Height = 20
               Header.Options = [hoAutoResize, hoDrag, hoVisible]
               Images = DummyImageList
               IncrementalSearch = isAll
@@ -350,7 +354,7 @@ object Nemp_MainForm: TNemp_MainForm
               StyleElements = [seClient, seBorder]
               TabOrder = 1
               TextMargin = 2
-              TreeOptions.AutoOptions = [toAutoDropExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
+              TreeOptions.AutoOptions = [toAutoDropExpand, toAutoTristateTracking]
               TreeOptions.MiscOptions = [toAcceptOLEDrop, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning, toVariableNodeHeight, toEditOnClick]
               TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
               TreeOptions.SelectionOptions = [toFullRowSelect, toRightClickSelect]
@@ -359,15 +363,20 @@ object Nemp_MainForm: TNemp_MainForm
               OnClick = AlbenVSTClick
               OnColumnDblClick = AlbenVSTColumnDblClick
               OnDragAllowed = AlbenVSTDragAllowed
+              OnDragOver = LibraryCollectionTreeDragOver
+              OnDragDrop = LibraryCollectionTreeDragDrop
               OnDrawText = AlbenVSTDrawText
+              OnEndDrag = LibraryVSTEndDrag
               OnFocusChanged = AlbenVSTFocusChanged
               OnGetText = AlbenVSTGetText
               OnPaintText = ArtistsVSTPaintText
               OnGetImageIndex = AlbenVSTGetImageIndex
+              OnGetUserClipboardFormats = TreesGetUserClipboardFormats
               OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
               OnIncrementalSearch = AlbenVSTIncrementalSearch
               OnKeyDown = StringVSTKeyDown
               OnMeasureItem = AlbenVSTMeasureItem
+              OnRenderOLEData = TreesRenderOLEData
               OnResize = AlbenVSTResize
               OnStartDrag = AlbenVSTStartDrag
               Columns = <
@@ -388,6 +397,7 @@ object Nemp_MainForm: TNemp_MainForm
             TabOrder = 2
             Visible = False
             OnClick = PanelTagCloudBrowseClick
+            OnMouseDown = PanelTagCloudBrowseMouseDown
             OnResize = PanelTagCloudBrowseResize
             OnPaint = PanelPaint
             OwnerDraw = False
@@ -565,8 +575,6 @@ object Nemp_MainForm: TNemp_MainForm
             BorderStyle = bsNone
             Ctl3D = True
             DefaultPasteMode = amInsertAfter
-            DragImageKind = diMainColumnOnly
-            DragWidth = 10
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
             Font.Height = -11
@@ -602,17 +610,19 @@ object Nemp_MainForm: TNemp_MainForm
             OnDragAllowed = PlaylistVSTDragAllowed
             OnDragOver = PlaylistVSTDragOver
             OnDragDrop = PlaylistVSTDragDrop
-            OnEndDrag = VSTEndDrag
+            OnEndDrag = PlaylistVSTEndDrag
             OnExpanded = PlaylistVSTCollapsAndExpanded
             OnGetText = PlaylistVSTGetText
             OnPaintText = VSTPaintText
             OnGetImageIndex = PlaylistVSTGetImageIndex
             OnGetHint = PlaylistVSTGetHint
+            OnGetUserClipboardFormats = TreesGetUserClipboardFormats
             OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
             OnKeyDown = PlaylistVSTKeyDown
             OnKeyUp = PlaylistVSTKeyUp
+            OnRenderOLEData = TreesRenderOLEData
             OnResize = PlaylistVSTResize
-            OnStartDrag = PlaylistVSTStartDrag
+            OnStartDrag = VSTFilesStartDrag
             Columns = <
               item
                 Alignment = taRightJustify
@@ -908,8 +918,6 @@ object Nemp_MainForm: TNemp_MainForm
             Colors.SelectionTextColor = clWindowText
             Constraints.MinHeight = 26
             DragImageKind = diMainColumnOnly
-            DragMode = dmAutomatic
-            DragOperations = [doMove]
             DragWidth = 10
             EditDelay = 50
             Font.Charset = DEFAULT_CHARSET
@@ -931,7 +939,7 @@ object Nemp_MainForm: TNemp_MainForm
             ShowHint = True
             StyleElements = [seClient, seBorder]
             TabOrder = 0
-            TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSpanColumns, toAutoTristateTracking, toAutoDeleteMovedNodes]
+            TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSpanColumns, toAutoTristateTracking]
             TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick]
             TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
             TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toMultiSelect, toRightClickSelect]
@@ -944,15 +952,19 @@ object Nemp_MainForm: TNemp_MainForm
             OnColumnClick = VSTColumnClick
             OnColumnDblClick = VSTColumnDblClick
             OnCreateEditor = VSTCreateEditor
+            OnDragAllowed = VSTDragAllowed
+            OnDragOver = LibraryCollectionTreeDragOver
+            OnDragDrop = LibraryCollectionTreeDragDrop
             OnEditCancelled = VSTEditCancelled
             OnEdited = VSTEdited
             OnEditing = VSTEditing
-            OnEndDrag = VSTEndDrag
+            OnEndDrag = LibraryVSTEndDrag
             OnFocusChanging = VSTFocusChanging
             OnGetText = VSTGetText
             OnPaintText = VSTPaintText
             OnGetImageIndex = VSTGetImageIndex
             OnGetHint = PlaylistVSTGetHint
+            OnGetUserClipboardFormats = TreesGetUserClipboardFormats
             OnHeaderClick = VSTHeaderClick
             OnHeaderDblClick = VSTHeaderDblClick
             OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
@@ -961,7 +973,8 @@ object Nemp_MainForm: TNemp_MainForm
             OnKeyDown = VSTKeyDown
             OnKeyUp = PlaylistVSTKeyUp
             OnNewText = VSTNewText
-            OnStartDrag = VSTStartDrag
+            OnRenderOLEData = TreesRenderOLEData
+            OnStartDrag = VSTFilesStartDrag
             Columns = <
               item
                 Position = 0
@@ -2348,69 +2361,12 @@ object Nemp_MainForm: TNemp_MainForm
         ShortCut = 16471
         OnClick = MM_ML_WebradioClick
       end
+      object MM_ML_ConfigureMediaLibrary: TMenuItem
+        Caption = 'Configure Media library'
+        OnClick = PM_ML_ConfigureMedialibraryClick
+      end
       object N22: TMenuItem
         Caption = '-'
-      end
-      object MM_ML_BrowseBy: TMenuItem
-        Caption = '&Browse by'
-        object MM_ML_BrowseByArtistAlbum: TMenuItem
-          Caption = 'Artists - Albums'
-          RadioItem = True
-          OnClick = SortierAuswahl1POPUPClick
-        end
-        object MM_ML_BrowseByAlbumArtists: TMenuItem
-          Tag = 6
-          Caption = 'Album - Artists'
-          OnClick = SortierAuswahl1POPUPClick
-        end
-        object MM_ML_BrowseByDirectoryArtist: TMenuItem
-          Tag = 1
-          Caption = 'Directories - Artists'
-          RadioItem = True
-          OnClick = SortierAuswahl1POPUPClick
-        end
-        object MM_ML_BrowseByDirectoryAlbum: TMenuItem
-          Tag = 2
-          Caption = 'Directories - Albums'
-          RadioItem = True
-          OnClick = SortierAuswahl1POPUPClick
-        end
-        object MM_ML_BrowseByGenreArtist: TMenuItem
-          Tag = 3
-          Caption = 'Genres - Artists'
-          RadioItem = True
-          OnClick = SortierAuswahl1POPUPClick
-        end
-        object MM_ML_BrowseByGenreYear: TMenuItem
-          Tag = 4
-          Caption = 'Genres - Years'
-          RadioItem = True
-          OnClick = SortierAuswahl1POPUPClick
-        end
-        object MM_ML_BrowseByYearArtist: TMenuItem
-          Tag = 7
-          Caption = 'Year - Artist'
-          OnClick = SortierAuswahl1POPUPClick
-        end
-        object MM_ML_BrowseByFileageAlbum: TMenuItem
-          Tag = 8
-          Caption = 'Fileage - Album'
-          OnClick = SortierAuswahl1POPUPClick
-        end
-        object MM_ML_BrowseByFileageArtist: TMenuItem
-          Tag = 9
-          Caption = 'Fileage - Artist'
-          OnClick = SortierAuswahl1POPUPClick
-        end
-        object N29: TMenuItem
-          Caption = '-'
-        end
-        object MM_ML_BrowseByMore: TMenuItem
-          Tag = 100
-          Caption = 'More...'
-          RadioItem = True
-          OnClick = PM_ML_BrowseByMoreClick
-        end
       end
       object MM_ML_Search: TMenuItem
         Caption = 'Search'
@@ -6962,8 +6918,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object DummyImageList: TImageList
     Width = 128
-    Left = 464
-    Top = 40
+    Left = 480
+    Top = 16
   end
   object Medialist_Browse_Categories_PopupMenu: TPopupMenu
     Left = 456

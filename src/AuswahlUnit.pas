@@ -283,7 +283,8 @@ begin
       if MedienBib.BrowseMode = 2 then
       begin
           Nemp_MainForm.PanelTagCloudBrowse.Repaint;
-          MedienBib.TagCloud.  ShowTags(False);
+          MedienBib.TagCloud.PaintAgain;
+          //  ShowTags(False);
       end;
 end;
 

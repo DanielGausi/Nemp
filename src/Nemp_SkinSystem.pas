@@ -1640,12 +1640,15 @@ begin
   {$IFDEF USESTYLES}
   if UseAdvancedSkin and NempOptions.GlobalUseAdvancedSkin then
   begin
+      RevokeDragFiles;
       TStylemanager.TrySetStyle(self.AdvancedStyleName);
       //if NotTheFirstActivation then
         Nemp_MainForm.ReInitTaskbarManager(True);
   end
   else
   begin
+      if NotTheFirstActivation then
+        RevokeDragFiles;
       TStyleManager.TrySetStyle('Windows');
       if NotTheFirstActivation then
         Nemp_MainForm.ReInitTaskbarManager(True);
@@ -1931,6 +1934,8 @@ begin
         Menu := Nemp_MainMenu;
 
     {$IFDEF USESTYLES}
+    if NotTheFirstActivation then
+      RevokeDragFiles;
     TStyleManager.TrySetStyle('Windows');
     if NotTheFirstActivation then
       Nemp_MainForm.ReInitTaskbarManager(True);

@@ -37,6 +37,10 @@ object FDetails: TFDetails
       Caption = 'Summary'
       DoubleBuffered = False
       ParentDoubleBuffered = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_File: TGroupBox
         Left = 0
         Top = 0
@@ -765,6 +769,10 @@ object FDetails: TFDetails
     object Tab_Lyrics: TTabSheet
       Caption = 'Lyrics'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_Lyrics: TGroupBox
         Left = 0
         Top = 0
@@ -842,6 +850,10 @@ object FDetails: TFDetails
     object Tab_Pictures: TTabSheet
       Caption = 'Pictures (cover art)'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object PanelCoverArtFile: TPanel
         AlignWithMargins = True
         Left = 3
@@ -1074,6 +1086,10 @@ object FDetails: TFDetails
     object Tab_MetaData: TTabSheet
       Caption = 'Metadata'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_TextFrames: TGroupBox
         Left = 0
         Top = 0

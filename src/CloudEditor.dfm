@@ -113,14 +113,13 @@ object CloudEditorForm: TCloudEditorForm
         Anchors = [akLeft, akTop, akRight, akBottom]
         BorderWidth = 1
         Header.AutoSizeIndex = 0
-        Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
+        Header.Options = [hoColumnResize, hoDrag, hoVisible]
         IncrementalSearch = isAll
         Indent = 4
         PopupMenu = PopupExistingTags
         TabOrder = 1
         TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
         TreeOptions.SelectionOptions = [toFullRowSelect, toMultiSelect]
-        OnBeforeItemErase = TagVSTBeforeItemErase
         OnColumnDblClick = TagVSTColumnDblClick
         OnGetText = TagVSTGetText
         OnPaintText = TagVSTPaintText
@@ -130,13 +129,13 @@ object CloudEditorForm: TCloudEditorForm
         Columns = <
           item
             Position = 0
-            Text = 'Tag'
             Width = 217
+            WideText = 'Tag'
           end
           item
             Position = 1
-            Text = 'Count'
             Width = 100
+            WideText = 'Count'
           end>
       end
       object BtnMerge: TButton
@@ -216,13 +215,13 @@ object CloudEditorForm: TCloudEditorForm
         Columns = <
           item
             Position = 0
-            Text = 'Original key'
             Width = 150
+            WideText = 'Original key'
           end
           item
             Position = 1
-            Text = 'Replace with'
             Width = 150
+            WideText = 'Replace with'
           end>
       end
       object BtnDeleteMergeTag: TButton
@@ -273,8 +272,8 @@ object CloudEditorForm: TCloudEditorForm
         Columns = <
           item
             Position = 0
-            Text = 'Key'
             Width = 200
+            WideText = 'Key'
           end>
       end
       object BtnDeleteIgnoreTag: TButton

@@ -35,7 +35,7 @@ unit SplitForm_Hilfsfunktionen;
 interface
 
 uses Windows, forms, Classes, Controls, StdCtrls, ExtCtrls, Graphics, Nemp_ConstantsAndTypes, Messages, dialogs, ShellApi
-  {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF} , sysutils, System.Types, BaseForms;
+  {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF} , sysutils, System.Types, BaseForms, ActiveX;
 
   procedure SetRegion(GrpBox: TPanel; aForm: TForm; var NempRegionsDistance: TNempRegionsDistance;  aHandle: hWnd);
   function IntervalOverlap(left1, right1, left2, right2: integer): boolean;
@@ -58,6 +58,7 @@ uses Windows, forms, Classes, Controls, StdCtrls, ExtCtrls, Graphics, Nemp_Const
   procedure FixScrollbar;
 
   procedure ReAcceptDragFiles;
+  procedure RevokeDragFiles;
 
   procedure UpdateSmallMainForm;
   procedure UpdateFormDesignNeu(newMode: Integer);
@@ -1187,13 +1188,31 @@ begin
   end;
 end;
 
+procedure RevokeDragFiles;
+begin
+  RevokeDragDrop(Nemp_MainForm.PlayerControlPanel.Handle);
+  RevokeDragDrop(Nemp_MainForm.GRPBOXArtistsAlben.Handle);
+end;
+
 procedure ReAcceptDragFiles;
 begin
       DragAcceptFiles (PlaylistForm.Handle, True);
       DragAcceptFiles (AuswahlForm.Handle, True);
       DragAcceptFiles (MedienlisteForm.Handle, True);
       DragAcceptFiles (ExtendedControlForm.Handle, True);
-      DragAcceptFiles (Nemp_MainForm.Handle, True);
+      //DragAcceptFiles (Nemp_MainForm.Handle, True);
+      //DragAcceptFiles(Nemp_MainForm._ControlPanel.Handle, True);
+      RegisterDragDrop(Nemp_MainForm._ControlPanel.Handle, Nemp_MainForm.fDropManager as IDropTarget);
+      //RegisterDragDrop(Nemp_MainForm.PanelCoverBrowse.Handle, Nemp_MainForm.fDropManager as IDropTarget);
+      RegisterDragDrop(Nemp_MainForm.GRPBOXArtistsAlben.Handle, Nemp_MainForm.fDropManager as IDropTarget);
+
+      {case RegisterDragDrop(Nemp_MainForm._ControlPanel.Handle, Nemp_MainForm.fDropManager as IDropTarget) of
+      DRAGDROP_E_INVALIDHWND : ShowMessage('invalid');
+      DRAGDROP_E_ALREADYREGISTERED : ShowMessage('already reg');
+      E_OUTOFMEMORY : ShowMessage('outofmem');
+       S_OK: ShowMessage('ok');
+    end;}
+
 end;
 
 

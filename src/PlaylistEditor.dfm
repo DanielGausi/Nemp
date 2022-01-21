@@ -14,6 +14,7 @@ object PlaylistEditorForm: TPlaylistEditorForm
   Font.Style = []
   OldCreateOrder = False
   ShowHint = True
+  OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -49,6 +50,7 @@ object PlaylistEditorForm: TPlaylistEditorForm
       Height = 220
       Align = alTop
       Anchors = [akLeft, akTop, akRight, akBottom]
+      Colors.UnfocusedSelectionColor = clGrayText
       Header.AutoSizeIndex = 0
       Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
       Indent = 4
@@ -72,7 +74,7 @@ object PlaylistEditorForm: TPlaylistEditorForm
       Columns = <
         item
           Position = 0
-          Width = 214
+          Width = 210
           WideText = 'Favorite playlists'
         end>
     end
@@ -144,11 +146,13 @@ object PlaylistEditorForm: TPlaylistEditorForm
       OnGetText = PlaylistFilesVSTGetText
       OnPaintText = PlaylistFilesVSTPaintText
       OnGetHint = PlaylistFilesVSTGetHint
+      OnGetUserClipboardFormats = PlaylistFilesVSTGetUserClipboardFormats
+      OnRenderOLEData = PlaylistFilesVSTRenderOLEData
       OnStartDrag = PlaylistFilesVSTStartDrag
       Columns = <
         item
           Position = 0
-          Width = 261
+          Width = 257
           WideText = 'Title'
         end
         item
@@ -196,19 +200,6 @@ object PlaylistEditorForm: TPlaylistEditorForm
       TabOrder = 1
       OnClick = PM_PL_AddFilesClick
     end
-  end
-  object DragFilesSrc1: TDragFilesSrc
-    DropEffect = deCopy
-    VerifyFiles = False
-    OnDropping = DragFilesSrc1Dropping
-    Left = 20
-    Top = 32
-  end
-  object DragDropTimer: TTimer
-    Enabled = False
-    OnTimer = DragDropTimerTimer
-    Left = 92
-    Top = 32
   end
   object PlayListOpenDialog: TOpenDialog
     Filter = 

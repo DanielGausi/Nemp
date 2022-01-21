@@ -74,12 +74,14 @@ uses WinApi.Windows, System.Classes, System.SysUtils,
                 fPath: String;
                 fDriveID: Integer;
                 fCategory: Cardinal;
+                fName: String;
                 function GetFilename: String;
             public
-                property Path   : String  read fPath    write fPath    ;
+                property Path: String read fPath write fPath ;
                 property Filename: String read GetFilename;
                 property DriveID: Integer read fDriveID write fDriveID ;
-                property Category: Cardinal read fCategory write fCategory; //write: todo
+                property Category: Cardinal read fCategory write fCategory;
+                property Name: String read fName write fName;
 
                 constructor Create(aFilename: String = '');
                 procedure LoadFromStream(aStream: TStream);
