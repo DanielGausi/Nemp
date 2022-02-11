@@ -1484,10 +1484,10 @@ begin
               begin
                   //if (SourceCoverlist[i].ID <> '')
                   //    and(SourceCoverlist[i].ID[1] <> '_')
-                  if (RC.SubCollections[i].CoverID <> '')
-                    and (RC.SubCollections[i].CoverID[1] <> '_')
+                  if (RC.Collection[i].CoverID <> '')
+                    and (RC.Collection[i].CoverID[1] <> '_')
                   then
-                      GoodCoverList.Add(RC.SubCollections[i]);
+                      GoodCoverList.Add(RC.Collection[i]);
               end;
 
               if GoodCoverList.Count >= 1 then
@@ -1554,7 +1554,7 @@ const
       for j := 0 to aRootCollection.CollectionCount - 1 do
       begin
         //if TNempCover(MainCoverList[j]).ID = aCoverID then
-        if aRootCollection.SubCollections[j].Key = aKey then
+        if aRootCollection.Collection[j].Key = aKey then
         begin
           result := j + 1;
           {

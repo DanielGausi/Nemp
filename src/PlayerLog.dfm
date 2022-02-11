@@ -46,6 +46,8 @@ object PlayerLogForm: TPlayerLogForm
     Width = 568
     Height = 216
     Anchors = [akLeft, akTop, akRight, akBottom]
+    Colors.UnfocusedSelectionColor = clHighlight
+    Colors.UnfocusedSelectionBorderColor = clHighlight
     Header.AutoSizeIndex = 0
     Header.Options = [hoColumnResize, hoDblClickResize, hoDrag, hoShowSortGlyphs, hoVisible]
     Indent = 0
@@ -56,28 +58,28 @@ object PlayerLogForm: TPlayerLogForm
     Columns = <
       item
         Position = 0
-        Text = 'Time'
         Width = 85
+        WideText = 'Time'
       end
       item
         Position = 1
-        Text = 'Title'
         Width = 120
+        WideText = 'Title'
       end
       item
         Position = 2
-        Text = 'Artist'
         Width = 96
+        WideText = 'Artist'
       end
       item
         Position = 3
-        Text = 'Filename'
         Width = 148
+        WideText = 'Filename'
       end
       item
         Position = 4
-        Text = 'Remark'
         Width = 69
+        WideText = 'Remark'
       end>
   end
   object cbSessionSelect: TComboBox

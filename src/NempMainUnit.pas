@@ -104,7 +104,6 @@ type
     PanelCoverBrowse: TNempPanel;
     CoverScrollbar: TScrollBar;
     MenuImages: TImageList;
-    TabBtn_Playlist: TSkinButton;
     PlayListStatusLBL: TLabel;
     PlayListOpenDialog: TOpenDialog;
     PlaylistDateienOpenDialog: TOpenDialog;
@@ -394,7 +393,6 @@ type
     MM_O_Skin_UseAdvanced: TMenuItem;
     PM_P_Skin_UseAdvancedSkin: TMenuItem;
     CoverFlowRefreshViewTimer: TTimer;
-    EditPlaylistSearch: TEdit;
     PopupEditExtendedTags: TPopupMenu;
     PM_RemoveTagThisFile: TMenuItem;
     N1: TMenuItem;
@@ -592,7 +590,6 @@ type
     PM_ML_ReplayGain_Clear: TMenuItem;
     N27: TMenuItem;
     LblBibReplayGain: TLabel;
-    TabBtn_Favorites: TSkinButton;
     PlaylistManagerPopup: TPopupMenu;
     N10: TMenuItem;
     PM_PLM_RecentPlaylists: TMenuItem;
@@ -624,6 +621,16 @@ type
     PM_ML_SortCollectionByGenre: TMenuItem;
     PM_ML_SortCollectionByDirectory: TMenuItem;
     MM_ML_ConfigureMediaLibrary: TMenuItem;
+    edtCloudSearch: TEdit;
+    AuswahlControlPanel: TNempPanel;
+    PlaylistControlPanel: TNempPanel;
+    TabBtn_Playlist: TSkinButton;
+    TabBtn_Favorites: TSkinButton;
+    EditPlaylistSearch: TEdit;
+    MedienBibDetailControlPanel: TNempPanel;
+    MedienListeControlPanel: TNempPanel;
+    PM_ML_ChangeCategory: TMenuItem;
+    PM_MLView_ChangeCategory: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -644,6 +651,7 @@ type
 
     procedure DatenbankUpdateTBClick(Sender: TObject);
 
+    procedure ChangeCategory(aList: TAudioFileList);
     procedure HandleFiles(aList: TAudioFileList; how: integer);
 
     function GetSelectedCollectionFromMainWindow: TAudioCollection;
@@ -1024,6 +1032,7 @@ type
     procedure PanelTagCloudBrowseMouseMove(Sender: TObject; Shift: TShiftState;
       X, Y: Integer);
     procedure PanelTagCloudBrowseClick(Sender: TObject);
+    procedure DoExpandCloud(ac: TAudioFileCollection);
     procedure PanelTagCloudBrowseDblClick(Sender: TObject);
     procedure CloudTestKey(Sender: TObject; var Key: Char);
 
@@ -1032,6 +1041,7 @@ type
 
     procedure CloudPaint(Sender: TObject);
     procedure CloudAfterPaint(Sender: TObject);
+    procedure OnGetCloudHint(Sender: TCloudView; ac: TAudioFileCollection; var HintText: String);
 
     procedure PanelTagCloudBrowseMouseDown(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -1052,7 +1062,6 @@ type
     procedure PM_PL_ShowInExplorerClick(Sender: TObject);
     procedure PM_ML_SetRatingsOfSelectedFilesClick(Sender: TObject);
     procedure GRPBOXArtistsAlbenResize(Sender: TObject);
-    procedure AuswahlPanelResize(Sender: TObject);
     procedure SplitterBrowseMoved(Sender: TObject);
     procedure SubSplitter2Moved(Sender: TObject);
 
@@ -1099,7 +1108,6 @@ type
       MousePos: TPoint; var Handled: Boolean);
     procedure CoverFlowRefreshViewTimerTimer(Sender: TObject);
     procedure EditPlaylistSearchEnter(Sender: TObject);
-    procedure EditPlaylistSearchExit(Sender: TObject);
     procedure EditPlaylistSearchChange(Sender: TObject);
     procedure EditPlaylistSearchKeyPress(Sender: TObject; var Key: Char);
     procedure EditPlaylistSearchKeyDown(Sender: TObject; var Key: Word;
@@ -1274,6 +1282,10 @@ type
     procedure LibraryCollectionTreeDragDrop(Sender: TBaseVirtualTree; Source: TObject;
       DataObject: IDataObject; Formats: TFormatArray; Shift: TShiftState;
       Pt: TPoint; var Effect: Integer; Mode: TDropMode);
+    procedure edtCloudSearchChange(Sender: TObject);
+    procedure edtCloudSearchKeyPress(Sender: TObject; var Key: Char);
+    procedure PM_ML_ChangeCategoryClick(Sender: TObject);
+    procedure PM_MLView_ChangeCategoryClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -1335,7 +1347,7 @@ type
 
   public
     { Public declarations }
-    CloudViewer: TCloudViewer;
+    CloudViewer: TCloudView;
 
     NempIsClosing: Boolean;
     fDropManager : TNempDragManager;// IDropTarget;
@@ -1509,7 +1521,7 @@ uses   Splash, About, OptionsComplete, StreamVerwaltung,
   CDOpenDialogs, WebServerLog, Lowbattery, ProgressUnit, EffectsAndEqualizer,
   MainFormBuilderForm, ReplayGainProgress, NempReplayGainCalculation,
   NewFavoritePlaylist, PlaylistManagement, PlaylistEditor, AudioDisplayUtils ,
-  LibraryOrganizer.Configuration;
+  LibraryOrganizer.Configuration, fChangeFileCategory;
 
 
 {$R *.dfm}
@@ -1622,31 +1634,33 @@ procedure TNemp_MainForm.PanelTagCloudBrowseClick(Sender: TObject);
 var
   ac: TAudioFileCollection;
 begin
-    MedienBib.TagCloud.FocussedTag := MedienBib.TagCloud.MouseOverTag;
-    ac := MedienBib.TagCloud.FocussedCollection;
+    CloudViewer.FocussedTag := CloudViewer.MouseOverTag;
+    ac := CloudViewer.FocussedCollection;
     if assigned(ac) then
       MedienBib.GenerateAnzeigeListe(ac);
 end;
 
-procedure TNemp_MainForm.PanelTagCloudBrowseDblClick(Sender: TObject);
-var
-  ac: TAudioFileCollection;
+procedure TNemp_MainForm.DoExpandCloud(ac: TAudioFileCollection);
 begin
-    MedienBib.TagCloud.FocussedTag := MedienBib.TagCloud.MouseOverTag;
-    ac := MedienBib.TagCloud.FocussedCollection;
-    if assigned(ac) and ac.ExpandTagCloud then begin
-      MedienBib.TagCloud.SetCollection(ac);
-      MedienBib.TagCloud.Paint;
-      MedienBib.GenerateAnzeigeListe(ac);
-    end;
+  if assigned(ac) and ac.ExpandTagCloud then begin
+    CloudViewer.Collection := ac;
+    CloudViewer.PaintCloud;
+    CloudViewer.FocussedTag := CloudViewer.GetFirstNewTag;
+    MedienBib.GenerateAnzeigeListe(ac);
+  end;
+end;
+
+procedure TNemp_MainForm.PanelTagCloudBrowseDblClick(Sender: TObject);
+begin
+  CloudViewer.FocussedTag := CloudViewer.MouseOverTag;
+  DoExpandCloud(CloudViewer.FocussedCollection);
 end;
 
 
 procedure TNemp_MainForm.PanelTagCloudBrowseMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
-var aTag: TPaintTag;
-    DateiListe: TAudioFileList;
-    ac: TAudioCollection;
+var
+   DateiListe: TAudioFileList;
 begin
     if ssleft in shift then
     begin
@@ -1663,17 +1677,9 @@ begin
     end
     else
     begin
-        TagCloudDownX := 0;
-        TagCloudDownY := 0;
-
-        aTag := MedienBib.TagCloud.GetTagAtMousePos(x,y);
-
-        if (aTag <> MedienBib.TagCloud.MouseOverTag) and assigned(aTag) then
-        begin
-            MedienBib.TagCloud.RePaintTag(MedienBib.TagCloud.MouseOverTag, False);
-            MedienBib.TagCloud.MouseOverTag := aTag;
-            MedienBib.TagCloud.RePaintTag(MedienBib.TagCloud.MouseOverTag, True);
-        end;
+      TagCloudDownX := 0;
+      TagCloudDownY := 0;
+      CloudViewer.MouseOverTag := CloudViewer.GetTagAtMousePos(x,y);
     end;
 end;
 
@@ -1685,30 +1691,16 @@ end;
 
 procedure TNemp_MainForm.PanelTagCloudBrowseResize(Sender: TObject);
 begin
-    if not FormReadyAndActivated then
-        exit;
-
-    MedienBib.TagCloud.Height := CloudViewer.Height;
-    MedienBib.TagCloud.Width := CloudViewer.Width;
-    MedienBib.TagCloud.Paint(''{MedienBib.TagCloud.CurrentTagList});
+  if not FormReadyAndActivated then
+    exit;
+  CloudViewer.ResizePaint(''{MedienBib.TagCloud.CurrentTagList});
 end;
 
 
 procedure TNemp_MainForm.CloudTestKey(Sender: TObject; var Key: Char);
-var
-  ac: TAudioFileCollection;
 begin
-    if ord(Key) = vk_return then
-    begin
-        ac := MedienBib.TagCloud.FocussedCollection;
-        if assigned(ac) and ac.ExpandTagCloud then begin
-          MedienBib.TagCloud.SetCollection(ac);
-          MedienBib.TagCloud.Paint;
-          MedienBib.GenerateAnzeigeListe(ac);
-        end;
-        // xxxxxxxxxxxxxxxx MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, True);
-        // MedienBib.TagCloud.ShowTags(True);
-    end;
+  if ord(Key) = vk_return then
+    DoExpandCloud(CloudViewer.FocussedCollection);
 end;
 
 procedure TNemp_MainForm.CloudTestKeyDown(Sender: TObject; var Key: Word;
@@ -1716,39 +1708,66 @@ procedure TNemp_MainForm.CloudTestKeyDown(Sender: TObject; var Key: Word;
 var
   ac: TAudioFileCollection;
 begin
-    MedienBib.TagCloud.NavigateCloud(Key, Shift);
+    CloudViewer.NavigateCloud(Key, Shift);
+
+    if (ssCtrl in Shift) and (key = $46) then
+      edtCloudSearch.SetFocus;
+
     case key of
         vk_Escape,
         vk_Back: begin
-                ac := MedienBib.TagCloud.FocussedCollection;
+                ac := CloudViewer.FocussedCollection;
                 if assigned(ac) and ac.ExpandTagCloud then begin
-                  MedienBib.TagCloud.SetCollection(ac);
-                  MedienBib.TagCloud.Paint;
+                  CloudViewer.Collection := ac;
+                  CloudViewer.PaintCloud;
                   MedienBib.GenerateAnzeigeListe(ac);
                 end;
-
-                // xxxxxxxxxxxxxxxx MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, True);
-                // MedienBib.TagCloud.ShowTags(True);
         end
     else
-        // xxxxxxxxxxxxxxxx MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, False);
-    begin
-      ac := MedienBib.TagCloud.FocussedCollection;
-      if assigned(ac) then
-        MedienBib.GenerateAnzeigeListe(ac);
+      begin
+        ac := CloudViewer.FocussedCollection;
+        if assigned(ac) then
+          MedienBib.GenerateAnzeigeListe(ac);
+      end;
     end;
-    end;
+
 end;
 
 procedure TNemp_MainForm.CloudAfterPaint(Sender: TObject);
 begin
     if Not NempSkin.isActive then
-        MedienBib.TagCloud.PaintAgain;
+        CloudViewer.PaintAgain;
 end;
 
 procedure TNemp_MainForm.CloudPaint(Sender: TObject);
 begin
-  MedienBib.TagCloud.PaintAgain;
+  CloudViewer.PaintAgain;
+end;
+
+procedure TNemp_MainForm.OnGetCloudHint(Sender: TCloudView; ac: TAudioFileCollection; var HintText: String);
+var
+  Files: TAudioFileList;
+  i, maxC: Integer;
+begin
+  if not assigned(ac) then begin
+    HintText := '';
+    exit;
+  end;
+
+  Files := TAudioFileList.Create(False);
+  try
+    HintText := '';
+    ac.GetFiles(Files, False, False);
+    if Files.Count > 0 then
+      Hinttext := NempDisplay.PlaylistTitle(Files[0]);
+    maxC := min(5, Files.Count);
+    for i := 1 to maxC - 1 do
+        Hinttext := Hinttext + #13#10 + NempDisplay.PlaylistTitle(Files[i]);
+    if Files.Count > 5 then
+      Hinttext := Hinttext + #13#10 + Format(TagCloud_MoreFiles, [Files.Count-5]);
+  finally
+    Files.Free;
+  end;
 end;
 
 procedure TNemp_MainForm.PanelTagCloudBrowseMouseDown(Sender: TObject;
@@ -1760,12 +1779,12 @@ begin
     TagCloudDownX := X;
     TagCloudDownY := Y;
 
-    //if Button = mbRight then begin
-      MedienBib.TagCloud.FocussedTag := MedienBib.TagCloud.MouseOverTag;
-      ac := MedienBib.TagCloud.FocussedCollection;
+    if Button = mbRight then begin
+      CloudViewer.FocussedTag := CloudViewer.MouseOverTag;
+      ac := CloudViewer.FocussedCollection;
       if assigned(ac) then
         MedienBib.GenerateAnzeigeListe(ac);
-    //end;
+    end;
 end;
 
 procedure TNemp_MainForm.PanelTagCloudBrowseMouseUp(Sender: TObject;
@@ -1936,7 +1955,7 @@ begin
     TCoverArtSearcher.InitCoverArtCache(SavePath, 0);
 
     // Create additional controls
-    CloudViewer           := TCloudViewer.Create(self);
+    CloudViewer           := TCloudView.Create(self);
     CloudViewer.Parent    := PanelTagCloudBrowse;
     CloudViewer.Name      := 'CloudViewer';
     CloudViewer.Align     := alClient;
@@ -1952,6 +1971,7 @@ begin
     CloudViewer.OnResize     := PanelTagCloudBrowseResize;
     CloudViewer.OnPaint      := CloudPaint;
     CloudViewer.OnAfterPaint := CloudAfterPaint;
+    CloudViewer.OnGetHint := OnGetCloudHint;
 
     CloudViewer.StyleElements := [];
 
@@ -2028,7 +2048,7 @@ begin
     // Create Medialibrary
     MedienBib := TMedienBibliothek.Create(FOwnMessageHandler, PanelCoverBrowse.Handle);
     MedienBib.BibScrobbler := NempPlayer.NempScrobbler;
-    MedienBib.TagCloud.Canvas := CloudViewer.Canvas;
+    //MedienBib.TagCloud.Canvas := CloudViewer.Canvas;
     MedienBib.SavePath := SavePath;
 
     CoverDownloadThread := TCoverDownloadWorkerThread.Create;
@@ -3765,7 +3785,7 @@ begin
           result := MedienBib.NewCoverFlow.Collection[CoverScrollbar.Position];
     end;
     2: begin
-      result := MedienBib.TagCloud.FocussedCollection;
+      result := CloudViewer.FocussedCollection;
     end;
   end;
 
@@ -3833,7 +3853,7 @@ var
   ac: TAudioCollection;
 begin
   result := False;
-  ac := MedienBib.TagCloud.FocussedCollection;
+  ac := CloudViewer.FocussedCollection;
   if assigned(ac) then begin
     result := True;
     GenerateSortedListFromCollection(ac, dest, CreateFileCopies);
@@ -4090,7 +4110,7 @@ begin
             ac := MedienBib.NewCoverFlow.Collection[CoverScrollbar.Position];
       end;
       2: begin
-        ac := MedienBib.TagCloud.FocussedCollection;
+        ac := CloudViewer.FocussedCollection;
       end;
     end;
 
@@ -4112,7 +4132,7 @@ begin
     if assigned(ac) and (ac is TAudioFileCollection) and (nLevel >= 0) and (MedienBib.BrowseMode <> 2) then begin
       acFile := TAudioFileCollection(ac);
       if not (acFile is TRootCollection) and (acFile.CollectionCount = 0) then begin
-        acFile := acFile.ParentCollection;
+        acFile := acFile.Parent;
         dec(nLevel);
       end;
 
@@ -4121,21 +4141,22 @@ begin
         CollectionCaption := TRootCollection(acFile).LevelCaption[0]
       end
       else begin
-        levelCaption := acFile.RootCollection.LevelCaption[nLevel];
+        levelCaption := acFile.Root.LevelCaption[nLevel];
         CollectionCaption := acFile.SimpleCaption;
       end;
 
-      isAlbum := (acFile.SubCollectionType = ctAlbum) or (MedienBib.BrowseMode = 1);
-      isDirectory := acFile.SubCollectionType = ctDirectory;
-      if isDirectory then
-        PM_ML_SortLayerBy.Caption :=  MainForm_MenuCaptionsSortDirectoriesBy
-      else
-        PM_ML_SortLayerBy.Caption := Format(MainForm_MenuCaptionsSortLayerBy, [levelCaption]);
+      isAlbum := (acFile.ChildContent = ccAlbum) or (MedienBib.BrowseMode = 1);
+      isDirectory := acFile.ChildContent = ccDirectory;
+
+      case acFile.Root.SpecialContent of
+        scRegular: PM_ML_SortLayerBy.Caption := Format(MainForm_MenuCaptionsSortLayerBy, [levelCaption]);
+        scDirectory: PM_ML_SortLayerBy.Caption :=  MainForm_MenuCaptionsSortDirectoriesBy;
+        scTagCloud: PM_ML_SortLayerBy.Caption :=  MainForm_MenuCaptionsSortTagCloudBy;
+      end;
       PM_ML_SortLayerBy.Visible := True;
 
-
       for i := 0 to PM_ML_SortLayerBy.Count - 1 do
-        PM_ML_SortLayerBy.Items[i].Checked := acFile.SubCollectionSorting = teCollectionSorting(PM_ML_SortLayerBy.Items[i].Tag);
+        PM_ML_SortLayerBy.Items[i].Checked := acFile.ChildSorting = teCollectionSorting(PM_ML_SortLayerBy.Items[i].Tag);
 
       {PM_ML_SortLayerByAlbum.Checked := acFile.SubCollectionSorting = teCollectionSorting(PM_ML_SortLayerByAlbum.Tag);
       PM_ML_SortLayerByArtistAlbum.Checked := acFile.SubCollectionSorting = teCollectionSorting(PM_ML_SortLayerByArtistAlbum.Tag);
@@ -4170,7 +4191,11 @@ begin
       PM_ML_SortCollectionBy.Visible := False;
     end;
 
-    if assigned(ac) then
+    if assigned(ac) then begin
+      PM_ML_ChangeCategory.Enabled := LibraryIsIdle AND LibraryNotBlockedByPartymode
+            AND (ac.CollectionClass = ccFiles)
+            AND (ac.Count > 0) ;
+
       case ac.CollectionClass of
         ccFiles: canPlay := ac.Count > 0;
         ccPlaylists: canPlay := True;
@@ -4178,8 +4203,11 @@ begin
       else
         canPlay := False;
       end
-    else
+    end
+    else begin
       canPlay := False;
+      PM_ML_ChangeCategory.Enabled := False;
+    end;
 
     PM_ML_PlayBrowse    .Enabled := canPlay AND LibraryNotBlockedByPartymode;
     PM_ML_EnqueueBrowse .Enabled := canPlay;
@@ -4190,6 +4218,7 @@ begin
     // changed to OnPopup (2019)
     PM_ML_SortLayerBy.Enabled := LibraryIsIdle;
     PM_ML_ConfigureMedialibrary.Enabled := LibraryIsIdle and LibraryNotBlockedByPartymode;
+
 
     PM_ML_SearchDirectory.Enabled := LibraryIsIdle AND LibraryNotBlockedByPartymode;
     PM_ML_Medialibrary   .Enabled := LibraryIsIdle AND LibraryNotBlockedByPartymode;
@@ -4245,6 +4274,7 @@ begin
                                                       AND (NOT MedienBib.AnzeigeShowsPlaylistFiles);
 
     // Editing Files
+    PM_MLView_ChangeCategory.Enabled := LibraryIsIdle AND SomeFilesSelected AND LibraryNotBlockedByPartymode AND (NOT MedienBib.AnzeigeShowsPlaylistFiles);
     PM_ML_SetRatingsOfSelectedFilesCHOOSE.Enabled := LibraryIsIdle AND SomeFilesSelected AND LibraryNotBlockedByPartymode AND (NOT MedienBib.AnzeigeShowsPlaylistFiles);
             PM_ML_SetRatingsOfSelectedFiles1 .Enabled := LibraryIsIdle AND SomeFilesSelected AND LibraryNotBlockedByPartymode AND (NOT MedienBib.AnzeigeShowsPlaylistFiles);
             PM_ML_SetRatingsOfSelectedFiles2 .Enabled := LibraryIsIdle AND SomeFilesSelected AND LibraryNotBlockedByPartymode AND (NOT MedienBib.AnzeigeShowsPlaylistFiles);
@@ -5247,9 +5277,12 @@ begin
                                 + Format((MainForm_Summary_FileCountTotal), [c] );
 
 
-  RefreshVSTDetailsTimer.Enabled := False;
-  RefreshVSTDetailsTimer.Enabled := True;
-  RefreshVSTDetailsTimer.Tag := SD_MEDIENBIB;
+  if c > 0 then begin
+
+    RefreshVSTDetailsTimer.Enabled := False;
+    RefreshVSTDetailsTimer.Enabled := True;
+    RefreshVSTDetailsTimer.Tag := SD_MEDIENBIB;
+  end;
   {aNode := VST.FocusedNode;
   if Assigned(aNode) then
   begin
@@ -5462,17 +5495,16 @@ begin
         begin
             // update the current File NOW
             MedienBib.CurrentAudioFile.ChangeTag(CurrentTagToChange, '');
+            MedienBib.RelocateAudioFile(MedienBib.CurrentAudioFile);
             DoSyncStuffAfterTagEdit(MedienBib.CurrentAudioFile, backup);
-
             // show the tags again.
             CreateTagLabels(MedienBib.CurrentAudioFile);
-
             // update all files, show hint to activate the Looooong procedure later.
             MedienBib.ChangeTags(CurrentTagToChange, '');
+            MedienBib.RefreshCollections;
             SetGlobalWarningID3TagUpdate;
-
             // Set a warning in the tab button, if we are using the tag cloud right now for browsing
-            SetBrowseTabCloudWarning(True);
+            //SetBrowseTabCloudWarning(True);
         end;
     end else
         TranslateMessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
@@ -5497,16 +5529,16 @@ begin
         begin
             // update the current File NOW
             MedienBib.CurrentAudioFile.ChangeTag(CurrentTagToChange, newTag);
+            MedienBib.RelocateAudioFile(MedienBib.CurrentAudioFile);
             DoSyncStuffAfterTagEdit(MedienBib.CurrentAudioFile, backup);
             // show the tags again.
             CreateTagLabels(MedienBib.CurrentAudioFile);
-
             // update all files, show hint to activate the Looooong procedure later.
             MedienBib.ChangeTags(CurrentTagToChange, newTag);
+            MedienBib.RefreshCollections;
             SetGlobalWarningID3TagUpdate;
-
             // Set a warning in the tab button, if we are using the tag cloud right now for browsing
-            SetBrowseTabCloudWarning(True);
+            //SetBrowseTabCloudWarning(True);
         end;
 
     end else
@@ -6251,7 +6283,7 @@ var
   lc: TLibraryCategory;
 begin
   lc := Sender.GetNodeData<TLibraryCategory>(Node);
-  if NempOrganizerSettings.ShowCollectionCount then
+  if NempOrganizerSettings.ShowCategoryCount then
     CellText := lc.CaptionCount //Format('%s (%d)', [lc.Name, lc.ItemCount]);
   else
     CellText := lc.Caption;
@@ -6294,7 +6326,7 @@ var
 begin
   for i := 0 to aCollection.CollectionCount - 1 do
   begin
-    subCollection := aCollection.SubCollections[i];
+    subCollection := aCollection.Collection[i];
     subCollectionNode := AlbenVST.AddChild(aNode, subCollection);
     AddCollection(subCollection, subCollectionNode)
   end;
@@ -6448,8 +6480,10 @@ procedure TNemp_MainForm.FillCollectionTagCloud(Source: TLibraryCategory; Remark
 var
   lastSelectedCollection: TAudioCollection;
   ParentCol, FocusCol: TAudioFileCollection;
+  LastKeyFound,
+  ExpandLastKey: Boolean;
 begin
-  if assigned(Source) then
+  if assigned(Source) and (Source.CategoryType = ccFiles) then
     MedienBib.CurrentCategory := Source
   else begin
     if MedienBib.FileCategories.Count > 0 then
@@ -6461,50 +6495,34 @@ begin
   if assigned(MedienBib.CurrentCategory) then begin
     lastSelectedCollection := Nil;
     if RemarkOldNodes then
-      lastSelectedCollection := Source.FindLastCollectionAgain;
+      lastSelectedCollection := TLibraryFileCategory(MedienBib.CurrentCategory).FindLastCollectionAgainTagCloud(LastKeyFound, ExpandLastKey);
     if not assigned(lastSelectedCollection) then
       lastSelectedCollection := MedienBib.CurrentCategory.Collections[0];
+     // das ergab grade ne AV .... außerhalb des gültigen bereichs
+      //wenn eine leere Categorie gewählt ist
 
-    caption := lastSelectedCollection.Key;
-
-    ParentCol := TAudioFileCollection(lastSelectedCollection).ParentCollection;
-
-    if assigned(ParentCol) {and (ParentCol.CollectionType <> ctRoot)} then begin
-      MedienBib.TagCloud.SetCollection(ParentCol);
-      // MedienBib.TagCloud.FocussedCollection :=
-      // focussed Tag anhand des letzten Keys bestimmen
+    if not LastKeyFound or ExpandLastKey then begin
+      TAudioFileCollection(lastSelectedCollection).ExpandTagCloud;
+      CloudViewer.Collection := TAudioFileCollection(lastSelectedCollection);
     end else
     begin
-      TAudioFileCollection(lastSelectedCollection).ExpandTagCloud;
-      MedienBib.TagCloud.SetCollection(TAudioFileCollection(lastSelectedCollection));
+      ParentCol := TAudioFileCollection(lastSelectedCollection).Parent;
+      if assigned(ParentCol) {and (ParentCol.CollectionType <> ctRoot)} then begin
+        CloudViewer.Collection := ParentCol;
+      end else
+      begin
+        TAudioFileCollection(lastSelectedCollection).ExpandTagCloud;
+        CloudViewer.Collection := TAudioFileCollection(lastSelectedCollection);
+      end;
     end;
 
-    MedienBib.TagCloud.Paint;
-
+    CloudViewer.PaintCloud;
     FocusCol := TAudioFileCollection(lastSelectedCollection);
     if not assigned(FocusCol) then
-      FocusCol := MedienBib.TagCloud.GetFirstNewCollection;
-
-    MedienBib.TagCloud.FocussedCollection := FocusCol;
+      FocusCol := CloudViewer.GetFirstNewCollection;
+    CloudViewer.FocussedCollection := FocusCol;
     MedienBib.GenerateAnzeigeListe(FocusCol);
-
-    // generateanzeigeliste anhend der gewählten colelction
-
-    {MedienBib.NewCoverFlow.SetNewList(MedienBib.CurrentCategory);
-    MedienBib.CoverArtSearcher.PrepareMainCover(MedienBib.CurrentCategory);
-    SetCoverFlowScrollbarRange(MedienBib.NewCoverFlow.CoverCount);
-    if RemarkOldNodes then begin
-      CoverScrollbar.Position := MedienBib.NewCoverFlow.GetCollectionIndex(MedienBib.CurrentCategory.FindLastCollectionAgain);
-      //MedienBib.NewCoverFlow.CurrentItem
-    end
-    else
-      CoverScrollbar.Position := 0;
-
-    CoverScrollbarChange(Nil);
-    MedienBib.NewCoverFlow.Paint(1);
-    }
   end;
-
 end;
 
 procedure TNemp_MainForm.FillCollectionTree(Source: TLibraryCategory; RemarkOldNodes: LongBool);
@@ -6523,10 +6541,6 @@ begin
 
   if assigned(Source) then begin
     MedienBib.CurrentCategory := Source;
-
-    //ShowMessage('FillCollectionTree: ' +  MedienBib.CurrentCategory.Name);
-
-    // ShowMessage (Source.LastSelectedCollectionData[MedienBib.BrowseMode].KeyPath);
 
     // Get lastSelectedCollection first.
     // This may create some more layers of sub-collections which the tree should also display
@@ -6584,28 +6598,10 @@ begin
       2: begin
                 ReFillCategoryMenu(RemarkOldNodes);
                 FillCollectionTagCloud(MedienBib.CurrentCategory, RemarkOldNodes);
-
-
-                // MedienBib.TagCloud.SetCollection
-                (*
-                // 1. Backup Breadcrumbs (current navigation)
-                if RemarkOldNodes then
-                    MedienBib.TagCloud.BackUpNavigation;
-
-                // 2. Rebuild TagCloud
-                MedienBib.ReBuildTagCloud;
-
-                // 3. Restore BreadCrumbs
-                if RemarkOldNodes then
-                    MedienBib.RestoreTagCloudNavigation;
-
-                // 4. Show Files for the current Tag
-                // xxxxxxxxxxxxxxxx MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, False);
-                *)
       end;
   end;
   SetBrowseTabWarning(False);
-  SetBrowseTabCloudWarning(False);
+  // SetBrowseTabCloudWarning(False);
 end;
 
 
@@ -9180,6 +9176,59 @@ begin
 end;
 
 
+procedure TNemp_MainForm.ChangeCategory(aList: TAudioFileList);
+begin
+  if NOT (assigned(MedienBib.CurrentCategory)
+    and (MedienBib.CurrentCategory is TLibraryFileCategory))
+  then
+    exit;
+
+  if not assigned(FormChangeCategory) then
+    Application.CreateForm(TFormChangeCategory, FormChangeCategory);
+
+  FormChangeCategory.SetCategories(MedienBib.FileCategories, TLibraryFileCategory(MedienBib.CurrentCategory));
+  FormChangeCategory.SetFiles(aList);
+  if FormChangeCategory.ShowModal = mrOK then begin
+    MedienBib.ChangeCategory(
+            MedienBib.CurrentCategory,
+            FormChangeCategory.NewCategory,
+            aList,
+            FormChangeCategory.Effect);
+    MedienBib.RefreshCollections;
+  end;
+end;
+
+procedure TNemp_MainForm.PM_MLView_ChangeCategoryClick(Sender: TObject);
+var
+  FileList: TAudioFileList;
+begin
+  FileList := TAudioFileList.Create(False);
+  try
+    if GenerateSortedListFromFileView(FileList, False) then
+      // Show SelectionDialog and Change Category of the files
+      ChangeCategory(FileList);
+  finally
+    FileList.Free;
+  end;
+end;
+
+procedure TNemp_MainForm.PM_ML_ChangeCategoryClick(Sender: TObject);
+var
+  FileList: TAudioFileList;
+begin
+  FileList := TAudioFileList.Create(False);
+  try
+    case medienBib.BrowseMode of
+      0: GenerateSortedListFromCollectionTree(FileList, False);
+      1: GenerateSortedListFromCoverFlow(FileList, False);
+      2: GenerateSortedListFromTagCloud(FileList, False);
+    end;
+    // Show SelectionDialog and Change Category of the files
+    ChangeCategory(FileList);
+  finally
+    FileList.Free;
+  end;
+end;
 
 procedure TNemp_MainForm.PM_ML_CloudEditorClick(Sender: TObject);
 begin
@@ -10147,18 +10196,6 @@ end;
 
 procedure TNemp_MainForm.EDITFastSearchEnter(Sender: TObject);
 begin
-  if EditFastSearch.Tag = 0 then
-  begin
-      EditFastSearch.OnChange := Nil;
-      EditFastSearch.Text := '';
-      EditFastSearch.OnChange := EDITFastSearchChange;
-  end
-  else
-      EditFastSearch.SelectAll;
-  EditFastSearch.Font.Color := clWindowText;
-  EditFastSearch.Font.Style := [];
-  EditFastSearch.Tag := 1;
-
   if (EditFastSearch.Text <> '')
        AND (MedienBib.DisplayContent <> DISPLAY_QuickSearch)
   then
@@ -10171,25 +10208,14 @@ begin
       //    AND (MedienBib.BrowseMode = 1)
       //then
       //    RefreshCoverFlowTimer.Enabled := True;
-
   end;
 end;
 
 procedure TNemp_MainForm.EDITFastSearchExit(Sender: TObject);
 begin
-  if Trim(EditFastSearch.Text) = '' then
-  begin
-    EditFastSearch.Font.Color := clGrayText;
-    EditFastSearch.Font.Style := [];
-    EditFastSearch.Tag := 0;
-    EditFastSearch.OnChange := Nil;
-    EditFastSearch.Text := MainForm_GlobalQuickSearch;
-    EditFastSearch.OnChange := EDITFastSearchChange;
-  end else
-  begin
-      if EditFastSearch.Tag <> 0 then
-          MedienBib.BibSearcher.AddQuickSearchQueryToHistory(EditFastSearch.Text);
-  end;
+  if Trim(EditFastSearch.Text) <> '' then
+    //if EditFastSearch.Tag <> 0 then
+        MedienBib.BibSearcher.AddQuickSearchQueryToHistory(EditFastSearch.Text);
 end;
 
 
@@ -10198,38 +10224,9 @@ end;
 //--------------------
 procedure TNemp_MainForm.EditPlaylistSearchEnter(Sender: TObject);
 begin
-    if EditPlaylistSearch.Tag = 0 then
-    begin
-        EditPlaylistSearch.OnChange := Nil;
-        EditPlaylistSearch.Text := '';
-        EditPlaylistSearch.OnChange := EditPlaylistSearchChange;
-    end
-    else
-    begin
-        EditPlaylistSearch.SelectAll;
-        if Length(Trim(EditPlaylistSearch.Text)) >= 3 then
-            // do search ...
-            NempPlaylist.Search(EditPlaylistSearch.Text)
-    end;
-
-    EditPlaylistSearch.Font.Color := clWindowText;
-    EditPlaylistSearch.Font.Style := [];
-    EditPlaylistSearch.Tag := 1;
-
-
-end;
-
-procedure TNemp_MainForm.EditPlaylistSearchExit(Sender: TObject);
-begin
-    if Trim(EditPlaylistSearch.Text) = '' then
-    begin
-        EditPlaylistSearch.Font.Color := clGrayText;
-        EditPlaylistSearch.Font.Style := [];
-        EditPlaylistSearch.Tag := 0;
-        EditPlaylistSearch.OnChange := Nil;
-        EditPlaylistSearch.Text := MainForm_PlaylistSearch;
-        EditPlaylistSearch.OnChange := EditPlaylistSearchChange;
-    end;
+  // EditPlaylistSearch.SelectAll;
+  if Length(Trim(EditPlaylistSearch.Text)) >= 3 then
+      NempPlaylist.Search(EditPlaylistSearch.Text)
 end;
 
 procedure TNemp_MainForm.EditPlaylistSearchKeyDown(Sender: TObject;
@@ -10351,6 +10348,26 @@ begin
     end;
 end;
 
+
+procedure TNemp_MainForm.edtCloudSearchChange(Sender: TObject);
+begin
+  if MedienBib.BrowseMode = 2 then
+    CloudViewer.PaintCloud(edtCloudSearch.Text);
+end;
+
+
+procedure TNemp_MainForm.edtCloudSearchKeyPress(Sender: TObject; var Key: Char);
+begin
+      case ord(key) of
+        VK_RETURN: key := #0;
+
+        VK_ESCAPE: begin
+              key := #0;
+              edtCloudSearch.Text := '';
+              CloudViewer.PaintCloud('');
+        end
+    end;
+end;
 
 procedure TNemp_MainForm.EDITFastSearchChange(Sender: TObject);
 begin
@@ -10501,9 +10518,9 @@ begin
             if assigned(ac) and (ac is TAudioFileCollection) then begin
               acFile := TAudioFileCollection(ac);
               if not (acFile is TRootCollection) and (acFile.CollectionCount = 0) then
-                acFile := acFile.ParentCollection;
+                acFile := acFile.Parent;
               // sort the selected collection (and only this one!)
-              acFile.ReSortCollection(newSorting);
+              acFile.ReSort(newSorting);
                // refill Tree
               AlbenVST.OnFocusChanged := NIL;
               FillCollectionTree(Nil, True);
@@ -10558,9 +10575,10 @@ begin
               acFile := TAudioFileCollection(ac);
               if not (acFile is TRootCollection) and (acFile.CollectionCount = 0) then begin
                 dec(nLevel);
+                acFile := acFile.Parent;
               end;
 
-              rc := TAudioFileCollection(ac).RootCollection;
+              rc := TAudioFileCollection(ac).Root;
               MedienBib.ChangeFileCollectionSorting(lc.IndexOf(rc), nLevel, newSorting);
                // refill Tree
               AlbenVST.OnFocusChanged := NIL;
@@ -10584,7 +10602,6 @@ end;
 
 
 
-
 procedure TNemp_MainForm.PM_ML_BrowseByMoreClick(Sender: TObject);
 begin
 {    if Not Assigned(OptionsCompleteForm) then
@@ -10602,17 +10619,6 @@ begin
   ReleaseCapture;
   PerForm(WM_SysCommand, $F012 , 0);
 end;
-
-procedure TNemp_MainForm.AuswahlPanelResize(Sender: TObject);
-var ExtraSpace: Integer;
-begin
-    ExtraSpace := 16 * NempOptions.AnzeigeMode;
-    AuswahlFillPanel.Left := TabBtn_TagCloud.Left + TabBtn_TagCloud.Width + 6;
-    AuswahlFillPanel.Width := AuswahlPanel.Width - AuswahlFillPanel.Left - ExtraSpace;
-
-    AuswahlStatusLBL.Width := AuswahlFillPanel.Width - 16;
-end;
-
 
 procedure TNemp_MainForm.TntFormDestroy(Sender: TObject);
 begin
@@ -11541,6 +11547,7 @@ procedure TNemp_MainForm.VSTNewText(Sender: TBaseVirtualTree;
 var af: TAudioFile;
     WriteNewStringData: Boolean;
     aErr: TNempAudioError;
+    SearchDirty, CollectionDirty: Boolean;
 begin
     af := VST.GetNodeData<TAudioFile>(Node);
     if not assigned(af) then  exit;
@@ -11585,7 +11592,14 @@ begin
         begin
             SyncAudioFilesWith(af);
             MedienBib.Changed := True;
-            CorrectVCLAfterAudioFileEdit(af);
+            CorrectVCLAfterAudioFileEdit(af, True);
+
+            // using variables, as we need to perform *both* checks
+            SearchDirty := MedienBib.SearchStringIsDirty(VST.Header.Columns[column].Tag);
+            CollectionDirty := MedienBib.CollectionsAreDirty(VST.Header.Columns[column].Tag);
+
+            if SearchDirty or CollectionDirty then
+              SetBrowseTabWarning(True);
         end else
         begin
             // Read old Data again, if we edited something else than RATING
@@ -12037,30 +12051,18 @@ end;
 
 
 procedure TNemp_MainForm.MedialistPanelResize(Sender: TObject);
-var ExtraSpace: Integer;
 begin
     if not FormReadyAndActivated then
         exit;
-
-    ExtraSpace := 16 * NempOptions.AnzeigeMode;
-    MedienlisteFillPanel.Left := EditFastSearch.Left + EditFastSearch.Width + 6;
-    MedienlisteFillPanel.Width := MedialistPanel.Width - MedienlisteFillPanel.Left - ExtraSpace;// - 8;
-    MedienListeStatusLBL.Width := MedienlisteFillPanel.Width - 16;
 
     if Assigned_NempFormBuildOptions then
         NempSkin.SetVSTOffsets;
 end;
 
 procedure TNemp_MainForm.MedienBibDetailPanelResize(Sender: TObject);
-var ExtraSpace: Integer;
 begin
     if not FormReadyAndActivated then
         exit;
-
-    ExtraSpace := 16 * NempOptions.AnzeigeMode;
-    MedienBibDetailFillPanel.Left := TabBtn_SummaryLock.Left + TabBtn_SummaryLock.Width + 6;
-    MedienBibDetailFillPanel.Width := MedienBibDetailPanel.Width - MedienBibDetailFillPanel.Left - ExtraSpace;
-    MedienBibDetailStatusLbl.Width := MedienBibDetailFillPanel.Width - 16;
 
     if Assigned_NempFormBuildOptions and ( NOT NempFormBuildOptions.HideFileOverviewPanel) then
          NempFormBuildOptions.ResizeSubPanel(MedienBibDetailPanel, DetailCoverLyricsPanel, NempFormBuildOptions.FileOverviewCoverRatio);
@@ -12104,18 +12106,12 @@ end;
 
 
 procedure TNemp_MainForm.PlaylistPanelResize(Sender: TObject);
-var ExtraSpace: Integer;
 begin
-    if not FormReadyAndActivated then
-        exit;
+  if not FormReadyAndActivated then
+      exit;
 
-    ExtraSpace := 16 * NempOptions.AnzeigeMode;
-    PlaylistFillPanel.Left := EditplaylistSearch.Left + EditplaylistSearch.Width + 6;
-    PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left - ExtraSpace;
-    PlayListStatusLBL.Width := PlaylistFillPanel.Width - 16;
-
-    if Assigned_NempFormBuildOptions then
-        NempSkin.SetPlaylistOffsets;
+  if Assigned_NempFormBuildOptions then
+      NempSkin.SetPlaylistOffsets;
 end;
 
 
@@ -13361,8 +13357,6 @@ begin
              or (fDropManager.DragSource = AlbenVST))
           then begin
             // we are dropping Files from the Library
-            // todo: Another check... PlaylistFiles in the VST? Not actual Files stored in the Library?
-            // we need to get The AudioFile separately anyway .... By "GetSelection" or something like that
             AudioFileList := TAudioFileList.Create(False);
             try
               for i := 0 to fDropManager.FileNameCount - 1 do begin
@@ -13375,6 +13369,7 @@ begin
                 MedienBib.ChangeCategory(MedienBib.CurrentCategory, TargetCategory, AudioFileList, caCategoryCopy)
               else
                 MedienBib.ChangeCategory(MedienBib.CurrentCategory, TargetCategory, AudioFileList, caCategoryMove);
+              MedienBib.RefreshCollections(False);
 
               ArtistsVST.Invalidate;
             finally

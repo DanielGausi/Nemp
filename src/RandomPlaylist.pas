@@ -250,7 +250,7 @@ begin
   LastCheckedTags := TStringList.Create;
 
   TagRoot := TRootCollection.Create(Nil);
-  TagRoot.AddSubCollectionType(ctTagCloud, csCount);
+  TagRoot.AddSubCollectionType(ccTagCloud, csCount);
 
   LoadStarGraphics(RandomRatingHelper);
 
@@ -438,7 +438,7 @@ begin
       // Add TopTags to tmpCollections
       maxC := min(StrToIntDef(cbTagCountSelection.Text, 150), TagRoot.CollectionCount);
       for i := 0 to maxC - 1 do
-        tmpCollections.Add(TagRoot.SubCollections[i]);
+        tmpCollections.Add(TagRoot.Collection[i]);
       // Sort tmpCollections by Key
       tmpCollections.Sort(TComparer<TAudioCollection>.Construct(
         function (const item1, item2: TAudioCollection): Integer

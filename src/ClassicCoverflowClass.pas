@@ -104,7 +104,7 @@ begin
   begin
     // Index >= 1, and valid
     if CoverCategory.CollectionCount = 1 then
-      result := CoverCategory.Collections[0].SubCollections[Index-1]
+      result := CoverCategory.Collections[0].Collection[Index-1]
     else
       result := CoverCategory.Collections[Index];
   end;

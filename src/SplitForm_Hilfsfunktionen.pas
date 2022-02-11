@@ -35,7 +35,7 @@ unit SplitForm_Hilfsfunktionen;
 interface
 
 uses Windows, forms, Classes, Controls, StdCtrls, ExtCtrls, Graphics, Nemp_ConstantsAndTypes, Messages, dialogs, ShellApi
-  {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF} , sysutils, System.Types, BaseForms, ActiveX;
+  {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF} , sysutils, System.Types, BaseForms, ActiveX, SkinButtons;
 
   procedure SetRegion(GrpBox: TPanel; aForm: TForm; var NempRegionsDistance: TNempRegionsDistance;  aHandle: hWnd);
   function IntervalOverlap(left1, right1, left2, right2: integer): boolean;
@@ -62,6 +62,8 @@ uses Windows, forms, Classes, Controls, StdCtrls, ExtCtrls, Graphics, Nemp_Const
 
   procedure UpdateSmallMainForm;
   procedure UpdateFormDesignNeu(newMode: Integer);
+
+  procedure PositionCloseImage(CloseBtn: TSkinButton; ParentPanel: TPanel);
 
 var
 
@@ -817,7 +819,7 @@ begin
         MedienBibDetailFillPanel      .OnMouseUP := ExtendedControlForm.OnMouseUP;
         MedienBibDetailStatusLbl      .OnMouseUP := ExtendedControlForm.OnMouseUP;
 
-        EditPlaylistSearchExit(Nil);
+        // EditPlaylistSearchExit(Nil);
         EDITFastSearchExit(Nil);
     end;
 end;
@@ -919,7 +921,7 @@ begin
     MedienBibDetailFillPanel      .OnMouseUP   := Nil;
     MedienBibDetailStatusLbl      .OnMouseUP   := Nil;
 
-    EditPlaylistSearchExit(Nil);
+    //EditPlaylistSearchExit(Nil);
     EDITFastSearchExit(Nil);
   end;
 end;
@@ -1213,6 +1215,14 @@ begin
        S_OK: ShowMessage('ok');
     end;}
 
+end;
+
+procedure PositionCloseImage(CloseBtn: TSkinButton; ParentPanel: TPanel);
+begin
+  CloseBtn.Left := ParentPanel.Width - CloseBtn.Width - 2;
+  CloseBtn.Top := 4;
+  CloseBtn.Parent := ParentPanel;
+  CloseBtn.BringToFront;
 end;
 
 

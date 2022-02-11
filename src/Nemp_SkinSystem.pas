@@ -42,7 +42,7 @@ iniFiles, jpeg, NempPanel, Classes, oneinst, SkinButtons, PNGImage, ProgressShap
 
 Nemp_ConstantsAndTypes, PartyModeClass{$IFDEF USESTYLES}, vcl.themes, vcl.styles, Vcl.CheckLst {$ENDIF};
 
-const MAX_MENUIMAGE_INDEX = 41;
+const MAX_MENUIMAGE_INDEX = 43;
       MAX_PLAYLIST_IMAGE_INDEX = 23;
 
 type
@@ -550,7 +550,6 @@ begin
   TabButtons[10].GlyphFile := 'TabBtnHeadset';//'TabBtnHeadset'    ;
   TabButtons[11].GlyphFile := 'TabBtnMarker'     ;
   TabButtons[12].GlyphFile := 'TabBtnFavorites'  ;
-
 
   SlideButtons[0].Button  := Nemp_MainForm.VolButton           ;
   SlideButtons[1].Button  := Nemp_MainForm.SlideBarButton      ;

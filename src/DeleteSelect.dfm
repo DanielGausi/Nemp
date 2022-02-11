@@ -108,6 +108,8 @@ object DeleteSelection: TDeleteSelection
       Width = 236
       Height = 135
       Align = alRight
+      Colors.UnfocusedSelectionColor = clHighlight
+      Colors.UnfocusedSelectionBorderColor = clHighlight
       Header.AutoSizeIndex = 0
       Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
       Indent = 0
@@ -127,6 +129,8 @@ object DeleteSelection: TDeleteSelection
       Width = 429
       Height = 135
       Align = alClient
+      Colors.UnfocusedSelectionColor = clHighlight
+      Colors.UnfocusedSelectionBorderColor = clHighlight
       Header.AutoSizeIndex = 0
       Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
       Indent = 0
@@ -199,6 +203,8 @@ object DeleteSelection: TDeleteSelection
       Top = 24
       Width = 193
       Height = 76
+      Colors.UnfocusedSelectionColor = clHighlight
+      Colors.UnfocusedSelectionBorderColor = clHighlight
       DefaultNodeHeight = 22
       Header.AutoSizeIndex = 0
       Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowImages, hoShowSortGlyphs]

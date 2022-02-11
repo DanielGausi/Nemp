@@ -46,7 +46,7 @@ type
     grpBoxView: TGroupBox;
     lblPlaylistCaptionMode: TLabel;
     cbShowCoverForAlbum: TCheckBox;
-    cbShowCount: TCheckBox;
+    cbShowCollectionCount: TCheckBox;
     cbPlaylistCaptionMode: TComboBox;
     ActionEditLayer: TAction;
     PopupLayers: TPopupMenu;
@@ -78,6 +78,7 @@ type
     Moveup2: TMenuItem;
     Movedown2: TMenuItem;
     Splitter1: TSplitter;
+    cbShowCategoryCount: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -144,7 +145,7 @@ type
 
 
     procedure PrepareNewLayerForm(isRoot: Boolean);
-    procedure PrepareEditLayerForm(AllowDirectory: Boolean; aType: teCollectionType; aSorting: teCollectionSorting);
+    procedure PrepareEditLayerForm(AllowDirectory: Boolean; aType: teCollectionContent; aSorting: teCollectionSorting);
 
     function CategoryNameExists(aName: String; Categories: TLibraryCategoryList): Boolean;
     function NewUniqueCategoryName(Categories: TLibraryCategoryList): String;
@@ -232,7 +233,7 @@ var
   i, iRC: Integer;
   newCat: TLibraryFileCategory;
   newRoot: TRootCollection;
-  aRootConfig: TCollectionTypeList;
+  aRootConfig: TCollectionConfigList;
 begin
   OrganizerSettings.Assign(NempOrganizerSettings);
   fCategoriesChanged  := False;
@@ -244,7 +245,7 @@ begin
     aRootConfig := OrganizerSettings.RootCollectionConfig[iRC];
     newRoot := TRootCollection.Create(Nil);
     for i := 0 to aRootConfig.Count - 1 do begin
-      newRoot.AddSubCollectionType(aRootConfig[i].CollectionType, aRootConfig[i].CollectionSorting);
+      newRoot.AddSubCollectionType(aRootConfig[i].CollectionContent, aRootConfig[i].CollectionSorting);
     end;
     RootCollections.Add(newRoot);
   end;
@@ -270,7 +271,8 @@ begin
   cbAlbumKeymode.ItemIndex := Integer(OrganizerSettings.AlbumKeyMode);
   cbIgnoreCDDirectories.Checked := OrganizerSettings.TrimCDFromDirectory;
   editCDNames.Text := OrganizerSettings.CDNames.DelimitedText;
-  cbShowCount.Checked := OrganizerSettings.ShowCollectionCount;
+  cbShowCollectionCount.Checked := OrganizerSettings.ShowCollectionCount;
+  cbShowCategoryCount.Checked := OrganizerSettings.ShowCategoryCount;
   cbShowCoverForAlbum.Checked := OrganizerSettings.ShowCoverArtOnAlbum;
   checkBoxNewFilesCategory.Checked := OrganizerSettings.UseNewCategory;
   cbPlaylistCaptionMode.ItemIndex := Integer(OrganizerSettings.PlaylistCaptionMode);
@@ -477,7 +479,7 @@ var
 begin
   nLevel := VSTSortings.GetNodeLevel(Node);
   ActionEditLayer.Enabled := nLevel > 0;
-  ActionAddLayer.Enabled := NOT rc.IsDirectoryCollection;
+  ActionAddLayer.Enabled := rc.SpecialContent = scRegular; //NOT rc.IsDirectoryCollection;
   ActionDeleteLayer.Enabled := (nLevel = 0) or (rc.LayerDepth > 1)
 end;
 
@@ -697,6 +699,7 @@ begin
   lc := VSTCategories.GetNodeData<TLibraryCategory>(aNode);
   VSTCategories.DeleteNode(aNode);
   FileCategories.Remove(lc);
+  lc.Free;
   // select another node
   if assigned(reselectNode) then begin
     VSTCategories.FocusedNode := reselectNode;
@@ -710,7 +713,7 @@ begin
 end;
 
 procedure TFormLibraryConfiguration.PrepareEditLayerForm(AllowDirectory: Boolean;
-  aType: teCollectionType; aSorting: teCollectionSorting);
+  aType: teCollectionContent; aSorting: teCollectionSorting);
 begin
   if not assigned(FormNewLayer) then
     Application.CreateForm(TFormNewLayer, FormNewLayer);
@@ -787,6 +790,7 @@ begin
     VSTSortings.DeleteNode(aNode);
     VSTSortings.Invalidate;
     RootCollections.Remove(rc);
+    rc.Free;
   end else
   begin
     // delete a sub-layer from the RootCollection
@@ -826,11 +830,9 @@ begin
   if level > 0 then begin
     rc := VSTSortings.GetNodeData<TRootCollection>(aNode);
 
-    PrepareNewLayerForm(rc.IsDirectoryCollection);
-
     PrepareEditLayerForm(rc.LayerDepth <= 1,
-        rc.CollectionTypeList[level-1].CollectionType,
-        rc.CollectionTypeList[level-1].CollectionSorting
+        rc.CollectionConfigList[level-1].CollectionContent,
+        rc.CollectionConfigList[level-1].CollectionSorting
         );
 
     if FormNewLayer.ShowModal = mrOk then begin
@@ -867,7 +869,7 @@ begin
     // Convert RootCollections to OrganizerSettings
     OrganizerSettings.Clear;
     for i := 0 to RootCollections.Count - 1 do begin
-      OrganizerSettings.AddConfig(TRootCollection(RootCollections[i]).CollectionTypeList);
+      OrganizerSettings.AddConfig(TRootCollection(RootCollections[i]).CollectionConfigList);
     end;
     OrganizerSettings.ChangeCoverFlowSorting(
       teCollectionSorting(cbCoverFlowSorting.Items.Objects[cbCoverFlowSorting.ItemIndex])
@@ -877,7 +879,8 @@ begin
   OrganizerSettings.AlbumKeyMode := teAlbumKeyMode(cbAlbumKeymode.ItemIndex);
   OrganizerSettings.TrimCDFromDirectory := cbIgnoreCDDirectories.Checked;
   OrganizerSettings.CDNames.DelimitedText := editCDNames.Text;
-  OrganizerSettings.ShowCollectionCount := cbShowCount.Checked;
+  OrganizerSettings.ShowCollectionCount := cbShowCollectionCount.Checked;
+  OrganizerSettings.ShowCategoryCount := cbShowCategoryCount.Checked;
   OrganizerSettings.ShowCoverArtOnAlbum := cbShowCoverForAlbum.Checked;
   OrganizerSettings.UseNewCategory := checkBoxNewFilesCategory.Checked;
   OrganizerSettings.PlaylistCaptionMode := tePlaylistCaptionMode(cbPlaylistCaptionMode.ItemIndex);

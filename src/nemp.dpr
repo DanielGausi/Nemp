@@ -136,7 +136,8 @@ uses
   LibraryOrganizer.Webradio in 'LibraryOrganizer.Webradio.pas',
   LibraryOrganizer.Configuration in 'LibraryOrganizer.Configuration.pas' {FormLibraryConfiguration},
   LibraryOrganizer.Configuration.NewLayer in 'LibraryOrganizer.Configuration.NewLayer.pas' {FormNewLayer},
-  NempDragFiles in 'NempDragFiles.pas';
+  NempDragFiles in 'NempDragFiles.pas',
+  fChangeFileCategory in 'fChangeFileCategory.pas' {FormChangeCategory};
 
 {$R *.res}
 

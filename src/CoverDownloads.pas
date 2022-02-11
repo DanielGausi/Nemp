@@ -43,12 +43,12 @@ uses
   System.Net.URLClient, System.Net.HttpClient;
 
 const
-    ccArtist     = 0;
-    ccAlbum      = 1;
-    ccDirectory  = 2;
-    ccQueryCount = 3;
-    ccLastQuery  = 4;
-    ccDataEnd    = 255;
+    cIDArtist     = 0;
+    cIDAlbum      = 1;
+    cIDDirectory  = 2;
+    cIDQueryCount = 3;
+    cIDLastQuery  = 4;
+    cIDDataEnd    = 255;
 
 type
 
@@ -241,16 +241,16 @@ begin
         aStream.Read(id, sizeof(ID));
         inc(c);
         case ID of
-            ccArtist     : Artist := ReadTextFromStream;
-            ccAlbum      : Album  := ReadTextFromStream;
-            ccDirectory  : Directory  := ReadTextFromStream;
-            ccQueryCount : aStream.Read(queryCount, SizeOf(queryCount));
-            ccLastQuery  : aStream.Read(lastChecked, SizeOf(LastChecked));
-            ccDataEnd    : ;  // Nothing to do
+            cIDArtist     : Artist := ReadTextFromStream;
+            cIDAlbum      : Album  := ReadTextFromStream;
+            cIDDirectory  : Directory  := ReadTextFromStream;
+            cIDQueryCount : aStream.Read(queryCount, SizeOf(queryCount));
+            cIDLastQuery  : aStream.Read(lastChecked, SizeOf(LastChecked));
+            cIDDataEnd    : ;  // Nothing to do
         else
-            ID := ccDataEnd;  // Somthing was wrong, abort
+            ID := cIDDataEnd;  // Somthing was wrong, abort
         end;
-    until (ID = ccDataEnd) or (c >= ccDataEnd);
+    until (ID = cIDDataEnd) or (c >= cIDDataEnd);
 end;
 {
     --------------------------------------------------------
@@ -274,19 +274,19 @@ var ID: Byte;
         end;
 
 begin
-    WriteTextToStream(ccArtist   , Artist);
-    WriteTextToStream(ccAlbum    , Album );
-    WriteTextToStream(ccDirectory, Directory);
+    WriteTextToStream(cIDArtist   , Artist);
+    WriteTextToStream(cIDAlbum    , Album );
+    WriteTextToStream(cIDDirectory, Directory);
 
-    ID := ccQueryCount;
+    ID := cIDQueryCount;
     aStream.Write(ID, sizeof(ID));
     aStream.Write(QueryCount, sizeOf(QueryCount));
 
-    ID := ccLastQuery;
+    ID := cIDLastQuery;
     aStream.Write(ID, sizeof(ID));
     aStream.Write(lastChecked, sizeOf(lastChecked));
 
-    ID := ccDataEnd;
+    ID := cIDDataEnd;
     aStream.Write(ID, sizeof(ID));
 end;
 
@@ -1112,7 +1112,7 @@ begin
       exit;
 
     afc := tAudioFileCollection(aCollection);
-    if not (afc.CollectionType = ctAlbum) then
+    if not (afc.Content = ccAlbum) then
       exit;
 
     if (afc.Album = CoverFlowText_VariousArtists)

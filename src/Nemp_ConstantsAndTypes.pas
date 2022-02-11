@@ -695,7 +695,7 @@ const
     MB_RefreshTagCloudFile = 31;
 
     // Set TabWarning for TagCloud after getting Tags
-    MB_TagsSetTabWarning = 32;
+    MB_TagsSetFinished = 32;
 
     // An error occured in a Thread: Log Message
     MB_ErrorLog = 33;

@@ -33,6 +33,8 @@ object AuswahlForm: TAuswahlForm
     Height = 422
     Align = alClient
     BevelOuter = bvNone
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 0
     OnMouseDown = ContainerPanelAuswahlformMouseDown
     OnMouseMove = ContainerPanelAuswahlformMouseMove

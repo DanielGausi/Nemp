@@ -112,6 +112,8 @@ object CloudEditorForm: TCloudEditorForm
         Height = 351
         Anchors = [akLeft, akTop, akRight, akBottom]
         BorderWidth = 1
+        Colors.UnfocusedSelectionColor = clHighlight
+        Colors.UnfocusedSelectionBorderColor = clHighlight
         Header.AutoSizeIndex = 0
         Header.Options = [hoColumnResize, hoDrag, hoVisible]
         IncrementalSearch = isAll
@@ -203,6 +205,8 @@ object CloudEditorForm: TCloudEditorForm
         Height = 384
         Anchors = [akLeft, akTop, akRight, akBottom]
         BorderWidth = 1
+        Colors.UnfocusedSelectionColor = clHighlight
+        Colors.UnfocusedSelectionBorderColor = clHighlight
         Header.AutoSizeIndex = 0
         Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
         Indent = 4
@@ -261,6 +265,8 @@ object CloudEditorForm: TCloudEditorForm
         Height = 384
         Anchors = [akLeft, akTop, akRight, akBottom]
         BorderWidth = 1
+        Colors.UnfocusedSelectionColor = clHighlight
+        Colors.UnfocusedSelectionBorderColor = clHighlight
         Header.AutoSizeIndex = 0
         Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
         Indent = 4

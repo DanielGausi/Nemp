@@ -422,7 +422,7 @@ begin
   begin
     // Index >= 1, and valid
     if fCoverCategory.CollectionCount = 1 then
-      result := fCoverCategory.Collections[0].SubCollections[Index-1]
+      result := fCoverCategory.Collections[0].Collection[Index-1]
     else
       result := fCoverCategory.Collections[Index];
   end;
@@ -437,7 +437,7 @@ begin
   case aCollection.CollectionClass of
     ccFiles: begin
           if fCoverCategory.CollectionCount = 1 then
-            result := 1 + fCoverCategory.Collections[0].GetCollectionIndex(aCollection)
+            result := 1 + fCoverCategory.Collections[0].IndexOf(aCollection)
           else
             result := 0; // invalid/empty
     end;

@@ -47,6 +47,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
       BevelOuter = bvNone
       BorderStyle = bsNone
       BorderWidth = 1
+      Colors.UnfocusedSelectionColor = clHighlight
+      Colors.UnfocusedSelectionBorderColor = clHighlight
       Header.AutoSizeIndex = 0
       Header.MainColumn = -1
       Header.Options = [hoColumnResize, hoDrag]
@@ -73,10 +75,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabSystem0: TTabSheet
         Caption = 'Sys (Main)'
         ImageIndex = 6
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_NempUpdater: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -305,10 +303,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabSystem1: TTabSheet
         Caption = 'Sys (Control)'
         ImageIndex = 5
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_Hotkeys: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -1176,10 +1170,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabSystem2: TTabSheet
         Caption = 'Sys (Files)'
         ImageIndex = 6
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_FileFormats: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -1338,10 +1328,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabSystem3: TTabSheet
         Caption = 'Sys (System)'
         ImageIndex = 20
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_Deskband: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -1501,10 +1487,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlaylistRandom: TTabSheet
         Caption = 'Random'
         ImageIndex = 21
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_BetaOptions: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -1894,10 +1876,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView0: TTabSheet
         Caption = 'View (Main)'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_ViewMain_Columns: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -2091,10 +2069,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView1: TTabSheet
         Caption = 'View (Party)'
         ImageIndex = 19
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_ViewPartymode_Amplification: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -2193,10 +2167,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView3: TTabSheet
         Caption = 'View (Fonts)'
         ImageIndex = 7
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_Fonts: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -2428,10 +2398,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView5: TTabSheet
         Caption = 'View (Ext)'
         ImageIndex = 21
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_ViewExt_NoMetadata: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -2785,10 +2751,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabFiles0: TTabSheet
         Caption = 'Files (Main)'
         ImageIndex = 22
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_FilesMain_Directories: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -2973,10 +2935,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabFiles1: TTabSheet
         Caption = 'Files (Metadata)'
         ImageIndex = 20
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_AutoRating: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -3143,10 +3101,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabFiles2: TTabSheet
         Caption = 'Files (Cover)'
         ImageIndex = 24
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_TabMedia3_Cover: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -3335,6 +3289,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Top = 20
             Width = 241
             Height = 53
+            Colors.UnfocusedSelectionColor = clHighlight
+            Colors.UnfocusedSelectionBorderColor = clHighlight
             Header.AutoSizeIndex = 0
             Header.Options = [hoColumnResize, hoDrag, hoShowImages, hoShowSortGlyphs]
             TabOrder = 0
@@ -3390,10 +3346,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabFiles3: TTabSheet
         Caption = 'Files (Search)'
         ImageIndex = 25
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_TabMedia4_GlobalSearchOptions: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -3559,10 +3511,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer0: TTabSheet
         Caption = 'Player (Main)'
         ImageIndex = 2
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_Devices: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -3808,10 +3756,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer1: TTabSheet
         Caption = 'Player (Ext)'
         ImageIndex = 22
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_ExtendedAudio: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -3974,10 +3918,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer2: TTabSheet
         Caption = 'Player (Playlist)'
         ImageIndex = 19
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_PlaylistBehaviour: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -4209,10 +4149,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer4: TTabSheet
         Caption = 'Player (Streams)'
         ImageIndex = 23
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_WebradioRecording: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -4401,10 +4337,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer5: TTabSheet
         Caption = 'Player (Effects)'
         ImageIndex = 15
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_Effects: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -4630,10 +4562,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer6: TTabSheet
         Caption = 'Player (Event)'
         ImageIndex = 19
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           446
           584)
@@ -4820,10 +4748,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer7: TTabSheet
         Caption = 'Player (Scrobble)'
         ImageIndex = 17
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBox_Scrobble: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -5186,10 +5110,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer8: TTabSheet
         Caption = 'Player (Webserver)'
         ImageIndex = 18
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GrpBoxConfig: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -5481,10 +5401,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView4: TTabSheet
         Caption = 'View(CoverFlow)'
         ImageIndex = 21
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object grpBox_CoverFlowPositions: TGroupBox
           AlignWithMargins = True
           Left = 3

@@ -365,7 +365,7 @@ begin
 
         //CB_MedienBibGlobalQuickSearch.OnClick := Nil;
         //CB_MedienBibGlobalQuickSearch.OnClick := CB_MedienBibGlobalQuickSearchClick;
-        EditFastSearch.Text := MainForm_GlobalQuickSearch;
+        // EditFastSearch.Text := MainForm_GlobalQuickSearch;
         EditFastSearch.Hint := MainForm_GlobalQuickSearchHint;
 
         EditPlaylistSearch.Hint := MainForm_PlaylistSearchHint;

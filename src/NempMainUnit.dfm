@@ -95,7 +95,6 @@ object Nemp_MainForm: TNemp_MainForm
         BevelOuter = bvNone
         TabOrder = 0
         OnMouseDown = AuswahlPanelMouseDown
-        OnResize = AuswahlPanelResize
         object GRPBOXArtistsAlben: TNempPanel
           Tag = 2
           Left = 0
@@ -105,7 +104,7 @@ object Nemp_MainForm: TNemp_MainForm
           Align = alClient
           BevelInner = bvRaised
           BevelOuter = bvLowered
-          TabOrder = 0
+          TabOrder = 1
           OnResize = GRPBOXArtistsAlbenResize
           OnPaint = GRPBOXArtistsAlbenPaint
           OwnerDraw = False
@@ -259,7 +258,6 @@ object Nemp_MainForm: TNemp_MainForm
             Height = 140
             Anchors = []
             BevelOuter = bvNone
-            PopupMenu = Medialist_Browse_PopupMenu
             TabOrder = 0
             object SplitterBrowse: TSplitter
               Left = 73
@@ -280,6 +278,8 @@ object Nemp_MainForm: TNemp_MainForm
               BevelInner = bvNone
               BevelOuter = bvNone
               BorderStyle = bsNone
+              Colors.UnfocusedSelectionColor = clHighlight
+              Colors.UnfocusedSelectionBorderColor = clHighlight
               Constraints.MinWidth = 20
               DefaultNodeHeight = 14
               DragImageKind = diMainColumnOnly
@@ -296,7 +296,6 @@ object Nemp_MainForm: TNemp_MainForm
               Indent = 14
               Margin = 0
               ParentFont = False
-              PopupMenu = Medialist_Browse_PopupMenu
               ScrollBarOptions.ScrollBars = ssVertical
               StyleElements = [seClient, seBorder]
               TabOrder = 0
@@ -333,6 +332,8 @@ object Nemp_MainForm: TNemp_MainForm
               BevelInner = bvNone
               BevelOuter = bvNone
               BorderStyle = bsNone
+              Colors.UnfocusedSelectionColor = clHighlight
+              Colors.UnfocusedSelectionBorderColor = clHighlight
               Constraints.MinWidth = 20
               DragOperations = [doCopy]
               Font.Charset = DEFAULT_CHARSET
@@ -412,97 +413,38 @@ object Nemp_MainForm: TNemp_MainForm
           Align = alTop
           BevelOuter = bvNone
           ParentBackground = False
-          TabOrder = 1
+          TabOrder = 0
           OnPaint = PanelPaint
           OwnerDraw = False
-          DesignSize = (
-            540
-            28)
-          object TabBtn_Preselection: TSkinButton
-            Tag = 1
-            Left = 2
-            Top = 2
-            Width = 24
-            Height = 24
-            Hint = 'Show context menu'
-            ParentShowHint = False
-            PopupMenu = Medialist_Browse_PopupMenu
-            ShowHint = True
-            TabOrder = 0
-            TabStop = False
-            OnClick = TabBtn_PreselectionClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
-          end
-          object TabBtn_Browse: TSkinButton
-            Left = 30
-            Top = 2
-            Width = 24
-            Height = 24
-            Hint = 'Browse your medialibrary'
-            ParentShowHint = False
-            PopupMenu = Medialist_Browse_PopupMenu
-            ShowHint = True
-            TabOrder = 1
-            OnClick = TABPanelAuswahlClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 3
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clPurple
-            Color2 = clGreen
-          end
-          object TabBtn_CoverFlow: TSkinButton
-            Tag = 1
-            Left = 58
-            Top = 2
-            Width = 24
-            Height = 24
-            Hint = 'Coverflow'
-            ParentShowHint = False
-            PopupMenu = Medialist_Browse_PopupMenu
-            ShowHint = True
-            TabOrder = 2
-            OnClick = TABPanelAuswahlClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 2
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
-          end
           object AuswahlFillPanel: TNempPanel
             Tag = 2
-            Left = 114
+            AlignWithMargins = True
+            Left = 200
             Top = 2
-            Width = 426
+            Width = 340
             Height = 24
-            Anchors = [akLeft, akTop, akRight]
+            Margins.Left = 0
+            Margins.Top = 2
+            Margins.Right = 0
+            Margins.Bottom = 2
+            Align = alClient
             BevelInner = bvRaised
             BevelOuter = bvLowered
+            Padding.Top = 2
+            Padding.Bottom = 2
             PopupMenu = Medialist_Browse_PopupMenu
-            TabOrder = 3
+            TabOrder = 0
             OnPaint = TABPanelPaint
             OwnerDraw = False
             DesignSize = (
-              426
+              340
               24)
             object AuswahlStatusLBL: TLabel
               Left = 10
               Top = 5
-              Width = 410
+              Width = 324
               Height = 13
-              Anchors = [akLeft, akTop, akRight, akBottom]
+              Anchors = [akLeft, akTop, akRight]
               AutoSize = False
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
@@ -513,29 +455,113 @@ object Nemp_MainForm: TNemp_MainForm
               ShowAccelChar = False
               Transparent = True
               StyleElements = [seClient, seBorder]
-              ExplicitWidth = 170
             end
           end
-          object TabBtn_TagCloud: TSkinButton
+          object AuswahlControlPanel: TNempPanel
             Tag = 2
-            Left = 86
-            Top = 2
-            Width = 24
-            Height = 24
-            Hint = 'Tag cloud'
-            ParentShowHint = False
-            PopupMenu = Medialist_Browse_PopupMenu
-            ShowHint = True
-            TabOrder = 4
-            OnClick = TABPanelAuswahlClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 3
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
+            Left = 0
+            Top = 0
+            Width = 200
+            Height = 28
+            Align = alLeft
+            BevelOuter = bvNone
+            TabOrder = 1
+            OnPaint = PanelPaint
+            OwnerDraw = False
+            object edtCloudSearch: TEdit
+              Left = 114
+              Top = 4
+              Width = 81
+              Height = 21
+              AutoSize = False
+              TabOrder = 4
+              TextHint = 'Search (Tags)'
+              OnChange = edtCloudSearchChange
+              OnKeyPress = edtCloudSearchKeyPress
+            end
+            object TabBtn_Browse: TSkinButton
+              Left = 30
+              Top = 2
+              Width = 24
+              Height = 24
+              Hint = 'Treeview'
+              ParentShowHint = False
+              PopupMenu = Medialist_Browse_PopupMenu
+              ShowHint = True
+              TabOrder = 1
+              OnClick = TABPanelAuswahlClick
+              DrawMode = dm_Skin
+              NumGlyphsX = 5
+              NumGlyphsY = 3
+              GlyphLine = 0
+              CustomRegion = False
+              FocusDrawMode = fdm_Windows
+              Color1 = clPurple
+              Color2 = clGreen
+            end
+            object TabBtn_CoverFlow: TSkinButton
+              Tag = 1
+              Left = 58
+              Top = 2
+              Width = 24
+              Height = 24
+              Hint = 'Coverflow'
+              ParentShowHint = False
+              PopupMenu = Medialist_Browse_PopupMenu
+              ShowHint = True
+              TabOrder = 2
+              OnClick = TABPanelAuswahlClick
+              DrawMode = dm_Skin
+              NumGlyphsX = 5
+              NumGlyphsY = 3
+              GlyphLine = 0
+              CustomRegion = False
+              FocusDrawMode = fdm_Windows
+              Color1 = clBlack
+              Color2 = clBlack
+            end
+            object TabBtn_Preselection: TSkinButton
+              Tag = 1
+              Left = 2
+              Top = 2
+              Width = 24
+              Height = 24
+              Hint = 'Show context menu'
+              ParentShowHint = False
+              PopupMenu = Medialist_Browse_PopupMenu
+              ShowHint = True
+              TabOrder = 0
+              OnClick = TabBtn_PreselectionClick
+              DrawMode = dm_Skin
+              NumGlyphsX = 5
+              NumGlyphsY = 1
+              GlyphLine = 0
+              CustomRegion = False
+              FocusDrawMode = fdm_Windows
+              Color1 = clBlack
+              Color2 = clBlack
+            end
+            object TabBtn_TagCloud: TSkinButton
+              Tag = 2
+              Left = 86
+              Top = 2
+              Width = 24
+              Height = 24
+              Hint = 'Tag cloud'
+              ParentShowHint = False
+              PopupMenu = Medialist_Browse_PopupMenu
+              ShowHint = True
+              TabOrder = 3
+              OnClick = TABPanelAuswahlClick
+              DrawMode = dm_Skin
+              NumGlyphsX = 5
+              NumGlyphsY = 3
+              GlyphLine = 0
+              CustomRegion = False
+              FocusDrawMode = fdm_Windows
+              Color1 = clBlack
+              Color2 = clBlack
+            end
           end
         end
       end
@@ -573,6 +599,8 @@ object Nemp_MainForm: TNemp_MainForm
             BevelInner = bvNone
             BevelOuter = bvNone
             BorderStyle = bsNone
+            Colors.UnfocusedSelectionColor = clHighlight
+            Colors.UnfocusedSelectionBorderColor = clHighlight
             Ctl3D = True
             DefaultPasteMode = amInsertAfter
             Font.Charset = DEFAULT_CHARSET
@@ -659,29 +687,33 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 0
           OnPaint = PanelPaint
           OwnerDraw = False
-          DesignSize = (
-            546
-            28)
           object PlaylistFillPanel: TNempPanel
             Tag = 1
-            Left = 129
+            AlignWithMargins = True
+            Left = 127
             Top = 2
-            Width = 417
+            Width = 419
             Height = 24
-            Anchors = [akLeft, akTop, akRight]
+            Margins.Left = 0
+            Margins.Top = 2
+            Margins.Right = 0
+            Margins.Bottom = 2
+            Align = alClient
             BevelInner = bvRaised
             BevelOuter = bvLowered
+            BiDiMode = bdLeftToRight
+            ParentBiDiMode = False
             PopupMenu = PlayListPOPUP
-            TabOrder = 3
+            TabOrder = 0
             OnPaint = TABPanelPaint
             OwnerDraw = False
             DesignSize = (
-              417
+              419
               24)
             object PlayListStatusLBL: TLabel
               Left = 10
               Top = 5
-              Width = 400
+              Width = 402
               Height = 13
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -691,62 +723,72 @@ object Nemp_MainForm: TNemp_MainForm
               ExplicitWidth = 426
             end
           end
-          object TabBtn_Playlist: TSkinButton
-            Left = 2
-            Top = 2
-            Width = 24
-            Height = 24
-            Hint = 'Show context menu'
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 0
-            TabStop = False
-            OnClick = TabPanelPlaylistClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
-          end
-          object EditPlaylistSearch: TEdit
-            Left = 58
-            Top = 3
-            Width = 65
-            Height = 21
-            AutoSize = False
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentFont = False
-            TabOrder = 2
-            Text = 'Search'
-            OnEnter = EditPlaylistSearchEnter
-            OnExit = EditPlaylistSearchExit
-            OnKeyDown = EditPlaylistSearchKeyDown
-            OnKeyPress = EditPlaylistSearchKeyPress
-          end
-          object TabBtn_Favorites: TSkinButton
-            Left = 28
-            Top = 2
-            Width = 24
-            Height = 24
-            Hint = 'Favorite playlists'
+          object PlaylistControlPanel: TNempPanel
+            Tag = 1
+            Left = 0
+            Top = 0
+            Width = 127
+            Height = 28
+            Align = alLeft
+            BevelOuter = bvNone
             TabOrder = 1
-            TabStop = False
-            OnClick = TabBtn_FavoritesClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
+            OnPaint = PanelPaint
+            OwnerDraw = False
+            object TabBtn_Playlist: TSkinButton
+              Left = 0
+              Top = 2
+              Width = 24
+              Height = 24
+              Hint = 'Show context menu'
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 0
+              OnClick = TabPanelPlaylistClick
+              DrawMode = dm_Skin
+              NumGlyphsX = 5
+              NumGlyphsY = 1
+              GlyphLine = 0
+              CustomRegion = False
+              FocusDrawMode = fdm_Windows
+              Color1 = clBlack
+              Color2 = clBlack
+            end
+            object TabBtn_Favorites: TSkinButton
+              Left = 26
+              Top = 2
+              Width = 24
+              Height = 24
+              Hint = 'Favorite playlists'
+              TabOrder = 1
+              OnClick = TabBtn_FavoritesClick
+              DrawMode = dm_Skin
+              NumGlyphsX = 5
+              NumGlyphsY = 1
+              GlyphLine = 0
+              CustomRegion = False
+              FocusDrawMode = fdm_Windows
+              Color1 = clBlack
+              Color2 = clBlack
+            end
+            object EditPlaylistSearch: TEdit
+              Left = 56
+              Top = 4
+              Width = 65
+              Height = 21
+              AutoSize = False
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              TabOrder = 2
+              TextHint = 'Search'
+              OnChange = EditPlaylistSearchChange
+              OnEnter = EditPlaylistSearchEnter
+              OnKeyDown = EditPlaylistSearchKeyDown
+              OnKeyPress = EditPlaylistSearchKeyPress
+            end
           end
         end
       end
@@ -799,47 +841,31 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 0
           OnPaint = PanelPaint
           OwnerDraw = False
-          DesignSize = (
-            607
-            28)
-          object EDITFastSearch: TEdit
-            Left = 58
-            Top = 3
-            Width = 198
-            Height = 21
-            AutoSize = False
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clGrayText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentFont = False
-            PopupMenu = QuickSearchHistory_PopupMenu
-            TabOrder = 2
-            OnEnter = EDITFastSearchEnter
-            OnExit = EDITFastSearchExit
-            OnKeyPress = EDITFastSearchKeyPress
-          end
           object MedienlisteFillPanel: TNempPanel
             Tag = 3
-            Left = 262
+            AlignWithMargins = True
+            Left = 236
             Top = 2
-            Width = 339
-            Height = 23
-            Anchors = [akLeft, akTop, akRight]
+            Width = 371
+            Height = 24
+            Margins.Left = 0
+            Margins.Top = 2
+            Margins.Right = 0
+            Margins.Bottom = 2
+            Align = alClient
             BevelInner = bvRaised
             BevelOuter = bvLowered
             PopupMenu = Medialist_View_PopupMenu
-            TabOrder = 3
+            TabOrder = 1
             OnPaint = TABPanelPaint
             OwnerDraw = False
             DesignSize = (
-              339
-              23)
+              371
+              24)
             object MedienListeStatusLBL: TLabel
               Left = 14
               Top = 5
-              Width = 325
+              Width = 357
               Height = 13
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -849,46 +875,76 @@ object Nemp_MainForm: TNemp_MainForm
               ExplicitWidth = 326
             end
           end
-          object TabBtn_Medialib: TSkinButton
-            Left = 2
-            Top = 2
-            Width = 24
-            Height = 24
-            Hint = 'Show context menu'
-            ParentShowHint = False
-            ShowHint = True
+          object MedienListeControlPanel: TNempPanel
+            Tag = 3
+            Left = 0
+            Top = 0
+            Width = 236
+            Height = 28
+            Align = alLeft
+            BevelOuter = bvNone
             TabOrder = 0
-            TabStop = False
-            OnClick = TabPanelMedienlisteClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
-          end
-          object TabBtn_Marker: TSkinButton
-            Left = 28
-            Top = 2
-            Width = 24
-            Height = 24
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 1
-            TabStop = False
-            OnClick = TabBtn_MarkerClick
-            OnKeyPress = TabBtn_MarkerKeyPress
-            OnMouseDown = TabBtn_MarkerMouseDown
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 5
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
+            OnPaint = PanelPaint
+            OwnerDraw = False
+            object EDITFastSearch: TEdit
+              Left = 58
+              Top = 4
+              Width = 172
+              Height = 21
+              AutoSize = False
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clGrayText
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              PopupMenu = QuickSearchHistory_PopupMenu
+              TabOrder = 2
+              TextHint = 'Search (Library)'
+              OnChange = EDITFastSearchChange
+              OnEnter = EDITFastSearchEnter
+              OnExit = EDITFastSearchExit
+              OnKeyPress = EDITFastSearchKeyPress
+            end
+            object TabBtn_Marker: TSkinButton
+              Left = 28
+              Top = 2
+              Width = 24
+              Height = 24
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 1
+              OnClick = TabBtn_MarkerClick
+              OnKeyPress = TabBtn_MarkerKeyPress
+              OnMouseDown = TabBtn_MarkerMouseDown
+              DrawMode = dm_Skin
+              NumGlyphsX = 5
+              NumGlyphsY = 5
+              GlyphLine = 0
+              CustomRegion = False
+              FocusDrawMode = fdm_Windows
+              Color1 = clBlack
+              Color2 = clBlack
+            end
+            object TabBtn_Medialib: TSkinButton
+              Left = 2
+              Top = 2
+              Width = 24
+              Height = 24
+              Hint = 'Show context menu'
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 0
+              OnClick = TabPanelMedienlisteClick
+              DrawMode = dm_Skin
+              NumGlyphsX = 5
+              NumGlyphsY = 1
+              GlyphLine = 0
+              CustomRegion = False
+              FocusDrawMode = fdm_Windows
+              Color1 = clBlack
+              Color2 = clBlack
+            end
           end
         end
         object GRPBOXVST: TNempPanel
@@ -916,6 +972,8 @@ object Nemp_MainForm: TNemp_MainForm
             BevelOuter = bvNone
             BorderStyle = bsNone
             Colors.SelectionTextColor = clWindowText
+            Colors.UnfocusedSelectionColor = clHighlight
+            Colors.UnfocusedSelectionBorderColor = clHighlight
             Constraints.MinHeight = 26
             DragImageKind = diMainColumnOnly
             DragWidth = 10
@@ -1174,9 +1232,9 @@ object Nemp_MainForm: TNemp_MainForm
               Tag = 2
               Left = 8
               Top = 42
-              Width = 54
+              Width = 78
               Height = 13
-              Caption = '                  '
+              Caption = '12                  12'
               ShowAccelChar = False
               StyleElements = [seClient, seBorder]
               OnDblClick = DetailLabelDblClick
@@ -1186,9 +1244,9 @@ object Nemp_MainForm: TNemp_MainForm
             object LblBibArtist: TLabel
               Left = 8
               Top = 8
-              Width = 54
+              Width = 82
               Height = 13
-              Caption = '                  '
+              Caption = '12                  12'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
               Font.Height = -11
@@ -1204,9 +1262,9 @@ object Nemp_MainForm: TNemp_MainForm
             object LblBibDuration: TLabel
               Left = 8
               Top = 93
-              Width = 54
+              Width = 78
               Height = 13
-              Caption = '                  '
+              Caption = '12                  12'
               ShowAccelChar = False
               StyleElements = [seClient, seBorder]
             end
@@ -1301,9 +1359,9 @@ object Nemp_MainForm: TNemp_MainForm
               Tag = 6
               Left = 8
               Top = 189
-              Width = 54
+              Width = 78
               Height = 13
-              Caption = '                  '
+              Caption = '12                  12'
               ShowAccelChar = False
               StyleElements = [seClient, seBorder]
             end
@@ -1330,74 +1388,93 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 1
           OnPaint = PanelPaint
           OwnerDraw = False
-          DesignSize = (
-            479
-            28)
           object MedienBibDetailFillPanel: TNempPanel
             Tag = 3
-            Left = 58
-            Top = 3
-            Width = 415
-            Height = 23
-            Anchors = [akLeft, akTop, akRight]
+            AlignWithMargins = True
+            Left = 56
+            Top = 2
+            Width = 423
+            Height = 24
+            Margins.Left = 0
+            Margins.Top = 2
+            Margins.Right = 0
+            Margins.Bottom = 2
+            Align = alClient
             BevelInner = bvRaised
             BevelOuter = bvLowered
             PopupMenu = Medialist_View_PopupMenu
-            TabOrder = 2
+            TabOrder = 0
             StyleElements = [seClient, seBorder]
             OnPaint = TABPanelPaint
             OwnerDraw = False
+            DesignSize = (
+              423
+              24)
             object MedienBibDetailStatusLbl: TLabel
               Left = 14
               Top = 4
-              Width = 63
+              Width = 403
               Height = 13
+              Anchors = [akLeft, akTop, akRight]
+              AutoSize = False
               Caption = 'File overview'
               StyleElements = [seClient, seBorder]
             end
           end
-          object TabBtn_Cover: TSkinButton
-            Left = 2
-            Top = 2
-            Width = 24
-            Height = 24
-            Hint = 'Toggle Cover/Lyrics'
-            ParentShowHint = False
-            PopupMenu = Player_PopupMenu
-            ShowHint = True
-            TabOrder = 0
-            OnClick = PlayerTabsClick
-            OnMouseMove = TabBtn_CoverMouseMove
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 2
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
-          end
-          object TabBtn_SummaryLock: TSkinButton
-            Tag = 2
-            Left = 28
-            Top = 2
-            Width = 24
-            Height = 24
-            Hint = 'Toggle File Overview (player only vs. selected file)'
-            ParentShowHint = False
-            PopupMenu = Player_PopupMenu
-            ShowHint = True
+          object MedienBibDetailControlPanel: TNempPanel
+            Tag = 3
+            Left = 0
+            Top = 0
+            Width = 56
+            Height = 28
+            Align = alLeft
+            BevelOuter = bvNone
             TabOrder = 1
-            OnClick = TabBtn_SummaryLockClick
-            OnMouseMove = TabBtn_CoverMouseMove
-            DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 2
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
+            OnPaint = PanelPaint
+            OwnerDraw = False
+            object TabBtn_Cover: TSkinButton
+              Left = 2
+              Top = 2
+              Width = 24
+              Height = 24
+              Hint = 'Toggle Cover/Lyrics'
+              ParentShowHint = False
+              PopupMenu = Player_PopupMenu
+              ShowHint = True
+              TabOrder = 0
+              OnClick = PlayerTabsClick
+              OnMouseMove = TabBtn_CoverMouseMove
+              DrawMode = dm_Skin
+              NumGlyphsX = 5
+              NumGlyphsY = 2
+              GlyphLine = 0
+              CustomRegion = False
+              FocusDrawMode = fdm_Windows
+              Color1 = clBlack
+              Color2 = clBlack
+            end
+            object TabBtn_SummaryLock: TSkinButton
+              Tag = 2
+              Left = 28
+              Top = 2
+              Width = 24
+              Height = 24
+              Hint = 'Toggle File Overview (player only vs. selected file)'
+              ParentShowHint = False
+              PopupMenu = Player_PopupMenu
+              ShowHint = True
+              TabOrder = 1
+              OnClick = TabBtn_SummaryLockClick
+              OnMouseMove = TabBtn_CoverMouseMove
+              DrawMode = dm_Windows
+              NumGlyphsX = 5
+              NumGlyphsY = 2
+              GlyphLine = 0
+              CustomRegion = False
+              FocusDrawMode = fdm_Windows
+              Color1 = clBlack
+              Color2 = clBlack
+            end
           end
         end
       end
@@ -2363,6 +2440,7 @@ object Nemp_MainForm: TNemp_MainForm
       end
       object MM_ML_ConfigureMediaLibrary: TMenuItem
         Caption = 'Configure Media library'
+        ImageIndex = 43
         OnClick = PM_ML_ConfigureMedialibraryClick
       end
       object N22: TMenuItem
@@ -3503,12 +3581,13 @@ object Nemp_MainForm: TNemp_MainForm
     Top = 488
   end
   object MenuImages: TImageList
+    DrawingStyle = dsTransparent
     ShareImages = True
-    Left = 24
-    Top = 280
+    Left = 32
+    Top = 176
     Bitmap = {
-      494C01012A00300B040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
-      000000000000360000002800000040000000B0000000010020000000000000B0
+      494C01012C00300B040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      000000000000360000002800000040000000C0000000010020000000000000C0
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -3525,119 +3604,247 @@ object Nemp_MainForm: TNemp_MainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000006CA7D0004094D0003F92
+      CF003F92CE003E92CF003E94D0006CA7D0000000000000000000000000000000
+      00000000000000000000DCDCDC00CCCCCC00CCCCCC00DDDDDD00000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000003B93D100A9F9FF008FF0
+      FF008FEFFF008DF0FF00D2FFFF003E94D0000000000000000000000000000000
+      000000000000000000006D98C1004182BD003D80BB00628FBA00DEDEDE000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000C0000000C000000000
       000000C0000000C000000000000000C0000000C000000000000000C0000000C0
       00000000000000C0000000C00000000000000000000000000000000000000000
+      0000CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC003390D100B7F3FF0077E0
+      FD0077E0FD0076E0FE00DAFEFF003B92CF0000000000F4F4F400F5F5F500F5F5
+      F500F5F5F500F8F8F8004D8DC30057A4D60059A0D3004C8FC5006490BA00DFDF
+      DF00F5F5F5000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00008D8C8C008D8C8C008D8C8C008D8C8C008D8C8C00308FD200CEF7FF00B5EE
+      FE00DBF9FF00DDFBFF00E2FFFF003D94D000D0D0D000AFC1CD00B0C1CD00B0C1
+      CC00B2C2CD00B9C5CD005291C700B7E6FA00529FD300579FD2004B8EC5006690
+      B900B2C3CE00D1D1D10000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000C0000000C000000000
       000000C0000000C000000000000000C0000000C000000000000000C0000000C0
       00000000000000C0000000C00000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00008D8C8C00000000000000000000000000000000003492D300DCFDFF00DAFB
+      FF00348DCD003991CE003D94D0007EB8E0004F9DD2004398D2004094D0003E92
+      CF003E92CE003E92CF00498DC5004D99CE00B4E3F900509ED300539DD3003080
+      C2003D9BDA004BA0DA00D6D6D600F8F8F8000000000000000000000000000000
       00000000000000000000E8A20000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00008D8C8C0000000000000000000000000000000000539FD4003C93D0003B92
+      CF005CA0D000CCCCCC00CCCCCC00DCDCDC004499D2003F94D000ABFBFF009BF3
+      FF0092F1FF0093F1FF0093F3FF0066AED7004B96CD00AFE1F90081AFD000BCBF
+      B9008E8178008E827A009B948E00C4C3C2000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000000000006BD7BF006BD7BF000000
       00006BD7BF006BD7BF00000000006BD7BF006BD7BF00000000006BD7BF006BD7
       BF00000000006BD7BF006BD7BF00000000000000000000000000000000000000
+      00008D8C8C000000000000000000000000000000000075ABD0003E93CF003E91
+      CE003E92CE003E92CF003E94D0006EA8D0004397D10056ACDD008EDAF500A2ED
+      FF0082E5FE0084E5FE0085E7FF0088EBFF0061A9D60057A7D700E0DCD800D4CD
+      CC00D5D2D100EEEBE900EBE7E600918E8A000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000D8D8D800CCCCCC00CCCCCC00CCCC
+      CC008D8C8C00CCCCCC00D1D1D10000000000000000003C93D100A9F9FF008FF0
+      FF008FEFFF008DF0FF00D2FFFF003E94D0004296D10071C4EA006CBCE600BBF2
+      FF0075DEFD0077DEFC0078DFFD007DE1FE007EE4FF0078E6FF00C1B4AF00DCD8
+      D800CFCDCC00918C890097908B009E948D000000000000000000000000000000
       00000000000000000000000000000000000000000000E8A20000000000000000
       000000000000000000000000000000000000000000006BD7BF006BD7BF000000
       00006BD7BF006BD7BF00000000006BD7BF006BD7BF00000000006BD7BF006BD7
-      BF00000000006BD7BF006BD7BF00000000000000000000000000000000000000
+      BF00000000006BD7BF006BD7BF000000000063A4D1004397D1004094D0003C92
+      D0003991D0003B92D1004799D200CCCCCC00CCCCCC003490D100B7F3FF0077E0
+      FD0077E0FD0076E0FE00DAFEFF003B92CF004095D00090DDF80044A0D800DDFC
+      FF00DAFAFF00DBF9FF00DEFAFF0074DCFC0075DCFC0070DFFF00A1938E00D9D5
+      D400C3BFBE009B95910070C8F9009DBCD1000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000000000000000000000000000E8A2
+      0000000000000000000000000000000000004397D10054A6D90082E3FD0086EB
+      FF0083EAFF0085ECFF0051B3E4008D8C8C008D8C8C003190D200CEF7FF00B5EE
+      FE00DBF9FF00DDFBFF00E2FFFF003D94D0003E93CF00B2F6FF0051ACDE00358A
+      CA00358ACA00358ACA00368ACA005BBDE9006ED9FC0066DAFF00A3958F00E3DF
+      DE00B1AFAC00A29D9900A69D9700ACA09800000000000000000000000000E8A2
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000000000000000000000000000277FFF00277FFF000000
       0000000000000000000000000000277FFF00277FFF0000000000277FFF00277F
-      FF0000000000277FFF00277FFF00000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      FF0000000000277FFF00277FFF00000000004095D000A0E5FB0048A7DD00DDFA
+      FF00DAF9FF00DBFAFF00DDFCFF0059A0D200000000003692D200DCFDFF00DAFB
+      FF00348DCD003991CE003D94D0007CB7DF003D92CF00B8F3FF0077DFFE007BE0
+      FE007CE1FE007CE1FF007DE2FF0052ABDD0055BAE900D9FAFF00BCC7C900D4CC
+      C800F3F0EE00E3E0DD00D1CAC4009FA4A8000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000E8A200000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000003D93CF00C1F7FF0051B5E5002F89
+      CA002F8ACB00328CCC003992CF003F97D300000000007EB8E1003D94D0003D94
+      D00081BAE0000000000000000000000000003C92CF00C0F3FF0070D9FB0073DA
+      FB0074DAFB0074DAFB0074DBFB0076DEFD004FA9DD00358CCC00388ECC00899D
+      AD00B1A69F00B5AAA20098A6B00091BCDA000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000000000000000000000000000277FFF00277FFF000000
       0000000000000000000000000000277FFF00277FFF0000000000000000000000
-      000000000000277FFF00277FFF00000000000000000000000000000000000000
+      000000000000277FFF00277FFF00000000003B92CF00D2F9FF00B6F0FF00DCFD
+      FF00DFFFFF00E5FFFF003E95D000000000000000000000000000000000000000
+      0000000000000000000000000000000000003B92CF00CAF6FF0069D5F9006CD5
+      F9006AD4F90069D4F90069D5F9006AD6FA006BD8FB006BD9FD0069DAFE0063D9
+      FF00D2FBFF003392D300D8E6EF00000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000003D94D000DCFDFF00DAFBFF00358F
+      CD003A92CF003E95D0007DB8E000000000000000000000000000000000000000
+      0000000000000000000000000000000000003B92CF00D5F7FF0060D1F90061D0
+      F800B4EBFD00D9F6FF00DAF8FF00DAF8FF00DAF9FF00DBF9FF00DAF9FF00D9FA
+      FF00DDFDFF003C94D100D7E9F500000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000241CED00241CED0000000000000000000000
+      0000000000000000000000000000000000004D9ED4003D94D0003D94D00052A0
+      D500000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000003D94D000DCFCFF00D8F7FF00D8F7
+      FF00DBFAFF00358ECD003991CE003A92CF003A92CF003A92CF003A92CF003A92
+      CF003D94D00051A0D50000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000003D94D0003A92CF003A92
+      CF003D94D00055A2D500DFEDF700DAEAF600D9EAF600D9EAF600D9EAF600D9EA
+      F600D6E9F5000000000000000000000000000000000000000000000000000000
       0000FDFDFE00FAFAFB00F6F6F800F4F4F600F5F5F700F9F9FA00FCFCFD000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4918,12 +5125,16 @@ object Nemp_MainForm: TNemp_MainForm
       000038D3DC000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000424D3E000000000000003E000000
-      2800000040000000B00000000100010000000000800500000000000000000000
-      000000000000000000000000FFFFFF00FFFFFFFF00000000FFFFFFFF00000000
-      EDB7924900000000EDB7FFFF00000000E8B7924900000000E8B7FFFF00000000
-      E8B7924900000000ED17FFFF00000000ED17924900000000C517FFFF00000000
-      C5A39E4900000000C5A3FFFF00000000EDA39E7900000000EDB7FFFF00000000
-      FFFFFE7F00000000FFFFFFFF00000000F01FFFFFF003E007C007FFFFC0008001
+      2800000040000000C00000000100010000000000000600000000000000000000
+      000000000000000000000000FFFFFF0000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000FFFFFFFFFF80FC3FFFFFFFFFFF80FC1F
+      EDB79249F0008007EDB7FFFFF0000003E8B79249F7800000E8B7FFFFF7800000
+      E8B79249F7800000ED17FFFF01800000ED17924900000000C517FFFF00000000
+      C5A39E4900800000C5A3FFFF00870000EDA39E7901FF0001EDB7FFFF01FF0001
+      FFFFFE7F0FFF0003FFFFFFFFFFFF8007F01FFFFFF003E007C007FFFFC0008001
       8003FC7F800000008003F00F800080000001C007C00080010001C007F0018001
       00018003F00380E100018003E00F80E100018003E01F800100018003C03F8001
       00018003C07F83818001C003C0FF80018003C00780FF8001C007E00F83FFC001
@@ -4976,7 +5187,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object PlaylistDateienOpenDialog: TOpenDialog
     Options = [ofHideReadOnly, ofAllowMultiSelect, ofEnableSizing]
-    Left = 776
+    Left = 872
+    Top = 8
   end
   object OpenDialog1: TOpenDialog
     DefaultExt = 'gmp'
@@ -4993,8 +5205,8 @@ object Nemp_MainForm: TNemp_MainForm
     FilterIndex = 2
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
     OnTypeChange = PlayListSaveDialogTypeChange
-    Left = 873
-    Top = 1
+    Left = 921
+    Top = 9
   end
   object SaveDialog1: TSaveDialog
     DefaultExt = 'gmp'
@@ -5147,6 +5359,10 @@ object Nemp_MainForm: TNemp_MainForm
       ImageIndex = 38
       ShortCut = 16430
       OnClick = PM_ML_DeleteSelectedClick
+    end
+    object PM_MLView_ChangeCategory: TMenuItem
+      Caption = 'Change category of selected files'
+      OnClick = PM_MLView_ChangeCategoryClick
     end
     object N72: TMenuItem
       Caption = '-'
@@ -6597,6 +6813,10 @@ object Nemp_MainForm: TNemp_MainForm
     object N27: TMenuItem
       Caption = '-'
     end
+    object PM_ML_ChangeCategory: TMenuItem
+      Caption = 'Change Category of selected files'
+      OnClick = PM_ML_ChangeCategoryClick
+    end
     object PM_ML_SortCollectionBy: TMenuItem
       Caption = 'Sort Collection by'
       object PM_ML_SortCollectionByName: TMenuItem
@@ -6696,6 +6916,7 @@ object Nemp_MainForm: TNemp_MainForm
     end
     object PM_ML_ConfigureMedialibrary: TMenuItem
       Caption = 'Configure Media library'
+      ImageIndex = 42
       OnClick = PM_ML_ConfigureMedialibraryClick
     end
     object N16: TMenuItem

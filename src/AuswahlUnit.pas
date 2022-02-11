@@ -109,12 +109,12 @@ begin
   Height := BHeight ;
   Width  := BWidth  ;
 
-  Nemp_MainForm.AuswahlFillPanel.Width := Nemp_MainForm.AuswahlPanel.Width - Nemp_MainForm.AuswahlFillPanel.Left - 16;//26;
-  CloseImageA.Left := Nemp_MainForm.AuswahlPanel.Width - CloseImageA.Width;// - 5;//10;
-  CloseImageA.Top := 3;
+  // Nemp_MainForm.AuswahlFillPanel.Width := Nemp_MainForm.AuswahlPanel.Width - Nemp_MainForm.AuswahlFillPanel.Left - 16;//26;
+  PositionCloseImage(CloseImageA, Nemp_MainForm.AuswahlPanel);
+  {CloseImageA.Left := Nemp_MainForm.AuswahlPanel.Width - CloseImageA.Width - 2;// - 5;//10;
+  CloseImageA.Top := 4;
   CloseImageA.Parent := Nemp_MainForm.AuswahlPanel;
-  CloseImageA.BringToFront;
-
+  CloseImageA.BringToFront;}
 
   SetRegion(ContainerPanelAuswahlForm, self, NempRegionsDistance, handle);
 
@@ -164,12 +164,13 @@ end;
 
 procedure TAuswahlForm.FormActivate(Sender: TObject);
 begin
-  Nemp_MainForm.AuswahlFillPanel.Width := Nemp_MainForm.AuswahlPanel.Width
+  PositionCloseImage(CloseImageA, Nemp_MainForm.AuswahlPanel);
+  {Nemp_MainForm.AuswahlFillPanel.Width := Nemp_MainForm.AuswahlPanel.Width
                                         - Nemp_MainForm.AuswahlFillPanel.Left - 16;//26;
-  CloseImageA.Left := Nemp_MainForm.AuswahlPanel.Width - CloseImageA.Width;// - 5;//10;
-  CloseImageA.Top := 3;
+  CloseImageA.Left := Nemp_MainForm.AuswahlPanel.Width - CloseImageA.Width - 2;// - 5;//10;
+  CloseImageA.Top := 4;
   CloseImageA.Parent := Nemp_MainForm.AuswahlPanel;
-  CloseImageA.BringToFront;
+  CloseImageA.BringToFront;}
 end;
 
 procedure TAuswahlForm.FormClose(Sender: TObject;
@@ -283,7 +284,7 @@ begin
       if MedienBib.BrowseMode = 2 then
       begin
           Nemp_MainForm.PanelTagCloudBrowse.Repaint;
-          MedienBib.TagCloud.PaintAgain;
+          Nemp_MainForm.CloudViewer.PaintAgain;
           //  ShowTags(False);
       end;
 end;

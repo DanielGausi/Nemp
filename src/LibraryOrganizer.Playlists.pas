@@ -27,7 +27,7 @@ type
       function GetCaption: String; override;
       function GetSimpleCaption: String; override;
       function GetCoverID: String; override;  // = ''
-      function GetSubCollection(Index: Integer): TAudioCollection; override; // = Nil
+      function GetCollection(Index: Integer): TAudioCollection; override; // = Nil
       function GetCollectionCount: Integer; override; // = 0
     public
       property LibraryPlaylist: TLibraryPlaylist read fLibraryPlaylist;
@@ -35,7 +35,6 @@ type
       constructor Create(aOwner: TLibraryCategory; aPlaylist: TLibraryPlaylist); //Create(aPlaylistFile: String);
       destructor Destroy; override;
       procedure Clear; override;
-      procedure Empty; override;
       procedure RemoveEmptyCollections; override;
 
       procedure DoGetFiles(dest: TAudioFileList; recursive: Boolean); override;
@@ -43,9 +42,11 @@ type
 
       function MatchPrefix(aPrefix: String): Boolean; override;
       function ComparePrefix(aPrefix: String): Integer; override;
+      function IndexOf(aCollection: TAudioCollection): Integer; override;
+
       procedure Analyse(recursive: Boolean); override; // empty
-      procedure SortCollection(doRecursive: Boolean = True); override; // empty
-      procedure ReSortCollection(newSorting: teCollectionSorting); override; // empty
+      procedure Sort(doRecursive: Boolean = True); override; // empty
+      procedure ReSort(newSorting: teCollectionSorting); override; // empty
       procedure SortCollectionLevel(aLevel: Integer; ForceSorting: Boolean = False); override; // empty
 
       function ChangeDriveChar(newChar: Char): Boolean;
@@ -111,13 +112,6 @@ begin
   fPlaylistFiles.Clear;
 end;
 
-procedure TAudioPlaylistCollection.Empty;
-begin
-  inherited;
-
-  Clear;
-end;
-
 function TAudioPlaylistCollection.GetCaption: String;
 begin
   // Frage: hier ggf. nach CollectionType (muss noch eingeführt werden) unterscheiden?
@@ -141,12 +135,18 @@ begin
   result := GetCaption;
 end;
 
+function TAudioPlaylistCollection.IndexOf(
+  aCollection: TAudioCollection): Integer;
+begin
+  result := -1;
+end;
+
 function TAudioPlaylistCollection.GetCoverID: String;
 begin
   result := '';
 end;
 
-function TAudioPlaylistCollection.GetSubCollection(
+function TAudioPlaylistCollection.GetCollection(
   Index: Integer): TAudioCollection;
 begin
   result := Nil;
@@ -203,13 +203,13 @@ begin
   // nothing to do
 end;
 
-procedure TAudioPlaylistCollection.ReSortCollection(
+procedure TAudioPlaylistCollection.ReSort(
   newSorting: teCollectionSorting);
 begin
   // nothing to do
 end;
 
-procedure TAudioPlaylistCollection.SortCollection(doRecursive: Boolean);
+procedure TAudioPlaylistCollection.Sort(doRecursive: Boolean);
 begin
   // nothing to do
 end;

@@ -47,7 +47,7 @@ uses
   M4AFiles, M4AAtoms, md5,
 
   CoverHelper, Buttons, ExtDlgs, ImgList,  Hilfsfunktionen, Systemhelper, HtmlHelper,
-  Nemp_ConstantsAndTypes, gnuGettext, Lyrics, TagClouds,
+  Nemp_ConstantsAndTypes, gnuGettext, Lyrics, TagClouds, LibraryOrganizer.Base,
   Nemp_RessourceStrings, Menus, RatingCtrls, Spin, VirtualTrees, Vcl.Themes, vcl.styles;
 
 type
@@ -399,6 +399,7 @@ type
     procedure HandleCoverIDSetting(aNewID: String);
 
     procedure ReloadDataAfterEdit(aERR: TNempAudioError);
+    procedure CheckForChangedData(BackupFile: TAudioFile);
     function CurrentFileHasBeenChanged: Boolean;
 
     function GetID3v1TagfromBaseAudioFile(aBaseAudioFile: TBaseAudioFile): TID3v1Tag;
@@ -1017,6 +1018,7 @@ var aErr: TNempAudioError;
     ApeFile: TBaseApeFile;
     mp3File: TMp3File;
     DataWritten: Boolean;
+    Backup: TAudioFile;
 begin
 
     if not CurrentTagObject.Valid then
@@ -1047,7 +1049,10 @@ begin
     end;
 
 
-    begin
+    Backup := TAudioFile.Create;
+    try
+        Backup.Assign(CurrentAudioFile);
+
         // Update TagCloud-Tags
         if TagCloudTagsChanged  then
             ApplyTagListToTagObject;
@@ -1160,9 +1165,10 @@ begin
         LyricsHasChanged       := False;
         CurrentTagRatingChanged := False;
         ReloadDataAfterEdit(aErr);
-
-
-    end
+        CheckForChangedData(Backup);
+    finally
+      Backup.Free;
+    end;
 end;
 procedure TFDetails.BtnUndoClick(Sender: TObject);
 begin
@@ -1651,6 +1657,43 @@ begin
     // note: This will also activate ReloadTimerTimer
     //       which will call "ShowDetails" again to refresh this whole form
     CorrectVCLAfterAudioFileEdit(CurrentAudioFile);
+end;
+
+procedure TFDetails.CheckForChangedData(BackupFile: TAudioFile);
+var
+  CollectionDirty, SearchDirty: Boolean;
+begin
+  CollectionDirty := False;
+  SearchDirty := False;
+  // Check for relevant changes for the QuickSearch-String
+  if (BackupFile.Artist <> CurrentAudioFile.Artist)
+    or (BackupFile.Titel <> CurrentAudioFile.Titel)
+    or (BackupFile.Album <> CurrentAudioFile.Album)
+  then
+    // Artist, Title and Album are handled the same for Searchstrings, so one test for all is enough
+    // (they are all included, or Search is not accelerated at all)
+    SearchDirty := SearchDirty or MedienBib.SearchStringIsDirty(CON_ARTIST);
+  // other properties may be included or not
+  if (BackupFile.Comment  <> CurrentAudioFile.Comment) then
+    SearchDirty := SearchDirty or MedienBib.SearchStringIsDirty(CON_STANDARDCOMMENT);
+  if (BackupFile.Genre  <> CurrentAudioFile.Genre) then
+    SearchDirty := SearchDirty or MedienBib.SearchStringIsDirty(CON_GENRE);
+
+  // Check for relevant changes for the collections
+  if (BackupFile.Artist <> CurrentAudioFile.Artist) then
+    CollectionDirty := CollectionDirty or MedienBib.CollectionsAreDirty(CON_ARTIST);
+  if (BackupFile.Album <> CurrentAudioFile.Album) then
+    CollectionDirty := CollectionDirty or MedienBib.CollectionsAreDirty(CON_ALBUM);
+  if (BackupFile.Year <> CurrentAudioFile.Year) then
+    CollectionDirty := CollectionDirty or MedienBib.CollectionsAreDirty(CON_YEAR);
+  if (BackupFile.Genre <> CurrentAudioFile.Genre) then
+    CollectionDirty := CollectionDirty or MedienBib.CollectionsAreDirty(CON_GENRE);
+  if (BackupFile.RawTagLastFM <> CurrentAudioFile.RawTagLastFM) then
+    CollectionDirty := CollectionDirty or MedienBib.CollectionsAreDirty(ccTagCloud);
+
+  // Set Warning in BrowseTabs of the MainForm, if necessary
+  if SearchDirty or CollectionDirty then
+    SetBrowseTabWarning(True);
 end;
 
 

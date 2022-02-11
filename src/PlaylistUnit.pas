@@ -109,12 +109,13 @@ begin
   Height := BHeight ;
   Width  := BWidth  ;
 
-  Nemp_MainForm.PlaylistFillPanel.Width := Nemp_MainForm.PlaylistPanel.Width - Nemp_MainForm.PlaylistFillPanel.Left - 16;
-
+  PositionCloseImage(CloseImageP, Nemp_MainForm.PlaylistPanel);
+  {Nemp_MainForm.PlaylistFillPanel.Width := Nemp_MainForm.PlaylistPanel.Width - Nemp_MainForm.PlaylistFillPanel.Left - 16;
   CloseImageP.Parent := Nemp_MainForm.PlaylistPanel;
   CloseImageP.Left := Nemp_MainForm.PlaylistPanel.Width - CloseImageP.Width;
   CloseImageP.Top := 3; //6              // PlaylistPanel
   CloseImageP.BringToFront;
+  }
 
   SetRegion(ContainerPanelPlaylistForm, self, NempRegionsDistance, handle);
 
@@ -163,12 +164,13 @@ end;
 
 procedure TPlaylistForm.FormActivate(Sender: TObject);
 begin
-  Nemp_MainForm.PlaylistFillPanel.Width := Nemp_MainForm.PlaylistPanel.Width - Nemp_MainForm.PlaylistFillPanel.Left - 16;
+  PositionCloseImage(CloseImageP, Nemp_MainForm.PlaylistPanel);
 
+{  Nemp_MainForm.PlaylistFillPanel.Width := Nemp_MainForm.PlaylistPanel.Width - Nemp_MainForm.PlaylistFillPanel.Left - 16;
   CloseImageP.Parent := Nemp_MainForm.PlaylistPanel;
   CloseImageP.Left := Nemp_MainForm.PlaylistPanel.Width - CloseImageP.Width;
   CloseImageP.Top := 3; //6              // PlaylistPanel
-  CloseImageP.BringToFront;
+  CloseImageP.BringToFront;}
 end;
 
 procedure TPlaylistForm.FormClose(Sender: TObject;

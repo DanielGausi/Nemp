@@ -25,7 +25,7 @@ type
       function GetCaption: String; override;
       function GetSimpleCaption: String; override;
       function GetCoverID: String; override;  // = ''
-      function GetSubCollection(Index: Integer): TAudioCollection; override; // = Nil
+      function GetCollection(Index: Integer): TAudioCollection; override; // = Nil
       function GetCollectionCount: Integer; override; // = 0
     public
       property Station: TStation read fStation;
@@ -33,7 +33,6 @@ type
       constructor Create(aOwner: TLibraryCategory; aStation: TStation);
       destructor Destroy; override;
       procedure Clear; override;
-      procedure Empty; override;
       procedure RemoveEmptyCollections; override;
 
       procedure DoGetFiles(dest: TAudioFileList; recursive: Boolean); override;
@@ -41,9 +40,11 @@ type
 
       function MatchPrefix(aPrefix: String): Boolean; override;
       function ComparePrefix(aPrefix: String): Integer; override;
+      function IndexOf(aCollection: TAudioCollection): Integer; override;
+
       procedure Analyse(recursive: Boolean); override; // empty
-      procedure SortCollection(doRecursive: Boolean = True); override; // empty
-      procedure ReSortCollection(newSorting: teCollectionSorting); override; // empty
+      procedure Sort(doRecursive: Boolean = True); override; // empty
+      procedure ReSort(newSorting: teCollectionSorting); override; // empty
       procedure SortCollectionLevel(aLevel: Integer; ForceSorting: Boolean = False); override; // empty
 
   end;
@@ -124,6 +125,12 @@ begin
   result := GetCaption;
 end;
 
+function TAudioWebradioCollection.IndexOf(
+  aCollection: TAudioCollection): Integer;
+begin
+  result := -1;
+end;
+
 function TAudioWebradioCollection.GetCollectionCount: Integer;
 begin
   result := 0;
@@ -134,7 +141,7 @@ begin
   result := '';
 end;
 
-function TAudioWebradioCollection.GetSubCollection(
+function TAudioWebradioCollection.GetCollection(
   Index: Integer): TAudioCollection;
 begin
   result := Nil;
@@ -153,11 +160,6 @@ end;
 
 procedure TAudioWebradioCollection.DoGetFiles(dest: TAudioFileList;
   recursive: Boolean);
-begin
-  // nothing to do
-end;
-
-procedure TAudioWebradioCollection.Empty;
 begin
   // nothing to do
 end;
@@ -181,13 +183,13 @@ begin
   // nothing to do
 end;
 
-procedure TAudioWebradioCollection.ReSortCollection(
+procedure TAudioWebradioCollection.ReSort(
   newSorting: teCollectionSorting);
 begin
   // nothing to do
 end;
 
-procedure TAudioWebradioCollection.SortCollection(doRecursive: Boolean);
+procedure TAudioWebradioCollection.Sort(doRecursive: Boolean);
 begin
   // nothing to do
 end;

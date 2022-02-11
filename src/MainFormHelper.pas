@@ -35,7 +35,7 @@ interface
 
 uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTrees,
     NempAudioFiles, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, dialogs, CoverHelper,
-    MyDialogs, System.UITypes, math, Vcl.ExtCtrls, Vcl.Graphics, RatingCtrls,
+    MyDialogs, System.UITypes, math, Vcl.ExtCtrls, Vcl.Graphics, RatingCtrls, SkinButtons,
     LibraryOrganizer.Base, LibraryOrganizer.Files, LibraryOrganizer.Playlists, LibraryOrganizer.Webradio;
 
 type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
@@ -88,7 +88,7 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     function HandleMergeRule(aTag: String; out newTag: String): Boolean;
     // Select all files with the same path as MedienBib.CurrentAudioFile
     function GetListOfAudioFileCopies(Original: TAudioFile; Target: TAudioFileList): Boolean;
-    procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile; CheckTrees: Boolean=True);
+    procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile; CheckTrees: Boolean=False);
     procedure SyncAudioFilesWith(aAudioFile: TAudioFile);
     procedure DoSyncStuffAfterTagEdit(aAudioFile: TAudiofile; backupTag: UTF8String);
 
@@ -96,6 +96,7 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     procedure RepositionABRepeatButtons;
     procedure SwapABImagesIfNecessary(FixedImage: TImage);
 
+    procedure ShowTagCloudSearch(DoShow: Boolean);
     procedure SetBrowseTabWarning(ShowWarning: Boolean);
     procedure SetBrowseTabCloudWarning(ShowWarning: Boolean);
     procedure SetGlobalWarningID3TagUpdate;
@@ -688,29 +689,12 @@ begin
             ///  Swapping the mode may cause deleting temporary created Audiofiles from Playlists
             ///  If such a tmporary File was currently selected, it may result in access violations later. => Nil it.
             MedienBib.CurrentAudioFile := Nil;
-
+            MedienBib.RepairSearchStrings; // actually done only if needed
             case NewMode of
                 0,1,2: begin
-                    //MedienBib.ReBuildBrowseLists;
                     MedienBib.ReBuildCategories;
                     ReFillBrowseTrees(True);
                 end;
-                {2: begin
-                    // new 2022
-                    MedienBib.ReBuildCategories;
-
-                    // old stuff, delete
-
-                    // 1. Backup Breadcrumbs (current navigation)
-                    MedienBib.TagCloud.BackUpNavigation;
-                    // 2. Rebuild TagCloud
-                    MedienBib.ReBuildTagCloud;
-                    // 3. Restore BreadCrumbs
-                    MedienBib.RestoreTagCloudNavigation;
-                    // 4. Show Files for the current Tag
-                    // xxxxxxxxxxxxxxxx MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, False);
-
-                end; }
             end;
 
             if NempSkin.isActive then
@@ -725,20 +709,22 @@ end;
 
 procedure SwitchBrowsePanel(NewMode: Integer);
 begin
-    MedienBib.TagCloud.Clear;
+    Nemp_MainForm.CloudViewer.Clear;
     MedienBib.NewCoverFlow.Clear;
     Nemp_MainForm.ArtistsVST.Clear;
     Nemp_MainForm.AlbenVST.Clear;
 
     with Nemp_MainForm do
     begin
-
+        ShowTagCloudSearch(NewMode = 2);
+        SetBrowseTabWarning(False);
         case Newmode of
             0: begin
                 // Zeige Browse-Listen
                 PanelCoverBrowse.visible := False;
                 PanelStandardBrowse.Visible := MedienBib.Count > 0;
                 PanelTagCloudBrowse.Visible := False;
+                //ShowTagCloudSearch(False);
 
                 PanelStandardBrowse.Left := 2;
                 PanelStandardBrowse.Width := AuswahlPanel.Width - 4;
@@ -760,6 +746,7 @@ begin
                 PanelStandardBrowse.Visible := False;
                 PanelTagCloudBrowse.Visible := False;
                 PanelCoverBrowse.Visible := MedienBib.Count > 0;
+                //ShowTagCloudSearch(False);
 
                 PanelCoverBrowse.Left := 2;
                 PanelCoverBrowse.Width := AuswahlPanel.Width - 4;
@@ -780,6 +767,7 @@ begin
                 PanelStandardBrowse.Visible := False;
                 PanelTagCloudBrowse.Visible := MedienBib.Count > 0;
                 PanelCoverBrowse.Visible := False;
+                // ShowTagCloudSearch(True);
 
                 PanelTagCloudBrowse.Left := 2;
                 PanelTagCloudBrowse.Width := AuswahlPanel.Width - 4;
@@ -848,7 +836,7 @@ begin
 end;
 
 procedure ReTranslateNemp(LanguageCode: String);
-var i, c: Integer;
+var i: Integer;
 begin
     with Nemp_MainForm do
     begin
@@ -863,6 +851,7 @@ begin
 
         DisplayPlayerMainTitleInformation(True);
         DisplayHeadsetTitleInformation(True);
+        ShowVSTDetails(NempPlayer.CurrentFile, SD_PLAYER);
 
         // refresh Hints und sonstige Anzeigen
         case NempPlaylist.WiedergabeMode of
@@ -1396,9 +1385,18 @@ begin
         aAudioFile.ID3TagNeedsUpdate := False;
         SyncAudioFilesWith(aAudioFile);
         // Correct GUI (player, Details, Detailform, VSTs))
-        CorrectVCLAfterAudioFileEdit(aAudioFile);
+        CorrectVCLAfterAudioFileEdit(aAudioFile, True);
+
+        if MedienBib.CollectionsAreDirty(ccTagCloud) then
+          SetBrowseTabWarning(True);
+
+
+        {
+          Tags im TagCloud-Modus werden "dirty" (aber auch NUR DORT)
+          QuickSearch-Strings sind nicht betroffen
+        }
         // Update the TagCloud
-        BibFile := MedienBib.GetAudioFileWithFilename(aAudioFile.Pfad);
+        // BibFile := MedienBib.GetAudioFileWithFilename(aAudioFile.Pfad);
         //if assigned(BibFile) then
         //    MedienBib.TagCloud.UpdateAudioFile(BibFile);
     end else
@@ -1419,7 +1417,7 @@ end;
         PlaylistVST
         Detailform
 }
-procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile; CheckTrees: Boolean=True);
+procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile; CheckTrees: Boolean=False);
 var OriginalPath: String;
     bibFile: TAudioFile;
 
@@ -1457,17 +1455,6 @@ begin
         //       will produce some strange AVs here - so we do it quick&dirty with a timer
         //       (Probably some issues with VST.Edited and stuff. Don't know.)
         FDetails.ReloadTimer.Enabled := True;
-
-    // TabWarning
-    if CheckTrees then
-    begin
-        bibFile := MedienBib.GetAudioFileWithFilename(aFile.Pfad);
-        if SameFile(bibFile) then
-        begin
-            if MedienBib.CollectionKeyHasChanged(bibFile) then
-              SetBrowseTabWarning(True);
-        end;
-    end;
 end;
 
 procedure RepositionABRepeatButtons;
@@ -1548,38 +1535,64 @@ begin
     end;
 end;
 
+procedure ShowTagCloudSearch(DoShow: Boolean);
+begin
+  if DoShow then begin
+    Nemp_MainForm.AuswahlControlPanel.Width := Nemp_MainForm.edtCloudSearch.Left + Nemp_MainForm.edtCloudSearch.Width +4;
+    Nemp_MainForm.edtCloudSearch.Visible := True;
+  end else
+  begin
+    Nemp_MainForm.AuswahlControlPanel.Width := Nemp_MainForm.edtCloudSearch.Left;
+    Nemp_MainForm.edtCloudSearch.Visible := False;
+  end;
+end;
+
 // When editing audiofiles, the browse-lists may become invalid
 // in this case, a Warning-Icon should be displayed in the first Browse-Button
 procedure SetBrowseTabWarning(ShowWarning: Boolean);
+var
+  aBtn: TSkinButton;
 begin
-    With Nemp_MainForm do
+    with Nemp_MainForm do
     begin
-        if ShowWarning then
-        begin
-            // Show a warning-sign
-            if Medienbib.BrowseMode = 0 then
-            begin
-                // Browsing by artist-album activated
-                TabBtn_Browse.GlyphLine := 2;
-            end else
-                // Browsing by cover (or something else) activated
-                TabBtn_Browse.GlyphLine := 0;
-            TabBtn_Browse.Hint := TabBtnBrowse_Hint1 + #13#10 + TabBtnBrowse_Hint2;
+        {TabBtn_RepairStructure.Visible := ShowWarning;
 
+        if edtCloudSearch.Visible then begin
+            if ShowWarning then
+              edtCloudSearch.Left := TabBtn_RepairStructure.Left + TabBtn_RepairStructure.Width + 4
+            else
+              edtCloudSearch.Left := TabBtn_RepairStructure.Left;
+            edtCloudSearch.Width := AuswahlControlPanel.Width - edtCloudSearch.Left - 4;
         end else
         begin
-            // Show Default-Button
-            if Medienbib.BrowseMode = 0 then
-            begin
-                // Browsing by artist-album activated
-                TabBtn_Browse.GlyphLine := 1;
-            end else
-                // Browsing by cover (or something else) activated
-                TabBtn_Browse.GlyphLine := 0;
-            TabBtn_Browse.Hint := TabBtnBrowse_Hint1;
+          if ShowWarning then
+            AuswahlControlPanel.Width := TabBtn_RepairStructure.Left + TabBtn_RepairStructure.Width + 4
+          else
+            AuswahlControlPanel.Width := TabBtn_RepairStructure.Left;
         end;
         // Refresh the Button
-        TabBtn_Browse.Refresh;
+        // TabBtn_Browse.Refresh;
+        }
+        case MedienBib.BrowseMode of
+          0: aBtn :=  TabBtn_Browse;
+          1: aBtn :=  TabBtn_CoverFlow;
+          2: aBtn :=  TabBtn_TagCloud;
+        else
+          aBtn :=  TabBtn_Browse;
+        end;
+
+        TabBtn_Browse.Hint := TabBtnBrowse_OriginalHint;
+        TabBtn_CoverFlow.Hint := TabBtnCoverFlow_OriginalHint;
+        TabBtn_TagCloud.Hint := TabBtnTagCloud_OriginalHint;
+
+        if ShowWarning then begin
+          aBtn.GlyphLine := 2;
+          aBtn.Hint := MedienBib.TabBtnBrowse_InconsistencyHint;
+        end
+        else
+          aBtn.GlyphLine := 1;
+
+        aBtn.Refresh;
     end;
 end;
 
@@ -1597,7 +1610,7 @@ begin
             end else
                 // Browsing by cover (or something else) activated
                 TabBtn_TagCloud.GlyphLine := 0;
-            TabBtn_TagCloud.Hint := TabBtnTagCloud_Hint1 + #13#10 + TabBtnTagCloud_Hint2;
+            //TabBtn_TagCloud.Hint := TabBtnTagCloud_Hint1 + #13#10 + TabBtnTagCloud_Hint2;
 
         end else
         begin
@@ -1609,7 +1622,7 @@ begin
             end else
                 // Browsing by cover (or something else) activated
                 TabBtn_TagCloud.GlyphLine := 0;
-            TabBtn_TagCloud.Hint := TabBtnTagCloud_Hint1;
+            //TabBtn_TagCloud.Hint := TabBtnTagCloud_Hint1;
         end;
         // Refresh the Button
         TabBtn_TagCloud.Refresh;
@@ -1953,19 +1966,24 @@ begin
 end;
 
 procedure CollectionDblClick(ac: TAudioCollection; Node: PVirtualNode);
+var
+  rc: TRootCollection;
 begin
   case ac.CollectionClass of
     ccFiles: begin
-        if (TAudioFileCollection(ac).CollectionType = ctRoot) and (TAudioFileCollection(ac).SubCollectionType = ctTagCloud) then
+        if (TAudioFileCollection(ac).Content = ccRoot) and (TAudioFileCollection(ac).ChildContent = ccTagCloud) then
         begin
           TRootCollection(ac).ResetTagCloud;
           Nemp_MainForm.FillCollectionTree(Nil, True);
         end else
         begin
-          if TAudioFileCollection(ac).CollectionType = ctTagCloud then begin
+          if TAudioFileCollection(ac).Content = ccTagCloud then begin
+            Nemp_MainForm.AlbenVST.BeginUpdate;
             Nemp_MainForm.AlbenVST.DeleteChildren(Node);
-            TAudioFileCollection(ac).ExpandTagCloud;
+            TAudioFileCollection(ac).ExpandTagCloud(True);
+
             Nemp_MainForm.AddCollection(ac, Node);
+            Nemp_MainForm.AlbenVST.EndUpdate;
           end
           else
             MedienBib.GenerateReverseAnzeigeListe(ac);

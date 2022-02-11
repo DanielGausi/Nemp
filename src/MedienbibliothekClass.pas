@@ -218,6 +218,9 @@ type
         fBrowseMode: Integer;
         fCoverSortOrder: Integer;
 
+        fSearchStringIsDirty: Boolean;
+        fCollectionsAreDirty: Boolean;
+
         fJobList: TJobList;
 
         function IsAutoSortWanted: Boolean;
@@ -385,8 +388,7 @@ type
         // Flag, was für Dateien in der Playlist sind
         // Muss bei jeder Änderung der AnzeigeListe gesetzt werden
         // Zusätzlich dürfen Dateien aus der AnzeigeListe ggf. nicht in andere Listen gehängt werden.
-        AnzeigeShowsPlaylistFiles: Boolean;
-
+        // AnzeigeShowsPlaylistFiles: Boolean;  //Changed to a function...
         DisplayContent: TDisplayContent;
 
         // Liste für die Webradio-Stationen
@@ -477,7 +479,7 @@ type
 
         NewCoverFlow: TNempCoverFlow;
 
-        TagCloud: TCloudPainter;
+        // TagCloud: TCloudPainter;
         TagPostProcessor: TTagPostProcessor;
         AskForAutoResolveInconsistencies: Boolean;
         ShowAutoResolveInconsistenciesHints: Boolean;
@@ -632,13 +634,21 @@ type
         // procedure CleanUpCategories;
         procedure DeleteEmptyPlaylistCollections;
         procedure DeleteEmptyFileCollections;
-        procedure RefreshCollections;
+        procedure RefreshCollections(FullRefill: Boolean = True);
 
         procedure ChangeFileCollectionSorting(RCIndex, Layer: Integer; newSorting: teCollectionSorting);
+
+        function SearchStringIsDirty(EditedColumn: Integer): Boolean;
+        function CollectionsAreDirty(EditedColumn: Integer): Boolean; overload;
+        function CollectionsAreDirty(EditedContent: teCollectionContent): Boolean; overload;
+
+        function TabBtnBrowse_InconsistencyHint: String;
+        procedure RepairSearchStrings;
 
         // procedure GetTopTags(ResultCount: Integer; Offset: Integer; Target: TObjectList; HideAutoTags: Boolean = False);
         //procedure RestoreTagCloudNavigation;
 
+        function AnzeigeShowsPlaylistFiles: Boolean;
         procedure GenerateAnzeigeListe(aCollection: TAudioCollection);
         procedure GenerateReverseAnzeigeListe(aCollection: TAudioCollection);
 
@@ -820,7 +830,6 @@ begin
   AnzeigeListe              := LastBrowseResultList;
   BaseMarkerList            := LastBrowseResultList;
 
-  AnzeigeShowsPlaylistFiles := False;
   DisplayContent := DISPLAY_None;
 
   BibSearcher := TBibSearcher.Create(aWnd);
@@ -845,6 +854,9 @@ begin
   Changed := False;
   //Initializing := init_nothing;
 
+  fSearchStringIsDirty := False;
+  fCollectionsAreDirty := False;
+
   //CurrentArtist := BROWSE_ALL;   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
   //CurrentAlbum := BROWSE_ALL;
   for i := 0 to SORT_MAX  do
@@ -858,7 +870,7 @@ begin
 
   CoverArtSearcher := TCoverArtSearcher.Create;
 
-  TagCloud := TCloudPainter.Create;
+  // TagCloud := TCloudPainter.Create;
   TagPostProcessor := TTagPostProcessor.Create; // Data files are loaded automatically
 
   fJobList := TJobList.Create;
@@ -875,7 +887,7 @@ begin
   fMergeListCopy.Free;
 
   TagPostProcessor.Free;
-  TagCloud.Free;
+  // TagCloud.Free;
 
   CoverArtSearcher.Free;
 
@@ -965,7 +977,6 @@ begin
   LastQuickSearchResultList .Clear;
   LastMarkFilterList        .Clear;
 
-  AnzeigeShowsPlaylistFiles := False;
   DisplayContent := DISPLAY_None;
 
   BibSearcher.Clear;
@@ -1066,14 +1077,18 @@ end;
 
 
 function TMedienBibliothek.ChangeTags(oldTag, newTag: String): Integer;
-var i, c: Integer;
+var i, c, iCat: Integer;
+
 begin
     result := 0;
     if StatusBibUpdate >= 2 then exit;
     c := 0;
     for i := 0 to Mp3ListePfadSort.Count - 1 do
-        if Mp3ListePfadSort[i].ChangeTag(oldTag, newTag) then
-            inc(c);
+        if Mp3ListePfadSort[i].ChangeTag(oldTag, newTag) then begin
+          inc(c);
+          for iCat := 0 to self.FileCategories.Count - 1 do
+            TLibraryFileCategory(FileCategories[iCat]).RelocateAudioFile(Mp3ListePfadSort[i]);
+        end;
     result := c;
 end;
 
@@ -1793,6 +1808,8 @@ begin
 
   BibSearcher.BuildTotalSearchStrings(Mp3ListePfadSort);
   LeaveCriticalSection(CSUpdate);
+
+  fSearchStringIsDirty := False;
 end;
 {
     --------------------------------------------------------
@@ -3092,7 +3109,7 @@ begin
     end;
 
     if done > 0 then
-        SendMessage(MainWindowHandle, WM_MedienBib, MB_TagsSetTabWarning, 0);
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_TagsSetFinished, 0);
 
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, 100);
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(TTaskBarProgressState.None));
@@ -3619,7 +3636,18 @@ begin
 
     if (FileCat.ItemCount > 0) and (RCIndex < FileCat.CollectionCount) then begin
       rc := TRootCollection(FileCat.Collections[RCIndex]);
-      if rc.IsDirectoryCollection then begin
+
+      case rc.SpecialContent of
+        scRegular: begin
+          rc.ChangeSubCollectionSorting(Layer, newSorting);
+          rc.SortCollectionLevel(Layer, True);
+        end;
+        scDirectory: rc.ReSortDirectoryCollection(newSorting, True);
+        scTagCloud: rc.ReSortTagCloudCollection(newSorting, True);
+      end;
+
+
+      {if rc.IsDirectoryCollection then begin
         // Directory-Collection
         rc.ReSortDirectoryCollection(newSorting, True);
       end else
@@ -3627,10 +3655,85 @@ begin
         // no Directory-Collection
         rc.ChangeSubCollectionSorting(Layer, newSorting);
         rc.SortCollectionLevel(Layer, True);
-      end;
+      end;}
     end;
   end;
 end;
+
+{
+    --------------------------------------------------------
+    After editing single files, the Collections-datastructure
+    and/or the SearchString for QuickSearch need an update.
+    --------------------------------------------------------
+}
+function TMedienBibliothek.SearchStringIsDirty(EditedColumn: Integer): Boolean;
+begin
+  if not BibSearcher.AccelerateSearch then
+    fSearchStringIsDirty := False
+  else begin
+    fSearchStringIsDirty := fSearchStringIsDirty
+      or (EditedColumn in [CON_ARTIST, CON_TITEL, CON_ALBUM])
+      or (BibSearcher.AccelerateSearchIncludeComment and (EditedColumn = CON_STANDARDCOMMENT))
+      or (BibSearcher.AccelerateSearchIncludeGenre and (EditedColumn = CON_GENRE));
+  end;
+
+  result := fSearchStringIsDirty;
+end;
+
+function TMedienBibliothek.CollectionsAreDirty(EditedContent: teCollectionContent): Boolean;
+var
+  r: Integer;
+  FileCat: TLibraryFileCategory;
+begin
+  result := fCollectionsAreDirty;
+  if result or (editedContent = ccNone) then exit;
+
+  FileCat := TLibraryFileCategory(FileCategories[0]);
+  for r := 0 to FileCat.CollectionCount - 1 do
+    fCollectionsAreDirty := fCollectionsAreDirty
+      or TRootCollection(FileCat.Collections[r]).ContainsContent(editedContent)
+      or TRootCollection(FileCat.Collections[r]).ContainsContent(ccTagCloud);
+
+  result := fCollectionsAreDirty;
+end;
+
+function TMedienBibliothek.CollectionsAreDirty(EditedColumn: Integer): Boolean;
+var
+  editedContent: teCollectionContent;
+begin
+  case EditedColumn of
+    CON_ARTIST : editedContent := ccArtist;
+    CON_ALBUM  : editedContent := ccAlbum;
+    CON_YEAR   : editedContent := ccYear;
+    CON_GENRE  : editedContent := ccGenre;
+  else
+    editedContent := ccNone; // i.e. edited property isn't relevant for the structure of the Collection
+  end;
+
+  result := CollectionsAreDirty(editedContent);
+end;
+
+procedure TMedienBibliothek.RepairSearchStrings;
+begin
+  if fSearchStringIsDirty then begin
+    EnterCriticalSection(CSUpdate);
+    BibSearcher.BuildTotalSearchStrings(Mp3ListePfadSort);
+    LeaveCriticalSection(CSUpdate);
+    fSearchStringIsDirty := False;
+  end;
+end;
+
+function TMedienBibliothek.TabBtnBrowse_InconsistencyHint: String;
+begin
+  result := TabBtnBrowse_RepairHint;
+  if fSearchStringIsDirty then
+    result := result + #13#10 + TabBtnBrowse_DirtySearch;
+  if self.fCollectionsAreDirty then
+    result := result + #13#10 + TabBtnBrowse_DirtyCollections;
+
+  result := result + #13#10 + TabBtnBrowse_RepairHint2;
+end;
+
 
 {
     --------------------------------------------------------
@@ -3920,6 +4023,11 @@ begin
           ( (AnzeigeListe.Count {+ AnzeigeListe2.Count} < 5000) or (Not SkipSortOnLargeLists));
 end;
 
+
+function TMedienBibliothek.AnzeigeShowsPlaylistFiles: Boolean;
+begin
+  result := DisplayContent = DISPLAY_BrowsePlaylist;
+end;
 {
     --------------------------------------------------------
     GenerateAnzeigeListe
@@ -4310,6 +4418,7 @@ begin
   AnzeigeListe.Sort(MainSort);
   AnzeigeListIsCurrentlySorted := True;
 end;
+
 
 {
     --------------------------------------------------------
@@ -5537,17 +5646,9 @@ begin
     CurrentCategory := tmpCat;
 
   for i := 0 to 2 do begin
-    for catIdx := 0 to FileCategories.Count - 1 do begin
+    for catIdx := 0 to FileCategories.Count - 1 do
       FileCategories[catIdx].LastSelectedCollectionData[i].LoadSettings(i, catIdx);
-
-      //ShowMessage (FileCategories[catIdx].LastSelectedCollectionData[i].KeyPath);
-    end;
-    // fCollectionMetaInfo.Assign(CurrentCategory.LastSelectedCollectionData[BrowseMode]);
-    // fCollectionMetaInfo.SaveSettings;
   end;
-  // fCollectionMetaInfo.LoadSettings;
-  //ShowMessage('LoadLastSelectionData ' +  CurrentCategory.Name);
-
 end;
 
 procedure TMedienBibliothek.CreateRootCollections;
@@ -5631,7 +5732,7 @@ begin
     PlaylistCategories[i].RemoveEmptyCollections;
 end;
 
-procedure TMedienBibliothek.RefreshCollections;
+procedure TMedienBibliothek.RefreshCollections(FullRefill: Boolean);
 var
   catIdx, r: Integer;
 begin
@@ -5654,7 +5755,8 @@ begin
   end;
 
   // refill view
-  SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, LParam(True));
+  if FullRefill then
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, LParam(True));
 end;
 
 procedure TMedienBibliothek.FillRootCollection(Dest: TRootCollection; SourceCategory: TLibraryCategory);
@@ -5684,7 +5786,7 @@ begin
       Dest.AddAudioFile(Mp3ListePfadSort[i]);
   end;
 
-  Dest.SortCollection(False);
+  Dest.Sort(False);
 end;
 
 procedure TMedienBibliothek.ReBuildCategories;
@@ -5760,21 +5862,6 @@ begin
       end;
     end;
   end;
-
-   // this method may be called by VCL- and background-Threads
-  case BrowseMode of
-    // ClearEmptyNodes first: Otherwise we get some access violations (e.g. on GetImageIndex)
-    0: SendMessage(MainWindowHandle, WM_MedienBib, MB_ClearEmptyNodes, 0);
-    1: ;
-    2: ;
-  end;
-  DeleteEmptyFileCollections;
-
-  for catIdx := 0 to FileCategories.Count - 1 do begin
-    FileCategories[catIdx].AnalyseCollections(True);
-    FileCategories[catIdx].SortCollections(True);
-  end;
-
 end;
 
 function TMedienBibliothek.LoadFileCategoriesFromStream(aStream: TStream): Boolean;
@@ -6270,6 +6357,7 @@ var
   i, catIdx, actualCatIdx: Integer;
   added: Boolean;
 begin
+  fCollectionsAreDirty := False;
   for i := 0 to aFileList.Count - 1 do begin
     added := False;
     for catIdx := 0 to FileCategories.Count - 1 do begin

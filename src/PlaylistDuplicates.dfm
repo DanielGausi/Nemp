@@ -55,6 +55,8 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
         BevelInner = bvNone
         BevelOuter = bvNone
         BorderStyle = bsNone
+        Colors.UnfocusedSelectionColor = clHighlight
+        Colors.UnfocusedSelectionBorderColor = clHighlight
         Ctl3D = True
         DefaultPasteMode = amInsertAfter
         DragImageKind = diMainColumnOnly

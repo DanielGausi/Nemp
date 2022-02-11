@@ -140,15 +140,12 @@ end;
 
 procedure TExtendedControlForm.FormActivate(Sender: TObject);
 begin
-
-  //Copied from MedíenListeForm, do something equivalent here
-
-  Nemp_MainForm.MedienBibDetailFillPanel.Width := Nemp_MainForm.MedienBibDetailPanel.Width - Nemp_MainForm.MedienBibDetailFillPanel.Left - 16;
+  PositionCloseImage(CloseImageE, Nemp_MainForm.MedienBibDetailPanel);
+  {Nemp_MainForm.MedienBibDetailFillPanel.Width := Nemp_MainForm.MedienBibDetailPanel.Width - Nemp_MainForm.MedienBibDetailFillPanel.Left - 16;
   CloseImageE.Left := Nemp_MainForm.MedienBibDetailPanel.Width - CloseImageE.Width;
   CloseImageE.Top := 3;
   CloseImageE.Parent := Nemp_MainForm.MedienBibDetailPanel;
-  CloseImageE.BringToFront;
-
+  CloseImageE.BringToFront;}
 end;
 
 procedure TExtendedControlForm.FormClose(Sender: TObject;
@@ -271,13 +268,13 @@ begin
   // rework needed .... somethin like in the other forms as well
   // the different code for "regions" is due to the "header" in the other forms
 
-
+  PositionCloseImage(CloseImageE, Nemp_MainForm.MedienBibDetailPanel);
+  {
   Nemp_MainForm.MedienBibDetailFillPanel.Width := Nemp_MainForm.MedienBibDetailPanel.Width -  Nemp_MainForm.MedienBibDetailFillPanel.Left - 16;
-
   CloseImageE.Left := Nemp_MainForm.MedienBibDetailPanel.Width - CloseImageE.Width;// - 10;
   CloseImageE.Top := 3;
   CloseImageE.Parent := Nemp_MainForm.MedienBibDetailPanel;
-  CloseImageE.BringToFront;
+  CloseImageE.BringToFront;}
 
   SetRegion(ContainerPanelExtendedControlsForm, self, NempRegionsDistance, handle);
 

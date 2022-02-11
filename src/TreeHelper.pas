@@ -533,22 +533,16 @@ end;
 
 procedure InitiateDragDrop(SourceTree: TVirtualStringTree; DragDrop: TNempDragManager; DoExecute: Boolean);
 var
-  i, maxC: Integer;
+  i: Integer;
   SelectedMp3s: TNodeArray;
-  State: TKeyboardState;
 begin
     DragDrop.InitDrag(SourceTree);
-
     SelectedMp3s := SourceTree.GetSortedSelection(False);
-    // maxC := LimitFileCount(length(SelectedMp3s), maxFiles);
     for i := 0 to length(SelectedMp3s) - 1 do //maxC - 1 do
       DragDrop.AddFile(SourceTree.GetNodeData<TAudioFile>(SelectedMp3s[i]), True);
 
     if DoExecute and (DragDrop.FileNameCount > 0) then
     begin
-      //if maxFiles > 0 then begin
-      // DragDrop.MaxDropFiles := LimitFileCount(length(SelectedMp3s), maxFiles);
-
       PrepareDragImage(DragDrop, SourceTree.GetNodeData<TAudioFile>(SelectedMp3s[0]));
       DragDrop.Execute;
     end;
@@ -557,8 +551,7 @@ end;
 
 procedure InitiateDragDrop(Source: TAudioFileList; SourceControl: TControl; DragDrop: TNempDragManager; DoExecute: Boolean);
 var
-  i, maxC: Integer;
-  State: TKeyboardState;
+  i: Integer;
 begin
     DragDrop.InitDrag(SourceControl);
     for i := 0 to Source.Count - 1 do // maxC - 1 do
@@ -566,16 +559,10 @@ begin
 
     if DoExecute and (DragDrop.FileNameCount > 0) then
     begin
-      //if maxFiles > 0 then begin
-      // DragDrop.MaxDropFiles := LimitFileCount(Source.Count, maxFiles);
-      //end;
-
       PrepareDragImage(DragDrop, Source[0]);
       DragDrop.Execute;
     end;
 end;
-
-
 
 
 (*

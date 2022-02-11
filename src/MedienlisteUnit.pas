@@ -110,13 +110,13 @@ begin
   Height := BHeight ;
   Width  := BWidth  ;
 
-  Nemp_MainForm.MedienlisteFillPanel.Width := Nemp_MainForm.MedialistPanel.Width -  Nemp_MainForm.MedienlisteFillPanel.Left - 16;
-
-
+  PositionCloseImage(CloseImageM, Nemp_MainForm.MedialistPanel);
+  {Nemp_MainForm.MedienlisteFillPanel.Width := Nemp_MainForm.MedialistPanel.Width -  Nemp_MainForm.MedienlisteFillPanel.Left - 16;
   CloseImageM.Left := Nemp_MainForm.MedialistPanel.Width - CloseImageM.Width;// - 10;
   CloseImageM.Top := 3;
   CloseImageM.Parent := Nemp_MainForm.MedialistPanel;
   CloseImageM.BringToFront;
+  }
 
   SetRegion(ContainerPanelMedienBibForm, self, NempRegionsDistance, handle);
 
@@ -164,11 +164,12 @@ end;
 
 procedure TMedienlisteForm.FormActivate(Sender: TObject);
 begin
-  Nemp_MainForm.MedienlisteFillPanel.Width := Nemp_MainForm.MedialistPanel.Width - Nemp_MainForm.MedienlisteFillPanel.Left - 16;
+  PositionCloseImage(CloseImageM, Nemp_MainForm.MedialistPanel);
+  {Nemp_MainForm.MedienlisteFillPanel.Width := Nemp_MainForm.MedialistPanel.Width - Nemp_MainForm.MedienlisteFillPanel.Left - 16;
   CloseImageM.Left := Nemp_MainForm.MedialistPanel.Width - CloseImageM.Width;
   CloseImageM.Top := 3;
   CloseImageM.Parent := Nemp_MainForm.MedialistPanel;
-  CloseImageM.BringToFront;
+  CloseImageM.BringToFront;}
 end;
 
 procedure TMedienlisteForm.FormClose(Sender: TObject;

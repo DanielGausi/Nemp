@@ -213,6 +213,8 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
+        Colors.UnfocusedSelectionColor = clHighlight
+        Colors.UnfocusedSelectionBorderColor = clHighlight
         DragOperations = [doMove]
         Header.AutoSizeIndex = 0
         Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs]
@@ -374,7 +376,7 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
           175)
         object lblPlaylistCaptionMode: TLabel
           Left = 16
-          Top = 70
+          Top = 86
           Width = 90
           Height = 13
           Caption = 'Display playlists by'
@@ -388,18 +390,18 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
           Caption = 'Show cover art on layer "Album"'
           TabOrder = 0
         end
-        object cbShowCount: TCheckBox
+        object cbShowCollectionCount: TCheckBox
           Left = 16
-          Top = 47
+          Top = 39
           Width = 292
           Height = 17
           Anchors = [akLeft, akTop, akRight]
-          Caption = 'Show number of elements in tree view'
+          Caption = 'Show number of elements in collections'
           TabOrder = 1
         end
         object cbPlaylistCaptionMode: TComboBox
           Left = 16
-          Top = 89
+          Top = 105
           Width = 201
           Height = 21
           Style = csDropDownList
@@ -411,6 +413,14 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
             'Folder'
             'Folder\Filename'
             'Complete path')
+        end
+        object cbShowCategoryCount: TCheckBox
+          Left = 16
+          Top = 55
+          Width = 273
+          Height = 17
+          Caption = 'Show number of elements in categories'
+          TabOrder = 3
         end
       end
     end

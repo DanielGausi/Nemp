@@ -50,7 +50,8 @@ object PlaylistEditorForm: TPlaylistEditorForm
       Height = 220
       Align = alTop
       Anchors = [akLeft, akTop, akRight, akBottom]
-      Colors.UnfocusedSelectionColor = clGrayText
+      Colors.UnfocusedSelectionColor = clHighlight
+      Colors.UnfocusedSelectionBorderColor = clHighlight
       Header.AutoSizeIndex = 0
       Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
       Indent = 4
@@ -123,6 +124,8 @@ object PlaylistEditorForm: TPlaylistEditorForm
       Height = 220
       Align = alTop
       Anchors = [akLeft, akTop, akRight, akBottom]
+      Colors.UnfocusedSelectionColor = clHighlight
+      Colors.UnfocusedSelectionBorderColor = clHighlight
       DefaultPasteMode = amInsertAfter
       DragWidth = 10
       Header.AutoSizeIndex = 0

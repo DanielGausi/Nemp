@@ -703,8 +703,10 @@ begin
             Nemp_MainForm.LblEmptyLibraryHint.Caption := PWideChar(aMsg.LParam);
         end;
 
-        MB_TagsSetTabWarning: begin
-            SetBrowseTabCloudWarning(True);
+        MB_TagsSetFinished: begin
+            MedienBib.ReBuildCategories;
+            ReFillBrowseTrees(True);
+            //SetBrowseTabCloudWarning(True);
         end;
 
         MB_UpdateProcessComplete: begin

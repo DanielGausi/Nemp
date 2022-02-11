@@ -40,19 +40,19 @@ type
   // Difference between ctDirectory and ctPath:
   // - ctDirectory creates a subcollection for every folder on the path, simulating the actual file system on the disk
   // - ctPath uses just the Path (without the Filename) as a Key. Used to get the "common directory" during analysis of a collection
-  teCollectionType = (ctNone, ctRoot, ctArtist, ctAlbum, ctDirectory, ctGenre, ctDecade, ctYear, ctFileAgeYear, ctFileAgeMonth,
-      ctTagCloud,
-      ctPath, ctCoverID); // the last 2 are just for internal use
+  teCollectionContent = (ccNone, ccRoot, ccArtist, ccAlbum, ccDirectory, ccGenre, ccDecade, ccYear, ccFileAgeYear, ccFileAgeMonth,
+      ccTagCloud,
+      ccPath, ccCoverID); // the last 2 are just for internal use
   teCollectionSorting = (csDefault, csAlbum, csArtistAlbum, csCount, csYear, csFileAge, csGenre, csDirectory);
 
   teMissingCoverPreSorting = (mcFirst, mcIgnore, mcEnd);
 
   TCollectionConfig = record
-    CollectionType: teCollectionType; // a..l
+    CollectionContent: teCollectionContent; // a..l
     CollectionSorting: teCollectionSorting; // 0..7
   end;
 
-  TCollectionTypeList = class(TList<TCollectionConfig>);
+  TCollectionConfigList = class(TList<TCollectionConfig>);
   // TRootCollectionConfig = Array of TCollectionConfig;  // save as ([a..j][0..5])*
   // Note: The Medialibrary will load an "Array of TCollectionTypeList" from the settings-inifile
   // to initialise the Collections in the FileCategories
@@ -92,7 +92,7 @@ const
   CollectionSorting_ByGenre  = 'Genre';
   CollectionSorting_ByDirectory  = 'Directory';
 
-  RootCaptions: Array[teCollectionType] of String = (
+  RootCaptions: Array[teCollectionContent] of String = (
     rsCollectionDataUnknown, rsCollectionDataUnknown,
     rcArtists, rcAlbums,
     rcDirectories, rcGenres,
@@ -102,7 +102,7 @@ const
     rcDirectories, rcCoverID // the last 2 are just for internal use
   );
 
-  RootCaptionsExact: Array[teCollectionType] of String = (
+  RootCaptionsExact: Array[teCollectionContent] of String = (
     rsCollectionDataUnknown, rsCollectionDataUnknown,
     rcArtists, rcAlbums,
     rcDirectories, rcGenres,
@@ -132,15 +132,16 @@ type
       fTrimCDFromDirectory: Boolean;
       fCDNames: TStringList;
       fShowCollectionCount: Boolean;
+      fShowCategoryCount: Boolean;
       fShowCoverArtOnAlbum: Boolean;
       fUseNewCategory: Boolean;
-      fDefaultRootCollectionConfig: TCollectionTypeList;
-      fCoverFlowRootCollectionConfig: TCollectionTypeList;
-      FTagCloudCollectionConfig: TCollectionTypeList;
-      fCategoryConfig: Array of TCollectionTypeList;
+      fDefaultRootCollectionConfig: TCollectionConfigList;
+      fCoverFlowRootCollectionConfig: TCollectionConfigList;
+      FTagCloudCollectionConfig: TCollectionConfigList;
+      fCategoryConfig: Array of TCollectionConfigList;
 
       procedure ClearCategoryConfig;
-      function GetRootCollectionConfig(Index: Integer): TCollectionTypeList;
+      function GetRootCollectionConfig(Index: Integer): TCollectionConfigList;
 
       //procedure InitDefaultRootCollections;
       function GetRootCollectionCount: Integer;
@@ -148,6 +149,7 @@ type
       //property GroupYearsByDecade   : Boolean read fGroupYearsByDecade   write fGroupYearsByDecade   ;
       //property GroupFileAgeByYear   : Boolean read fGroupFileAgeByYear   write fGroupFileAgeByYear   ;
       property ShowCollectionCount  : Boolean read fShowCollectionCount write fShowCollectionCount;
+      property ShowCategoryCount    : Boolean read fShowCategoryCount write fShowCategoryCount;
       property ShowCoverArtOnAlbum  : Boolean read fShowCoverArtOnAlbum write fShowCoverArtOnAlbum;
       property UseNewCategory       : Boolean read fUseNewCategory write fUseNewCategory;
       property AlbumKeyMode: teAlbumKeyMode read fAlbumKeyMode write fAlbumKeyMode;
@@ -156,9 +158,9 @@ type
       property CDNames: TStringList read fCDNames;
 
       property RootCollectionCount: Integer read GetRootCollectionCount;
-      property RootCollectionConfig[Index: Integer]: TCollectionTypeList read GetRootCollectionConfig;
-      property CoverFlowRootCollectionConfig: TCollectionTypeList read fCoverFlowRootCollectionConfig;
-      property TagCloudCollectionConfig: TCollectionTypeList read FTagCloudCollectionConfig;
+      property RootCollectionConfig[Index: Integer]: TCollectionConfigList read GetRootCollectionConfig;
+      property CoverFlowRootCollectionConfig: TCollectionConfigList read fCoverFlowRootCollectionConfig;
+      property TagCloudCollectionConfig: TCollectionConfigList read FTagCloudCollectionConfig;
 
       constructor create;
       destructor Destroy; override;
@@ -167,7 +169,7 @@ type
       procedure Assign(Source: TOrganizerSettings);
       procedure LoadSettings;
       procedure SaveSettings;
-      procedure AddConfig(newConfig: TCollectionTypeList);
+      procedure AddConfig(newConfig: TCollectionConfigList);
 
       procedure ChangeFileCollectionSorting(RCIndex, Layer: Integer; newSorting: teCollectionSorting);
       procedure ChangeCoverFlowSorting(newSorting: teCollectionSorting);
@@ -189,9 +191,9 @@ type
       fKey: String;
       function GetCaption: String; virtual; abstract;
       function GetSimpleCaption: String; virtual; abstract;
-      function GetCategoryCaption: String;
+
       function GetCoverID: String; virtual; abstract;
-      function GetSubCollection(Index: Integer): TAudioCollection; virtual; abstract;
+      function GetCollection(Index: Integer): TAudioCollection; virtual; abstract;
       function GetCollectionCount: Integer; virtual; abstract;
 
       procedure DoGetFiles(dest: TAudioFileList; recursive: Boolean); virtual; abstract;
@@ -202,30 +204,31 @@ type
       property Count: Integer read fCount;
       property Caption: String read GetCaption;
       property SimpleCaption: String read GetSimpleCaption;
-      property CategoryCaption: String read GetCategoryCaption;
       property CoverID: String read GetCoverID;
+
       property CollectionClass: teCollectionClass read fCollectionClass;
 
       property CollectionCount: Integer read GetCollectionCount;
-      property SubCollections[Index: Integer]: TAudioCollection read GetSubCollection;
+      property Collection[Index: Integer]: TAudioCollection read GetCollection;
 
       constructor Create(aOwner: TLibraryCategory);
       destructor Destroy; override;
 
       procedure Clear; virtual; abstract;
       procedure RemoveEmptyCollections; virtual; abstract;
-      procedure Empty; virtual; abstract;
-      procedure GetFiles(dest: TAudioFileList; recursive: Boolean);
+      // Last Parameter Remember: Sometimes the automatically "RememberLastCollection" of the OwnerCategory
+      // is not wanted (e.g. when generating the HintString in TagCloud-Mode during MouseOver)
+      procedure GetFiles(dest: TAudioFileList; recursive: Boolean; Remember: Boolean = True);
       procedure Analyse(recursive: Boolean); virtual; abstract;
 
-      procedure SortCollection(doRecursive: Boolean = True); virtual; abstract;
-      procedure ReSortCollection(newSorting: teCollectionSorting); virtual; abstract;
+      procedure Sort(doRecursive: Boolean = True); virtual; abstract;
+      procedure ReSort(newSorting: teCollectionSorting); virtual; abstract;
       procedure SortCollectionLevel(aLevel: Integer; ForceSorting: Boolean = False); virtual; abstract;
 
       function MatchPrefix(aPrefix: String): Boolean; virtual; abstract;
       function ComparePrefix(aPrefix: String): Integer; virtual; abstract;
 
-      function GetCollectionIndex(aCollection: TAudioCollection): Integer; virtual; abstract;
+      function IndexOf(aCollection: TAudioCollection): Integer; virtual; abstract;
 
       // for Coverdownloads we need to remember a collection for some time
       // and we need access to this collection after the download is complete. For that, we
@@ -248,26 +251,21 @@ type
   TCollectionMetaInfo = class
     private
       fKeyPath: TStringList;
-      // fCollectionLink: TAudioCollection; // may become invalid over time ...
       fRootIndex: Integer;
-
+      fExpanded: Boolean; // (for TagCloud)
       function GetKey(Index: Integer): String;
       function GetKeyCount: Integer;
-      function GetKeyPath: String;
     public
       property RootIndex: Integer read fRootIndex write fRootIndex;
       property Keys[Index: Integer]: String read GetKey;
       property KeyCount: Integer read GetKeyCount;
-
-      property KeyPath: String read GetKeyPath;
+      property Expanded: Boolean read fExpanded write fExpanded;
 
       constructor Create;
       destructor Destroy; override;
       procedure Clear;
-
       procedure Assign(aInfo: TCollectionMetaInfo);
       procedure AddKey(aKey: String);
-
       procedure LoadSettings(BrowseIDx, CatIdx: Integer);
       procedure SaveSettings(BrowseIDx, CatIdx: Integer);
   end;
@@ -284,29 +282,24 @@ type
 
       function GetCollection(Index: Integer): TAudioCollection;
       function GetCollectionCount: Integer;
-      function GetNameCount: String;
 
     protected
       // Category.Collections:
-      // For Files, this is a predefined List of TRootCollections, like "Music", "New stuff", "Earbooks"
-      // For Category Playlists/Webradio, it is the list of Playlists/Webradio-Stations, in form of a TAudioCollection
+      // For Files, this is a predefined List of TRootCollections, with different ContentTypes7Sortings
+      // For Category Playlists/Webradio, it is the list of Playlists/Webradio-Stations in form of a TAudioCollection
       fCollections: TAudioCollectionList;
-
       fBrowseMode: Integer;
       fLastSelectedCollectionData: TCollectionMetaInfoArray;
-      //fLastSelectedCollection: TAudioCollection;
-
-      fIndex: Byte;     // for the Bitmask-property in Audiofiles, 0..32
-      //fSortIndex: Byte; // for the sort order in the treeview (= Index in the CategoryList)
+      fIndex: Byte;     // for the Bitmask-property in Audiofiles, 1..32
       fCategoryType: teCollectionClass;
 
       function GetItemCount: Integer; virtual; abstract;
-
       function GetCaption: String; virtual;
       function GetCaptionCount: String; virtual;
     public
       property Name: String read fName write fName;
       property Caption: String read GetCaption;
+      property CaptionCount: String read GetCaptionCount;
       property CategoryType: teCollectionClass read fCategoryType;
 
       property IsDefault: Boolean read fIsDefault write fIsDefault;
@@ -314,7 +307,6 @@ type
       property BrowseMode: Integer read fBrowseMode write fBrowseMode;
 
       property Index: Byte read fIndex write fIndex;
-      //property SortIndex: Byte read fSortIndex write fSortIndex;
       property CaptionMode: Integer read fCaptionMode write fCaptionMode;
       property ItemCount: Integer read GetItemCount;
       property CollectionCount: Integer read GetCollectionCount;
@@ -322,16 +314,6 @@ type
       function IndexOf(Index: TAudioCollection): Integer;
 
       property LastSelectedCollectionData: TCollectionMetaInfoArray read fLastSelectedCollectionData;
-      {Das ding erweitern auf ein Array[1..3] für die drei BrowseModi.
-      Dann kann jede Kategorie (Musik, Recently Added, Audiobooks, ...) ihre drei Key-Reihen speichern (inkl RC-index)
-      Die MedienBib muss dann für jede Category dieses CollectionMetaInfo-Array speichern -
-      am besten wäre eigentlich in der GMP-Datei selbst, nicht in der INI - aber das würde dann quasi IMMER ein triggern der Save-Routine am Ende bewirken
-      Beser daher doch in der INI, auch wenn da dann eine Trennung von Daten vorliegt, die eigentlich zusammengehören ....
-      }
-      // property LastSelectedCollection: TAudioCollection read fLastSelectedCollection;
-
-      property NameCount: String read GetNameCount;
-      property CaptionCount: String read GetCaptionCount;
 
       constructor Create;
       destructor Destroy; override;
@@ -339,8 +321,8 @@ type
 
       procedure AssignSettings(Source: TLibraryCategory);
 
-      // sorting the collections stored in fCollections,
-      // but NOT fCollections itself!
+      // Sort the collections in fCollections of the Category.
+      // (But NOT fCollections itself, as this order is predefined by the Users choice)
       procedure SortCollections(doRecursive: Boolean = True); virtual;
       procedure AnalyseCollections(recursive: Boolean); virtual;
       procedure RemoveEmptyCollections; virtual;
@@ -372,11 +354,10 @@ type
 
 
   function NempOrganizerSettings: TOrganizerSettings;
-  procedure IniStrToRootConfig(aString: String; Dest: TCollectionTypeList);
+  procedure IniStrToRootConfig(aString: String; Dest: TCollectionConfigList);
+  function RootConfigToIniStr(aConfig: TCollectionConfigList): String;
 
-  function RootConfigToIniStr(aConfig: TCollectionTypeList): String;
-
-  procedure AddConfigToList(Dest: TCollectionTypeList; newType: teCollectionType; newSorting: teCollectionSorting);
+  procedure AddConfigToList(Dest: TCollectionConfigList; newType: teCollectionContent; newSorting: teCollectionSorting);
 
 
 implementation
@@ -397,7 +378,7 @@ end;
 
 
 
-procedure IniStrToRootConfig(aString: String; Dest: TCollectionTypeList);
+procedure IniStrToRootConfig(aString: String; Dest: TCollectionConfigList);
 var
   i, configDepth: Integer;
 begin
@@ -405,13 +386,13 @@ begin
 
   for i := 0 to configDepth-1 do begin
     AddConfigToList(Dest,
-        teCollectionType(ord(aString[2*i+1]) - ord('a')),
+        teCollectionContent(ord(aString[2*i+1]) - ord('a')),
         teCollectionSorting(StrToIntDef(aString[2*i+2], 0))
     );
   end;
 end;
 
-function RootConfigToIniStr(aConfig: TCollectionTypeList): String;
+function RootConfigToIniStr(aConfig: TCollectionConfigList): String;
 var
   i, configDepth: Integer;
 begin
@@ -420,7 +401,7 @@ begin
   result := '';
   for i := 0 to configDepth-1 do begin
     result := result
-              + chr(Integer(aConfig[i].CollectionType) + ord('a'))
+              + chr(Integer(aConfig[i].CollectionContent) + ord('a'))
               + IntToStr(Integer(aConfig[i].CollectionSorting));
   end;
 end;
@@ -515,11 +496,11 @@ begin
   end;
 end;
 
-procedure AddConfigToList(Dest: TCollectionTypeList; newType: teCollectionType; newSorting: teCollectionSorting);
+procedure AddConfigToList(Dest: TCollectionConfigList; newType: teCollectionContent; newSorting: teCollectionSorting);
 var
   newData: TCollectionConfig;
 begin
-  newData.CollectionType := newType;
+  newData.CollectionContent := newType;
   newData.CollectionSorting := newSorting;
   Dest.Add(newData);
 end;
@@ -540,18 +521,19 @@ begin
 
   fTrimCDFromDirectory := True;
   fShowCollectionCount := True;
+  fShowCategoryCount   := True;
   fShowCoverArtOnAlbum := True;
   fUseNewCategory := True;
 
-  fCoverFlowRootCollectionConfig := TCollectionTypeList.Create;
-  fDefaultRootCollectionConfig := TCollectionTypeList.Create;
-  FTagCloudCollectionConfig := TCollectionTypeList.Create;
+  fCoverFlowRootCollectionConfig := TCollectionConfigList.Create;
+  fDefaultRootCollectionConfig := TCollectionConfigList.Create;
+  FTagCloudCollectionConfig := TCollectionConfigList.Create;
 
   // Default-RootCollectionConfig (as a final Fallback)
-  AddConfigToList(fDefaultRootCollectionConfig, ctArtist, csDefault);
-  AddConfigToList(fDefaultRootCollectionConfig, ctAlbum, csDefault);
+  AddConfigToList(fDefaultRootCollectionConfig, ccArtist, csDefault);
+  AddConfigToList(fDefaultRootCollectionConfig, ccAlbum, csDefault);
   // TagCloud-Configuration (fixed)
-  AddConfigToList(FTagCloudCollectionConfig, ctTagCloud, csDefault);
+  AddConfigToList(FTagCloudCollectionConfig, ccTagCloud, csDefault);
 end;
 
 destructor TOrganizerSettings.Destroy;
@@ -589,6 +571,7 @@ begin
   fTrimCDFromDirectory := Source.fTrimCDFromDirectory;
   fCDNames.Assign(Source.fCDNames);
   fShowCollectionCount := Source.fShowCollectionCount;
+  fShowCategoryCount   := Source.fShowCategoryCount;
   fShowCoverArtOnAlbum := Source.fShowCoverArtOnAlbum;
   fUseNewCategory      := Source.fUseNewCategory;
 
@@ -596,12 +579,12 @@ begin
   ClearCategoryConfig;
   SetLength(fCategoryConfig, Length(Source.fCategoryConfig));
   for iRC := 0 to Length(fCategoryConfig) -1  do begin
-    fCategoryConfig[iRC] := TCollectionTypeList.Create;
+    fCategoryConfig[iRC] := TCollectionConfigList.Create;
 
     for i := 0 to Source.fCategoryConfig[iRC].Count - 1 do begin
       AddConfigToList(
         fCategoryConfig[iRC],
-        Source.fCategoryConfig[iRC][i].CollectionType,
+        Source.fCategoryConfig[iRC][i].CollectionContent,
         Source.fCategoryConfig[iRC][i].CollectionSorting
       );
     end;
@@ -612,7 +595,7 @@ begin
   for i := 0 to Source.fDefaultRootCollectionConfig.Count - 1 do begin
     AddConfigToList(
         fDefaultRootCollectionConfig,
-        Source.fDefaultRootCollectionConfig[i].CollectionType,
+        Source.fDefaultRootCollectionConfig[i].CollectionContent,
         Source.fDefaultRootCollectionConfig[i].CollectionSorting
       );
   end;
@@ -622,23 +605,23 @@ begin
   for i := 0 to Source.fCoverFlowRootCollectionConfig.Count - 1 do begin
     AddConfigToList(
         fCoverFlowRootCollectionConfig,
-        Source.fCoverFlowRootCollectionConfig[i].CollectionType,
+        Source.fCoverFlowRootCollectionConfig[i].CollectionContent,
         Source.fCoverFlowRootCollectionConfig[i].CollectionSorting
       );
   end;
 end;
 
-procedure TOrganizerSettings.AddConfig(newConfig: TCollectionTypeList);
+procedure TOrganizerSettings.AddConfig(newConfig: TCollectionConfigList);
 var
   lastIndex, i: Integer;
 begin
   SetLength(fCategoryConfig, Length(fCategoryConfig) + 1);
   lastIndex := Length(fCategoryConfig) - 1;
-  fCategoryConfig[lastIndex] := TCollectionTypeList.Create;
+  fCategoryConfig[lastIndex] := TCollectionConfigList.Create;
   for i := 0 to newConfig.Count - 1 do
     AddConfigToList(
       fCategoryConfig[lastIndex],
-      newConfig[i].CollectionType,
+      newConfig[i].CollectionContent,
       newConfig[i].CollectionSorting
     );
 end;
@@ -656,16 +639,22 @@ begin
 
   ChangedData.CollectionSorting := newSorting;
 
-  if RootCollectionConfig[RCIndex][0].CollectionType = ctDirectory then begin
-    ChangedData.CollectionType := ctDirectory;
+  if RootCollectionConfig[RCIndex][0].CollectionContent = ccDirectory then begin
+    ChangedData.CollectionContent := ccDirectory;
     RootCollectionConfig[RCIndex][0] := ChangedData;
   end
-  else begin
-    if RootCollectionConfig[RCIndex].Count >= Layer then begin
-      ChangedData.CollectionType := RootCollectionConfig[RCIndex][Layer].CollectionType;
-      RootCollectionConfig[RCIndex][Layer] := ChangedData;
+  else
+    if RootCollectionConfig[RCIndex][0].CollectionContent = ccTagCloud then begin
+      ChangedData.CollectionContent := ccTagCloud;
+      RootCollectionConfig[RCIndex][0] := ChangedData;
+    end
+    else
+    begin
+      if RootCollectionConfig[RCIndex].Count >= Layer then begin
+        ChangedData.CollectionContent := RootCollectionConfig[RCIndex][Layer].CollectionContent;
+        RootCollectionConfig[RCIndex][Layer] := ChangedData;
+      end;
     end;
-  end;
 end;
 
 procedure TOrganizerSettings.ChangeCoverFlowSorting(
@@ -676,9 +665,9 @@ begin
   ChangedData.CollectionSorting := newSorting;
 
   if CoverFlowRootCollectionConfig.Count > 0 then
-    ChangedData.CollectionType := CoverFlowRootCollectionConfig[0].CollectionType
+    ChangedData.CollectionContent := CoverFlowRootCollectionConfig[0].CollectionContent
   else
-    ChangedData.CollectionType := ctAlbum;
+    ChangedData.CollectionContent := ccAlbum;
 
   CoverFlowRootCollectionConfig.Clear;
   CoverFlowRootCollectionConfig.Add(ChangedData);
@@ -691,7 +680,7 @@ begin
 end;
 
 function TOrganizerSettings.GetRootCollectionConfig(
-  Index: Integer): TCollectionTypeList;
+  Index: Integer): TCollectionConfigList;
 begin
   if (Index < 0) or (Index > length(fCategoryConfig)) then begin
     result := fDefaultRootCollectionConfig
@@ -729,7 +718,7 @@ begin
   ClearCategoryConfig;
   SetLength(fCategoryConfig, categoryCount);
   for i := 0 to categoryCount-1 do begin
-    fCategoryConfig[i] := TCollectionTypeList.Create;
+    fCategoryConfig[i] := TCollectionConfigList.Create;
     if i <= 1 then
       defStr := DefaultCategories[i]
     else
@@ -748,6 +737,7 @@ begin
   fCDNames.DelimitedText := NempSettingsManager.ReadString('LibraryOrganizer', 'CDNames', 'CD');
 
   fShowCollectionCount := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowCollectionCount', True);
+  fShowCategoryCount   := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowCategoryCount', True);
   fShowCoverArtOnAlbum := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowCoverArtOnAlbum', True);
 end;
 
@@ -767,6 +757,7 @@ begin
   NempSettingsManager.WriteBool('LibraryOrganizer', 'TrimCDFromDirectory', fTrimCDFromDirectory);
   NempSettingsManager.WriteString('LibraryOrganizer', 'CDNames', fCDNames.DelimitedText);
   NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowCollectionCount', fShowCollectionCount);
+  NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowCategoryCount', fShowCategoryCount);
   NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowCoverArtOnAlbum', fShowCoverArtOnAlbum);
 end;
 
@@ -797,7 +788,6 @@ procedure TLibraryCategory.AssignSettings(Source: TLibraryCategory);
 begin
   Name := Source.Name;
   Index := Source.Index;
-  //SortIndex := Source.SortIndex;
   IsDefault := Source.IsDefault;
   IsNew := Source.IsNew;
 end;
@@ -876,11 +866,6 @@ begin
   result := fCollections.Count;
 end;
 
-function TLibraryCategory.GetNameCount: String;
-begin
-  result := Format('%s (%d)', [fName, ItemCount]);
-end;
-
 function TLibraryCategory.GetCaption: String;
 begin
   result := fName;
@@ -897,7 +882,7 @@ var
   i: Integer;
 begin
   for i := 0 to fCollections.Count - 1 do
-    fCollections[i].SortCollection(doRecursive);
+    fCollections[i].Sort(doRecursive);
 end;
 
 procedure TLibraryCategory.AnalyseCollections(recursive: Boolean);
@@ -953,20 +938,11 @@ begin
   end;
 end;
 
-function TAudioCollection.GetCategoryCaption: String;
-begin
-  if assigned(fOwnerCategory) then
-    result := fOwnerCategory.Name
-  else
-    result := '';
-end;
 
-
-procedure TAudioCollection.GetFiles(dest: TAudioFileList; recursive: Boolean);
+procedure TAudioCollection.GetFiles(dest: TAudioFileList; recursive: Boolean; Remember: Boolean = True);
 begin
-  if assigned(fOwnerCategory) then
+  if Remember and assigned(fOwnerCategory) then
     fOwnerCategory.RememberLastCollection(self);
-    //fLastSelectedCollection := self;
   DoGetFiles(dest, recursive);
 end;
 
@@ -975,6 +951,7 @@ end;
 constructor TCollectionMetaInfo.Create;
 begin
   fKeyPath := TStringList.Create;
+  fExpanded := false;
 end;
 
 destructor TCollectionMetaInfo.Destroy;
@@ -987,6 +964,7 @@ procedure TCollectionMetaInfo.Clear;
 begin
   fKeyPath.Clear;
   fRootIndex := -1;
+  fExpanded := false;
 end;
 
 procedure TCollectionMetaInfo.Assign(aInfo: TCollectionMetaInfo);
@@ -1010,11 +988,6 @@ begin
   result := fKeyPath.Count;
 end;
 
-function TCollectionMetaInfo.GetKeyPath: String;
-begin
-  result := fKeyPath.Text;
-end;
-
 procedure TCollectionMetaInfo.LoadSettings(BrowseIDx, CatIdx: Integer);
 var
   keyString: String;
@@ -1026,6 +999,7 @@ begin
 
   fRootIndex := NempSettingsManager.ReadInteger('LibraryOrganizerSelection' + suffix, 'RootIndex' + idxStr, 0);
   keyDepth := NempSettingsManager.ReadInteger('LibraryOrganizerSelection' + suffix, 'KeyDepth' + idxStr, 0);
+  Expanded := NempSettingsManager.ReadBool('LibraryOrganizerSelection' + suffix, 'Expanded' + idxStr, False);
   for i := 0 to keyDepth-1 do begin
     keyString := NempSettingsManager.ReadString('LibraryOrganizerSelection' + suffix, 'Key' + idxStr + '-' + IntToStr(i), '');
     fKeyPath.Add(keyString);
@@ -1041,6 +1015,7 @@ begin
   suffix := OrganizerSelectionSuffix[BrowseIdx];
   NempSettingsManager.WriteInteger('LibraryOrganizerSelection' + suffix, 'RootIndex' + idxStr, fRootIndex);
   NempSettingsManager.WriteInteger('LibraryOrganizerSelection' + suffix, 'KeyDepth' + idxStr, KeyCount);
+  NempSettingsManager.WriteBool('LibraryOrganizerSelection' + suffix, 'Expanded' + idxStr, Expanded);
   for i := 0 to KeyCount-1 do
     NempSettingsManager.WriteString('LibraryOrganizerSelection' + suffix, 'Key' + idxStr + '-' + IntToStr(i), Keys[i]);
 end;

@@ -146,7 +146,7 @@ begin
     TranslateComponent (self);
 
     TagRoot := TRootCollection.Create(Nil);
-    TagRoot.AddSubCollectionType(ctTagCloud, csCount);
+    TagRoot.AddSubCollectionType(ccTagCloud, csCount);
 
     TagVST.NodeDataSize := SizeOf(TLibraryCategory);
     IgnoreTagVST.NodeDataSize := SizeOf(TIgnoreTagString);
@@ -251,7 +251,7 @@ begin
     TagVST.BeginUpdate;
     ShowAutoTags := not cbHideAutoTags.Checked;
     for i := 0 to TagRoot.CollectionCount - 1 do begin
-      ac := TAudioFileCollection(TagRoot.SubCollections[i]);
+      ac := TAudioFileCollection(TagRoot.Collection[i]);
       if ShowAutoTags or (not ac.IsAutoTag) then
         TagVST.AddChild(Nil, ac);
     end;
@@ -265,8 +265,8 @@ procedure TCloudEditorForm.SortTags;
 begin
   // no more ascending/descending for now
   case TagVST.Header.SortColumn of
-    0: TagRoot.ReSortCollection(csDefault);
-    1: TagRoot.ReSortCollection(csCount);
+    0: TagRoot.ReSort(csDefault);
+    1: TagRoot.ReSort(csCount);
   end;
 end;
 
@@ -661,8 +661,9 @@ begin
             ActualizeTreeView(True);
             FillMergeTree(False);
             FillIgnoreTree(False);
+            MedienBib.RefreshCollections;
             SetGlobalWarningID3TagUpdate;
-            SetBrowseTabCloudWarning(True);
+            //SetBrowseTabCloudWarning(True);
         end;
     end;
 end;
@@ -787,8 +788,9 @@ begin
             FillMergeTree(False);
             FillIgnoreTree(False);
 
+            MedienBib.RefreshCollections;
             SetGlobalWarningID3TagUpdate;
-            SetBrowseTabCloudWarning(True);
+            //SetBrowseTabCloudWarning(True);
         end;
     end;
 end;
@@ -879,8 +881,9 @@ begin
             FillMergeTree(False);
             FillIgnoreTree(False);
 
+            MedienBib.RefreshCollections;
             SetGlobalWarningID3TagUpdate;
-            SetBrowseTabCloudWarning(True);
+            //SetBrowseTabCloudWarning(True);
         end;
     end;
 end;
