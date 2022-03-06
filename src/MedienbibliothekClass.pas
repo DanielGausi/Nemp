@@ -636,7 +636,9 @@ type
         procedure DeleteEmptyFileCollections;
         procedure RefreshCollections(FullRefill: Boolean = True);
 
-        procedure ChangeFileCollectionSorting(RCIndex, Layer: Integer; newSorting: teCollectionSorting);
+        procedure ChangeFileCollectionSorting(RCIndex, Layer: Integer; newSorting: teCollectionSorting;
+          newDirection: teSortDirection; OnlyDirection: Boolean);
+        procedure ChangePlaylistCollectionSorting(newSorting: tePlaylistCollectionSorting; newDirection: teSortDirection);
 
         function SearchStringIsDirty(EditedColumn: Integer): Boolean;
         function CollectionsAreDirty(EditedColumn: Integer): Boolean; overload;
@@ -686,6 +688,7 @@ type
 
         // Sorting the Lists
         procedure AddSorter(TreeHeaderColumnTag: Integer; FlipSame: Boolean = True);
+        procedure ChangeSortDirection(NewDirection: teSortDirection);
         procedure SortAnzeigeListe;
 
         // Generating RandomList (Random Playlist)
@@ -3617,7 +3620,7 @@ end;
 
 
 procedure TMedienBibliothek.ChangeFileCollectionSorting(RCIndex, Layer: Integer;
-  newSorting: teCollectionSorting);
+  newSorting: teCollectionSorting; newDirection: teSortDirection; OnlyDirection: Boolean);
 var
   iCat: Integer;
   rc: TRootCollection;
@@ -3625,8 +3628,8 @@ var
 begin
   // Change Sorting in the Library-Configuration
   case self.BrowseMode of
-    0: NempOrganizerSettings.ChangeFileCollectionSorting(RCIndex, Layer, newSorting);
-    1: NempOrganizerSettings.ChangeCoverFlowSorting(newSorting);
+    0: NempOrganizerSettings.ChangeFileCollectionSorting(RCIndex, Layer, newSorting, newDirection,OnlyDirection);
+    1: NempOrganizerSettings.ChangeCoverFlowSorting(newSorting, newDirection, OnlyDirection);
   end;
 
 
@@ -3639,11 +3642,11 @@ begin
 
       case rc.SpecialContent of
         scRegular: begin
-          rc.ChangeSubCollectionSorting(Layer, newSorting);
+          rc.ChangeSubCollectionSorting(Layer, newSorting, newDirection, OnlyDirection);
           rc.SortCollectionLevel(Layer, True);
         end;
-        scDirectory: rc.ReSortDirectoryCollection(newSorting, True);
-        scTagCloud: rc.ReSortTagCloudCollection(newSorting, True);
+        scDirectory: rc.ReSortDirectoryCollection(newSorting, newDirection, OnlyDirection, True);
+        scTagCloud: rc.ReSortTagCloudCollection(newSorting, newDirection, OnlyDirection, True);
       end;
 
 
@@ -3658,6 +3661,17 @@ begin
       end;}
     end;
   end;
+end;
+
+procedure TMedienBibliothek.ChangePlaylistCollectionSorting(newSorting: tePlaylistCollectionSorting;
+          newDirection: teSortDirection);
+var
+  catIdx: Integer;
+begin
+  NempOrganizerSettings.PlaylistSorting := newSorting;
+  NempOrganizerSettings.PlaylistSortDirection := newDirection;
+  for catIdx := 0 to PlaylistCategories.Count - 1 do
+    TLibraryPlaylistCategory(PlaylistCategories[catIdx]).Sort(newSorting, newDirection);
 end;
 
 {
@@ -4355,6 +4369,7 @@ begin
         CON_ALBUMGAIN           : NewSortMethod := AFCompareAlbumGain;
         CON_TRACKPEAK           : NewSortMethod := AFCompareTrackPeak;
         CON_ALBUMPEAK           : NewSortMethod := AFCompareAlbumPeak;
+        CON_BPM                 : NewSortMethod := AFCompareBPM;
     else
         NewSortMethod := AFComparePath;
     end;
@@ -4380,8 +4395,15 @@ begin
         Sortparams[0].Direction := sd_Ascending;
         Sortparams[0].Tag := TreeHeaderColumnTag;
     end;
-
 end;
+
+procedure TMedienBibliothek.ChangeSortDirection(NewDirection: teSortDirection);
+begin
+  SortParams[0].Direction := NewDirection;
+  SortParams[1].Direction := NewDirection;
+  SortParams[2].Direction := NewDirection;
+end;
+
 procedure TMedienBibliothek.AddStartJob(aJobtype: TJobType; aJobParam: String);
 var newJob: TStartJob;
 begin
@@ -5794,6 +5816,10 @@ begin
   InitFileCategories;
   MergeFileIntoCategories(Mp3ListePfadSort);
   MergePlaylistsIntoCategories(AllPlaylistsPfadSort);
+
+  if assigned(FavoritePlaylistCategory) and (FavoritePlaylistCategory.CollectionCount = 0) then
+    MergeNempDefaultPlaylists;
+
   // SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, 0);
 end;
 
@@ -6405,7 +6431,10 @@ begin
 
   // todo: SortOrder einstellbar ... ?  Ggf. an CaptionMode koppeln?
   for catIdx := 0 to PlaylistCategories.Count - 1 do begin
-    TLibraryPlaylistCategory(PlaylistCategories[catIdx]).Sort(csAlbum);
+    // TLibraryPlaylistCategory(PlaylistCategories[catIdx]).Sort(csAlbum);
+    TLibraryPlaylistCategory(PlaylistCategories[catIdx]).Sort(
+        NempOrganizerSettings.PlaylistSorting,
+        NempOrganizerSettings.PlaylistSortDirection);
   end;
 end;
 

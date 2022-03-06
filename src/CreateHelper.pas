@@ -43,7 +43,7 @@ unit CreateHelper;
 interface
 
     uses Forms, Windows, Graphics, Classes, Menus, Controls, SysUtils, IniFiles, VirtualTrees, Messages,
-    dialogs, shellApi, ID3GenreList, ActiveX
+    dialogs, shellApi, ID3GenreList, ActiveX, OneInst
     {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF};
 
 
@@ -538,6 +538,33 @@ begin
     end;
 end;
 
+procedure CheckWriteAccess;
+var
+  cfgIni: TMemIniFile;
+begin
+  if NempSettingsManager.WriteAccessPossible then
+    exit;
+
+  // write access is not possible: Nemp will not function as intended
+  if UseUserAppData then
+    // rather unlikely. UserPath should be always accessible
+    AddErrorLog(WriteAccessNotPossibleUserPath)
+  else
+  begin
+    // the file "UseLocalData.cfg" exists, indicating portable mode
+    // - likely cause for this issue: The user unzipped the portable archive to "c:\progam files"
+    // - a warning should be displayed, unless the user explicitly knows what he's doing.
+    //   For that case, he can edit the UseLocalData.cfg to "ShowWarning=0"
+    cfgIni := TMemIniFile.Create(ExtractFilePath(Paramstr(0)) + 'UseLocalData.cfg');
+    try
+      if cfgIni.ReadBool('Settings', 'ShowWarning', True) then
+        AddErrorLog(WriteAccessNotPossiblePortable);
+    finally
+      cfgIni.Free;
+    end;
+  end;
+end;
+
 procedure StuffToDoAfterCreate;
 var TmpLastExitWasOK: Boolean;
 begin
@@ -610,6 +637,7 @@ begin
         {$ENDIF}
 
         AutoLoadBib;
+        CheckWriteAccess;
     end;
 end;
 

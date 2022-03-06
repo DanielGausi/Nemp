@@ -250,7 +250,7 @@ begin
   LastCheckedTags := TStringList.Create;
 
   TagRoot := TRootCollection.Create(Nil);
-  TagRoot.AddSubCollectionType(ccTagCloud, csCount);
+  TagRoot.AddSubCollectionType(ccTagCloud, csCount, sd_Descending);
 
   LoadStarGraphics(RandomRatingHelper);
 

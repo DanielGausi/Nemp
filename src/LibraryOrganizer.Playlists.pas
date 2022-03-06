@@ -20,6 +20,7 @@ type
       // temporary AudioFiles, loaded from a PlaylistFile to display them
       fPlaylistFiles: TAudioFileList;
       fFileName: String;
+      fFolder: String;
       fName: String;
       fCaptionMode: tePlaylistCaptionMode;
       fLibraryPlaylist: TLibraryPlaylist;
@@ -46,7 +47,7 @@ type
 
       procedure Analyse(recursive: Boolean); override; // empty
       procedure Sort(doRecursive: Boolean = True); override; // empty
-      procedure ReSort(newSorting: teCollectionSorting); override; // empty
+      procedure ReSort(newSorting: teCollectionSorting; newDirection: teSortDirection); override; // empty
       procedure SortCollectionLevel(aLevel: Integer; ForceSorting: Boolean = False); override; // empty
 
       function ChangeDriveChar(newChar: Char): Boolean;
@@ -57,10 +58,14 @@ type
     private
       fLoadedPlaylistCounter: Integer;
       fDriveManager: TDriveManager;
+      fSortDirection: teSortDirection;
+      fSortOrder: tePlaylistCollectionSorting;
       procedure NotifyLoading;
     protected
       function GetItemCount: Integer; override;
       function GetCaption: String; override;
+      function Compare(const item1,item2: TAudioPlaylistCollection): Integer;
+
     public
       property DriveManager: TDriveManager read fDriveManager write fDriveManager;
 
@@ -70,7 +75,7 @@ type
       procedure AddPlaylist(aPlaylistFile: TLibraryPlaylist);
       procedure RemovePlaylist(aPlaylistFile: TLibraryPlaylist);
       // sort the List of fCollections
-      procedure Sort(SortOrder: teCollectionSorting);
+      procedure Sort(newSortOrder: tePlaylistCollectionSorting; newSortDirection: teSortDirection);
 
       procedure RememberLastCollection(aCollection: TAudioCollection); override;
       function FindLastCollectionAgain: TAudioCollection; override;
@@ -94,6 +99,7 @@ begin
   fCollectionClass := ccPlaylists;
   fKey := aPlaylist.Path;
   fFileName := ExtractFilename(fKey);
+  fFolder :=  ExtractFileName(ExtractFileDir(fKey));
   fName := aPlaylist.Name;
   fLibraryPlaylist := aPlaylist;
   fCount := 1;
@@ -122,8 +128,8 @@ begin
   else
   begin
     case NempOrganizerSettings.PlaylistCaptionMode of
-      pcmFilename: result := ExtractFileName(fKey);
-      pcmFolder: result := ExtractFileName(ExtractFileDir(fKey)); // + '\' + ExtractFileName(fKey);
+      pcmFilename: result := fFileName; //ExtractFileName(fKey);
+      pcmFolder: result := fFolder; //ExtractFileName(ExtractFileDir(fKey)); // + '\' + ExtractFileName(fKey);
       pcmFolderFilename: result := ExtractFileName(ExtractFileDir(fKey)) + '\' + ExtractFileName(fKey);
       pcmPath: result := fKey;
     end;
@@ -204,7 +210,7 @@ begin
 end;
 
 procedure TAudioPlaylistCollection.ReSort(
-  newSorting: teCollectionSorting);
+  newSorting: teCollectionSorting; newDirection: teSortDirection);
 begin
   // nothing to do
 end;
@@ -280,23 +286,77 @@ begin
   self.fCollections.Clear;
 end;
 
-procedure TLibraryPlaylistCategory.Sort(SortOrder: teCollectionSorting);
+function TLibraryPlaylistCategory.Compare(const item1, item2: TAudioPlaylistCollection): Integer;
+
+  function CompareKey(const item1, item2: TAudioPlaylistCollection): Integer;
+  begin
+    result := AnsiCompareText_NempIgnoreCase(item1.fKey, item2.fKey);
+  end;
+  function CompareFolder(const item1, item2: TAudioPlaylistCollection): Integer;
+  begin
+    result := AnsiCompareText_NempIgnoreCase(item1.fFolder, item2.fFolder);
+    if result = 0 then
+      result := CompareKey(item1, item2);
+  end;
+  function CompareFilename(const item1, item2: TAudioPlaylistCollection): Integer;
+  begin
+    result := AnsiCompareText_NempIgnoreCase(item1.fFileName, item2.fFileName);
+    if result = 0 then
+      result := CompareFolder(item1, item2);
+  end;
+
 begin
-  case SortOrder of
-    csAlbum: fCollections.Sort(
+  case fSortOrder of
+    pcsPath: begin
+        case fSortDirection of
+          sd_Ascending: result := CompareKey(item1, item2);
+          sd_Descending: result := CompareKey(item2, item1);
+        end;
+    end;
+    pcsFolder: begin
+        case fSortDirection of
+          sd_Ascending: result := CompareFolder(TAudioPlaylistCollection(item1), TAudioPlaylistCollection(item2));
+          sd_Descending: result := CompareFolder(TAudioPlaylistCollection(item2), TAudioPlaylistCollection(item1));
+        end;
+    end;
+    pcsFilename: begin
+        case fSortDirection of
+          sd_Ascending: result := CompareFilename(TAudioPlaylistCollection(item1), TAudioPlaylistCollection(item2));
+          sd_Descending: result := CompareFilename(TAudioPlaylistCollection(item2), TAudioPlaylistCollection(item1));
+        end;
+    end;
+  end;
+end;
+
+procedure TLibraryPlaylistCategory.Sort(newSortOrder: tePlaylistCollectionSorting; newSortDirection: teSortDirection);
+begin
+  fSortOrder := newSortOrder;
+  fSortDirection := newSortDirection;
+
+  fCollections.Sort(
+      TComparer<TAudioCollection>.Construct( function (const item1,item2: TAudioCollection): Integer
+          begin
+            result := Compare(TAudioPlaylistCollection(item1), TAudioPlaylistCollection(item2))
+            //AnsiCompareText_NempIgnoreCase(TAudioPlaylistCollection(item1).fFileName, TAudioPlaylistCollection(item2).fFileName);
+          end)
+  );
+
+  (*
+  case newSortOrder of
+    cpsFilename: fCollections.Sort(
         TComparer<TAudioCollection>.Construct( function (const item1,item2: TAudioCollection): Integer
             begin
               result := AnsiCompareText_NempIgnoreCase(TAudioPlaylistCollection(item1).fFileName, TAudioPlaylistCollection(item2).fFileName);
             end)
     );
-  else
+  else    // cpsPath, cpsDirectory
     fCollections.Sort(
         TComparer<TAudioCollection>.Construct( function (const item1,item2: TAudioCollection): Integer
             begin
               result := AnsiCompareText_NempIgnoreCase(item1.Key, item2.Key);
             end)
     );
-  end;
+  end;*)
 end;
 
 procedure TLibraryPlaylistCategory.AddPlaylist(aPlaylistFile: TLibraryPlaylist);

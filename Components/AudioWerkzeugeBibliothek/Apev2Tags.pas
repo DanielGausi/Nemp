@@ -211,7 +211,6 @@ type
             property Bibliography     : UnicodeString read fGetBibliography      write fSetBibliography     ;
             property Introplay        : UnicodeString read fGetIntroplay         write fSetIntroplay        ;
 
-
             constructor Create;
             destructor Destroy; override;
 

@@ -47,7 +47,8 @@ const
     BREADCRUMB_HGAP = 4;
 
     FONTSIZE_BREADCRUMB = 10;
-    FIRST_BREADCRUMB_MARGIN = 24;
+    FIRST_BREADCRUMB_MARGIN = 28;
+    TOP_MARGIN = 4;
 
 type
 
@@ -808,10 +809,10 @@ begin
 
     // The very first Breadcrumb should be painted with a little margin for the Category-MenuButton
     x := FIRST_BREADCRUMB_MARGIN;
-    y := 0;
+    y := TOP_MARGIN;
 
     newLine := TTagLine.Create(Width);
-    newLine.Top := 0;
+    newLine.Top := TOP_MARGIN;
     fBreadCrumbLines.Add(newLine);
 
     newTag := TPaintTag.Create(colList[colList.Count - 1]);
@@ -875,7 +876,7 @@ begin
     exit;
 
   // Sort CurrentCollection by Count: We want to paint the collections with the highest Count
-  fCollection.ReSort(csCount);
+  fCollection.ReSort(csCount, sd_Descending);
 
   // Clear all existing PaintObjects
   fMouseOverTag := Nil;

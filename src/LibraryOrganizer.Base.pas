@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, System.Classes, System.SysUtils, System.Generics.Collections, System.Generics.Defaults,
-  System.Math, DriveRepairTools,
+  System.Math, DriveRepairTools,        dialogs,
   NempAudioFiles, NempFileUtils, Nemp_ConstantsAndTypes, Nemp_RessourceStrings;
 
 resourcestring
@@ -33,8 +33,20 @@ const
   MP3DB_CAT_ISNEW = 6;
 
 const
-  DefaultCategories: Array [0..1] of String = ('c0d0', 'e0');
+{
+  Neues Format für die Ini-Strings eines Root-Eintrages für die TreeViews
+  - Konfiguration einer Ebene separiert durch ";"
+  - Elemente einer Ebene (Typ, Sortierungen inkl. auf/absteigend-Markierung) separiert durch ","
+  Layer1,sort+,sort+,sort-;Layer2,sort+;Layer3,sort+,sort-,sort+
+}
 
+  cDefaultCategoryConfigStrings: Array [0..1] of String = ('c,0+;d,0+', 'e,0+');  // Interpret-Alben und Verzeichnis-Struktur
+  cDefaultCategoryConfigStr = 'e,0+'; // Verzeichnis-Struktur
+  cDefaultCoverFlowConfigStr  = 'd,2+,4-';  // Alben sortiert nach Interpret + Erscheinungsjahr
+
+  //cDefaultCategoryConfigStrings: Array [0..1] of String = ('c00d00', 'e00');
+  //cDefaultCategoryConfigStr = 'e00';
+  //cDefaultCoverFlowConfigStr  = 'd50';
 
 type
   // Difference between ctDirectory and ctPath:
@@ -43,20 +55,25 @@ type
   teCollectionContent = (ccNone, ccRoot, ccArtist, ccAlbum, ccDirectory, ccGenre, ccDecade, ccYear, ccFileAgeYear, ccFileAgeMonth,
       ccTagCloud,
       ccPath, ccCoverID); // the last 2 are just for internal use
-  teCollectionSorting = (csDefault, csAlbum, csArtistAlbum, csCount, csYear, csFileAge, csGenre, csDirectory);
+  // do not change the order of teCollectionSorting! The actualvalues are used e.g. as "Tag" for some MenuItems
+  teCollectionSorting = (csDefault, csAlbum, csArtist, csCount, csYear, csFileAge, csGenre, csDirectory);
+  tePlaylistCollectionSorting = (pcsFilename, pcsFolder, pcsPath);
 
   teMissingCoverPreSorting = (mcFirst, mcIgnore, mcEnd);
 
   TCollectionConfig = record
-    CollectionContent: teCollectionContent; // a..l
-    CollectionSorting: teCollectionSorting; // 0..7
+    Content: teCollectionContent; // a..l
+    PrimarySorting: teCollectionSorting; // 0..7
+    SecondarySorting: teCollectionSorting; // 0..7
+    TertiarySorting: teCollectionSorting; // 0..7
+    SortDirection1: teSortDirection;
+    SortDirection2: teSortDirection;
+    SortDirection3: teSortDirection;
   end;
 
   TCollectionConfigList = class(TList<TCollectionConfig>);
-  // TRootCollectionConfig = Array of TCollectionConfig;  // save as ([a..j][0..5])*
-  // Note: The Medialibrary will load an "Array of TCollectionTypeList" from the settings-inifile
-  // to initialise the Collections in the FileCategories
-
+  // Note: The Medialibrary will load an "Array of TCollectionConfigList" from the settings-inifile
+  // to initialise the RootCollections in the FileCategories
 
   teInsertMode = (imList, imDictionary);
   teCollectionUniqueness = (cuUnique, cuSampler, cuInvalid);
@@ -72,6 +89,44 @@ const
   //'ctNone', 'ctRoot', 'ctArtist', 'ctAlbum', 'ctDirectory', 'ctGenre', 'ctDecade', 'ctYear', 'ctFileAgeYear', 'ctFileAgeMonth',
   //'ctPath', 'ctCoverID');
 
+  cEmptyCollectionConfig: TCollectionConfig = (
+      Content: ccNone;
+      PrimarySorting: csDefault;
+      SecondarySorting: csDefault;
+      TertiarySorting: csDefault;
+      SortDirection1: sd_Ascending;
+      SortDirection2: sd_Ascending;
+      SortDirection3: sd_Ascending );
+
+  cDirectoryCollectionConfig: TCollectionConfig = (
+      Content: ccDirectory;
+      PrimarySorting: csDefault;
+      SecondarySorting: csDefault;
+      TertiarySorting: csDefault;
+      SortDirection1: sd_Ascending;
+      SortDirection2: sd_Ascending;
+      SortDirection3: sd_Ascending );
+
+  cTagCloudCollectionConfig: TCollectionConfig = (
+      Content: ccTagCloud;
+      PrimarySorting: csCount;
+      SecondarySorting: csDefault;
+      TertiarySorting: csDefault;
+      SortDirection1: sd_Ascending;
+      SortDirection2: sd_Ascending;
+      SortDirection3: sd_Ascending );
+
+  // Default Configuration for Treeview and Coverflow
+  // (Second Configuration for TreeView: cDirectoryCollectionConfig)
+  cDefaultConfig: TCollectionConfig = (
+      Content: ccAlbum;
+      PrimarySorting: csArtist;
+      SecondarySorting: csYear;
+      TertiarySorting: csDefault;
+      SortDirection1: sd_Ascending;
+      SortDirection2: sd_Descending;
+      SortDirection3: sd_Ascending );
+
   rcArtists = 'Artists';
   rcAlbums = 'Albums';
   rcDirectories = 'Directories';
@@ -85,7 +140,7 @@ const
 
   CollectionSorting_Default  = 'Name';
   CollectionSorting_ByAlbum  = 'Album';
-  CollectionSorting_ByArtistAlbum  = 'Artist and Album';
+  CollectionSorting_ByArtist  = 'Artist';
   CollectionSorting_ByCount  = 'Count';
   CollectionSorting_ByYear  = 'Release year';
   CollectionSorting_ByFileAge  = 'Fileage';
@@ -113,7 +168,7 @@ const
   );
 
   CollectionSortingNames: Array[teCollectionSorting] of String = (
-    CollectionSorting_Default, CollectionSorting_ByAlbum, CollectionSorting_ByArtistAlbum,
+    CollectionSorting_Default, CollectionSorting_ByAlbum, CollectionSorting_ByArtist,
     CollectionSorting_ByCount, CollectionSorting_ByYear, CollectionSorting_ByFileAge,
     CollectionSorting_ByGenre, CollectionSorting_ByDirectory
   );
@@ -129,6 +184,8 @@ type
       //fGroupFileAgeByYear   : Boolean;
       fAlbumKeyMode: teAlbumKeyMode;
       fPlaylistCaptionMode: tePlaylistCaptionMode;
+      fPlaylistSorting: tePlaylistCollectionSorting;
+      fPlaylistSortDirection: teSortDirection;
       fTrimCDFromDirectory: Boolean;
       fCDNames: TStringList;
       fShowCollectionCount: Boolean;
@@ -143,8 +200,16 @@ type
       procedure ClearCategoryConfig;
       function GetRootCollectionConfig(Index: Integer): TCollectionConfigList;
 
+      procedure CheckCoverFlowConfig;
+
       //procedure InitDefaultRootCollections;
       function GetRootCollectionCount: Integer;
+
+      procedure SetPlaylistCaptionMode(Value: Integer);
+      procedure SetAlbumKeyMode(Value: Integer);
+      procedure SetPlaylistSorting(Value: Integer);
+      procedure SetPlaylistDirection(Value: Integer);
+
     public
       //property GroupYearsByDecade   : Boolean read fGroupYearsByDecade   write fGroupYearsByDecade   ;
       //property GroupFileAgeByYear   : Boolean read fGroupFileAgeByYear   write fGroupFileAgeByYear   ;
@@ -154,6 +219,9 @@ type
       property UseNewCategory       : Boolean read fUseNewCategory write fUseNewCategory;
       property AlbumKeyMode: teAlbumKeyMode read fAlbumKeyMode write fAlbumKeyMode;
       property PlaylistCaptionMode: tePlaylistCaptionMode read fPlaylistCaptionMode write fPlaylistCaptionMode;
+      property PlaylistSorting: tePlaylistCollectionSorting read fPlaylistSorting write fPlaylistSorting;
+      property PlaylistSortDirection: teSortDirection read fPlaylistSortDirection write fPlaylistSortDirection;
+
       property TrimCDFromDirectory: Boolean read fTrimCDFromDirectory write fTrimCDFromDirectory;
       property CDNames: TStringList read fCDNames;
 
@@ -169,10 +237,14 @@ type
       procedure Assign(Source: TOrganizerSettings);
       procedure LoadSettings;
       procedure SaveSettings;
+
+      // used in TFormLibraryConfiguration.BtnApplyClick
       procedure AddConfig(newConfig: TCollectionConfigList);
 
-      procedure ChangeFileCollectionSorting(RCIndex, Layer: Integer; newSorting: teCollectionSorting);
-      procedure ChangeCoverFlowSorting(newSorting: teCollectionSorting);
+      procedure ChangeFileCollectionSorting(RCIndex, Layer: Integer; newSorting: teCollectionSorting;
+        newDirection: teSortDirection; OnlyDirection: Boolean);
+      procedure ChangeCoverFlowSorting(newSorting: teCollectionSorting;
+        newDirection: teSortDirection; OnlyDirection: Boolean);
 
   end;
 
@@ -222,7 +294,7 @@ type
       procedure Analyse(recursive: Boolean); virtual; abstract;
 
       procedure Sort(doRecursive: Boolean = True); virtual; abstract;
-      procedure ReSort(newSorting: teCollectionSorting); virtual; abstract;
+      procedure ReSort(newSorting: teCollectionSorting; newDirection: teSortDirection); virtual; abstract;
       procedure SortCollectionLevel(aLevel: Integer; ForceSorting: Boolean = False); virtual; abstract;
 
       function MatchPrefix(aPrefix: String): Boolean; virtual; abstract;
@@ -354,11 +426,10 @@ type
 
 
   function NempOrganizerSettings: TOrganizerSettings;
-  procedure IniStrToRootConfig(aString: String; Dest: TCollectionConfigList);
+  procedure IniStrToRootConfig(ConfigStr: String; Dest: TCollectionConfigList);
   function RootConfigToIniStr(aConfig: TCollectionConfigList): String;
 
-  procedure AddConfigToList(Dest: TCollectionConfigList; newType: teCollectionContent; newSorting: teCollectionSorting);
-
+  procedure PrepareForNewPrimarySorting(var aConfig: TCollectionConfig);
 
 implementation
 
@@ -378,32 +449,121 @@ end;
 
 
 
-procedure IniStrToRootConfig(aString: String; Dest: TCollectionConfigList);
+procedure IniStrToRootConfig(ConfigStr: String; Dest: TCollectionConfigList);
 var
-  i, configDepth: Integer;
-begin
-  configDepth := Length(aString) Div 2;
+  iLayer: Integer;
+  ListLayer, ListSortings: TStringList;
+  newConfig: TCollectionConfig;
 
-  for i := 0 to configDepth-1 do begin
-    AddConfigToList(Dest,
-        teCollectionContent(ord(aString[2*i+1]) - ord('a')),
-        teCollectionSorting(StrToIntDef(aString[2*i+2], 0))
-    );
+  function ValidSort(aStr: String): Boolean;
+  begin
+    result := (Length(aStr) >= 2)
+      and (StrToIntDef(aStr[1], -1) > -1)
+      and ( (aStr[2] = '+') or (aStr[2] = '-'))
   end;
+
+  function CharToSortDirection(aChar: Char): teSortDirection;
+  begin
+    if aChar = '+' then
+      result := sd_Ascending
+    else
+      result := sd_Descending;
+  end;
+
+  function CharToSorting(aChar: Char): teCollectionSorting;
+  var
+    aInt: Integer;
+  begin
+    aInt := StrToInt(aChar);
+    if (aInt >= Ord(Low(teCollectionSorting))) and (aInt <= Ord(High(teCollectionSorting))) then
+      result := teCollectionSorting(aInt)
+    else
+      result := csDefault
+  end;
+
+begin
+
+  ListLayer := TStringList.Create;
+  ListSortings := TStringList.Create;
+  try
+    ListLayer.Delimiter := ';';
+    ListSortings.Delimiter := ',';
+
+    ListLayer.DelimitedText := ConfigStr;
+    for iLayer := 0 to ListLayer.Count - 1 do begin
+      ListSortings.DelimitedText := Listlayer[iLayer];
+      newConfig := cEmptyCollectionConfig; // reset
+
+      if (ListSortings.Count > 0) and (Length(ListSortings[0]) >= 1) then begin
+        newConfig.Content := teCollectionContent(ord(ListSortings[0][1]) - ord('a'));
+        if (ListSortings.Count > 1) and ValidSort(ListSortings[1]) then begin
+          newConfig.PrimarySorting :=  CharToSorting(ListSortings[1][1]);
+          newConfig.SortDirection1 := CharToSortDirection(ListSortings[1][2]);
+        end;
+        if (ListSortings.Count > 2) and ValidSort(ListSortings[2]) then begin
+          newConfig.SecondarySorting :=  CharToSorting(ListSortings[2][1]);
+          newConfig.SortDirection2 := CharToSortDirection(ListSortings[2][2]);
+        end;
+        if (ListSortings.Count > 3) and ValidSort(ListSortings[3]) then begin
+          newConfig.TertiarySorting :=  CharToSorting(ListSortings[3][1]);
+          newConfig.SortDirection3 := CharToSortDirection(ListSortings[3][2]);
+        end;
+      end;
+
+      if newConfig.Content <> ccNone then
+        dest.Add(newConfig);
+    end;
+
+  finally
+    ListLayer.Free;
+    ListSortings.Free;
+  end;
+
 end;
 
 function RootConfigToIniStr(aConfig: TCollectionConfigList): String;
 var
-  i, configDepth: Integer;
+  i: Integer;
+
+  function SortDirToStr(aDirection: teSortDirection): String;
+  begin
+    if aDirection = sd_Descending then
+      result := '-'
+    else
+      result := '+';
+  end;
+
+  function SortToStr(aSorting: teCollectionSorting): String;
+  begin
+    result := IntToStr(Integer(aSorting));
+  end;
+
+  function ConfigToStr(Config: TCollectionConfig): String;
+  begin
+    result := chr(Integer(Config.Content) + ord('a'))
+      + ',' + SortToStr(Config.PrimarySorting) + SortDirToStr(Config.SortDirection1)
+      + ',' + SortToStr(Config.SecondarySorting) + SortDirToStr(Config.SortDirection2)
+      + ',' + SortToStr(Config.TertiarySorting) + SortDirToStr(Config.SortDirection3);
+  end;
+
 begin
+  if aConfig.Count > 0 then
+    result := ConfigToStr(aConfig[0]);
+
+  for i := 1 to aConfig.Count - 1 do
+    result := result + ';' + ConfigToStr(aConfig[i]);
+
+  {
   configDepth := aConfig.Count;// Length(aConfig);
 
   result := '';
   for i := 0 to configDepth-1 do begin
     result := result
-              + chr(Integer(aConfig[i].CollectionContent) + ord('a'))
-              + IntToStr(Integer(aConfig[i].CollectionSorting));
+              + chr(Integer(aConfig[i].Content) + ord('a'))
+              + IntToStr(Integer(aConfig[i].PrimarySorting))
+              + IntToStr(Integer(aConfig[i].SortDirection1 ));
   end;
+  }
 end;
 
 
@@ -496,13 +656,12 @@ begin
   end;
 end;
 
-procedure AddConfigToList(Dest: TCollectionConfigList; newType: teCollectionContent; newSorting: teCollectionSorting);
-var
-  newData: TCollectionConfig;
+procedure PrepareForNewPrimarySorting(var aConfig: TCollectionConfig);
 begin
-  newData.CollectionContent := newType;
-  newData.CollectionSorting := newSorting;
-  Dest.Add(newData);
+  aConfig.TertiarySorting := aConfig.SecondarySorting;
+  aConfig.SecondarySorting := aConfig.PrimarySorting;
+  aConfig.SortDirection3 := aConfig.SortDirection2;
+  aConfig.SortDirection2 := aConfig.SortDirection1;
 end;
 
 
@@ -530,10 +689,13 @@ begin
   FTagCloudCollectionConfig := TCollectionConfigList.Create;
 
   // Default-RootCollectionConfig (as a final Fallback)
-  AddConfigToList(fDefaultRootCollectionConfig, ccArtist, csDefault);
-  AddConfigToList(fDefaultRootCollectionConfig, ccAlbum, csDefault);
+  fDefaultRootCollectionConfig.Add(cDefaultConfig);
+
+  //AddConfigToList(fDefaultRootCollectionConfig, ccArtist, csDefault, sd_Ascending);
+  //AddConfigToList(fDefaultRootCollectionConfig, ccAlbum, csDefault, sd_Ascending);
   // TagCloud-Configuration (fixed)
-  AddConfigToList(FTagCloudCollectionConfig, ccTagCloud, csDefault);
+  // AddConfigToList(FTagCloudCollectionConfig, ccTagCloud, csDefault, sd_Ascending);
+  fTagCloudCollectionConfig.Add(cTagCloudCollectionConfig);
 end;
 
 destructor TOrganizerSettings.Destroy;
@@ -568,6 +730,9 @@ var
 begin
   fAlbumKeyMode        := Source.fAlbumKeyMode;
   fPlaylistCaptionMode := Source.fPlaylistCaptionMode;
+  fPlaylistSorting       := Source.fPlaylistSorting;
+  fPlaylistSortDirection := Source.fPlaylistSortDirection;
+
   fTrimCDFromDirectory := Source.fTrimCDFromDirectory;
   fCDNames.Assign(Source.fCDNames);
   fShowCollectionCount := Source.fShowCollectionCount;
@@ -581,34 +746,19 @@ begin
   for iRC := 0 to Length(fCategoryConfig) -1  do begin
     fCategoryConfig[iRC] := TCollectionConfigList.Create;
 
-    for i := 0 to Source.fCategoryConfig[iRC].Count - 1 do begin
-      AddConfigToList(
-        fCategoryConfig[iRC],
-        Source.fCategoryConfig[iRC][i].CollectionContent,
-        Source.fCategoryConfig[iRC][i].CollectionSorting
-      );
-    end;
+    for i := 0 to Source.fCategoryConfig[iRC].Count - 1 do
+      fCategoryConfig[iRC].Add(Source.fCategoryConfig[iRC][i])
   end;
 
   // assign DefaultRootConfig
   fDefaultRootCollectionConfig.Clear;
-  for i := 0 to Source.fDefaultRootCollectionConfig.Count - 1 do begin
-    AddConfigToList(
-        fDefaultRootCollectionConfig,
-        Source.fDefaultRootCollectionConfig[i].CollectionContent,
-        Source.fDefaultRootCollectionConfig[i].CollectionSorting
-      );
-  end;
+  for i := 0 to Source.fDefaultRootCollectionConfig.Count - 1 do
+    fDefaultRootCollectionConfig.Add(Source.fDefaultRootCollectionConfig[i]);
 
   // assign CoverFlowConfig
   fCoverFlowRootCollectionConfig.Clear;
-  for i := 0 to Source.fCoverFlowRootCollectionConfig.Count - 1 do begin
-    AddConfigToList(
-        fCoverFlowRootCollectionConfig,
-        Source.fCoverFlowRootCollectionConfig[i].CollectionContent,
-        Source.fCoverFlowRootCollectionConfig[i].CollectionSorting
-      );
-  end;
+  for i := 0 to Source.fCoverFlowRootCollectionConfig.Count - 1 do
+    fCoverFlowRootCollectionConfig.Add(Source.fCoverFlowRootCollectionConfig[i]);
 end;
 
 procedure TOrganizerSettings.AddConfig(newConfig: TCollectionConfigList);
@@ -619,16 +769,12 @@ begin
   lastIndex := Length(fCategoryConfig) - 1;
   fCategoryConfig[lastIndex] := TCollectionConfigList.Create;
   for i := 0 to newConfig.Count - 1 do
-    AddConfigToList(
-      fCategoryConfig[lastIndex],
-      newConfig[i].CollectionContent,
-      newConfig[i].CollectionSorting
-    );
+    fCategoryConfig[lastIndex].Add(newConfig[i])
 end;
 
 
-procedure TOrganizerSettings.ChangeFileCollectionSorting(RCIndex,
-  Layer: Integer; newSorting: teCollectionSorting);
+procedure TOrganizerSettings.ChangeFileCollectionSorting(RCIndex, Layer: Integer;
+  newSorting: teCollectionSorting; newDirection: teSortDirection; OnlyDirection: Boolean);
 var
   ChangedData: TCollectionConfig;
 begin
@@ -637,40 +783,46 @@ begin
   if RootCollectionConfig[RCIndex].Count = 0 then
     exit;
 
-  ChangedData.CollectionSorting := newSorting;
-
-  if RootCollectionConfig[RCIndex][0].CollectionContent = ccDirectory then begin
-    ChangedData.CollectionContent := ccDirectory;
+  if RootCollectionConfig[RCIndex][0].Content in [ccDirectory, ccTagCloud] then begin
+    ChangedData := RootCollectionConfig[RCIndex][0];
+    if OnlyDirection then
+      ChangedData.SortDirection1 := newDirection
+    else begin
+      PrepareForNewPrimarySorting(ChangedData);
+      ChangedData.PrimarySorting := newSorting;
+      ChangedData.SortDirection1 := newDirection;
+    end;
     RootCollectionConfig[RCIndex][0] := ChangedData;
-  end
-  else
-    if RootCollectionConfig[RCIndex][0].CollectionContent = ccTagCloud then begin
-      ChangedData.CollectionContent := ccTagCloud;
-      RootCollectionConfig[RCIndex][0] := ChangedData;
-    end
-    else
-    begin
-      if RootCollectionConfig[RCIndex].Count >= Layer then begin
-        ChangedData.CollectionContent := RootCollectionConfig[RCIndex][Layer].CollectionContent;
+  end else
+  begin
+    if RootCollectionConfig[RCIndex].Count >= Layer then begin
+        ChangedData := RootCollectionConfig[RCIndex][Layer];
+        if OnlyDirection then
+          ChangedData.SortDirection1 := newDirection
+        else begin
+          PrepareForNewPrimarySorting(ChangedData);
+          ChangedData.PrimarySorting := newSorting;
+          ChangedData.SortDirection1 := newDirection;
+        end;
         RootCollectionConfig[RCIndex][Layer] := ChangedData;
       end;
-    end;
+  end;
 end;
 
-procedure TOrganizerSettings.ChangeCoverFlowSorting(
-  newSorting: teCollectionSorting);
+procedure TOrganizerSettings.ChangeCoverFlowSorting(newSorting: teCollectionSorting;
+  newDirection: teSortDirection; OnlyDirection: Boolean);
 var
   ChangedData: TCollectionConfig;
 begin
-  ChangedData.CollectionSorting := newSorting;
-
-  if CoverFlowRootCollectionConfig.Count > 0 then
-    ChangedData.CollectionContent := CoverFlowRootCollectionConfig[0].CollectionContent
-  else
-    ChangedData.CollectionContent := ccAlbum;
-
-  CoverFlowRootCollectionConfig.Clear;
-  CoverFlowRootCollectionConfig.Add(ChangedData);
+  ChangedData := CoverFlowRootCollectionConfig[0];
+  if OnlyDirection then
+    ChangedData.SortDirection1 := newDirection
+  else begin
+    PrepareForNewPrimarySorting(ChangedData);
+    ChangedData.PrimarySorting := newSorting;
+    ChangedData.SortDirection1 := newDirection;
+  end;
+  CoverFlowRootCollectionConfig[0] := ChangedData;
 end;
 
 
@@ -690,19 +842,43 @@ begin
   end;
 end;
 
-{ // (Test code)
-procedure TOrganizerSettings.InitDefaultRootCollections;
+
+procedure TOrganizerSettings.CheckCoverFlowConfig;
 begin
-  SetLength(fCategoryConfig, 2);
-  SetLength(fCategoryConfig[0], 2);
-  fCategoryConfig[0][0].CollectionType := ctArtist;
-  fCategoryConfig[0][0].CollectionSorting := csDefault;
-  fCategoryConfig[0][1].CollectionType := ctAlbum;
-  fCategoryConfig[0][1].CollectionSorting := csDefault;
-  SetLength(fCategoryConfig[1], 1);
-  fCategoryConfig[1][0].CollectionType := ctDirectory;
-  fCategoryConfig[1][0].CollectionSorting := csDefault;
-end;}
+  if fCoverFlowRootCollectionConfig.Count = 0 then begin
+    IniStrToRootConfig(cDefaultCoverFlowConfigStr, fCoverFlowRootCollectionConfig);
+  end;
+end;
+
+procedure TOrganizerSettings.SetPlaylistCaptionMode(Value: Integer);
+begin
+  if (Value >= Integer(Low(tePlaylistCaptionMode))) and (Value <= Integer(High(tePlaylistCaptionMode))) then
+    fPlaylistCaptionMode := tePlaylistCaptionMode(Value)
+  else
+    fPlaylistCaptionMode := pcmFilename;
+end;
+procedure TOrganizerSettings.SetAlbumKeyMode(Value: Integer);
+begin
+  if (Value >= Integer(Low(teAlbumKeyMode))) and (Value <= Integer(High(teAlbumKeyMode))) then
+    fAlbumKeyMode := teAlbumKeyMode(Value)
+  else
+    fAlbumKeyMode := akAlbumDirectory;
+end;
+procedure TOrganizerSettings.SetPlaylistSorting(Value: Integer);
+begin
+  if (Value >= Integer(Low(tePlaylistCollectionSorting))) and (Value <= Integer(High(tePlaylistCollectionSorting))) then
+    fPlaylistSorting := tePlaylistCollectionSorting(Value)
+  else
+    fPlaylistSorting := pcsFilename;
+end;
+procedure TOrganizerSettings.SetPlaylistDirection(Value: Integer);
+begin
+  if (Value >= Integer(Low(teSortDirection))) and (Value <= Integer(High(teSortDirection))) then
+    fPlaylistSortDirection := teSortDirection(Value)
+  else
+    fPlaylistSortDirection := sd_Ascending;
+end;
+
 
 procedure TOrganizerSettings.LoadSettings;
 var
@@ -720,19 +896,24 @@ begin
   for i := 0 to categoryCount-1 do begin
     fCategoryConfig[i] := TCollectionConfigList.Create;
     if i <= 1 then
-      defStr := DefaultCategories[i]
+      defStr := cDefaultCategoryConfigStrings[i]
     else
-      defStr := 'e0';
+      defStr := cDefaultCategoryConfigStr;
     categoryString := NempSettingsManager.ReadString('LibraryOrganizer', 'Root'+IntToStr(i), defStr);
     IniStrToRootConfig(categoryString, fCategoryConfig[i]);
   end;
+
   // Configuration des Coverflow
   // note: Only "d" makes sense here (=Album)
-  categoryString := NempSettingsManager.ReadString('LibraryOrganizer', 'CoverflowConfig', 'd5');
+  categoryString := NempSettingsManager.ReadString('LibraryOrganizer', 'CoverflowConfig', cDefaultCoverFlowConfigStr);
   IniStrToRootConfig(categoryString, fCoverFlowRootCollectionConfig);
+  CheckCoverFlowConfig;
 
-  fAlbumKeyMode := teAlbumKeyMode(NempSettingsManager.ReadInteger('LibraryOrganizer', 'AlbumKeyMode', Integer(akAlbumDirectory)));
-  fPlaylistCaptionMode := tePlaylistCaptionMode(NempSettingsManager.ReadInteger('LibraryOrganizer', 'PlaylistCaptionMode', Integer(pcmFilename)));
+  SetAlbumKeyMode(NempSettingsManager.ReadInteger('LibraryOrganizer', 'AlbumKeyMode', Integer(akAlbumDirectory)));
+  SetPlaylistCaptionMode(NempSettingsManager.ReadInteger('LibraryOrganizer', 'PlaylistCaptionMode', Integer(pcmFilename)));
+  SetPlaylistSorting(NempSettingsManager.ReadInteger('LibraryOrganizer', 'PlaylistSorting', Integer(pcsFilename)));
+  SetPlaylistDirection(NempSettingsManager.ReadInteger('LibraryOrganizer', 'PlaylistSortDirection', Integer(sd_Ascending)));
+
   fTrimCDFromDirectory := NempSettingsManager.ReadBool('LibraryOrganizer', 'TrimCDFromDirectory', True);
   fCDNames.DelimitedText := NempSettingsManager.ReadString('LibraryOrganizer', 'CDNames', 'CD');
 
@@ -754,6 +935,8 @@ begin
 
   NempSettingsManager.WriteInteger('LibraryOrganizer', 'AlbumKeyMode', Integer(fAlbumKeyMode));
   NempSettingsManager.WriteInteger('LibraryOrganizer', 'PlaylistCaptionMode', Integer(fPlaylistCaptionMode));
+  NempSettingsManager.WriteInteger('LibraryOrganizer', 'PlaylistSorting', Integer(fPlaylistSorting));
+  NempSettingsManager.WriteInteger('LibraryOrganizer', 'PlaylistSortDirection', Integer(fPlaylistSortDirection));
   NempSettingsManager.WriteBool('LibraryOrganizer', 'TrimCDFromDirectory', fTrimCDFromDirectory);
   NempSettingsManager.WriteString('LibraryOrganizer', 'CDNames', fCDNames.DelimitedText);
   NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowCollectionCount', fShowCollectionCount);

@@ -58,6 +58,23 @@ uses
 const
     VORBIS_ID = 'vorbis';
 
+    VORBIS_ALBUM        = 'ALBUM'        ;
+    VORBIS_ARTIST       = 'ARTIST'       ;
+    VORBIS_CONTACT      = 'CONTACT'      ;
+    VORBIS_COPYRIGHT    = 'COPYRIGHT'    ;
+    VORBIS_DATE         = 'DATE'         ;
+    VORBIS_YEAR         = 'YEAR'         ;
+    VORBIS_DESCRIPTION  = 'DESCRIPTION'  ;
+    VORBIS_GENRE        = 'GENRE'        ;
+    VORBIS_ISRC         = 'ISRC'         ;
+    VORBIS_LICENSE      = 'LICENSE'      ;
+    VORBIS_LOCATION     = 'LOCATION'     ;
+    VORBIS_ORGANIZATION = 'ORGANIZATION' ;
+    VORBIS_PERFORMER    = 'PERFORMER'    ;
+    VORBIS_TITLE        = 'TITLE'        ;
+    VORBIS_TRACKNUMBER  = 'TRACKNUMBER'  ;
+    VORBIS_VERSION      = 'VERSION'      ;
+
 type
 
     {$IFNDEF UNICODE}
@@ -300,79 +317,79 @@ end;
 
 function TVorbisComments.fGetAlbum: UnicodeString;
 begin
-    result := fGetPropertyByFieldname('album');
+    result := fGetPropertyByFieldname(VORBIS_ALBUM);
 end;
 
 function TVorbisComments.fGetArtist: UnicodeString;
 begin
-    result := fGetPropertyByFieldname('artist');
+    result := fGetPropertyByFieldname(VORBIS_ARTIST);
 end;
 
 function TVorbisComments.fGetContact: UnicodeString;
 begin
-    result := fGetPropertyByFieldname('contact');
+    result := fGetPropertyByFieldname(VORBIS_CONTACT);
 end;
 
 function TVorbisComments.fGetCopyright: UnicodeString;
 begin
-    result := fGetPropertyByFieldname('copyright');
+    result := fGetPropertyByFieldname(VORBIS_COPYRIGHT);
 end;
 
 function TVorbisComments.fGetDate: UnicodeString;
 begin
-    result := fGetPropertyByFieldname('date');
+    result := fGetPropertyByFieldname(VORBIS_DATE);
     if result = '' then
-        result := fGetPropertyByFieldname('year');
+        result := fGetPropertyByFieldname(VORBIS_YEAR);
 end;
 
 function TVorbisComments.fGetDescription: UnicodeString;
 begin
-    result := fGetPropertyByFieldname('description');
+    result := fGetPropertyByFieldname(VORBIS_DESCRIPTION);
 end;
 
 function TVorbisComments.fGetGenre: UnicodeString;
 begin
-    result := fGetPropertyByFieldname('genre');
+    result := fGetPropertyByFieldname(VORBIS_GENRE);
 end;
 
 function TVorbisComments.fGetISRC: UnicodeString;
 begin
-    result := fGetPropertyByFieldname('isrc');
+    result := fGetPropertyByFieldname(VORBIS_ISRC);
 end;
 
 function TVorbisComments.fGetLicense: UnicodeString;
 begin
-    result := fGetPropertyByFieldname('license');
+    result := fGetPropertyByFieldname(VORBIS_LICENSE);
 end;
 
 function TVorbisComments.fGetLocation: UnicodeString;
 begin
-    result := fGetPropertyByFieldname('location');
+    result := fGetPropertyByFieldname(VORBIS_LOCATION);
 end;
 
 function TVorbisComments.fGetOrganization: UnicodeString;
 begin
-    result := fGetPropertyByFieldname('organization');
+    result := fGetPropertyByFieldname(VORBIS_ORGANIZATION);
 end;
 
 function TVorbisComments.fGetPerformer: UnicodeString;
 begin
-    result := fGetPropertyByFieldname('performer');
+    result := fGetPropertyByFieldname(VORBIS_PERFORMER);
 end;
 
 function TVorbisComments.fGetTitle: UnicodeString;
 begin
-    result := fGetPropertyByFieldname('title');
+    result := fGetPropertyByFieldname(VORBIS_TITLE);
 end;
 
 function TVorbisComments.fGetTrackNumber: UnicodeString;
 begin
-    result := fGetPropertyByFieldname('tracknumber');
+    result := fGetPropertyByFieldname(VORBIS_TRACKNUMBER);
 end;
 
 function TVorbisComments.fGetVersion: UnicodeString;
 begin
-    result := fGetPropertyByFieldname('version');
+    result := fGetPropertyByFieldname(VORBIS_VERSION);
 end;
 
 
@@ -405,7 +422,7 @@ begin
         if not assigned(matchingVector)  then
         begin
             matchingVector := TCommentVector.Create;
-            matchingVector.FieldName := aField;
+            matchingVector.FieldName := AnsiUppercase(aField);
             fCommentVectorList.Add(matchingVector);
         end;
 
@@ -416,77 +433,77 @@ end;
 
 procedure TVorbisComments.fSetAlbum(value: UnicodeString);
 begin
-    fSetPropertyByFieldname('album', Value);
+    fSetPropertyByFieldname(VORBIS_ALBUM, Value);
 end;
 
 procedure TVorbisComments.fSetArtist(value: UnicodeString);
 begin
-    fSetPropertyByFieldname('artist', Value);
+    fSetPropertyByFieldname(VORBIS_ARTIST, Value);
 end;
 
 procedure TVorbisComments.fSetContact(value: UnicodeString);
 begin
-    fSetPropertyByFieldname('contact', Value);
+    fSetPropertyByFieldname(VORBIS_CONTACT, Value);
 end;
 
 procedure TVorbisComments.fSetCopyright(value: UnicodeString);
 begin
-    fSetPropertyByFieldname('copyright', Value);
+    fSetPropertyByFieldname(VORBIS_COPYRIGHT, Value);
 end;
 
 procedure TVorbisComments.fSetDate(value: UnicodeString);
 begin
-    fSetPropertyByFieldname('date', Value);
+    fSetPropertyByFieldname(VORBIS_DATE, Value);
 end;
 
 procedure TVorbisComments.fSetDescription(value: UnicodeString);
 begin
-    fSetPropertyByFieldname('description', Value);
+    fSetPropertyByFieldname(VORBIS_DESCRIPTION, Value);
 end;
 
 procedure TVorbisComments.fSetGenre(value: UnicodeString);
 begin
-    fSetPropertyByFieldname('genre', Value);
+    fSetPropertyByFieldname(VORBIS_GENRE, Value);
 end;
 
 procedure TVorbisComments.fSetISRC(value: UnicodeString);
 begin
-    fSetPropertyByFieldname('isrc', Value);
+    fSetPropertyByFieldname(VORBIS_ISRC, Value);
 end;
 
 procedure TVorbisComments.fSetLicense(value: UnicodeString);
 begin
-    fSetPropertyByFieldname('license', Value);
+    fSetPropertyByFieldname(VORBIS_LICENSE, Value);
 end;
 
 procedure TVorbisComments.fSetLocation(value: UnicodeString);
 begin
-    fSetPropertyByFieldname('location', Value);
+    fSetPropertyByFieldname(VORBIS_LOCATION, Value);
 end;
 
 procedure TVorbisComments.fSetOrganization(value: UnicodeString);
 begin
-    fSetPropertyByFieldname('organization', Value);
+    fSetPropertyByFieldname(VORBIS_ORGANIZATION, Value);
 end;
 
 procedure TVorbisComments.fSetPerformer(value: UnicodeString);
 begin
-    fSetPropertyByFieldname('performer', Value);
+    fSetPropertyByFieldname(VORBIS_PERFORMER, Value);
 end;
 
 procedure TVorbisComments.fSetTitle(value: UnicodeString);
 begin
-    fSetPropertyByFieldname('title', Value);
+    fSetPropertyByFieldname(VORBIS_TITLE, Value);
 end;
 
 procedure TVorbisComments.fSetTrackNumber(value: UnicodeString);
 begin
-    fSetPropertyByFieldname('tracknumber', Value);
+    fSetPropertyByFieldname(VORBIS_TRACKNUMBER, Value);
 end;
 
 procedure TVorbisComments.fSetVersion(value: UnicodeString);
 begin
-    fSetPropertyByFieldname('version', Value);
+    fSetPropertyByFieldname(VORBIS_VERSION, Value);
 end;
 
 

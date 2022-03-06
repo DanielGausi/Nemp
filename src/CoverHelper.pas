@@ -1480,7 +1480,7 @@ begin
           GoodCoverList := TAudioCollectionList.Create(False);
           try
               // fill GoodCoverList with "good covers", i.e. a cover-bitmap exists
-              for i := 1 to RC.CollectionCount - 1 do  //SourceCoverList.Count - 1 do
+              for i := 0 to RC.CollectionCount - 1 do  //SourceCoverList.Count - 1 do
               begin
                   //if (SourceCoverlist[i].ID <> '')
                   //    and(SourceCoverlist[i].ID[1] <> '_')

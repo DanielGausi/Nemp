@@ -611,15 +611,6 @@ type
     TabBtnCoverCategory: TSkinButton;
     Medialist_Browse_Categories_PopupMenu: TPopupMenu;
     PM_ML_ConfigureMedialibrary: TMenuItem;
-    PM_ML_SortCollectionBy: TMenuItem;
-    PM_ML_SortCollectionByName: TMenuItem;
-    PM_ML_SortCollectionByAlbum: TMenuItem;
-    PM_ML_SortCollectionByArtistAlbum: TMenuItem;
-    PM_ML_SortCollectionByCount: TMenuItem;
-    PM_ML_SortCollectionByReleaseYear: TMenuItem;
-    PM_ML_SortCollectionByFileage: TMenuItem;
-    PM_ML_SortCollectionByGenre: TMenuItem;
-    PM_ML_SortCollectionByDirectory: TMenuItem;
     MM_ML_ConfigureMediaLibrary: TMenuItem;
     edtCloudSearch: TEdit;
     AuswahlControlPanel: TNempPanel;
@@ -631,6 +622,19 @@ type
     MedienListeControlPanel: TNempPanel;
     PM_ML_ChangeCategory: TMenuItem;
     PM_MLView_ChangeCategory: TMenuItem;
+    PM_ML_bpm: TMenuItem;
+    N11: TMenuItem;
+    PM_ML_SortLayerAscending: TMenuItem;
+    PM_ML_SortLayerDescending: TMenuItem;
+    TabBtnTagCloudCategory: TSkinButton;
+    PM_ML_SortPlaylistsBy: TMenuItem;
+    PM_ML_SortPlaylistsByPath: TMenuItem;
+    PM_ML_SortPlaylistsByFolder: TMenuItem;
+    PM_ML_SortPlaylistsByFilename: TMenuItem;
+    N28: TMenuItem;
+    PM_ML_SortPlaylistsAscending: TMenuItem;
+    PM_ML_SortPlaylistsDescending: TMenuItem;
+    PM_ML_SortLayerByArtistReleaseYear: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -684,7 +688,6 @@ type
     procedure VSTColumnDblClick(Sender: TBaseVirtualTree;
       Column: TColumnIndex; Shift: TShiftState);
     procedure MM_ML_SortAscendingClick(Sender: TObject);
-    procedure MM_ML_SortDescendingClick(Sender: TObject);
     procedure MM_O_PreferencesClick(Sender: TObject);
     procedure VSTKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
@@ -1249,7 +1252,7 @@ type
     procedure TabBtnCoverCategoryClick(Sender: TObject);
     procedure PM_ML_FilesPlayEnqueueClick(Sender: TObject);
     procedure PM_ML_ConfigureMedialibraryClick(Sender: TObject);
-    procedure PM_ML_SortCollectionByClick(Sender: TObject);
+    // procedure PM_ML_SortCollectionByClick(Sender: TObject);
     procedure CategoryVSTDragOver(Sender: TBaseVirtualTree; Source: TObject;
       Shift: TShiftState; State: TDragState; Pt: TPoint; Mode: TDropMode;
       var Effect: Integer; var Accept: Boolean);
@@ -1286,6 +1289,8 @@ type
     procedure edtCloudSearchKeyPress(Sender: TObject; var Key: Char);
     procedure PM_ML_ChangeCategoryClick(Sender: TObject);
     procedure PM_MLView_ChangeCategoryClick(Sender: TObject);
+    procedure Medialist_Browse_Categories_PopupMenuPopup(Sender: TObject);
+    procedure PM_ML_SortPlaylistsDescendingClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -1429,7 +1434,7 @@ type
     function GetFocussedCategory: TLibraryCategory;
     function GetFocussedCollection: TAudioCollection;
     procedure ReFillBrowseTrees(RemarkOldNodes: LongBool);
-    procedure ReFillCategoryMenu(RemarkOldNodes: LongBool);
+    procedure ReFillCategoryMenu;
     procedure ReFillCategoryTree(RemarkOldNodes: LongBool);
     procedure RefreshCollectionTreeHeader(Source: TLibraryCategory);
     procedure FillCollectionTree(Source: TLibraryCategory; RemarkOldNodes: LongBool);
@@ -1972,8 +1977,11 @@ begin
     CloudViewer.OnPaint      := CloudPaint;
     CloudViewer.OnAfterPaint := CloudAfterPaint;
     CloudViewer.OnGetHint := OnGetCloudHint;
-
     CloudViewer.StyleElements := [];
+
+    TabBtnTagCloudcategory.Parent := CloudViewer;
+    TabBtnTagCloudcategory.Left := 2;
+    TabBtnTagCloudcategory.Top := 2;
 
     //NewPlayerPanel.DoubleBuffered := True;
 
@@ -3399,6 +3407,7 @@ begin
       CON_LASTFMTAGS: MedienBib.AddSorter(CON_LASTFMTAGS, False);
       CON_TRACKGAIN: MedienBib.AddSorter(CON_TRACKGAIN, False);
       CON_ALBUMGAIN: MedienBib.AddSorter(CON_ALBUMGAIN, False);
+      CON_BPM: MedienBib.AddSorter(CON_BPM, False);
   end;
 
   MedienBib.SortAnzeigeListe;
@@ -3415,6 +3424,23 @@ begin
   VST.Enabled := True;
 end;
 
+procedure TNemp_MainForm.MM_ML_SortAscendingClick(Sender: TObject);
+var
+  oldAudioFile: TAudioFile;
+  sndTag: Integer;
+begin
+  oldAudioFile := GetFocussedAudioFile;
+
+  //(Sender as TMenuItem).Checked := True;
+  //das checked im OnPopup machen. das dan auch für die Sortiermodi  - dabie ggf. auf  Sortparams[0 - 1 - 2- 3 ]  überprüfen
+
+  sndTag := (Sender as TMenuItem).Tag;
+  MedienBib.ChangeSortDirection(teSortDirection(sndTag));
+  VST.Header.SortDirection := VirtualTrees.TSortDirection(sndTag);
+
+  MedienBib.SortAnzeigeListe;
+  FillTreeView(MedienBib.AnzeigeListe, oldAudioFile);
+end;
 
 procedure TNemp_MainForm.PM_ML_HideSelectedClick(Sender: TObject);
 var i:integer;
@@ -4065,8 +4091,6 @@ end;
   PopUp MediaListMenus
   ***************************
 }
-
-
 procedure TNemp_MainForm.Medialist_Browse_PopupMenuPopup(Sender: TObject);
 var //o: TComponent;
     //PoppedAtAlbumVST,
@@ -4082,7 +4106,7 @@ var //o: TComponent;
     ac: TAudioCollection;
     lc: TLibraryCategory;
     acFile: TAudioFileCollection;
-    isAlbum, isDirectory: Boolean;
+    isAlbum, isDirectory, isSortable: Boolean;
     levelCaption, enqueueCaption, CollectionCaption: String;
 begin
     // The (smaller) menu for the Browsing part (top left of the form)
@@ -4091,10 +4115,11 @@ begin
     LibraryNotCritical := MedienBib.StatusBibUpdate <= 1;
     LibraryNotBlockedByPartymode := NOT NempSkin.NempPartyMode.DoBlockBibOperations;
     ac := Nil;
-    lc := Nil;
-    catNode := ArtistsVST.FocusedNode;
-    if assigned(catNode) then
-      lc := ArtistsVST.GetNodeData<TLibraryCategory>(catNode);
+    lc := MedienBib.CurrentCategory;
+    //Nil;
+    //catNode := ArtistsVST.FocusedNode;
+    //if assigned(catNode) then
+    //  lc := ArtistsVST.GetNodeData<TLibraryCategory>(catNode);
 
     nLevel := -1;
     case MedienBib.BrowseMode of
@@ -4127,6 +4152,9 @@ begin
     end;
     PM_ML_EnqueueBrowse.Caption := enqueueCaption;
 
+    isSortable := assigned(lc) and (MedienBib.BrowseMode <> 2);
+    PM_ML_SortLayerBy.Visible := isSortable and (lc.CategoryType = ccFiles);
+    PM_ML_SortPlaylistsBy.Visible := isSortable and (lc.CategoryType = ccPlaylists);
 
     // Menus "Sort Layer/Collection by"
     if assigned(ac) and (ac is TAudioFileCollection) and (nLevel >= 0) and (MedienBib.BrowseMode <> 2) then begin
@@ -4153,10 +4181,16 @@ begin
         scDirectory: PM_ML_SortLayerBy.Caption :=  MainForm_MenuCaptionsSortDirectoriesBy;
         scTagCloud: PM_ML_SortLayerBy.Caption :=  MainForm_MenuCaptionsSortTagCloudBy;
       end;
-      PM_ML_SortLayerBy.Visible := True;
+      // PM_ML_SortLayerBy.Visible := True;
 
       for i := 0 to PM_ML_SortLayerBy.Count - 1 do
         PM_ML_SortLayerBy.Items[i].Checked := acFile.ChildSorting = teCollectionSorting(PM_ML_SortLayerBy.Items[i].Tag);
+      // two special cases:
+      PM_ML_SortLayerByArtistAlbum.Checked := (acFile.ChildSorting = csArtist) and (acFile.SecondaryChildSorting = csAlbum);
+      PM_ML_SortLayerByArtistReleaseYear.Checked := (acFile.ChildSorting = csArtist) and (acFile.SecondaryChildSorting = csYear);
+
+      PM_ML_SortLayerAscending.Checked := acFile.ChildSortDirection = sd_Ascending;
+      PM_ML_SortLayerDescending.Checked := acFile.ChildSortDirection = sd_Descending;
 
       {PM_ML_SortLayerByAlbum.Checked := acFile.SubCollectionSorting = teCollectionSorting(PM_ML_SortLayerByAlbum.Tag);
       PM_ML_SortLayerByArtistAlbum.Checked := acFile.SubCollectionSorting = teCollectionSorting(PM_ML_SortLayerByArtistAlbum.Tag);
@@ -4170,11 +4204,12 @@ begin
       // Submenu for "sort layer by"
       PM_ML_SortLayerByAlbum.Visible := isAlbum;
       PM_ML_SortLayerByArtistAlbum.Visible := isAlbum;
+      PM_ML_SortLayerByArtistReleaseYear.Visible := isAlbum;
       PM_ML_SortLayerByReleaseYear.Visible := isAlbum;
       PM_ML_SortLayerByFileAge.Visible := isAlbum;
       PM_ML_SortLayerByGenre.Visible := isAlbum;
       PM_ML_SortLayerByDirectory.Visible := isAlbum or isDirectory;
-
+      (*
       // Submenu for "Sort Collection by"
       PM_ML_SortCollectionBy.Caption := Format(MainForm_MenuCaptionsSortCollectionBy, [CollectionCaption]);
       PM_ML_SortCollectionBy.Visible := False;
@@ -4185,10 +4220,18 @@ begin
       PM_ML_SortCollectionByFileAge.Visible := isAlbum;
       PM_ML_SortCollectionByGenre.Visible := isAlbum;
       PM_ML_SortCollectionByDirectory.Visible := isAlbum or isDirectory;
-    end else
-    begin
-      PM_ML_SortLayerBy.Visible := False;
-      PM_ML_SortCollectionBy.Visible := False;
+      *)
+    end;// else
+    //begin
+    //  PM_ML_SortLayerBy.Visible := False;
+      //PM_ML_SortCollectionBy.Visible := False;
+    //end;
+
+    if assigned(ac) and (ac is TAudioPlaylistCollection) and (MedienBib.BrowseMode <> 2) then begin
+      for i := 0 to self.PM_ML_SortPlaylistsBy.Count - 1 do
+        PM_ML_SortPlaylistsBy.Items[i].Checked := NempOrganizerSettings.PlaylistSorting = tePlaylistCollectionSorting(PM_ML_SortPlaylistsBy.Items[i].Tag);
+      PM_ML_SortPlaylistsAscending.Checked := NempOrganizerSettings.PlaylistSortDirection = sd_Ascending;
+      PM_ML_SortPlaylistsDescending.Checked := NempOrganizerSettings.PlaylistSortDirection = sd_Descending;
     end;
 
     if assigned(ac) then begin
@@ -4312,6 +4355,23 @@ begin
     // properties and details
     PM_ML_ShowInExplorer.Enabled :=  assigned(VST.FocusedNode);
     PM_ML_Properties    .Enabled :=  assigned(VST.FocusedNode) AND (NOT NempSkin.NempPartyMode.DoBlockDetailWindow);
+
+    PM_ML_SortArtistTitle.Checked := (MedienBib.Sortparams[0].Tag = CON_ARTIST) and (MedienBib.Sortparams[1].Tag = CON_TITEL) ;
+    PM_ML_SortArtistAlbumTitle.Checked := (MedienBib.Sortparams[0].Tag = CON_ARTIST) and (MedienBib.Sortparams[1].Tag = CON_ALBUM) and (MedienBib.Sortparams[2].Tag = CON_TITEL);
+    PM_ML_SortTitleArtist.Checked := (MedienBib.Sortparams[0].Tag = CON_TITEL) and (MedienBib.Sortparams[1].Tag = CON_ARTIST);
+    PM_ML_SortAlbumArtistTitle.Checked := (MedienBib.Sortparams[0].Tag = CON_ALBUM) and (MedienBib.Sortparams[1].Tag = CON_ARTIST) and (MedienBib.Sortparams[2].Tag = CON_TITEL);
+    PM_ML_SortAlbumTitleArtist.Checked := (MedienBib.Sortparams[0].Tag = CON_ALBUM) and (MedienBib.Sortparams[1].Tag = CON_TITEL) and (MedienBib.Sortparams[2].Tag = CON_ARTIST);
+    PM_ML_SortAlbumTracknr.Checked := (MedienBib.Sortparams[0].Tag = CON_ALBUM) and (MedienBib.Sortparams[1].Tag = CON_TRACKNR);
+    PM_ML_SortFilename.Checked := (MedienBib.Sortparams[0].Tag = CON_DATEINAME);
+    PM_ML_SortPathFilename.Checked := (MedienBib.Sortparams[0].Tag = CON_PFAD);
+    PM_ML_SortLyricsexists.Checked := (MedienBib.Sortparams[0].Tag = CON_LYRICSEXISTING);
+    PM_ML_SortGenre.Checked := (MedienBib.Sortparams[0].Tag = CON_GENRE);
+    PM_ML_SortDuration.Checked := (MedienBib.Sortparams[0].Tag = CON_DAUER);
+    PM_ML_SortFilesize.Checked := (MedienBib.Sortparams[0].Tag = CON_FILESIZE);
+    PM_ML_bpm.Checked := (MedienBib.Sortparams[0].Tag = CON_BPM);
+    //-
+    PM_ML_SortAscending.Checked := MedienBib.Sortparams[0].Direction = sd_Ascending;
+    PM_ML_SortDescending.Checked := MedienBib.Sortparams[0].Direction = sd_Descending;
 end;
 
 
@@ -4550,8 +4610,6 @@ end;
 
 
 
-
-
 procedure TNemp_MainForm.ShowSummary(aList: TAudioFileList = Nil);
 var i, catCount: integer;
   dauer: int64;
@@ -4779,6 +4837,7 @@ begin
 
           CON_TRACKPEAK : Celltext := PeakValueToString(af.TrackPeak);
           CON_ALBUMPEAK : Celltext := PeakValueToString(af.AlbumPeak);
+          CON_BPM : Celltext := af.BPM;
 
         else
           CellText := ' ';
@@ -4907,16 +4966,6 @@ begin
   end;
 end;
 
-
-procedure TNemp_MainForm.MM_ML_SortAscendingClick(Sender: TObject);
-begin
-  PM_ML_SortAscending.Checked := True;
-end;
-
-procedure TNemp_MainForm.MM_ML_SortDescendingClick(Sender: TObject);
-begin
-  PM_ML_SortDescending.Checked := True;
-end;
 
 procedure TNemp_MainForm.VSTPaintText(Sender: TBaseVirtualTree;
   const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
@@ -6354,7 +6403,13 @@ begin
     result := Nil;
 end;
 
-procedure TNemp_MainForm.ReFillCategoryMenu(RemarkOldNodes: LongBool);
+procedure TNemp_MainForm.Medialist_Browse_Categories_PopupMenuPopup(
+  Sender: TObject);
+begin
+  ReFillCategoryMenu;
+end;
+
+procedure TNemp_MainForm.ReFillCategoryMenu;
 var
   i: Integer;
   aMenuItem: TMenuItem;
@@ -6365,23 +6420,29 @@ begin
     aMenuItem := TMenuItem.Create(Nemp_MainForm);
     aMenuItem.OnClick := CoverFlowCategoryMenuItemClick;
     aMenuItem.Caption := MedienBib.FileCategories[i].CaptionCount;
+    aMenuItem.Checked := MedienBib.FileCategories[i] = MedienBib.CurrentCategory;
     aMenuItem.Tag := i;
     Medialist_Browse_Categories_PopupMenu.Items.Add(aMenuItem);
   end;
-  // Playlists-Categories
-  for i := 0 to MedienBib.PlaylistCategories.Count - 1 do begin
+  if MedienBib.BrowseMode <> 2  then begin
+    // Playlists-Categories
+    for i := 0 to MedienBib.PlaylistCategories.Count - 1 do begin
+      aMenuItem := TMenuItem.Create(Nemp_MainForm);
+      aMenuItem.OnClick := CoverFlowCategoryMenuItemClick;
+      aMenuItem.Caption := MedienBib.PlaylistCategories[i].CaptionCount;
+      aMenuItem.Checked := MedienBib.PlaylistCategories[i] = MedienBib.CurrentCategory;
+      aMenuItem.Tag := 1000 + i;
+      Medialist_Browse_Categories_PopupMenu.Items.Add(aMenuItem);
+    end;
+    // Webradio-Category
     aMenuItem := TMenuItem.Create(Nemp_MainForm);
     aMenuItem.OnClick := CoverFlowCategoryMenuItemClick;
-    aMenuItem.Caption := MedienBib.PlaylistCategories[i].CaptionCount;
-    aMenuItem.Tag := 1000 + i;
+    aMenuItem.Caption := MedienBib.WebRadioCategory.CaptionCount;
+
+    aMenuItem.Checked := MedienBib.WebRadioCategory = MedienBib.CurrentCategory;
+    aMenuItem.Tag := 2000;
     Medialist_Browse_Categories_PopupMenu.Items.Add(aMenuItem);
   end;
-  // Webradio-Category
-  aMenuItem := TMenuItem.Create(Nemp_MainForm);
-  aMenuItem.OnClick := CoverFlowCategoryMenuItemClick;
-  aMenuItem.Caption := MedienBib.WebRadioCategory.CaptionCount;
-  aMenuItem.Tag := 2000;
-  Medialist_Browse_Categories_PopupMenu.Items.Add(aMenuItem);
 end;
 
 procedure TNemp_MainForm.ReFillCategoryTree(RemarkOldNodes: LongBool);
@@ -6446,7 +6507,13 @@ begin
       aCat := MedienBib.PlaylistCategories[TagMod];
     2: aCat := MedienBib.WebRadioCategory;
   end;
-  FillCollectionCoverflow(aCat, True);
+
+  case MedienBib.BrowseMode of
+    0: ; // nothing to do. Category-Selection is done by the treeview, not the Popup
+    1: FillCollectionCoverflow(aCat, True);
+    2: FillCollectionTagCloud(aCat, True);
+  end;
+
 end;
 
 procedure TNemp_MainForm.FillCollectionCoverflow(Source: TLibraryCategory; RemarkOldNodes: LongBool);
@@ -6592,11 +6659,11 @@ begin
       end;
       1: begin
                 // Coverflow
-                ReFillCategoryMenu(RemarkOldNodes);
+                ReFillCategoryMenu;
                 FillCollectionCoverflow(MedienBib.CurrentCategory, RemarkOldNodes);
       end;
       2: begin
-                ReFillCategoryMenu(RemarkOldNodes);
+                ReFillCategoryMenu;
                 FillCollectionTagCloud(MedienBib.CurrentCategory, RemarkOldNodes);
       end;
   end;
@@ -10493,6 +10560,7 @@ begin
 end;
 
 
+(*
 procedure TNemp_MainForm.PM_ML_SortCollectionByClick(Sender: TObject);
 var
   aNode: PVirtualNode;
@@ -10536,18 +10604,23 @@ begin
       end;
   end;
 end;
+*)
 
 
 
 procedure TNemp_MainForm.SortierAuswahl1POPUPClick(Sender: TObject);
 var
   aNode, catNode: PVirtualNode;
-  nLevel: Integer;
+  nLevel, sndTag: Integer;
   ac: TAudioCollection;
   acFile: TAudioFileCollection;
   lc: TLibraryCategory;
   rc: TRootCollection;
-  newSorting: teCollectionSorting;
+  newSorting, secondSorting: teCollectionSorting;
+  newDirection, secondDirection: teSortDirection;
+  // Flag-variable: add a new sorting type, or just change the sortdirection?
+  OnlyChangeDirection, AddSecondSorter: Boolean;
+
 begin
   if MedienBib.StatusBibUpdate >= 2 then
   begin
@@ -10555,16 +10628,62 @@ begin
     exit;
   end;
 
-  lc := Nil;
-  catNode := ArtistsVST.FocusedNode;
-  if assigned(catNode) then
-    lc := ArtistsVST.GetNodeData<TLibraryCategory>(catNode);
+  sndTag := (Sender as TMenuItem).Tag;
 
-  newSorting := teCollectionSorting((Sender as TMenuItem).Tag);
+  case sndTag of
+    0..7: begin
+      // csDefault, csAlbum, csArtist, csCount, csYear, csFileAge, csGenre, csDirectory
+      OnlyChangeDirection := False;
+      AddSecondSorter := False;
+      newSorting := teCollectionSorting(sndTag);
+      newDirection := sd_Ascending;
+    end;
+    50: begin
+      OnlyChangeDirection := False;
+      AddSecondSorter := True;
+      newSorting := csAlbum;
+      newDirection := sd_Ascending;
+      secondSorting := csArtist;
+      secondDirection := sd_Ascending;
+    end;
+    51: begin
+      OnlyChangeDirection := False;
+      AddSecondSorter := True;
+      newSorting := csYear;
+      newDirection := sd_Descending;
+      secondSorting := csArtist;
+      secondDirection := sd_Ascending;
+    end;
+
+    100, 102: begin
+      OnlyChangeDirection := True;
+      AddSecondSorter := False;
+      newSorting := csDefault; // actually not used later
+      newDirection := teSortDirection(sndTag mod 2);
+    end;
+  end;
+
+
+(*  if (sndTag >= Ord(Low(teCollectionSorting))) and (sndTag <= Ord(High(teCollectionSorting))) then begin
+    OnlyChangeDirection := False;
+    newSorting := teCollectionSorting(sndTag);
+    newDirection := sd_Ascending;
+  end else
+  begin
+    OnlyChangeDirection := True;
+    newSorting := csDefault; // actually not used later
+    newDirection := teSortDirection(sndTag mod 2);
+  end;*)
+
   case MedienBib.BrowseMode of
       0: begin
             // classic browse mode
             // Get Collection, Get RootCollection, Get CollectionLevel
+            lc := Nil;
+            catNode := ArtistsVST.FocusedNode;
+            if assigned(catNode) then
+              lc := ArtistsVST.GetNodeData<TLibraryCategory>(catNode);
+
             ac := Nil;
             aNode := AlbenVST.FocusedNode;
             nLevel := AlbenVST.GetNodeLevel(aNode);
@@ -10579,7 +10698,11 @@ begin
               end;
 
               rc := TAudioFileCollection(ac).Root;
-              MedienBib.ChangeFileCollectionSorting(lc.IndexOf(rc), nLevel, newSorting);
+
+              MedienBib.ChangeFileCollectionSorting(lc.IndexOf(rc), nLevel, newSorting, newDirection, OnlyChangeDirection);    // newDirection = sd_Ascending
+              if AddSecondSorter then
+                MedienBib.ChangeFileCollectionSorting(lc.IndexOf(rc), nLevel, SecondSorting, SecondDirection, OnlyChangeDirection);    // newDirection = sd_Ascending
+
                // refill Tree
               AlbenVST.OnFocusChanged := NIL;
               FillCollectionTree(Nil, True);
@@ -10589,7 +10712,9 @@ begin
       1: begin
             ac := MedienBib.NewCoverFlow.Collection[0];
             if assigned(ac) and (ac is TRootCollection) then begin
-              MedienBib.ChangeFileCollectionSorting(0, 0, newSorting);
+              MedienBib.ChangeFileCollectionSorting(0, 0, newSorting, newDirection, OnlyChangeDirection);    // newDirection= sd_Ascending
+              if AddSecondSorter then
+                MedienBib.ChangeFileCollectionSorting(0, 0, SecondSorting, SecondDirection, OnlyChangeDirection);
               FillCollectionCoverflow(MedienBib.CurrentCategory, True);
             end;
       end
@@ -10599,6 +10724,43 @@ begin
       end;
   end;
 end;
+
+procedure TNemp_MainForm.PM_ML_SortPlaylistsDescendingClick(Sender: TObject);
+var
+  sndTag: Integer;
+  newSorting: tePlaylistCollectionSorting;
+  newDirection: teSortDirection;
+begin
+  if MedienBib.StatusBibUpdate >= 2 then
+  begin
+    TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+    exit;
+  end;
+
+  sndTag := (Sender as TMenuItem).Tag;
+  if (sndTag >= Ord(Low(tePlaylistCollectionSorting))) and (sndTag <= Ord(High(tePlaylistCollectionSorting))) then begin
+    newSorting := tePlaylistCollectionSorting(sndTag);
+    newDirection := NempOrganizerSettings.PlaylistSortDirection;
+  end else
+  begin
+    newSorting := NempOrganizerSettings.PlaylistSorting;
+    newDirection := teSortDirection(sndTag mod 2);
+  end;
+
+  MedienBib.ChangePlaylistCollectionSorting(newSorting, newDirection);
+  case MedienBib.BrowseMode of
+    0: begin
+      AlbenVST.OnFocusChanged := NIL;
+      FillCollectionTree(Nil, True);
+      AlbenVST.OnFocusChanged := AlbenVSTFocusChanged;
+    end;
+    1: begin
+      FillCollectionCoverflow(MedienBib.CurrentCategory, True);
+    end;
+    2: ; // TagCloud: Nothing to do
+  end;
+end;
+
 
 
 
@@ -11447,6 +11609,7 @@ begin
                     CON_YEAR,
                     CON_GENRE,
                     CON_TRACKNR,
+                    CON_BPM,
                     CON_CD: begin
                         if af.HasSupportedTagFormat then
                         begin
@@ -11578,6 +11741,7 @@ begin
         CON_GENRE: af.Genre := NewText;
         CON_TRACKNR: af.Track := StrToIntDef(NewText, 0);
         CON_CD: af.CD := NewText;
+        CON_BPM: af.BPM := NewText;
     else
         {CON_DAUER, CON_BITRATE, CON_CBR, CON_MODE, CON_SAMPLERATE, CON_FILESIZE,
         CON_PFAD, CON_ORDNER, CON_DATEINAME, CON_LYRICSEXISTING, CON_EXTENSION, ... }

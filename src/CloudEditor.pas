@@ -146,7 +146,7 @@ begin
     TranslateComponent (self);
 
     TagRoot := TRootCollection.Create(Nil);
-    TagRoot.AddSubCollectionType(ccTagCloud, csCount);
+    TagRoot.AddSubCollectionType(ccTagCloud, csCount, sd_Descending);
 
     TagVST.NodeDataSize := SizeOf(TLibraryCategory);
     IgnoreTagVST.NodeDataSize := SizeOf(TIgnoreTagString);
@@ -263,13 +263,12 @@ end;
 
 procedure TCloudEditorForm.SortTags;
 begin
-  // no more ascending/descending for now
   case TagVST.Header.SortColumn of
-    0: TagRoot.ReSort(csDefault);
-    1: TagRoot.ReSort(csCount);
+    // note: NempAudioFiles.teSortDirection and VirtualTrees.TSotrDirection are compatible!
+    0: TagRoot.ReSort(csDefault, teSortDirection(TagVST.Header.SortDirection));
+    1: TagRoot.ReSort(csCount, teSortDirection(TagVST.Header.SortDirection));
   end;
 end;
-
 
 procedure TCloudEditorForm.SortMergetags;
 begin
@@ -284,8 +283,6 @@ begin
         1: MedienBib.TagPostProcessor.MergeList.Sort(Sort_ReplaceKey);
     end;
 end;
-
-
 
 procedure TCloudEditorForm.ReselectIgnoreNode(aKey: String);
 var

@@ -402,6 +402,28 @@ object Nemp_MainForm: TNemp_MainForm
             OnResize = PanelTagCloudBrowseResize
             OnPaint = PanelPaint
             OwnerDraw = False
+            object TabBtnTagCloudCategory: TSkinButton
+              Tag = 1
+              Left = 16
+              Top = 13
+              Width = 24
+              Height = 24
+              Hint = 'Select category'
+              ParentShowHint = False
+              PopupMenu = Medialist_Browse_Categories_PopupMenu
+              ShowHint = True
+              TabOrder = 0
+              TabStop = False
+              OnClick = TabBtnCoverCategoryClick
+              DrawMode = dm_Skin
+              NumGlyphsX = 5
+              NumGlyphsY = 1
+              GlyphLine = 0
+              CustomRegion = False
+              FocusDrawMode = fdm_Windows
+              Color1 = clBlack
+              Color2 = clBlack
+            end
           end
         end
         object AuswahlHeaderPanel: TNempPanel
@@ -1118,6 +1140,9 @@ object Nemp_MainForm: TNemp_MainForm
               end
               item
                 Position = 27
+              end
+              item
+                Position = 28
               end>
           end
         end
@@ -1706,6 +1731,7 @@ object Nemp_MainForm: TNemp_MainForm
             Top = 69
             Width = 20
             Height = 20
+            Enabled = False
             ParentShowHint = False
             ShowHint = True
             TabOrder = 0
@@ -5328,21 +5354,26 @@ object Nemp_MainForm: TNemp_MainForm
         GroupIndex = 1
         OnClick = AnzeigeSortMENUClick
       end
+      object PM_ML_bpm: TMenuItem
+        Tag = 28
+        Caption = 'BPM (Beats per minute)'
+        GroupIndex = 1
+        OnClick = AnzeigeSortMENUClick
+      end
       object N4: TMenuItem
         Caption = '-'
         GroupIndex = 1
-      end
-      object PM_ML_SortDescending: TMenuItem
-        Caption = 'Descending'
-        GroupIndex = 1
-        RadioItem = True
-        OnClick = MM_ML_SortDescendingClick
       end
       object PM_ML_SortAscending: TMenuItem
         Caption = 'Ascending'
         Checked = True
         GroupIndex = 1
-        RadioItem = True
+        OnClick = MM_ML_SortAscendingClick
+      end
+      object PM_ML_SortDescending: TMenuItem
+        Tag = 1
+        Caption = 'Descending'
+        GroupIndex = 1
         OnClick = MM_ML_SortAscendingClick
       end
     end
@@ -6817,101 +6848,97 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Change Category of selected files'
       OnClick = PM_ML_ChangeCategoryClick
     end
-    object PM_ML_SortCollectionBy: TMenuItem
-      Caption = 'Sort Collection by'
-      object PM_ML_SortCollectionByName: TMenuItem
-        Caption = 'Name'
-        RadioItem = True
-        OnClick = PM_ML_SortCollectionByClick
-      end
-      object PM_ML_SortCollectionByAlbum: TMenuItem
-        Tag = 1
-        Caption = 'Album'
-        RadioItem = True
-        OnClick = PM_ML_SortCollectionByClick
-      end
-      object PM_ML_SortCollectionByArtistAlbum: TMenuItem
-        Tag = 2
-        Caption = 'Artist and Album'
-        RadioItem = True
-        OnClick = PM_ML_SortCollectionByClick
-      end
-      object PM_ML_SortCollectionByCount: TMenuItem
-        Tag = 3
-        Caption = 'Count'
-        RadioItem = True
-        OnClick = PM_ML_SortCollectionByClick
-      end
-      object PM_ML_SortCollectionByReleaseYear: TMenuItem
-        Tag = 4
-        Caption = 'Release Year'
-        RadioItem = True
-        OnClick = PM_ML_SortCollectionByClick
-      end
-      object PM_ML_SortCollectionByFileage: TMenuItem
-        Tag = 5
-        Caption = 'Fileage'
-        OnClick = PM_ML_SortCollectionByClick
-      end
-      object PM_ML_SortCollectionByGenre: TMenuItem
-        Tag = 6
-        Caption = 'Genre'
-        OnClick = PM_ML_SortCollectionByClick
-      end
-      object PM_ML_SortCollectionByDirectory: TMenuItem
-        Tag = 7
-        Caption = 'Directory'
-        OnClick = PM_ML_SortCollectionByClick
-      end
-    end
     object PM_ML_SortLayerBy: TMenuItem
       Caption = 'Sort layer by'
       object PM_ML_SortLayerByName: TMenuItem
         Caption = 'Name'
-        RadioItem = True
         OnClick = SortierAuswahl1POPUPClick
       end
       object PM_ML_SortLayerByAlbum: TMenuItem
         Tag = 1
         Caption = 'Album'
-        RadioItem = True
         OnClick = SortierAuswahl1POPUPClick
       end
       object PM_ML_SortLayerByArtistAlbum: TMenuItem
-        Tag = 2
-        Caption = 'Artist and Album'
-        RadioItem = True
+        Tag = 50
+        Caption = 'Artist, Album'
+        OnClick = SortierAuswahl1POPUPClick
+      end
+      object PM_ML_SortLayerByArtistReleaseYear: TMenuItem
+        Tag = 51
+        Caption = 'Artist, Release Year'
         OnClick = SortierAuswahl1POPUPClick
       end
       object PM_ML_SortLayerByCount: TMenuItem
         Tag = 3
         Caption = 'Count'
-        RadioItem = True
         OnClick = SortierAuswahl1POPUPClick
       end
       object PM_ML_SortLayerByReleaseYear: TMenuItem
         Tag = 4
         Caption = 'Release Year'
-        RadioItem = True
         OnClick = SortierAuswahl1POPUPClick
       end
       object PM_ML_SortLayerByFileAge: TMenuItem
         Tag = 5
         Caption = 'Fileage'
-        RadioItem = True
         OnClick = SortierAuswahl1POPUPClick
       end
       object PM_ML_SortLayerByGenre: TMenuItem
         Tag = 6
         Caption = 'Genre'
-        RadioItem = True
         OnClick = SortierAuswahl1POPUPClick
       end
       object PM_ML_SortLayerByDirectory: TMenuItem
         Tag = 7
         Caption = 'Directory'
-        RadioItem = True
         OnClick = SortierAuswahl1POPUPClick
+      end
+      object N11: TMenuItem
+        Tag = 9000
+        Caption = '-'
+      end
+      object PM_ML_SortLayerAscending: TMenuItem
+        Tag = 100
+        Caption = 'Ascending'
+        Checked = True
+        OnClick = SortierAuswahl1POPUPClick
+      end
+      object PM_ML_SortLayerDescending: TMenuItem
+        Tag = 101
+        Caption = 'Descending'
+        OnClick = SortierAuswahl1POPUPClick
+      end
+    end
+    object PM_ML_SortPlaylistsBy: TMenuItem
+      Caption = 'Sort playlists by'
+      object PM_ML_SortPlaylistsByFilename: TMenuItem
+        Caption = 'Filename'
+        OnClick = PM_ML_SortPlaylistsDescendingClick
+      end
+      object PM_ML_SortPlaylistsByFolder: TMenuItem
+        Tag = 1
+        Caption = 'Folder'
+        OnClick = PM_ML_SortPlaylistsDescendingClick
+      end
+      object PM_ML_SortPlaylistsByPath: TMenuItem
+        Tag = 2
+        Caption = 'Path'
+        OnClick = PM_ML_SortPlaylistsDescendingClick
+      end
+      object N28: TMenuItem
+        Tag = 4211
+        Caption = '-'
+      end
+      object PM_ML_SortPlaylistsAscending: TMenuItem
+        Tag = 100
+        Caption = 'Ascending'
+        OnClick = PM_ML_SortPlaylistsDescendingClick
+      end
+      object PM_ML_SortPlaylistsDescending: TMenuItem
+        Tag = 101
+        Caption = 'Descending'
+        OnClick = PM_ML_SortPlaylistsDescendingClick
       end
     end
     object PM_ML_ConfigureMedialibrary: TMenuItem
@@ -7143,6 +7170,7 @@ object Nemp_MainForm: TNemp_MainForm
     Top = 16
   end
   object Medialist_Browse_Categories_PopupMenu: TPopupMenu
+    OnPopup = Medialist_Browse_Categories_PopupMenuPopup
     Left = 456
     Top = 180
   end

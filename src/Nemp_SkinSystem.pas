@@ -359,7 +359,7 @@ type
         // ControlButtons: The Buttons on the MainForm
         ControlButtons : Array[TControlButtons] of TSkinButton;
 
-        TabButtons: Array [0..12] of SkinButtonRec;
+        TabButtons: Array [0..14] of SkinButtonRec;
         SlideButtons: Array [0..2] of SkinButtonRec;
 
         NempPartyMode: TNempPartyMode;
@@ -536,6 +536,8 @@ begin
   TabButtons[10].Button   :=  Nemp_MainForm.TabBtn_Headset       ; // headset playback
   TabButtons[11].Button   :=  Nemp_mainForm.TabBtn_Marker        ;
   TabButtons[12].Button   :=  Nemp_mainForm.TabBtn_Favorites     ;
+  TabButtons[13].Button   :=  Nemp_mainForm.TabBtnCoverCategory     ;
+  TabButtons[14].Button   :=  Nemp_mainForm.TabBtnTagCloudCategory  ;
 
   TabButtons[0].GlyphFile := 'TabBtnCover'       ;
   TabButtons[1].GlyphFile := 'TabBtnSummaryLock' ;
@@ -550,6 +552,8 @@ begin
   TabButtons[10].GlyphFile := 'TabBtnHeadset';//'TabBtnHeadset'    ;
   TabButtons[11].GlyphFile := 'TabBtnMarker'     ;
   TabButtons[12].GlyphFile := 'TabBtnFavorites'  ;
+  TabButtons[13].GlyphFile := 'TabBtnCategory'   ;
+  TabButtons[14].GlyphFile := 'TabBtnCategory'   ;
 
   SlideButtons[0].Button  := Nemp_MainForm.VolButton           ;
   SlideButtons[1].Button  := Nemp_MainForm.SlideBarButton      ;

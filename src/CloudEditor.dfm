@@ -115,7 +115,7 @@ object CloudEditorForm: TCloudEditorForm
         Colors.UnfocusedSelectionColor = clHighlight
         Colors.UnfocusedSelectionBorderColor = clHighlight
         Header.AutoSizeIndex = 0
-        Header.Options = [hoColumnResize, hoDrag, hoVisible]
+        Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
         IncrementalSearch = isAll
         Indent = 4
         PopupMenu = PopupExistingTags

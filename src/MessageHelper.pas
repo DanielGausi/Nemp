@@ -1718,14 +1718,12 @@ begin
     WM_PlayerStop, WM_PlayerPlay: begin
                                     BassTimer.Enabled := //NempPlayer.BassStatus = BASS_ACTIVE_PLAYING;
                                                          NempPlayer.Status = PLAYER_ISPLAYING;
-                                    if assigned(NempPlayer.MainAudioFile) then
-                                    begin
-                                        RecordBtn.Enabled
-                                        //RecordBtn.Visible
-                                         := NempPlayer.MainAudioFile.isStream
-                                                           and (NempPlayer.BassStatus = BASS_ACTIVE_PLAYING)
-                                                           and (NempPlayer.StreamType <> 'Ogg')
-                                    end;
+
+                                    RecordBtn.Enabled := assigned(NempPlayer.MainAudioFile)
+                                         and NempPlayer.MainAudioFile.isStream
+                                         and (NempPlayer.BassStatus = BASS_ACTIVE_PLAYING)
+                                         and (NempPlayer.StreamType <> 'Ogg');
+
                                     if  Message.Msg = WM_PlayerStop then
                                     begin
                                       // Set the SlideBtn to its initial position

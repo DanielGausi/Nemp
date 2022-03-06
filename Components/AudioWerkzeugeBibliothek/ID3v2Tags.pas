@@ -152,6 +152,7 @@ type
     function GetOriginalLyricist: UnicodeString;
     function GetOriginalReleaseYear: UnicodeString;
     function GetOriginalAlbumTitel: UnicodeString;
+    function GetBPM: UnicodeString;
 
     //property set functions
     procedure SetTitle(Value: UnicodeString);
@@ -176,6 +177,7 @@ type
     procedure SetOriginalLyricist(Value: UnicodeString);
     procedure SetOriginalReleaseYear(Value: UnicodeString);
     procedure SetOriginalAlbumTitel(Value: UnicodeString);
+    procedure SetBPM(Value: UnicodeString);
 
     function GetStandardUserDefinedURL: AnsiString;
     procedure SetStandardUserDefinedURL(Value: AnsiString);
@@ -228,6 +230,7 @@ type
     property OriginalLyricist:    UnicodeString read  GetOriginalLyricist    write SetOriginalLyricist   ;
     property OriginalReleaseYear: UnicodeString read  GetOriginalReleaseYear write SetOriginalReleaseYear;
     property OriginalAlbumTitel:  UnicodeString read  GetOriginalAlbumTitel  write SetOriginalAlbumTitel ;
+    property BPM: UnicodeString read GetBPM write SetBPM;
 
 
     property FlgUnsynch       : Boolean read fFlgUnsynch write fFlgUnsynch;
@@ -1986,6 +1989,11 @@ begin
   SetText(Idv2_ORIGINALALBUMTITEL, value);
 end;
 
+procedure TID3v2Tag.SetBPM(Value: UnicodeString);
+begin
+  SetText(IDv2_BPM, Value);
+end;
+
 
 // ------------------------------------------
 // Getter for properties
@@ -2095,6 +2103,10 @@ end;
 function TID3v2Tag.GetOriginalAlbumTitel: UnicodeString;
 begin
   result := GetText(IDv2_ORIGINALALBUMTITEL);
+end;
+function TID3v2Tag.GetBPM: UnicodeString;
+begin
+  result := GetText(IDv2_BPM);
 end;
 
 

@@ -44,7 +44,7 @@ type
 
       procedure Analyse(recursive: Boolean); override; // empty
       procedure Sort(doRecursive: Boolean = True); override; // empty
-      procedure ReSort(newSorting: teCollectionSorting); override; // empty
+      procedure ReSort(newSorting: teCollectionSorting; newDirection: teSortDirection); override; // empty
       procedure SortCollectionLevel(aLevel: Integer; ForceSorting: Boolean = False); override; // empty
 
   end;
@@ -184,7 +184,7 @@ begin
 end;
 
 procedure TAudioWebradioCollection.ReSort(
-  newSorting: teCollectionSorting);
+  newSorting: teCollectionSorting; newDirection: teSortDirection);
 begin
   // nothing to do
 end;

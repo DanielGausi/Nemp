@@ -2,8 +2,8 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
   Left = 0
   Top = 0
   Caption = 'Library configuration'
-  ClientHeight = 361
-  ClientWidth = 684
+  ClientHeight = 500
+  ClientWidth = 686
   Color = clBtnFace
   Constraints.MinHeight = 400
   Constraints.MinWidth = 700
@@ -20,17 +20,17 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
   TextHeight = 13
   object PnlButtons: TPanel
     Left = 0
-    Top = 320
-    Width = 684
+    Top = 459
+    Width = 686
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
     DesignSize = (
-      684
+      686
       41)
     object BtnOK: TButton
-      Left = 407
+      Left = 409
       Top = 6
       Width = 85
       Height = 25
@@ -40,7 +40,7 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
       OnClick = BtnOKClick
     end
     object BtnCancel: TButton
-      Left = 589
+      Left = 591
       Top = 6
       Width = 85
       Height = 25
@@ -52,7 +52,7 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
       OnClick = BtnCancelClick
     end
     object BtnApply: TButton
-      Left = 498
+      Left = 500
       Top = 6
       Width = 85
       Height = 25
@@ -65,15 +65,15 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
   object PnlMain: TPanel
     Left = 0
     Top = 0
-    Width = 684
-    Height = 320
+    Width = 686
+    Height = 459
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
     object Splitter1: TSplitter
       Left = 180
       Top = 0
-      Height = 320
+      Height = 459
       ExplicitLeft = 201
       ExplicitHeight = 370
     end
@@ -81,7 +81,7 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
       Left = 0
       Top = 0
       Width = 180
-      Height = 320
+      Height = 459
       Align = alLeft
       Caption = 'Categories'
       Constraints.MinWidth = 180
@@ -92,8 +92,10 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
         Left = 2
         Top = 15
         Width = 176
-        Height = 132
+        Height = 271
         Align = alClient
+        Colors.UnfocusedSelectionColor = clHighlight
+        Colors.UnfocusedSelectionBorderColor = clHighlight
         DragOperations = [doMove]
         Header.AutoSizeIndex = 0
         Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs]
@@ -117,7 +119,7 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
       end
       object pnlCategoryButtons: TPanel
         Left = 2
-        Top = 147
+        Top = 286
         Width = 176
         Height = 62
         Align = alBottom
@@ -144,7 +146,7 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
       end
       object pnlCategoryAdds: TPanel
         Left = 2
-        Top = 209
+        Top = 348
         Width = 176
         Height = 109
         Align = alBottom
@@ -197,8 +199,8 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
     object grpBoxSortLevels: TGroupBox
       Left = 183
       Top = 0
-      Width = 182
-      Height = 320
+      Width = 184
+      Height = 459
       Align = alClient
       Caption = 'Category layers'
       Constraints.MinWidth = 180
@@ -208,8 +210,8 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
       object VSTSortings: TVirtualStringTree
         Left = 2
         Top = 15
-        Width = 178
-        Height = 132
+        Width = 180
+        Height = 272
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -230,13 +232,13 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
         Columns = <
           item
             Position = 0
-            Width = 174
+            Width = 176
           end>
       end
       object pnlLayerButtons: TPanel
         Left = 2
-        Top = 147
-        Width = 178
+        Top = 287
+        Width = 180
         Height = 92
         Align = alBottom
         BevelOuter = bvNone
@@ -270,39 +272,19 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
       end
       object pnlLayerAdds: TPanel
         Left = 2
-        Top = 239
-        Width = 178
-        Height = 79
+        Top = 379
+        Width = 180
+        Height = 78
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 2
-        DesignSize = (
-          178
-          79)
-        object lblCoverFlowSorting: TLabel
-          Left = 8
-          Top = 28
-          Width = 87
-          Height = 13
-          Caption = 'Sort Coverflow by'
-        end
-        object cbCoverFlowSorting: TComboBox
-          Left = 8
-          Top = 47
-          Width = 150
-          Height = 21
-          Style = csDropDownList
-          Anchors = [akLeft, akTop, akRight]
-          TabOrder = 0
-          OnChange = cbCoverFlowSortingChange
-        end
       end
     end
     object PnlSettings: TPanel
-      Left = 365
+      Left = 367
       Top = 0
       Width = 319
-      Height = 320
+      Height = 459
       Align = alRight
       BevelOuter = bvNone
       DoubleBuffered = True
@@ -312,13 +294,14 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
         Left = 0
         Top = 0
         Width = 319
-        Height = 145
+        Height = 137
         Align = alTop
         Caption = 'Album settings'
         TabOrder = 0
+        ExplicitTop = 88
         DesignSize = (
           319
-          145)
+          137)
         object lblAlbumDefinition: TLabel
           Left = 16
           Top = 18
@@ -365,22 +348,17 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
       end
       object grpBoxView: TGroupBox
         Left = 0
-        Top = 145
+        Top = 355
         Width = 319
-        Height = 175
+        Height = 104
         Align = alClient
         Caption = 'Display settings'
-        TabOrder = 1
+        TabOrder = 3
+        ExplicitTop = 361
+        ExplicitHeight = 98
         DesignSize = (
           319
-          175)
-        object lblPlaylistCaptionMode: TLabel
-          Left = 16
-          Top = 86
-          Width = 90
-          Height = 13
-          Caption = 'Display playlists by'
-        end
+          104)
         object cbShowCoverForAlbum: TCheckBox
           Left = 16
           Top = 24
@@ -399,10 +377,71 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
           Caption = 'Show number of elements in collections'
           TabOrder = 1
         end
+        object cbShowCategoryCount: TCheckBox
+          Left = 16
+          Top = 55
+          Width = 273
+          Height = 17
+          Caption = 'Show number of elements in categories'
+          TabOrder = 2
+        end
+      end
+      object grpBoxPlaylists: TGroupBox
+        Left = 0
+        Top = 137
+        Width = 319
+        Height = 136
+        Align = alTop
+        Caption = 'Playlist settings'
+        TabOrder = 1
+        ExplicitTop = 225
+        object lblPlaylistCaptionMode: TLabel
+          Left = 16
+          Top = 24
+          Width = 90
+          Height = 13
+          Caption = 'Display playlists by'
+        end
+        object lblPlaylistSortMode: TLabel
+          Left = 16
+          Top = 72
+          Width = 76
+          Height = 13
+          Caption = 'Sort playlists by'
+        end
         object cbPlaylistCaptionMode: TComboBox
           Left = 16
-          Top = 105
-          Width = 201
+          Top = 43
+          Width = 161
+          Height = 21
+          Style = csDropDownList
+          ItemIndex = 0
+          TabOrder = 0
+          Text = 'Filename'
+          Items.Strings = (
+            'Filename'
+            'Folder'
+            'Folder\Filename'
+            'Complete path')
+        end
+        object cbPlaylistSortDirection: TComboBox
+          AlignWithMargins = True
+          Left = 192
+          Top = 91
+          Width = 110
+          Height = 21
+          Style = csDropDownList
+          ItemIndex = 0
+          TabOrder = 1
+          Text = 'Ascending'
+          Items.Strings = (
+            'Ascending'
+            'Descending')
+        end
+        object cbPlaylistSortMode: TComboBox
+          Left = 16
+          Top = 91
+          Width = 161
           Height = 21
           Style = csDropDownList
           ItemIndex = 0
@@ -411,16 +450,40 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
           Items.Strings = (
             'Filename'
             'Folder'
-            'Folder\Filename'
             'Complete path')
         end
-        object cbShowCategoryCount: TCheckBox
+      end
+      object grpBoxCoverflow: TGroupBox
+        Left = 0
+        Top = 273
+        Width = 319
+        Height = 82
+        Align = alTop
+        Caption = 'Coverflow settings'
+        TabOrder = 2
+        object lblCoverFlowSorting: TLabel
           Left = 16
-          Top = 55
-          Width = 273
-          Height = 17
-          Caption = 'Show number of elements in categories'
-          TabOrder = 3
+          Top = 24
+          Width = 87
+          Height = 13
+          Caption = 'Sort Coverflow by'
+        end
+        object btnEditCoverflow: TButton
+          Left = 256
+          Top = 41
+          Width = 36
+          Height = 25
+          Caption = '...'
+          TabOrder = 0
+          OnClick = btnEditCoverflowClick
+        end
+        object cbSortCoverflow: TComboBox
+          Left = 16
+          Top = 43
+          Width = 225
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 1
         end
       end
     end

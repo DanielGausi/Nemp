@@ -1680,7 +1680,9 @@ begin
               at_File: begin
                   myAList.add('#EXTINF:' + IntTostr(aAudiofile.Duration) + ','
                       + aAudioFile.Artist + ' - ' + aAudioFile.Titel);
-                  myAList.Add(ExtractRelativePathNew(aFilename, aAudioFile.Pfad ));
+                  // myAList.Add(ExtractRelativePathNew(aFilename, aAudioFile.Pfad ));
+                  myAList.Add(ExtractRelativePath(aFilename, aAudioFile.Pfad ));
+
               end;
               at_Stream: begin
                   myAList.add('#EXTINF:' + '0,' + aAudioFile.Description);
@@ -1718,7 +1720,8 @@ begin
               aAudiofile := Playlist[i-1] as TPlaylistfile;
               case aAudioFile.AudioType of
                   at_File: begin
-                      ini.WriteString ('playlist', 'File'  + IntToStr(i), ExtractRelativePathNew(aFilename, aAudioFile.Pfad ));
+                      //ini.WriteString ('playlist', 'File'  + IntToStr(i), ExtractRelativePathNew(aFilename, aAudioFile.Pfad ));
+                      ini.WriteString ('playlist', 'File'  + IntToStr(i), ExtractRelativePath(aFilename, aAudioFile.Pfad ));
                       ini.WriteString ('playlist', 'Title' + IntToStr(i), aAudioFile.Artist + ' - ' + aAudioFile.Titel);
                       ini.WriteInteger('playlist', 'Length'+ IntToStr(i), aAudioFile.Duration);
                   end;

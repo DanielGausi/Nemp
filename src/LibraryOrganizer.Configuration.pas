@@ -62,8 +62,6 @@ type
     pnlLayerButtons: TPanel;
     cbDefaultCategory: TComboBox;
     pnlLayerAdds: TPanel;
-    lblCoverFlowSorting: TLabel;
-    cbCoverFlowSorting: TComboBox;
     pnlCategoryButtons: TPanel;
     pnlCategoryAdds: TPanel;
     PnlMain: TPanel;
@@ -79,6 +77,14 @@ type
     Movedown2: TMenuItem;
     Splitter1: TSplitter;
     cbShowCategoryCount: TCheckBox;
+    lblPlaylistSortMode: TLabel;
+    cbPlaylistSortMode: TComboBox;
+    cbPlaylistSortDirection: TComboBox;
+    grpBoxPlaylists: TGroupBox;
+    grpBoxCoverflow: TGroupBox;
+    lblCoverFlowSorting: TLabel;
+    btnEditCoverflow: TButton;
+    cbSortCoverflow: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -127,7 +133,7 @@ type
     procedure ActionMoveCategoryDownExecute(Sender: TObject);
     procedure PopupCategoriesPopup(Sender: TObject);
     procedure PopupLayersPopup(Sender: TObject);
-    procedure cbCoverFlowSortingChange(Sender: TObject);
+    procedure btnEditCoverflowClick(Sender: TObject);
   private
     { Private declarations }
     FileCategories: TLibraryCategoryList;
@@ -143,9 +149,14 @@ type
     procedure RefreshCategoryButtons;
     procedure RefreshLayerActions(Node: PVirtualNode; rc: TRootCollection);
 
+    procedure FillCoverFlowSortingLabel(aConfig: TCollectionConfig);
 
     procedure PrepareNewLayerForm(isRoot: Boolean);
-    procedure PrepareEditLayerForm(AllowDirectory: Boolean; aType: teCollectionContent; aSorting: teCollectionSorting);
+    // procedure PrepareEditLayerForm(AllowDirectory: Boolean; aType: teCollectionContent; aSorting: teCollectionSorting);
+    procedure PrepareEditLayerForm(AllowDirectory: Boolean; aConfig: TCollectionConfig);
+    procedure PrepareEditCoverflowForm(aConfig: TCollectionConfig);
+
+
 
     function CategoryNameExists(aName: String; Categories: TLibraryCategoryList): Boolean;
     function NewUniqueCategoryName(Categories: TLibraryCategoryList): String;
@@ -206,17 +217,6 @@ begin
   VSTCategories.NodeDataSize := SizeOf(TLibraryCategory);
   VSTSortings.NodeDataSize := SizeOf(TAudioCollection);
 
-  // Valid Sortings for Coverflow
-  cbCoverFlowSorting.Clear;
-  cbCoverFlowSorting.Items.AddObject( CollectionSortingNames[csDefault], TObject(csDefault));
-  cbCoverFlowSorting.Items.AddObject(CollectionSortingNames[csAlbum], TObject(csAlbum));
-  cbCoverFlowSorting.Items.AddObject(CollectionSortingNames[csArtistAlbum], TObject(csArtistAlbum));
-  cbCoverFlowSorting.Items.AddObject(CollectionSortingNames[csGenre], TObject(csGenre));
-  cbCoverFlowSorting.Items.AddObject(CollectionSortingNames[csYear], TObject(csYear));
-  cbCoverFlowSorting.Items.AddObject(CollectionSortingNames[csFileAge], TObject(csFileAge));
-  cbCoverFlowSorting.Items.AddObject(CollectionSortingNames[csDirectory], TObject(csDirectory));
-  cbCoverFlowSorting.Items.AddObject( CollectionSortingNames[csCount], TObject(csCount));
-  cbCoverFlowSorting.ItemIndex := 0;
 end;
 
 procedure TFormLibraryConfiguration.FormDestroy(Sender: TObject);
@@ -245,7 +245,8 @@ begin
     aRootConfig := OrganizerSettings.RootCollectionConfig[iRC];
     newRoot := TRootCollection.Create(Nil);
     for i := 0 to aRootConfig.Count - 1 do begin
-      newRoot.AddSubCollectionType(aRootConfig[i].CollectionContent, aRootConfig[i].CollectionSorting);
+      // newRoot.AddSubCollectionType(aRootConfig[i].Content, aRootConfig[i].PrimarySorting);
+      newRoot.AddSubCollectionType(aRootConfig[i]);
     end;
     RootCollections.Add(newRoot);
   end;
@@ -263,10 +264,7 @@ begin
   FillCategoryTree;
   FillCategoryComboBoxes;
   FillCollectionTree;
-
-  cbCoverFlowSorting.ItemIndex := cbCoverFlowSorting.Items.IndexOfObject(
-    TObject(OrganizerSettings.CoverFlowRootCollectionConfig[0].CollectionSorting)
-  );
+  FillCoverFlowSortingLabel(OrganizerSettings.CoverFlowRootCollectionConfig[0]);
 
   cbAlbumKeymode.ItemIndex := Integer(OrganizerSettings.AlbumKeyMode);
   cbIgnoreCDDirectories.Checked := OrganizerSettings.TrimCDFromDirectory;
@@ -276,6 +274,8 @@ begin
   cbShowCoverForAlbum.Checked := OrganizerSettings.ShowCoverArtOnAlbum;
   checkBoxNewFilesCategory.Checked := OrganizerSettings.UseNewCategory;
   cbPlaylistCaptionMode.ItemIndex := Integer(OrganizerSettings.PlaylistCaptionMode);
+  cbPlaylistSortMode.ItemIndex := Integer(OrganizerSettings.PlaylistSorting);
+  cbPlaylistSortDirection.ItemIndex := Integer(OrganizerSettings.PlaylistSortDirection);
 
   cbNewFilesCategory.Enabled := checkBoxNewFilesCategory.Checked;
 end;
@@ -332,6 +332,22 @@ begin
 
   VSTSortings.FullExpand;
   VSTSortings.EndUpdate;
+end;
+
+procedure TFormLibraryConfiguration.FillCoverFlowSortingLabel(aConfig: TCollectionConfig);
+var
+  s: String;
+begin
+  s := _(CollectionSortingNames[aConfig.PrimarySorting]);
+  if aConfig.SecondarySorting <> csDefault then begin
+    s := s + ', ' + _(CollectionSortingNames[aConfig.SecondarySorting]);
+    if aConfig.TertiarySorting <> csDefault then
+      s := s + ', ' + _(CollectionSortingNames[aConfig.TertiarySorting]);
+  end;
+
+  cbSortCoverflow.Items.Clear;
+  cbSortCoverflow.Items.Add(s);
+  cbSortCoverflow.ItemIndex := 0;
 end;
 
 
@@ -410,11 +426,6 @@ begin
       result := True;
       break;
     end;
-end;
-
-procedure TFormLibraryConfiguration.cbCoverFlowSortingChange(Sender: TObject);
-begin
-  fCollectionsChanged := True;
 end;
 
 procedure TFormLibraryConfiguration.cbDefaultCategoryChange(Sender: TObject);
@@ -712,14 +723,24 @@ begin
   FillCategoryComboBoxes;
 end;
 
-procedure TFormLibraryConfiguration.PrepareEditLayerForm(AllowDirectory: Boolean;
-  aType: teCollectionContent; aSorting: teCollectionSorting);
+procedure TFormLibraryConfiguration.PrepareEditLayerForm(AllowDirectory: Boolean; aConfig: TCollectionConfig);
 begin
   if not assigned(FormNewLayer) then
     Application.CreateForm(TFormNewLayer, FormNewLayer);
   FormNewLayer.FillPropertiesSelection(AllowDirectory);
-  FormNewLayer.SetDefaultValues(aType, aSorting);
-  FormNewLayer.EditValue := True;
+  FormNewLayer.SetDefaultValues(aConfig);// (aType, aSorting);
+  FormNewLayer.EditMode := teEdit;
+  //FormNewLayer.EditValue := True;
+  //FormNewLayer.AllowPropertyChange := AllowPropertyChange;
+end;
+
+procedure TFormLibraryConfiguration.PrepareEditCoverflowForm(aConfig: TCollectionConfig);
+begin
+  if not assigned(FormNewLayer) then
+    Application.CreateForm(TFormNewLayer, FormNewLayer);
+  FormNewLayer.FillPropertiesSelection(False);
+  FormNewLayer.SetDefaultValues(aConfig);
+  FormNewLayer.EditMode := teCoverFlow;
 end;
 
 procedure TFormLibraryConfiguration.PrepareNewLayerForm(isRoot: Boolean);
@@ -727,7 +748,9 @@ begin
   if not assigned(FormNewLayer) then
     Application.CreateForm(TFormNewLayer, FormNewLayer);
   FormNewLayer.FillPropertiesSelection(isRoot);
-  FormNewLayer.EditValue := False;
+  FormNewLayer.EditMode := teNew;
+  //FormNewLayer.EditValue := False;
+  //FormNewLayer.AllowPropertyChange := AllowPropertyChange;
 end;
 
 procedure TFormLibraryConfiguration.ActionAddRootLayerExecute(Sender: TObject);
@@ -740,7 +763,8 @@ begin
   if FormNewLayer.ShowModal = mrOk then begin
     fCollectionsChanged := True;
     newRoot := TRootCollection.Create(Nil);
-    newRoot.AddSubCollectionType(FormNewLayer.CollectionType, FormNewLayer.SortingType);
+    // newRoot.AddSubCollectionType(FormNewLayer.CollectionType, FormNewLayer.SortingType);
+    newRoot.AddSubCollectionType(FormNewLayer.NewConfig);
     RootCollections.Add(newRoot);
     NewNode := VSTSortings.AddChild(nil, newRoot);
     for iLevel := 0 to TRootCollection(newRoot).LayerDepth - 1 do
@@ -761,7 +785,8 @@ begin
   if FormNewLayer.ShowModal = mrOk then begin
     fCollectionsChanged := True;
     rc := VSTSortings.GetNodeData<TRootCollection>(aNode);
-    rc.InsertSubCollectionType(VSTSortings.GetNodeLevel(aNode), FormNewLayer.CollectionType, FormNewLayer.SortingType);
+    // rc.InsertSubCollectionType(VSTSortings.GetNodeLevel(aNode), FormNewLayer.CollectionType, FormNewLayer.SortingType);
+    rc.InsertSubCollectionType(VSTSortings.GetNodeLevel(aNode), FormNewLayer.NewConfig);
     // The data assigned to each node under one RootCollectionNode is all the same, so we can just add a new child
     // at the end of the current subtree and trigger a repaint of the Tree
     while aNode.ChildCount > 0 do
@@ -772,6 +797,51 @@ begin
   end;
 end;
 
+procedure TFormLibraryConfiguration.btnEditCoverflowClick(Sender: TObject);
+begin
+  // todo
+
+  PrepareEditCoverflowForm(OrganizerSettings.CoverFlowRootCollectionConfig[0]);
+  if FormNewLayer.ShowModal = mrOk then begin
+    fCollectionsChanged := True;
+
+    OrganizerSettings.CoverFlowRootCollectionConfig[0] := FormNewLayer.NewConfig;
+    FillCoverFlowSortingLabel(OrganizerSettings.CoverFlowRootCollectionConfig[0]);
+
+
+  end;
+
+
+
+  (*
+    if FormNewLayer.ShowModal = mrOk then begin
+      rc.ChangeSubCollectionType(level-1,
+        FormNewLayer.NewConfig
+        //FormNewLayer.CollectionType,
+        //FormNewLayer.SortingType
+      );
+
+      RefreshLayerActions(aNode, rc);
+      VSTSortings.Invalidate;
+    end;
+
+
+
+   if level > 0 then begin
+    rc := VSTSortings.GetNodeData<TRootCollection>(aNode);
+
+    PrepareEditLayerForm(rc.LayerDepth <= 1,
+        rc.CollectionConfigList[level-1]
+
+
+     if not assigned(FormNewLayer) then
+    Application.CreateForm(TFormNewLayer, FormNewLayer);
+  FormNewLayer.FillPropertiesSelection(AllowDirectory);
+  FormNewLayer.SetDefaultValues(aConfig);// (aType, aSorting);
+  FormNewLayer.EditValue := True;
+  *)
+
+end;
 
 procedure TFormLibraryConfiguration.ActionDeleteLayerExecute(Sender: TObject);
 var
@@ -831,14 +901,16 @@ begin
     rc := VSTSortings.GetNodeData<TRootCollection>(aNode);
 
     PrepareEditLayerForm(rc.LayerDepth <= 1,
-        rc.CollectionConfigList[level-1].CollectionContent,
-        rc.CollectionConfigList[level-1].CollectionSorting
+        rc.CollectionConfigList[level-1]
+        //rc.CollectionConfigList[level-1].Content,
+        //rc.CollectionConfigList[level-1].PrimarySorting
         );
 
     if FormNewLayer.ShowModal = mrOk then begin
       rc.ChangeSubCollectionType(level-1,
-        FormNewLayer.CollectionType,
-        FormNewLayer.SortingType
+        FormNewLayer.NewConfig
+        //FormNewLayer.CollectionType,
+        //FormNewLayer.SortingType
       );
 
       RefreshLayerActions(aNode, rc);
@@ -868,12 +940,8 @@ begin
   if fCollectionsChanged then begin
     // Convert RootCollections to OrganizerSettings
     OrganizerSettings.Clear;
-    for i := 0 to RootCollections.Count - 1 do begin
+    for i := 0 to RootCollections.Count - 1 do
       OrganizerSettings.AddConfig(TRootCollection(RootCollections[i]).CollectionConfigList);
-    end;
-    OrganizerSettings.ChangeCoverFlowSorting(
-      teCollectionSorting(cbCoverFlowSorting.Items.Objects[cbCoverFlowSorting.ItemIndex])
-    );
   end;
 
   OrganizerSettings.AlbumKeyMode := teAlbumKeyMode(cbAlbumKeymode.ItemIndex);
@@ -884,8 +952,11 @@ begin
   OrganizerSettings.ShowCoverArtOnAlbum := cbShowCoverForAlbum.Checked;
   OrganizerSettings.UseNewCategory := checkBoxNewFilesCategory.Checked;
   OrganizerSettings.PlaylistCaptionMode := tePlaylistCaptionMode(cbPlaylistCaptionMode.ItemIndex);
+  OrganizerSettings.PlaylistSorting := tePlaylistCollectionSorting(cbPlaylistSortMode.ItemIndex);
+  OrganizerSettings.PlaylistSortDirection := teSortDirection(cbPlaylistSortDirection.ItemIndex);
   NempOrganizerSettings.Assign(OrganizerSettings);
 
+  MedienBib.ChangePlaylistCollectionSorting(NempOrganizerSettings.PlaylistSorting, NempOrganizerSettings.PlaylistSortDirection);
   MedienBib.ReFillFileCategories;
 end;
 

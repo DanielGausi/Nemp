@@ -1168,6 +1168,18 @@ ChangeCategoryForm_CurrentCategory = 'Current category: "%s"';
 ChangeCategoryForm_MoreFiles = '... and %d more';
 ChangeCategoryForm_AffectedFiles = 'Affected files: %d';
 
+WriteAccessNotPossibleUserPath = 'Nemp can''t write into the Users appdata path and therefore can''t save any data (including settings, playlist and the media library). This is quite unusual. '
+  + #13#10
+  + #13#10 + 'You may try Nemp using in "portable mode".'
+  + #13#10
+  + #13#10 + 'Please refer to the documentation for further details.';
+
+WriteAccessNotPossiblePortable = 'Nemp can''t write into the current directory and therefore can''t save any data (including settings, playlist and the media library). '
+  + #13#10
+  + #13#10 + 'You may try Nemp using in "installed mode" by deleting the file "UseLocalData.cfg". Otherwise, you should move Nemp into your "portable apps" directory.'
+  + #13#10
+  + #13#10 + 'Please refer to the documentation for further details.';
+
 implementation
 
 end.

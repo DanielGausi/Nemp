@@ -238,6 +238,7 @@ type
         fPlayCounter: Cardinal;
         // some more properties
         // read it from the file itself
+        fBPM: UnicodeString;
         fDuration: Integer;
         fChannelModeIDX: Byte;
         fSamplerateIDX: Byte;
@@ -412,6 +413,7 @@ type
         property Rating: Byte read fRating write fRating;
         property RoundedRating: Double read fGetRoundedRating;
         property PlayCounter: Cardinal read fPlayCounter write fPlayCounter;
+        property BPM: UnicodeString read fBPM write fBPM;
 
         property ChannelModeIdx: Byte read fChannelModeIDX;
         property SampleRateIdx: Byte read fSampleRateIDX;
@@ -553,11 +555,11 @@ type
 
 
     TAudioFileCompare = function(a1,a2: TAudioFile): Integer;
-    TSortDirection = (sd_Ascending, sd_Descending);
+    teSortDirection = (sd_Ascending, sd_Descending);
 
     TCompareRecord = record
         Comparefunction: TAudioFileCompare;
-        Direction: TSortDirection;
+        Direction: teSortDirection;
         Tag: Integer;
     end;
     
@@ -644,6 +646,7 @@ const
 
       MP3DB_ALBUMPEAK = 37;
       MP3DB_TRACKPEAK = 38;
+      MP3DB_BPM = 14;
 
 
       // 42 marked the end of an AudioFile (until Nemp 4.12)
@@ -877,11 +880,11 @@ begin
     RawTagLastFM       := aAudioFile.RawTagLastFM        ;
     Favorite           := aAudioFile.fFavorite           ;
     fCategory          := aAudioFile.fCategory           ;
+    fBPM               := aAudioFile.fBPM                ;
     TrackGain          := aAudioFile.TrackGain           ;
     AlbumGain          := aAudioFile.AlbumGain           ;
     TrackPeak          := aAudioFile.TrackPeak           ;
     AlbumPeak          := aAudioFile.AlbumPeak           ;
-
 end;
 procedure TAudioFile.AssignLight(aAudioFile: TAudioFile);
 begin
@@ -911,6 +914,7 @@ begin
     Pfad               := aAudioFile.Pfad                ;
     Favorite           := aAudioFile.fFavorite           ;
     fCategory          := aAudioFile.fCategory           ;
+    fBPM               := aAudioFile.fBPM                ;
     TrackGain          := aAudioFile.TrackGain           ;
     AlbumGain          := aAudioFile.AlbumGain           ;
     TrackPeak          := aAudioFile.TrackPeak           ;
@@ -1310,15 +1314,22 @@ begin
     aMp3File.ID3v2Tag.AutoCorrectCodepage := NempCharCodeOptions.AutoDetectCodePage;
 
     CD          := aMp3File.ID3v2Tag.GetText(IDv2_PARTOFASET);
+    if CD = '' then
+      CD := aMp3File.ApeTag.GetValueByKey(APE_DISCNUMBER);
     Lyrics      := UTF8Encode(aMp3File.id3v2tag.Lyrics);
     Comment     := aMp3File.Comment;
     PlayCounter := aMp3File.Id3v2tag.PlayCounter;
+    if PlayCounter = 0 then
+      StrToIntDef(aMp3File.ApeTag.GetValueByKey(APE_PLAYCOUNT), 0);
+
     // Determine rating if wanted.
     // Note: only if no rating is set!
     // Change January 2010: Set Rating if Flag is set OR (not AND as before) the current rating is zero
     // No: Read it always from ID3Tag, as ratings are always written into the tag on mp3-Files!
     // if ((Flags and GAD_Rating) = GAD_Rating) OR (fRating = 0) then
     fRating := aMp3File.id3v2tag.Rating;
+    if fRating = 0 then
+      StrToIntDef(aMp3File.ApeTag.GetValueByKey(APE_RATING), 0);
 
     fvbr := aMp3File.MpegInfo.vbr;
     case aMp3File.MpegInfo.channelmode of
@@ -1345,11 +1356,22 @@ begin
         TagStream.Free;
     end;
 
+    fBPM := aMp3File.ID3v2Tag.BPM;
+    if fBPM = '' then
+      fBPM := aMp3File.ApeTag.GetValueByKey(TRACK_BPM);
+
     // Get ReplayGain Information
     TrackGain := GainStringToSingle(aMp3File.id3v2tag.GetUserText(REPLAYGAIN_TRACK_GAIN));
     AlbumGain := GainStringToSingle(aMp3File.id3v2tag.GetUserText(REPLAYGAIN_ALBUM_GAIN));
     TrackPeak := PeakStringToSingle(aMp3File.id3v2tag.GetUserText(REPLAYGAIN_TRACK_PEAK));
     AlbumPeak := PeakStringToSingle(aMp3File.id3v2tag.GetUserText(REPLAYGAIN_ALBUM_PEAK));
+    // try APETag
+    if IsZero(TrackGain) or IsZero(AlbumGain) then begin
+      TrackGain := GainStringToSingle(aMp3File.ApeTag.GetValueByKey(REPLAYGAIN_TRACK_GAIN));
+      AlbumGain := GainStringToSingle(aMp3File.ApeTag.GetValueByKey(REPLAYGAIN_ALBUM_GAIN));
+      TrackPeak := PeakStringToSingle(aMp3File.ApeTag.GetValueByKey(REPLAYGAIN_TRACK_PEAK));
+      AlbumPeak := PeakStringToSingle(aMp3File.ApeTag.GetValueByKey(REPLAYGAIN_ALBUM_PEAK));
+    end;
 end;
 
 {
@@ -1366,9 +1388,9 @@ begin
     PlayCounter := StrToIntDef(aFlacFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT), 0);
     Rating :=  StrToIntDef(aFlacFile.GetPropertyByFieldname(VORBIS_RATING), 0);
 
+    fBPM := aFlacFile.GetPropertyByFieldname(TRACK_BPM);
     TrackGain := GainStringToSingle(aFlacFile.GetPropertyByFieldname(REPLAYGAIN_TRACK_GAIN));
     AlbumGain := GainStringToSingle(aFlacFile.GetPropertyByFieldname(REPLAYGAIN_ALBUM_GAIN));
-
     TrackPeak := PeakStringToSingle(aFlacFile.GetPropertyByFieldname(REPLAYGAIN_TRACK_PEAK));
     AlbumPeak := PeakStringToSingle(aFlacFile.GetPropertyByFieldname(REPLAYGAIN_ALBUM_PEAK));
 
@@ -1415,9 +1437,9 @@ begin
     // LastFM-Tags/CATEGORIES: Probably Nemp-Only
     RawTagLastFM := UTF8String(aOggFile.GetPropertyByFieldname(VORBIS_CATEGORIES));
 
+    fBPM := aOggFile.GetPropertyByFieldname(TRACK_BPM);
     TrackGain := GainStringToSingle(aOggFile.GetPropertyByFieldname(REPLAYGAIN_TRACK_GAIN));
     AlbumGain := GainStringToSingle(aOggFile.GetPropertyByFieldname(REPLAYGAIN_ALBUM_GAIN));
-
     TrackPeak := PeakStringToSingle(aOggFile.GetPropertyByFieldname(REPLAYGAIN_TRACK_PEAK));
     AlbumPeak := PeakStringToSingle(aOggFile.GetPropertyByFieldname(REPLAYGAIN_ALBUM_PEAK));
 end;
@@ -1450,9 +1472,9 @@ begin
     PlayCounter := StrToIntDef(aM4AFile.GetSpecialData(DEFAULT_MEAN, M4APlayCounter),0);
     Rating      := StrToIntDef(aM4AFile.GetSpecialData(DEFAULT_MEAN, M4ARating), 0);
 
+    fBPM := aM4AFile.GetSpecialData(DEFAULT_MEAN, TRACK_BPM);
     TrackGain := GainStringToSingle(aM4AFile.GetSpecialData(DEFAULT_MEAN, REPLAYGAIN_TRACK_GAIN));
     AlbumGain := GainStringToSingle(aM4AFile.GetSpecialData(DEFAULT_MEAN, REPLAYGAIN_ALBUM_GAIN));
-
     TrackPeak := PeakStringToSingle(aM4AFile.GetSpecialData(DEFAULT_MEAN, REPLAYGAIN_TRACK_PEAK));
     AlbumPeak := PeakStringToSingle(aM4AFile.GetSpecialData(DEFAULT_MEAN, REPLAYGAIN_ALBUM_PEAK));
 end;
@@ -1485,6 +1507,7 @@ begin
     PlayCounter  := StrToIntDef(aBaseApeFile.ApeTag.GetValueByKey(APE_PLAYCOUNT), 0);
     Rating       := StrToIntDef(aBaseApeFile.ApeTag.GetValueByKey(APE_RATING), 0);
     RawTagLastFM := UTF8String(aBaseApeFile.ApeTag.GetValueByKey(APE_CATEGORIES));
+    BPM       := aBaseApeFile.ApeTag.GetValueByKey(TRACK_BPM);
     TrackGain := GainStringToSingle(aBaseApeFile.ApeTag.GetValueByKey(REPLAYGAIN_TRACK_GAIN));
     AlbumGain := GainStringToSingle(aBaseApeFile.ApeTag.GetValueByKey(REPLAYGAIN_ALBUM_GAIN));
     TrackPeak := PeakStringToSingle(aBaseApeFile.ApeTag.GetValueByKey(REPLAYGAIN_TRACK_PEAK));
@@ -2163,6 +2186,28 @@ begin
                             at_OptimFrog,
                             at_TrueAudio: TBaseApeFile(MainFile).ApeTag.SetValueByKey(APE_DISCNUMBER, aValue);
                             //  at_Invalid: ; at_Wma: ; at_Wav: ;
+                        end;
+                    end;
+
+                    CON_BPM: begin
+                        case MainFile.FileType of
+                          at_Mp3: begin
+                            EnsureID3v2Exists(TMp3File(MainFile));
+                            TMp3File(MainFile).ID3v2Tag.BPM := AValue;
+                            if TMp3File(MainFile).ApeTag.Exists then
+                              TMp3File(MainFile).ApeTag.SetValueByKey(TRACK_BPM, aValue);
+
+                          end;
+                          at_Ogg: TOggVorbisFile(MainFile).SetPropertyByFieldname(TRACK_BPM, aValue);
+                          at_Flac: TFlacFile(MainFile).SetPropertyByFieldname(TRACK_BPM, aValue);
+                          at_M4A: TM4aFile(MainFile).SetSpecialData(DEFAULT_MEAN, TRACK_BPM, aValue);
+                          at_Monkey,
+                          at_WavPack,
+                          at_MusePack,
+                          at_OptimFrog,
+                          at_TrueAudio: TBaseApeFile(MainFile).ApeTag.SetValueByKey(TRACK_BPM, aValue);
+
+                          //at_Invalid, at_Wma, at_Wav, at_AbstractApe: ;
                         end;
                     end;
                 end;
@@ -2939,6 +2984,8 @@ begin
             MP3DB_ALBUMPEAK : fAlbumPeak := ReadSingleFromStream(aStream);
             MP3DB_TRACKPEAK : fTrackPeak := ReadSingleFromStream(aStream);
 
+            MP3DB_BPM : fBPM := ReadTextFromStream(aStream);
+
             DATA_END_ID: ; // Explicitly do Nothing -  because of the ELSE path ;-)
         else
             begin
@@ -3227,6 +3274,8 @@ begin
     if not isZero(fTrackGain) then result := result + WriteSingleToStream(aStream, MP3DB_TRACKGAIN, fTrackGain);
     if not SameValue(fAlbumPeak, 1) then result := result + WriteSingleToStream(aStream, MP3DB_ALBUMPEAK, fAlbumPeak);
     if not SameValue(fTrackPeak, 1) then result := result + WriteSingleToStream(aStream, MP3DB_TRACKPEAK, fTrackPeak);
+
+    if fBPM <> '' then result := result + WriteTextToStream(aStream, MP3DB_BPM, fBPM);
 
     if aPath <> '' then
     begin
