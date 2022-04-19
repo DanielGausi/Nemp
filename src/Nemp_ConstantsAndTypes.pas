@@ -168,7 +168,7 @@ type
 
         public
             property Block   : TPanel read fBlock  ;
-            property Header  : TPanel read fHeader ;
+            //property Header  : TPanel read fHeader ;
             property Content : TPanel read fContent;
             property Name    : String read fName   ;
 

@@ -214,7 +214,7 @@ type
       function ComparePrefix(aPrefix: String): Integer; override;
       function IndexOf(aCollection: TAudioCollection): Integer; override;
 
-      procedure Analyse(recursive: Boolean); override;
+      procedure Analyse(recursive, ForceAnalysis: Boolean); override;
       // After inserting all Files into a collection, we may want to analyze these files and collect further data
       // for example, when sorting by Album, we may want addtional common information like "year", "genre", "artist"
 
@@ -709,7 +709,7 @@ var
 begin
   // for a common "Artist", we should not work with collections.
   // On some albums, there are a lot tracks from "main artist feat. other artist"
-  // or somethin like that. That should be recognized as "main artist"
+  // or something like that. That should be recognized as "main artist"
 
   if fFileList.Count <= 50 then
     maxIdx := fFileList.Count-1
@@ -817,14 +817,21 @@ var
   i: Integer;
   aRoot: TRootCollection;
 begin
-  // A "common Directory" like "various" doesn't make sense
-  // => use the most common Directory
   aRoot := TRootCollection.Create(nil);
   try
     aRoot.AddSubCollectionType(ccPath, csCount, sd_Descending);
     for i := 0 to fFileList.Count - 1 do
       aRoot.AddAudioFile(fFileList[i]);
-    fDirectory := TAudioFileCollection(aRoot.Collection[0]).fDirectory;
+    aRoot.Sort(False);
+
+    case HasUniqueValue(aRoot) of
+      cuUnique: fDirectory := TAudioFileCollection(aRoot.Collection[0]).fDirectory;
+      // cuSampler: fDirectory := TAudioFileCollection(aRoot.Collection[0]).fDirectory;
+    else
+      //cuInvalid, cuSampler
+       fDirectory := '';
+    end;
+    // fDirectory := TAudioFileCollection(aRoot.Collection[0]).fDirectory; // ? no. That is not a good idea
   finally
     aRoot.Free;
   end;
@@ -899,44 +906,55 @@ begin
   fFileAge := newestAge;
 end;
 
-procedure TAudioFileCollection.Analyse(recursive: Boolean);
+procedure TAudioFileCollection.Analyse(recursive, ForceAnalysis: Boolean);
 var
   i: Integer;
 begin
   if recursive then
     for i := 0 to fCollectionList.Count - 1 do
-      fCollectionList[i].Analyse(recursive);
+      fCollectionList[i].Analyse(recursive, ForceAnalysis);
 
   if (fFileList.Count = 0) or (not fNeedAnalysis) then
     exit; // nothing more to do in that case
 
-  case self.Content of
-    ccNone: ;
-    ccRoot: ;
-    ccArtist: ;
-    ccAlbum: begin
-          // like in the "Coverflow"
-          GetCommonArtist;
-          GetCommonAlbum;
-          GetCommonGenre;
-          GetCommonYear;
-          GetCommonFileAge;
-          GetCommonDirectory;
-          getCommonCoverID;
+  if ForceAnalysis then begin
+    GetCommonArtist;
+    GetCommonAlbum;
+    GetCommonGenre;
+    GetCommonYear;
+    GetCommonFileAge;
+    GetCommonDirectory;
+    getCommonCoverID;
+  end else
+  begin
+    case self.Content of
+      ccNone: ;
+      ccRoot: ;
+      ccArtist: ;
+      ccAlbum: begin
+            // like in the "Coverflow"
+            GetCommonArtist;
+            GetCommonAlbum;
+            GetCommonGenre;
+            GetCommonYear;
+            GetCommonFileAge;
+            GetCommonDirectory;
+            getCommonCoverID;
+      end;
+      ccDirectory: begin
+            // maybe useful for different sortings than "by directory name"
+            //GetCommonArtist;
+            //GetCommonAlbum;
+            //GetCommonGenre;
+            //GetCommonYear;
+            GetCommonFileAge;
+      end;
+      ccGenre: ;
+      ccDecade: ;
+      ccYear: ;
+      ccFileAgeYear: ;
+      ccFileAgeMonth: ;
     end;
-    ccDirectory: begin
-          // maybe useful for different sortings than "by directory name"
-          //GetCommonArtist;
-          //GetCommonAlbum;
-          //GetCommonGenre;
-          //GetCommonYear;
-          GetCommonFileAge;
-    end;
-    ccGenre: ;
-    ccDecade: ;
-    ccYear: ;
-    ccFileAgeYear: ;
-    ccFileAgeMonth: ;
   end;
   // Analysis done.
   fNeedAnalysis := False;

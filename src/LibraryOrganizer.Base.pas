@@ -291,7 +291,7 @@ type
       // Last Parameter Remember: Sometimes the automatically "RememberLastCollection" of the OwnerCategory
       // is not wanted (e.g. when generating the HintString in TagCloud-Mode during MouseOver)
       procedure GetFiles(dest: TAudioFileList; recursive: Boolean; Remember: Boolean = True);
-      procedure Analyse(recursive: Boolean); virtual; abstract;
+      procedure Analyse(recursive, ForceAnalysis: Boolean); virtual; abstract;
 
       procedure Sort(doRecursive: Boolean = True); virtual; abstract;
       procedure ReSort(newSorting: teCollectionSorting; newDirection: teSortDirection); virtual; abstract;
@@ -1073,7 +1073,7 @@ var
   i: Integer;
 begin
   for i := 0 to fCollections.Count - 1 do
-    fCollections[i].Analyse(recursive);
+    fCollections[i].Analyse(recursive, False);
 end;
 
 

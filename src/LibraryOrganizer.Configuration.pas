@@ -8,7 +8,7 @@ uses
   gnuGettext, Nemp_RessourceStrings, MyDialogs, NempAudioFiles, LibraryOrganizer.Configuration.NewLayer,
   LibraryOrganizer.Base, LibraryOrganizer.Files, LibraryOrganizer.Playlists,
   Vcl.StdCtrls, Vcl.ExtCtrls, VirtualTrees, Vcl.ComCtrls, System.Actions,
-  Vcl.ActnList, Vcl.Menus, ActiveX;
+  Vcl.ActnList, Vcl.Menus, ActiveX, Vcl.Mask;
 
 type
  

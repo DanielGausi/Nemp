@@ -945,8 +945,6 @@ type
 
     procedure Player_PopupMenuPopup(Sender: TObject);
     procedure VST_ColumnPopupPopup(Sender: TObject);
-    procedure Splitter4CanResize(Sender: TObject; var NewSize: Integer;
-      var Accept: Boolean);
 
     procedure VST_ColumnPopupOnClick(Sender: TObject);
     procedure EDITFastSearchChange(Sender: TObject);
@@ -1259,10 +1257,6 @@ type
     procedure CategoryVSTDragDrop(Sender: TBaseVirtualTree; Source: TObject;
       DataObject: IDataObject; Formats: TFormatArray; Shift: TShiftState;
       Pt: TPoint; var Effect: Integer; Mode: TDropMode);
-    procedure AlbenVSTCreateDragManager(Sender: TBaseVirtualTree;
-      out DragManager: IVTDragManager);
-    procedure AlbenVSTCreateDataObject(Sender: TBaseVirtualTree;
-      out IDataObject: IDataObject);
 
     procedure LibraryMetaDragOver(Shift: TShiftState; State: TDragState;
       Pt: TPoint; Mode: TDropMode; DataObject: IDataObject; var Effect: Integer; var Accept: Boolean);
@@ -6904,33 +6898,6 @@ begin
     //FillTreeView(MedienBib.AnzeigeListe, Nil);
     //Nemp_MainForm.ShowSummary;
   end;
-
-  (*
-  FocussedArtistNode := ArtistsVST.FocusedNode;
-  if assigned(FocussedArtistNode) then
-  begin
-    ArtistData := ArtistsVST.GetNodeData(FocussedArtistNode);
-    Artist := TJustAstring(ArtistData^.FString).DataString;
-  end else Artist := BROWSE_ALL;
-
-  AlbumData := AlbenVST.GetNodeData(node);
-  Album := TJustAstring(AlbumData^.FString).DataString;
-  MedienBib.CurrentAlbum := Album;
-  MedienBib.AlbumIndex := Node.Index;
-
-  if Artist = BROWSE_RADIOSTATIONS then
-  begin
-      if Integer(Node.Index) < MedienBib.RadioStationList.Count then
-      begin
-          Station := TStation(MedienBib.RadioStationList[Node.Index]);
-          AuswahlStatusLBL.Caption := Station.GetInfoString;
-      end
-      else
-          TranslateMessageDLG(Shoutcast_MainForm_BibError, mtError, [mbOK], 0);
-      ShowVSTDetails(NIL);
-  end else
-      MedienBib.GenerateAnzeigeListe(Artist, Album);
-  *)
 end;
 
 
@@ -6992,34 +6959,6 @@ begin
     VK_RETURN: begin
       ac := AlbenVST.GetNodeData<TAudioCollection>(AlbenVST.FocusedNode);
       CollectionDblClick(ac, AlbenVST.FocusedNode);
-
-      (*
-      albumNode := AlbenVST.FocusedNode;
-      if not Assigned(albumNode) then
-        Exit;
-      //AlbumData := AlbenVST.GetNodeData(albumNode);
-      artistNode := ArtistsVST.FocusedNode;
-      if assigned(ArtistNode) then
-      begin
-          ArtistData := ArtistsVST.GetNodeData(ArtistNode);
-          artist := TJustAstring(ArtistData^.FString).DataString;
-      end else
-          artist := BROWSE_ALL;
-
-
-      if artist = BROWSE_RADIOSTATIONS then
-      begin
-          if Integer(AlbumNode.Index) < MedienBib.RadioStationList.Count then
-              TStation(MedienBib.RadioStationList[AlbumNode.Index]).TuneIn(NempPlaylist.BassHandlePlaylist)
-          else
-              TranslateMessageDLG(Shoutcast_MainForm_BibError, mtError, [mbOK], 0);
-      end else
-      if (artist <> BROWSE_PLAYLISTS) then
-      begin
-          AlbumData := AlbenVST.GetNodeData(albumNode);
-          MedienBib.GenerateAnzeigeListe(BROWSE_ALL, TJustAstring(AlbumData^.FString).DataString);
-      end;
-      *)
     end;
   end;
 end;
@@ -7038,58 +6977,16 @@ begin
 
   ac := AlbenVST.GetNodeData<TAudioCollection>(albumNode);
   CollectionDblClick(ac, AlbenVST.FocusedNode);
-
-  (*
-  artistNode := ArtistsVST.FocusedNode;
-  if assigned(ArtistNode) then
-  begin
-      ArtistData := ArtistsVST.GetNodeData(ArtistNode);
-      artist := TJustAstring(ArtistData^.FString).DataString;
-  end else
-      artist := BROWSE_ALL;
-
-
-  if artist = BROWSE_RADIOSTATIONS then
-  begin
-      if Integer(AlbumNode.Index) < MedienBib.RadioStationList.Count then
-          TStation(MedienBib.RadioStationList[AlbumNode.Index]).TuneIn(NempPlaylist.BassHandlePlaylist)
-      else
-          TranslateMessageDLG(Shoutcast_MainForm_BibError, mtError, [mbOK], 0);
-  end else
-  begin
-      if (artist <> BROWSE_PLAYLISTS) then
-      begin
-          AlbumData := AlbenVST.GetNodeData(albumNode);
-          MedienBib.GenerateAnzeigeListe(BROWSE_ALL, TJustAstring(AlbumData^.FString).DataString);
-      end;
-  end;
-  *)
 end;
 
-
-
-procedure TNemp_MainForm.AlbenVSTCreateDataObject(Sender: TBaseVirtualTree;
-  out IDataObject: IDataObject);
-begin
-  // hier das machen, was bei der dargfilesscr passiert
-end;
-
-procedure TNemp_MainForm.AlbenVSTCreateDragManager(Sender: TBaseVirtualTree;
-  out DragManager: IVTDragManager);
-begin
-////  hier nix?
-end;
 
 // horizontal splitter between Top and VST
 procedure TNemp_MainForm.MainSplitterMoved(Sender: TObject);
 begin
-    if not FormReadyAndActivated then
-        exit;
+    if not FormReadyAndActivated then exit;
+    if not Assigned_NempFormBuildOptions then exit;
 
-    if not Assigned_NempFormBuildOptions then
-        exit;
-
-    //NempOptions.NempFormRatios.VSTHeight := Round(_TopMainPanel.Height / Height * 100);    
+    //NempOptions.NempFormRatios.VSTHeight := Round(_TopMainPanel.Height / Height * 100);
     NempFormBuildOptions.OnMainSplitterMoved(Sender);
 
     if NempSkin.isActive then
@@ -7103,8 +7000,7 @@ end;
 // vertical splitter between player and Browse
 procedure TNemp_MainForm.SubSplitter1Moved(Sender: TObject);
 begin
-    if not FormReadyAndActivated then
-        exit;
+    if not FormReadyAndActivated then exit;
 
     if Assigned_NempFormBuildOptions then
         NempFormBuildOptions.OnSplitterMoved(Sender);
@@ -7112,6 +7008,23 @@ begin
     if NempSkin.isActive then
     begin
         NempSkin.FitSkinToNewWindow;
+        RepaintPanels;
+    end;
+end;
+
+// vertical splitter between VST and Cover
+procedure TNemp_MainForm.SubSplitter2Moved(Sender: TObject);
+begin
+    if not FormReadyAndActivated then exit;
+    if not Assigned_NempFormBuildOptions then exit;
+
+    if Assigned_NempFormBuildOptions then
+      NempFormBuildOptions.OnSplitterMoved(Sender);
+
+    if NempSkin.isActive then
+    begin
+        NempSkin.RepairSkinOffset;
+        NempSkin.SetVSTOffsets;
         RepaintPanels;
     end;
 end;
@@ -7124,37 +7037,10 @@ begin
 
     if not FormReadyAndActivated then
         exit;
-
+    // This is a special Splitter, NOT part of the new FormLayout Concept
     if Assigned_NempFormBuildOptions then
         NempFormBuildOptions.BrowseArtistRatio := Round(ArtistsVST.Width / AuswahlPanel.Width * 100);
 end;
-
-procedure TNemp_MainForm.Splitter4CanResize(Sender: TObject;
-  var NewSize: Integer; var Accept: Boolean);
-begin
-
-end;
-
-// vertical splitter between VST and Cover
-procedure TNemp_MainForm.SubSplitter2Moved(Sender: TObject);
-begin
-    if not FormReadyAndActivated then
-        exit;
-
-    if not Assigned_NempFormBuildOptions then
-        exit;
-            
-    NempFormBuildOptions.OnSplitterMoved(Sender);     
-
-    if NempSkin.isActive then
-    begin
-        NempSkin.RepairSkinOffset;
-        NempSkin.SetVSTOffsets;
-        RepaintPanels;
-    end;
-end;
-
-
 
 procedure TNemp_MainForm.BassTimerTimer(Sender: TObject);
 begin
@@ -12262,6 +12148,7 @@ begin
     if not Assigned_NempFormBuildOptions then
         exit;
 
+    // This is a special Splitter, NOT part of the new FormLayout Concept
     if MedienBibDetailPanel.Width > 0 then
         NempFormBuildOptions.FileOverviewCoverRatio := Round(DetailCoverLyricsPanel.Width * 100 / MedienBibDetailPanel.Width)
     else

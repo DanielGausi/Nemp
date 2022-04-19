@@ -1098,7 +1098,11 @@ Playlist_SearchingNewFilesComplete = 'Searching for music files completed. The n
 HTTP_Connection_Error = 'Error connecting %s: %s';
 
 FormBuilder_SeparateWindowWarning = 'The form layout cannot be applied in separate window mode.';
-
+FormBuilder_MainContainerCaption = 'Click %s and %s to split the window into multiple panes.' + #13#10 + 'Then drag and drop the 7 Nemp GUI-Elements to those panes.';
+FormBuilder_ElementCount = 'Please create %d more panes so you can place all GUI-Elements on the form.';
+FormBuilder_ElementCountComplete = 'Now Drag and Drop the above GUI-Elements to the panes you''ve created.';
+FormBuilder_ElementCountTooMany = 'You''ve created too many panes. Please delete some of them.';
+FormBuilder_ConstructionComplete = 'Construction complete. Click "Apply" to test this setup in the real Nemp window.';
 
 PlaylistManagerAutoSave_Caption = 'Confirmation';
 PlaylistManagerAutoSave_Text    = 'The current playlist "%s" has been changed since it has been saved.' +#13#10 + #13#10

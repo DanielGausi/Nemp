@@ -15,7 +15,6 @@ object Nemp_MainForm: TNemp_MainForm
   Font.Style = []
   KeyPreview = True
   Menu = Nemp_MainMenu
-  OldCreateOrder = False
   Position = poDesigned
   Scaled = False
   ShowHint = True
@@ -29,7 +28,6 @@ object Nemp_MainForm: TNemp_MainForm
   OnKeyUp = PlaylistVSTKeyUp
   OnResize = FormResize
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 13
   object __MainContainerPanel: TNempPanel
     Tag = 2
@@ -44,6 +42,7 @@ object Nemp_MainForm: TNemp_MainForm
     OnMouseMove = __MainContainerPanelMouseMove
     OnMouseUp = __MainContainerPanelMouseUp
     OnResize = __MainContainerPanelResize
+    Ratio = 0
     OwnerDraw = False
     object MainSplitter: TSplitter
       Left = 0
@@ -106,6 +105,7 @@ object Nemp_MainForm: TNemp_MainForm
           BevelOuter = bvLowered
           TabOrder = 1
           OnResize = GRPBOXArtistsAlbenResize
+          Ratio = 0
           OnPaint = GRPBOXArtistsAlbenPaint
           OwnerDraw = False
           DesignSize = (
@@ -145,6 +145,7 @@ object Nemp_MainForm: TNemp_MainForm
             OnMouseMove = IMGMedienBibCoverMouseMove
             OnMouseUp = IMGMedienBibCoverMouseUp
             OnResize = PanelCoverBrowseResize
+            Ratio = 0
             OnPaint = PanelCoverBrowsePaint
             OnAfterPaint = PanelCoverBrowseAfterPaint
             OwnerDraw = False
@@ -208,6 +209,7 @@ object Nemp_MainForm: TNemp_MainForm
               ShowCaption = False
               TabOrder = 1
               OnMouseDown = Lbl_CoverFlowMouseDown
+              Ratio = 0
               OnPaint = Pnl_CoverFlowLabelPaint
               OwnerDraw = False
               DesignSize = (
@@ -315,6 +317,8 @@ object Nemp_MainForm: TNemp_MainForm
               OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
               OnIncrementalSearch = ArtistsVSTIncrementalSearch
               OnResize = ArtistsVSTResize
+              Touch.InteractiveGestures = [igPan, igPressAndTap]
+              Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
               Columns = <
                 item
                   MinWidth = 0
@@ -380,6 +384,8 @@ object Nemp_MainForm: TNemp_MainForm
               OnRenderOLEData = TreesRenderOLEData
               OnResize = AlbenVSTResize
               OnStartDrag = AlbenVSTStartDrag
+              Touch.InteractiveGestures = [igPan, igPressAndTap]
+              Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
               Columns = <
                 item
                   MinWidth = 0
@@ -400,6 +406,7 @@ object Nemp_MainForm: TNemp_MainForm
             OnClick = PanelTagCloudBrowseClick
             OnMouseDown = PanelTagCloudBrowseMouseDown
             OnResize = PanelTagCloudBrowseResize
+            Ratio = 0
             OnPaint = PanelPaint
             OwnerDraw = False
             object TabBtnTagCloudCategory: TSkinButton
@@ -436,6 +443,7 @@ object Nemp_MainForm: TNemp_MainForm
           BevelOuter = bvNone
           ParentBackground = False
           TabOrder = 0
+          Ratio = 0
           OnPaint = PanelPaint
           OwnerDraw = False
           object AuswahlFillPanel: TNempPanel
@@ -456,6 +464,7 @@ object Nemp_MainForm: TNemp_MainForm
             Padding.Bottom = 2
             PopupMenu = Medialist_Browse_PopupMenu
             TabOrder = 0
+            Ratio = 0
             OnPaint = TABPanelPaint
             OwnerDraw = False
             DesignSize = (
@@ -488,6 +497,7 @@ object Nemp_MainForm: TNemp_MainForm
             Align = alLeft
             BevelOuter = bvNone
             TabOrder = 1
+            Ratio = 0
             OnPaint = PanelPaint
             OwnerDraw = False
             object edtCloudSearch: TEdit
@@ -597,6 +607,7 @@ object Nemp_MainForm: TNemp_MainForm
         BevelOuter = bvNone
         TabOrder = 1
         OnResize = PlaylistPanelResize
+        Ratio = 0
         OwnerDraw = False
         object GRPBOXPlaylist: TNempPanel
           Tag = 1
@@ -609,6 +620,7 @@ object Nemp_MainForm: TNemp_MainForm
           BevelOuter = bvLowered
           PopupMenu = PlayListPOPUP
           TabOrder = 1
+          Ratio = 0
           OnPaint = NewPanelPaint
           OwnerDraw = False
           object PlaylistVST: TVirtualStringTree
@@ -673,28 +685,30 @@ object Nemp_MainForm: TNemp_MainForm
             OnRenderOLEData = TreesRenderOLEData
             OnResize = PlaylistVSTResize
             OnStartDrag = VSTFilesStartDrag
+            Touch.InteractiveGestures = [igPan, igPressAndTap]
+            Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
             Columns = <
               item
                 Alignment = taRightJustify
                 Margin = 0
                 Position = 0
                 Spacing = 0
+                Text = '#'
                 Width = 30
-                WideText = '#'
               end
               item
                 Position = 1
                 Spacing = 0
+                Text = 'Title'
                 Width = 472
-                WideText = 'Title'
               end
               item
                 Alignment = taRightJustify
                 Margin = 0
                 Position = 2
                 Spacing = 50
+                Text = 'Time'
                 Width = 40
-                WideText = 'Time'
               end>
           end
         end
@@ -707,6 +721,7 @@ object Nemp_MainForm: TNemp_MainForm
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 0
+          Ratio = 0
           OnPaint = PanelPaint
           OwnerDraw = False
           object PlaylistFillPanel: TNempPanel
@@ -727,6 +742,7 @@ object Nemp_MainForm: TNemp_MainForm
             ParentBiDiMode = False
             PopupMenu = PlayListPOPUP
             TabOrder = 0
+            Ratio = 0
             OnPaint = TABPanelPaint
             OwnerDraw = False
             DesignSize = (
@@ -754,6 +770,7 @@ object Nemp_MainForm: TNemp_MainForm
             Align = alLeft
             BevelOuter = bvNone
             TabOrder = 1
+            Ratio = 0
             OnPaint = PanelPaint
             OwnerDraw = False
             object TabBtn_Playlist: TSkinButton
@@ -825,6 +842,7 @@ object Nemp_MainForm: TNemp_MainForm
       BevelOuter = bvNone
       TabOrder = 1
       OnResize = _TopMainPanelResize
+      Ratio = 0
       OwnerDraw = False
       object SubSplitter2: TSplitter
         Left = 607
@@ -849,6 +867,7 @@ object Nemp_MainForm: TNemp_MainForm
         BevelOuter = bvNone
         TabOrder = 0
         OnResize = MedialistPanelResize
+        Ratio = 0
         OwnerDraw = False
         object MedienBibHeaderPanel: TNempPanel
           Tag = 3
@@ -861,6 +880,7 @@ object Nemp_MainForm: TNemp_MainForm
           DoubleBuffered = True
           ParentDoubleBuffered = False
           TabOrder = 0
+          Ratio = 0
           OnPaint = PanelPaint
           OwnerDraw = False
           object MedienlisteFillPanel: TNempPanel
@@ -879,6 +899,7 @@ object Nemp_MainForm: TNemp_MainForm
             BevelOuter = bvLowered
             PopupMenu = Medialist_View_PopupMenu
             TabOrder = 1
+            Ratio = 0
             OnPaint = TABPanelPaint
             OwnerDraw = False
             DesignSize = (
@@ -906,6 +927,7 @@ object Nemp_MainForm: TNemp_MainForm
             Align = alLeft
             BevelOuter = bvNone
             TabOrder = 0
+            Ratio = 0
             OnPaint = PanelPaint
             OwnerDraw = False
             object EDITFastSearch: TEdit
@@ -982,6 +1004,7 @@ object Nemp_MainForm: TNemp_MainForm
           ParentDoubleBuffered = False
           PopupMenu = Medialist_View_PopupMenu
           TabOrder = 1
+          Ratio = 0
           OnPaint = NewPanelPaint
           OwnerDraw = False
           object VST: TVirtualStringTree
@@ -1055,6 +1078,8 @@ object Nemp_MainForm: TNemp_MainForm
             OnNewText = VSTNewText
             OnRenderOLEData = TreesRenderOLEData
             OnStartDrag = VSTFilesStartDrag
+            Touch.InteractiveGestures = [igPan, igPressAndTap]
+            Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
             Columns = <
               item
                 Position = 0
@@ -1156,6 +1181,7 @@ object Nemp_MainForm: TNemp_MainForm
         BevelOuter = bvNone
         TabOrder = 1
         OnResize = MedienBibDetailPanelResize
+        Ratio = 0
         OwnerDraw = False
         object ContainerPanelMedienBibDetails: TNempPanel
           Left = 0
@@ -1165,6 +1191,7 @@ object Nemp_MainForm: TNemp_MainForm
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
+          Ratio = 0
           OwnerDraw = False
           object SplitterFileOverview: TSplitter
             Left = 248
@@ -1176,8 +1203,7 @@ object Nemp_MainForm: TNemp_MainForm
             OnCanResize = SplitterFileOverviewCanResize
             OnMoved = SplitterFileOverviewMoved
             ExplicitLeft = 250
-            ExplicitTop = 4
-            ExplicitHeight = 279
+            ExplicitTop = 3
           end
           object DetailCoverLyricsPanel: TNempPanel
             Tag = 3
@@ -1191,6 +1217,7 @@ object Nemp_MainForm: TNemp_MainForm
             PopupMenu = PopupEditExtendedTags
             TabOrder = 0
             OnResize = DetailID3TagPanelResize
+            Ratio = 0
             OnPaint = NewPanelPaint
             OwnerDraw = False
             DesignSize = (
@@ -1237,6 +1264,7 @@ object Nemp_MainForm: TNemp_MainForm
             PopupMenu = PopupEditExtendedTags
             TabOrder = 1
             OnResize = DetailID3TagPanelResize
+            Ratio = 0
             OnPaint = NewPanelPaint
             OwnerDraw = False
             DesignSize = (
@@ -1411,6 +1439,7 @@ object Nemp_MainForm: TNemp_MainForm
           DoubleBuffered = True
           ParentDoubleBuffered = False
           TabOrder = 1
+          Ratio = 0
           OnPaint = PanelPaint
           OwnerDraw = False
           object MedienBibDetailFillPanel: TNempPanel
@@ -1430,6 +1459,7 @@ object Nemp_MainForm: TNemp_MainForm
             PopupMenu = Medialist_View_PopupMenu
             TabOrder = 0
             StyleElements = [seClient, seBorder]
+            Ratio = 0
             OnPaint = TABPanelPaint
             OwnerDraw = False
             DesignSize = (
@@ -1455,6 +1485,7 @@ object Nemp_MainForm: TNemp_MainForm
             Align = alLeft
             BevelOuter = bvNone
             TabOrder = 1
+            Ratio = 0
             OnPaint = PanelPaint
             OwnerDraw = False
             object TabBtn_Cover: TSkinButton
@@ -1515,6 +1546,7 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 2
       OnMouseMove = _ControlPanelMouseMove
       OnResize = _ControlPanelResize
+      Ratio = 0
       OwnerDraw = False
       object ControlContainer2: TNempPanel
         Left = 481
@@ -1524,6 +1556,7 @@ object Nemp_MainForm: TNemp_MainForm
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
+        Ratio = 0
         OwnerDraw = False
         object NewPlayerPanel: TNempPanel
           Tag = 4
@@ -1541,6 +1574,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = PaintFrameMouseMove
           OnMouseUp = PaintFrameMouseUp
           OnResize = NewPlayerPanelResize
+          Ratio = 0
           OnPaint = ControlPanelPaint
           OwnerDraw = False
           DesignSize = (
@@ -1807,6 +1841,7 @@ object Nemp_MainForm: TNemp_MainForm
         OnMouseDown = PaintFrameMouseDown
         OnMouseMove = PaintFrameMouseMove
         OnMouseUp = PaintFrameMouseUp
+        Ratio = 0
         OwnerDraw = False
         object HeadsetControlPanel: TNempPanel
           Tag = 3
@@ -1820,6 +1855,7 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 3
           OnClick = HeadsetControlPanelClick
           OnDragOver = GRPBOXControlDragOver
+          Ratio = 0
           OnPaint = ControlPanelPaint
           OwnerDraw = False
           OnMouseWheelUp = HeadsetControlPanelMouseWheelUp
@@ -1976,6 +2012,7 @@ object Nemp_MainForm: TNemp_MainForm
           BevelInner = bvRaised
           BevelOuter = bvLowered
           TabOrder = 1
+          Ratio = 0
           OnPaint = ControlPanelPaint
           OwnerDraw = False
           object CoverImage: TImage
@@ -2003,6 +2040,7 @@ object Nemp_MainForm: TNemp_MainForm
           BevelOuter = bvLowered
           PopupMenu = PlayListPOPUP
           TabOrder = 0
+          Ratio = 0
           OnPaint = ControlPanelPaint
           OwnerDraw = False
           object TabBtn_MainPlayerControl: TSkinButton
@@ -2084,6 +2122,7 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 2
           OnClick = PlayerControlPanelClick
           OnDragOver = GRPBOXControlDragOver
+          Ratio = 0
           OnPaint = ControlPanelPaint
           OwnerDraw = False
           OnMouseWheelUp = PlayerControlPanelMouseWheelUp

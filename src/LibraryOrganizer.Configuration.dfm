@@ -12,7 +12,6 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
@@ -111,10 +110,12 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
         OnEditing = VSTCategoriesEditing
         OnGetText = VSTCategoriesGetText
         OnNewText = VSTCategoriesNewText
+        Touch.InteractiveGestures = [igPan, igPressAndTap]
+        Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
         Columns = <
           item
             Position = 0
-            Width = 172
+            Width = 176
           end>
       end
       object pnlCategoryButtons: TPanel
@@ -229,10 +230,12 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
         OnDragDrop = VSTSortingsDragDrop
         OnFocusChanged = VSTSortingsFocusChanged
         OnGetText = VSTSortingsGetText
+        Touch.InteractiveGestures = [igPan, igPressAndTap]
+        Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
         Columns = <
           item
             Position = 0
-            Width = 176
+            Width = 180
           end>
       end
       object pnlLayerButtons: TPanel
@@ -328,6 +331,7 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
           EditLabel.Height = 13
           EditLabel.Caption = 'Base names to ignore (comma separated)'
           TabOrder = 2
+          Text = ''
         end
         object cbAlbumKeymode: TComboBox
           Left = 16

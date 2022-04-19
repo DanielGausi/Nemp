@@ -4,9 +4,9 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, MyDialogs,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, MyDialogs, MainFormLayout,
 
-  Nemp_ConstantsAndTypes, Vcl.ComCtrls;
+  Nemp_ConstantsAndTypes, Vcl.ComCtrls, NempPanel;
 
 type
 
@@ -57,14 +57,49 @@ type
     RGrpControlSubPanel: TRadioGroup;
     LblSubPanelPosition: TLabel;
     cbControlPositionSubPanel: TComboBox;
-    GroupBox2: TGroupBox;
-    cbControlPanelRows: TCheckBox;
-    cbControlPanelShowCover: TCheckBox;
     GroupBox3: TGroupBox;
     cbHideFileOverview: TCheckBox;
     BtnUndo: TButton;
     BtnResetToDefault: TButton;
     BtnOK: TButton;
+    PageControl1: TPageControl;
+    TabSheet1: TTabSheet;
+    pnlButtons: TPanel;
+    TabSheet2: TTabSheet;
+    MainContainer: TNempContainerPanel;
+    pnlTree: TNempPanel;
+    pnlCoverflow: TNempPanel;
+    pnlCloud: TNempPanel;
+    pnlPlaylist: TNempPanel;
+    pnlMedialist: TNempPanel;
+    pnlDetails: TNempPanel;
+    pnlControls: TNempPanel;
+    Button1: TButton;
+    cbSelection: TCheckBox;
+    cbPlaylist: TCheckBox;
+    cbMedialist: TCheckBox;
+    cbeDetails: TCheckBox;
+    BtnClearTEST: TButton;
+    btnRemoveTree: TButton;
+    Button2: TButton;
+    Button3: TButton;
+    Button4: TButton;
+    Button5: TButton;
+    Button6: TButton;
+    Button7: TButton;
+    lblMainContainer: TLabel;
+    grpBoxNempElements: TGroupBox;
+    grpBoxVisibleElements: TGroupBox;
+    pnlNempWindowEdit: TPanel;
+    pnlSettings: TPanel;
+    cbControls: TCheckBox;
+    grpBoxControlPanelConfig: TGroupBox;
+    cbControlPanelRows: TCheckBox;
+    cbControlPanelShowCover: TCheckBox;
+    grpBoxNempConstruction: TGroupBox;
+    pnlConstructionHint: TPanel;
+    lblElementCount: TLabel;
+    lblVisibleElementsNote: TLabel;
     procedure cbMainLayoutChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure BlockBrowseResize(Sender: TObject);
@@ -92,17 +127,47 @@ type
       var Accept: Boolean);
     procedure BtnOKClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure cbSelectionClick(Sender: TObject);
+
+    procedure NewLayoutSplitterMoved(Sender: TObject);
+    procedure AfterContainerCreated(Sender: TObject);
+
+    procedure MainContainerResize(Sender: TObject);
+    procedure BtnClearTESTClick(Sender: TObject);
+    //procedure BtnSplitHorizontallyClick(Sender: TObject);
+    //procedure btnSplitVerticallyClick(Sender: TObject);
+
+    procedure BtnEditContainerClick(Sender: TObject);
+    procedure NempContainerDragOver(Sender, Source: TObject; X, Y: Integer;
+      State: TDragState; var Accept: Boolean);
+    procedure NempContainerDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure BtnResetPanelClick(Sender: TObject);
+    procedure pnlDefaultContainerDragDrop(Sender, Source: TObject; X,
+      Y: Integer);
+    procedure pnlDefaultContainerDragOver(Sender, Source: TObject; X,
+      Y: Integer; State: TDragState; var Accept: Boolean);
+    procedure pnlMedialistMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
   private
     { Private declarations }
     LocalBuildOptions: TNempFormBuildOptions;
+
+    TestLayout: TNempLayout;
 
     procedure ApplySettings;
 
     procedure FixRowLayoutButtons(aRow, aColumn, maxRow, maxColumn: Integer; aBlock: TNempBlockPanel);
     procedure FixAllButtons;
     procedure FixSettingsGUI;
+
+    procedure RefreshConstructionHint;
+    procedure RemovePanelFromParent(aPanel: TNempPanel);
+    procedure ResetNempPanel(aPanel: TNempPanel);
+    procedure ResetAllNempPanel;
   public
     { Public declarations }
+    procedure WndProc(var Msg: TMessage); override;
 
   end;
 
@@ -114,6 +179,9 @@ implementation
 uses NempMainUnit, Nemp_RessourceStrings, Hilfsfunktionen, gnugettext;
 
 {$R *.dfm}
+
+const
+  WM_REMOVEPANEL = WM_USER + 1;
 
 
 procedure TMainFormBuilder.FixAllButtons;
@@ -297,26 +365,39 @@ begin
     ApplySettings;
     LocalBuildOptions.SwapMainLayout;
     FixAllButtons;
+
+    TestLayout := TNempLayout.Create;
+    TestLayout.ConstructionLayout := True;
+
+    TestLayout.TreePanel       := pnlTree;
+    TestLayout.CoverflowPanel  := pnlCoverflow;
+    TestLayout.CloudPanel      := pnlCloud;
+    TestLayout.PlaylistPanel   := pnlPlaylist;
+    TestLayout.MedialistPanel  := pnlMedialist;
+    TestLayout.DetailsPanel    := pnlDetails;
+    TestLayout.ControlsPanel   := pnlControls;
+    TestLayout.MainContainer   := MainContainer;
+    TestLayout.OnAfterContainerCreate := AfterContainerCreated;
+
+    MainContainer.OnEditButtonClick := BtnEditContainerClick;
+    MainContainer.CreateEditButtons;
+    MainContainer.SplitterMinSize := 33;
+    lblMainContainer.Font.Size := 11;
+    lblMainContainer.Caption := Format(FormBuilder_MainContainerCaption, [#$25E7, #$2B12]);
+
+    RefreshConstructionHint;
+    TestLayout.RefreshEditButtons;
 end;
 
 procedure TMainFormBuilder.FormDestroy(Sender: TObject);
 begin
     LocalBuildOptions.Free;
+    TestLayout.Free;
 end;
 
 
 
 procedure TMainFormBuilder.FormShow(Sender: TObject);
-begin
-    LocalBuildOptions.Assign(NempFormBuildOptions);
-    FixAllButtons;
-    FixSettingsGUI;
-end;
-
-
-
-
-procedure TMainFormBuilder.BtnUndoClick(Sender: TObject);
 begin
     LocalBuildOptions.Assign(NempFormBuildOptions);
     FixAllButtons;
@@ -330,6 +411,278 @@ begin
     FixAllButtons;
     FixSettingsGUI;
 end;
+
+procedure TMainFormBuilder.BtnUndoClick(Sender: TObject);
+begin
+    LocalBuildOptions.Assign(NempFormBuildOptions);
+    FixAllButtons;
+    FixSettingsGUI;
+end;
+
+procedure TMainFormBuilder.Button1Click(Sender: TObject);
+begin
+  TestLayout.Clear;
+  TestLayout.LoadSettings;
+  TestLayout.OnSplitterMoved := NewLayoutSplitterMoved;
+  TestLayout.BuildMainForm;
+
+  RefreshConstructionHint;
+  TestLayout.RefreshEditButtons;
+end;
+
+procedure TMainFormBuilder.WndProc(var Msg: TMessage);
+begin
+  inherited;
+  case Msg.Msg of
+    WM_REMOVEPANEL: begin
+      TestLayout.DeletePanel(TNempContainerPanel(Msg.WParam));
+      RefreshConstructionHint;
+      TestLayout.RefreshEditButtons;
+    end;
+  end;
+end;
+
+procedure TMainFormBuilder.RefreshConstructionHint;
+var
+  lc: Integer;
+    function AllPanelsPlaced: Boolean;
+    begin
+      result := (pnlTree.Parent <> grpBoxNempElements)
+          and (pnlCoverflow.Parent <> grpBoxNempElements)
+          and (pnlCloud.Parent <> grpBoxNempElements)
+          and (pnlPlaylist.Parent <> grpBoxNempElements)
+          and (pnlDetails.Parent <> grpBoxNempElements)
+          and (pnlMedialist.Parent <> grpBoxNempElements)
+          and (pnlControls.Parent <> grpBoxNempElements)
+    end;
+begin
+  lc := MainContainer.LeafCount;
+  lblMainContainer.Visible := lc = 1;
+
+  if AllPanelsPlaced then
+    lblElementCount.Caption := FormBuilder_ConstructionComplete
+  else
+  begin
+    if lc < 7 then
+      lblElementCount.Caption := Format(FormBuilder_ElementCount, [7 - lc])
+    else
+      if lc = 7 then
+        lblElementCount.Caption := FormBuilder_ElementCountComplete
+      else
+        lblElementCount.Caption := FormBuilder_ElementCountTooMany;
+  end;
+end;
+{
+  Remove a NempPanel from the Framework (and put it back to the Selection-Container)
+}
+
+procedure TMainFormBuilder.RemovePanelFromParent(aPanel: TNempPanel);
+var
+  aParent: TNempContainerPanel;
+begin
+  if assigned(aPanel.Parent) and (aPanel.Parent is TNempContainerPanel) then begin
+    aParent := TNempContainerPanel(aPanel.Parent);
+    aParent.RemovePanel(aPanel);
+    if aPanel.FixedHeight and (assigned(aParent.ParentPanel)) then begin
+      aParent.Align := alNone;
+      aParent.FixedHeight := False;
+      aParent.ParentPanel.AlignChildPanels(False);
+    end;
+  end;
+
+  RefreshConstructionHint;
+  TestLayout.RefreshEditButtons;
+end;
+
+procedure TMainFormBuilder.ResetNempPanel(aPanel: TNempPanel);
+
+begin
+  aPanel.Align := alNone;
+  RemovePanelFromParent(aPanel);
+
+  // put it back to the Selection-Container
+  aPanel.Parent := grpBoxNempElements;
+  aPanel.Visible := True;
+  aPanel.Top := 16;
+  aPanel.Left := aPanel.Tag;
+  aPanel.Width := 96;
+  if aPanel.FixedHeight then
+    aPanel.Height := 35
+  else
+    aPanel.Height := 50;
+  RefreshConstructionHint;
+  TestLayout.RefreshEditButtons;
+end;
+
+procedure TMainFormBuilder.ResetAllNempPanel;
+begin
+  ResetNempPanel(pnlTree);
+  ResetNempPanel(pnlCoverflow);
+  ResetNempPanel(pnlCloud);
+  ResetNempPanel(pnlPlaylist);
+  ResetNempPanel(pnlMedialist);
+  ResetNempPanel(pnlDetails);
+  ResetNempPanel(pnlControls);
+end;
+
+procedure TMainFormBuilder.BtnResetPanelClick(Sender: TObject);
+var
+  snd: TNempPanel;
+begin
+  snd := ((Sender as TButton).Parent) as TNempPanel;
+  ResetNempPanel(snd);
+end;
+
+{
+  Assign the NempPanels to a Container within the built up Framework
+}
+procedure TMainFormBuilder.NempContainerDragOver(Sender, Source: TObject; X,
+  Y: Integer; State: TDragState; var Accept: Boolean);
+var
+  snd, sndParent: TNempContainerPanel;
+  src: TNempPanel;
+begin
+  snd := Sender as TNempContainerPanel;
+  if (Source is TNempPanel)
+      and (snd.HierarchyLevel > 0)
+      and (snd.ChildPanelCount = 0)
+  then begin
+    src := TNempPanel(Source);
+    sndParent := snd.ParentPanel;
+    accept := (not src.FixedHeight)
+        or (src.FixedHeight and (sndParent.Orientation = poVertical));
+  end
+  else
+    accept := False;
+end;
+
+procedure TMainFormBuilder.NempContainerDragDrop(Sender, Source: TObject; X,
+  Y: Integer);
+var
+  snd: TNempContainerPanel;
+  src: TNempPanel;
+begin
+  snd := Sender as TNempContainerPanel;
+  src := TNempPanel(Source);
+  src.Align := alNone;
+  // remove the Panel from its previous Parent and add it to the DropTarget
+  RemovePanelFromParent(src);
+  snd.AddNempPanel(src);
+  // adjust the Height of the DropTarget (=Sender), if the SourcePanel has a FixedHeight (i.e. = ControlPanel)
+  if src.FixedHeight then begin
+    snd.Align := alNone;
+    snd.Height := src.Height;
+    snd.FixedHeight := True;
+    src.Align := alClient;
+    snd.ParentPanel.AlignChildPanels(false);
+  end else
+    src.Align := alClient;
+
+  //snd.AlignChildPanels(False);
+  RefreshConstructionHint;
+  TestLayout.RefreshEditButtons;
+end;
+
+
+
+procedure TMainFormBuilder.pnlDefaultContainerDragOver(Sender, Source: TObject;
+  X, Y: Integer; State: TDragState; var Accept: Boolean);
+begin
+  accept := (Source is TNempPanel);
+end;
+
+procedure TMainFormBuilder.pnlMedialistMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  if pnlMediaList.Align = alClient then
+    caption := 'client'
+  else
+    caption := 'NICHT client';
+
+  if pnlMedialist.Parent.Align = alClient then
+    caption := caption + '  Parent auch'
+  else
+    caption := caption + '  Parent NICHT';
+
+
+end;
+
+procedure TMainFormBuilder.pnlDefaultContainerDragDrop(Sender, Source: TObject;
+  X, Y: Integer);
+begin
+  ResetNempPanel(Source as TNempPanel);
+end;
+
+
+
+{
+
+}
+procedure TMainFormBuilder.MainContainerResize(Sender: TObject);
+begin
+  //  MainContainer.Caption := MainContainer.Caption + ' wuppdi';
+  TestLayout.ReAlignMainForm
+end;
+
+procedure TMainFormBuilder.BtnClearTESTClick(Sender: TObject);
+begin
+  //TestLayout.ReAlignMainForm;
+  //ResetAllNempPanel;
+  TestLayout.Clear;
+  ResetAllNempPanel;
+  MainContainer.OnEditButtonClick := BtnEditContainerClick;
+  self.MainContainer.CreateEditButtons;
+end;
+
+
+
+{
+  Schrittweise Aufbau per GUI-Interaktionen
+}
+
+procedure TMainFormBuilder.AfterContainerCreated(Sender: TObject);
+var
+  cntSend: TNempContainerPanel;
+begin
+  cntSend := Sender as TNempContainerPanel;
+
+  cntSend.OnEditButtonClick := BtnEditContainerClick;
+  cntSend.OnDragOver := NempContainerDragOver;
+  cntSend.OnDragDrop := NempContainerDragDrop;
+  cntSend.CreateEditButtons;
+  cntSend.ParentBackground := False;
+end;
+
+procedure TMainFormBuilder.BtnEditContainerClick(Sender: TObject);
+var
+  BtnPanel, ParentPanel, newPanel: TNempContainerPanel;
+begin
+  if not (Sender is TButton) then exit;
+  if not ((Sender as TButton).Parent is TNempContainerPanel) then exit;
+  BtnPanel :=  TNempContainerPanel((Sender as TButton).Parent);
+
+  case TButton(Sender).Tag of
+    1: TestLayout.Split(BtnPanel, poHorizontal);
+    2: TestLayout.Split(BtnPanel, poVertical);
+    // deleting a button (by deleting it's Parent) in its own OnClick event is not a good idea. Therefore:
+    3: PostMessage(Handle, WM_REMOVEPANEL, wParam(BtnPanel), 0); // see WndProc how to handle WM_REMOVEPANEL
+  end;
+  RefreshConstructionHint;
+  TestLayout.RefreshEditButtons;
+end;
+
+
+
+procedure TMainFormBuilder.NewLayoutSplitterMoved(Sender: TObject);
+//var
+//  panel: TNempContainerPanel;
+begin
+  //panel := TNempContainerPanel( (Sender as TSplitter).Parent);
+  //caption := 'Splitter auf Panel ' + Panel.ID + ' bewegt.';
+end;
+
+
+
 
 
 procedure TMainFormBuilder.BtnApplyClick(Sender: TObject);
@@ -358,6 +711,8 @@ begin
     BtnApplyClick(Sender);
     close;
 end;
+
+
 
 procedure TMainFormBuilder.BlockBrowseResize(Sender: TObject);
 begin
@@ -443,6 +798,31 @@ begin
     LocalBuildOptions.NewLayout := TMainLayout(cbMainLayout.ItemIndex);
     LocalBuildOptions.SwapMainLayout;
     FixAllButtons;
+end;
+
+procedure TMainFormBuilder.cbSelectionClick(Sender: TObject);
+
+  procedure ShowHide(aPanel: TNempPanel; doShow: Boolean);
+  begin
+    if DoShow then
+      aPanel.ShowPanel
+    else
+      if aPanel.Parent <> grpBoxNempElements  then
+        aPanel.HidePanel;
+  end;
+
+begin
+  case TCheckBox(Sender).Tag of
+    0: ShowHide(pnlTree, TCheckBox(Sender).Checked);
+    1: ShowHide(pnlCoverflow, TCheckBox(Sender).Checked);
+    2: ShowHide(pnlCloud, TCheckBox(Sender).Checked);
+    3: ShowHide(pnlPlaylist, TCheckBox(Sender).Checked);
+    4: ShowHide(pnlMedialist, TCheckBox(Sender).Checked);
+    5: ShowHide(pnlDetails, TCheckBox(Sender).Checked);
+  end;
+
+  TestLayout.ReAlignMainForm;
+
 end;
 
 procedure TMainFormBuilder.cbHideFileOverviewClick(Sender: TObject);
@@ -539,6 +919,8 @@ procedure TMainFormBuilder.SplitterTopMoved(Sender: TObject);
 begin
     LocalBuildOptions.OnSplitterMoved(Sender);
 end;
+
+
 
 procedure TMainFormBuilder.MainSplitterMoved(Sender: TObject);
 begin

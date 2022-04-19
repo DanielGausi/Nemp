@@ -36,16 +36,14 @@ uses Windows, Classes, SysUtils, StrUtils;
 
 //
 function IsValidFilenameFormat(aFormatString: String): Boolean;
-
 function IsValidFilename(aFilename: String): Boolean;
-
 function ConvertToFileName(aString: String): String;
 
 // vergleicht die Strings zeichenweise und erlaubt dabei tolerance-viele Fehler
 function SameString(string1, string2: UnicodeString; tolerance: Integer; var Fehlstelle: Integer): Boolean;
-
 function GetCommonString(Strings: TStringList; tolerance: Integer; var Fehlstelle: Integer): UnicodeString;
 
+function StrListValueDef(Source: TStringList; const Name, default: String): String;
 
 implementation
 
@@ -204,6 +202,13 @@ begin
       Fehlstelle := 0;
   end;
 
+end;
+
+function StrListValueDef(Source: TStringList; const Name, default: String): String;
+begin
+  result := Source.Values[Name];
+  if result = '' then
+    result := default;
 end;
 
 end.

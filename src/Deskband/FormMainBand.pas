@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, SHDocVw_TLB, ExtCtrls, StdCtrls, XPMan,
   NempApi, Menus,  ImgList, 
-  TaskbarStuff;
+  TaskbarStuff, System.ImageList;
 
 type
   TNempDeskBand = class(TForm)
