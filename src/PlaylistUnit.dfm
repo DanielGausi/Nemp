@@ -13,7 +13,6 @@ object PlaylistForm: TPlaylistForm
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
-  OldCreateOrder = False
   OnActivate = FormActivate
   OnClose = FormClose
   OnHide = FormHide
@@ -22,7 +21,7 @@ object PlaylistForm: TPlaylistForm
   OnMouseMove = FormMouseMove
   OnMouseUp = FormMouseUp
   OnResize = FormResize
-  PixelsPerInch = 96
+  OnShow = FormShow
   TextHeight = 13
   object ContainerPanelPlaylistForm: TNempPanel
     Tag = 1
@@ -36,6 +35,7 @@ object PlaylistForm: TPlaylistForm
     OnMouseDown = ContainerPanelPlaylistFormMouseDown
     OnMouseMove = ContainerPanelPlaylistFormMouseMove
     OnMouseUp = ContainerPanelPlaylistFormMouseUp
+    Ratio = 0
     OnPaint = ContainerPanelPlaylistFormPaint
     OwnerDraw = False
     DesignSize = (
@@ -61,6 +61,20 @@ object PlaylistForm: TPlaylistForm
       FocusDrawMode = fdm_Windows
       Color1 = clBlack
       Color2 = clBlack
+    end
+    object pnlSplit: TPanel
+      AlignWithMargins = True
+      Left = 7
+      Top = 2
+      Width = 406
+      Height = 294
+      Margins.Left = 7
+      Margins.Top = 2
+      Margins.Right = 7
+      Margins.Bottom = 7
+      Align = alClient
+      BevelOuter = bvNone
+      TabOrder = 1
     end
   end
 end

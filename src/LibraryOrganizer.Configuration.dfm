@@ -1,8 +1,11 @@
 object FormLibraryConfiguration: TFormLibraryConfiguration
   Left = 0
   Top = 0
+  Hint = 
+    'Add new files also to the "Default" category, if files are expli' +
+    'citly added to the "New" category.'
   Caption = 'Library configuration'
-  ClientHeight = 500
+  ClientHeight = 495
   ClientWidth = 686
   Color = clBtnFace
   Constraints.MinHeight = 400
@@ -15,16 +18,16 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 13
   object PnlButtons: TPanel
     Left = 0
-    Top = 459
+    Top = 454
     Width = 686
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitTop = 463
     DesignSize = (
       686
       41)
@@ -65,14 +68,15 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
     Left = 0
     Top = 0
     Width = 686
-    Height = 459
+    Height = 454
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
+    ExplicitHeight = 463
     object Splitter1: TSplitter
       Left = 180
       Top = 0
-      Height = 459
+      Height = 454
       ExplicitLeft = 201
       ExplicitHeight = 370
     end
@@ -80,18 +84,17 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
       Left = 0
       Top = 0
       Width = 180
-      Height = 459
+      Height = 454
       Align = alLeft
       Caption = 'Categories'
       Constraints.MinWidth = 180
-      DoubleBuffered = True
-      ParentDoubleBuffered = False
       TabOrder = 0
+      ExplicitHeight = 463
       object VSTCategories: TVirtualStringTree
         Left = 2
         Top = 15
         Width = 176
-        Height = 271
+        Height = 243
         Align = alClient
         Colors.UnfocusedSelectionColor = clHighlight
         Colors.UnfocusedSelectionBorderColor = clHighlight
@@ -109,25 +112,26 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
         OnDragDrop = VSTCategoriesDragDrop
         OnEditing = VSTCategoriesEditing
         OnGetText = VSTCategoriesGetText
+        OnPaintText = VSTCategoriesPaintText
         OnNewText = VSTCategoriesNewText
         Touch.InteractiveGestures = [igPan, igPressAndTap]
         Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+        ExplicitHeight = 252
         Columns = <
           item
             Position = 0
-            Width = 176
+            Width = 172
           end>
       end
       object pnlCategoryButtons: TPanel
         Left = 2
-        Top = 286
+        Top = 258
         Width = 176
         Height = 62
         Align = alBottom
         BevelOuter = bvNone
-        DoubleBuffered = True
-        ParentDoubleBuffered = False
         TabOrder = 1
+        ExplicitTop = 267
         object BtnAddCategory: TButton
           Left = 8
           Top = 8
@@ -147,15 +151,15 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
       end
       object pnlCategoryAdds: TPanel
         Left = 2
-        Top = 348
+        Top = 320
         Width = 176
-        Height = 109
+        Height = 132
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 2
         DesignSize = (
           176
-          109)
+          132)
         object lblDefaultCategory: TLabel
           Left = 8
           Top = 8
@@ -163,10 +167,17 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
           Height = 13
           Caption = 'Default category'
         end
+        object lblRecentlyAddedCategory: TLabel
+          Left = 8
+          Top = 54
+          Width = 131
+          Height = 13
+          Caption = 'Category "Recently added"'
+        end
         object cbDefaultCategory: TComboBox
           Left = 8
           Top = 27
-          Width = 154
+          Width = 150
           Height = 21
           Style = csDropDownList
           Anchors = [akLeft, akTop, akRight]
@@ -175,7 +186,7 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
         end
         object cbNewFilesCategory: TComboBox
           Left = 8
-          Top = 77
+          Top = 72
           Width = 154
           Height = 21
           Style = csDropDownList
@@ -183,36 +194,23 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
           TabOrder = 1
           OnChange = cbNewFilesCategoryChange
         end
-        object checkBoxNewFilesCategory: TCheckBox
-          Left = 8
-          Top = 54
-          Width = 150
-          Height = 17
-          Anchors = [akLeft, akTop, akRight]
-          Caption = 'Add new files to'
-          Checked = True
-          State = cbChecked
-          TabOrder = 2
-          OnClick = checkBoxNewFilesCategoryClick
-        end
       end
     end
     object grpBoxSortLevels: TGroupBox
       Left = 183
       Top = 0
       Width = 184
-      Height = 459
+      Height = 454
       Align = alClient
       Caption = 'Category layers'
       Constraints.MinWidth = 180
-      DoubleBuffered = True
-      ParentDoubleBuffered = False
       TabOrder = 1
+      ExplicitHeight = 463
       object VSTSortings: TVirtualStringTree
         Left = 2
         Top = 15
         Width = 180
-        Height = 272
+        Height = 243
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -230,17 +228,19 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
         OnDragDrop = VSTSortingsDragDrop
         OnFocusChanged = VSTSortingsFocusChanged
         OnGetText = VSTSortingsGetText
+        OnPaintText = VSTCategoriesPaintText
         Touch.InteractiveGestures = [igPan, igPressAndTap]
         Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+        ExplicitHeight = 252
         Columns = <
           item
             Position = 0
-            Width = 180
+            Width = 176
           end>
       end
       object pnlLayerButtons: TPanel
         Left = 2
-        Top = 287
+        Top = 258
         Width = 180
         Height = 92
         Align = alBottom
@@ -248,6 +248,7 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
         DoubleBuffered = True
         ParentDoubleBuffered = False
         TabOrder = 1
+        ExplicitTop = 267
         object BtnAddSubLayer: TButton
           Left = 8
           Top = 33
@@ -275,24 +276,27 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
       end
       object pnlLayerAdds: TPanel
         Left = 2
-        Top = 379
+        Top = 350
         Width = 180
-        Height = 78
+        Height = 102
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 2
+        ExplicitLeft = 3
+        ExplicitTop = 356
       end
     end
     object PnlSettings: TPanel
       Left = 367
       Top = 0
       Width = 319
-      Height = 459
+      Height = 454
       Align = alRight
       BevelOuter = bvNone
       DoubleBuffered = True
       ParentDoubleBuffered = False
       TabOrder = 2
+      ExplicitHeight = 463
       object grpBoxAlbumSettings: TGroupBox
         Left = 0
         Top = 0
@@ -301,7 +305,6 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
         Align = alTop
         Caption = 'Album settings'
         TabOrder = 0
-        ExplicitTop = 88
         DesignSize = (
           319
           137)
@@ -352,17 +355,16 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
       end
       object grpBoxView: TGroupBox
         Left = 0
-        Top = 355
+        Top = 376
         Width = 319
-        Height = 104
+        Height = 78
         Align = alClient
         Caption = 'Display settings'
         TabOrder = 3
-        ExplicitTop = 361
-        ExplicitHeight = 98
+        ExplicitHeight = 87
         DesignSize = (
           319
-          104)
+          78)
         object cbShowCoverForAlbum: TCheckBox
           Left = 16
           Top = 24
@@ -372,22 +374,14 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
           Caption = 'Show cover art on layer "Album"'
           TabOrder = 0
         end
-        object cbShowCollectionCount: TCheckBox
+        object cbShowElementCount: TCheckBox
           Left = 16
           Top = 39
           Width = 292
           Height = 17
           Anchors = [akLeft, akTop, akRight]
-          Caption = 'Show number of elements in collections'
+          Caption = 'Show number of elements'
           TabOrder = 1
-        end
-        object cbShowCategoryCount: TCheckBox
-          Left = 16
-          Top = 55
-          Width = 273
-          Height = 17
-          Caption = 'Show number of elements in categories'
-          TabOrder = 2
         end
       end
       object grpBoxPlaylists: TGroupBox
@@ -398,7 +392,6 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
         Align = alTop
         Caption = 'Playlist settings'
         TabOrder = 1
-        ExplicitTop = 225
         object lblPlaylistCaptionMode: TLabel
           Left = 16
           Top = 24
@@ -461,10 +454,11 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
         Left = 0
         Top = 273
         Width = 319
-        Height = 82
+        Height = 103
         Align = alTop
         Caption = 'Coverflow settings'
         TabOrder = 2
+        ExplicitLeft = 4
         object lblCoverFlowSorting: TLabel
           Left = 16
           Top = 24
@@ -473,21 +467,35 @@ object FormLibraryConfiguration: TFormLibraryConfiguration
           Caption = 'Sort Coverflow by'
         end
         object btnEditCoverflow: TButton
-          Left = 256
-          Top = 41
-          Width = 36
-          Height = 25
+          Left = 272
+          Top = 43
+          Width = 28
+          Height = 21
           Caption = '...'
           TabOrder = 0
           OnClick = btnEditCoverflowClick
         end
-        object cbSortCoverflow: TComboBox
+        object cbMissingCoverMode: TComboBox
           Left = 16
-          Top = 43
-          Width = 225
+          Top = 70
+          Width = 250
           Height = 21
           Style = csDropDownList
+          ItemIndex = 1
           TabOrder = 1
+          Text = 'No special handling of missing cover'
+          Items.Strings = (
+            'All missing cover at the beginning'
+            'No special handling of missing cover'
+            'All missing cover at the end')
+        end
+        object edtCoverFlowSortings: TEdit
+          Left = 16
+          Top = 43
+          Width = 250
+          Height = 21
+          ReadOnly = True
+          TabOrder = 2
         end
       end
     end

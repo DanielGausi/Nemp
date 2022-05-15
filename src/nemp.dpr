@@ -148,7 +148,7 @@ var EVILHACKX, EVILHACKY: INTEGER;
 
 begin
 
-    ReportMemoryLeaksOnShutdown := True; //False;
+    ReportMemoryLeaksOnShutdown := False;
 
     Application.Initialize;
     Application.MainFormOnTaskbar := True;

@@ -91,7 +91,7 @@ Const SO_Pfad = 0;
 
   function BinaerPlaylistSuche(Liste: TLibraryPlaylistList; filename: UnicodeString; l,r:integer):integer;
   procedure MergePlaylists(MainList, NewList: TLibraryPlaylistList);
-  Procedure AntiMergePlaylists(MainList, DeleteList: TLibraryPlaylistList);
+  // Procedure AntiMergePlaylists(MainList, DeleteList: TLibraryPlaylistList);
 
 
 implementation
@@ -133,7 +133,7 @@ procedure MergePlaylists(MainList, NewList: TLibraryPlaylistList);
 var
   i: Integer;
 begin
-  // System Change 2021: Do not use linear-time merging here
+  // System Change 2021/22: Do not use linear-time merging here
   // We don't have THAT many Playlists, so we just add the new Files, and sort the whole list again
   for i := 0 to NewList.Count - 1 do
     MainList.Add(NewList[i]);
@@ -142,7 +142,7 @@ begin
 end;
 
 
-Procedure AntiMergePlaylists(MainList, DeleteList: TLibraryPlaylistList);
+(*Procedure AntiMergePlaylists(MainList, DeleteList: TLibraryPlaylistList);
 var
   i: Integer;
 begin
@@ -152,6 +152,6 @@ begin
     MainList.Remove(DeleteList[i]);
   end;
 end;
-
+*)
 
 end.

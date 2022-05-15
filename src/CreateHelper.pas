@@ -43,7 +43,7 @@ unit CreateHelper;
 interface
 
     uses Forms, Windows, Graphics, Classes, Menus, Controls, SysUtils, IniFiles, VirtualTrees, Messages,
-    dialogs, shellApi, ID3GenreList, ActiveX, OneInst
+    dialogs, shellApi, ID3GenreList, ActiveX, OneInst, MainFormlayout
     {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF};
 
 
@@ -97,7 +97,8 @@ begin
         end;
         LoadWindowPosition; // Nemp_MainForm
 
-        NempFormBuildOptions.LoadSettings;
+        //NempFormBuildOptions.LoadSettings;
+        NempLayout.LoadSettings;
 
         TDrivemanager.LoadSettings;
         NempDisplay.LoadSettings;
@@ -130,6 +131,7 @@ begin
         // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         //  MedienBib.NewCoverFlow.InitList(MedienBib.CoverViewList, MedienBib.CoverCount);
         MedienBib.LoadSettings;
+        NempLayout.BrowseMode := MedienBib.BrowseMode;
 
         VSTColumns_LoadSettings(VST);
 
@@ -372,21 +374,16 @@ begin
         TabBtn_Marker.Hint := MainForm_MarkerBtnHint;
 
         // Optionen verarbeiten, Variablen entsprechend setzen
-        PM_P_ViewStayOnTop.Checked := NempOptions.MiniNempStayOnTop;
-        MM_O_ViewStayOnTop.Checked := NempOptions.MiniNempStayOnTop;
-
+        actToggleStayOnTop.Checked := NempOptions.MiniNempStayOnTop;
         AutoShowDetailsTMP := False; /// NempOptions.AutoShowDetails;
 
         // Menüeinträge checken//unchecken
-        PM_P_ViewSeparateWindows_Equalizer.Checked := NempOptions.FormPositions[nfExtendedControls].Visible; // .ErweiterteControlsVisible;
-        PM_P_ViewSeparateWindows_Playlist.Checked  := NempOptions.FormPositions[nfPlaylist].Visible; //.PlaylistVisible;
-        PM_P_ViewSeparateWindows_Medialist.Checked := NempOptions.FormPositions[nfMediaLibrary].Visible; //.MedienlisteVisible;
-        PM_P_ViewSeparateWindows_Browse.Checked    := NempOptions.FormPositions[nfBrowse].Visible; //.AuswahlSucheVisible;
+        actSplitToggleFileOverview.Checked := NempOptions.FormPositions[nfExtendedControls].Visible;
+        actSplitTogglePlaylist.Checked  := NempOptions.FormPositions[nfPlaylist].Visible;
+        actSplitToggleTitleList.Checked := NempOptions.FormPositions[nfMediaLibrary].Visible;
+        actSplitToggleBrowseList.Checked    := NempOptions.FormPositions[nfBrowse].Visible;
+        // The Checked-Status for the Compact-Versions of these action will be done in the "NempLayout.OnAfterBuild"
 
-        MM_O_ViewSeparateWindows_Equalizer.Checked := NempOptions.FormPositions[nfExtendedControls].Visible; //.ErweiterteControlsVisible;
-        MM_O_ViewSeparateWindows_Playlist.Checked  := NempOptions.FormPositions[nfPlaylist].Visible; //.PlaylistVisible;
-        MM_O_ViewSeparateWindows_Medialist.Checked := NempOptions.FormPositions[nfMediaLibrary].Visible; //.MedienlisteVisible;
-        MM_O_ViewSeparateWindows_Browse.Checked    := NempOptions.FormPositions[nfBrowse].Visible; //.AuswahlSucheVisible;
 
         if NempOptions.FullRowSelect then
             VST.TreeOptions.SelectionOptions := VST.TreeOptions.SelectionOptions + [toFullRowSelect]
@@ -456,6 +453,7 @@ end;
 procedure ApplyLayout;
 var tmpStr: String;
 begin
+    NempLayout.BuildMainForm(nil);
     with Nemp_MainForm do
     begin
         // Ggf. Tray-Icon erzeugen und das erzeugen in TrayIconAdded merken
@@ -593,18 +591,18 @@ begin
         AutoLoadPlaylist(TmpLastExitWasOK);
         NempPlaylist.PlaylistManager.InitPlaylistFilenames;
 
+        __MainContainerPanel.ID := 'A';
         ApplyLayout;
 
         UpdateSplashScreen(SplashScreen_GenerateWindows);
 
-        _TopMainPanel.Constraints.MinHeight := NempFormBuildOptions.MainPanelMinHeight;
-        _TopMainPanel.Constraints.MinWidth := NempFormBuildOptions.MainPanelMinWidth;
-
-        GRPBOXArtistsAlben.Height := GRPBOXPlaylist.Height;
-        GRPBOXArtistsAlben.Anchors := [akleft, aktop, akright, akBottom];
-
+        //_TopMainPanel.Constraints.MinHeight := NempFormBuildOptions.MainPanelMinHeight;
+        //_TopMainPanel.Constraints.MinWidth := NempFormBuildOptions.MainPanelMinWidth;
+        //GRPBOXArtistsAlben.Height := GRPBOXPlaylist.Height;
+        //GRPBOXArtistsAlben.Anchors := [akleft, aktop, akright, akBottom];
+        // yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
         UpdateFormDesignNeu(NempOptions.AnzeigeMode);
-        NempFormBuildOptions.ResizeSubPanel(AuswahlPanel, ArtistsVST, NempFormBuildOptions.BrowseArtistRatio);
+        NempLayout.ResizeSubPanel(TreePanel, ArtistsVST, NempLayout.TreeViewRatio);
 
         if NempSkin.isActive then
             MedienBib.NewCoverFlow.SetColor(NempSkin.SkinColorScheme.FormCL)

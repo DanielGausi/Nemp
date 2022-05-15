@@ -3,7 +3,7 @@ unit MainFormLayout;
 interface
 
 uses
-  Windows, SysUtils, Classes, Controls, ExtCtrls, Messages, math,
+  Windows, SysUtils, Classes, Controls, ExtCtrls, Messages, math, System.IniFiles,
   System.Generics.Collections, System.Generics.Defaults, Nemp_ConstantsAndTypes, NempPanel;
 
 
@@ -19,6 +19,8 @@ type
     nbControls
   );
 
+  teFileOverViewMode = (fovBoth, fovCover, fovText);
+
 const
   cNempBlocksID: Array[teNempBlocks] of Char = ( 'a', 'b', 'c', 'p', 'm', 'd', 'x');
 
@@ -28,6 +30,7 @@ type
     private
       fBlocksUsed: Array[teNempBlocks] of Boolean;
       fNempBlocks: Array[teNempBlocks] of TNempPanel;
+      fBlockHeapControl: TWinControl;
 
       fConstructionLayout: Boolean;
       fCriticalParsingError: Boolean;
@@ -36,11 +39,28 @@ type
       fOnSplitterMoved: TNotifyEvent;
       fOnContainerResize: TNotifyEvent;
       fOnAfterContainerCreate: TNotifyEvent;
+      fOnAfterBuild: TNotifyEvent;
 
       // ContainerPanels: sorted list of freshly created ContainerPanels A, B, C, D, E, F, G (at most, probably less)
       // BuildInstructions: sorted list with instructions what SubPanels should be created for the Panel with the ID
-      fContainerPanels: TNempPanelList;
+      fContainerPanels: TNempContainerPanelList;
       fBuildInstructions: TStringList;
+      fBuildInProcess: Boolean;
+
+      // addtional properties
+      fFileOverviewCoverRatio: Integer;
+      fTreeViewRatio         : Integer;
+      fTreeviewOrientation   : Integer; // stacked (new) or side by side (classic)
+      fShowControlCover      : Boolean;
+      fFileOVerviewOrientation: Integer;
+      fFileOverviewMode: teFileOverViewMode;
+
+
+      fShowBibSelection: Boolean; // Show TreeView, Coverflow, tagCloud
+      fShowMedialist: Boolean; // Show the MediaList (if not: Only access to full Albums/Directories/Artists/whatever the Library is configured by)
+      fShowFileOverview: Boolean; // Show the File Overview Panel
+
+      fBrowseMode: Integer;
 
       procedure TestAddBlock(ID: teNempBlocks);
       procedure TestAddContainer(ID: Char; DummyContainers: TStringList);
@@ -57,9 +77,33 @@ type
       function TestInstructions(aBuildInstructions: TStrings): Boolean;
       procedure SetDefaultInstructions(aBuildInstructions: TStrings);
 
-      procedure PrepareRebuild;
+
+      function CreateInstructionLine(aContainer: TNempContainerPanel): string;
+      function CreateRatioLine(aContainer: TNempContainerPanel): string;
+
+
     public
       property ConstructionLayout: Boolean read fConstructionLayout write fConstructionLayout;
+      property BlockHeapControl: TWinControl read fBlockHeapControl write fBlockHeapControl;
+      property BuildInProcess: Boolean read fBuildInProcess;
+
+
+      property TreeviewOrientation   : Integer read fTreeviewOrientation    write fTreeviewOrientation   ;
+      property FileOVerviewOrientation: Integer read fFileOVerviewOrientation write fFileOVerviewOrientation ;
+      property FileOverviewMode  : teFileOverViewMode read fFileOverviewMode   write fFileOverviewMode   ;
+      property ShowControlCover : Boolean read fShowControlCover  write fShowControlCover;
+
+      // Show/Hide some of the Sections in the MainWindow. Playlist and Controls are always visible
+      property ShowBibSelection : Boolean read fShowBibSelection  write fShowBibSelection;
+      property ShowMedialist    : Boolean read fShowMedialist     write fShowMedialist   ;
+      property ShowFileOverview : Boolean read fShowFileOverview  write fShowFileOverview;
+      // only relevant in the real MainWindow, not for the FormDesigner
+      property FileOverviewCoverRatio: Integer read fFileOverviewCoverRatio write fFileOverviewCoverRatio;
+      property TreeViewRatio         : Integer read fTreeViewRatio          write fTreeViewRatio         ;
+
+
+      property BrowseMode: Integer read fBrowseMode write fBrowseMode;
+
       property MainContainer: TNempContainerPanel read fMainContainer write fMainContainer;
       property TreePanel: TNempPanel Index nbTree read GetNempBlock write SetNempBlock;
       property CoverflowPanel: TNempPanel Index nbCoverflow read GetNempBlock write SetNempBlock;
@@ -72,58 +116,103 @@ type
       property OnSplitterMoved: TNotifyEvent read fOnSplitterMoved write fOnSplitterMoved;
       property OnContainerResize: TNotifyEvent read fOnContainerResize write fOnContainerResize;
       property OnAfterContainerCreate: TNotifyEvent read fOnAfterContainerCreate write fOnAfterContainerCreate;
-
+      property OnAfterBuild: TNotifyEvent read fOnAfterBuild write fOnAfterBuild;
 
       constructor Create;
       destructor Destroy; override;
 
+      procedure Assign(Source: TNempLayout);
+
       procedure Clear;
       procedure LoadSettings;
       procedure SaveSettings;
+      procedure ResetToDefault;
+      function LoadPreset(Source: TMemIniFile; Section: String; ReloadRatios: Boolean): Boolean;
 
+      procedure PrepareRebuild;
+      procedure PrepareSplitForm;
       procedure BuildMainForm(Instructions: TStringList = Nil);
+      procedure ReNumberContainerPanels;
+      procedure CreateBuildInstructions(dest: TStrings);
+      procedure Simplify; //(Complete: Boolean);
+
+      procedure RefreshVisibilty;
       procedure ReAlignMainForm;
-      procedure RefreshEditButtons;
+      procedure RefreshEditButtons(SplitComplete: Boolean);
 
       procedure Split(Source: TNempContainerPanel; SplitOrientation: tePanelOrientation);
       procedure DeletePanel(Source: TNempContainerPanel);
 
+      procedure ResizeSubPanel(ABlockPanel: TPanel; aSubPanel: TWinControl; aRatio: Integer);
+
   end;
+
+function NempLayout: TNempLayout;
+function NempLayout_Ready: Boolean;
 
 implementation
 
 uses Dialogs, StringHelper;
 
+var
+  fNempLayout: TNempLayout;
+
 const
   cIniMainFormLayout: String = 'MainFormLayout';
 
-  cMAXBUILD = 6;
+  cMAXBUILD = 25;
+  // note: Changes should also be done in "SetDefaultInstructions"
+  cInitBuild: String = 'haCD'; // TreeView
+  cInitRatio: String = '20,80,40';
+  cDefaultBuild: Array[0..cMAXBUILD] of String = (
+    'vEmx', // MediaList, Controls
+    'vpd',  // Playlist, FileOverwiew
+    'hbc',  // CoverFlow, TagClouD
+    '','','','','','','','','','','','','','','','','','','','','','',''
+  );
+  cDefaultRatio: Array[0..cMAXBUILD] of String = (
+    '50,50,50', // last 50 is ignored (fixed height Controls)
+    '60,40',
+    '50,50', // doesn't matter, only one is visible
+    '','','','','','','','','','','','','','','','','','','','','','',''
+  );
+
+  {
   cInitBuild: String = 'hBC';
   cInitRatio: String = '75,25';
   cDefaultBuild: Array[0..cMAXBUILD] of String = (
-    'vDmx',
-    'vpd',  // playlist, details
-    'habc', // drei Browsemodi (erstmal auf einem Panel, wie bisher)
-    '',
-    '',
-    '',
-    ''
+    'vDmx', // Medialist, Controls
+    'vpd',  // Playlist, FileOverwiew
+    'habc', // TreeView, CoverFlow, TagClouD
+    '','','','','','','','','','','','','','','','','','','','','','',''
   );
   cDefaultRatio: Array[0..cMAXBUILD] of String = (
     '34,66',
     '80,20',
     '20,40,20',
-    '',
-    '',
-    '',
-    ''
+    '','','','','','','','','','','','','','','','','','','','','','',''
   );
+  }
+
+function NempLayout: TNempLayout;
+begin
+  if not assigned(fNempLayout) then
+    fNempLayout := TNempLayout.Create;
+
+  result := fNempLayout;
+end;
+
+function NempLayout_Ready: Boolean;
+begin
+  result := assigned(fNempLayout);
+end;
 
 { TNempLayout }
 
 constructor TNempLayout.Create;
 begin
-  fContainerPanels := TNempPanelList.Create(False);
+  BlockHeapControl := Nil;
+  fContainerPanels := TNempContainerPanelList.Create(False);
   fBuildInstructions := TStringList.Create;
 
   fCriticalParsingError := False;
@@ -134,8 +223,13 @@ destructor TNempLayout.Destroy;
 var
   i: Integer;
 begin
-  for i := fContainerPanels.Count - 1 downto 0 do
-    fContainerPanels[i].Free;
+  BlockHeapControl := Nil;
+  try
+    for i := fContainerPanels.Count - 1 downto 0 do
+      fContainerPanels[i].Free;
+  except
+  ;
+  end;
 
   fContainerPanels.Free;
   fBuildInstructions.Free;
@@ -143,7 +237,18 @@ begin
   inherited;
 end;
 
+procedure TNempLayout.Assign(Source: TNempLayout);
+begin
+  fBuildInstructions.Assign(Source.fBuildInstructions);
+  fTreeviewOrientation    := Source.fTreeviewOrientation;
+  fFileOVerviewOrientation  := Source.fFileOVerviewOrientation;
+  FileOverviewMode  := Source.FileOverviewMode;
+  fShowControlCover := Source.fShowControlCover;
 
+  fShowBibSelection  := Source.fShowBibSelection;
+  fShowMedialist     := Source.fShowMedialist;
+  fShowFileOverview  := Source.fShowFileOverview;
+end;
 
 procedure TNempLayout.Clear;
 var
@@ -152,17 +257,15 @@ var
 begin
   for iBlock := Low(teNempBlocks) to High(teNempBlocks) do begin
     fBlocksUsed[iBlock] := False;
-    self.fNempBlocks[iBlock].Parent := Nil;
+    fNempBlocks[iBlock].Parent := BlockHeapControl;
   end;
-
   for i := fContainerPanels.Count - 1 downto 0 do
     fContainerPanels[i].Free;
-
+  fMainContainer.Clear;
   fContainerPanels.Clear;
   fBuildInstructions.Clear;
   fCriticalParsingError := False;
 end;
-
 
 procedure TNempLayout.SetNempBlock(Index: teNempBlocks; Value: TNempPanel);
 begin
@@ -173,19 +276,191 @@ begin
   result := fNempBlocks[Index];
 end;
 
-
 procedure TNempLayout.LoadSettings;
+//var
+//  intFovMode: Integer;
 begin
+
+  LoadPreset(NempSettingsManager, cIniMainFormLayout, True);
+
+{
   NempSettingsManager.ReadSectionValues(cIniMainFormLayout, fBuildInstructions);
 
   if not TestInstructions(fBuildInstructions) then
     SetDefaultInstructions(fBuildInstructions);
+
+  fFileOverviewCoverRatio := NempSettingsManager.ReadInteger(cIniMainFormLayout, 'FileOverviewCoverRatio', 50);
+  fTreeViewRatio := NempSettingsManager.ReadInteger(cIniMainFormLayout, 'TreeViewRatio', 30);
+  fTreeviewOrientation := NempSettingsManager.ReadInteger(cIniMainFormLayout, 'TreeviewOrientation', 0);
+  fFileOVerviewOrientation := NempSettingsManager.ReadInteger(cIniMainFormLayout, 'FileOVerviewOrientation', 0);
+  intFovMode := NempSettingsManager.ReadInteger(cIniMainFormLayout, 'FileOverviewMode', 0);
+  case intFovMode of
+    1: fFileOverviewMode := fovCover;
+    2:  fFileOverviewMode := fovText;
+  else
+     fFileOverviewMode := fovBoth;
+  end;
+
+  fShowControlCover := NempSettingsManager.ReadBool(cIniMainFormLayout, 'ShowControlCover', True);
+  fShowBibSelection := NempSettingsManager.ReadBool(cIniMainFormLayout, 'ShowBibSelection', True);
+  fShowMedialist    := NempSettingsManager.ReadBool(cIniMainFormLayout, 'ShowMedialist', True);
+  fShowFileOverview := NempSettingsManager.ReadBool(cIniMainFormLayout, 'ShowFileOverview', True);
+}
 end;
 
-procedure TNempLayout.SaveSettings;
+function TNempLayout.LoadPreset(Source: TMemIniFile; Section: String; ReloadRatios: Boolean): Boolean;
+var
+  intFovMode: Integer;
 begin
-  // todo:
+  Source.ReadSectionValues(Section, fBuildInstructions);
+  result := TestInstructions(fBuildInstructions);
+
+  if not result then begin
+    SetDefaultInstructions(fBuildInstructions);
+    exit;
+  end;
+
+  if ReloadRatios then begin
+    fFileOverviewCoverRatio := NempSettingsManager.ReadInteger(cIniMainFormLayout, 'FileOverviewCoverRatio', 50);
+    fTreeViewRatio := NempSettingsManager.ReadInteger(cIniMainFormLayout, 'TreeViewRatio', 30);
+  end;
+
+  fTreeviewOrientation := Source.ReadInteger(Section, 'TreeviewOrientation', 1);
+  fFileOVerviewOrientation := Source.ReadInteger(Section, 'FileOVerviewOrientation', 0);
+  intFovMode := Source.ReadInteger(Section, 'FileOverviewMode', 0);
+  case intFovMode of
+    1: fFileOverviewMode := fovCover;
+    2:  fFileOverviewMode := fovText;
+  else
+    fFileOverviewMode := fovBoth;
+  end;
+
+  fShowControlCover := Source.ReadBool(Section, 'ShowControlCover', True);
+  fShowBibSelection := Source.ReadBool(Section, 'ShowBibSelection', True);
+  fShowMedialist    := Source.ReadBool(Section, 'ShowMedialist', True);
+  fShowFileOverview := Source.ReadBool(Section, 'ShowFileOverview', True);
 end;
+
+
+procedure TNempLayout.SaveSettings;
+var
+  i: Integer;
+begin
+  NempSettingsManager.EraseSection(cIniMainFormLayout);
+  NempSettingsManager.WriteString(cIniMainFormLayout, 'A', CreateInstructionLine(MainContainer));
+  NempSettingsManager.WriteString(cIniMainFormLayout, 'ARatio', CreateRatioLine(MainContainer));
+
+  for i := 0 to fContainerPanels.Count - 1 do begin
+    NempSettingsManager.WriteString(cIniMainFormLayout, fContainerPanels[i].ID, CreateInstructionLine(fContainerPanels[i]));
+    NempSettingsManager.WriteString(cIniMainFormLayout, fContainerPanels[i].ID + 'Ratio', CreateRatioLine(fContainerPanels[i]));
+  end;
+
+  NempSettingsManager.WriteInteger(cIniMainFormLayout, 'FileOverviewCoverRatio', fFileOverviewCoverRatio);
+  NempSettingsManager.WriteInteger(cIniMainFormLayout, 'TreeViewRatio', fTreeViewRatio);
+  NempSettingsManager.WriteInteger(cIniMainFormLayout, 'TreeviewOrientation', fTreeviewOrientation);
+  NempSettingsManager.WriteInteger(cIniMainFormLayout, 'FileOVerviewOrientation', fFileOVerviewOrientation);
+  NempSettingsManager.WriteInteger(cIniMainFormLayout, 'FileOverviewMode', Integer(fFileOverviewMode));
+
+  NempSettingsManager.WriteBool(cIniMainFormLayout, 'ShowControlCover', fShowControlCover);
+  NempSettingsManager.WriteBool(cIniMainFormLayout, 'ShowBibSelection', fShowBibSelection);
+  NempSettingsManager.WriteBool(cIniMainFormLayout, 'ShowMedialist', fShowMedialist);
+  NempSettingsManager.WriteBool(cIniMainFormLayout, 'ShowFileOverview', fShowFileOverview);
+end;
+
+procedure TNempLayout.ResetToDefault;
+begin
+  SetDefaultInstructions(fBuildInstructions);
+  fTreeviewOrientation := 0;
+  fShowControlCover := True;
+  fShowBibSelection := True;
+  fShowMedialist    := True;
+  fShowFileOverview := True;
+end;
+
+procedure TNempLayout.ReNumberContainerPanels;
+begin
+  for var i: Integer := 0 to fContainerPanels.Count - 1 do begin
+    fContainerPanels[i].ID := chr(ord('B') + i);
+    fContainerPanels[i].Caption := chr(ord('B') + i);
+  end;
+end;
+
+procedure TNempLayout.CreateBuildInstructions(dest: TStrings);
+var
+  i: Integer;
+begin
+  ReNumberContainerPanels;
+
+  dest.Clear;
+  dest.Add('A=' + CreateInstructionLine(MainContainer));
+  for i := 0 to fContainerPanels.Count - 1 do
+    dest.Add(fContainerPanels[i].ID + '=' + CreateInstructionLine(fContainerPanels[i]));
+
+  dest.Add('ARatio=' + CreateRatioLine(MainContainer));
+  for i := 0 to fContainerPanels.Count - 1 do
+    dest.Add(fContainerPanels[i].ID + 'Ratio=' + CreateRatioLine(fContainerPanels[i]));
+
+end;
+
+procedure TNempLayout.Simplify; //(Complete: Boolean);
+var
+  Instructions: TStringList;
+  WorkToDo, Changed: Boolean;
+  redIdx: Integer;
+  redID, replaceID: String;
+
+  function DetectRedundantInstruction(out idx: Integer; out idName, idReplace: String): Boolean;
+  begin
+    result := False;
+    for var i: Integer := Instructions.Count - 1 downto 0 do begin
+      if (length(Instructions.ValueFromIndex[i]) = 2)
+      //and (Complete or (Instructions.ValueFromIndex[i][2] in ['B'..'Z']))
+    then  begin
+        idx := i;
+        idName := Instructions.Names[i];
+        idReplace := Instructions.ValueFromIndex[i][2];
+        result := True;
+      end;
+    end;
+  end;
+
+  procedure ReplaceRedundantID(old, new: String);
+  begin
+    for var i: Integer := Instructions.Count - 1 downto 0 do
+      Instructions.ValueFromIndex[i] := StringReplace(Instructions.ValueFromIndex[i], old, new, [rfReplaceAll]);
+  end;
+
+begin
+  Instructions := TStringList.Create;
+  try
+    CreateBuildInstructions(Instructions);
+    WorkToDo := True;
+    Changed := False;
+    while WorkToDo do begin
+      WorkToDo := False;
+      if DetectRedundantInstruction(redIdx, redID, replaceID) then begin
+
+        Instructions.Delete(redIdx);
+        if Instructions.IndexOfName(redID+'Ratio') > -1 then
+          Instructions.Delete(Instructions.IndexOfName(redID+'Ratio'));
+
+        ReplaceRedundantID(redID, replaceID);
+
+        WorkToDo := True;
+        Changed := True;
+      end;
+    end;
+
+    if Changed then begin
+      fBuildInstructions.Assign(Instructions);
+      // Clear;           // das löscht alles, und macht auch dei Block-Panels auf NIL-Parent (also unsichtbar)
+      // BuildMainForm(Instructions);
+    end;
+  finally
+    Instructions.Free;
+  end;
+end;
+
 
 function TNempLayout.TestInstructions(aBuildInstructions: TStrings): Boolean;
 var
@@ -194,6 +469,8 @@ var
   iBlock: teNempBlocks;
   DummyContainers: TStringList;
 begin
+  for iBlock := Low(teNempBlocks) to High(teNempBlocks) do
+    fBlocksUsed[iBlock] := False;
 
   fCriticalParsingError := False;
   BuildStr := aBuildInstructions.Values['A'];
@@ -213,6 +490,10 @@ begin
     DummyContainers.Free;
   end;
 
+  for iBlock := Low(teNempBlocks) to High(teNempBlocks) do
+    if not fBlocksUsed[iBlock] then
+      fCriticalParsingError := True;
+
   result := not fCriticalParsingError;
 
   // reset "used" information
@@ -223,15 +504,15 @@ end;
 procedure TNempLayout.SetDefaultInstructions(aBuildInstructions: TStrings);
 begin
   aBuildInstructions.Clear;
-  aBuildInstructions.Add('A=hBC');
-  aBuildInstructions.Add('B=vDmx');
-  aBuildInstructions.Add('C=vpd');
-  aBuildInstructions.Add('D=habc');
+  aBuildInstructions.Add('A=haCD');
+  aBuildInstructions.Add('C=vEmx');
+  aBuildInstructions.Add('D=vpd');
+  aBuildInstructions.Add('E=hbc');
 
-  aBuildInstructions.Add('ARatio=75,25');
-  aBuildInstructions.Add('BRatio=34,66');
-  aBuildInstructions.Add('CRatio=80,20');
-  aBuildInstructions.Add('DRatio=20,40,20');
+  aBuildInstructions.Add('ARatio=20,80,40');
+  aBuildInstructions.Add('CRatio=50,50,50');
+  aBuildInstructions.Add('DRatio=60,40');
+  aBuildInstructions.Add('ERatio=50,50');
 end;
 
   {
@@ -245,13 +526,23 @@ var
 begin
   for iBlock := Low(teNempBlocks) to High(teNempBlocks) do begin
     fBlocksUsed[iBlock] := False;
-    fNempBlocks[iBlock].Parent := Nil;
+    fNempBlocks[iBlock].Parent := BlockHeapControl;
   end;
 
   for i := fContainerPanels.Count - 1 downto 0 do
     fContainerPanels[i].Free;
 
+  fMainContainer.Clear;
   fContainerPanels.Clear;
+end;
+
+procedure TNempLayout.PrepareSplitForm;
+var
+  i: Integer;
+begin
+  for i := fContainerPanels.Count - 1 downto 0 do
+    fContainerPanels[i].Clear;  //.Visible := False;
+  fMainContainer.Clear;
 end;
 
 procedure TNempLayout.BuildMainForm(Instructions: TStringList = Nil);
@@ -260,31 +551,38 @@ var
   i, currentIdx: Integer;
   currentContainer: TNempContainerPanel;
 begin
-  if Instructions = Nil then
-    Instructions := fBuildInstructions;
+  if assigned(Instructions) then
+    fBuildInstructions.Assign(Instructions);
+
+
+  //if Instructions = Nil then
+  //  Instructions := fBuildInstructions;
 
   LockWindowUpdate(fMainContainer.Handle);
+  fBuildInProcess := True;
   PrepareRebuild;
 
   fMainContainer.ID := 'A';
 
-  BuildStr := StrListValueDef(Instructions, 'A', cInitBuild);
-  RatioStr := StrListValueDef(Instructions, 'ARatio', cInitRatio);
+  BuildStr := StrListValueDef(fBuildInstructions, 'A', cInitBuild);
+  RatioStr := StrListValueDef(fBuildInstructions, 'ARatio', cInitRatio);
   ParseInstructionLine(BuildStr, fMainContainer);
   ParseRatioLine(RatioStr, fMainContainer);
   currentIdx := 0;
-  while (currentIdx <= self.fContainerPanels.Count - 1) and (currentIdx <= cMAXBUILD) do begin
-    currentContainer := TNempContainerPanel(fContainerPanels[currentIdx]);
+  while (currentIdx <= fContainerPanels.Count - 1) and (currentIdx <= cMAXBUILD) do begin
+    currentContainer := fContainerPanels[currentIdx];
     if (not ConstructionLayout) or (currentContainer.ChildPanelCount = 0) then begin
       // During Construction, some Dummy-Containers are created, that should contain exactly one of the GUI-Blocks
       // these Dummy-Containers are directly filled with the proper GUI-Block and need no further handling here
-      BuildStr := StrListValueDef(Instructions, currentContainer.ID, cDefaultBuild[currentIdx]);
-      RatioStr := StrListValueDef(Instructions, currentContainer.ID+'Ratio', cDefaultRatio[currentIdx]);
+      BuildStr := StrListValueDef(fBuildInstructions, currentContainer.ID, cDefaultBuild[currentIdx]);
+      RatioStr := StrListValueDef(fBuildInstructions, currentContainer.ID+'Ratio', cDefaultRatio[currentIdx]);
       ParseInstructionLine(BuildStr, currentContainer);
       ParseRatioLine(RatioStr, currentContainer);
     end;
     inc(currentIdx);
   end;
+
+  RefreshVisibilty;
 
   fMainContainer.AlignChildPanels(True);
   {for i := 0 to fContainerPanels.Count - 1 do
@@ -293,16 +591,65 @@ begin
 
   fMainContainer.OnSplitterMoved := OnSplitterMoved;
   for i := 0 to fContainerPanels.Count - 1 do
-    TNempContainerPanel(fContainerPanels[i]).OnSplitterMoved := OnSplitterMoved;
+    fContainerPanels[i].OnSplitterMoved := OnSplitterMoved;
 
-
+  fBuildInProcess := False;
   LockWindowUpdate(0);
+
+  if assigned(OnAfterBuild) then
+    OnAfterBuild(self);
 end;
+
+procedure TNempLayout.RefreshVisibilty;
+var
+  iBlock: teNempBlocks;
+begin
+  if ConstructionLayout then begin
+    for iBlock := Low(teNempBlocks) to High(teNempBlocks) do
+      fNempBlocks[iBlock].ShowPanel;
+  end else
+  begin
+    // "the real layout", i.e. the actual Nemp MainForm
+    if ShowBibSelection and (BrowseMode = 0) then
+      TreePanel.ShowPanel
+    else
+      TreePanel.HidePanel;
+
+    if ShowBibSelection and (BrowseMode = 1) then
+      CoverflowPanel.ShowPanel
+    else
+      CoverflowPanel.HidePanel;
+
+    if ShowBibSelection and (BrowseMode = 2) then
+      CloudPanel.ShowPanel
+    else
+      CloudPanel.HidePanel;
+
+    if ShowMedialist then
+      MedialistPanel.ShowPanel
+    else
+      MedialistPanel.HidePanel;
+
+    if ShowFileOverview then
+      DetailsPanel.ShowPanel
+    else
+      DetailsPanel.HidePanel;
+
+//    Dieser Check geht manchmal schief und blendet auch das MainPanel aus ...
+
+    for iBlock := Low(teNempBlocks) to High(teNempBlocks) do begin
+      if assigned(fNempBlocks[iBlock].Parent) and (fNempBlocks[iBlock].Parent is TNempContainerPanel) then
+        TNempContainerPanel(fNempBlocks[iBlock].Parent).CheckVisibility;
+    end;
+  end;
+end;
+
 
 procedure TNempLayout.ReAlignMainForm;
 begin
   LockWindowUpdate(fMainContainer.Handle);
   fMainContainer.AlignChildPanels(True);
+
   //for var i: Integer := 0 to fContainerPanels.Count - 1 do
   //  if fContainerPanels[i].Visible then
   //    TNempContainerPanel(fContainerPanels[i]).AlignChildPanels;
@@ -330,8 +677,11 @@ end;
 function TNempLayout.AddContainer(ID: Char; aParent: TNempContainerPanel): TNempContainerPanel;
 begin
   result := aParent.AddContainerPanel;
-  result.Caption := ID;
   result.ID := ID;
+  if self.ConstructionLayout then begin
+    result.Caption := ID;
+    result.ParentBackground := False;
+  end;
   fContainerPanels.Add(result);
 
   if assigned(fOnAfterContainerCreate) then
@@ -367,13 +717,12 @@ begin
       'm': AddBlock(nbMedialist, aPanel);
       'd': AddBlock(nbDetails, aPanel);
       'x': AddBlock(nbControls, aPanel);
-      'B'..'G': AddContainer(aInstruction[i], aPanel);
+      'B'..'Z': AddContainer(aInstruction[i], aPanel);
     else
       ; // Parsing-Error, invalid Data
     end;
   end;
 end;
-
 
 procedure TNempLayout.ParseRatioLine(aRatioLine: String;
   aPanel: TNempContainerPanel);
@@ -387,16 +736,60 @@ begin
     RatioStringList.DelimitedText := aRatioLine;
     if RatioStringList.Count = aPanel.ChildPanelCount then begin
       for i := 0 to RatioStringList.Count - 1 do
-        aPanel.SetRatio(i, StrToIntDef(RatioStringList[i], 20));
+        //aPanel.SetRatio(i, StrToIntDef(RatioStringList[i], 20));
+        aPanel.ChildRatio[i] := StrToIntDef(RatioStringList[i], 20);
+
     end else
     begin
       for i := 0 to aPanel.ChildPanelCount - 1 do
-        aPanel.SetRatio(i, Round(100 / aPanel.ChildPanelCount));
+        // aPanel.SetRatio(i, Round(100 / aPanel.ChildPanelCount));
+        aPanel.ChildRatio[i] := Round(100 / aPanel.ChildPanelCount);
     end;
 
   finally
     RatioStringList.Free;
   end;
+end;
+
+function TNempLayout.CreateInstructionLine(aContainer: TNempContainerPanel): string;
+var
+  i: Integer;
+  b: teNempBlocks;
+  BlockFound: Boolean;
+begin
+  case aContainer.Orientation of
+    poVertical: result := 'v';
+    poHorizontal: result := 'h';
+  else
+    result := '';
+  end;
+
+  for i := 0 to aContainer.ChildPanelCount - 1 do begin
+    // add the terminal symbol for one of the Nemp GUI Elements
+    BlockFound := False;
+    for b := Low(teNempBlocks) to High(teNempBlocks) do begin
+      if fNempBlocks[b] = aContainer.ChildPanel[i] then begin
+        BlockFound := True;
+        result := result + cNempBlocksID[b];
+        break;
+      end;
+    end;
+    // if the current ChildPanel is not one of the actual GUI elements: Add the ID of the Container to the instruction line
+    if (not BlockFound) and (aContainer.ChildPanel[i] is TNempContainerPanel) then
+        result := result + TNempContainerPanel(aContainer.ChildPanel[i]).ID;
+  end;
+end;
+
+function TNempLayout.CreateRatioLine(aContainer: TNempContainerPanel): string;
+var
+  i: Integer;
+begin
+  if aContainer.ChildPanelCount > 0 then
+    result := aContainer.ChildPanel[0].Ratio.ToString
+  else
+    result := '';
+  for i := 1 to aContainer.ChildPanelCount - 1 do
+    result := result + ',' + aContainer.ChildPanel[i].Ratio.ToString;
 end;
 
 procedure TNempLayout.TestAddBlock(ID: teNempBlocks);
@@ -439,7 +832,7 @@ begin
       'm': TestAddBlock(nbMedialist);
       'd': TestAddBlock(nbDetails);
       'x': TestAddBlock(nbControls);
-      'B'..'G': TestAddContainer(aInstruction[i], DummyContainers);
+      'B'..'Z': TestAddContainer(aInstruction[i], DummyContainers);
     else
         fCriticalParsingError := True;
     end;
@@ -460,6 +853,7 @@ begin
   if (Source.HierarchyLevel > 0) and (ParentPanel.Orientation = SplitOrientation) then begin
     newPanel := AddContainer('_', ParentPanel);
     newPanel.Ratio := 50;
+    newPanel.OnSplitterMoved := OnSplitterMoved;
     ParentPanel.AlignChildPanels(False);
   end else
   // (b) (ParentPanel.Orientation <> Source.Orientation) // == "different Orientation"
@@ -468,8 +862,10 @@ begin
     Source.Orientation := SplitOrientation;
     newPanel := AddContainer('_', Source);
     newPanel.Ratio := 50;
+    newPanel.OnSplitterMoved := OnSplitterMoved;
     newPanel := AddContainer('_', Source);
     newPanel.Ratio := 50;
+    newPanel.OnSplitterMoved := OnSplitterMoved;
     Source.AlignChildPanels(False);
   end;
 end;
@@ -493,20 +889,50 @@ begin
   end;
 end;
 
-procedure TNempLayout.RefreshEditButtons;
+procedure TNempLayout.RefreshEditButtons(SplitComplete: Boolean);
 var
   i: Integer;
 begin
   if fMainContainer.ChildPanelCount = 0 then
-    fMainContainer.ShowEditButtons
+    fMainContainer.ShowEditButtons(not SplitComplete)
   else
     fMainContainer.HideEditButtons;
 
   for i := 0 to fContainerPanels.Count - 1 do
-    if TNempContainerPanel(fContainerPanels[i]).ChildPanelCount = 0 then
-      TNempContainerPanel(fContainerPanels[i]).ShowEditButtons
+    if fContainerPanels[i].ChildPanelCount = 0 then
+      fContainerPanels[i].ShowEditButtons(not SplitComplete)
     else
-      TNempContainerPanel(fContainerPanels[i]).HideEditButtons;
+      fContainerPanels[i].HideEditButtons;
 end;
+
+procedure TNempLayout.ResizeSubPanel(ABlockPanel: TPanel;
+  aSubPanel: TWinControl; aRatio: Integer);
+var newSize: Integer;
+begin
+  if aSubPanel.Align in [alLeft, alRight] then begin
+    newSize := Round(aRatio / 100 * (ABlockPanel.Width));
+    if newSize < 30 then
+        newSize := 30;
+    if ABlockPanel.Width - newSize < 30 then
+        newSize := ABlockPanel.Width - 30;
+    aSubPanel.Width := newSize;
+  end else
+  if aSubPanel.Align in [alTop, alBottom] then begin
+    newSize := Round(aRatio / 100 * (ABlockPanel.Height));
+    if newSize < 30 then
+        newSize := 30;
+    if ABlockPanel.Height - newSize < 30 then
+        newSize := ABlockPanel.Width - 30;
+    aSubPanel.Height := newSize;
+  end
+end;
+
+
+initialization
+  fNempLayout := Nil;
+
+finalization
+  if assigned(fNempLayout) then
+    fNempLayout.Free;
 
 end.

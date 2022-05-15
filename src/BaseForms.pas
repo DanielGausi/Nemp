@@ -34,10 +34,13 @@ Nemp_ConstantsAndTypes ;
         BWidth: Integer;
         BHeight: Integer;
 
+        procedure CreateParams(var Params: TCreateParams); override;
+
       public
         procedure InitForm(aID: TENempFormIDs; aMainForm: TNempForm);
         procedure SaveWindowPosition;
         procedure LoadWindowPosition;
+        procedure DoFormResize;
     end;
 
 implementation
@@ -59,6 +62,18 @@ begin
 end;
 
 { TNempSubForm }
+
+procedure TNempSubForm.CreateParams(var Params: TCreateParams);
+begin
+  inherited CreateParams(Params);
+  Params.WndParent := Application.Handle;
+end;
+
+procedure TNempSubForm.DoFormResize;
+begin
+  if assigned(OnResize) then
+    OnResize(self);
+end;
 
 procedure TNempSubForm.InitForm(aID: TENempFormIDs; aMainForm: TNempForm);
 begin
@@ -119,8 +134,8 @@ begin
 
   // some of these setting may not be loaded correctly, but I'll ignore that here
   // (inconsistent IniKeys in previous Versions)
-  NempOptions.FormPositions[fNempFormID].Visible :=
-    NempSettingsManager.ReadBool('Windows', iniPrefix+'Visible', cDefaultWindowData[fNempFormID].Visible);
+  //NempOptions.FormPositions[fNempFormID].Visible :=
+  //  NempSettingsManager.ReadBool('Windows', iniPrefix+'Visible', cDefaultWindowData[fNempFormID].Visible);
 
   NempOptions.FormPositions[fNempFormID].Docked :=
     NempSettingsManager.ReadBool('Windows', iniPrefix+'Docked', cDefaultWindowData[fNempFormID].Docked);
@@ -134,8 +149,6 @@ begin
   NempOptions.FormPositions[fNempFormID].Width   := Width;
   NempOptions.FormPositions[fNempFormID].Height  := Height;
   NempOptions.FormPositions[fNempFormID].Docked  := NempRegionsDistance.docked ;
-  // Do not set Visible in the Settings-Object here. This must be set by the form when it is shown/closed
-
   // store settings in the SettingsManager
   NempSettingsManager.WriteString('NempForms', cDefaultWindowData[fNempFormID].Key,
       NempOptions.FormPositions[fNempFormID].SetDataToString );

@@ -188,10 +188,12 @@ type
       fPlaylistSortDirection: teSortDirection;
       fTrimCDFromDirectory: Boolean;
       fCDNames: TStringList;
-      fShowCollectionCount: Boolean;
-      fShowCategoryCount: Boolean;
+      // fShowCollectionCount: Boolean;
+      // fShowCategoryCount: Boolean;
+      fShowElementCount: Boolean;
       fShowCoverArtOnAlbum: Boolean;
-      fUseNewCategory: Boolean;
+      // fUseNewCategory: Boolean;
+      // fUseSmartAdd: Boolean;
       fDefaultRootCollectionConfig: TCollectionConfigList;
       fCoverFlowRootCollectionConfig: TCollectionConfigList;
       FTagCloudCollectionConfig: TCollectionConfigList;
@@ -213,10 +215,12 @@ type
     public
       //property GroupYearsByDecade   : Boolean read fGroupYearsByDecade   write fGroupYearsByDecade   ;
       //property GroupFileAgeByYear   : Boolean read fGroupFileAgeByYear   write fGroupFileAgeByYear   ;
-      property ShowCollectionCount  : Boolean read fShowCollectionCount write fShowCollectionCount;
-      property ShowCategoryCount    : Boolean read fShowCategoryCount write fShowCategoryCount;
+      //property ShowCollectionCount  : Boolean read fShowCollectionCount write fShowCollectionCount;
+      //property ShowCategoryCount    : Boolean read fShowCategoryCount write fShowCategoryCount;
+      property ShowElementCount     : Boolean read fShowElementCount write fShowElementCount;
       property ShowCoverArtOnAlbum  : Boolean read fShowCoverArtOnAlbum write fShowCoverArtOnAlbum;
-      property UseNewCategory       : Boolean read fUseNewCategory write fUseNewCategory;
+      // property UseNewCategory       : Boolean read fUseNewCategory write fUseNewCategory;
+      // property UseSmartAdd          : Boolean read fUseSmartAdd write fUseSmartAdd;
       property AlbumKeyMode: teAlbumKeyMode read fAlbumKeyMode write fAlbumKeyMode;
       property PlaylistCaptionMode: tePlaylistCaptionMode read fPlaylistCaptionMode write fPlaylistCaptionMode;
       property PlaylistSorting: tePlaylistCollectionSorting read fPlaylistSorting write fPlaylistSorting;
@@ -648,12 +652,11 @@ procedure SetNewCategoryIndex(aList: TLibraryCategoryList; newIndex: Integer);
 var
   i: Integer;
 begin
-  if (newIndex >= 0) and (newIndex < aList.Count) then begin
-    for i := 0 to aList.Count - 1 do
-      aList[i].fIsNew := False;
-    // Set new index
+  for i := 0 to aList.Count - 1 do
+    aList[i].fIsNew := False;
+  // Set new index
+  if (newIndex >= 0) and (newIndex < aList.Count) then
     aList[newIndex].fIsNew := True;
-  end;
 end;
 
 procedure PrepareForNewPrimarySorting(var aConfig: TCollectionConfig);
@@ -679,10 +682,12 @@ begin
   PlaylistCaptionMode := pcmFolder; //pcmPath; //pcmFilename; //pcmFolder;
 
   fTrimCDFromDirectory := True;
-  fShowCollectionCount := True;
-  fShowCategoryCount   := True;
+  fShowElementCount    := True;
+  // fShowCollectionCount := True;
+  // fShowCategoryCount   := True;
   fShowCoverArtOnAlbum := True;
-  fUseNewCategory := True;
+  // fUseNewCategory := True;
+  // fUseSmartAdd := True;
 
   fCoverFlowRootCollectionConfig := TCollectionConfigList.Create;
   fDefaultRootCollectionConfig := TCollectionConfigList.Create;
@@ -735,10 +740,12 @@ begin
 
   fTrimCDFromDirectory := Source.fTrimCDFromDirectory;
   fCDNames.Assign(Source.fCDNames);
-  fShowCollectionCount := Source.fShowCollectionCount;
-  fShowCategoryCount   := Source.fShowCategoryCount;
+  ShowElementCount     := Source.ShowElementCount;
+  // fShowCollectionCount := Source.fShowCollectionCount;
+  // fShowCategoryCount   := Source.fShowCategoryCount;
   fShowCoverArtOnAlbum := Source.fShowCoverArtOnAlbum;
-  fUseNewCategory      := Source.fUseNewCategory;
+  // fUseNewCategory      := Source.fUseNewCategory;
+  // fUseSmartAdd         := Source.fUseSmartAdd;
 
   // assign CategoryConfig
   ClearCategoryConfig;
@@ -888,8 +895,8 @@ begin
   categoryCount := NempSettingsManager.ReadInteger('LibraryOrganizer', 'RootCount', 2);
   if categoryCount = 0 then
     categoryCount := 1;
-  if categoryCount > 5 then
-    categoryCount := 5;
+  if categoryCount > 10 then
+    categoryCount := 10;
 
   ClearCategoryConfig;
   SetLength(fCategoryConfig, categoryCount);
@@ -917,9 +924,13 @@ begin
   fTrimCDFromDirectory := NempSettingsManager.ReadBool('LibraryOrganizer', 'TrimCDFromDirectory', True);
   fCDNames.DelimitedText := NempSettingsManager.ReadString('LibraryOrganizer', 'CDNames', 'CD');
 
-  fShowCollectionCount := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowCollectionCount', True);
-  fShowCategoryCount   := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowCategoryCount', True);
+  //fShowCollectionCount := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowCollectionCount', True);
+  //fShowCategoryCount   := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowCategoryCount', True);
+  fShowElementCount   := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowElementCount', True);
   fShowCoverArtOnAlbum := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowCoverArtOnAlbum', True);
+
+  // fUseNewCategory := NempSettingsManager.ReadBool('LibraryOrganizer', 'UseNewCategory', True);
+  // fUseSmartAdd := NempSettingsManager.ReadBool('LibraryOrganizer', 'UseSmartAdd', True);
 end;
 
 procedure TOrganizerSettings.SaveSettings;
@@ -939,9 +950,13 @@ begin
   NempSettingsManager.WriteInteger('LibraryOrganizer', 'PlaylistSortDirection', Integer(fPlaylistSortDirection));
   NempSettingsManager.WriteBool('LibraryOrganizer', 'TrimCDFromDirectory', fTrimCDFromDirectory);
   NempSettingsManager.WriteString('LibraryOrganizer', 'CDNames', fCDNames.DelimitedText);
-  NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowCollectionCount', fShowCollectionCount);
-  NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowCategoryCount', fShowCategoryCount);
+  //NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowCollectionCount', fShowCollectionCount);
+  //NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowCategoryCount', fShowCategoryCount);
+  NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowElementCount', fShowElementCount);
   NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowCoverArtOnAlbum', fShowCoverArtOnAlbum);
+
+  // NempSettingsManager.WriteBool('LibraryOrganizer', 'UseNewCategory', fUseNewCategory);
+  // NempSettingsManager.WriteBool('LibraryOrganizer', 'UseSmartAdd', fUseSmartAdd);
 end;
 
 { TLibraryCategory }

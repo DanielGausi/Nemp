@@ -109,7 +109,7 @@ type
         fLeft,
         fWidth,
         fHeight  : Integer;
-        fDocked,
+        fDocked: Boolean;
         fVisible: Boolean;
 
       public
@@ -735,7 +735,6 @@ const
 
     MB_SetStatus = 100;
 
-
     // Konstanten für den Status der Bib:
     BIB_Status_Free = 0;
     BIB_Status_UpdateStart = 1;
@@ -1022,10 +1021,10 @@ const
 function GetDefaultEqualizerIndex(aEQSettingsName: String): Integer;
 
 function NempOptions: TNempOptions;
-function NempFormBuildOptions: TNempFormBuildOptions;
+// function NempFormBuildOptions: TNempFormBuildOptions;
 function NempSettingsManager: TNempSettingsManager;
 
-function Assigned_NempFormBuildOptions: Boolean;
+//function Assigned_NempFormBuildOptions: Boolean;
 
 
 implementation
@@ -1036,10 +1035,10 @@ var fNempOptions: TNempOptions;
     fNempSettingsManager: TNempSettingsManager;
     fNempFormBuildOptions: TNempFormBuildOptions;
 
-function Assigned_NempFormBuildOptions: Boolean;
+{function Assigned_NempFormBuildOptions: Boolean;
 begin
   result := assigned(fNempFormBuildOptions);
-end;
+end;}
 
 function NempSettingsManager: TNempSettingsManager;
 begin
@@ -1055,12 +1054,13 @@ begin
   result := fNempOptions;
 end;
 
+(*
 function NempFormBuildOptions: TNempFormBuildOptions;
 begin
   if not assigned(fNempFormBuildOptions) then
     fNempFormBuildOptions := TNempFormBuildOptions.create;
   result := fNempFormBuildOptions;
-end;
+end;*)
 
 
 
@@ -3109,7 +3109,7 @@ begin
             IntToStr(fLeft  ) + ';' +
             IntToStr(fWidth ) + ';' +
             IntToStr(fHeight) + ';' +
-            BoolToStr(fDocked ) + ';' +
+            BoolToStr(fDocked) +';' +
             BoolToStr(fVisible)
 end;
 

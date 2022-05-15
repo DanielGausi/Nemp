@@ -676,7 +676,7 @@ end;
 
 function TAudioFileCollection.GetCaption: String;
 begin
-  result := BuildCaption(NempOrganizerSettings.ShowCollectionCount)
+  result := BuildCaption(NempOrganizerSettings.ShowElementCount)
 end;
 
 function TAudioFileCollection.GetSimpleCaption: String;

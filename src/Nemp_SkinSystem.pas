@@ -38,7 +38,7 @@ unit Nemp_SkinSystem;
 interface
 
 uses Windows, Graphics, ExtCtrls, Controls, Types, Forms, dialogs, SysUtils, VirtualTrees,  StdCtrls,
-iniFiles, jpeg, NempPanel, Classes, oneinst, SkinButtons, PNGImage, ProgressShape,
+iniFiles, jpeg, NempPanel, Classes, oneinst, SkinButtons, PNGImage, ProgressShape, MainFormLayout,
 
 Nemp_ConstantsAndTypes, PartyModeClass{$IFDEF USESTYLES}, vcl.themes, vcl.styles, Vcl.CheckLst {$ENDIF};
 
@@ -359,12 +359,13 @@ type
         // ControlButtons: The Buttons on the MainForm
         ControlButtons : Array[TControlButtons] of TSkinButton;
 
-        TabButtons: Array [0..14] of SkinButtonRec;
+        TabButtons: Array [0..22] of SkinButtonRec;
         SlideButtons: Array [0..2] of SkinButtonRec;
 
         NempPartyMode: TNempPartyMode;
 
-        FormBuilder: TNempFormBuildOptions;
+        // FormBuilder: TNempFormBuildOptions;
+        FormLayout: TNempLayout;
 
         property ControlProgressLoaded: Boolean read fControlProgressLoaded;
 
@@ -528,16 +529,27 @@ begin
   TabButtons[2].Button    :=  Nemp_MainForm.TabBtn_Equalizer     ;
   TabButtons[3].Button    :=  Nemp_MainForm.TabBtn_MainPlayerControl    ; // main playback // Headset playback
   TabButtons[4].Button    :=  Nemp_MainForm.TabBtn_Playlist      ;
-  TabButtons[5].Button    :=  Nemp_MainForm.TabBtn_Browse        ;
-  TabButtons[6].Button    :=  Nemp_MainForm.TabBtn_CoverFlow     ;
-  TabButtons[7].Button    :=  Nemp_MainForm.TabBtn_TagCloud      ;
-  TabButtons[8].Button    :=  Nemp_MainForm.TabBtn_Preselection  ;
+  TabButtons[5].Button    :=  Nemp_MainForm.TabBtn_Browse0        ;
+  TabButtons[6].Button    :=  Nemp_MainForm.TabBtn_CoverFlow0     ;
+  TabButtons[7].Button    :=  Nemp_MainForm.TabBtn_TagCloud0      ;
+  TabButtons[8].Button    :=  Nemp_MainForm.TabBtn_Preselection0  ;
   TabButtons[9].Button    :=  Nemp_MainForm.TabBtn_Medialib      ;
   TabButtons[10].Button   :=  Nemp_MainForm.TabBtn_Headset       ; // headset playback
   TabButtons[11].Button   :=  Nemp_mainForm.TabBtn_Marker        ;
   TabButtons[12].Button   :=  Nemp_mainForm.TabBtn_Favorites     ;
   TabButtons[13].Button   :=  Nemp_mainForm.TabBtnCoverCategory     ;
   TabButtons[14].Button   :=  Nemp_mainForm.TabBtnTagCloudCategory  ;
+
+  TabButtons[15].Button    :=  Nemp_MainForm.TabBtn_Browse1        ;
+  TabButtons[16].Button    :=  Nemp_MainForm.TabBtn_CoverFlow1     ;
+  TabButtons[17].Button    :=  Nemp_MainForm.TabBtn_TagCloud1      ;
+  TabButtons[18].Button    :=  Nemp_MainForm.TabBtn_Preselection1  ;
+  TabButtons[19].Button    :=  Nemp_MainForm.TabBtn_Browse2        ;
+  TabButtons[20].Button    :=  Nemp_MainForm.TabBtn_CoverFlow2     ;
+  TabButtons[21].Button    :=  Nemp_MainForm.TabBtn_TagCloud2      ;
+  TabButtons[22].Button    :=  Nemp_MainForm.TabBtn_Preselection2  ;
+
+
 
   TabButtons[0].GlyphFile := 'TabBtnCover'       ;
   TabButtons[1].GlyphFile := 'TabBtnSummaryLock' ;
@@ -554,6 +566,14 @@ begin
   TabButtons[12].GlyphFile := 'TabBtnFavorites'  ;
   TabButtons[13].GlyphFile := 'TabBtnCategory'   ;
   TabButtons[14].GlyphFile := 'TabBtnCategory'   ;
+  TabButtons[15].GlyphFile := 'TabBtnBrowse'      ;
+  TabButtons[16].GlyphFile := 'TabBtnCoverflow'   ;
+  TabButtons[17].GlyphFile := 'TabBtnTagCloud'    ;
+  TabButtons[18].GlyphFile := 'TabBtnNemp'        ;
+  TabButtons[19].GlyphFile := 'TabBtnBrowse'      ;
+  TabButtons[20].GlyphFile := 'TabBtnCoverflow'   ;
+  TabButtons[21].GlyphFile := 'TabBtnTagCloud'    ;
+  TabButtons[22].GlyphFile := 'TabBtnNemp'        ;
 
   SlideButtons[0].Button  := Nemp_MainForm.VolButton           ;
   SlideButtons[1].Button  := Nemp_MainForm.SlideBarButton      ;
@@ -1007,7 +1027,7 @@ procedure TNempSkin.RepairSkinOffset;
 var aPoint: TPoint;
     aForm: TForm;
 begin
-    if FormBuilder.RebuildingRightNow then
+    if FormLayout.BuildInProcess then
         exit;
 
     // todo: get a matching sub-Form in separate window mode (i.e. the top left one, the bottom right one, ...)
@@ -1081,19 +1101,19 @@ begin
     begin
         case aAlignment of
             // left-center
-            0: aPoint :=  Point(0 - aTree.Left, (aTree.ClientHeight Div 2) - (aBitmap.Height Div 2) );
+            0: aPoint :=  Point(0 - aTree.Left, - aTree.Top + (aParent.ClientHeight Div 2) - (aBitmap.Height Div 2) );
             // right-center
-            1: aPoint := Point(- aTree.Left + aParent.ClientWidth - aBitmap.Width, (aTree.ClientHeight Div 2) - (aBitmap.Height Div 2) );
+            1: aPoint := Point(- aTree.Left + aParent.ClientWidth - aBitmap.Width, - aTree.Top + (aParent.ClientHeight Div 2) - (aBitmap.Height Div 2) );
             // align to MainControls (use PlayerPageOffset<X/Y>Orig in that case), doesnt make sense here - use "center-center"
-            2: aPoint := Point(aTree.Left + (aParent.ClientWidth Div 2) - (aBitmap.Width Div 2), (aTree.ClientHeight Div 2) - (aBitmap.Height Div 2) );
+            2: aPoint := Point(aTree.Left + (aParent.ClientWidth Div 2) - (aBitmap.Width Div 2), - aTree.Top + (aParent.ClientHeight Div 2) - (aBitmap.Height Div 2) );
             // left-top
-            3: aPoint := Point(0 - aTree.Left,0);
+            3: aPoint := Point(0 - aTree.Left, 0 - aTree.Top);
             //right-top
-            4: aPoint := Point(-aTree.Left + aParent.ClientWidth - aBitmap.Width, 0);
+            4: aPoint := Point(-aTree.Left + aParent.ClientWidth - aBitmap.Width, 0 - aTree.Top);
             //left-bottom
-            5: aPoint := Point (0 - aTree.Left, aTree.ClientHeight - aBitmap.Height);
+            5: aPoint := Point (0 - aTree.Left, 0 - aTree.Top + aParent.ClientHeight - aBitmap.Height);
             //right-bottom
-            6: aPoint :=  Point (-aTree.Left + aParent.ClientWidth - aBitmap.Width, aTree.ClientHeight - aBitmap.Height);
+            6: aPoint :=  Point (-aTree.Left + aParent.ClientWidth - aBitmap.Width, 0 - aTree.Top + aParent.ClientHeight - aBitmap.Height);
         end;
     end else
     begin
@@ -1155,7 +1175,7 @@ end;
 Procedure TNempSkin.SetArtistAlbumOffsets;
 var pnlPoint: TPoint;
 begin
-    if FormBuilder.RebuildingRightNow then
+     if FormLayout.BuildInProcess then
         exit;
 
     if self.fBrowseBitmapLoaded then
@@ -1185,7 +1205,7 @@ end;
 procedure TNempSkin.SetVSTOffsets;
 var ImgPoint: TPoint;
 begin
-    if FormBuilder.RebuildingRightNow then
+     if FormLayout.BuildInProcess then
         exit;
 
 
@@ -1208,7 +1228,7 @@ end;
 
 Procedure TNempSkin.SetPlaylistOffsets;
 begin
-    if FormBuilder.RebuildingRightNow then
+     if FormLayout.BuildInProcess then
         exit;
 
     if fPlaylistBitmapLoaded then
@@ -1257,6 +1277,7 @@ var i, idx: integer;
 
 begin
   isActive := True;
+  RevokeDragFiles;
 
   //zunächst: Ownerdraw der Boxen/Panels setzen
   for i := 0 to Nemp_MainForm.ComponentCount - 1 do
@@ -1593,9 +1614,10 @@ begin
         MedienBib.NewCoverFlow.SetColor(SkinColorScheme.FormCL);
 
     Color := SkinColorScheme.FormCL;
-    MainSplitter.Color := SkinColorScheme.SplitterColor;
-    SubSplitter1.Color := SkinColorScheme.SplitterColor;
-    SubSplitter2.Color := SkinColorScheme.SplitterColor;
+    // yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+    //MainSplitter.Color := SkinColorScheme.SplitterColor;
+    //SubSplitter1.Color := SkinColorScheme.SplitterColor;
+    //SubSplitter2.Color := SkinColorScheme.SplitterColor;
     SplitterBrowse.Color := SkinColorScheme.SplitterColor;
     SplitterFileOverview.Color := SkinColorScheme.SplitterColor;
 
@@ -1717,6 +1739,7 @@ var i, idx: integer;
 
 begin
   isActive := False;
+  RevokeDragFiles;
   //zunächst: Ownerdraw der Boxen/Panels setzen
   with Nemp_MainForm do
   begin
@@ -1903,9 +1926,10 @@ begin
   with Nemp_MainForm do
   begin
     Color := clBtnFace;
-    MainSplitter.Color := clBtnFace;
-    SubSplitter1.Color := clBtnFace;
-    SubSplitter2.Color := clBtnFace;
+    // yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+    //MainSplitter.Color := clBtnFace;
+    //SubSplitter1.Color := clBtnFace;
+    //SubSplitter2.Color := clBtnFace;
     SplitterBrowse.Color := clBtnFace;
     SplitterFileOverview.Color := clBtnFace;
 

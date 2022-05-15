@@ -53,6 +53,7 @@ type
   TAuswahlForm = class(TNempSubForm)
     ContainerPanelAuswahlform: TNempPanel;
     CloseImageA: TSkinButton;
+    pnlSplit: TPanel;
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure FormShow(Sender: TObject);
@@ -110,7 +111,8 @@ begin
   Width  := BWidth  ;
 
   // Nemp_MainForm.AuswahlFillPanel.Width := Nemp_MainForm.AuswahlPanel.Width - Nemp_MainForm.AuswahlFillPanel.Left - 16;//26;
-  PositionCloseImage(CloseImageA, Nemp_MainForm.AuswahlPanel);
+  // yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+  PositionCloseImage(CloseImageA, Nemp_MainForm.TreePanel);
   {CloseImageA.Left := Nemp_MainForm.AuswahlPanel.Width - CloseImageA.Width - 2;// - 5;//10;
   CloseImageA.Top := 4;
   CloseImageA.Parent := Nemp_MainForm.AuswahlPanel;
@@ -164,7 +166,7 @@ end;
 
 procedure TAuswahlForm.FormActivate(Sender: TObject);
 begin
-  PositionCloseImage(CloseImageA, Nemp_MainForm.AuswahlPanel);
+  PositionCloseImage(CloseImageA, Nemp_MainForm.TreePanel);
   {Nemp_MainForm.AuswahlFillPanel.Width := Nemp_MainForm.AuswahlPanel.Width
                                         - Nemp_MainForm.AuswahlFillPanel.Left - 16;//26;
   CloseImageA.Left := Nemp_MainForm.AuswahlPanel.Width - CloseImageA.Width - 2;// - 5;//10;
@@ -205,9 +207,9 @@ end;
 procedure TAuswahlForm.FormResize(Sender: TObject);
 begin
    // Größenkorrekturen
-  if (Nemp_MainForm.ArtistsVST.Width > Nemp_MainForm.AuswahlPanel.width - 40)
+  if (Nemp_MainForm.ArtistsVST.Width > Nemp_MainForm.TreePanel.width - 40)
       OR (Nemp_MainForm.ArtistsVST.Width < 40) then
-          Nemp_MainForm.ArtistsVST.Width := Nemp_MainForm.AuswahlPanel.width DIV 2;
+          Nemp_MainForm.ArtistsVST.Width := Nemp_MainForm.TreePanel.width DIV 2;
 
   SetRegion(ContainerPanelAuswahlForm, self, NempRegionsDistance, handle);
   If Nemp_MainForm.NempSkin.isActive then
@@ -222,8 +224,7 @@ begin
   with Nemp_MainForm do
   begin
     NempOptions.FormPositions[fNempFormID].Visible := False;
-    PM_P_ViewSeparateWindows_Browse.Checked := NempOptions.FormPositions[fNempFormID].Visible;
-    MM_O_ViewSeparateWindows_Browse.Checked := NempOptions.FormPositions[fNempFormID].Visible;
+    actSplitToggleBrowseList.Checked := NempOptions.FormPositions[fNempFormID].Visible;
   end;
   close;
 end;
@@ -275,9 +276,14 @@ end;
 procedure TAuswahlForm.RepaintForm;
 begin
       Repaint;
-      Nemp_MainForm.AuswahlPanel.Repaint;
-      Nemp_MainForm.AuswahlFillPanel.Repaint;
-      Nemp_MainForm.GRPBOXArtistsAlben.Repaint;
+      Nemp_MainForm.CloudPanel.Repaint;
+      Nemp_MainForm.TreePanel.Repaint;
+      Nemp_MainForm.CoverflowPanel.Repaint;
+
+      Nemp_MainForm.AuswahlFillPanel0.Repaint;
+      Nemp_MainForm.AuswahlFillPanel1.Repaint;
+      Nemp_MainForm.AuswahlFillPanel2.Repaint;
+
       Nemp_MainForm.PanelCoverBrowse.Repaint;
       Nemp_MainForm.PanelStandardBrowse.Repaint;
 

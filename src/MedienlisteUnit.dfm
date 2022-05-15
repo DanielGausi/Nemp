@@ -13,7 +13,6 @@ object MedienlisteForm: TMedienlisteForm
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
-  OldCreateOrder = False
   OnActivate = FormActivate
   OnClose = FormClose
   OnHide = FormHide
@@ -22,7 +21,7 @@ object MedienlisteForm: TMedienlisteForm
   OnMouseMove = FormMouseMove
   OnMouseUp = FormMouseUp
   OnResize = FormResize
-  PixelsPerInch = 96
+  OnShow = FormShow
   TextHeight = 13
   object ContainerPanelMedienBibForm: TNempPanel
     Tag = 3
@@ -38,6 +37,7 @@ object MedienlisteForm: TMedienlisteForm
     OnMouseDown = ContainerPanelMedienBibFormMouseDown
     OnMouseMove = ContainerPanelMedienBibFormMouseMove
     OnMouseUp = ContainerPanelMedienBibFormMouseUp
+    Ratio = 0
     OnPaint = ContainerPanelMedienBibFormPaint
     OwnerDraw = False
     DesignSize = (
@@ -63,6 +63,20 @@ object MedienlisteForm: TMedienlisteForm
       FocusDrawMode = fdm_Windows
       Color1 = clBlack
       Color2 = clBlack
+    end
+    object pnlSplit: TPanel
+      AlignWithMargins = True
+      Left = 7
+      Top = 2
+      Width = 560
+      Height = 241
+      Margins.Left = 7
+      Margins.Top = 2
+      Margins.Right = 7
+      Margins.Bottom = 7
+      Align = alClient
+      BevelOuter = bvNone
+      TabOrder = 1
     end
   end
 end

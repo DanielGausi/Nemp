@@ -12,14 +12,12 @@ object PlaylistEditorForm: TPlaylistEditorForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   ShowHint = True
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 13
   object Splitter1: TSplitter
     Left = 220
@@ -72,11 +70,13 @@ object PlaylistEditorForm: TPlaylistEditorForm
       OnGetText = PlaylistSelectionVSTGetText
       OnNewText = PlaylistSelectionVSTNewText
       OnStartDrag = PlaylistSelectionVSTStartDrag
+      Touch.InteractiveGestures = [igPan, igPressAndTap]
+      Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
       Columns = <
         item
           Position = 0
-          Width = 210
-          WideText = 'Favorite playlists'
+          Text = 'Favorite playlists'
+          Width = 214
         end>
     end
     object BtnNew: TButton
@@ -152,19 +152,21 @@ object PlaylistEditorForm: TPlaylistEditorForm
       OnGetUserClipboardFormats = PlaylistFilesVSTGetUserClipboardFormats
       OnRenderOLEData = PlaylistFilesVSTRenderOLEData
       OnStartDrag = PlaylistFilesVSTStartDrag
+      Touch.InteractiveGestures = [igPan, igPressAndTap]
+      Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
       Columns = <
         item
           Position = 0
-          Width = 257
-          WideText = 'Title'
+          Text = 'Title'
+          Width = 261
         end
         item
           Alignment = taRightJustify
           CaptionAlignment = taRightJustify
           Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coUseCaptionAlignment, coEditable, coStyleColor]
           Position = 1
+          Text = 'Duration'
           Width = 64
-          WideText = 'Duration'
         end>
     end
     object BtnSave: TButton

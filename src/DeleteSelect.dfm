@@ -12,7 +12,6 @@ object DeleteSelection: TDeleteSelection
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnClose = FormClose
   OnCreate = FormCreate
@@ -20,7 +19,6 @@ object DeleteSelection: TDeleteSelection
   DesignSize = (
     684
     428)
-  PixelsPerInch = 96
   TextHeight = 13
   object LblFiles: TLabel
     Left = 8
@@ -116,11 +114,13 @@ object DeleteSelection: TDeleteSelection
       TabOrder = 0
       TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
       OnGetText = VSTPlaylistFilesGetText
+      Touch.InteractiveGestures = [igPan, igPressAndTap]
+      Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
       Columns = <
         item
           Position = 0
+          Text = 'Playlists on the selected drive'
           Width = 232
-          WideText = 'Playlists on the selected drive'
         end>
     end
     object VSTFiles: TVirtualStringTree
@@ -137,11 +137,13 @@ object DeleteSelection: TDeleteSelection
       TabOrder = 1
       TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
       OnGetText = VSTFilesGetText
+      Touch.InteractiveGestures = [igPan, igPressAndTap]
+      Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
       Columns = <
         item
           Position = 0
+          Text = 'Audio files on the selected drive'
           Width = 425
-          WideText = 'Audio files on the selected drive'
         end>
     end
   end
@@ -215,11 +217,13 @@ object DeleteSelection: TDeleteSelection
       OnChange = VSTDrivesChange
       OnChecked = VSTDrivesChecked
       OnGetText = VSTDrivesGetText
+      Touch.InteractiveGestures = [igPan, igPressAndTap]
+      Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
       Columns = <
         item
           Position = 0
+          Text = 'Files'
           Width = 189
-          WideText = 'Files'
         end>
     end
   end

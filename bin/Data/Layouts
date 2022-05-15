@@ -1,0 +1,110 @@
+﻿;
+; Some predefined Layouts for Nemp
+; Do not modify this file, unless you know what you're doing
+;
+[Default1]
+en=Default (1)
+de=Standard (1)
+A=haCD
+ARatio=20,80,40
+C=vEmx
+CRatio=50,50,50
+D=vpd
+DRatio=60,40
+E=hbc
+ERatio=50,50
+TreeViewRatio=30
+TreeviewOrientation=1
+FileOVerviewOrientation=0
+FileOverviewMode=0
+ShowControlCover=1
+ShowBibSelection=1
+ShowMedialist=1
+ShowFileOverview=1
+
+[Default2]
+en=Default (2)
+de=Standard (2)
+A=vBx
+ARatio=50,50
+B=haEF
+BRatio=26,72,50
+E=vGm
+ERatio=50,50
+F=vpd
+FRatio=51,48
+G=hbc
+GRatio=50,50
+TreeViewRatio=22
+TreeviewOrientation=1
+FileOVerviewOrientation=0
+FileOverviewMode=0
+ShowControlCover=1
+ShowBibSelection=1
+ShowMedialist=1
+ShowFileOverview=1
+
+[Classic]
+en=Classic layout (Nemp 4.15)
+de=Klassisches Layout (Nemp 4.15)
+A=hBC
+ARatio=66,32
+B=vDmx
+BRatio=50,50,50
+C=vpd
+CRatio=58,40
+D=habc
+DRatio=50,50,50
+TreeViewRatio=22
+TreeviewOrientation=0
+FileOVerviewOrientation=0
+FileOverviewMode=0
+ShowControlCover=1
+ShowBibSelection=1
+ShowMedialist=1
+ShowFileOverview=1
+
+[PlaylistOnly]
+en=Minimal (Playlist only)
+de=Minimal (nur Playlist)
+A=haC
+ARatio=15,83
+C=vDx
+CRatio=50,50
+D=hFpd
+DRatio=50,50,50
+F=vIm
+FRatio=50,50
+I=hbc
+IRatio=50,50
+TreeViewRatio=43
+TreeviewOrientation=1
+FileOVerviewOrientation=1
+FileOverviewMode=0
+ShowControlCover=1
+ShowBibSelection=0
+ShowMedialist=0
+ShowFileOverview=0
+
+[PlaylistAndDetails]
+en=Playlist and File overview
+de=Playlist und Datei-Übersicht
+A=haC
+ARatio=15,83
+C=vDx
+CRatio=50,50
+D=hFpd
+DRatio=50,50,50
+F=vHm
+FRatio=50,50
+H=hbc
+HRatio=50,50
+TreeViewRatio=43
+TreeviewOrientation=1
+FileOVerviewOrientation=1
+FileOverviewMode=0
+ShowControlCover=1
+ShowBibSelection=0
+ShowMedialist=0
+ShowFileOverview=1
+

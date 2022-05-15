@@ -52,6 +52,7 @@ type
   TPlaylistForm = class(TNempSubForm)
     ContainerPanelPlaylistForm: TNempPanel;
     CloseImageP: TSkinButton;
+    pnlSplit: TPanel;
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure FormShow(Sender: TObject);
@@ -209,8 +210,7 @@ begin
   with Nemp_MainForm do
   begin
     NempOptions.FormPositions[fNempFormID].Visible := False;
-    PM_P_ViewSeparateWindows_Playlist.Checked := NempOptions.FormPositions[fNempFormID].Visible;
-    MM_O_ViewSeparateWindows_Playlist.Checked := NempOptions.FormPositions[fNempFormID].Visible;
+    actSplitTogglePlayList.Checked := NempOptions.FormPositions[fNempFormID].Visible;
   end;
   close;
 end;

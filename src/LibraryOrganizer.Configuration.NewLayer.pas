@@ -179,9 +179,9 @@ begin
   cbSecondarySorting.ItemIndex := max(0, cbSecondarySorting.Items.IndexOfObject(TObject(aConfig.SecondarySorting)));
   cbTertiarySorting.ItemIndex := max(0, cbTertiarySorting.Items.IndexOfObject(TObject(aConfig.TertiarySorting)));
 
-  cbPrimaryDirection.ItemIndex := Integer(aConfig.PrimarySorting);
-  cbSecondaryDirection.ItemIndex := Integer(aConfig.SecondarySorting);
-  cbTertiaryDirection.ItemIndex := Integer(aConfig.TertiarySorting);
+  cbPrimaryDirection.ItemIndex := Integer(aConfig.SortDirection1);
+  cbSecondaryDirection.ItemIndex := Integer(aConfig.SortDirection2);
+  cbTertiaryDirection.ItemIndex := Integer(aConfig.SortDirection3);
 end;
 
 (*procedure TFormNewLayer.SetEdit(Value: Boolean);

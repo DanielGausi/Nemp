@@ -643,12 +643,11 @@ begin
 
      // das true versaut es ggf. zumindest dann, wenn oben newID auf '' gesetzt wurde
 
-
     // if we found an image, but the ID has changed: Change it on the other files with that ID as well
     if (aAudioFile.CoverID <> oldID) then
     begin
-        if aAudioFile.CoverID = '' then
-          aAudioFile.CoverID := 'kaputt repaired';
+        //if aAudioFile.CoverID = '' then
+        //  aAudioFile.CoverID := 'kaputt repaired';
         MedienBib.ChangeCoverID(oldID, aAudioFile.CoverID);
         if  MedienBib.NewCoverFlow.CurrentCoverID = oldID then
             MedienBib.NewCoverFlow.CurrentCoverID := aAudioFile.CoverID;

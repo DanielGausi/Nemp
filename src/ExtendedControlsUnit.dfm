@@ -15,7 +15,6 @@ object ExtendedControlForm: TExtendedControlForm
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
-  OldCreateOrder = False
   OnActivate = FormActivate
   OnClose = FormClose
   OnHide = FormHide
@@ -24,7 +23,7 @@ object ExtendedControlForm: TExtendedControlForm
   OnMouseMove = FormMouseMove
   OnMouseUp = FormMouseUp
   OnResize = FormResize
-  PixelsPerInch = 96
+  OnShow = FormShow
   TextHeight = 13
   object ContainerPanelExtendedControlsForm: TNempPanel
     Tag = 6
@@ -38,6 +37,7 @@ object ExtendedControlForm: TExtendedControlForm
     OnMouseDown = ContainerPanelExtendedControlsFormMouseDown
     OnMouseMove = ContainerPanelExtendedControlsFormMouseMove
     OnMouseUp = ContainerPanelExtendedControlsFormMouseUp
+    Ratio = 0
     OnPaint = ContainerPanelExtendedControlsFormPaint
     OwnerDraw = False
     DesignSize = (
@@ -63,6 +63,20 @@ object ExtendedControlForm: TExtendedControlForm
       FocusDrawMode = fdm_Windows
       Color1 = clBlack
       Color2 = clBlack
+    end
+    object pnlSplit: TPanel
+      AlignWithMargins = True
+      Left = 7
+      Top = 2
+      Width = 386
+      Height = 191
+      Margins.Left = 7
+      Margins.Top = 2
+      Margins.Right = 7
+      Margins.Bottom = 7
+      Align = alClient
+      BevelOuter = bvNone
+      TabOrder = 1
     end
   end
 end

@@ -55,7 +55,7 @@ type
       private
           fActive: Boolean;
           fResizeProc: TChangeProc;
-          fLastTopHeight: Integer;
+          // fLastTopHeight: Integer;
           flastHeight: Integer;
           fLastWidth: Integer;
 
@@ -277,8 +277,8 @@ procedure TNempPartyMode.BackupOriginalPositions;
 var i: Integer;
 begin
     // Store original positions of controls in an array
-    Setlength(fPositionArray, 46);  // 114
-    SetLength(fPartyControls, 46);
+    Setlength(fPositionArray, 54);  // 114
+    SetLength(fPartyControls, 54);
     i := 0;
     with Nemp_MainForm do
     begin
@@ -333,10 +333,20 @@ begin
         SetOriginalPosition(TabBtn_MainPlayerControl , i);
         SetOriginalPosition(TabBtn_Headset      , i);
 
-        SetOriginalPosition(TabBtn_Preselection , i);
-        SetOriginalPosition(TabBtn_Browse       , i);
-        SetOriginalPosition(TabBtn_CoverFlow    , i);
-        SetOriginalPosition(TabBtn_TagCloud     , i);
+        SetOriginalPosition(TabBtn_Preselection0 , i);
+        SetOriginalPosition(TabBtn_Browse0       , i);
+        SetOriginalPosition(TabBtn_CoverFlow0    , i);
+        SetOriginalPosition(TabBtn_TagCloud0     , i);
+        //
+        SetOriginalPosition(TabBtn_Preselection1 , i);
+        SetOriginalPosition(TabBtn_Browse1       , i);
+        SetOriginalPosition(TabBtn_CoverFlow1    , i);
+        SetOriginalPosition(TabBtn_TagCloud1     , i);
+        //
+        SetOriginalPosition(TabBtn_Preselection2 , i);
+        SetOriginalPosition(TabBtn_Browse2       , i);
+        SetOriginalPosition(TabBtn_CoverFlow2    , i);
+        SetOriginalPosition(TabBtn_TagCloud2     , i);
 
         SetOriginalPosition(TabBtn_Playlist     , i);
         SetOriginalPosition(TabBtn_Medialib     , i);
@@ -349,13 +359,13 @@ begin
 
         // Additional Controls
         i := 0;
-        Setlength(fAdditionalControls, 31);
-        SetLength(fAdditionalPositionsArray, 31);
+        Setlength(fAdditionalControls, 40);
+        SetLength(fAdditionalPositionsArray, 40);
 
-        SetAdditionalOriginalPosition(AuswahlHeaderPanel, i);
-        SetAdditionalOriginalPosition(AuswahlFillPanel, i);
-        SetAdditionalOriginalPosition(AuswahlStatusLBL, i);
-        SetAdditionalOriginalPosition(GRPBOXArtistsAlben, i);
+        SetAdditionalOriginalPosition(AuswahlHeaderPanel0, i);
+        SetAdditionalOriginalPosition(AuswahlFillPanel0, i);
+        SetAdditionalOriginalPosition(AuswahlStatusLBL0, i);
+        SetAdditionalOriginalPosition(TreePanel, i);
 
         SetAdditionalOriginalPosition(PlayerHeaderPanel, i);
         SetAdditionalOriginalPosition(PlaylistFillPanel, i);
@@ -391,6 +401,18 @@ begin
         SetAdditionalOriginalPosition(PlayerTimeLbl   , i);
         SetAdditionalOriginalPosition(PaintFrame      , i);
 
+        //
+        SetAdditionalOriginalPosition(AuswahlHeaderPanel1, i);
+        SetAdditionalOriginalPosition(AuswahlFillPanel1, i);
+        SetAdditionalOriginalPosition(AuswahlStatusLBL1, i);
+        SetAdditionalOriginalPosition(CoverFlowPanel, i);
+        //
+        SetAdditionalOriginalPosition(AuswahlHeaderPanel2, i);
+        SetAdditionalOriginalPosition(AuswahlFillPanel2, i);
+        SetAdditionalOriginalPosition(AuswahlStatusLBL2, i);
+        SetAdditionalOriginalPosition(CloudPanel, i);
+        SetAdditionalOriginalPosition(edtCloudSearch, i);
+
 
         //SetAdditionalOriginalPosition(, i);
 
@@ -407,7 +429,8 @@ begin
     begin
         ChangeProc := Bigger;
         fResizeProc := Bigger;
-        fLastTopHeight := Nemp_MainForm._TopMainPanel.Height;
+        // yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy das div 2 ist unsinn, nur behelfsweise
+        // fLastTopHeight := Nemp_MainForm.Height Div 2 ; // Nemp_MainForm._TopMainPanel.Height;
         fLastHeight    := Nemp_MainForm.Height;
         fLastWidth     := Nemp_MainForm.Width;
     end
@@ -448,28 +471,60 @@ begin
         end;
 
         // Additional Controls
-        AuswahlHeaderPanel.Height := ChangeProc(fAdditionalPositionsArray[0].Height);
-        AuswahlFillPanel.Left := ChangeProc(fAdditionalPositionsArray[1].Left);
-        AuswahlFillPanel.Height := ChangeProc(fAdditionalPositionsArray[1].Height);
-        AuswahlFillPanel.Top := ChangeProc(fAdditionalPositionsArray[1].Top);
-        AuswahlFillPanel.Width := AuswahlPanel.Width - AuswahlFillPanel.Left;
-        AuswahlStatusLBL.Top := ChangeProc(fAdditionalPositionsArray[2].Top);
-        AuswahlStatusLBL.Height := ChangeProc(fAdditionalPositionsArray[2].Height);
-        AuswahlStatusLBL.Font.Size := ChangeProc(fAdditionalPositionsArray[2].FontSize);
-        GRPBOXArtistsAlben.Top := ChangeProc(fAdditionalPositionsArray[3].Top);
+        AuswahlHeaderPanel0.Height := ChangeProc(fAdditionalPositionsArray[0].Height);
+        AuswahlFillPanel0.Left := ChangeProc(fAdditionalPositionsArray[1].Left);
+        ///AuswahlFillPanel.Height := ChangeProc(fAdditionalPositionsArray[1].Height);
+        ///AuswahlFillPanel.Top := ChangeProc(fAdditionalPositionsArray[1].Top);
+        //yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+        // AuswahlFillPanel.Width := AuswahlPanel.Width - AuswahlFillPanel.Left;
+        AuswahlStatusLBL0.Top := ChangeProc(fAdditionalPositionsArray[2].Top);
+        AuswahlStatusLBL0.Height := ChangeProc(fAdditionalPositionsArray[2].Height);
+        AuswahlStatusLBL0.Font.Size := ChangeProc(fAdditionalPositionsArray[2].FontSize);
+        //yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+        // GRPBOXArtistsAlben.Top := ChangeProc(fAdditionalPositionsArray[3].Top);
+
+        // Additional Controls
+        AuswahlHeaderPanel1.Height := ChangeProc(fAdditionalPositionsArray[31].Height);
+        AuswahlFillPanel1.Left := ChangeProc(fAdditionalPositionsArray[32].Left);
+        ///AuswahlFillPanel.Height := ChangeProc(fAdditionalPositionsArray[1].Height);
+        ///AuswahlFillPanel.Top := ChangeProc(fAdditionalPositionsArray[1].Top);
+        //yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+        // AuswahlFillPanel.Width := AuswahlPanel.Width - AuswahlFillPanel.Left;
+        AuswahlStatusLBL1.Top := ChangeProc(fAdditionalPositionsArray[33].Top);
+        AuswahlStatusLBL1.Height := ChangeProc(fAdditionalPositionsArray[33].Height);
+        AuswahlStatusLBL1.Font.Size := ChangeProc(fAdditionalPositionsArray[33].FontSize);
+        //yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+        // GRPBOXArtistsAlben.Top := ChangeProc(fAdditionalPositionsArray[34].Top);
+
+        // Additional Controls
+        AuswahlHeaderPanel2.Height := ChangeProc(fAdditionalPositionsArray[35].Height);
+        AuswahlFillPanel2.Left := ChangeProc(fAdditionalPositionsArray[36].Left);
+        ///AuswahlFillPanel.Height := ChangeProc(fAdditionalPositionsArray[1].Height);
+        ///AuswahlFillPanel.Top := ChangeProc(fAdditionalPositionsArray[1].Top);
+        //yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+        // AuswahlFillPanel.Width := AuswahlPanel.Width - AuswahlFillPanel.Left;
+        AuswahlStatusLBL2.Top := ChangeProc(fAdditionalPositionsArray[37].Top);
+        AuswahlStatusLBL2.Height := ChangeProc(fAdditionalPositionsArray[37].Height);
+        AuswahlStatusLBL2.Font.Size := ChangeProc(fAdditionalPositionsArray[37].FontSize);
+        //yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+        // GRPBOXArtistsAlben.Top := ChangeProc(fAdditionalPositionsArray[38].Top);
+        edtCloudSearch.Height := ChangeProc(fAdditionalPositionsArray[39].Height);
+        edtCloudSearch.Width := ChangeProc(fAdditionalPositionsArray[39].Width);
+        edtCloudSearch.Left := ChangeProc(fAdditionalPositionsArray[39].Left);
+        edtCloudSearch.Top := ChangeProc(fAdditionalPositionsArray[39].Top);
+        edtCloudSearch.Font.Size := ChangeProc(fAdditionalPositionsArray[39].FontSize);
+
 
         PlayerHeaderPanel.Height := ChangeProc(fAdditionalPositionsArray[4].Height);
-
         PlaylistFillPanel.Left := ChangeProc(fAdditionalPositionsArray[5].Left);
-        PlaylistFillPanel.Height := ChangeProc(fAdditionalPositionsArray[5].Height);
-        PlaylistFillPanel.Top := ChangeProc(fAdditionalPositionsArray[5].Top);
-
+        ///PlaylistFillPanel.Height := ChangeProc(fAdditionalPositionsArray[5].Height);
+        ///PlaylistFillPanel.Top := ChangeProc(fAdditionalPositionsArray[5].Top);
 
         PlayListStatusLBL.Top := ChangeProc(fAdditionalPositionsArray[6].Top);
         PlayListStatusLBL.Height := ChangeProc(fAdditionalPositionsArray[6].Height);
         PlayListStatusLBL.Font.Size := ChangeProc(fAdditionalPositionsArray[6].FontSize);
 
-        GRPBOXPlaylist.Top := ChangeProc(fAdditionalPositionsArray[7].Top);
+        //GRPBOXPlaylist.Top := ChangeProc(fAdditionalPositionsArray[7].Top);
 
         PlaylistFillPanel.Width := PlayerHeaderPanel.Width - PlaylistFillPanel.Left;
         EditPlaylistSearch.Height := ChangeProc(fAdditionalPositionsArray[15].Height);
@@ -480,15 +535,12 @@ begin
 
         MedienBibHeaderPanel.Height := ChangeProc(fAdditionalPositionsArray[8].Height);
         MedienlisteFillPanel.Left := ChangeProc(fAdditionalPositionsArray[9].Left);
-        MedienlisteFillPanel.Height := ChangeProc(fAdditionalPositionsArray[9].Height);
-        MedienlisteFillPanel.Top := ChangeProc(fAdditionalPositionsArray[9].Top);
-
+        ///MedienlisteFillPanel.Height := ChangeProc(fAdditionalPositionsArray[9].Height);
+        ///MedienlisteFillPanel.Top := ChangeProc(fAdditionalPositionsArray[9].Top);
         MedienListeStatusLBL.Top := ChangeProc(fAdditionalPositionsArray[10].Top);
         MedienListeStatusLBL.Height := ChangeProc(fAdditionalPositionsArray[10].Height);
         MedienListeStatusLBL.Font.Size := ChangeProc(fAdditionalPositionsArray[10].FontSize);
-
-        GRPBOXVST.Top := ChangeProc(fAdditionalPositionsArray[11].Top);
-
+        //GRPBOXVST.Top := ChangeProc(fAdditionalPositionsArray[11].Top);
         MedienlisteFillPanel.Width := MedienBibHeaderPanel.Width - MedienlisteFillPanel.Left;
         EDITFastSearch.Height := ChangeProc(fAdditionalPositionsArray[12].Height);
         EDITFastSearch.Width := ChangeProc(fAdditionalPositionsArray[12].Width);
@@ -508,11 +560,9 @@ begin
         EditPlaylistSearch.Font.Size := ChangeProc(fAdditionalPositionsArray[14].FontSize);
 
         MedienBibDetailHeaderPanel.Height := ChangeProc(fAdditionalPositionsArray[15].Height);
-
         MedienBibDetailFillPanel.Left   := ChangeProc(fAdditionalPositionsArray[16].Left);
-        MedienBibDetailFillPanel.Height := ChangeProc(fAdditionalPositionsArray[16].Height);
-        MedienBibDetailFillPanel.Top    := ChangeProc(fAdditionalPositionsArray[16].Top);
-
+        ///MedienBibDetailFillPanel.Height := ChangeProc(fAdditionalPositionsArray[16].Height);
+        ///MedienBibDetailFillPanel.Top    := ChangeProc(fAdditionalPositionsArray[16].Top);
         MedienBibDetailStatusLbl.Top       := ChangeProc(fAdditionalPositionsArray[17].Top);
         MedienBibDetailStatusLbl.Height    := ChangeProc(fAdditionalPositionsArray[17].Height);
         MedienBibDetailStatusLbl.Font.Size := ChangeProc(fAdditionalPositionsArray[17].FontSize);
@@ -608,7 +658,8 @@ begin
         CorrectVCLForABRepeat;
 
         // correct Splitter
-        SubSplitter1.Left := AuswahlPanel.Width;
+        //SubSplitter1.Left := AuswahlPanel.Width;
+        //yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
 
         // Load correctly scaled graphics
         if Nemp_MainForm.NempSkin.isActive then

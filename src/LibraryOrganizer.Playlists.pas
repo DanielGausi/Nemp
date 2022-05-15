@@ -311,20 +311,28 @@ begin
         case fSortDirection of
           sd_Ascending: result := CompareKey(item1, item2);
           sd_Descending: result := CompareKey(item2, item1);
+        else
+          result := CompareKey(item1, item2);
         end;
     end;
     pcsFolder: begin
         case fSortDirection of
           sd_Ascending: result := CompareFolder(TAudioPlaylistCollection(item1), TAudioPlaylistCollection(item2));
           sd_Descending: result := CompareFolder(TAudioPlaylistCollection(item2), TAudioPlaylistCollection(item1));
+        else
+          result := CompareFolder(TAudioPlaylistCollection(item1), TAudioPlaylistCollection(item2));
         end;
     end;
     pcsFilename: begin
         case fSortDirection of
           sd_Ascending: result := CompareFilename(TAudioPlaylistCollection(item1), TAudioPlaylistCollection(item2));
           sd_Descending: result := CompareFilename(TAudioPlaylistCollection(item2), TAudioPlaylistCollection(item1));
+        else
+          result := CompareFilename(TAudioPlaylistCollection(item1), TAudioPlaylistCollection(item2));
         end;
     end;
+  else
+    result := CompareKey(item1, item2);
   end;
 end;
 

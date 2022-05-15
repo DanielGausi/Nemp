@@ -5,67 +5,19 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, MyDialogs, MainFormLayout,
+  System.Generics.Collections, System.Generics.Defaults,
 
-  Nemp_ConstantsAndTypes, Vcl.ComCtrls, NempPanel;
+  Nemp_ConstantsAndTypes, Vcl.ComCtrls, NempPanel, Vcl.Menus, System.IniFiles;
 
 type
 
-
+  TMenuItemList = TObjectList<TMenuItem>;
 
   TMainFormBuilder = class(TForm)
-    __MainContainer: TPanel;
-    _ControlPanel: TPanel;
-    _TopMainPanel: TPanel;
-    _BottomMainPanel: TPanel;
-    MainSplitter: TSplitter;
-    ___FormSimulatorPanel: TPanel;
-    BlockBrowse: TPanel;
-    BlockPlaylist: TPanel;
-    BlockMedialist: TPanel;
-    BlockFileOverview: TPanel;
-    SplitterBottom: TSplitter;
-    SplitterTop: TSplitter;
-    ImgCoverFlowUp: TImage;
-    ImgPlaylistUp: TImage;
-    ImgFileOverviewUp: TImage;
-    ImgMediaListUp: TImage;
-    ImgCoverFlowLeft: TImage;
-    ImgPlaylistLeft: TImage;
-    ImgMediaListLeft: TImage;
-    ImgFileOverviewLeft: TImage;
-    ImgFileOverviewDown: TImage;
-    ImgFileOverviewRight: TImage;
-    ImgMediaListRight: TImage;
-    ImgMediaListDown: TImage;
-    ImgCoverFlowDown: TImage;
-    ImgPlaylistDown: TImage;
-    ImgPlaylistRight: TImage;
-    ImgCoverFlowRight: TImage;
-    GrpBoxSettings: TGroupBox;
-    cbMainLayout: TComboBox;
-    HeaderBrowse: TPanel;
-    HeaderPlaylist: TPanel;
-    HeaderFileOverview: TPanel;
-    HeaderMedialist: TPanel;
-    ContentBrowse: TPanel;
-    ContentPlaylist: TPanel;
-    ContentMedialist: TPanel;
-    ContentFileOverview: TPanel;
     BtnApply: TButton;
-    GroupBox1: TGroupBox;
-    cbControlPosition: TComboBox;
-    RGrpControlSubPanel: TRadioGroup;
-    LblSubPanelPosition: TLabel;
-    cbControlPositionSubPanel: TComboBox;
-    GroupBox3: TGroupBox;
-    cbHideFileOverview: TCheckBox;
-    BtnUndo: TButton;
-    BtnResetToDefault: TButton;
+    BtnCancel: TButton;
     BtnOK: TButton;
-    PageControl1: TPageControl;
-    TabSheet1: TTabSheet;
     pnlButtons: TPanel;
-    TabSheet2: TTabSheet;
     MainContainer: TNempContainerPanel;
     pnlTree: TNempPanel;
     pnlCoverflow: TNempPanel;
@@ -74,67 +26,56 @@ type
     pnlMedialist: TNempPanel;
     pnlDetails: TNempPanel;
     pnlControls: TNempPanel;
-    Button1: TButton;
     cbSelection: TCheckBox;
-    cbPlaylist: TCheckBox;
     cbMedialist: TCheckBox;
     cbeDetails: TCheckBox;
-    BtnClearTEST: TButton;
     btnRemoveTree: TButton;
-    Button2: TButton;
-    Button3: TButton;
-    Button4: TButton;
-    Button5: TButton;
-    Button6: TButton;
-    Button7: TButton;
+    btnRemoveCoverflow: TButton;
+    btnRemoveCloud: TButton;
+    btnRemovePlaylist: TButton;
+    btnRemoveMediaList: TButton;
+    btnRemoveDetails: TButton;
+    btnRemoveControls: TButton;
     lblMainContainer: TLabel;
     grpBoxNempElements: TGroupBox;
     grpBoxVisibleElements: TGroupBox;
     pnlNempWindowEdit: TPanel;
     pnlSettings: TPanel;
-    cbControls: TCheckBox;
-    grpBoxControlPanelConfig: TGroupBox;
-    cbControlPanelRows: TCheckBox;
+    grpBoxAdditionalConfig: TGroupBox;
     cbControlPanelShowCover: TCheckBox;
     grpBoxNempConstruction: TGroupBox;
     pnlConstructionHint: TPanel;
     lblElementCount: TLabel;
-    lblVisibleElementsNote: TLabel;
-    procedure cbMainLayoutChange(Sender: TObject);
+    Memo1: TMemo;
+    pnlConstruction: TPanel;
+    MainMenu: TMainMenu;
+    mmLayout: TMenuItem;
+    mmSplit1: TMenuItem;
+    mmClear: TMenuItem;
+    mmResetToDefault: TMenuItem;
+    mmUndo: TMenuItem;
+    cbTreeViewOrientation: TComboBox;
+    lblTreeViewOrientation: TLabel;
+    cbFileOverviewOrientation: TComboBox;
+    lblFileOverview: TLabel;
+    cbFileOverviewMode: TComboBox;
+    lblPlaylistAlwaysVisible: TLabel;
+    BtnNewLayout: TButton;
+    mmExampleLayouts: TMenuItem;
     procedure FormCreate(Sender: TObject);
-    procedure BlockBrowseResize(Sender: TObject);
-    procedure BlockPlaylistResize(Sender: TObject);
-    procedure BlockMedialistResize(Sender: TObject);
-    procedure BlockFileOverviewResize(Sender: TObject);
-    procedure ImgRightClick(Sender: TObject);
-    procedure ImgLeftClick(Sender: TObject);
-    procedure ImgUpClick(Sender: TObject);
-    procedure ImgDownClick(Sender: TObject);
-    procedure cbControlPositionChange(Sender: TObject);
-    procedure RGrpControlSubPanelClick(Sender: TObject);
-    procedure cbControlPositionSubPanelChange(Sender: TObject);
     procedure BtnApplyClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure cbControlPanelRowsClick(Sender: TObject);
-    procedure cbControlPanelShowCoverClick(Sender: TObject);
-    procedure cbControlPanelShowVisualisationClick(Sender: TObject);
-    procedure cbHideFileOverviewClick(Sender: TObject);
-    procedure SplitterTopMoved(Sender: TObject);
-    procedure MainSplitterMoved(Sender: TObject);
-    procedure BtnUndoClick(Sender: TObject);
+    procedure BtnCancelClick(Sender: TObject);
     procedure BtnResetToDefaultClick(Sender: TObject);
-    procedure SplitterTopCanResize(Sender: TObject; var NewSize: Integer;
-      var Accept: Boolean);
     procedure BtnOKClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
     procedure cbSelectionClick(Sender: TObject);
 
     procedure NewLayoutSplitterMoved(Sender: TObject);
     procedure AfterContainerCreated(Sender: TObject);
 
     procedure MainContainerResize(Sender: TObject);
-    procedure BtnClearTESTClick(Sender: TObject);
+    procedure BtnNewLayoutClick(Sender: TObject);
     //procedure BtnSplitHorizontallyClick(Sender: TObject);
     //procedure btnSplitVerticallyClick(Sender: TObject);
 
@@ -147,28 +88,33 @@ type
       Y: Integer);
     procedure pnlDefaultContainerDragOver(Sender, Source: TObject; X,
       Y: Integer; State: TDragState; var Accept: Boolean);
-    procedure pnlMedialistMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+
+    procedure mmLayoutPresetClick(Sender: TObject);
+    procedure cbFileOverviewModeChange(Sender: TObject);
+    procedure mmUndoClick(Sender: TObject);
   private
     { Private declarations }
-    LocalBuildOptions: TNempFormBuildOptions;
+    //LocalBuildOptions: TNempFormBuildOptions;
 
     TestLayout: TNempLayout;
+    BackupLayout: TNempLayout;
+    LayoutDefaults: TMemIniFile;
+    AvailableLayouts: TStringList;
+    CreatedMenuItems: TMenuItemList;
 
-    procedure ApplySettings;
+    procedure BuildMainMenu;
 
-    procedure FixRowLayoutButtons(aRow, aColumn, maxRow, maxColumn: Integer; aBlock: TNempBlockPanel);
-    procedure FixAllButtons;
-    procedure FixSettingsGUI;
-
-    procedure RefreshConstructionHint;
+    procedure ApplySettingsToGui;
+    procedure RefreshEditGUI;
+    procedure RefreshFileOverViewGUI;
     procedure RemovePanelFromParent(aPanel: TNempPanel);
     procedure ResetNempPanel(aPanel: TNempPanel);
     procedure ResetAllNempPanel;
+    procedure AssignFromBackupLayout;
   public
     { Public declarations }
     procedure WndProc(var Msg: TMessage); override;
-
+    procedure ReTranslateMenuItems;
   end;
 
 var
@@ -176,7 +122,7 @@ var
 
 implementation
 
-uses NempMainUnit, Nemp_RessourceStrings, Hilfsfunktionen, gnugettext;
+uses Nemp_RessourceStrings, Hilfsfunktionen, gnugettext, SplitForm_Hilfsfunktionen;
 
 {$R *.dfm}
 
@@ -184,251 +130,177 @@ const
   WM_REMOVEPANEL = WM_USER + 1;
 
 
-procedure TMainFormBuilder.FixAllButtons;
-var i: Integer;
-begin
-    case localBuildOptions.MainLayout of
-      Layout_TwoRows: begin
-          for i := 0 to localBuildOptions.PanelAChilds.Count - 1 do
-              FixRowLayoutButtons(0, i, 1, localBuildOptions.PanelAChilds.Count-1, localBuildOptions.PanelAChilds[i]);
-
-          for i := 0 to localBuildOptions.PanelBChilds.Count - 1 do
-              FixRowLayoutButtons(1, i, 1, localBuildOptions.PanelBChilds.Count-1, localBuildOptions.PanelBChilds[i]);
-      end;
-
-      Layout_TwoColumns: begin
-          for i := 0 to localBuildOptions.PanelAChilds.Count - 1 do
-              FixRowLayoutButtons(i, 0, localBuildOptions.PanelAChilds.Count-1, 1, localBuildOptions.PanelAChilds[i]);
-
-          for i := 0 to localBuildOptions.PanelBChilds.Count - 1 do
-              FixRowLayoutButtons(i, 1, localBuildOptions.PanelBChilds.Count-1, 1, localBuildOptions.PanelBChilds[i]);
-
-      end;
-    end;
-
-end;
-
-procedure TMainFormBuilder.FixRowLayoutButtons(aRow, aColumn, maxRow,
-  maxColumn: Integer; aBlock: TNempBlockPanel);
-var UpVis, DownVis, LeftVis, RightVis: Boolean;
-begin
-    UpVis   := (aRow > 0)            and (maxColumn > 0);
-    DownVis := (aRow < maxRow)       and (maxColumn > 0);
-    LeftVis := (aColumn > 0)         and (maxRow > 0);
-    RightVis:= (aColumn < maXColumn) and (maxRow > 0);
-
-    if aBlock.Block = BlockBrowse then
-    begin
-        ImgCoverFlowUp   .Visible := UpVis;
-        ImgCoverFlowDown .Visible := DownVis;
-        ImgCoverFlowLeft .Visible := LeftVis;
-        ImgCoverFlowRight.Visible := RightVis;
-    end;
-
-    if aBlock.Block = BlockPlaylist then
-    begin
-        ImgPlaylistUp   .Visible := UpVis;
-        ImgPlaylistDown .Visible := DownVis;
-        ImgPlaylistLeft .Visible := LeftVis;
-        ImgPlaylistRight.Visible := RightVis;
-    end;
-
-    if aBlock.Block = BlockMedialist then
-    begin
-        ImgMediaListUp   .Visible := UpVis;
-        ImgMediaListDown .Visible := DownVis;
-        ImgMediaListLeft .Visible := LeftVis;
-        ImgMediaListRight.Visible := RightVis;
-    end;
-
-    if aBlock.Block = BlockFileOverview then
-    begin
-        ImgFileOverviewUp   .Visible := UpVis;
-        ImgFileOverviewDown .Visible := DownVis;
-        ImgFileOverviewLeft .Visible := LeftVis;
-        ImgFileOverviewRight.Visible := RightVis;
-    end;
-end;
-
-procedure TMainFormBuilder.FixSettingsGUI;
-begin
-
-    RGrpControlSubPanel.OnClick := Nil;
-    if LocalBuildOptions.ControlPanelSubParent = LocalBuildOptions.BlockBrowse       then RGrpControlSubPanel.ItemIndex := 0;
-    if LocalBuildOptions.ControlPanelSubParent = LocalBuildOptions.BlockPlaylist     then RGrpControlSubPanel.ItemIndex := 1;
-    if LocalBuildOptions.ControlPanelSubParent = LocalBuildOptions.BlockMediaList    then RGrpControlSubPanel.ItemIndex := 2;
-    if LocalBuildOptions.ControlPanelSubParent = LocalBuildOptions.BlockFileOverview then RGrpControlSubPanel.ItemIndex := 3;
-    RGrpControlSubPanel.OnClick := RGrpControlSubPanelClick;
-
-    cbControlPosition.OnChange := Nil;
-    cbControlPosition.ItemIndex := Integer(LocalBuildOptions.ControlPanelPosition);
-    cbControlPosition.OnChange := cbControlPositionChange;
-
-    cbMainLayout.OnChange := Nil;
-    cbMainLayout.ItemIndex := Integer(LocalBuildOptions.MainLayout);
-    cbMainLayout.OnChange := cbMainLayoutChange;
-
-    cbControlPositionSubPanel.OnChange := Nil;
-    if LocalBuildOptions.ControlPanelSubPosition = cp_SubTop then cbControlPositionSubPanel.ItemIndex := 0;
-    if LocalBuildOptions.ControlPanelSubPosition = cp_SubBottom then cbControlPositionSubPanel.ItemIndex := 1;
-    cbControlPositionSubPanel.OnChange := cbControlPositionSubPanelChange;
-
-    cbControlPanelRows.Checked              := LocalBuildOptions.ControlPanelTwoRows           ;
-    cbControlPanelShowCover.Checked         := LocalBuildOptions.ControlPanelShowCover         ;
-    // cbControlPanelShowVisualisation.Checked := LocalBuildOptions.ControlPanelShowVisualisation ;
-
-    cbHideFileOverview.OnClick := Nil;
-    cbHideFileOverview.Checked := LocalBuildOptions.HideFileOverviewPanel;
-    cbHideFileOverview.OnClick := cbHideFileOverviewClick;
-
-    // enable/disable Postion-sub-settings for ControlPanel
-    RGrpControlSubPanel.Enabled       := LocalBuildOptions.ControlPanelPosition = cp_subPanel;
-    LblSubPanelPosition.Enabled       := LocalBuildOptions.ControlPanelPosition = cp_subPanel;
-    cbControlPositionSubPanel.Enabled := LocalBuildOptions.ControlPanelPosition = cp_subPanel;
-end;
-
 procedure TMainFormBuilder.FormCreate(Sender: TObject);
-var fn: String;
+var
+  fnIni: String;
 begin
-    BackupComboboxes(self);
-    TranslateComponent (self);
-    RestoreComboboxes(self);
+  BackupComboboxes(self);
+  TranslateComponent (self);
+  RestoreComboboxes(self);
 
-    LocalBuildOptions := TNempFormBuildOptions.Create;
-    LocalBuildOptions.NewLayout := Layout_TwoRows;
+  MainContainer.ID := 'A';
+  TestLayout := TNempLayout.Create;
+  TestLayout.ConstructionLayout := True;
 
-    LocalBuildOptions.MegaContainer  := ___FormSimulatorPanel;
-    LocalBuildOptions.SuperContainer := __MainContainer;
-    LocalBuildOptions.MainContainerA := _TopMainPanel;
-    LocalBuildOptions.MainContainerB := _BottomMainPanel;
-    LocalBuildOptions.MainSplitter := MainSplitter;
+  TestLayout.TreePanel       := pnlTree;
+  TestLayout.CoverflowPanel  := pnlCoverflow;
+  TestLayout.CloudPanel      := pnlCloud;
+  TestLayout.PlaylistPanel   := pnlPlaylist;
+  TestLayout.MedialistPanel  := pnlMedialist;
+  TestLayout.DetailsPanel    := pnlDetails;
+  TestLayout.ControlsPanel   := pnlControls;
+  TestLayout.MainContainer   := MainContainer;
+  TestLayout.OnAfterContainerCreate := AfterContainerCreated;
+  TestLayout.OnSplitterMoved := NewLayoutSplitterMoved;
+  TestLayout.BlockHeapControl := grpBoxNempElements;
 
-    LocalBuildOptions.ChildPanelMinHeight := 100;
-    LocalBuildOptions.ChildPanelMinWidth  := 100;
+  BackupLayout := TNempLayout.Create;
 
-    LocalBuildOptions.MainPanelMinHeight := 100;
-    LocalBuildOptions.MainPanelMinWidth := 100;
+  MainContainer.OnEditButtonClick := BtnEditContainerClick;
+  MainContainer.CreateEditButtons;
+  MainContainer.SplitterMinSize := 33;
+  lblMainContainer.Font.Size := 11;
+  lblMainContainer.Caption := Format(FormBuilder_MainContainerCaption, [#$25E7, #$2B12]);
 
-    LocalBuildOptions.ControlPanel.SetControlValues(_ControlPanel, Nil, Nil, Nil, Nil, Nil, Nil, Nil,{ Nil,} 'Player Control');
+  fnIni := ExtractFilePath(ParamStr(0)) + 'Data\Layouts';
+  if FileExists(fnIni) then  begin
+    LayoutDefaults := TMemIniFile.Create(fnIni, TEncoding.UTF8);
+    //LayoutDefaults := TMemIniFile.Create(fnIni);
+    AvailableLayouts := TStringList.Create;
+    CreatedMenuItems := TMenuItemList.Create(False);
+  end
+  else begin
+    LayoutDefaults := Nil;
+    AvailableLayouts := Nil;
+  end;
 
-    // fill it with the default layout
-    LocalBuildOptions.BlockBrowse.SetValues(BlockBrowse, HeaderBrowse, ContentBrowse, 'Coverflow');
-    LocalBuildOptions.BlockPlaylist.SetValues(BlockPlaylist, HeaderPlaylist, ContentPlaylist, 'Playlist');
-    LocalBuildOptions.BlockMediaList.SetValues(BlockMediaList, HeaderMediaList, ContentMedialist, 'Medialist');
-    LocalBuildOptions.BlockFileOverview.SetValues(BlockFileOverview, HeaderFileOverview, ContentFileOverview, 'File overview');
-
-    LocalBuildOptions.PanelAChilds.Add(LocalBuildOptions.BlockBrowse);
-    LocalBuildOptions.PanelAChilds.Add(LocalBuildOptions.BlockPlaylist);
-
-    LocalBuildOptions.PanelBChilds.Add(LocalBuildOptions.BlockMediaList);
-    LocalBuildOptions.PanelBChilds.Add(LocalBuildOptions.BlockFileOverView);
-
-    LocalBuildOptions.SubSplitter1 := SplitterTop;
-    LocalBuildOptions.SubSplitter2 := SplitterBottom;
-
-    fn := ExtractFilePath(ParamStr(0)) + 'Images\FormBuilderUp.png';
-    if FileExists(fn) then
-    begin
-        ImgMediaListUp    .Picture.LoadFromFile(fn);
-        ImgFileOverviewUp .Picture.LoadFromFile(fn);
-        ImgPlaylistUp     .Picture.LoadFromFile(fn);
-        ImgCoverFlowUp    .Picture.LoadFromFile(fn);
-    end;
-
-    fn := ExtractFilePath(ParamStr(0)) + 'Images\FormBuilderDown.png';
-    if FileExists(fn) then
-    begin
-        ImgMediaListDown    .Picture.LoadFromFile(fn);
-        ImgFileOverviewDown .Picture.LoadFromFile(fn);
-        ImgPlaylistDown     .Picture.LoadFromFile(fn);
-        ImgCoverFlowDown    .Picture.LoadFromFile(fn);
-    end;
-
-    fn := ExtractFilePath(ParamStr(0)) + 'Images\FormBuilderLeft.png';
-    if FileExists(fn) then
-    begin
-        ImgMediaListLeft    .Picture.LoadFromFile(fn);
-        ImgFileOverviewLeft .Picture.LoadFromFile(fn);
-        ImgPlaylistLeft     .Picture.LoadFromFile(fn);
-        ImgCoverFlowLeft    .Picture.LoadFromFile(fn);
-    end;
-
-    fn := ExtractFilePath(ParamStr(0)) + 'Images\FormBuilderRight.png';
-    if FileExists(fn) then
-    begin
-        ImgMediaListRight    .Picture.LoadFromFile(fn);
-        ImgFileOverviewRight .Picture.LoadFromFile(fn);
-        ImgPlaylistRight     .Picture.LoadFromFile(fn);
-        ImgCoverFlowRight    .Picture.LoadFromFile(fn);
-    end;
-
-    ApplySettings;
-    LocalBuildOptions.SwapMainLayout;
-    FixAllButtons;
-
-    TestLayout := TNempLayout.Create;
-    TestLayout.ConstructionLayout := True;
-
-    TestLayout.TreePanel       := pnlTree;
-    TestLayout.CoverflowPanel  := pnlCoverflow;
-    TestLayout.CloudPanel      := pnlCloud;
-    TestLayout.PlaylistPanel   := pnlPlaylist;
-    TestLayout.MedialistPanel  := pnlMedialist;
-    TestLayout.DetailsPanel    := pnlDetails;
-    TestLayout.ControlsPanel   := pnlControls;
-    TestLayout.MainContainer   := MainContainer;
-    TestLayout.OnAfterContainerCreate := AfterContainerCreated;
-
-    MainContainer.OnEditButtonClick := BtnEditContainerClick;
-    MainContainer.CreateEditButtons;
-    MainContainer.SplitterMinSize := 33;
-    lblMainContainer.Font.Size := 11;
-    lblMainContainer.Caption := Format(FormBuilder_MainContainerCaption, [#$25E7, #$2B12]);
-
-    RefreshConstructionHint;
-    TestLayout.RefreshEditButtons;
+  BuildMainMenu;
 end;
 
 procedure TMainFormBuilder.FormDestroy(Sender: TObject);
 begin
-    LocalBuildOptions.Free;
-    TestLayout.Free;
+  TestLayout.Free;
+  if assigned(LayoutDefaults) then
+    LayoutDefaults.Free;
+  if assigned(AvailableLayouts) then
+    AvailableLayouts.Free;
+  if assigned(CreatedMenuItems) then
+    CreatedMenuItems.Free;
 end;
-
-
 
 procedure TMainFormBuilder.FormShow(Sender: TObject);
 begin
-    LocalBuildOptions.Assign(NempFormBuildOptions);
-    FixAllButtons;
-    FixSettingsGUI;
+  BackupLayout.Assign(NempLayout);
+  AssignFromBackupLayout;
+  lblElementCount.Caption := FormBuilder_ConstructionFormShow;
+end;
+
+procedure TMainFormBuilder.BuildMainMenu;
+var
+  langKey, newName: String;
+  newItem: TMenuItem;
+  i: Integer;
+begin
+  if not assigned(LayoutDefaults) then begin
+    //mmSplit1.Visible := False;
+    mmExampleLayouts.Visible := False;
+    exit;
+  end;
+
+  LayoutDefaults.ReadSections(AvailableLayouts);
+  if NempOptions.Language = 'de' then
+    langKey := 'de'
+  else
+    langKey := 'en';
+
+  for i := 0 to AvailableLayouts.Count - 1 do begin
+    newName := LayoutDefaults.ReadString(AvailableLayouts[i], langKey, AvailableLayouts[i]);
+
+    newItem := TMenuItem.Create(self);
+    newItem.Tag := i;
+    newItem.AutoHotkeys := maManual;
+    newItem.Caption := newName;
+    newItem.Hint := FormBuilder_LoadPresetHint;
+    newItem.OnClick := mmLayoutPresetClick;
+    CreatedMenuItems.Add(newItem);
+    // mmLayout.Insert(i, newItem);
+    mmExampleLayouts.Add(newItem)
+  end;
+end;
+
+procedure TMainFormBuilder.ReTranslateMenuItems;
+var
+  langKey: String;
+  i: Integer;
+begin
+  if not assigned(CreatedMenuItems) then
+    exit;
+
+  if NempOptions.Language = 'de' then
+    langKey := 'de'
+  else
+    langKey := 'en';
+
+  for i := 0 to CreatedMenuItems.Count - 1 do
+    CreatedMenuItems[i].Caption := LayoutDefaults.ReadString(AvailableLayouts[i], langKey, AvailableLayouts[i]);
+end;
+
+procedure TMainFormBuilder.mmLayoutPresetClick(Sender: TObject);
+var
+  idx: Integer;
+begin
+  idx := (Sender as TMenuItem).Tag;
+  if (idx >= 0) and (idx <= AvailableLayouts.Count - 1) then begin
+    if not TestLayout.LoadPreset(LayoutDefaults, AvailableLayouts[idx], False) then
+      TranslateMessageDLG(FormBuilder_PresetInstructionsInvalid, mtWarning, [MBOK], 0);
+
+    ApplySettingsToGui;
+    TestLayout.BuildMainForm;
+    RefreshEditGUI;
+  end else
+    TranslateMessageDLG(FormBuilder_PresetInstructionsMissing, mtError, [MBOK], 0); // should not happen at all ...
+end;
+
+
+procedure TMainFormBuilder.AssignFromBackupLayout;
+begin
+  TestLayout.Assign(BackupLayout);
+  ApplySettingsToGui;
+  TestLayout.BuildMainForm;
+  RefreshEditGUI;
+  RefreshFileOverViewGUI;
 end;
 
 // reset all input and restore Default Laoyut
 procedure TMainFormBuilder.BtnResetToDefaultClick(Sender: TObject);
 begin
-    LocalBuildOptions.ResetToDefault;
-    FixAllButtons;
-    FixSettingsGUI;
-end;
-
-procedure TMainFormBuilder.BtnUndoClick(Sender: TObject);
-begin
-    LocalBuildOptions.Assign(NempFormBuildOptions);
-    FixAllButtons;
-    FixSettingsGUI;
-end;
-
-procedure TMainFormBuilder.Button1Click(Sender: TObject);
-begin
-  TestLayout.Clear;
-  TestLayout.LoadSettings;
-  TestLayout.OnSplitterMoved := NewLayoutSplitterMoved;
+  TestLayout.ResetToDefault;
+  ApplySettingsToGui;
   TestLayout.BuildMainForm;
-
-  RefreshConstructionHint;
-  TestLayout.RefreshEditButtons;
+  RefreshEditGUI;
+  RefreshFileOverViewGUI;
 end;
+
+procedure TMainFormBuilder.BtnCancelClick(Sender: TObject);
+begin
+  NempLayout.Assign(BackupLayout);
+  NempLayout.BuildMainForm;
+  Close;
+end;
+
+procedure TMainFormBuilder.mmUndoClick(Sender: TObject);
+begin
+  AssignFromBackupLayout;
+  TestLayout.Assign(BackupLayout);
+  ApplySettingsToGui;
+  TestLayout.BuildMainForm;
+  RefreshEditGUI;
+  RefreshFileOverViewGUI;
+  // revoke changes also on MainForm
+  NempLayout.Assign(BackupLayout);
+  NempLayout.BuildMainForm;
+end;
+
 
 procedure TMainFormBuilder.WndProc(var Msg: TMessage);
 begin
@@ -436,28 +308,37 @@ begin
   case Msg.Msg of
     WM_REMOVEPANEL: begin
       TestLayout.DeletePanel(TNempContainerPanel(Msg.WParam));
-      RefreshConstructionHint;
-      TestLayout.RefreshEditButtons;
+      RefreshEditGUI;
     end;
   end;
 end;
 
-procedure TMainFormBuilder.RefreshConstructionHint;
+procedure TMainFormBuilder.RefreshEditGUI;
 var
   lc: Integer;
-    function AllPanelsPlaced: Boolean;
-    begin
-      result := (pnlTree.Parent <> grpBoxNempElements)
-          and (pnlCoverflow.Parent <> grpBoxNempElements)
-          and (pnlCloud.Parent <> grpBoxNempElements)
-          and (pnlPlaylist.Parent <> grpBoxNempElements)
-          and (pnlDetails.Parent <> grpBoxNempElements)
-          and (pnlMedialist.Parent <> grpBoxNempElements)
-          and (pnlControls.Parent <> grpBoxNempElements)
-    end;
+  AllPanelsPlaced: Boolean;
 begin
   lc := MainContainer.LeafCount;
   lblMainContainer.Visible := lc = 1;
+
+  AllPanelsPlaced := (pnlTree.Parent <> grpBoxNempElements)
+          and (pnlCoverflow.Parent <> grpBoxNempElements)
+          and (pnlCloud.Parent <> grpBoxNempElements)
+          and (pnlPlaylist.Parent <> grpBoxNempElements)
+          and (pnlMedialist.Parent <> grpBoxNempElements)
+          and (pnlDetails.Parent <> grpBoxNempElements)
+          and (pnlControls.Parent <> grpBoxNempElements);
+
+  btnRemoveTree.Visible := pnlTree.Parent <> grpBoxNempElements;
+  btnRemoveCoverflow.Visible := pnlCoverflow.Parent <> grpBoxNempElements;
+  btnRemoveCloud.Visible := pnlCloud.Parent <> grpBoxNempElements;
+  btnRemovePlaylist.Visible := pnlPlaylist.Parent <> grpBoxNempElements;
+  btnRemoveMediaList.Visible := pnlMedialist.Parent <> grpBoxNempElements;
+  btnRemoveDetails.Visible := pnlDetails.Parent <> grpBoxNempElements;
+  btnRemoveControls.Visible := pnlControls.Parent <> grpBoxNempElements;
+
+  BtnOk.Enabled := AllPanelsPlaced;
+  BtnApply.Enabled := AllPanelsPlaced;
 
   if AllPanelsPlaced then
     lblElementCount.Caption := FormBuilder_ConstructionComplete
@@ -471,11 +352,22 @@ begin
       else
         lblElementCount.Caption := FormBuilder_ElementCountTooMany;
   end;
+
+  TestLayout.RefreshEditButtons(lc=7);
+  TestLayout.ReNumberContainerPanels;
+
+  TestLayout.CreateBuildInstructions(Memo1.Lines);
 end;
+
+procedure TMainFormBuilder.RefreshFileOverViewGUI;
+begin
+  // lblFileOVerviewOrientation.Enabled := cbFileOverviewMode.ItemIndex = 0;
+  cbFileOverviewOrientation.Enabled := cbFileOverviewMode.ItemIndex = 0;
+end;
+
 {
   Remove a NempPanel from the Framework (and put it back to the Selection-Container)
 }
-
 procedure TMainFormBuilder.RemovePanelFromParent(aPanel: TNempPanel);
 var
   aParent: TNempContainerPanel;
@@ -490,8 +382,8 @@ begin
     end;
   end;
 
-  RefreshConstructionHint;
-  TestLayout.RefreshEditButtons;
+
+  RefreshEditGUI;
 end;
 
 procedure TMainFormBuilder.ResetNempPanel(aPanel: TNempPanel);
@@ -510,8 +402,7 @@ begin
     aPanel.Height := 35
   else
     aPanel.Height := 50;
-  RefreshConstructionHint;
-  TestLayout.RefreshEditButtons;
+  RefreshEditGUI;
 end;
 
 procedure TMainFormBuilder.ResetAllNempPanel;
@@ -579,8 +470,7 @@ begin
     src.Align := alClient;
 
   //snd.AlignChildPanels(False);
-  RefreshConstructionHint;
-  TestLayout.RefreshEditButtons;
+  RefreshEditGUI;
 end;
 
 
@@ -591,22 +481,6 @@ begin
   accept := (Source is TNempPanel);
 end;
 
-procedure TMainFormBuilder.pnlMedialistMouseDown(Sender: TObject;
-  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  if pnlMediaList.Align = alClient then
-    caption := 'client'
-  else
-    caption := 'NICHT client';
-
-  if pnlMedialist.Parent.Align = alClient then
-    caption := caption + '  Parent auch'
-  else
-    caption := caption + '  Parent NICHT';
-
-
-end;
-
 procedure TMainFormBuilder.pnlDefaultContainerDragDrop(Sender, Source: TObject;
   X, Y: Integer);
 begin
@@ -614,26 +488,20 @@ begin
 end;
 
 
-
 {
 
 }
 procedure TMainFormBuilder.MainContainerResize(Sender: TObject);
 begin
-  //  MainContainer.Caption := MainContainer.Caption + ' wuppdi';
-  TestLayout.ReAlignMainForm
+  TestLayout.ReAlignMainForm;
 end;
 
-procedure TMainFormBuilder.BtnClearTESTClick(Sender: TObject);
+procedure TMainFormBuilder.BtnNewLayoutClick(Sender: TObject);
 begin
-  //TestLayout.ReAlignMainForm;
-  //ResetAllNempPanel;
   TestLayout.Clear;
   ResetAllNempPanel;
-  MainContainer.OnEditButtonClick := BtnEditContainerClick;
-  self.MainContainer.CreateEditButtons;
+  RefreshEditGUI;
 end;
-
 
 
 {
@@ -655,7 +523,7 @@ end;
 
 procedure TMainFormBuilder.BtnEditContainerClick(Sender: TObject);
 var
-  BtnPanel, ParentPanel, newPanel: TNempContainerPanel;
+  BtnPanel: TNempContainerPanel;
 begin
   if not (Sender is TButton) then exit;
   if not ((Sender as TButton).Parent is TNempContainerPanel) then exit;
@@ -667,22 +535,14 @@ begin
     // deleting a button (by deleting it's Parent) in its own OnClick event is not a good idea. Therefore:
     3: PostMessage(Handle, WM_REMOVEPANEL, wParam(BtnPanel), 0); // see WndProc how to handle WM_REMOVEPANEL
   end;
-  RefreshConstructionHint;
-  TestLayout.RefreshEditButtons;
+  RefreshEditGUI;
 end;
-
 
 
 procedure TMainFormBuilder.NewLayoutSplitterMoved(Sender: TObject);
-//var
-//  panel: TNempContainerPanel;
 begin
-  //panel := TNempContainerPanel( (Sender as TSplitter).Parent);
-  //caption := 'Splitter auf Panel ' + Panel.ID + ' bewegt.';
+  TestLayout.CreateBuildInstructions(Memo1.Lines);
 end;
-
-
-
 
 
 procedure TMainFormBuilder.BtnApplyClick(Sender: TObject);
@@ -692,16 +552,27 @@ begin
         TranslateMessageDLG(FormBuilder_SeparateWindowWarning, mtWarning, [MBOK], 0);
     end else
     begin
-        LockWindowUpdate(Nemp_MainForm.Handle);
+        TestLayout.ShowBibSelection  := cbSelection.Checked;
+        TestLayout.ShowMedialist     := cbMedialist.Checked;
+        TestLayout.ShowFileOverview  := cbeDetails.Checked;
+        // Additional Settings
+        TestLayout.ShowControlCover := cbControlPanelShowCover.Checked;
+        TestLayout.TreeviewOrientation := cbTreeViewOrientation.ItemIndex;
+        TestLayout.FileOVerviewOrientation := cbFileOverviewOrientation.ItemIndex;
+        TestLayout.FileOverviewMode := teFileOverViewMode(cbFileOverviewMode.ItemIndex);
 
-        NempFormBuildOptions.BeginUpdate;
-        NempFormBuildOptions.assign (LocalBuildOptions);
-        NempFormBuildOptions.EndUpdate;
+        RevokeDragFiles;
+        //LockWindowUpdate(Nemp_MainForm.Handle);
+        //LockWindowUpdate(0);
+        TestLayout.Simplify;
+        NempLayout.Clear;
+        NempLayout.Assign(TestLayout);
+        NempLayout.BuildMainForm;
 
-        LockWindowUpdate(0);
-
-        Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
-        // Nemp_MainForm.CorrectSkinRegions;
+        NempLayout.SaveSettings;
+        NempSettingsManager.UpdateFile;
+        // TestLayout.Clear;
+        // TestLayout.BuildMainForm;
     end;
 end;
 
@@ -712,442 +583,30 @@ begin
     close;
 end;
 
-
-
-procedure TMainFormBuilder.BlockBrowseResize(Sender: TObject);
+procedure TMainFormBuilder.ApplySettingsToGui;
 begin
-    ImgCoverFlowUp    .left := (ContentBrowse.Width  Div 2) - 12;
-    ImgCoverFlowUp.Top := 4;
-
-    ImgCoverFlowDown  .left := (ContentBrowse.Width  Div 2) - 12;
-    ImgCoverFlowDown.Top := ContentBrowse.Height - 28;
-
-    ImgCoverFlowLeft  .top  := (ContentBrowse.Height Div 2) - 12;
-    ImgCoverFlowLeft.Left := 4;
-
-    ImgCoverFlowRight .top  := (ContentBrowse.Height Div 2) - 12;
-    ImgCoverFlowRight.Left := ContentBrowse.Width - 28;
-end;
-procedure TMainFormBuilder.BlockFileOverviewResize(Sender: TObject);
-begin
-    ImgFileOverviewUp    .left := (ContentFileOverview.Width  Div 2) - 12;
-    ImgFileOverviewUp.Top := 4;
-
-    ImgFileOverviewDown  .left := (ContentFileOverview.Width  Div 2) - 12;
-    ImgFileOverviewDown.Top := ContentFileOverview.Height - 28;
-
-    ImgFileOverviewLeft  .top  := (ContentFileOverview.Height Div 2) - 12;
-    ImgFileOverviewLeft.Left := 4;
-
-    ImgFileOverviewRight .top  := (ContentFileOverview.Height Div 2) - 12;
-    ImgFileOverviewRight.Left  := ContentFileOverview.Width - 28;
-end;
-procedure TMainFormBuilder.BlockMedialistResize(Sender: TObject);
-begin
-    ImgMediaListUp    .Left := (ContentMedialist.Width  Div 2) - 12;
-    ImgMediaListUp    .Top := 4;
-
-    ImgMediaListDown  .Left := (ContentMedialist.Width  Div 2) - 12;
-    ImgMediaListDown  .Top := ContentMedialist.Height - 28;
-
-    ImgMediaListLeft  .top  := (ContentMedialist.Height Div 2) - 12;
-    ImgMediaListLeft  .left := 4;
-
-    ImgMediaListRight .top  := (ContentMedialist.Height Div 2) - 12;
-    ImgMediaListRight .left := ContentMedialist.Width - 28
-
-end;
-procedure TMainFormBuilder.BlockPlaylistResize(Sender: TObject);
-begin
-    ImgPlaylistUp    .left := (ContentPlaylist.Width  Div 2) - 12;
-    ImgPlaylistUp    .Top := 4;
-
-    ImgPlaylistDown  .left := (ContentPlaylist.Width  Div 2) - 12;
-    ImgPlaylistDown.Top := ContentPlaylist.Height - 28;
-
-    ImgPlaylistLeft  .top  := (ContentPlaylist.Height Div 2) - 12;
-    ImgPlaylistLeft  .left := 4;
-
-    ImgPlaylistRight .top  := (ContentPlaylist.Height Div 2) - 12;
-    ImgPlaylistRight .left := ContentPlaylist.Width  - 28;
+  cbSelection.Checked := TestLayout.ShowBibSelection;
+  cbMedialist.Checked := TestLayout.ShowMedialist;
+  cbeDetails.Checked := TestLayout.ShowFileOverview;
+  // Additional Settings
+  cbControlPanelShowCover.Checked := TestLayout.ShowControlCover;
+  cbTreeViewOrientation.ItemIndex := TestLayout.TreeviewOrientation;
+  cbFileOverviewOrientation.ItemIndex := TestLayout.FileOVerviewOrientation;
+  cbFileOverviewMode.ItemIndex := Integer(TestLayout.FileOverviewMode);
 end;
 
-
-
-procedure TMainFormBuilder.ApplySettings;
+procedure TMainFormBuilder.cbFileOverviewModeChange(Sender: TObject);
 begin
-    LocalBuildOptions.ControlPanelPosition := TControlPanelPosition(cbControlPosition.ItemIndex);
-    LocalBuildOptions.NewLayout := TMainLayout(cbMainLayout.ItemIndex);
-    case cbControlPositionSubPanel.ItemIndex of
-        0: LocalBuildOptions.ControlPanelSubPosition := cp_SubTop;
-        1:  LocalBuildOptions.ControlPanelSubPosition := cp_SubBottom;
-    end;
-
-    case RGrpControlSubPanel.ItemIndex of
-        0: LocalBuildOptions.ControlPanelSubParent := LocalBuildOptions.BlockBrowse;
-        1: LocalBuildOptions.ControlPanelSubParent := LocalBuildOptions.BlockPlaylist;
-        2: LocalBuildOptions.ControlPanelSubParent := LocalBuildOptions.BlockMediaList;
-        3: LocalBuildOptions.ControlPanelSubParent := LocalBuildOptions.BlockFileOverview;
-    end;
-end;
-
-
-
-procedure TMainFormBuilder.cbMainLayoutChange(Sender: TObject);
-begin
-    LocalBuildOptions.NewLayout := TMainLayout(cbMainLayout.ItemIndex);
-    LocalBuildOptions.SwapMainLayout;
-    FixAllButtons;
+  RefreshFileOverViewGUI;
 end;
 
 procedure TMainFormBuilder.cbSelectionClick(Sender: TObject);
-
-  procedure ShowHide(aPanel: TNempPanel; doShow: Boolean);
-  begin
-    if DoShow then
-      aPanel.ShowPanel
-    else
-      if aPanel.Parent <> grpBoxNempElements  then
-        aPanel.HidePanel;
-  end;
-
 begin
   case TCheckBox(Sender).Tag of
-    0: ShowHide(pnlTree, TCheckBox(Sender).Checked);
-    1: ShowHide(pnlCoverflow, TCheckBox(Sender).Checked);
-    2: ShowHide(pnlCloud, TCheckBox(Sender).Checked);
-    3: ShowHide(pnlPlaylist, TCheckBox(Sender).Checked);
-    4: ShowHide(pnlMedialist, TCheckBox(Sender).Checked);
-    5: ShowHide(pnlDetails, TCheckBox(Sender).Checked);
+    0: TestLayout.ShowBibSelection := TCheckBox(Sender).Checked;
+    1: TestLayout.ShowMedialist := TCheckBox(Sender).Checked;
+    2: TestLayout.ShowFileOverview := TCheckBox(Sender).Checked;
   end;
-
-  TestLayout.ReAlignMainForm;
-
-end;
-
-procedure TMainFormBuilder.cbHideFileOverviewClick(Sender: TObject);
-var VisA, VisB: Boolean;
-begin
-    VisA := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds);
-    VisB := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds);
-
-    if cbHideFileOverview.Checked then
-    begin
-        // set one of the splitters to "available"
-        if LocalBuildOptions.PanelAChilds.IndexOf(LocalBuildOptions.BlockFileOverview) > -1 then
-            LocalBuildOptions.MakeOneSplitterAvailable(0);
-        if LocalBuildOptions.PanelBChilds.IndexOf(LocalBuildOptions.BlockFileOverview) > -1 then
-            LocalBuildOptions.MakeOneSplitterAvailable(1);
-        // remove the block from the childpanels
-        LocalBuildOptions.PanelAChilds.Extract(LocalBuildOptions.BlockFileOverview);
-        LocalBuildOptions.PanelBChilds.Extract(LocalBuildOptions.BlockFileOverview);
-        // hide the block
-        LocalBuildOptions.BlockFileOverview.Block.Visible := False;
-    end else
-    begin
-        // show the block
-        LocalBuildOptions.BlockFileOverview.Block.Visible := True;
-        // add it to the (second) panel
-        // buit only if it is really NOT included in one of the lists
-        if (LocalBuildOptions.PanelAChilds.IndexOf(LocalBuildOptions.BlockFileOverview) = -1)
-            and (LocalBuildOptions.PanelBChilds.IndexOf(LocalBuildOptions.BlockFileOverview) = -1)
-        then
-            LocalBuildOptions.PanelBChilds.Add(LocalBuildOptions.BlockFileOverview);
-    end;
-    // rebuild the layout
-    LocalBuildOptions.HideFileOverviewPanel := cbHideFileOverview.Checked;
-    LocalBuildOptions.RefreshBothRowsOrColumns(False);
-    FixAllButtons;
-
-    if (VisA <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds))
-        or  (VisB <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds))
-    then
-        LocalBuildOptions.SwapMainLayout;
-end;
-
-procedure TMainFormBuilder.cbControlPanelRowsClick(Sender: TObject);
-begin
-    LocalBuildOptions.ControlPanelTwoRows           := cbControlPanelRows.Checked;
-end;
-
-procedure TMainFormBuilder.cbControlPanelShowCoverClick(Sender: TObject);
-begin
-    LocalBuildOptions.ControlPanelShowCover         := cbControlPanelShowCover.Checked;
-end;
-
-procedure TMainFormBuilder.cbControlPanelShowVisualisationClick(
-  Sender: TObject);
-begin
-    //LocalBuildOptions.ControlPanelShowVisualisation := cbControlPanelShowVisualisation.Checked;
-end;
-
-procedure TMainFormBuilder.cbControlPositionChange(Sender: TObject);
-begin
-    ApplySettings;
-    LocalBuildOptions.SwapMainLayout;
-
-    RGrpControlSubPanel      .Enabled := cbControlPosition.ItemIndex = 3;
-    LblSubPanelPosition      .Enabled := cbControlPosition.ItemIndex = 3;
-    cbControlPositionSubPanel.Enabled := cbControlPosition.ItemIndex = 3;
-end;
-
-procedure TMainFormBuilder.cbControlPositionSubPanelChange(Sender: TObject);
-begin
-    ApplySettings;
-    LocalBuildOptions.SwapMainLayout;
-end;
-
-procedure TMainFormBuilder.RGrpControlSubPanelClick(Sender: TObject);
-begin
-    ApplySettings;
-    LocalBuildOptions.SwapMainLayout;
-end;
-
-
-procedure TMainFormBuilder.SplitterTopCanResize(Sender: TObject;
-  var NewSize: Integer; var Accept: Boolean);
-var s: TSplitter;
-begin
-    s := Sender as TSplitter;
-    if s.Align in [alLeft, alRight] then
-        accept := (s.MinSize < NewSize) and ( (s.Parent.Width - newSize) > s.MinSize)
-    else
-        accept := (s.MinSize < NewSize) and ( (s.Parent.Height - newSize) > s.MinSize)
-end;
-
-procedure TMainFormBuilder.SplitterTopMoved(Sender: TObject);
-begin
-    LocalBuildOptions.OnSplitterMoved(Sender);
-end;
-
-
-
-procedure TMainFormBuilder.MainSplitterMoved(Sender: TObject);
-begin
-    LocalBuildOptions.OnMainSplitterMoved(Sender);
-end;
-
-procedure TMainFormBuilder.ImgUpClick(Sender: TObject);
-var idx: Integer;
-    ParentPanel: TPanel;
-    ParentBlock: TNempBlockPanel;
-    VisA, VisB: Boolean;
-begin
-    VisA := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds);
-    VisB := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds);
-
-    // UP-Click
-    ParentPanel := ((Sender as TImage).Parent.Parent) as TPanel;
-    ParentBlock := LocalBuildOptions.GetBlockByPanel(ParentPanel);
-
-    // if "two columns": Move one Up in the ChildList
-    if LocalBuildOptions.MainLayout = Layout_TwoColumns  then
-    begin
-        idx := LocalBuildOptions.PanelAChilds.IndexOf(ParentBlock);
-        if (idx > 0) and (idx < LocalBuildOptions.PanelAChilds.Count) then
-            LocalBuildOptions.PanelAChilds.Exchange(idx, idx - 1);
-
-        // or is it in the right MainPanel?
-        idx := LocalBuildOptions.PanelBChilds.IndexOf(ParentBlock);
-        if (idx > 0) and (idx < LocalBuildOptions.PanelBChilds.Count) then
-            LocalBuildOptions.PanelBChilds.Exchange(idx, idx - 1);
-
-        LocalBuildOptions.RefreshAColumn((ParentPanel.Parent) as TPanel);
-        FixAllButtons;
-    end;
-
-    // if "two Rows": Move to the upper row
-    if LocalBuildOptions.MainLayout = Layout_TwoRows  then
-    begin
-        idx := LocalBuildOptions.PanelBChilds.IndexOf(ParentBlock);
-        if idx > -1 then // it really is in the bottom MAIN Panel
-        begin
-            LocalBuildOptions.PanelBChilds.Extract(ParentBlock);
-            if idx = 0 then
-                LocalBuildOptions.PanelAChilds.Insert(idx, ParentBlock)      ///
-            else
-                LocalBuildOptions.PanelAChilds.Add(ParentBlock); // order will be done by RefreshBothRowsOrColumns
-
-            LocalBuildOptions.MakeOneSplitterAvailable(1);
-        end;
-
-        LocalBuildOptions.RefreshBothRowsOrColumns(True);
-        LocalBuildOptions.ApplyRatios;
-        FixAllButtons;
-    end;
-
-    if (VisA <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds))
-        or  (VisB <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds))
-    then
-        LocalBuildOptions.SwapMainLayout;
-end;
-
-
-
-
-procedure TMainFormBuilder.ImgDownClick(Sender: TObject);
-var idx: Integer;
-    ParentPanel: TPanel;
-    ParentBlock: TNempBlockPanel;
-    VisA, VisB: Boolean;
-begin
-    VisA := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds);
-    VisB := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds);
-
-    // DOWN-Click
-    ParentPanel := ((Sender as TImage).Parent.Parent) as TPanel;
-    ParentBlock := LocalBuildOptions.GetBlockByPanel(ParentPanel);
-
-    // if "two columns": Move one DOWN in the ChildList
-    if LocalBuildOptions.MainLayout = Layout_TwoColumns  then
-    begin
-        idx := LocalBuildOptions.PanelAChilds.IndexOf(ParentBlock);
-        if (idx > -1) and (idx < LocalBuildOptions.PanelAChilds.Count - 1) then
-            LocalBuildOptions.PanelAChilds.Exchange(idx, idx + 1);
-
-        // or is it in the right MainPanel?
-        idx := LocalBuildOptions.PanelBChilds.IndexOf(ParentBlock);
-        if (idx > -1) and (idx < LocalBuildOptions.PanelBChilds.Count - 1) then
-            LocalBuildOptions.PanelBChilds.Exchange(idx, idx + 1);
-
-        LocalBuildOptions.RefreshAColumn((ParentPanel.Parent) as TPanel);
-        FixAllButtons;
-    end;
-
-    // if "two Rows": Move to the bottom row
-    if LocalBuildOptions.MainLayout = Layout_TwoRows  then
-    begin
-        idx := LocalBuildOptions.PanelAChilds.IndexOf(ParentBlock);
-        if idx > -1 then // it really is in the bottom MAIN Panel
-        begin
-            LocalBuildOptions.PanelAChilds.Extract(ParentBlock);
-            if idx = 0 then
-                LocalBuildOptions.PanelBChilds.Insert(idx, ParentBlock)      ///
-            else
-                LocalBuildOptions.PanelBChilds.Add(ParentBlock);
-
-            LocalBuildOptions.MakeOneSplitterAvailable(0);
-        end;
-
-        LocalBuildOptions.RefreshBothRowsOrColumns(True);
-        LocalBuildOptions.ApplyRatios;
-        FixAllButtons;
-    end;
-
-    if (VisA <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds))
-        or  (VisB <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds))
-    then
-        LocalBuildOptions.SwapMainLayout;
-end;
-
-procedure TMainFormBuilder.ImgLeftClick(Sender: TObject);
-var idx: Integer;
-    ParentPanel: TPanel;
-    ParentBlock: TNempBlockPanel;
-    VisA, VisB: Boolean;
-begin
-    VisA := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds);
-    VisB := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds);
-
-    // LeftClick
-    ParentPanel := ((Sender as TImage).Parent.Parent) as TPanel;
-    ParentBlock := LocalBuildOptions.GetBlockByPanel(ParentPanel);
-
-    // if "two rows": Move one Left in the ChildList
-    if LocalBuildOptions.MainLayout = Layout_TwoRows  then
-    begin
-        idx := LocalBuildOptions.PanelAChilds.IndexOf(ParentBlock);
-        if (idx > 0) and (idx < LocalBuildOptions.PanelAChilds.Count) then
-            LocalBuildOptions.PanelAChilds.Exchange(idx, idx - 1);
-
-        // or is it in the bottom MainPanel?
-        idx := LocalBuildOptions.PanelBChilds.IndexOf(ParentBlock);
-        if (idx > 0) and (idx < LocalBuildOptions.PanelBChilds.Count) then
-            LocalBuildOptions.PanelBChilds.Exchange(idx, idx - 1);
-
-        LocalBuildOptions.RefreshARow((ParentPanel.Parent) as TPanel);
-        FixAllButtons;
-    end;
-
-    // if "two Columns": Move to the left Column
-    if LocalBuildOptions.MainLayout = Layout_TwoColumns  then
-    begin
-        idx := LocalBuildOptions.PanelBChilds.IndexOf(ParentBlock);
-        if idx > -1 then // it really is in the right MAIN Panel
-        begin
-            LocalBuildOptions.PanelBChilds.Extract(ParentBlock);
-            if idx = 0 then
-                LocalBuildOptions.PanelAChilds.Insert(idx, ParentBlock)   ////
-            else
-                LocalBuildOptions.PanelAChilds.Add(ParentBlock);
-
-            LocalBuildOptions.MakeOneSplitterAvailable(1);
-        end;
-
-        LocalBuildOptions.RefreshBothRowsOrColumns(True);
-        LocalBuildOptions.ApplyRatios;
-        FixAllButtons;
-    end;
-
-    if (VisA <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds))
-        or  (VisB <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds))
-    then
-        LocalBuildOptions.SwapMainLayout;
-end;
-
-procedure TMainFormBuilder.ImgRightClick(Sender: TObject);
-var idx: Integer;
-    ParentPanel: TPanel;
-    ParentBlock: TNempBlockPanel;
-    VisA, VisB: Boolean;
-begin
-    VisA := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds);
-    VisB := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds);
-
-    // RightClick
-    ParentPanel := ((Sender as TImage).Parent.Parent) as TPanel;
-    ParentBlock := LocalBuildOptions.GetBlockByPanel(ParentPanel);
-
-    // if "two rows": Move one Right in the ChildList
-    if LocalBuildOptions.MainLayout = Layout_TwoRows  then
-    begin
-        idx := LocalBuildOptions.PanelAChilds.IndexOf(ParentBlock);
-        if (idx > -1) and (idx < LocalBuildOptions.PanelAChilds.Count - 1) then
-            LocalBuildOptions.PanelAChilds.Exchange(idx, idx + 1);
-
-        // or is it in the bottom MainPanel?
-        idx := LocalBuildOptions.PanelBChilds.IndexOf(ParentBlock);
-        if (idx > -1) and (idx < LocalBuildOptions.PanelBChilds.Count - 1) then
-            LocalBuildOptions.PanelBChilds.Exchange(idx, idx + 1);
-
-        LocalBuildOptions.RefreshARow((ParentPanel.Parent) as TPanel);
-        FixAllButtons;
-    end;
-
-    // if "two Columns": Move to the right Column
-    if LocalBuildOptions.MainLayout = Layout_TwoColumns  then
-    begin
-        idx := LocalBuildOptions.PanelAChilds.IndexOf(ParentBlock);
-        if idx > -1 then // it really is in the left MAIN Panel
-        begin
-            LocalBuildOptions.PanelAChilds.Extract(ParentBlock);
-            if idx = 0 then
-                LocalBuildOptions.PanelBChilds.insert(idx, ParentBlock)  ////
-            else
-                LocalBuildOptions.PanelBChilds.Add(ParentBlock);
-
-            LocalBuildOptions.MakeOneSplitterAvailable(0);
-        end;
-
-        LocalBuildOptions.RefreshBothRowsOrColumns(True);
-        LocalBuildOptions.ApplyRatios;
-        FixAllButtons;
-    end;
-
-    if (VisA <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds))
-        or  (VisB <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds))
-    then
-        LocalBuildOptions.SwapMainLayout;
 end;
 
 

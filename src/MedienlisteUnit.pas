@@ -53,6 +53,7 @@ type
   TMedienlisteForm = class(TNempSubForm)
     ContainerPanelMedienBibForm: TNempPanel;
     CloseImageM: TSkinButton;
+    pnlSplit: TPanel;
     procedure FormShow(Sender: TObject);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -202,8 +203,7 @@ begin
   with Nemp_MainForm do
   begin
     NempOptions.FormPositions[fNempFormID].Visible := False;
-    PM_P_ViewSeparateWindows_Medialist.Checked := NempOptions.FormPositions[fNempFormID].Visible;
-    MM_O_ViewSeparateWindows_Medialist.Checked := NempOptions.FormPositions[fNempFormID].Visible;
+    actSplitToggleTitleList.Checked := NempOptions.FormPositions[fNempFormID].Visible;
   end;
   close;
 end;

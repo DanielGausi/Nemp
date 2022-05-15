@@ -69,7 +69,7 @@ uses NempMainUnit, Nemp_ConstantsAndTypes, NempAPI, Details,
     Nemp_RessourceStrings, ShoutCastUtils, WebServerClass,
     UpdateUtils, SystemHelper, ScrobblerUtils, OptionsComplete,
     DriveRepairTools, ShutDown, Spectrum_Vis, PlayerClass, BirthdayShow,
-    SearchTool, MMSystem, BibHelper, CloudEditor,
+    SearchTool, MMSystem, BibHelper, CloudEditor, SplitForm_Hilfsfunktionen,
     DeleteSelect, GnuGetText, MedienbibliothekClass, PlayerLog,
     PostProcessorUtils, ProgressUnit, EffectsAndEqualizer,
     AudioDisplayUtils, System.Win.TaskbarCore;
@@ -906,7 +906,6 @@ begin
             if assigned(PlayerLogForm) then
                 PlayerLogForm.vstPlayerLog.Invalidate;
         end;
-
   end;
 end;
 

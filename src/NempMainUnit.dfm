@@ -29,7 +29,7 @@ object Nemp_MainForm: TNemp_MainForm
   OnResize = FormResize
   OnShow = FormShow
   TextHeight = 13
-  object __MainContainerPanel: TNempPanel
+  object __MainContainerPanel: TNempContainerPanel
     Tag = 2
     Left = 0
     Top = 0
@@ -44,1497 +44,8 @@ object Nemp_MainForm: TNemp_MainForm
     OnResize = __MainContainerPanelResize
     Ratio = 0
     OwnerDraw = False
-    object MainSplitter: TSplitter
-      Left = 0
-      Top = 240
-      Width = 1090
-      Height = 4
-      Cursor = crVSplit
-      Align = alTop
-      Color = clBtnFace
-      MinSize = 150
-      ParentColor = False
-      ResizeStyle = rsUpdate
-      StyleElements = [seFont, seBorder]
-      OnCanResize = SplitterFileOverviewCanResize
-      OnMoved = MainSplitterMoved
-      ExplicitWidth = 1047
-    end
-    object _TopMainPanel: TPanel
-      Tag = 200
-      Left = 0
-      Top = 0
-      Width = 1090
-      Height = 240
-      Align = alTop
-      BevelOuter = bvNone
-      Constraints.MinHeight = 240
-      TabOrder = 0
-      OnResize = _TopMainPanelResize
-      object SubSplitter1: TSplitter
-        Left = 540
-        Top = 0
-        Width = 4
-        Height = 240
-        MinSize = 100
-        ResizeStyle = rsUpdate
-        StyleElements = [seFont, seBorder]
-        OnCanResize = SplitterFileOverviewCanResize
-        OnMoved = SubSplitter1Moved
-        ExplicitLeft = 385
-        ExplicitHeight = 425
-      end
-      object AuswahlPanel: TPanel
-        Tag = 2
-        Left = 0
-        Top = 0
-        Width = 540
-        Height = 240
-        Align = alLeft
-        BevelOuter = bvNone
-        TabOrder = 0
-        OnMouseDown = AuswahlPanelMouseDown
-        object GRPBOXArtistsAlben: TNempPanel
-          Tag = 2
-          Left = 0
-          Top = 28
-          Width = 540
-          Height = 212
-          Align = alClient
-          BevelInner = bvRaised
-          BevelOuter = bvLowered
-          TabOrder = 1
-          OnResize = GRPBOXArtistsAlbenResize
-          Ratio = 0
-          OnPaint = GRPBOXArtistsAlbenPaint
-          OwnerDraw = False
-          DesignSize = (
-            540
-            212)
-          object LblEmptyLibraryHint: TLabel
-            Left = 60
-            Top = 4
-            Width = 205
-            Height = 116
-            AutoSize = False
-            Caption = 'Library is empty'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -16
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentFont = False
-            ShowAccelChar = False
-            WordWrap = True
-            StyleElements = [seClient, seBorder]
-          end
-          object PanelCoverBrowse: TNempPanel
-            Tag = 2
-            Left = 98
-            Top = 6
-            Width = 167
-            Height = 175
-            Anchors = []
-            BevelOuter = bvNone
-            PopupMenu = Medialist_Browse_PopupMenu
-            TabOrder = 1
-            Visible = False
-            OnDblClick = PanelCoverBrowseDblClick
-            OnEndDrag = PanelCoverBrowseEndDrag
-            OnMouseDown = PanelCoverBrowseMouseDown
-            OnMouseMove = IMGMedienBibCoverMouseMove
-            OnMouseUp = IMGMedienBibCoverMouseUp
-            OnResize = PanelCoverBrowseResize
-            Ratio = 0
-            OnPaint = PanelCoverBrowsePaint
-            OnAfterPaint = PanelCoverBrowseAfterPaint
-            OwnerDraw = False
-            OnMouseWheelUp = PanelCoverBrowseMouseWheelUp
-            OnMouseWheelDown = PanelCoverBrowseMouseWheelDown
-            DesignSize = (
-              167
-              175)
-            object IMGMedienBibCover: TImage
-              Left = 3
-              Top = 6
-              Width = 164
-              Height = 24
-              Anchors = [akLeft, akTop, akRight, akBottom]
-              Center = True
-              DragCursor = crDefault
-              Proportional = True
-              OnMouseDown = IMGMedienBibCoverMouseDown
-              OnMouseMove = IMGMedienBibCoverMouseMove
-              OnMouseUp = IMGMedienBibCoverMouseUp
-            end
-            object ImgScrollCover: TImage
-              Left = 1
-              Top = 36
-              Width = 164
-              Height = 75
-              Anchors = [akLeft, akRight, akBottom]
-              Transparent = True
-              OnMouseDown = ImgScrollCoverMouseDown
-              ExplicitWidth = 297
-            end
-            object CoverScrollbar: TScrollBar
-              Left = 8
-              Top = 156
-              Width = 159
-              Height = 17
-              Anchors = [akLeft, akRight, akBottom]
-              LargeChange = 3
-              Max = 3
-              PageSize = 3
-              TabOrder = 0
-              OnChange = CoverScrollbarChange
-              OnEnter = CoverScrollbarEnter
-              OnKeyDown = CoverScrollbarKeyDown
-            end
-            object Pnl_CoverFlowLabel: TNempPanel
-              Tag = 2
-              Left = 30
-              Top = 117
-              Width = 100
-              Height = 33
-              Anchors = [akLeft, akRight, akBottom]
-              BevelOuter = bvNone
-              Caption = 'Pnl_CoverFlowLabel'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindow
-              Font.Height = -11
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-              ShowCaption = False
-              TabOrder = 1
-              OnMouseDown = Lbl_CoverFlowMouseDown
-              Ratio = 0
-              OnPaint = Pnl_CoverFlowLabelPaint
-              OwnerDraw = False
-              DesignSize = (
-                100
-                33)
-              object Lbl_CoverFlow: TLabel
-                Left = 38
-                Top = 10
-                Width = 62
-                Height = 13
-                Alignment = taCenter
-                Anchors = [akLeft, akTop, akRight]
-                AutoSize = False
-                ShowAccelChar = False
-                Transparent = True
-                StyleElements = [seClient, seBorder]
-                OnMouseDown = Lbl_CoverFlowMouseDown
-              end
-              object TabBtnCoverCategory: TSkinButton
-                Tag = 1
-                Left = 8
-                Top = 5
-                Width = 24
-                Height = 24
-                Hint = 'Select category'
-                ParentShowHint = False
-                PopupMenu = Medialist_Browse_Categories_PopupMenu
-                ShowHint = True
-                TabOrder = 0
-                TabStop = False
-                OnClick = TabBtnCoverCategoryClick
-                DrawMode = dm_Skin
-                NumGlyphsX = 5
-                NumGlyphsY = 1
-                GlyphLine = 0
-                CustomRegion = False
-                FocusDrawMode = fdm_Windows
-                Color1 = clBlack
-                Color2 = clBlack
-              end
-            end
-          end
-          object PanelStandardBrowse: TPanel
-            Tag = 2
-            Left = 318
-            Top = -10
-            Width = 216
-            Height = 140
-            Anchors = []
-            BevelOuter = bvNone
-            TabOrder = 0
-            object SplitterBrowse: TSplitter
-              Left = 73
-              Top = 0
-              Width = 4
-              Height = 140
-              StyleElements = [seFont, seBorder]
-              OnMoved = SplitterBrowseMoved
-              ExplicitHeight = 59
-            end
-            object ArtistsVST: TVirtualStringTree
-              Tag = 1
-              Left = 0
-              Top = 0
-              Width = 73
-              Height = 140
-              Align = alLeft
-              BevelInner = bvNone
-              BevelOuter = bvNone
-              BorderStyle = bsNone
-              Colors.UnfocusedSelectionColor = clHighlight
-              Colors.UnfocusedSelectionBorderColor = clHighlight
-              Constraints.MinWidth = 20
-              DefaultNodeHeight = 14
-              DragImageKind = diMainColumnOnly
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -11
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              Header.AutoSizeIndex = 0
-              Header.Background = clWindow
-              Header.Height = 22
-              Header.Options = [hoAutoResize, hoDrag, hoVisible]
-              IncrementalSearch = isAll
-              Indent = 14
-              Margin = 0
-              ParentFont = False
-              ScrollBarOptions.ScrollBars = ssVertical
-              StyleElements = [seClient, seBorder]
-              TabOrder = 0
-              TextMargin = 2
-              TreeOptions.AutoOptions = [toAutoDropExpand, toAutoTristateTracking]
-              TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
-              TreeOptions.SelectionOptions = [toFullRowSelect, toRightClickSelect]
-              OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
-              OnAfterItemErase = VSTAfterItemErase
-              OnClick = ArtistsVSTClick
-              OnDragAllowed = ArtistsVSTDragAllowed
-              OnDragOver = CategoryVSTDragOver
-              OnDragDrop = CategoryVSTDragDrop
-              OnFocusChanged = ArtistsVSTFocusChanged
-              OnGetText = StringVSTGetText
-              OnPaintText = ArtistsVSTPaintText
-              OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
-              OnIncrementalSearch = ArtistsVSTIncrementalSearch
-              OnResize = ArtistsVSTResize
-              Touch.InteractiveGestures = [igPan, igPressAndTap]
-              Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-              Columns = <
-                item
-                  MinWidth = 0
-                  Position = 0
-                  Width = 73
-                end>
-            end
-            object AlbenVST: TVirtualStringTree
-              Tag = 2
-              Left = 77
-              Top = 0
-              Width = 139
-              Height = 140
-              Align = alClient
-              BevelInner = bvNone
-              BevelOuter = bvNone
-              BorderStyle = bsNone
-              Colors.UnfocusedSelectionColor = clHighlight
-              Colors.UnfocusedSelectionBorderColor = clHighlight
-              Constraints.MinWidth = 20
-              DragOperations = [doCopy]
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -11
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              Header.AutoSizeIndex = 0
-              Header.Background = clWindow
-              Header.Height = 20
-              Header.Options = [hoAutoResize, hoDrag, hoVisible]
-              Images = DummyImageList
-              IncrementalSearch = isAll
-              Indent = 14
-              Margin = 0
-              ParentFont = False
-              PopupMenu = Medialist_Browse_PopupMenu
-              ScrollBarOptions.ScrollBars = ssVertical
-              StyleElements = [seClient, seBorder]
-              TabOrder = 1
-              TextMargin = 2
-              TreeOptions.AutoOptions = [toAutoDropExpand, toAutoTristateTracking]
-              TreeOptions.MiscOptions = [toAcceptOLEDrop, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning, toVariableNodeHeight, toEditOnClick]
-              TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
-              TreeOptions.SelectionOptions = [toFullRowSelect, toRightClickSelect]
-              OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
-              OnAfterItemErase = VSTAfterItemErase
-              OnClick = AlbenVSTClick
-              OnColumnDblClick = AlbenVSTColumnDblClick
-              OnDragAllowed = AlbenVSTDragAllowed
-              OnDragOver = LibraryCollectionTreeDragOver
-              OnDragDrop = LibraryCollectionTreeDragDrop
-              OnDrawText = AlbenVSTDrawText
-              OnEndDrag = LibraryVSTEndDrag
-              OnFocusChanged = AlbenVSTFocusChanged
-              OnGetText = AlbenVSTGetText
-              OnPaintText = ArtistsVSTPaintText
-              OnGetImageIndex = AlbenVSTGetImageIndex
-              OnGetUserClipboardFormats = TreesGetUserClipboardFormats
-              OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
-              OnIncrementalSearch = AlbenVSTIncrementalSearch
-              OnKeyDown = StringVSTKeyDown
-              OnMeasureItem = AlbenVSTMeasureItem
-              OnRenderOLEData = TreesRenderOLEData
-              OnResize = AlbenVSTResize
-              OnStartDrag = AlbenVSTStartDrag
-              Touch.InteractiveGestures = [igPan, igPressAndTap]
-              Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-              Columns = <
-                item
-                  MinWidth = 0
-                  Position = 0
-                  Width = 139
-                end>
-            end
-          end
-          object PanelTagCloudBrowse: TNempPanel
-            Tag = 2
-            Left = 318
-            Top = 46
-            Width = 119
-            Height = 160
-            BevelOuter = bvNone
-            TabOrder = 2
-            Visible = False
-            OnClick = PanelTagCloudBrowseClick
-            OnMouseDown = PanelTagCloudBrowseMouseDown
-            OnResize = PanelTagCloudBrowseResize
-            Ratio = 0
-            OnPaint = PanelPaint
-            OwnerDraw = False
-            object TabBtnTagCloudCategory: TSkinButton
-              Tag = 1
-              Left = 16
-              Top = 13
-              Width = 24
-              Height = 24
-              Hint = 'Select category'
-              ParentShowHint = False
-              PopupMenu = Medialist_Browse_Categories_PopupMenu
-              ShowHint = True
-              TabOrder = 0
-              TabStop = False
-              OnClick = TabBtnCoverCategoryClick
-              DrawMode = dm_Skin
-              NumGlyphsX = 5
-              NumGlyphsY = 1
-              GlyphLine = 0
-              CustomRegion = False
-              FocusDrawMode = fdm_Windows
-              Color1 = clBlack
-              Color2 = clBlack
-            end
-          end
-        end
-        object AuswahlHeaderPanel: TNempPanel
-          Tag = 2
-          Left = 0
-          Top = 0
-          Width = 540
-          Height = 28
-          Align = alTop
-          BevelOuter = bvNone
-          ParentBackground = False
-          TabOrder = 0
-          Ratio = 0
-          OnPaint = PanelPaint
-          OwnerDraw = False
-          object AuswahlFillPanel: TNempPanel
-            Tag = 2
-            AlignWithMargins = True
-            Left = 200
-            Top = 2
-            Width = 340
-            Height = 24
-            Margins.Left = 0
-            Margins.Top = 2
-            Margins.Right = 0
-            Margins.Bottom = 2
-            Align = alClient
-            BevelInner = bvRaised
-            BevelOuter = bvLowered
-            Padding.Top = 2
-            Padding.Bottom = 2
-            PopupMenu = Medialist_Browse_PopupMenu
-            TabOrder = 0
-            Ratio = 0
-            OnPaint = TABPanelPaint
-            OwnerDraw = False
-            DesignSize = (
-              340
-              24)
-            object AuswahlStatusLBL: TLabel
-              Left = 10
-              Top = 5
-              Width = 324
-              Height = 13
-              Anchors = [akLeft, akTop, akRight]
-              AutoSize = False
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -11
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-              ShowAccelChar = False
-              Transparent = True
-              StyleElements = [seClient, seBorder]
-            end
-          end
-          object AuswahlControlPanel: TNempPanel
-            Tag = 2
-            Left = 0
-            Top = 0
-            Width = 200
-            Height = 28
-            Align = alLeft
-            BevelOuter = bvNone
-            TabOrder = 1
-            Ratio = 0
-            OnPaint = PanelPaint
-            OwnerDraw = False
-            object edtCloudSearch: TEdit
-              Left = 114
-              Top = 4
-              Width = 81
-              Height = 21
-              AutoSize = False
-              TabOrder = 4
-              TextHint = 'Search (Tags)'
-              OnChange = edtCloudSearchChange
-              OnKeyPress = edtCloudSearchKeyPress
-            end
-            object TabBtn_Browse: TSkinButton
-              Left = 30
-              Top = 2
-              Width = 24
-              Height = 24
-              Hint = 'Treeview'
-              ParentShowHint = False
-              PopupMenu = Medialist_Browse_PopupMenu
-              ShowHint = True
-              TabOrder = 1
-              OnClick = TABPanelAuswahlClick
-              DrawMode = dm_Skin
-              NumGlyphsX = 5
-              NumGlyphsY = 3
-              GlyphLine = 0
-              CustomRegion = False
-              FocusDrawMode = fdm_Windows
-              Color1 = clPurple
-              Color2 = clGreen
-            end
-            object TabBtn_CoverFlow: TSkinButton
-              Tag = 1
-              Left = 58
-              Top = 2
-              Width = 24
-              Height = 24
-              Hint = 'Coverflow'
-              ParentShowHint = False
-              PopupMenu = Medialist_Browse_PopupMenu
-              ShowHint = True
-              TabOrder = 2
-              OnClick = TABPanelAuswahlClick
-              DrawMode = dm_Skin
-              NumGlyphsX = 5
-              NumGlyphsY = 3
-              GlyphLine = 0
-              CustomRegion = False
-              FocusDrawMode = fdm_Windows
-              Color1 = clBlack
-              Color2 = clBlack
-            end
-            object TabBtn_Preselection: TSkinButton
-              Tag = 1
-              Left = 2
-              Top = 2
-              Width = 24
-              Height = 24
-              Hint = 'Show context menu'
-              ParentShowHint = False
-              PopupMenu = Medialist_Browse_PopupMenu
-              ShowHint = True
-              TabOrder = 0
-              OnClick = TabBtn_PreselectionClick
-              DrawMode = dm_Skin
-              NumGlyphsX = 5
-              NumGlyphsY = 1
-              GlyphLine = 0
-              CustomRegion = False
-              FocusDrawMode = fdm_Windows
-              Color1 = clBlack
-              Color2 = clBlack
-            end
-            object TabBtn_TagCloud: TSkinButton
-              Tag = 2
-              Left = 86
-              Top = 2
-              Width = 24
-              Height = 24
-              Hint = 'Tag cloud'
-              ParentShowHint = False
-              PopupMenu = Medialist_Browse_PopupMenu
-              ShowHint = True
-              TabOrder = 3
-              OnClick = TABPanelAuswahlClick
-              DrawMode = dm_Skin
-              NumGlyphsX = 5
-              NumGlyphsY = 3
-              GlyphLine = 0
-              CustomRegion = False
-              FocusDrawMode = fdm_Windows
-              Color1 = clBlack
-              Color2 = clBlack
-            end
-          end
-        end
-      end
-      object PlaylistPanel: TNempPanel
-        Tag = 1
-        Left = 544
-        Top = 0
-        Width = 546
-        Height = 240
-        Align = alClient
-        BevelOuter = bvNone
-        TabOrder = 1
-        OnResize = PlaylistPanelResize
-        Ratio = 0
-        OwnerDraw = False
-        object GRPBOXPlaylist: TNempPanel
-          Tag = 1
-          Left = 0
-          Top = 28
-          Width = 546
-          Height = 212
-          Align = alClient
-          BevelInner = bvRaised
-          BevelOuter = bvLowered
-          PopupMenu = PlayListPOPUP
-          TabOrder = 1
-          Ratio = 0
-          OnPaint = NewPanelPaint
-          OwnerDraw = False
-          object PlaylistVST: TVirtualStringTree
-            Left = 2
-            Top = 2
-            Width = 542
-            Height = 208
-            Align = alClient
-            BevelEdges = []
-            BevelInner = bvNone
-            BevelOuter = bvNone
-            BorderStyle = bsNone
-            Colors.UnfocusedSelectionColor = clHighlight
-            Colors.UnfocusedSelectionBorderColor = clHighlight
-            Ctl3D = True
-            DefaultPasteMode = amInsertAfter
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            Header.AutoSizeIndex = 1
-            Header.Background = clWindow
-            Header.MainColumn = 1
-            Header.Options = [hoAutoResize, hoDrag, hoVisible]
-            Header.PopupMenu = PlaylistVST_HeaderPopup
-            HintMode = hmHint
-            Images = PlayListImageList
-            Margin = 0
-            ParentCtl3D = False
-            ParentFont = False
-            ParentShowHint = False
-            PopupMenu = PlayListPOPUP
-            ScrollBarOptions.ScrollBars = ssVertical
-            ShowHint = True
-            StyleElements = [seClient, seBorder]
-            TabOrder = 0
-            TextMargin = 0
-            TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking]
-            TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
-            TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toMultiSelect, toRightClickSelect]
-            OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
-            OnAfterItemErase = VSTAfterItemErase
-            OnAfterItemPaint = PlaylistVSTAfterItemPaint
-            OnBeforeItemErase = VSTBeforeItemErase
-            OnChange = PlaylistVSTChange
-            OnCollapsed = PlaylistVSTCollapsAndExpanded
-            OnColumnDblClick = PlaylistVSTColumnDblClick
-            OnDragAllowed = PlaylistVSTDragAllowed
-            OnDragOver = PlaylistVSTDragOver
-            OnDragDrop = PlaylistVSTDragDrop
-            OnEndDrag = PlaylistVSTEndDrag
-            OnExpanded = PlaylistVSTCollapsAndExpanded
-            OnGetText = PlaylistVSTGetText
-            OnPaintText = VSTPaintText
-            OnGetImageIndex = PlaylistVSTGetImageIndex
-            OnGetHint = PlaylistVSTGetHint
-            OnGetUserClipboardFormats = TreesGetUserClipboardFormats
-            OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
-            OnKeyDown = PlaylistVSTKeyDown
-            OnKeyUp = PlaylistVSTKeyUp
-            OnRenderOLEData = TreesRenderOLEData
-            OnResize = PlaylistVSTResize
-            OnStartDrag = VSTFilesStartDrag
-            Touch.InteractiveGestures = [igPan, igPressAndTap]
-            Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-            Columns = <
-              item
-                Alignment = taRightJustify
-                Margin = 0
-                Position = 0
-                Spacing = 0
-                Text = '#'
-                Width = 30
-              end
-              item
-                Position = 1
-                Spacing = 0
-                Text = 'Title'
-                Width = 472
-              end
-              item
-                Alignment = taRightJustify
-                Margin = 0
-                Position = 2
-                Spacing = 50
-                Text = 'Time'
-                Width = 40
-              end>
-          end
-        end
-        object PlayerHeaderPanel: TNempPanel
-          Tag = 1
-          Left = 0
-          Top = 0
-          Width = 546
-          Height = 28
-          Align = alTop
-          BevelOuter = bvNone
-          TabOrder = 0
-          Ratio = 0
-          OnPaint = PanelPaint
-          OwnerDraw = False
-          object PlaylistFillPanel: TNempPanel
-            Tag = 1
-            AlignWithMargins = True
-            Left = 127
-            Top = 2
-            Width = 419
-            Height = 24
-            Margins.Left = 0
-            Margins.Top = 2
-            Margins.Right = 0
-            Margins.Bottom = 2
-            Align = alClient
-            BevelInner = bvRaised
-            BevelOuter = bvLowered
-            BiDiMode = bdLeftToRight
-            ParentBiDiMode = False
-            PopupMenu = PlayListPOPUP
-            TabOrder = 0
-            Ratio = 0
-            OnPaint = TABPanelPaint
-            OwnerDraw = False
-            DesignSize = (
-              419
-              24)
-            object PlayListStatusLBL: TLabel
-              Left = 10
-              Top = 5
-              Width = 402
-              Height = 13
-              Anchors = [akLeft, akTop, akRight]
-              AutoSize = False
-              ShowAccelChar = False
-              Transparent = True
-              StyleElements = [seClient, seBorder]
-              ExplicitWidth = 426
-            end
-          end
-          object PlaylistControlPanel: TNempPanel
-            Tag = 1
-            Left = 0
-            Top = 0
-            Width = 127
-            Height = 28
-            Align = alLeft
-            BevelOuter = bvNone
-            TabOrder = 1
-            Ratio = 0
-            OnPaint = PanelPaint
-            OwnerDraw = False
-            object TabBtn_Playlist: TSkinButton
-              Left = 0
-              Top = 2
-              Width = 24
-              Height = 24
-              Hint = 'Show context menu'
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 0
-              OnClick = TabPanelPlaylistClick
-              DrawMode = dm_Skin
-              NumGlyphsX = 5
-              NumGlyphsY = 1
-              GlyphLine = 0
-              CustomRegion = False
-              FocusDrawMode = fdm_Windows
-              Color1 = clBlack
-              Color2 = clBlack
-            end
-            object TabBtn_Favorites: TSkinButton
-              Left = 26
-              Top = 2
-              Width = 24
-              Height = 24
-              Hint = 'Favorite playlists'
-              TabOrder = 1
-              OnClick = TabBtn_FavoritesClick
-              DrawMode = dm_Skin
-              NumGlyphsX = 5
-              NumGlyphsY = 1
-              GlyphLine = 0
-              CustomRegion = False
-              FocusDrawMode = fdm_Windows
-              Color1 = clBlack
-              Color2 = clBlack
-            end
-            object EditPlaylistSearch: TEdit
-              Left = 56
-              Top = 4
-              Width = 65
-              Height = 21
-              AutoSize = False
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -11
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-              TabOrder = 2
-              TextHint = 'Search'
-              OnChange = EditPlaylistSearchChange
-              OnEnter = EditPlaylistSearchEnter
-              OnKeyDown = EditPlaylistSearchKeyDown
-              OnKeyPress = EditPlaylistSearchKeyPress
-            end
-          end
-        end
-      end
-    end
-    object _VSTPanel: TNempPanel
-      Tag = 3
-      Left = 0
-      Top = 244
-      Width = 1090
-      Height = 405
-      Align = alClient
-      BevelOuter = bvNone
-      TabOrder = 1
-      OnResize = _TopMainPanelResize
-      Ratio = 0
-      OwnerDraw = False
-      object SubSplitter2: TSplitter
-        Left = 607
-        Top = 0
-        Width = 4
-        Height = 405
-        Align = alRight
-        MinSize = 50
-        ResizeStyle = rsUpdate
-        StyleElements = [seFont, seBorder]
-        OnCanResize = SplitterFileOverviewCanResize
-        OnMoved = SubSplitter2Moved
-        ExplicitLeft = 720
-        ExplicitHeight = 196
-      end
-      object MedialistPanel: TNempPanel
-        Left = 0
-        Top = 0
-        Width = 607
-        Height = 405
-        Align = alClient
-        BevelOuter = bvNone
-        TabOrder = 0
-        OnResize = MedialistPanelResize
-        Ratio = 0
-        OwnerDraw = False
-        object MedienBibHeaderPanel: TNempPanel
-          Tag = 3
-          Left = 0
-          Top = 0
-          Width = 607
-          Height = 28
-          Align = alTop
-          BevelOuter = bvNone
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
-          TabOrder = 0
-          Ratio = 0
-          OnPaint = PanelPaint
-          OwnerDraw = False
-          object MedienlisteFillPanel: TNempPanel
-            Tag = 3
-            AlignWithMargins = True
-            Left = 236
-            Top = 2
-            Width = 371
-            Height = 24
-            Margins.Left = 0
-            Margins.Top = 2
-            Margins.Right = 0
-            Margins.Bottom = 2
-            Align = alClient
-            BevelInner = bvRaised
-            BevelOuter = bvLowered
-            PopupMenu = Medialist_View_PopupMenu
-            TabOrder = 1
-            Ratio = 0
-            OnPaint = TABPanelPaint
-            OwnerDraw = False
-            DesignSize = (
-              371
-              24)
-            object MedienListeStatusLBL: TLabel
-              Left = 14
-              Top = 5
-              Width = 357
-              Height = 13
-              Anchors = [akLeft, akTop, akRight]
-              AutoSize = False
-              ShowAccelChar = False
-              Transparent = True
-              StyleElements = [seClient, seBorder]
-              ExplicitWidth = 326
-            end
-          end
-          object MedienListeControlPanel: TNempPanel
-            Tag = 3
-            Left = 0
-            Top = 0
-            Width = 236
-            Height = 28
-            Align = alLeft
-            BevelOuter = bvNone
-            TabOrder = 0
-            Ratio = 0
-            OnPaint = PanelPaint
-            OwnerDraw = False
-            object EDITFastSearch: TEdit
-              Left = 58
-              Top = 4
-              Width = 172
-              Height = 21
-              AutoSize = False
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clGrayText
-              Font.Height = -11
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-              PopupMenu = QuickSearchHistory_PopupMenu
-              TabOrder = 2
-              TextHint = 'Search (Library)'
-              OnChange = EDITFastSearchChange
-              OnEnter = EDITFastSearchEnter
-              OnExit = EDITFastSearchExit
-              OnKeyPress = EDITFastSearchKeyPress
-            end
-            object TabBtn_Marker: TSkinButton
-              Left = 28
-              Top = 2
-              Width = 24
-              Height = 24
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 1
-              OnClick = TabBtn_MarkerClick
-              OnKeyPress = TabBtn_MarkerKeyPress
-              OnMouseDown = TabBtn_MarkerMouseDown
-              DrawMode = dm_Skin
-              NumGlyphsX = 5
-              NumGlyphsY = 5
-              GlyphLine = 0
-              CustomRegion = False
-              FocusDrawMode = fdm_Windows
-              Color1 = clBlack
-              Color2 = clBlack
-            end
-            object TabBtn_Medialib: TSkinButton
-              Left = 2
-              Top = 2
-              Width = 24
-              Height = 24
-              Hint = 'Show context menu'
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 0
-              OnClick = TabPanelMedienlisteClick
-              DrawMode = dm_Skin
-              NumGlyphsX = 5
-              NumGlyphsY = 1
-              GlyphLine = 0
-              CustomRegion = False
-              FocusDrawMode = fdm_Windows
-              Color1 = clBlack
-              Color2 = clBlack
-            end
-          end
-        end
-        object GRPBOXVST: TNempPanel
-          Tag = 3
-          Left = 0
-          Top = 28
-          Width = 607
-          Height = 377
-          Align = alClient
-          BevelInner = bvRaised
-          BevelOuter = bvLowered
-          DoubleBuffered = False
-          ParentDoubleBuffered = False
-          PopupMenu = Medialist_View_PopupMenu
-          TabOrder = 1
-          Ratio = 0
-          OnPaint = NewPanelPaint
-          OwnerDraw = False
-          object VST: TVirtualStringTree
-            Left = 2
-            Top = 2
-            Width = 603
-            Height = 373
-            Align = alClient
-            BevelInner = bvNone
-            BevelOuter = bvNone
-            BorderStyle = bsNone
-            Colors.SelectionTextColor = clWindowText
-            Colors.UnfocusedSelectionColor = clHighlight
-            Colors.UnfocusedSelectionBorderColor = clHighlight
-            Constraints.MinHeight = 26
-            DragImageKind = diMainColumnOnly
-            DragWidth = 10
-            EditDelay = 50
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            Header.AutoSizeIndex = -1
-            Header.Background = clWindow
-            Header.Options = [hoColumnResize, hoDblClickResize, hoDrag, hoRestrictDrag, hoShowSortGlyphs, hoVisible]
-            Header.SortColumn = 0
-            HintMode = hmHint
-            IncrementalSearch = isAll
-            Indent = 0
-            Margin = 0
-            ParentFont = False
-            ParentShowHint = False
-            PopupMenu = Medialist_View_PopupMenu
-            ShowHint = True
-            StyleElements = [seClient, seBorder]
-            TabOrder = 0
-            TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSpanColumns, toAutoTristateTracking]
-            TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick]
-            TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
-            TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toMultiSelect, toRightClickSelect]
-            OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
-            OnAfterCellPaint = VSTAfterCellPaint
-            OnAfterGetMaxColumnWidth = VSTAfterGetMaxColumnWidth
-            OnAfterItemErase = VSTAfterItemErase
-            OnBeforeItemErase = VSTBeforeItemErase
-            OnChange = VSTChange
-            OnColumnClick = VSTColumnClick
-            OnColumnDblClick = VSTColumnDblClick
-            OnCreateEditor = VSTCreateEditor
-            OnDragAllowed = VSTDragAllowed
-            OnDragOver = LibraryCollectionTreeDragOver
-            OnDragDrop = LibraryCollectionTreeDragDrop
-            OnEditCancelled = VSTEditCancelled
-            OnEdited = VSTEdited
-            OnEditing = VSTEditing
-            OnEndDrag = LibraryVSTEndDrag
-            OnFocusChanging = VSTFocusChanging
-            OnGetText = VSTGetText
-            OnPaintText = VSTPaintText
-            OnGetImageIndex = VSTGetImageIndex
-            OnGetHint = PlaylistVSTGetHint
-            OnGetUserClipboardFormats = TreesGetUserClipboardFormats
-            OnHeaderClick = VSTHeaderClick
-            OnHeaderDblClick = VSTHeaderDblClick
-            OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
-            OnIncrementalSearch = VSTIncrementalSearch
-            OnInitNode = VSTInitNode
-            OnKeyDown = VSTKeyDown
-            OnKeyUp = PlaylistVSTKeyUp
-            OnNewText = VSTNewText
-            OnRenderOLEData = TreesRenderOLEData
-            OnStartDrag = VSTFilesStartDrag
-            Touch.InteractiveGestures = [igPan, igPressAndTap]
-            Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-            Columns = <
-              item
-                Position = 0
-                Width = 10
-              end
-              item
-                Position = 1
-              end
-              item
-                Position = 2
-              end
-              item
-                Position = 3
-              end
-              item
-                Position = 4
-              end
-              item
-                Position = 5
-              end
-              item
-                Position = 6
-              end
-              item
-                Position = 7
-              end
-              item
-                Position = 8
-              end
-              item
-                Position = 9
-              end
-              item
-                Position = 10
-              end
-              item
-                Position = 11
-              end
-              item
-                Position = 12
-              end
-              item
-                Position = 13
-              end
-              item
-                Position = 14
-              end
-              item
-                Position = 15
-              end
-              item
-                Position = 16
-              end
-              item
-                Position = 17
-              end
-              item
-                Position = 18
-              end
-              item
-                Position = 19
-              end
-              item
-                Position = 20
-              end
-              item
-                Position = 21
-              end
-              item
-                Position = 22
-              end
-              item
-                Position = 23
-              end
-              item
-                Position = 24
-              end
-              item
-                Position = 25
-              end
-              item
-                Position = 26
-              end
-              item
-                Position = 27
-              end
-              item
-                Position = 28
-              end>
-          end
-        end
-      end
-      object MedienBibDetailPanel: TNempPanel
-        Left = 611
-        Top = 0
-        Width = 479
-        Height = 405
-        Align = alRight
-        BevelOuter = bvNone
-        TabOrder = 1
-        OnResize = MedienBibDetailPanelResize
-        Ratio = 0
-        OwnerDraw = False
-        object ContainerPanelMedienBibDetails: TNempPanel
-          Left = 0
-          Top = 28
-          Width = 479
-          Height = 377
-          Align = alClient
-          BevelOuter = bvNone
-          TabOrder = 0
-          Ratio = 0
-          OwnerDraw = False
-          object SplitterFileOverview: TSplitter
-            Left = 248
-            Top = 0
-            Width = 4
-            Height = 377
-            ResizeStyle = rsUpdate
-            StyleElements = [seFont, seBorder]
-            OnCanResize = SplitterFileOverviewCanResize
-            OnMoved = SplitterFileOverviewMoved
-            ExplicitLeft = 250
-            ExplicitTop = 3
-          end
-          object DetailCoverLyricsPanel: TNempPanel
-            Tag = 3
-            Left = 0
-            Top = 0
-            Width = 248
-            Height = 377
-            Align = alLeft
-            BevelInner = bvRaised
-            BevelOuter = bvLowered
-            PopupMenu = PopupEditExtendedTags
-            TabOrder = 0
-            OnResize = DetailID3TagPanelResize
-            Ratio = 0
-            OnPaint = NewPanelPaint
-            OwnerDraw = False
-            DesignSize = (
-              248
-              377)
-            object ImgDetailCover: TImage
-              Left = 4
-              Top = 8
-              Width = 240
-              Height = 359
-              Anchors = [akLeft, akTop, akRight, akBottom]
-              Proportional = True
-              Stretch = True
-              OnDblClick = ImgDetailCoverDblClick
-              OnMouseDown = ImgDetailCoverMouseDown
-              OnMouseMove = ImgDetailCoverMouseMove
-            end
-            object LyricsMemo: TMemo
-              Left = 4
-              Top = 6
-              Width = 240
-              Height = 359
-              Anchors = [akLeft, akTop, akRight, akBottom]
-              BevelInner = bvNone
-              BevelOuter = bvNone
-              BorderStyle = bsNone
-              PopupMenu = Player_PopupMenu
-              ReadOnly = True
-              TabOrder = 0
-              Visible = False
-              StyleElements = [seBorder]
-              OnKeyDown = LyricsMemoKeyDown
-            end
-          end
-          object DetailID3TagPanel: TNempPanel
-            Tag = 3
-            Left = 252
-            Top = 0
-            Width = 227
-            Height = 377
-            Align = alClient
-            BevelInner = bvRaised
-            BevelOuter = bvLowered
-            PopupMenu = PopupEditExtendedTags
-            TabOrder = 1
-            OnResize = DetailID3TagPanelResize
-            Ratio = 0
-            OnPaint = NewPanelPaint
-            OwnerDraw = False
-            DesignSize = (
-              227
-              377)
-            object ImgBibRating: TImage
-              Left = 8
-              Top = 129
-              Width = 70
-              Height = 14
-              Hint = 'Click to change rating'
-              Visible = False
-              OnMouseDown = ImgBibRatingMouseDown
-              OnMouseLeave = ImgBibRatingMouseLeave
-              OnMouseMove = ImgBibRatingMouseMove
-            end
-            object LblBibAlbum: TLabel
-              Tag = 2
-              Left = 8
-              Top = 42
-              Width = 78
-              Height = 13
-              Caption = '12                  12'
-              ShowAccelChar = False
-              StyleElements = [seClient, seBorder]
-              OnDblClick = DetailLabelDblClick
-              OnMouseEnter = DetailLabelMouseOver
-              OnMouseLeave = DetailLabelMouseLeave
-            end
-            object LblBibArtist: TLabel
-              Left = 8
-              Top = 8
-              Width = 82
-              Height = 13
-              Caption = '12                  12'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -11
-              Font.Name = 'Tahoma'
-              Font.Style = [fsBold]
-              ParentFont = False
-              ShowAccelChar = False
-              StyleElements = [seClient, seBorder]
-              OnDblClick = DetailLabelDblClick
-              OnMouseEnter = DetailLabelMouseOver
-              OnMouseLeave = DetailLabelMouseLeave
-            end
-            object LblBibDuration: TLabel
-              Left = 8
-              Top = 93
-              Width = 78
-              Height = 13
-              Caption = '12                  12'
-              ShowAccelChar = False
-              StyleElements = [seClient, seBorder]
-            end
-            object LblBibGenre: TLabel
-              Tag = 5
-              Left = 8
-              Top = 76
-              Width = 54
-              Height = 13
-              Caption = '                  '
-              ShowAccelChar = False
-              StyleElements = [seClient, seBorder]
-              OnDblClick = DetailLabelDblClick
-              OnMouseEnter = DetailLabelMouseOver
-              OnMouseLeave = DetailLabelMouseLeave
-            end
-            object LblBibPlayCounter: TLabel
-              Left = 84
-              Top = 129
-              Width = 54
-              Height = 13
-              Caption = '                  '
-              ShowAccelChar = False
-              StyleElements = [seClient, seBorder]
-            end
-            object LblBibQuality: TLabel
-              Left = 8
-              Top = 110
-              Width = 54
-              Height = 13
-              Caption = '                  '
-              ShowAccelChar = False
-              StyleElements = [seClient, seBorder]
-            end
-            object LblBibTitle: TLabel
-              Tag = 1
-              Left = 8
-              Top = 25
-              Width = 54
-              Height = 13
-              Caption = '                  '
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -11
-              Font.Name = 'Tahoma'
-              Font.Style = [fsBold]
-              ParentFont = False
-              ShowAccelChar = False
-              StyleElements = [seClient, seBorder]
-            end
-            object LblBibYear: TLabel
-              Tag = 4
-              Left = 8
-              Top = 59
-              Width = 54
-              Height = 13
-              Caption = '                  '
-              ShowAccelChar = False
-              StyleElements = [seClient, seBorder]
-              OnDblClick = DetailLabelDblClick
-              OnMouseEnter = DetailLabelMouseOver
-              OnMouseLeave = DetailLabelMouseLeave
-            end
-            object Bevel1: TBevel
-              Left = 8
-              Top = 206
-              Width = 209
-              Height = 5
-              Anchors = [akLeft, akTop, akRight]
-              Shape = bsBottomLine
-            end
-            object LblBibReplayGain: TLabel
-              Left = 9
-              Top = 149
-              Width = 54
-              Height = 13
-              Hint = 'ReplayGain values'
-              Caption = '                  '
-              ShowAccelChar = False
-              StyleElements = [seClient, seBorder]
-            end
-            object lblBibFilename: TLabel
-              Left = 8
-              Top = 174
-              Width = 54
-              Height = 13
-              Caption = '                  '
-              ShowAccelChar = False
-              StyleElements = [seClient, seBorder]
-            end
-            object lblBibDirectory: TLabel
-              Tag = 6
-              Left = 8
-              Top = 189
-              Width = 78
-              Height = 13
-              Caption = '12                  12'
-              ShowAccelChar = False
-              StyleElements = [seClient, seBorder]
-            end
-            object Bevel2: TBevel
-              Left = 9
-              Top = 165
-              Width = 209
-              Height = 5
-              Anchors = [akLeft, akTop, akRight]
-              Shape = bsBottomLine
-            end
-          end
-        end
-        object MedienBibDetailHeaderPanel: TNempPanel
-          Tag = 3
-          Left = 0
-          Top = 0
-          Width = 479
-          Height = 28
-          Align = alTop
-          BevelOuter = bvNone
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
-          TabOrder = 1
-          Ratio = 0
-          OnPaint = PanelPaint
-          OwnerDraw = False
-          object MedienBibDetailFillPanel: TNempPanel
-            Tag = 3
-            AlignWithMargins = True
-            Left = 56
-            Top = 2
-            Width = 423
-            Height = 24
-            Margins.Left = 0
-            Margins.Top = 2
-            Margins.Right = 0
-            Margins.Bottom = 2
-            Align = alClient
-            BevelInner = bvRaised
-            BevelOuter = bvLowered
-            PopupMenu = Medialist_View_PopupMenu
-            TabOrder = 0
-            StyleElements = [seClient, seBorder]
-            Ratio = 0
-            OnPaint = TABPanelPaint
-            OwnerDraw = False
-            DesignSize = (
-              423
-              24)
-            object MedienBibDetailStatusLbl: TLabel
-              Left = 14
-              Top = 4
-              Width = 403
-              Height = 13
-              Anchors = [akLeft, akTop, akRight]
-              AutoSize = False
-              Caption = 'File overview'
-              StyleElements = [seClient, seBorder]
-            end
-          end
-          object MedienBibDetailControlPanel: TNempPanel
-            Tag = 3
-            Left = 0
-            Top = 0
-            Width = 56
-            Height = 28
-            Align = alLeft
-            BevelOuter = bvNone
-            TabOrder = 1
-            Ratio = 0
-            OnPaint = PanelPaint
-            OwnerDraw = False
-            object TabBtn_Cover: TSkinButton
-              Left = 2
-              Top = 2
-              Width = 24
-              Height = 24
-              Hint = 'Toggle Cover/Lyrics'
-              ParentShowHint = False
-              PopupMenu = Player_PopupMenu
-              ShowHint = True
-              TabOrder = 0
-              OnClick = PlayerTabsClick
-              OnMouseMove = TabBtn_CoverMouseMove
-              DrawMode = dm_Skin
-              NumGlyphsX = 5
-              NumGlyphsY = 2
-              GlyphLine = 0
-              CustomRegion = False
-              FocusDrawMode = fdm_Windows
-              Color1 = clBlack
-              Color2 = clBlack
-            end
-            object TabBtn_SummaryLock: TSkinButton
-              Tag = 2
-              Left = 28
-              Top = 2
-              Width = 24
-              Height = 24
-              Hint = 'Toggle File Overview (player only vs. selected file)'
-              ParentShowHint = False
-              PopupMenu = Player_PopupMenu
-              ShowHint = True
-              TabOrder = 1
-              OnClick = TabBtn_SummaryLockClick
-              OnMouseMove = TabBtn_CoverMouseMove
-              DrawMode = dm_Windows
-              NumGlyphsX = 5
-              NumGlyphsY = 2
-              GlyphLine = 0
-              CustomRegion = False
-              FocusDrawMode = fdm_Windows
-              Color1 = clBlack
-              Color2 = clBlack
-            end
-          end
-        end
-      end
-    end
+    HierarchyLevel = 0
+    SplitterMinSize = 110
     object _ControlPanel: TNempPanel
       Left = 0
       Top = 649
@@ -1543,10 +54,11 @@ object Nemp_MainForm: TNemp_MainForm
       Align = alBottom
       BevelOuter = bvNone
       PopupMenu = Player_PopupMenu
-      TabOrder = 2
+      TabOrder = 0
       OnMouseMove = _ControlPanelMouseMove
       OnResize = _ControlPanelResize
       Ratio = 0
+      FixedHeight = True
       OwnerDraw = False
       object ControlContainer2: TNempPanel
         Left = 481
@@ -2024,6 +536,7 @@ object Nemp_MainForm: TNemp_MainForm
             PopupMenu = Player_PopupMenu
             Proportional = True
             Stretch = True
+            OnClick = CoverImageClick
             OnDblClick = CoverImageDblClick
             OnMouseDown = ImgDetailCoverMouseDown
             OnMouseMove = ImgDetailCoverMouseMove
@@ -2476,6 +989,1768 @@ object Nemp_MainForm: TNemp_MainForm
         end
       end
     end
+    object PlaylistPanel: TNempPanel
+      Tag = 1
+      Left = 888
+      Top = 32
+      Width = 196
+      Height = 158
+      BevelOuter = bvNone
+      TabOrder = 1
+      OnResize = PlaylistPanelResize
+      Ratio = 0
+      OwnerDraw = False
+      object GRPBOXPlaylist: TNempPanel
+        Tag = 1
+        Left = 0
+        Top = 28
+        Width = 196
+        Height = 130
+        Align = alClient
+        BevelInner = bvRaised
+        BevelOuter = bvLowered
+        PopupMenu = PlayListPOPUP
+        TabOrder = 1
+        Ratio = 0
+        OnPaint = NewPanelPaint
+        OwnerDraw = False
+        object PlaylistVST: TVirtualStringTree
+          Left = 2
+          Top = 2
+          Width = 192
+          Height = 126
+          Align = alClient
+          BevelEdges = []
+          BevelInner = bvNone
+          BevelOuter = bvNone
+          BorderStyle = bsNone
+          Colors.UnfocusedSelectionColor = clHighlight
+          Colors.UnfocusedSelectionBorderColor = clHighlight
+          Ctl3D = True
+          DefaultPasteMode = amInsertAfter
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          Header.AutoSizeIndex = 1
+          Header.Background = clWindow
+          Header.MainColumn = 1
+          Header.Options = [hoAutoResize, hoDrag, hoVisible]
+          Header.PopupMenu = PlaylistVST_HeaderPopup
+          HintMode = hmHint
+          Images = PlayListImageList
+          Margin = 0
+          ParentCtl3D = False
+          ParentFont = False
+          ParentShowHint = False
+          PopupMenu = PlayListPOPUP
+          ScrollBarOptions.ScrollBars = ssVertical
+          ShowHint = True
+          StyleElements = [seClient, seBorder]
+          TabOrder = 0
+          TextMargin = 0
+          TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking]
+          TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
+          TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toMultiSelect, toRightClickSelect]
+          OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
+          OnAfterItemErase = VSTAfterItemErase
+          OnAfterItemPaint = PlaylistVSTAfterItemPaint
+          OnBeforeItemErase = VSTBeforeItemErase
+          OnChange = PlaylistVSTChange
+          OnCollapsed = PlaylistVSTCollapsAndExpanded
+          OnColumnDblClick = PlaylistVSTColumnDblClick
+          OnDragAllowed = PlaylistVSTDragAllowed
+          OnDragOver = PlaylistVSTDragOver
+          OnDragDrop = PlaylistVSTDragDrop
+          OnEndDrag = PlaylistVSTEndDrag
+          OnExpanded = PlaylistVSTCollapsAndExpanded
+          OnGetText = PlaylistVSTGetText
+          OnPaintText = VSTPaintText
+          OnGetImageIndex = PlaylistVSTGetImageIndex
+          OnGetHint = PlaylistVSTGetHint
+          OnGetUserClipboardFormats = TreesGetUserClipboardFormats
+          OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
+          OnKeyDown = PlaylistVSTKeyDown
+          OnKeyUp = PlaylistVSTKeyUp
+          OnRenderOLEData = TreesRenderOLEData
+          OnResize = PlaylistVSTResize
+          OnStartDrag = VSTFilesStartDrag
+          Touch.InteractiveGestures = [igPan, igPressAndTap]
+          Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+          Columns = <
+            item
+              Alignment = taRightJustify
+              Margin = 0
+              Position = 0
+              Spacing = 0
+              Text = '#'
+              Width = 30
+            end
+            item
+              Position = 1
+              Spacing = 0
+              Text = 'Title'
+              Width = 122
+            end
+            item
+              Alignment = taRightJustify
+              Margin = 0
+              Position = 2
+              Spacing = 50
+              Text = 'Time'
+              Width = 40
+            end>
+        end
+      end
+      object PlayerHeaderPanel: TNempPanel
+        Tag = 1
+        Left = 0
+        Top = 0
+        Width = 196
+        Height = 28
+        Align = alTop
+        BevelOuter = bvNone
+        TabOrder = 0
+        Ratio = 0
+        OnPaint = PanelPaint
+        OwnerDraw = False
+        object PlaylistFillPanel: TNempPanel
+          Tag = 1
+          AlignWithMargins = True
+          Left = 127
+          Top = 2
+          Width = 69
+          Height = 24
+          Margins.Left = 0
+          Margins.Top = 2
+          Margins.Right = 0
+          Margins.Bottom = 2
+          Align = alClient
+          BevelInner = bvRaised
+          BevelOuter = bvLowered
+          BiDiMode = bdLeftToRight
+          ParentBiDiMode = False
+          PopupMenu = PlayListPOPUP
+          TabOrder = 0
+          Ratio = 0
+          OnPaint = TABPanelPaint
+          OwnerDraw = False
+          DesignSize = (
+            69
+            24)
+          object PlayListStatusLBL: TLabel
+            Left = 10
+            Top = 5
+            Width = 52
+            Height = 13
+            Anchors = [akLeft, akTop, akRight]
+            AutoSize = False
+            ShowAccelChar = False
+            Transparent = True
+            StyleElements = [seClient, seBorder]
+            ExplicitWidth = 426
+          end
+        end
+        object PlaylistControlPanel: TNempPanel
+          Tag = 1
+          Left = 0
+          Top = 0
+          Width = 127
+          Height = 28
+          Align = alLeft
+          BevelOuter = bvNone
+          TabOrder = 1
+          Ratio = 0
+          OnPaint = PanelPaint
+          OwnerDraw = False
+          object TabBtn_Playlist: TSkinButton
+            Left = 0
+            Top = 2
+            Width = 24
+            Height = 24
+            Hint = 'Show context menu'
+            ParentShowHint = False
+            ShowHint = True
+            TabOrder = 0
+            OnClick = TabPanelPlaylistClick
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 1
+            GlyphLine = 0
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clBlack
+            Color2 = clBlack
+          end
+          object TabBtn_Favorites: TSkinButton
+            Left = 26
+            Top = 2
+            Width = 24
+            Height = 24
+            Hint = 'Favorite playlists'
+            TabOrder = 1
+            OnClick = TabBtn_FavoritesClick
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 1
+            GlyphLine = 0
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clBlack
+            Color2 = clBlack
+          end
+          object EditPlaylistSearch: TEdit
+            Left = 56
+            Top = 4
+            Width = 65
+            Height = 21
+            AutoSize = False
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 2
+            TextHint = 'Search'
+            OnChange = EditPlaylistSearchChange
+            OnEnter = EditPlaylistSearchEnter
+            OnKeyDown = EditPlaylistSearchKeyDown
+            OnKeyPress = EditPlaylistSearchKeyPress
+          end
+        end
+      end
+    end
+    object MedienBibDetailPanel: TNempPanel
+      Left = 728
+      Top = 224
+      Width = 352
+      Height = 249
+      BevelOuter = bvNone
+      TabOrder = 2
+      OnResize = MedienBibDetailPanelResize
+      Ratio = 0
+      OwnerDraw = False
+      object ContainerPanelMedienBibDetails: TNempPanel
+        Left = 0
+        Top = 28
+        Width = 352
+        Height = 221
+        Align = alClient
+        BevelOuter = bvNone
+        TabOrder = 0
+        Ratio = 0
+        OwnerDraw = False
+        object SplitterFileOverview: TSplitter
+          Left = 129
+          Top = 0
+          Width = 4
+          Height = 221
+          ResizeStyle = rsUpdate
+          StyleElements = [seFont, seBorder]
+          OnCanResize = SplitterFileOverviewCanResize
+          OnMoved = SplitterFileOverviewMoved
+          ExplicitLeft = 250
+          ExplicitTop = 3
+          ExplicitHeight = 377
+        end
+        object DetailCoverLyricsPanel: TNempPanel
+          Tag = 3
+          Left = 0
+          Top = 0
+          Width = 129
+          Height = 221
+          Align = alLeft
+          BevelInner = bvRaised
+          BevelOuter = bvLowered
+          PopupMenu = PopupEditExtendedTags
+          TabOrder = 0
+          OnResize = DetailID3TagPanelResize
+          Ratio = 0
+          OnPaint = NewPanelPaint
+          OwnerDraw = False
+          DesignSize = (
+            129
+            221)
+          object ImgDetailCover: TImage
+            Left = 4
+            Top = 8
+            Width = 121
+            Height = 203
+            Anchors = [akLeft, akTop, akRight, akBottom]
+            Center = True
+            Proportional = True
+            Stretch = True
+            OnDblClick = ImgDetailCoverDblClick
+            OnMouseDown = ImgDetailCoverMouseDown
+            OnMouseMove = ImgDetailCoverMouseMove
+            ExplicitWidth = 240
+            ExplicitHeight = 359
+          end
+          object LyricsMemo: TMemo
+            Left = 4
+            Top = 6
+            Width = 119
+            Height = 203
+            Anchors = [akLeft, akTop, akRight, akBottom]
+            BevelInner = bvNone
+            BevelOuter = bvNone
+            BorderStyle = bsNone
+            PopupMenu = Player_PopupMenu
+            ReadOnly = True
+            TabOrder = 0
+            Visible = False
+            StyleElements = [seBorder]
+            OnKeyDown = LyricsMemoKeyDown
+          end
+        end
+        object DetailID3TagPanel: TNempPanel
+          Tag = 3
+          Left = 133
+          Top = 0
+          Width = 219
+          Height = 221
+          Align = alClient
+          BevelInner = bvRaised
+          BevelOuter = bvLowered
+          PopupMenu = PopupEditExtendedTags
+          TabOrder = 1
+          OnResize = DetailID3TagPanelResize
+          Ratio = 0
+          OnPaint = NewPanelPaint
+          OwnerDraw = False
+          DesignSize = (
+            219
+            221)
+          object ImgBibRating: TImage
+            Left = 8
+            Top = 129
+            Width = 70
+            Height = 14
+            Hint = 'Click to change rating'
+            Visible = False
+            OnMouseDown = ImgBibRatingMouseDown
+            OnMouseLeave = ImgBibRatingMouseLeave
+            OnMouseMove = ImgBibRatingMouseMove
+          end
+          object LblBibAlbum: TLabel
+            Tag = 2
+            Left = 8
+            Top = 42
+            Width = 45
+            Height = 13
+            Caption = '               '
+            ShowAccelChar = False
+            StyleElements = [seClient, seBorder]
+            OnDblClick = DetailLabelDblClick
+            OnMouseEnter = DetailLabelMouseOver
+            OnMouseLeave = DetailLabelMouseLeave
+          end
+          object LblBibArtist: TLabel
+            Left = 8
+            Top = 8
+            Width = 45
+            Height = 13
+            Caption = '               '
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+            ShowAccelChar = False
+            StyleElements = [seClient, seBorder]
+            OnDblClick = DetailLabelDblClick
+            OnMouseEnter = DetailLabelMouseOver
+            OnMouseLeave = DetailLabelMouseLeave
+          end
+          object LblBibDuration: TLabel
+            Left = 8
+            Top = 93
+            Width = 45
+            Height = 13
+            Caption = '               '
+            ShowAccelChar = False
+            StyleElements = [seClient, seBorder]
+          end
+          object LblBibGenre: TLabel
+            Tag = 5
+            Left = 8
+            Top = 76
+            Width = 54
+            Height = 13
+            Caption = '                  '
+            ShowAccelChar = False
+            StyleElements = [seClient, seBorder]
+            OnDblClick = DetailLabelDblClick
+            OnMouseEnter = DetailLabelMouseOver
+            OnMouseLeave = DetailLabelMouseLeave
+          end
+          object LblBibPlayCounter: TLabel
+            Left = 84
+            Top = 129
+            Width = 54
+            Height = 13
+            Caption = '                  '
+            ShowAccelChar = False
+            StyleElements = [seClient, seBorder]
+          end
+          object LblBibQuality: TLabel
+            Left = 8
+            Top = 110
+            Width = 54
+            Height = 13
+            Caption = '                  '
+            ShowAccelChar = False
+            StyleElements = [seClient, seBorder]
+          end
+          object LblBibTitle: TLabel
+            Tag = 1
+            Left = 8
+            Top = 25
+            Width = 54
+            Height = 13
+            Caption = '                  '
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+            ShowAccelChar = False
+            StyleElements = [seClient, seBorder]
+          end
+          object LblBibYear: TLabel
+            Tag = 4
+            Left = 8
+            Top = 59
+            Width = 54
+            Height = 13
+            Caption = '                  '
+            ShowAccelChar = False
+            StyleElements = [seClient, seBorder]
+            OnDblClick = DetailLabelDblClick
+            OnMouseEnter = DetailLabelMouseOver
+            OnMouseLeave = DetailLabelMouseLeave
+          end
+          object Bevel1: TBevel
+            Left = 8
+            Top = 206
+            Width = 201
+            Height = 5
+            Anchors = [akLeft, akTop, akRight]
+            Shape = bsBottomLine
+            ExplicitWidth = 209
+          end
+          object LblBibReplayGain: TLabel
+            Left = 9
+            Top = 149
+            Width = 54
+            Height = 13
+            Hint = 'ReplayGain values'
+            Caption = '                  '
+            ShowAccelChar = False
+            StyleElements = [seClient, seBorder]
+          end
+          object lblBibFilename: TLabel
+            Left = 8
+            Top = 174
+            Width = 54
+            Height = 13
+            Caption = '                  '
+            ShowAccelChar = False
+            StyleElements = [seClient, seBorder]
+          end
+          object lblBibDirectory: TLabel
+            Tag = 6
+            Left = 8
+            Top = 189
+            Width = 45
+            Height = 13
+            Caption = '               '
+            ShowAccelChar = False
+            StyleElements = [seClient, seBorder]
+          end
+          object Bevel2: TBevel
+            Left = 9
+            Top = 165
+            Width = 201
+            Height = 5
+            Anchors = [akLeft, akTop, akRight]
+            Shape = bsBottomLine
+            ExplicitWidth = 209
+          end
+        end
+      end
+      object MedienBibDetailHeaderPanel: TNempPanel
+        Tag = 3
+        Left = 0
+        Top = 0
+        Width = 352
+        Height = 28
+        Align = alTop
+        BevelOuter = bvNone
+        DoubleBuffered = True
+        ParentDoubleBuffered = False
+        TabOrder = 1
+        Ratio = 0
+        OnPaint = PanelPaint
+        OwnerDraw = False
+        object MedienBibDetailFillPanel: TNempPanel
+          Tag = 3
+          AlignWithMargins = True
+          Left = 56
+          Top = 2
+          Width = 296
+          Height = 24
+          Margins.Left = 0
+          Margins.Top = 2
+          Margins.Right = 0
+          Margins.Bottom = 2
+          Align = alClient
+          BevelInner = bvRaised
+          BevelOuter = bvLowered
+          PopupMenu = Medialist_View_PopupMenu
+          TabOrder = 0
+          StyleElements = [seClient, seBorder]
+          Ratio = 0
+          OnPaint = TABPanelPaint
+          OwnerDraw = False
+          DesignSize = (
+            296
+            24)
+          object MedienBibDetailStatusLbl: TLabel
+            Left = 14
+            Top = 4
+            Width = 276
+            Height = 13
+            Anchors = [akLeft, akTop, akRight]
+            AutoSize = False
+            Caption = 'File overview'
+            StyleElements = [seClient, seBorder]
+            ExplicitWidth = 403
+          end
+        end
+        object MedienBibDetailControlPanel: TNempPanel
+          Tag = 3
+          Left = 0
+          Top = 0
+          Width = 56
+          Height = 28
+          Align = alLeft
+          BevelOuter = bvNone
+          TabOrder = 1
+          Ratio = 0
+          OnPaint = PanelPaint
+          OwnerDraw = False
+          object TabBtn_Cover: TSkinButton
+            Left = 2
+            Top = 2
+            Width = 24
+            Height = 24
+            Hint = 'Toggle Cover/Lyrics'
+            ParentShowHint = False
+            PopupMenu = Player_PopupMenu
+            ShowHint = True
+            TabOrder = 0
+            OnClick = PlayerTabsClick
+            OnMouseMove = TabBtn_CoverMouseMove
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 2
+            GlyphLine = 0
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clBlack
+            Color2 = clBlack
+          end
+          object TabBtn_SummaryLock: TSkinButton
+            Tag = 2
+            Left = 28
+            Top = 2
+            Width = 24
+            Height = 24
+            Hint = 'Toggle File Overview (player only vs. selected file)'
+            ParentShowHint = False
+            PopupMenu = Player_PopupMenu
+            ShowHint = True
+            TabOrder = 1
+            OnClick = TabBtn_SummaryLockClick
+            OnMouseMove = TabBtn_CoverMouseMove
+            DrawMode = dm_Windows
+            NumGlyphsX = 5
+            NumGlyphsY = 2
+            GlyphLine = 0
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clBlack
+            Color2 = clBlack
+          end
+        end
+      end
+    end
+    object MedialistPanel: TNempPanel
+      Left = 8
+      Top = 306
+      Width = 553
+      Height = 151
+      BevelOuter = bvNone
+      TabOrder = 3
+      OnResize = MedialistPanelResize
+      Ratio = 0
+      OwnerDraw = False
+      object MedienBibHeaderPanel: TNempPanel
+        Tag = 3
+        Left = 0
+        Top = 0
+        Width = 553
+        Height = 28
+        Align = alTop
+        BevelOuter = bvNone
+        DoubleBuffered = True
+        ParentDoubleBuffered = False
+        TabOrder = 0
+        Ratio = 0
+        OnPaint = PanelPaint
+        OwnerDraw = False
+        object MedienlisteFillPanel: TNempPanel
+          Tag = 3
+          AlignWithMargins = True
+          Left = 236
+          Top = 2
+          Width = 317
+          Height = 24
+          Margins.Left = 0
+          Margins.Top = 2
+          Margins.Right = 0
+          Margins.Bottom = 2
+          Align = alClient
+          BevelInner = bvRaised
+          BevelOuter = bvLowered
+          PopupMenu = Medialist_View_PopupMenu
+          TabOrder = 1
+          Ratio = 0
+          OnPaint = TABPanelPaint
+          OwnerDraw = False
+          DesignSize = (
+            317
+            24)
+          object MedienListeStatusLBL: TLabel
+            Left = 14
+            Top = 5
+            Width = 303
+            Height = 13
+            Anchors = [akLeft, akTop, akRight]
+            AutoSize = False
+            ShowAccelChar = False
+            Transparent = True
+            StyleElements = [seClient, seBorder]
+            ExplicitWidth = 326
+          end
+        end
+        object MedienListeControlPanel: TNempPanel
+          Tag = 3
+          Left = 0
+          Top = 0
+          Width = 236
+          Height = 28
+          Align = alLeft
+          BevelOuter = bvNone
+          TabOrder = 0
+          Ratio = 0
+          OnPaint = PanelPaint
+          OwnerDraw = False
+          object EDITFastSearch: TEdit
+            Left = 58
+            Top = 4
+            Width = 172
+            Height = 21
+            AutoSize = False
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clGrayText
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = []
+            ParentFont = False
+            PopupMenu = QuickSearchHistory_PopupMenu
+            TabOrder = 2
+            TextHint = 'Search (Library)'
+            OnChange = EDITFastSearchChange
+            OnEnter = EDITFastSearchEnter
+            OnExit = EDITFastSearchExit
+            OnKeyPress = EDITFastSearchKeyPress
+          end
+          object TabBtn_Marker: TSkinButton
+            Left = 28
+            Top = 2
+            Width = 24
+            Height = 24
+            ParentShowHint = False
+            ShowHint = True
+            TabOrder = 1
+            OnClick = TabBtn_MarkerClick
+            OnKeyPress = TabBtn_MarkerKeyPress
+            OnMouseDown = TabBtn_MarkerMouseDown
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 5
+            GlyphLine = 0
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clBlack
+            Color2 = clBlack
+          end
+          object TabBtn_Medialib: TSkinButton
+            Left = 2
+            Top = 2
+            Width = 24
+            Height = 24
+            Hint = 'Show context menu'
+            ParentShowHint = False
+            ShowHint = True
+            TabOrder = 0
+            OnClick = TabPanelMedienlisteClick
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 1
+            GlyphLine = 0
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clBlack
+            Color2 = clBlack
+          end
+        end
+      end
+      object GRPBOXVST: TNempPanel
+        Tag = 3
+        Left = 0
+        Top = 28
+        Width = 553
+        Height = 123
+        Align = alClient
+        BevelInner = bvRaised
+        BevelOuter = bvLowered
+        DoubleBuffered = False
+        ParentDoubleBuffered = False
+        PopupMenu = Medialist_View_PopupMenu
+        TabOrder = 1
+        Ratio = 0
+        OnPaint = NewPanelPaint
+        OwnerDraw = False
+        object VST: TVirtualStringTree
+          Left = 2
+          Top = 2
+          Width = 549
+          Height = 119
+          Align = alClient
+          BevelInner = bvNone
+          BevelOuter = bvNone
+          BorderStyle = bsNone
+          Colors.SelectionTextColor = clWindowText
+          Colors.UnfocusedSelectionColor = clHighlight
+          Colors.UnfocusedSelectionBorderColor = clHighlight
+          Constraints.MinHeight = 26
+          DragImageKind = diMainColumnOnly
+          DragWidth = 10
+          EditDelay = 50
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          Header.AutoSizeIndex = -1
+          Header.Background = clWindow
+          Header.Options = [hoColumnResize, hoDblClickResize, hoDrag, hoRestrictDrag, hoShowSortGlyphs, hoVisible]
+          Header.SortColumn = 0
+          HintMode = hmHint
+          IncrementalSearch = isAll
+          Indent = 0
+          Margin = 0
+          ParentFont = False
+          ParentShowHint = False
+          PopupMenu = Medialist_View_PopupMenu
+          ShowHint = True
+          StyleElements = [seClient, seBorder]
+          TabOrder = 0
+          TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSpanColumns, toAutoTristateTracking]
+          TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick]
+          TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
+          TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toMultiSelect, toRightClickSelect]
+          OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
+          OnAfterCellPaint = VSTAfterCellPaint
+          OnAfterGetMaxColumnWidth = VSTAfterGetMaxColumnWidth
+          OnAfterItemErase = VSTAfterItemErase
+          OnBeforeItemErase = VSTBeforeItemErase
+          OnChange = VSTChange
+          OnColumnClick = VSTColumnClick
+          OnColumnDblClick = VSTColumnDblClick
+          OnCreateEditor = VSTCreateEditor
+          OnDragAllowed = VSTDragAllowed
+          OnDragOver = LibraryCollectionTreeDragOver
+          OnDragDrop = LibraryCollectionTreeDragDrop
+          OnEditCancelled = VSTEditCancelled
+          OnEdited = VSTEdited
+          OnEditing = VSTEditing
+          OnEndDrag = LibraryVSTEndDrag
+          OnFocusChanging = VSTFocusChanging
+          OnGetText = VSTGetText
+          OnPaintText = VSTPaintText
+          OnGetImageIndex = VSTGetImageIndex
+          OnGetHint = PlaylistVSTGetHint
+          OnGetUserClipboardFormats = TreesGetUserClipboardFormats
+          OnHeaderClick = VSTHeaderClick
+          OnHeaderDblClick = VSTHeaderDblClick
+          OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
+          OnIncrementalSearch = VSTIncrementalSearch
+          OnInitNode = VSTInitNode
+          OnKeyDown = VSTKeyDown
+          OnKeyUp = PlaylistVSTKeyUp
+          OnNewText = VSTNewText
+          OnRenderOLEData = TreesRenderOLEData
+          OnStartDrag = VSTFilesStartDrag
+          Touch.InteractiveGestures = [igPan, igPressAndTap]
+          Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+          Columns = <
+            item
+              Position = 0
+              Width = 10
+            end
+            item
+              Position = 1
+            end
+            item
+              Position = 2
+            end
+            item
+              Position = 3
+            end
+            item
+              Position = 4
+            end
+            item
+              Position = 5
+            end
+            item
+              Position = 6
+            end
+            item
+              Position = 7
+            end
+            item
+              Position = 8
+            end
+            item
+              Position = 9
+            end
+            item
+              Position = 10
+            end
+            item
+              Position = 11
+            end
+            item
+              Position = 12
+            end
+            item
+              Position = 13
+            end
+            item
+              Position = 14
+            end
+            item
+              Position = 15
+            end
+            item
+              Position = 16
+            end
+            item
+              Position = 17
+            end
+            item
+              Position = 18
+            end
+            item
+              Position = 19
+            end
+            item
+              Position = 20
+            end
+            item
+              Position = 21
+            end
+            item
+              Position = 22
+            end
+            item
+              Position = 23
+            end
+            item
+              Position = 24
+            end
+            item
+              Position = 25
+            end
+            item
+              Position = 26
+            end
+            item
+              Position = 27
+            end
+            item
+              Position = 28
+            end>
+        end
+      end
+    end
+    object TreePanel: TNempPanel
+      Tag = 2
+      Left = 0
+      Top = 10
+      Width = 200
+      Height = 219
+      BevelOuter = bvNone
+      TabOrder = 4
+      OnMouseDown = TreePanelMouseDown
+      Ratio = 0
+      OwnerDraw = False
+      object AuswahlHeaderPanel0: TNempPanel
+        Tag = 2
+        Left = 0
+        Top = 0
+        Width = 200
+        Height = 28
+        Align = alTop
+        BevelOuter = bvNone
+        ParentBackground = False
+        TabOrder = 0
+        Ratio = 0
+        OnPaint = PanelPaint
+        OwnerDraw = False
+        object AuswahlFillPanel0: TNempPanel
+          Tag = 2
+          AlignWithMargins = True
+          Left = 121
+          Top = 2
+          Width = 79
+          Height = 24
+          Margins.Left = 0
+          Margins.Top = 2
+          Margins.Right = 0
+          Margins.Bottom = 2
+          Align = alClient
+          BevelInner = bvRaised
+          BevelOuter = bvLowered
+          Padding.Top = 2
+          Padding.Bottom = 2
+          PopupMenu = Medialist_Browse_PopupMenu
+          TabOrder = 0
+          Ratio = 0
+          OnPaint = TABPanelPaint
+          OwnerDraw = False
+          DesignSize = (
+            79
+            24)
+          object AuswahlStatusLBL0: TLabel
+            Left = 10
+            Top = 5
+            Width = 63
+            Height = 13
+            Anchors = [akLeft, akTop, akRight]
+            AutoSize = False
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = []
+            ParentFont = False
+            ShowAccelChar = False
+            Transparent = True
+            StyleElements = [seClient, seBorder]
+            ExplicitWidth = 324
+          end
+        end
+        object AuswahlControlPanel0: TNempPanel
+          Tag = 2
+          Left = 0
+          Top = 0
+          Width = 121
+          Height = 28
+          Align = alLeft
+          BevelOuter = bvNone
+          TabOrder = 1
+          Ratio = 0
+          OnPaint = PanelPaint
+          OwnerDraw = False
+          object TabBtn_Browse0: TSkinButton
+            Left = 30
+            Top = 2
+            Width = 24
+            Height = 24
+            Hint = 'Treeview'
+            ParentShowHint = False
+            PopupMenu = Medialist_Browse_PopupMenu
+            ShowHint = True
+            TabOrder = 1
+            OnClick = TABPanelAuswahlClick
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 3
+            GlyphLine = 1
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clPurple
+            Color2 = clGreen
+          end
+          object TabBtn_CoverFlow0: TSkinButton
+            Tag = 1
+            Left = 58
+            Top = 2
+            Width = 24
+            Height = 24
+            Hint = 'Coverflow'
+            ParentShowHint = False
+            PopupMenu = Medialist_Browse_PopupMenu
+            ShowHint = True
+            TabOrder = 2
+            OnClick = TABPanelAuswahlClick
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 3
+            GlyphLine = 0
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clBlack
+            Color2 = clBlack
+          end
+          object TabBtn_Preselection0: TSkinButton
+            Tag = 1
+            Left = 2
+            Top = 2
+            Width = 24
+            Height = 24
+            Hint = 'Show context menu'
+            ParentShowHint = False
+            PopupMenu = Medialist_Browse_PopupMenu
+            ShowHint = True
+            TabOrder = 0
+            OnClick = TabBtn_Preselection0Click
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 1
+            GlyphLine = 0
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clBlack
+            Color2 = clBlack
+          end
+          object TabBtn_TagCloud0: TSkinButton
+            Tag = 2
+            Left = 86
+            Top = 2
+            Width = 24
+            Height = 24
+            Hint = 'Tag cloud'
+            ParentShowHint = False
+            PopupMenu = Medialist_Browse_PopupMenu
+            ShowHint = True
+            TabOrder = 3
+            OnClick = TABPanelAuswahlClick
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 3
+            GlyphLine = 0
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clBlack
+            Color2 = clBlack
+          end
+        end
+      end
+      object PanelStandardBrowse: TPanel
+        Tag = 2
+        Left = 0
+        Top = 28
+        Width = 200
+        Height = 191
+        Align = alClient
+        BevelInner = bvRaised
+        BevelOuter = bvLowered
+        TabOrder = 1
+        object SplitterBrowse: TSplitter
+          Left = 2
+          Top = 81
+          Width = 196
+          Height = 4
+          Cursor = crVSplit
+          Align = alTop
+          StyleElements = [seFont, seBorder]
+          OnMoved = SplitterBrowseMoved
+          ExplicitLeft = 4
+          ExplicitTop = 75
+        end
+        object ArtistsVST: TVirtualStringTree
+          Tag = 1
+          Left = 2
+          Top = 2
+          Width = 196
+          Height = 79
+          Align = alTop
+          BevelInner = bvNone
+          BevelOuter = bvNone
+          BorderStyle = bsNone
+          Colors.UnfocusedSelectionColor = clHighlight
+          Colors.UnfocusedSelectionBorderColor = clHighlight
+          Constraints.MinWidth = 20
+          DefaultNodeHeight = 14
+          DragImageKind = diMainColumnOnly
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          Header.AutoSizeIndex = 0
+          Header.Background = clWindow
+          Header.Height = 22
+          Header.Options = [hoAutoResize, hoDrag, hoVisible]
+          IncrementalSearch = isAll
+          Indent = 14
+          Margin = 0
+          ParentFont = False
+          ScrollBarOptions.ScrollBars = ssVertical
+          StyleElements = [seClient, seBorder]
+          TabOrder = 0
+          TextMargin = 2
+          TreeOptions.AutoOptions = [toAutoDropExpand, toAutoTristateTracking]
+          TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
+          TreeOptions.SelectionOptions = [toFullRowSelect, toRightClickSelect]
+          OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
+          OnAfterItemErase = VSTAfterItemErase
+          OnClick = ArtistsVSTClick
+          OnDragAllowed = ArtistsVSTDragAllowed
+          OnDragOver = CategoryVSTDragOver
+          OnDragDrop = CategoryVSTDragDrop
+          OnFocusChanged = ArtistsVSTFocusChanged
+          OnGetText = StringVSTGetText
+          OnPaintText = ArtistsVSTPaintText
+          OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
+          OnIncrementalSearch = ArtistsVSTIncrementalSearch
+          OnResize = ArtistsVSTResize
+          Touch.InteractiveGestures = [igPan, igPressAndTap]
+          Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+          Columns = <
+            item
+              MinWidth = 0
+              Position = 0
+              Width = 196
+            end>
+        end
+        object AlbenVST: TVirtualStringTree
+          Tag = 2
+          Left = 2
+          Top = 85
+          Width = 196
+          Height = 104
+          Align = alClient
+          BevelInner = bvNone
+          BevelOuter = bvNone
+          BorderStyle = bsNone
+          Colors.UnfocusedSelectionColor = clHighlight
+          Colors.UnfocusedSelectionBorderColor = clHighlight
+          Constraints.MinWidth = 20
+          DragOperations = [doCopy]
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          Header.AutoSizeIndex = 0
+          Header.Background = clWindow
+          Header.Height = 20
+          Header.Options = [hoAutoResize, hoDrag, hoVisible]
+          Images = DummyImageList
+          IncrementalSearch = isAll
+          Indent = 14
+          Margin = 0
+          ParentFont = False
+          PopupMenu = Medialist_Browse_PopupMenu
+          ScrollBarOptions.ScrollBars = ssVertical
+          StyleElements = [seClient, seBorder]
+          TabOrder = 1
+          TextMargin = 2
+          TreeOptions.AutoOptions = [toAutoDropExpand, toAutoTristateTracking]
+          TreeOptions.MiscOptions = [toAcceptOLEDrop, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning, toVariableNodeHeight, toEditOnClick]
+          TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
+          TreeOptions.SelectionOptions = [toFullRowSelect, toRightClickSelect]
+          OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
+          OnAfterItemErase = VSTAfterItemErase
+          OnClick = AlbenVSTClick
+          OnColumnDblClick = AlbenVSTColumnDblClick
+          OnDragAllowed = AlbenVSTDragAllowed
+          OnDragOver = LibraryCollectionTreeDragOver
+          OnDragDrop = LibraryCollectionTreeDragDrop
+          OnDrawText = AlbenVSTDrawText
+          OnEndDrag = LibraryVSTEndDrag
+          OnFocusChanged = AlbenVSTFocusChanged
+          OnGetText = AlbenVSTGetText
+          OnPaintText = ArtistsVSTPaintText
+          OnGetImageIndex = AlbenVSTGetImageIndex
+          OnGetUserClipboardFormats = TreesGetUserClipboardFormats
+          OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
+          OnIncrementalSearch = AlbenVSTIncrementalSearch
+          OnKeyDown = StringVSTKeyDown
+          OnMeasureItem = AlbenVSTMeasureItem
+          OnRenderOLEData = TreesRenderOLEData
+          OnResize = AlbenVSTResize
+          OnStartDrag = AlbenVSTStartDrag
+          Touch.InteractiveGestures = [igPan, igPressAndTap]
+          Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+          Columns = <
+            item
+              MinWidth = 0
+              Position = 0
+              Width = 196
+            end>
+        end
+      end
+    end
+    object CoverflowPanel: TNempPanel
+      Tag = 2
+      Left = 214
+      Top = 10
+      Width = 189
+      Height = 217
+      BevelOuter = bvNone
+      TabOrder = 5
+      OnMouseDown = TreePanelMouseDown
+      Ratio = 0
+      OwnerDraw = False
+      object AuswahlHeaderPanel1: TNempPanel
+        Tag = 2
+        Left = 0
+        Top = 0
+        Width = 189
+        Height = 28
+        Align = alTop
+        BevelOuter = bvNone
+        ParentBackground = False
+        TabOrder = 0
+        Ratio = 0
+        OnPaint = PanelPaint
+        OwnerDraw = False
+        object AuswahlFillPanel1: TNempPanel
+          Tag = 2
+          AlignWithMargins = True
+          Left = 121
+          Top = 2
+          Width = 68
+          Height = 24
+          Margins.Left = 0
+          Margins.Top = 2
+          Margins.Right = 0
+          Margins.Bottom = 2
+          Align = alClient
+          BevelInner = bvRaised
+          BevelOuter = bvLowered
+          Padding.Top = 2
+          Padding.Bottom = 2
+          PopupMenu = Medialist_Browse_PopupMenu
+          TabOrder = 0
+          Ratio = 0
+          OnPaint = TABPanelPaint
+          OwnerDraw = False
+          DesignSize = (
+            68
+            24)
+          object AuswahlStatusLBL1: TLabel
+            Left = 10
+            Top = 5
+            Width = 52
+            Height = 13
+            Anchors = [akLeft, akTop, akRight]
+            AutoSize = False
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = []
+            ParentFont = False
+            ShowAccelChar = False
+            Transparent = True
+            StyleElements = [seClient, seBorder]
+            ExplicitWidth = 324
+          end
+        end
+        object AuswahlControlPanel1: TNempPanel
+          Tag = 2
+          Left = 0
+          Top = 0
+          Width = 121
+          Height = 28
+          Align = alLeft
+          BevelOuter = bvNone
+          TabOrder = 1
+          Ratio = 0
+          OnPaint = PanelPaint
+          OwnerDraw = False
+          object TabBtn_Browse1: TSkinButton
+            Left = 30
+            Top = 2
+            Width = 24
+            Height = 24
+            Hint = 'Treeview'
+            ParentShowHint = False
+            PopupMenu = Medialist_Browse_PopupMenu
+            ShowHint = True
+            TabOrder = 1
+            OnClick = TABPanelAuswahlClick
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 3
+            GlyphLine = 0
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clPurple
+            Color2 = clGreen
+          end
+          object TabBtn_CoverFlow1: TSkinButton
+            Tag = 1
+            Left = 58
+            Top = 2
+            Width = 24
+            Height = 24
+            Hint = 'Coverflow'
+            ParentShowHint = False
+            PopupMenu = Medialist_Browse_PopupMenu
+            ShowHint = True
+            TabOrder = 2
+            OnClick = TABPanelAuswahlClick
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 3
+            GlyphLine = 1
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clBlack
+            Color2 = clBlack
+          end
+          object TabBtn_Preselection1: TSkinButton
+            Tag = 1
+            Left = 2
+            Top = 2
+            Width = 24
+            Height = 24
+            Hint = 'Show context menu'
+            ParentShowHint = False
+            PopupMenu = Medialist_Browse_PopupMenu
+            ShowHint = True
+            TabOrder = 0
+            OnClick = TabBtn_Preselection0Click
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 1
+            GlyphLine = 0
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clBlack
+            Color2 = clBlack
+          end
+          object TabBtn_TagCloud1: TSkinButton
+            Tag = 2
+            Left = 86
+            Top = 2
+            Width = 24
+            Height = 24
+            Hint = 'Tag cloud'
+            ParentShowHint = False
+            PopupMenu = Medialist_Browse_PopupMenu
+            ShowHint = True
+            TabOrder = 3
+            OnClick = TABPanelAuswahlClick
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 3
+            GlyphLine = 0
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clBlack
+            Color2 = clBlack
+          end
+        end
+      end
+      object PanelCoverBrowse: TNempPanel
+        Tag = 2
+        Left = 0
+        Top = 28
+        Width = 189
+        Height = 189
+        Align = alClient
+        BevelInner = bvRaised
+        BevelOuter = bvLowered
+        PopupMenu = Medialist_Browse_PopupMenu
+        TabOrder = 1
+        OnDblClick = PanelCoverBrowseDblClick
+        OnEndDrag = PanelCoverBrowseEndDrag
+        OnMouseDown = PanelCoverBrowseMouseDown
+        OnMouseMove = IMGMedienBibCoverMouseMove
+        OnMouseUp = IMGMedienBibCoverMouseUp
+        OnResize = PanelCoverBrowseResize
+        Ratio = 0
+        OnPaint = PanelCoverBrowsePaint
+        OnAfterPaint = PanelCoverBrowseAfterPaint
+        OwnerDraw = False
+        OnMouseWheelUp = PanelCoverBrowseMouseWheelUp
+        OnMouseWheelDown = PanelCoverBrowseMouseWheelDown
+        DesignSize = (
+          189
+          189)
+        object IMGMedienBibCover: TImage
+          Left = 3
+          Top = 6
+          Width = 186
+          Height = 38
+          Anchors = [akLeft, akTop, akRight, akBottom]
+          Center = True
+          DragCursor = crDefault
+          Proportional = True
+          OnMouseDown = IMGMedienBibCoverMouseDown
+          OnMouseMove = IMGMedienBibCoverMouseMove
+          OnMouseUp = IMGMedienBibCoverMouseUp
+          ExplicitWidth = 164
+          ExplicitHeight = 24
+        end
+        object ImgScrollCover: TImage
+          Left = 1
+          Top = 50
+          Width = 186
+          Height = 75
+          Anchors = [akLeft, akRight, akBottom]
+          Transparent = True
+          OnMouseDown = ImgScrollCoverMouseDown
+          ExplicitTop = 36
+          ExplicitWidth = 297
+        end
+        object CoverScrollbar: TScrollBar
+          Left = 8
+          Top = 170
+          Width = 181
+          Height = 17
+          Anchors = [akLeft, akRight, akBottom]
+          LargeChange = 3
+          Max = 3
+          PageSize = 3
+          TabOrder = 0
+          OnChange = CoverScrollbarChange
+          OnEnter = CoverScrollbarEnter
+          OnKeyDown = CoverScrollbarKeyDown
+        end
+        object Pnl_CoverFlowLabel: TNempPanel
+          Tag = 2
+          Left = 30
+          Top = 131
+          Width = 122
+          Height = 33
+          Anchors = [akLeft, akRight, akBottom]
+          BevelOuter = bvNone
+          Caption = 'Pnl_CoverFlowLabel'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindow
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          ShowCaption = False
+          TabOrder = 1
+          OnMouseDown = Lbl_CoverFlowMouseDown
+          Ratio = 0
+          OnPaint = Pnl_CoverFlowLabelPaint
+          OwnerDraw = False
+          DesignSize = (
+            122
+            33)
+          object Lbl_CoverFlow: TLabel
+            Left = 38
+            Top = 10
+            Width = 84
+            Height = 13
+            Alignment = taCenter
+            Anchors = [akLeft, akTop, akRight]
+            AutoSize = False
+            ShowAccelChar = False
+            Transparent = True
+            StyleElements = [seClient, seBorder]
+            OnMouseDown = Lbl_CoverFlowMouseDown
+            ExplicitWidth = 62
+          end
+          object TabBtnCoverCategory: TSkinButton
+            Tag = 1
+            Left = 8
+            Top = 5
+            Width = 24
+            Height = 24
+            Hint = 'Select category'
+            ParentShowHint = False
+            PopupMenu = Medialist_Browse_Categories_PopupMenu
+            ShowHint = True
+            TabOrder = 0
+            TabStop = False
+            OnClick = TabBtnCoverCategoryClick
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 1
+            GlyphLine = 0
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clBlack
+            Color2 = clBlack
+          end
+        end
+      end
+    end
+    object CloudPanel: TNempPanel
+      Tag = 2
+      Left = 424
+      Top = 10
+      Width = 249
+      Height = 217
+      BevelOuter = bvNone
+      TabOrder = 6
+      OnMouseDown = TreePanelMouseDown
+      Ratio = 0
+      OwnerDraw = False
+      object AuswahlHeaderPanel2: TNempPanel
+        Tag = 2
+        Left = 0
+        Top = 0
+        Width = 249
+        Height = 28
+        Align = alTop
+        BevelOuter = bvNone
+        ParentBackground = False
+        TabOrder = 0
+        Ratio = 0
+        OnPaint = PanelPaint
+        OwnerDraw = False
+        object AuswahlFillPanel2: TNempPanel
+          Tag = 2
+          AlignWithMargins = True
+          Left = 200
+          Top = 2
+          Width = 49
+          Height = 24
+          Margins.Left = 0
+          Margins.Top = 2
+          Margins.Right = 0
+          Margins.Bottom = 2
+          Align = alClient
+          BevelInner = bvRaised
+          BevelOuter = bvLowered
+          Padding.Top = 2
+          Padding.Bottom = 2
+          PopupMenu = Medialist_Browse_PopupMenu
+          TabOrder = 0
+          Ratio = 0
+          OnPaint = TABPanelPaint
+          OwnerDraw = False
+          DesignSize = (
+            49
+            24)
+          object AuswahlStatusLBL2: TLabel
+            Left = 10
+            Top = 5
+            Width = 33
+            Height = 13
+            Anchors = [akLeft, akTop, akRight]
+            AutoSize = False
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = []
+            ParentFont = False
+            ShowAccelChar = False
+            Transparent = True
+            StyleElements = [seClient, seBorder]
+            ExplicitWidth = 324
+          end
+        end
+        object AuswahlControlPanel2: TNempPanel
+          Tag = 2
+          Left = 0
+          Top = 0
+          Width = 200
+          Height = 28
+          Align = alLeft
+          BevelOuter = bvNone
+          TabOrder = 1
+          Ratio = 0
+          OnPaint = PanelPaint
+          OwnerDraw = False
+          object edtCloudSearch: TEdit
+            Left = 116
+            Top = 3
+            Width = 81
+            Height = 21
+            AutoSize = False
+            TabOrder = 4
+            TextHint = 'Search (Tags)'
+            OnChange = ssdedtCloudSearchChange
+            OnKeyPress = ssdedtCloudSearchKeyPress
+          end
+          object TabBtn_Browse2: TSkinButton
+            Left = 30
+            Top = 2
+            Width = 24
+            Height = 24
+            Hint = 'Treeview'
+            ParentShowHint = False
+            PopupMenu = Medialist_Browse_PopupMenu
+            ShowHint = True
+            TabOrder = 1
+            OnClick = TABPanelAuswahlClick
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 3
+            GlyphLine = 0
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clPurple
+            Color2 = clGreen
+          end
+          object TabBtn_CoverFlow2: TSkinButton
+            Tag = 1
+            Left = 58
+            Top = 2
+            Width = 24
+            Height = 24
+            Hint = 'Coverflow'
+            ParentShowHint = False
+            PopupMenu = Medialist_Browse_PopupMenu
+            ShowHint = True
+            TabOrder = 2
+            OnClick = TABPanelAuswahlClick
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 3
+            GlyphLine = 0
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clBlack
+            Color2 = clBlack
+          end
+          object TabBtn_Preselection2: TSkinButton
+            Tag = 1
+            Left = 2
+            Top = 2
+            Width = 24
+            Height = 24
+            Hint = 'Show context menu'
+            ParentShowHint = False
+            PopupMenu = Medialist_Browse_PopupMenu
+            ShowHint = True
+            TabOrder = 0
+            OnClick = TabBtn_Preselection0Click
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 1
+            GlyphLine = 0
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clBlack
+            Color2 = clBlack
+          end
+          object TabBtn_TagCloud2: TSkinButton
+            Tag = 2
+            Left = 86
+            Top = 2
+            Width = 24
+            Height = 24
+            Hint = 'Tag cloud'
+            ParentShowHint = False
+            PopupMenu = Medialist_Browse_PopupMenu
+            ShowHint = True
+            TabOrder = 3
+            OnClick = TABPanelAuswahlClick
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 3
+            GlyphLine = 1
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clBlack
+            Color2 = clBlack
+          end
+        end
+      end
+      object PanelTagCloudBrowse: TNempPanel
+        Tag = 2
+        Left = 0
+        Top = 28
+        Width = 249
+        Height = 189
+        Align = alClient
+        BevelInner = bvRaised
+        BevelOuter = bvLowered
+        TabOrder = 1
+        OnClick = PanelTagCloudBrowseClick
+        OnMouseDown = PanelTagCloudBrowseMouseDown
+        OnResize = PanelTagCloudBrowseResize
+        Ratio = 0
+        OwnerDraw = False
+        object TabBtnTagCloudCategory: TSkinButton
+          Tag = 1
+          Left = 16
+          Top = 13
+          Width = 24
+          Height = 24
+          Hint = 'Select category'
+          ParentShowHint = False
+          PopupMenu = Medialist_Browse_Categories_PopupMenu
+          ShowHint = True
+          TabOrder = 0
+          TabStop = False
+          OnClick = TabBtnCoverCategoryClick
+          DrawMode = dm_Skin
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+      end
+    end
+    object EmptyLibraryPanel: TNempPanel
+      Tag = 2
+      Left = 676
+      Top = 33
+      Width = 185
+      Height = 171
+      BevelOuter = bvNone
+      TabOrder = 7
+      OnResize = EmptyLibraryPanelResize
+      Ratio = 0
+      OnPaint = EmptyLibraryPanelPaint
+      OwnerDraw = False
+      object LblEmptyLibraryHint: TLabel
+        Left = 24
+        Top = 22
+        Width = 161
+        Height = 116
+        AutoSize = False
+        Caption = 'Library is empty'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -16
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        ShowAccelChar = False
+        WordWrap = True
+        StyleElements = [seClient, seBorder]
+      end
+    end
   end
   object BassTimer: TTimer
     Enabled = False
@@ -2502,11 +2777,6 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = 'Manage webradio stations'
         ShortCut = 16471
         OnClick = MM_ML_WebradioClick
-      end
-      object MM_ML_ConfigureMediaLibrary: TMenuItem
-        Caption = 'Configure Media library'
-        ImageIndex = 43
-        OnClick = PM_ML_ConfigureMedialibraryClick
       end
       object N22: TMenuItem
         Caption = '-'
@@ -2687,62 +2957,67 @@ object Nemp_MainForm: TNemp_MainForm
         ImageIndex = 5
         OnClick = MM_O_PreferencesClick
       end
+      object MM_ML_ConfigureMediaLibrary: TMenuItem
+        Caption = 'Configure Media library'
+        ImageIndex = 43
+        OnClick = PM_ML_ConfigureMedialibraryClick
+      end
       object MM_O_Wizard: TMenuItem
         Caption = 'Wizard'
         ImageIndex = 32
         OnClick = MM_O_WizardClick
       end
-      object MM_O_View: TMenuItem
-        Caption = '&View'
-        object MM_O_ViewCompact: TMenuItem
-          Caption = '[--- Compact view ---]'
-          OnClick = PM_P_ViewCompactClick
+      object MM_O_Languages: TMenuItem
+        Caption = 'Languages'
+        object MM_O_Defaultlanguage: TMenuItem
+          Tag = -1
+          Caption = 'English'
+          OnClick = ChangeLanguage
         end
-        object MM_O_ViewCompactComplete: TMenuItem
-          Caption = '&Complete'
-          Checked = True
-          OnClick = MM_O_ViewCompactCompleteClick
-        end
-        object N34: TMenuItem
-          Caption = '-'
-        end
-        object MM_O_ViewSeparateWindows: TMenuItem
-          Tag = 1
-          Caption = '[--- Seperate windows ---]'
-          OnClick = MM_O_ViewCompactCompleteClick
-        end
-        object MM_O_ViewSeparateWindows_Equalizer: TMenuItem
-          Caption = 'Show file information'
-          ShortCut = 8304
-          OnClick = PM_P_ViewSeparateWindows_EqualizerClick
-        end
-        object MM_O_ViewSeparateWindows_Playlist: TMenuItem
-          Caption = 'Show &playlist'
-          Checked = True
-          ShortCut = 8305
-          OnClick = PM_P_ViewSeparateWindows_PlaylistClick
-        end
-        object MM_O_ViewSeparateWindows_Medialist: TMenuItem
-          Caption = 'Show &media library (title list)'
-          Checked = True
-          ShortCut = 8306
-          OnClick = PM_P_ViewSeparateWindows_MedialistClick
-        end
-        object MM_O_ViewSeparateWindows_Browse: TMenuItem
-          Caption = 'Show media libary (&browse list)'
-          Checked = True
-          ShortCut = 8307
-          OnClick = PM_P_ViewSeparateWindows_BrowseClick
-        end
-        object MM_O_ViewStayOnTop: TMenuItem
-          Caption = 'Stay on &top'
-          ShortCut = 16468
-          OnClick = PM_P_ViewStayOnTopClick
-        end
+      end
+      object N33: TMenuItem
+        Caption = '-'
       end
       object MM_O_FormBuilder: TMenuItem
         Caption = 'Form designer'
         OnClick = MM_O_FormBuilderClick
+      end
+      object MM_O_View: TMenuItem
+        Caption = '&View'
+        object MM_O_JoinWindows: TMenuItem
+          Action = actJoinWindows
+        end
+        object MM_O_SplitWindows: TMenuItem
+          Tag = 1
+          Action = actSplitWindows
+        end
+        object N29: TMenuItem
+          Caption = '-'
+        end
+        object MM_O_CompactToggleFileOverview: TMenuItem
+          Action = actCompactToggleFileOverview
+        end
+        object MM_O_CompactToggleTitleList: TMenuItem
+          Action = actCompactToggleTitleList
+        end
+        object MM_O_CompactToggleBrowselist: TMenuItem
+          Action = actCompactToggleBrowseList
+        end
+        object MM_O_SplitToggleFileOverview: TMenuItem
+          Action = actSplitToggleFileOverview
+        end
+        object MM_O_SplitToggle_Playlist: TMenuItem
+          Action = actSplitTogglePlaylist
+        end
+        object MM_O_SplitToggle_TitleList: TMenuItem
+          Action = actSplitToggleTitleList
+        end
+        object MM_O_SplitToggle_Browselist: TMenuItem
+          Action = actSplitToggleBrowseList
+        end
+        object MM_O_ToggleStayOnTop: TMenuItem
+          Action = actToggleStayOnTop
+        end
       end
       object MM_O_Skins: TMenuItem
         Caption = '&Skins'
@@ -2760,14 +3035,6 @@ object Nemp_MainForm: TNemp_MainForm
         object N38: TMenuItem
           Caption = '-'
           GroupIndex = 1
-        end
-      end
-      object MM_O_Languages: TMenuItem
-        Caption = 'Languages'
-        object MM_O_Defaultlanguage: TMenuItem
-          Tag = -1
-          Caption = 'English'
-          OnClick = ChangeLanguage
         end
       end
       object N32: TMenuItem
@@ -6008,50 +6275,39 @@ object Nemp_MainForm: TNemp_MainForm
     end
     object PM_P_View: TMenuItem
       Caption = 'View'
-      object PM_P_ViewCompact: TMenuItem
-        Caption = '[--- Compact view ---]'
-        OnClick = PM_P_ViewCompactClick
+      object PM_P_JoinWindows: TMenuItem
+        Action = actJoinWindows
       end
-      object PM_P_ViewCompactComplete: TMenuItem
-        Caption = 'Complete'
-        Checked = True
-        OnClick = MM_O_ViewCompactCompleteClick
+      object PM_P_SplitWindows: TMenuItem
+        Tag = 1
+        Action = actSplitWindows
       end
       object N31: TMenuItem
         Caption = '-'
       end
-      object PM_P_ViewSeparateWindows: TMenuItem
-        Tag = 1
-        Caption = '[--- Seperate windows ---]'
-        OnClick = MM_O_ViewCompactCompleteClick
+      object PM_P_CompactToggleFileoverview: TMenuItem
+        Action = actCompactToggleFileOverview
       end
-      object PM_P_ViewSeparateWindows_Equalizer: TMenuItem
-        Caption = 'Show file information'
-        ShortCut = 8304
-        OnClick = PM_P_ViewSeparateWindows_EqualizerClick
+      object PM_P_CompactToggleTitlelist: TMenuItem
+        Action = actCompactToggleTitleList
       end
-      object PM_P_ViewSeparateWindows_Playlist: TMenuItem
-        Caption = 'Show playlist'
-        Checked = True
-        ShortCut = 8305
-        OnClick = PM_P_ViewSeparateWindows_PlaylistClick
+      object PM_P_CompactToggleBrowseList: TMenuItem
+        Action = actCompactToggleBrowseList
       end
-      object PM_P_ViewSeparateWindows_Medialist: TMenuItem
-        Caption = 'Show media library (title list)'
-        Checked = True
-        ShortCut = 8306
-        OnClick = PM_P_ViewSeparateWindows_MedialistClick
+      object PM_P_SplitToggleFileOverview: TMenuItem
+        Action = actSplitToggleFileOverview
       end
-      object PM_P_ViewSeparateWindows_Browse: TMenuItem
-        Caption = 'Show media library (browse list)'
-        Checked = True
-        ShortCut = 8307
-        OnClick = PM_P_ViewSeparateWindows_BrowseClick
+      object PM_P_SplitTogglePlaylist: TMenuItem
+        Action = actSplitTogglePlaylist
       end
-      object PM_P_ViewStayOnTop: TMenuItem
-        Caption = 'Stay on top'
-        ShortCut = 16468
-        OnClick = PM_P_ViewStayOnTopClick
+      object PM_P_SplitToggleTitlelist: TMenuItem
+        Action = actSplitToggleTitleList
+      end
+      object PM_P_SplitToggleBrowseList: TMenuItem
+        Action = actSplitToggleBrowseList
+      end
+      object PM_P_ToggleStayOnTop: TMenuItem
+        Action = actToggleStayOnTop
       end
     end
     object PM_P_FormBuilder: TMenuItem
@@ -7136,8 +7392,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object PlaylistManagerPopup: TPopupMenu
     OnPopup = PlaylistManagerPopupPopup
-    Left = 696
-    Top = 56
+    Left = 704
+    Top = 24
     object PM_PLM_Default: TMenuItem
       Tag = -1
       Caption = 'Default playlist'
@@ -7212,5 +7468,58 @@ object Nemp_MainForm: TNemp_MainForm
     OnPopup = Medialist_Browse_Categories_PopupMenuPopup
     Left = 456
     Top = 180
+  end
+  object ActionList1: TActionList
+    Left = 112
+    Top = 70
+    object actJoinWindows: TAction
+      Caption = 'Join windows'
+      OnExecute = actJoinSplitWindowsExecute
+    end
+    object actSplitWindows: TAction
+      Tag = 1
+      Caption = 'Split windows'
+      OnExecute = actJoinSplitWindowsExecute
+    end
+    object actCompactToggleFileOverview: TAction
+      Caption = 'Show file overview'
+      OnExecute = actCompactToggleFileOverviewExecute
+    end
+    object actCompactToggleTitleList: TAction
+      Caption = 'Show title list'
+      OnExecute = actCompactToggleTitleListExecute
+    end
+    object actCompactToggleBrowseList: TAction
+      Caption = 'Show treeview/coverflow/tagcloud'
+      OnExecute = actCompactToggleBrowseListExecute
+    end
+    object actSplitToggleFileOverview: TAction
+      Caption = 'Show file overview'
+      OnExecute = actSplitToggleFileOverviewExecute
+    end
+    object actSplitTogglePlaylist: TAction
+      Caption = 'Show playlist'
+      OnExecute = actSplitTogglePlaylistExecute
+    end
+    object actSplitToggleTitleList: TAction
+      Caption = 'Show title list'
+      OnExecute = actSplitToggleTitleListExecute
+    end
+    object actSplitToggleBrowseList: TAction
+      Caption = 'Show treeview/coverflow/tagcloud'
+      OnExecute = actSplitToggleBrowseListExecute
+    end
+    object actToggleStayOnTop: TAction
+      Caption = 'Stay on top'
+      ShortCut = 16468
+      OnExecute = actToggleStayOnTopExecute
+    end
+  end
+  object SplitWindowTimer: TTimer
+    Enabled = False
+    Interval = 250
+    OnTimer = SplitWindowTimerTimer
+    Left = 112
+    Top = 136
   end
 end

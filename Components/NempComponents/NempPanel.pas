@@ -10,7 +10,10 @@ type
   //TMouseWheelEvent = procedure(Sender: TObject; delta: Word) of object;
 
   TNempPanel = class;
+  TNempContainerPanel = class;
   TNempPanelList = TObjectList<TNempPanel>;
+  TNempContainerPanelList = TObjectList<TNempContainerPanel>;
+  
   TButtonList = TObjectList<TButton>;
   TSplitterList = TObjectList<TSplitter>;
 
@@ -28,6 +31,8 @@ type
     procedure WMEraseBkGnd(var Message: TWMEraseBkGnd); message WM_ERASEBKGND;
   protected
     { Protected-Deklarationen }
+    fUpdating: Boolean;
+
     procedure Paint; override;
   public
     { Public-Deklarationen }
@@ -70,7 +75,6 @@ type
       fOnEditButtonClick: TNotifyEvent;
       // fOnContainerResize: TNotifyEvent;
 
-      fUpdating: Boolean;
       fHierarchyLevel: Integer;
       fSplitterMinSize: Integer;
 
@@ -78,7 +82,11 @@ type
 
       function GetChildPanelCount: Integer;
       function GetLeafCount: Integer;
-      procedure CheckVisibility;
+
+      function GetChildPanel(Index: Integer): TNempPanel;
+
+      procedure SetChildRatio(Index, Ratio: Integer);
+      function GetChildRatio(Index: Integer): Integer;
 
       procedure DoOnEditButtonClicked(Sender: TObject);
       procedure DoOnSplitterMoved(Sender: TObject);
@@ -89,6 +97,7 @@ type
     protected
       procedure AnalyseChilds;
       procedure ResetAligning;
+      procedure FinishAligning;
       procedure AlignHorizontally;
       procedure AlignVertically;
       procedure ResizeHorizontally(newWidth: Integer);
@@ -105,6 +114,9 @@ type
       property ID: Char read fID write fID;
       property ParentPanel: TNempContainerPanel read fParentPanel;
 
+      property ChildPanel[Index: Integer]: TNempPanel read GetChildPanel;
+      property ChildRatio[Index: Integer]: Integer read GetChildRatio write SetChildRatio;
+
       property OnSplitterMoved: TNotifyEvent read fOnSplitterMoved write fOnSplitterMoved;
       property OnSplitterCanResize: TCanResizeEvent read fOnSplitterCanResize write fOnSplitterCanResize;
       property OnEditButtonClick: TNotifyEvent read fOnEditButtonClick write fOnEditButtonClick;
@@ -112,10 +124,12 @@ type
 
       constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
+      procedure Clear; // Only used for the MainPanel of the NempLayout
 
       // procedure Clear; // only used for the Main ContainerPanel
       function HasSpareChild(out SpareChild: TNempContainerPanel): Boolean;
 
+      procedure CheckVisibility;
       procedure AlignChildPanels(Recursive: Boolean);
       // procedure ResizeChildPanels;
       // Problem: How to deal with the fixed-size-ControlPanel here?
@@ -124,16 +138,16 @@ type
       procedure AddNempPanel(Source: TNempPanel);
       procedure RemovePanel(Source: TNempPanel);
       procedure MovePanel(curIndex, newIndex: Integer);
-      procedure SetRatio(ChildIndex, Ratio: Integer);
+
 
       procedure CreateEditButtons;
-      procedure ShowEditButtons;
+      procedure ShowEditButtons(EnableSplit: Boolean);
       procedure HideEditButtons;
 
 
     published
       property HierarchyLevel: Integer read fHierarchyLevel write fHierarchyLevel;
-      property SplitterMinSize: Integer read fSplitterMinSize write fSplitterMinSize default 100;
+      property SplitterMinSize: Integer read fSplitterMinSize write fSplitterMinSize default 120;
 
   end;
 
@@ -196,15 +210,18 @@ begin
   inherited;
   fChildPanels := TNempPanelList.Create(False);
   fVisibleChilds := TNempPanelList.Create(False);
-  fChildSplitters := TSplitterList.Create(True);
+  fChildSplitters := TSplitterList.Create(False);
   fParentPanel := Nil;
   fEditButtons := Nil;
   fUpdating := False;
+  fOrientation := poVertical;
 end;
 
 
 
 destructor TNempContainerPanel.Destroy;
+var
+  i: Integer;
 begin
   if assigned(fParentPanel) then begin
     fParentPanel.fChildPanels.Remove(self);
@@ -213,15 +230,34 @@ begin
   if assigned(fEditButtons) then
     fEditButtons.Free;
 
+  // in "inherited" the ChildPanels will be destroyed as well. Those would then try to remove themselves from
+  // it's parent (i.e. this panel here) list of ChildPanels, which we will already free in the next step. Therefore:
+  for i := 0 to fChildPanels.Count - 1 do
+    if fChildPanels[i] is TNempContainerPanel then
+      TNempContainerPanel(fChildPanels[i]).fParentPanel := Nil;
+
   fVisibleChilds.Free;
   fChildPanels.Free;
   fChildSplitters.Free;
   inherited;
 end;
 
+procedure TNempContainerPanel.Clear;
+var
+  i: Integer;
+begin
+  for i := 0 to fChildSplitters.Count - 1 do
+    fChildSplitters[i].Visible := False;
+  fCurrentSplitterIndex := 0;
+
+  fChildPanels.Clear;
+  fVisibleChilds.Clear;
+end;
+
+
 function TNempContainerPanel.HasSpareChild(out SpareChild: TNempContainerPanel): Boolean;
 begin
-  result := (self.ChildPanelCount = 1)
+  result := (ChildPanelCount = 1)
       and (fChildPanels[0] is TNempContainerPanel)
       and (TNempContainerPanel(fChildPanels[0]).ChildPanelCount = 0);
   if result then
@@ -257,13 +293,19 @@ begin
     AddButton(4+50+8, 3, #$2A2F); // Vector or Cross Product; Delete
 end;
 
-procedure TNempContainerPanel.ShowEditButtons;
+procedure TNempContainerPanel.ShowEditButtons(EnableSplit: Boolean);
+var
+  i: Integer;
 begin
   if not Assigned(fEditButtons) then
     CreateEditButtons
-  else
-    for var i: Integer := 0 to fEditButtons.Count - 1 do
+  else begin
+    for i := 0 to fEditButtons.Count - 1 do
       fEditButtons[i].Visible := True;
+    // Disable the "split-buttons" if enough panels are created
+    for i := 0 to  1 do
+      fEditButtons[i].Enabled := EnableSplit;
+  end;
 end;
 
 procedure TNempContainerPanel.HideEditButtons;
@@ -276,14 +318,20 @@ begin
 end;
 
 procedure TNempContainerPanel.AnalyseChilds;
-var i: Integer;
+var
+  i: Integer;
+  TotalSumRatio: Integer;
+
 begin
   fVisibleSumRatio := 0;
+  TotalSumRatio := 0;
   fVisibleFixedHeight := 0;
   fVisibleChilds.Clear;
 
   for i := 0 to fChildPanels.Count - 1 do begin
-    if not fChildPanels[i].Visible then
+    //if not fChildPanels[i].FixedHeight then
+      TotalSumRatio := TotalSumRatio + fChildPanels[i].Ratio;
+    if not fChildPanels[i].Visible then    
       continue;
 
     fVisibleChilds.Add(fChildPanels[i]);
@@ -293,6 +341,13 @@ begin
       fVisibleSumRatio := fVisibleSumRatio + fChildPanels[i].Ratio
   end;
 
+  // if the total sum of all ratios gets to small, rescale it, so that size adjustrments will be more precise
+  if TotalSumRatio <= 25 then begin
+    for i := 0 to fChildPanels.Count - 1 do 
+      fChildPanels[i].Ratio := fChildPanels[i].Ratio * 10;
+    fVisibleSumRatio := fVisibleSumRatio * 10;  
+  end;
+  // if something's really wrong: set it to 100 to avoid "Division by 0" later 
   if fVisibleSumRatio = 0 then
     fVisibleSumRatio := 100;
 end;
@@ -300,6 +355,11 @@ end;
 function TNempContainerPanel.GetChildPanelCount: Integer;
 begin
   result := fChildPanels.Count;
+end;
+
+function TNempContainerPanel.GetChildPanel(Index: Integer): TNempPanel;
+begin
+  result := fChildPanels[Index];
 end;
 
 function TNempContainerPanel.GetLeafCount: Integer;
@@ -330,12 +390,20 @@ var
   i: Integer;
   HasVisibleChild: Boolean;
 begin
+
+
   HasVisibleChild := False;
   for i := 0 to fChildPanels.Count - 1 do
     if fChildPanels[i].Visible then
       HasVisibleChild := True;
   // if all ChildPanels are invisible: Hide this Panel itself
-  if not HasVisibleChild then
+  if HasVisibleChild then begin
+    if not visible then begin
+      ShowPanel;
+      AlignChildPanels(False);
+    end;
+  end
+  else
     HidePanel;
 end;
 
@@ -364,7 +432,7 @@ begin
     poVertical: begin
       for i := 0 to fChildPanels.Count - 1 do begin
         if fChildPanels[i].Visible then
-          fChildPanels[i].Ratio := Round(fChildPanels[i].Height / self.Height * fVisibleSumRatio);
+          fChildPanels[i].Ratio := Round(fChildPanels[i].Height / (Height - fVisibleFixedHeight) * fVisibleSumRatio);
       end;
     end;
     poHorizontal: begin
@@ -388,6 +456,7 @@ begin
   else
       accept := (s.MinSize < NewSize - s.Height) and ( (s.Parent.Height - newSize - s.Height) > s.MinSize);
 end;
+
 
 function TNempContainerPanel.GetNewSplitter(aAlign: TAlign; aPos: Integer): TSplitter;
 begin
@@ -423,11 +492,21 @@ var
   i: Integer;
 begin
   for i := 0 to fChildPanels.Count - 1 do
+    fChildPanels[i].fUpdating := True;
+  for i := 0 to fChildPanels.Count - 1 do
     fChildPanels[i].Align := alNone;
+
   for i := 0 to fChildSplitters.Count - 1 do
     fChildSplitters[i].Visible := False;
-
   fCurrentSplitterIndex := 0;
+end;
+
+procedure TNempContainerPanel.FinishAligning;
+var
+  i: Integer;
+begin
+for i := 0 to fChildPanels.Count - 1 do
+    fChildPanels[i].fUpdating := False;
 end;
 
 procedure TNempContainerPanel.AlignHorizontally;
@@ -437,7 +516,7 @@ var
   newSplitter: TSplitter;
 begin
   // Note: We do not handle "FixedWidth" here, as it is not used in NEMP so far !
-  //fUpdating := True;
+  fUpdating := True;
   // fChildSplitters.Clear;
   //ResetAligning;
 
@@ -463,7 +542,7 @@ begin
     end;
   end;
 
-  //fUpdating := False;
+  fUpdating := False;
 end;
 
 procedure TNempContainerPanel.AlignVertically;
@@ -472,7 +551,7 @@ var
   currentTop, remainingSize, newHeight, lastIndex: Integer;
   newSplitter: TSplitter;
 begin
-  //fUpdating := True;
+  fUpdating := True;
   // fChildSplitters.Clear;
   //ResetAligning;
 
@@ -498,7 +577,7 @@ begin
         fVisibleChilds[i].Align := alClient;
       end else begin
         // all other Panels: Align Top and add a new Splitter
-        newHeight := Round(self.Height * fVisibleChilds[i].Ratio / fVisibleSumRatio);
+        newHeight := Floor((Height - fVisibleFixedHeight) * fVisibleChilds[i].Ratio / fVisibleSumRatio);
 
         if (RemainingSize - newHeight < (lastIndex - i) * MIN_HEIGHT) then
           newHeight := MIN_HEIGHT;
@@ -510,7 +589,7 @@ begin
     end;
     remainingSize := Height - currentTop;
   end;
-  //fUpdating := False;
+  fUpdating := False;
 end;
 
 procedure TNempContainerPanel.AlignChildPanels(Recursive: Boolean);
@@ -521,18 +600,20 @@ begin
   if fVisibleChilds.Count = 0 then
     exit;
 
-  fUpdating := True;
+  //fUpdating := True;
   ResetAligning;
   case fOrientation of
     poVertical: AlignVertically;
     poHorizontal: AlignHorizontally;
   end;
-  fUpdating := False;
+  //fUpdating := False;
 
   if recursive then
     for i := 0 to fVisibleChilds.Count - 1 do
       if (fVisibleChilds[i] is TNempContainerPanel) then
         TNempContainerPanel(fVisibleChilds[i]).AlignChildPanels(recursive);
+
+  FinishAligning;
 end;
 
 procedure TNempContainerPanel.ResizeHorizontally(newWidth: Integer);
@@ -541,7 +622,7 @@ var
 begin
   AnalyseChilds; // (??)
 
-  fUpdating := True;
+  //fUpdating := True;
   if fVisibleChilds.Count > 1 then begin
     for i := 0 to fVisibleChilds.Count - 1 do begin
       // Do not adjust the size of a Child with Align = alClient
@@ -554,7 +635,7 @@ begin
       //    visibleChilds[i].Width := 250;
     end;
   end;
-  fUpdating := False;
+  //fUpdating := False;
 end;
 
 procedure TNempContainerPanel.ResizeVertically(newHeight: Integer);
@@ -563,7 +644,7 @@ var
 begin
   AnalyseChilds; // (??)
 
-  fUpdating := True;
+  //fUpdating := True;
   if fVisibleChilds.Count > 1 then begin
     for i := 0 to fVisibleChilds.Count - 1 do begin
       // Do not adjust the size of a Child with Align = alClient
@@ -571,12 +652,14 @@ begin
         continue;
       newSize := Floor(newHeight * fVisibleChilds[i].Ratio / fVisibleSumRatio);
       //if newSize > 250 then
-          fVisibleChilds[i].Height := newSize
+          fVisibleChilds[i].Height := newSize;
+
+          // fVisibleChilds[i].Width := Width - 40;
       //else
       //    visibleChilds[i].Height := 250;
     end;
   end;
-  fUpdating := False;
+  //fUpdating := False;
 end;
 
 
@@ -584,11 +667,14 @@ procedure TNempContainerPanel.WMSize(var Msg: TWMSize);
 begin
   inherited;
 
+  if not fUpdating then
+
   case fOrientation of
-    poVertical: ResizeVertically(Height);
-    poHorizontal: ResizeHorizontally(Width);
+    poVertical: ResizeVertically(Msg.Height);
+    poHorizontal: ResizeHorizontally(Msg.Width);
   end;
-  // inherited;
+
+  //inherited;
 end;
 
 
@@ -615,6 +701,7 @@ end;
 procedure TNempContainerPanel.RemovePanel(Source: TNempPanel);
 begin
   fChildPanels.Remove(Source);
+  fVisibleChilds.Remove(Source);
 end;
 
 procedure TNempContainerPanel.MovePanel(curIndex, newIndex: Integer);
@@ -623,9 +710,14 @@ begin
   AlignChildPanels(False);
 end;
 
-procedure TNempContainerPanel.SetRatio(ChildIndex, Ratio: Integer);
+procedure TNempContainerPanel.SetChildRatio(Index, Ratio: Integer);
 begin
-  fChildPanels[ChildIndex].Ratio := Ratio;
+  fChildPanels[Index].Ratio := Ratio;
+end;
+
+function TNempContainerPanel.GetChildRatio(Index: Integer): Integer;
+begin
+  result := fChildPanels[Index].Ratio;
 end;
 
 

@@ -44,14 +44,19 @@ uses
   DateUtils,  IniFiles, jpeg, PNGImage,  math, Contnrs,
   bass, fldbrows, StringHelper, MainFormHelper, RatingCtrls,
   NempAudioFiles, Spectrum_vis, Hilfsfunktionen, Systemhelper, TreeHelper,
-  CoverHelper, U_Charcode, Nemp_SkinSystem, UpdateUtils, HtmlHelper, Lyrics,
-  Nemp_ConstantsAndTypes, filetypes, Buttons, gnuGettext, languageCodes,
+  CoverHelper, UpdateUtils, HtmlHelper, Lyrics,
+  Nemp_ConstantsAndTypes, filetypes, Buttons, gnuGettext,
   Nemp_RessourceStrings,  ScrobblerUtils, ExtDlgs, NempCoverFlowClass,
-  SkinButtons, NempPanel, MyDialogs, Vcl.Mask, System.UITypes, Generics.Collections,
-  System.Generics.Defaults, NempTrackBar, LibraryOrganizer.Base
+  MyDialogs, Vcl.Mask, System.UITypes, Generics.Collections,
+  System.Generics.Defaults, NempTrackBar,
+  LibraryOrganizer.Configuration.NewLayer,
+  LibraryOrganizer.Base, LibraryOrganizer.Files, LibraryOrganizer.Playlists,
+  Vcl.Menus, System.Actions, Vcl.ActnList, ActiveX
   {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF};
 
 type
+
+  teMoveDirection = (mdUp, mdDown);
 
   TLyricTreeData = class
       public
@@ -196,21 +201,9 @@ type
     cbCountRatingOnlyPlaylist: TCheckBox;
     TabView0: TTabSheet;
     GrpBox_ViewMain_Columns: TGroupBox;
-    GrpBox_ViewMain_BrowseClassic: TGroupBox;
-    Label44: TLabel;
-    Label9: TLabel;
-    CBSortArray1: TComboBox;
-    CBSortArray2: TComboBox;
     GrpBox_ViewMain_Sorting: TGroupBox;
     CBAlwaysSortAnzeigeList: TCheckBox;
     CBSkipSortOnLargeLists: TCheckBox;
-    GrpBox_ViewMain_BrowseCoverflow: TGroupBox;
-    Label61: TLabel;
-    Label6: TLabel;
-    LblNACoverHint: TLabel;
-    cbCoverSortOrder: TComboBox;
-    cbMissingCoverMode: TComboBox;
-    cbHideNACover: TCheckBox;
     TabView1: TTabSheet;
     GrpBox_ViewPartymode_Amplification: TGroupBox;
     Lbl_PartyMode_ResizeFactor: TLabel;
@@ -573,6 +566,68 @@ type
     seCoverflowTextureCache: TSpinEdit;
     CB_AccelerateSearchIncludeGenre: TCheckBox;
     cb_ShowIndexInTreeview: TCheckBox;
+    TabFiles4: TTabSheet;
+    grpBoxCategories: TGroupBox;
+    VSTCategories: TVirtualStringTree;
+    lblDefaultCategory: TLabel;
+    cbDefaultCategory: TComboBox;
+    cbNewFilesCategory: TComboBox;
+    pnlCategorySettings: TPanel;
+    grpBoxSortLevels: TGroupBox;
+    VSTSortings: TVirtualStringTree;
+    pnlLayerSettings: TPanel;
+    pnlCategoryTree: TPanel;
+    pnlCategoryEdit: TPanel;
+    btnCategoryEdit: TButton;
+    pnlCategoryLayerTree: TPanel;
+    pnlLayerEdit: TPanel;
+    btnLayerEdit: TButton;
+    grpBoxPlaylists: TGroupBox;
+    lblPlaylistCaptionMode: TLabel;
+    lblPlaylistSortMode: TLabel;
+    cbPlaylistCaptionMode: TComboBox;
+    cbPlaylistSortMode: TComboBox;
+    lblRecentlyAddedCategory: TLabel;
+    grpBoxAlbumDefinition: TGroupBox;
+    cbShowCoverForAlbum: TCheckBox;
+    editCDNames: TLabeledEdit;
+    cbIgnoreCDDirectories: TCheckBox;
+    cbAlbumKeymode: TComboBox;
+    ScrollBox1: TScrollBox;
+    cbShowElementCount: TCheckBox;
+    grpBoxCoverflow: TGroupBox;
+    cbMissingCoverMode: TComboBox;
+    btnEditCoverflow: TButton;
+    edtCoverFlowSortings: TLabeledEdit;
+    cbPlaylistSortDirection: TComboBox;
+    lblDefineAlbum: TLabel;
+    ActionList1: TActionList;
+    ActionAddCategory: TAction;
+    ActionDeleteCategory: TAction;
+    ActionAddRootLayer: TAction;
+    ActionAddLayer: TAction;
+    ActionDeleteLayer: TAction;
+    ActionEditLayer: TAction;
+    ActionEditCategory: TAction;
+    ActionLayerMoveDown: TAction;
+    ActionLayerMoveUp: TAction;
+    ActionMoveCategoryUp: TAction;
+    ActionMoveCategoryDown: TAction;
+    PopupCategories: TPopupMenu;
+    Editcategory1: TMenuItem;
+    Addcategory1: TMenuItem;
+    Deletecategory1: TMenuItem;
+    N2: TMenuItem;
+    Moveup2: TMenuItem;
+    Movedown2: TMenuItem;
+    PopupLayers: TPopupMenu;
+    Editlayer1: TMenuItem;
+    Addrootlayer1: TMenuItem;
+    Addlayer1: TMenuItem;
+    Deletelayer1: TMenuItem;
+    N1: TMenuItem;
+    Moveup1: TMenuItem;
+    Movedown1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -691,13 +746,68 @@ type
     procedure tbCoverZMainChange(Sender: TObject);
     procedure BtnUndoCoverFlowSettingsClick(Sender: TObject);
     procedure BtnCoverFlowDefaultClick(Sender: TObject);
+    procedure cbDefaultCategoryChange(Sender: TObject);
+    procedure cbNewFilesCategoryChange(Sender: TObject);
+    procedure ActionAddCategoryExecute(Sender: TObject);
+    procedure ActionDeleteCategoryExecute(Sender: TObject);
+    procedure ActionAddRootLayerExecute(Sender: TObject);
+    procedure ActionAddLayerExecute(Sender: TObject);
+    procedure ActionDeleteLayerExecute(Sender: TObject);
+    procedure ActionEditLayerExecute(Sender: TObject);
+    procedure ActionEditCategoryExecute(Sender: TObject);
+    procedure ActionLayerMoveDownExecute(Sender: TObject);
+    procedure ActionLayerMoveUpExecute(Sender: TObject);
+    procedure ActionMoveCategoryUpExecute(Sender: TObject);
+    procedure ActionMoveCategoryDownExecute(Sender: TObject);
+    procedure PopupCategoriesPopup(Sender: TObject);
+    procedure PopupLayersPopup(Sender: TObject);
+    procedure btnEditCoverflowClick(Sender: TObject);
+    procedure VSTCategoriesGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
+    procedure VSTCategoriesNewText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Column: TColumnIndex; NewText: string);
+    procedure VSTCategoriesPaintText(Sender: TBaseVirtualTree;
+      const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
+      TextType: TVSTTextType);
+    procedure VSTCategoriesEditing(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Column: TColumnIndex; var Allowed: Boolean);
+    procedure VSTCategoriesDragAllowed(Sender: TBaseVirtualTree;
+      Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
+    procedure VSTCategoriesDragDrop(Sender: TBaseVirtualTree; Source: TObject;
+      DataObject: IDataObject; Formats: TFormatArray; Shift: TShiftState;
+      Pt: TPoint; var Effect: Integer; Mode: TDropMode);
+    procedure VSTCategoriesDragOver(Sender: TBaseVirtualTree; Source: TObject;
+      Shift: TShiftState; State: TDragState; Pt: TPoint; Mode: TDropMode;
+      var Effect: Integer; var Accept: Boolean);
+    procedure VSTSortingsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
+    procedure VSTSortingsPaintText(Sender: TBaseVirtualTree;
+      const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
+      TextType: TVSTTextType);
+    procedure VSTSortingsFocusChanged(Sender: TBaseVirtualTree;
+      Node: PVirtualNode; Column: TColumnIndex);
+    procedure VSTSortingsDragAllowed(Sender: TBaseVirtualTree;
+      Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
+    procedure VSTSortingsDragOver(Sender: TBaseVirtualTree; Source: TObject;
+      Shift: TShiftState; State: TDragState; Pt: TPoint; Mode: TDropMode;
+      var Effect: Integer; var Accept: Boolean);
+    procedure VSTSortingsDragDrop(Sender: TBaseVirtualTree; Source: TObject;
+      DataObject: IDataObject; Formats: TFormatArray; Shift: TShiftState;
+      Pt: TPoint; var Effect: Integer; Mode: TDropMode);
+    procedure btnCategoryEditClick(Sender: TObject);
+    procedure btnLayerEditClick(Sender: TObject);
 
   private
     { Private-Deklarationen }
     OldFontSize: integer;
     DetailRatingHelper: TRatingHelper;
-
     fLyricTreeDataList: TLyricTreeDataList;
+
+    FileCategories: TLibraryCategoryList;
+    RootCollections: TAudioCollectionList;
+    OrganizerSettings: TOrganizerSettings;
+    fCategoriesChanged: Boolean;
+    fCollectionsChanged: Boolean;
 
     // Hilfsprozeduren für das Hotkey-Laden/Speichern
     Function ModToIndex(aMod: Cardinal): Integer;
@@ -707,11 +817,30 @@ type
     function ValidTime(aText: String): Boolean;
 
     procedure LoadDefaultCover;
-
     procedure ApplyCoverFlowSettingsToGUI;
     procedure SetCoverFlowSettingsFromGUI;
 
-
+    // Media Library Configuration
+    procedure ShowMediaLibraryConfiguration;
+    procedure ApplyMediaLibraryConfiguration;
+    procedure FillCategoryTree;
+    procedure FillCategoryComboBoxes;
+    procedure FillCollectionTree;
+    procedure RefreshCategoryButtons;
+    procedure RefreshLayerActions(Node: PVirtualNode; rc: TRootCollection);
+    procedure FillCoverFlowSortingLabel(aConfig: TCollectionConfig);
+    procedure PrepareNewLayerForm(isRoot: Boolean);
+    procedure PrepareEditLayerForm(AllowDirectory: Boolean; aConfig: TCollectionConfig);
+    procedure PrepareEditCoverflowForm(aConfig: TCollectionConfig);
+    function CategoryNameExists(aName: String; Categories: TLibraryCategoryList): Boolean;
+    function NewUniqueCategoryName(Categories: TLibraryCategoryList): String;
+    function CategoryIndexExists(aIndex: Integer; CatEdit, CatLibrary: TLibraryCategoryList): Boolean; overload;
+    function CategoryIndexExists(aIndex: Integer; Categories: TLibraryCategoryList): Boolean; overload;
+    function NewUniqueCategoryIndex(CatEdit, CatLibrary: TLibraryCategoryList): Integer;
+    procedure EnsureDefaultCategoryIsSet;
+    procedure EnsureNewCategoryIsSet;
+    procedure MoveLayer(Direction: teMoveDirection);
+    procedure MoveCategory(Direction: teMoveDirection);
 
   protected
     Procedure ScrobblerMessage(Var aMsg: TMessage); message WM_Scrobbler;
@@ -760,8 +889,7 @@ var
  OptionsArraySystem : array[0..2] of TOptionData;
  OptionsArrayAnzeige: array[0..4] of TOptionData;
  OptionsArrayAudio  : array[0..8] of TOptionData;
- OptionsArrayFiles  : Array[0..4] of TOptionData;
- Testskin: TNempSkin;
+ OptionsArrayFiles  : Array[0..5] of TOptionData;
 
  BackUpCoverFlowSettings: TCoverFlowSettings;
 
@@ -775,6 +903,22 @@ begin
   Data^.FOptionData := aOption;
 end;
 
+function getNextIdx(const aIdx: Integer; Button: teMoveDirection): Integer;
+begin
+  case Button of
+    mdUp:   result := aIdx - 1;
+    mdDown: result := aIdx + 1;
+  else
+    result := aIdx + 1;
+  end;
+end;
+
+function ValidRange(aIdx, bIdx, maxIdx: Integer): Boolean;
+begin
+  result := (aIdx >= 0) and (bIdx >= 0)
+        and (aIdx <= maxIdx) and (bIdx <= maxIdx);
+end;
+
 procedure TOptionsCompleteForm.BTNCancelClick(Sender: TObject);
 begin
   MedienBib.NewCoverFlow.Settings := BackUpCoverFlowSettings;
@@ -783,6 +927,7 @@ begin
 
   close;
 end;
+
 (*
 procedure TOptionsCompleteForm.LoadStarGraphics;
 var s,h,u: TBitmap;
@@ -870,8 +1015,6 @@ begin
   DetailRatingHelper.DrawRatingInStarsOnBitmap(4*51 + 1, RatingImage45.Picture.Bitmap, RatingImage45.Width, RatingImage45.Height);
   DetailRatingHelper.DrawRatingInStarsOnBitmap(4*51+26 + 1, RatingImage50.Picture.Bitmap, RatingImage50.Width, RatingImage50.Height);
 
-  Testskin := TNempSkin.create;
-
   // DTPBirthdayTime.Format := 'HH:mm';
 
   for i := 0 to NempPlayer.ValidExtensions.Count - 1 do
@@ -946,17 +1089,20 @@ begin
   OptionsArrayFiles[0].Eintrag  := OptionsTree_FilesMain;
   OptionsArrayFiles[0].TabSheet := TabFiles0;
 
-      OptionsArrayFiles[1].Eintrag := OptionsTree_SystemFiletyps;
-      OptionsArrayFiles[1].TabSheet:= TabSystem2;
+      OptionsArrayFiles[1].Eintrag := OptionsTree_Categories;
+      OptionsArrayFiles[1].TabSheet:= TabFiles4;
 
-      OptionsArrayFiles[2].Eintrag  := OptionsTree_PlayerMetaDataAccess;
-      OptionsArrayFiles[2].TabSheet := TabFiles1;
+      OptionsArrayFiles[2].Eintrag := OptionsTree_SystemFiletyps;
+      OptionsArrayFiles[2].TabSheet:= TabSystem2;
 
-      OptionsArrayFiles[3].Eintrag := OptionsTree_FilesCover;
-      OptionsArrayFiles[3].TabSheet:= TabFiles2;
+      OptionsArrayFiles[3].Eintrag  := OptionsTree_PlayerMetaDataAccess;
+      OptionsArrayFiles[3].TabSheet := TabFiles1;
 
-      OptionsArrayFiles[4].Eintrag  := OptionsTree_MediabibSearch;
-      OptionsArrayFiles[4].TabSheet := TabFiles3;
+      OptionsArrayFiles[4].Eintrag := OptionsTree_FilesCover;
+      OptionsArrayFiles[4].TabSheet:= TabFiles2;
+
+      OptionsArrayFiles[5].Eintrag  := OptionsTree_MediabibSearch;
+      OptionsArrayFiles[5].TabSheet := TabFiles3;
       //OptionsArrayFiles[5].Eintrag  := OptionsTree_MediabibUnicode;
       //OptionsArrayFiles[5].TabSheet := TabFiles4;
 
@@ -1067,6 +1213,13 @@ begin
       )
   );
 
+  // MediaLibrary-Configuration
+  FileCategories := TLibraryCategoryList.Create(False);
+  OrganizerSettings := TOrganizerSettings.create;
+  RootCollections := TAudioCollectionList.Create(False);
+  VSTCategories.NodeDataSize := SizeOf(TLibraryCategory);
+  VSTSortings.NodeDataSize := SizeOf(TAudioCollection);
+
   // prepare and fill the treeview
   VSTLyricSettings.NodeDataSize := SizeOf(TLyricTreeData);
   VSTLyricSettings.RootNodeCount := fLyricTreeDataList.Count;
@@ -1117,6 +1270,7 @@ begin
     AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[2]);
     AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[3]);
     AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[4]);
+    AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[5]);
 
     OptionsVST.FullExpand(Nil);
 
@@ -1172,11 +1326,15 @@ begin
         end;
     finally
         OptionsVST.Clear;
-        // VerlaufBitmap.Free;
-        Testskin.Free;
     end;
 
-    self.VSTLyricSettings.Clear;
+  FileCategories.OwnsObjects := True;
+  FileCategories.Free;
+  OrganizerSettings.Free;
+  RootCollections.OwnsObjects := True;
+  RootCollections.Free;
+
+    VSTLyricSettings.Clear;
     fLyricTreeDataList.Free;
 end;
 
@@ -1197,7 +1355,6 @@ var i,s: integer;
 begin
   // Beta-Option
 //  cb_BetaDontUseThreadedUpdate.Checked := MedienBib.BetaDontUseThreadedUpdate;
-
   cb_UseClassicCoverflow.Checked := MedienBib.NewCoverFlow.Mode = cm_Classic;
   // cbFixCoverFlowOnStart.Checked := NempOptions.FixCoverFlowOnStart;
 
@@ -1438,9 +1595,6 @@ begin
     CBSpalten[i].Checked := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
   end;
 
-  cbHideNACover.Checked := MedienBib.HideNACover;
-  cbMissingCoverMode.ItemIndex := Integer(MedienBib.MissingCoverMode);
-
   CB_CoverSearch_inDir.Checked       := TCoverArtSearcher.UseDir;
   CB_CoverSearch_inParentDir.Checked := TCoverArtSearcher.UseParentDir;
   CB_CoverSearch_inSubDir.Checked    := TCoverArtSearcher.UseSubDir;
@@ -1468,11 +1622,6 @@ begin
 
   cb_EnableUSBMode.Checked := TDrivemanager.EnableUSBMode;
   cb_EnableCloudMode.Checked := TDrivemanager.EnableCloudMode;
-
-
-  //CBSortArray1.ItemIndex := integer(MedienBib.NempSortArray[1]);
-  //CBSortArray2.ItemIndex := integer(MedienBib.NempSortArray[2]);
-  //cbCoverSortOrder.ItemIndex := MedienBib.CoverSortOrder - 1;
 
   cbReplaceArtistBy.ItemIndex := Integer(NempDisplay.ArtistSubstitute); //Nemp_MainForm.NempOptions.ReplaceNAArtistBy;
   cbReplaceTitleBy .ItemIndex := Integer(NempDisplay.TitleSubstitute) ; //Nemp_MainForm.NempOptions.ReplaceNATitleBy ;
@@ -1624,67 +1773,6 @@ begin
   CB_Mod_Mute.ItemIndex    := ModToIndex(NempOptions.HotKeys[hkMute].Modifier);
   CB_Key_Mute.ItemIndex    := KeyToIndex(NempOptions.HotKeys[hkMute].Key);
 
-  {
-  ini := TMeminiFile.Create(SavePath + 'Hotkeys.ini', TEncoding.UTF8);
-  try
-       ini.Encoding := TEncoding.UTF8;
-       CB_Activate_Play.Checked := Ini.ReadBool('HotKeys','InstallHotkey_Play'       , True);
-         hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_Play' , 6);
-         hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_Play', ord('P'));
-         CB_Mod_Play.ItemIndex := ModToIndex(hMod);
-         CB_Key_Play.ItemIndex := KeyToIndex(hkey);
-
-       CB_Activate_Stop.Checked := Ini.ReadBool('HotKeys','InstallHotkey_Stop'       , True);
-         hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_Stop' , 6);
-         hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_Stop', ord('S'));
-         CB_Mod_Stop.ItemIndex := ModToIndex(hMod);
-         CB_Key_Stop.ItemIndex := KeyToIndex(hkey);
-
-       CB_Activate_Next.Checked := Ini.ReadBool('HotKeys','InstallHotkey_Next'       , True);
-         hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_Next' , 6);
-         hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_Next', ord('N'));
-         CB_Mod_Next.ItemIndex := ModToIndex(hMod);
-         CB_Key_Next.ItemIndex := KeyToIndex(hkey);
-
-       CB_Activate_Prev.Checked := Ini.ReadBool('HotKeys','InstallHotkey_Prev'       , True);
-         hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_Prev' , 6);
-         hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_Prev', ord('B'));
-         CB_Mod_Prev.ItemIndex := ModToIndex(hMod);
-         CB_Key_Prev.ItemIndex := KeyToIndex(hkey);
-
-       CB_Activate_JumpForward.Checked := Ini.ReadBool('HotKeys','InstallHotkey_JumpForward', True);
-         hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_JumpForward' , 6);
-         hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_JumpForward', ord('M'));
-         CB_Mod_JumpForward.ItemIndex := ModToIndex(hMod);
-         CB_Key_JumpForward.ItemIndex := KeyToIndex(hkey);
-
-       CB_Activate_JumpBack.Checked := Ini.ReadBool('HotKeys','InstallHotkey_JumpBack'   , True);
-         hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_JumpBack' , 6);
-         hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_JumpBack', ord('V'));
-         CB_Mod_JumpBack.ItemIndex := ModToIndex(hMod);
-         CB_Key_JumpBack.ItemIndex := KeyToIndex(hkey);
-
-       CB_Activate_IncVol.Checked := Ini.ReadBool('HotKeys','InstallHotkey_IncVol'     , True);
-         hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_IncVol' , 6);
-         hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_IncVol', $BB);
-         CB_Mod_IncVol.ItemIndex := ModToIndex(hMod);
-         CB_Key_IncVol.ItemIndex := KeyToIndex(hkey);
-
-       CB_Activate_DecVol.Checked := Ini.ReadBool('HotKeys','InstallHotkey_DecVol'     , True);
-         hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_DecVol' , 6);
-         hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_DecVol', $BD);
-         CB_Mod_DecVol.ItemIndex := ModToIndex(hMod);
-         CB_Key_DecVol.ItemIndex := KeyToIndex(hkey);
-
-       CB_Activate_mute.Checked := Ini.ReadBool('HotKeys','InstallHotkey_Mute'       , True);
-         hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_Mute' , 6);
-         hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_Mute', ord('0'));
-         CB_Mod_Mute.ItemIndex := ModToIndex(hMod);
-         CB_Key_Mute.ItemIndex := KeyToIndex(hkey);
-  finally
-    ini.Free;
-  end;
-  }
   CBRegisterHotKeysClick(Nil);
 
 
@@ -1808,9 +1896,11 @@ begin
   LoadDefaultCover;
 
   // CoverFlow Settings
-
   BackUpCoverFlowSettings := MedienBib.NewCoverFlow.Settings;
   ApplyCoverFlowSettingsToGUI;
+
+  // Library Configuration
+  ShowMediaLibraryConfiguration;
 
   //SetWindowPos(Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
 end;
@@ -2436,7 +2526,7 @@ end;
 
 procedure TOptionsCompleteForm.BTNApplyClick(Sender: TObject);
 var i,s,l, maxfont:integer;
-  NeedUpdate, NeedTotalStringUpdate, NeedTotalLyricStringUpdate, NeedCoverFlowSearchUpdate: boolean;
+  NeedTotalStringUpdate, NeedTotalLyricStringUpdate, NeedCoverFlowSearchUpdate: boolean;
   newLanguage, tmp: String;
   ReDrawVorauswahlTrees, ReDrawPlaylistTree, ReDrawMedienlistTree: Boolean;
   Ini: TMemIniFile;
@@ -2664,8 +2754,6 @@ begin
 
   TCoverArtSearcher.SubDirName := EDTCoverSubDirName.Text ;
   TCoverArtSearcher.SisterDirName := EDTCoverSisterDirName.Text;
-  MedienBib.HideNACover := cbHideNACover.Checked;
-
   TCoverArtSearcher.CoverSizeIndex := cb_CoverSize.ItemIndex;
   TCoverArtSearcher.InitCoverArtCache(Savepath, TCoverArtSearcher.CoverSizeIndex);
 
@@ -2688,26 +2776,10 @@ begin
 
   Nemp_MainForm.VST.ShowHint := MedienBib.ShowHintsInMedialist;
 
-  NeedUpdate := False;
   NeedCoverFlowSearchUpdate := False;
 
   //if MedienBib.StatusBibUpdate = 0 then
   //begin
-      // check for some critical updates for the medialibrary (done later in this procedure)
-      // --------------------------------------------------------
-      (*if      (((CBSortArray1.ItemIndex <> integer(MedienBib.NempSortArray[1]))
-                    OR (CBSortArray2.ItemIndex <> integer(MedienBib.NempSortArray[2])))
-              AND
-              (MedienBib.BrowseMode = 0))
-          OR
-              ( ((cbCoverSortOrder.ItemIndex + 1) <> MedienBib.CoverSortOrder)
-              AND (MedienBib.BrowseMode = 1) )
-          OR
-              ( ((cbMissingCoverMode.ItemIndex) <> Integer(MedienBib.MissingCoverMode))
-              AND (MedienBib.BrowseMode = 1) )
-      then
-          NeedUpdate := True;
-      *)
 
       if (MedienBib.BrowseMode = 1)  AND
           (cb_ChangeCoverflowOnSearch.Checked <> MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow)
@@ -2722,18 +2794,13 @@ begin
                              or (MedienBib.BibSearcher.AccelerateSearchIncludeGenre <> CB_AccelerateSearchIncludeGenre.Checked);
 
       if (MedienBib.StatusBibUpdate <> 0)
-          AND (NeedUpdate or NeedCoverFlowSearchUpdate or NeedTotalLyricStringUpdate or NeedTotalStringUpdate) then
+          AND (NeedCoverFlowSearchUpdate or NeedTotalLyricStringUpdate or NeedTotalStringUpdate) then
       begin
           // warning, settings MUST NOT be adopted now.
           MessageDLG((Warning_MedienBibIsBusy_Options), mtWarning, [MBOK], 0);
       end else
       begin
           // everthings fine
-          //MedienBib.NempSortArray[1] := TAudioFileStringIndex(CBSortArray1.ItemIndex);
-          //MedienBib.NempSortArray[2] := TAudioFileStringIndex(CBSortArray2.ItemIndex);
-          //MedienBib.CoverSortOrder := cbCoverSortOrder.ItemIndex + 1;
-          MedienBib.MissingCoverMode := teMissingCoverPreSorting(cbMissingCoverMode.ItemIndex);
-
           NempDisplay.ArtistSubstitute := TESubstituteValue(cbReplaceArtistBy.ItemIndex);
           NempDisplay.TitleSubstitute  := TESubstituteValue(cbReplaceTitleBy .ItemIndex);
           NempDisplay.AlbumSubstitute  := TESubstituteValue(cbReplaceAlbumBy .ItemIndex);
@@ -2916,7 +2983,9 @@ begin
   if NeedCoverFlowSearchUpdate then
       RestoreCoverFlowAfterSearch(True);
 
-  if NeedUpdate then
+  ApplyMediaLibraryConfiguration;
+
+  (*if NeedUpdate then
   begin
       // Browse-Listen neu aufbauen
       // todo  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -2936,7 +3005,7 @@ begin
           end;
       end;
       Nemp_MainForm.ShowSummary;
-  end else
+  end else   *)
   begin
     if ReDrawVorauswahlTrees then
     begin
@@ -3061,7 +3130,7 @@ begin
 
   NempOptions.MiniNempStayOnTop := cb_StayOnTop.Checked;
 
-  with Nemp_MainForm do
+  {with Nemp_MainForm do
   begin
     PM_P_ViewSeparateWindows_Equalizer.Checked := NempOptions.FormPositions[nfExtendedControls].Visible;
     MM_O_ViewSeparateWindows_Equalizer.Checked := NempOptions.FormPositions[nfExtendedControls].Visible;
@@ -3071,7 +3140,7 @@ begin
 
     PM_P_ViewSeparateWindows_Medialist.Checked := NempOptions.FormPositions[nfMediaLibrary].Visible;
     MM_O_ViewSeparateWindows_Medialist.Checked := NempOptions.FormPositions[nfMediaLibrary].Visible;
-  end;
+  end; }
 
   Nemp_MainForm.RepairZOrder;
   Show;
@@ -3346,8 +3415,6 @@ begin
     ShellExecute(Handle, 'open', PChar(LblWebserverUserURL.Caption), nil, nil, SW_SHOW);
 end;
 
-
-
 procedure TOptionsCompleteForm.LblWebserverAdminURLClick(Sender: TObject);
 begin
     ShellExecute(Handle, 'open', PChar(LblWebserverAdminURL.Caption), nil, nil, SW_SHOW);
@@ -3364,8 +3431,6 @@ begin
   CB_MOD_Stop.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
   CB_Key_Stop.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
 end;
-
-
 
 procedure TOptionsCompleteForm.CB_Activate_NextClick(Sender: TObject);
 begin
@@ -3431,6 +3496,7 @@ begin
   CB_Activate_DecVolClick(CB_Activate_DecVol);
   CB_Activate_MuteClick(CB_Activate_Mute);
 end;
+
 
 procedure TOptionsCompleteForm.cbFilenameFormatChange(Sender: TObject);
 begin
@@ -3982,6 +4048,8 @@ begin
   end;
 end;
 
+
+
 procedure TOptionsCompleteForm.BtnQRCodeClick(Sender: TObject);
 begin
     if not assigned(WebServerQRForm) then
@@ -4082,11 +4150,9 @@ begin
 
         currentNode := VSTLyricSettings.GetNext(currentNode);
     end;
-
 end;
 
-procedure TOptionsCompleteForm.VSTLyricSettingsChecked(Sender: TBaseVirtualTree;
-  Node: PVirtualNode);
+procedure TOptionsCompleteForm.VSTLyricSettingsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
 var currentNode: PVirtualNode;
     aTreeData: TLyricTreeData;
     currentPrio: Integer;
@@ -4108,8 +4174,7 @@ begin
     end;
 end;
 
-procedure TOptionsCompleteForm.VSTLyricSettingsNodeDblClick(
-  Sender: TBaseVirtualTree; const HitInfo: THitInfo);
+procedure TOptionsCompleteForm.VSTLyricSettingsNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
 var currentNode: PVirtualNode;
     aTreeData: TLyricTreeData;
 begin
@@ -4125,9 +4190,9 @@ begin
     end;
 end;
 
-
 // new december 2020:
 // customizable coverflow
+
 procedure TOptionsCompleteForm.ApplyCoverFlowSettingsToGUI;
 begin
   tbCoverZMain.OnChange := Nil;
@@ -4246,6 +4311,833 @@ begin
 
   MedienBib.NewCoverFlow.ApplySettings;
 end;
+
+{$REGION MediaLibrary: Category, Configuration}
+procedure TOptionsCompleteForm.ShowMediaLibraryConfiguration;
+var
+  i, iRC: Integer;
+  newCat: TLibraryFileCategory;
+  newRoot: TRootCollection;
+  aRootConfig: TCollectionConfigList;
+begin
+  OrganizerSettings.Assign(NempOrganizerSettings);
+  fCategoriesChanged  := False;
+  fCollectionsChanged := False;
+
+  RootCollections.OwnsObjects := True;
+  RootCollections.Clear;
+  for iRC := 0 to OrganizerSettings.RootCollectionCount - 1 do begin
+    aRootConfig := OrganizerSettings.RootCollectionConfig[iRC];
+    newRoot := TRootCollection.Create(Nil);
+    for i := 0 to aRootConfig.Count - 1 do
+      newRoot.AddSubCollectionType(aRootConfig[i]);
+    RootCollections.Add(newRoot);
+  end;
+  RootCollections.OwnsObjects := False;
+
+  FileCategories.OwnsObjects := True;
+  FileCategories.Clear;
+  for i := 0 to MedienBib.FileCategories.Count - 1 do begin
+    newCat := TLibraryFileCategory.Create;
+    newCat.AssignSettings(MedienBib.FileCategories[i]);
+    FileCategories.Add(newCat);
+  end;
+  FileCategories.OwnsObjects := False;
+
+  FillCategoryTree;
+  FillCategoryComboBoxes;
+  FillCollectionTree;
+  FillCoverFlowSortingLabel(OrganizerSettings.CoverFlowRootCollectionConfig[0]);
+  cbMissingCoverMode.ItemIndex := Integer(MedienBib.MissingCoverMode);
+
+  cbAlbumKeymode.ItemIndex := Integer(OrganizerSettings.AlbumKeyMode);
+  cbIgnoreCDDirectories.Checked := OrganizerSettings.TrimCDFromDirectory;
+  editCDNames.Text := OrganizerSettings.CDNames.DelimitedText;
+  cbShowElementCount.Checked := OrganizerSettings.ShowElementCount;
+  cbShowCoverForAlbum.Checked := OrganizerSettings.ShowCoverArtOnAlbum;
+  cbPlaylistCaptionMode.ItemIndex := Integer(OrganizerSettings.PlaylistCaptionMode);
+  cbPlaylistSortMode.ItemIndex := Integer(OrganizerSettings.PlaylistSorting);
+  cbPlaylistSortDirection.ItemIndex := Integer(OrganizerSettings.PlaylistSortDirection);
+end;
+
+procedure TOptionsCompleteForm.ApplyMediaLibraryConfiguration;
+var
+  i: Integer;
+  newCat: TLibraryFileCategory;
+begin
+  if (MedienBib.StatusBibUpdate <> 0) then begin
+    MessageDLG((Warning_MedienBibIsBusy_Config), mtWarning, [MBOK], 0);
+    exit;
+  end;
+
+  if fCategoriesChanged then begin
+    MedienBib.ClearFileCategories;
+    // create new Categories in Medienbib
+    for i := 0 to FileCategories.Count - 1 do begin
+      newCat := TLibraryFileCategory.Create;
+      newCat.AssignSettings(FileCategories[i]);
+      MedienBib.FileCategories.Add(newCat);
+    end;
+    MedienBib.DefaultFileCategory := TLibraryFileCategory(GetDefaultCategory(MedienBib.FileCategories));
+    MedienBib.NewFilesCategory := TLibraryFileCategory(GetNewCategory(MedienBib.FileCategories));
+  end;
+
+  if fCollectionsChanged then begin
+    // Convert RootCollections to OrganizerSettings
+    OrganizerSettings.Clear;
+    for i := 0 to RootCollections.Count - 1 do
+      OrganizerSettings.AddConfig(TRootCollection(RootCollections[i]).CollectionConfigList);
+  end;
+
+  MedienBib.MissingCoverMode := teMissingCoverPreSorting(cbMissingCoverMode.ItemIndex);
+  OrganizerSettings.AlbumKeyMode := teAlbumKeyMode(cbAlbumKeymode.ItemIndex);
+  OrganizerSettings.TrimCDFromDirectory := cbIgnoreCDDirectories.Checked;
+  OrganizerSettings.CDNames.DelimitedText := editCDNames.Text;
+  OrganizerSettings.ShowElementCount := cbShowElementCount.Checked;
+  OrganizerSettings.ShowCoverArtOnAlbum := cbShowCoverForAlbum.Checked;
+  OrganizerSettings.PlaylistCaptionMode := tePlaylistCaptionMode(cbPlaylistCaptionMode.ItemIndex);
+  OrganizerSettings.PlaylistSorting := tePlaylistCollectionSorting(cbPlaylistSortMode.ItemIndex);
+  OrganizerSettings.PlaylistSortDirection := teSortDirection(cbPlaylistSortDirection.ItemIndex);
+  NempOrganizerSettings.Assign(OrganizerSettings);
+  MedienBib.ChangePlaylistCollectionSorting(NempOrganizerSettings.PlaylistSorting, NempOrganizerSettings.PlaylistSortDirection);
+  MedienBib.ReFillFileCategories;
+end;
+
+procedure TOptionsCompleteForm.FillCategoryComboBoxes;
+var
+  i: Integer;
+begin
+  cbDefaultCategory.OnChange := Nil;
+  cbNewFilesCategory.OnChange := Nil;
+
+  cbDefaultCategory.Items.Clear;
+  cbNewFilesCategory.Items.Clear;
+
+  cbNewFilesCategory.Items.Add(CategoryRecentlyAddedEmpty);
+  for i := 0 to FileCategories.Count - 1 do begin
+    cbDefaultCategory.Items.Add(FileCategories[i].Name);
+    cbNewFilesCategory.Items.Add(FileCategories[i].Name);
+  end;
+
+  cbDefaultCategory.ItemIndex := GetDefaultCategoryIndex(FileCategories);
+  cbNewFilesCategory.ItemIndex := GetNewCategoryIndex(FileCategories) + 1;
+
+  cbDefaultCategory.OnChange := cbDefaultCategoryChange;
+  cbNewFilesCategory.OnChange := cbNewFilesCategoryChange;
+end;
+
+procedure TOptionsCompleteForm.FillCategoryTree;
+var
+  i: Integer;
+begin
+  VSTCategories.BeginUpdate;
+  VSTCategories.Clear;
+  for i := 0 to FileCategories.Count - 1 do
+    VSTCategories.AddChild(Nil, FileCategories[i]);
+
+  if FileCategories.Count > 0 then begin
+    VSTCategories.FocusedNode := VSTCategories.GetFirst;
+    VSTCategories.Selected[VSTCategories.GetFirst] := True;
+  end;
+  VSTCategories.EndUpdate;
+end;
+
+procedure TOptionsCompleteForm.FillCollectionTree;
+var
+  i, iLevel: Integer;
+  newNode: PVirtualNode;
+begin
+  VSTSortings.BeginUpdate;
+  VSTSortings.Clear;
+  for i := 0 to RootCollections.Count - 1 do begin
+    NewNode := VSTSortings.AddChild(nil, RootCollections[i]);
+    for iLevel := 0 to TRootCollection(RootCollections[i]).LayerDepth - 1 do
+      newNode := VSTSortings.AddChild(newNode, RootCollections[i]);
+  end;
+
+  VSTSortings.FullExpand;
+  VSTSortings.EndUpdate;
+end;
+
+procedure TOptionsCompleteForm.FillCoverFlowSortingLabel(aConfig: TCollectionConfig);
+var
+  s: String;
+begin
+  s := _(CollectionSortingNames[aConfig.PrimarySorting]);
+  if aConfig.SecondarySorting <> csDefault then begin
+    s := s + ', ' + _(CollectionSortingNames[aConfig.SecondarySorting]);
+    if aConfig.TertiarySorting <> csDefault then
+      s := s + ', ' + _(CollectionSortingNames[aConfig.TertiarySorting]);
+  end;
+  edtCoverFlowSortings.Text := s;
+end;
+
+procedure TOptionsCompleteForm.RefreshCategoryButtons;
+begin
+  ActionAddCategory.Enabled := FileCategories.Count < 32;
+  ActionDeleteCategory.Enabled  := FileCategories.Count > 1;
+end;
+
+procedure TOptionsCompleteForm.RefreshLayerActions(Node: PVirtualNode;
+  rc: TRootCollection);
+var
+  nLevel: Integer;
+begin
+  nLevel := VSTSortings.GetNodeLevel(Node);
+  ActionEditLayer.Enabled := nLevel > 0;
+  ActionAddLayer.Enabled := rc.SpecialContent = scRegular; //NOT rc.IsDirectoryCollection;
+  ActionDeleteLayer.Enabled := (nLevel = 0) or (rc.LayerDepth > 1)
+end;
+
+procedure TOptionsCompleteForm.PrepareEditLayerForm(AllowDirectory: Boolean; aConfig: TCollectionConfig);
+begin
+  if not assigned(FormNewLayer) then
+    Application.CreateForm(TFormNewLayer, FormNewLayer);
+  FormNewLayer.FillPropertiesSelection(AllowDirectory);
+  FormNewLayer.SetDefaultValues(aConfig);// (aType, aSorting);
+  FormNewLayer.EditMode := LibraryOrganizer.Configuration.NewLayer.teEdit;
+end;
+
+procedure TOptionsCompleteForm.PrepareEditCoverflowForm(aConfig: TCollectionConfig);
+begin
+  if not assigned(FormNewLayer) then
+    Application.CreateForm(TFormNewLayer, FormNewLayer);
+  FormNewLayer.FillPropertiesSelection(False);
+  FormNewLayer.SetDefaultValues(aConfig);
+  FormNewLayer.EditMode := teCoverFlow;
+end;
+
+procedure TOptionsCompleteForm.PrepareNewLayerForm(isRoot: Boolean);
+begin
+  if not assigned(FormNewLayer) then
+    Application.CreateForm(TFormNewLayer, FormNewLayer);
+  FormNewLayer.FillPropertiesSelection(isRoot);
+  FormNewLayer.EditMode := teNew;
+end;
+
+function TOptionsCompleteForm.CategoryNameExists(aName: String; Categories: TLibraryCategoryList): Boolean;
+var
+  i: Integer;
+begin
+  result := false;
+  for i := 0 to Categories.Count - 1 do
+    if Categories[i].Name = aName then begin
+      result := True;
+      break;
+    end;
+end;
+
+function TOptionsCompleteForm.CategoryIndexExists(aIndex: Integer; CatEdit, CatLibrary: TLibraryCategoryList): Boolean;
+begin
+  result := CategoryIndexExists(aIndex, CatEdit);
+  if not result then
+    result := CategoryIndexExists(aIndex, CatLibrary);
+end;
+
+function TOptionsCompleteForm.CategoryIndexExists(aIndex: Integer; Categories: TLibraryCategoryList): Boolean;
+var
+  i: Integer;
+begin
+  result := false;
+  for i := 0 to Categories.Count - 1 do
+    if Categories[i].Index = aIndex then begin
+      result := True;
+      break;
+    end;
+end;
+
+function TOptionsCompleteForm.NewUniqueCategoryName(Categories: TLibraryCategoryList): String;
+var
+  c: Integer;
+begin
+  result := rsNewCategoryName;
+  c := 0;
+  while CategoryNameExists(result, Categories) do begin
+    inc(c);
+    result := rsNewCategoryName + ' (' + IntToStr(c) + ')';
+  end;
+end;
+
+function TOptionsCompleteForm.NewUniqueCategoryIndex(CatEdit, CatLibrary: TLibraryCategoryList): Integer;
+begin
+  result := 0;
+  while CategoryIndexExists(result, CatEdit, CatLibrary) do begin
+    inc(result);
+  end;
+end;
+
+procedure TOptionsCompleteForm.EnsureDefaultCategoryIsSet;
+begin
+  if GetDefaultCategoryIndex(FileCategories) = -1 then
+    SetDefaultCategoryIndex(FileCategories, 0);
+end;
+
+procedure TOptionsCompleteForm.EnsureNewCategoryIsSet;
+begin
+  if GetNewCategoryIndex(FileCategories) = -1 then
+    SetNewCategoryIndex(FileCategories, 0);
+end;
+
+procedure TOptionsCompleteForm.btnCategoryEditClick(Sender: TObject);
+var
+  pt: TPoint;
+begin
+  pt := btnCategoryEdit.ClientToScreen(Point(0,0));
+  PopupCategories.Popup(pt.X, pt.Y + btnCategoryEdit.Height);
+end;
+
+procedure TOptionsCompleteForm.btnLayerEditClick(Sender: TObject);
+var
+  pt: TPoint;
+begin
+  pt := btnLayerEdit.ClientToScreen(Point(0,0));
+  PopupLayers.Popup(pt.X, pt.Y + btnLayerEdit.Height);
+end;
+
+procedure TOptionsCompleteForm.MoveCategory(Direction: teMoveDirection);
+var
+  aNode: PVirtualNode;
+  curIdx, newIdx: Integer;
+begin
+  fCategoriesChanged := True;
+  aNode := VSTCategories.FocusedNode;
+  curIdx := aNode.Index;
+  newIdx := getNextIdx(curIdx, Direction);
+
+  if ValidRange(curIdx, newIdx, FileCategories.Count-1) then begin
+    FileCategories.Move(curIdx, newIdx);
+    case Direction of
+      mdUp: VSTCategories.MoveTo(aNode, VSTCategories.GetPreviousSibling(aNode), amInsertBefore, false );
+      mdDown: VSTCategories.MoveTo(aNode, VSTCategories.GetNextSibling(aNode), amInsertAfter, false );
+    end;
+    VSTCategories.Invalidate;
+  end;
+end;
+
+procedure TOptionsCompleteForm.MoveLayer(Direction: teMoveDirection);
+var
+  aNode: PVirtualNode;
+  level, curIdx, newIdx: Integer;
+  rc: TRootCollection;
+begin
+  aNode := VSTSortings.FocusedNode;
+  if not assigned(aNode) then
+    exit;
+
+  fCollectionsChanged := True;
+  rc := VSTSortings.GetNodeData<TRootCollection>(aNode);
+  level := VSTSortings.GetNodeLevel(aNode);
+
+  if level = 0 then begin
+    curIdx := aNode.Index;
+    newIdx := getNextIdx(curIdx, Direction);
+
+    if ValidRange(curIdx, newIdx, RootCollections.Count-1) then begin
+      RootCollections.Move(curIdx, newIdx);
+      case Direction of
+        mdUp: VSTSortings.MoveTo(aNode, VSTSortings.GetPreviousSibling(aNode), amInsertBefore, false );
+        mdDown: VSTSortings.MoveTo(aNode, VSTSortings.GetNextSibling(aNode), amInsertAfter, false );
+      end;
+      VSTSortings.Invalidate;
+    end;
+  end
+  else begin
+    curIdx := level - 1;
+    newIdx := getNextIdx(curIdx, Direction);
+    if ValidRange(curIdx, newIdx, rc.LayerDepth-1) then begin
+      rc.MoveSubCollectionType(curIdx, newIdx);
+
+      case Direction of
+        mdUp: VSTSortings.FocusedNode := aNode.Parent;
+        mdDown: VSTSortings.FocusedNode := aNode.FirstChild;
+      end;
+      VSTSortings.Selected[aNode] := False;
+      VSTSortings.Selected[VSTSortings.FocusedNode] := True;
+
+      VSTSortings.Invalidate;
+    end;
+  end;
+end;
+
+procedure TOptionsCompleteForm.cbDefaultCategoryChange(Sender: TObject);
+begin
+  SetDefaultCategoryIndex(FileCategories, cbDefaultCategory.ItemIndex);
+  VSTCategories.Invalidate;
+end;
+
+procedure TOptionsCompleteForm.cbNewFilesCategoryChange(Sender: TObject);
+begin
+  SetNewCategoryIndex(FileCategories, cbNewFilesCategory.ItemIndex - 1);
+  VSTCategories.Invalidate;
+end;
+
+procedure TOptionsCompleteForm.PopupCategoriesPopup(Sender: TObject);
+var
+  aNode: PVirtualNode;
+  curIdx, newIdx: Integer;
+begin
+  aNode := VSTCategories.FocusedNode;
+  if not assigned(aNode) then begin
+    ActionMoveCategoryUp.Enabled := False;
+    ActionMoveCategoryDown.Enabled := False;
+  end else
+  begin
+    curIdx := aNode.Index;
+    newIdx := getNextIdx(curIdx, mdUp);
+    ActionMoveCategoryUp.Enabled := ValidRange(curIdx, newIdx, FileCategories.Count-1);
+    newIdx := getNextIdx(curIdx, mdDown);
+    ActionMoveCategoryDown.Enabled := ValidRange(curIdx, newIdx, FileCategories.Count-1);
+  end;
+end;
+
+procedure TOptionsCompleteForm.PopupLayersPopup(Sender: TObject);
+var
+  aNode: PVirtualNode;
+  level, curIdx, newIdx: Integer;
+  rc: TRootCollection;
+begin
+  aNode := VSTSortings.FocusedNode;
+  if not assigned(aNode) then begin
+    ActionLayerMoveUp.Enabled := False;
+    ActionLayerMoveDown.Enabled := False;
+    ActionAddLayer.Enabled := False;
+    ActionEditLayer.Enabled := False;
+    ActionDeleteLayer.Enabled := False;
+  end else begin
+    rc := VSTSortings.GetNodeData<TRootCollection>(aNode);
+    level := VSTSortings.GetNodeLevel(aNode);
+
+    if level = 0 then begin
+      curIdx := aNode.Index;
+      newIdx := getNextIdx(curIdx, mdUp);
+      ActionLayerMoveUp.Enabled := ValidRange(curIdx, newIdx, RootCollections.Count-1);
+      newIdx := getNextIdx(curIdx, mdDown);
+      ActionLayerMoveDown.Enabled := ValidRange(curIdx, newIdx, RootCollections.Count-1);
+    end
+    else begin
+      curIdx := level - 1;
+      newIdx := getNextIdx(curIdx, mdUp);
+      ActionLayerMoveUp.Enabled := ValidRange(curIdx, newIdx, rc.LayerDepth-1);
+      newIdx := getNextIdx(curIdx, mdDown);
+      ActionLayerMoveDown.Enabled := ValidRange(curIdx, newIdx, rc.LayerDepth-1)
+    end;
+  end;
+end;
+
+{
+  ActionAddCategoryExecute
+  Add a new Category to the list
+}
+procedure TOptionsCompleteForm.ActionAddCategoryExecute(Sender: TObject);
+var
+  newCat: TLibraryFileCategory;
+begin
+  fCategoriesChanged := True;
+  newCat := TLibraryFileCategory.Create;
+  newCat.Name := NewUniqueCategoryName(FileCategories);
+  newCat.Index := NewUniqueCategoryIndex(self.FileCategories, MedienBib.FileCategories);
+
+  if newCat.Index < 32 then begin
+    FileCategories.Add(newCat);
+    VSTCategories.AddChild(Nil, newCat);
+  end else
+  begin
+    newCat.Free;
+    TranslateMessageDLG(LibraryOrganizer_NoMoreCategoriesPossible, mtInformation, [MBOK], 0);
+  end;
+
+  RefreshCategoryButtons;
+  FillCategoryComboBoxes;
+end;
+
+{
+  ActionAddRootLayerExecute
+  Add a new RootLayer to the list
+}
+procedure TOptionsCompleteForm.ActionAddRootLayerExecute(Sender: TObject);
+var
+  newRoot: TRootCollection;
+  NewNode: PVirtualNode;
+  iLevel: Integer;
+begin
+  PrepareNewLayerForm(True);
+  if FormNewLayer.ShowModal = mrOk then begin
+    fCollectionsChanged := True;
+    newRoot := TRootCollection.Create(Nil);
+    newRoot.AddSubCollectionType(FormNewLayer.NewConfig);
+    RootCollections.Add(newRoot);
+    NewNode := VSTSortings.AddChild(nil, newRoot);
+    for iLevel := 0 to TRootCollection(newRoot).LayerDepth - 1 do
+      newNode := VSTSortings.AddChild(newNode, newRoot);
+  end;
+end;
+
+{
+  ActionAddLayerExecute
+  Add a new Layer to the list
+}
+procedure TOptionsCompleteForm.ActionAddLayerExecute(Sender: TObject);
+var
+  aNode: PVirtualNode;
+  rc: TRootCollection;
+begin
+  aNode := VSTSortings.FocusedNode;
+  if not assigned(aNode) then
+    exit;
+
+  PrepareNewLayerForm(False);
+  if FormNewLayer.ShowModal = mrOk then begin
+    fCollectionsChanged := True;
+    rc := VSTSortings.GetNodeData<TRootCollection>(aNode);
+    rc.InsertSubCollectionType(VSTSortings.GetNodeLevel(aNode), FormNewLayer.NewConfig);
+    // The data assigned to each node under one RootCollectionNode is all the same, so we can just add a new child
+    // at the end of the current subtree and trigger a repaint of the Tree
+    while aNode.ChildCount > 0 do
+      aNode := aNode.FirstChild;
+    VSTSortings.AddChild(aNode, rc);
+    VSTSortings.Expanded[aNode] := True;
+    VSTSortings.Invalidate;
+  end;
+end;
+
+{
+  ActionDeleteCategoryExecute
+  Removes the selected Category from the list
+}
+procedure TOptionsCompleteForm.ActionDeleteCategoryExecute(Sender: TObject);
+var
+  aNode, reselectNode: PVirtualNode;
+  lc: TLibraryCategory;
+begin
+  aNode := VSTCategories.FocusedNode;
+  if not assigned(aNode) then
+    exit;
+  fCategoriesChanged := True;
+  // get the next node that should be selected after the current one is removed
+  reselectNode := VSTCategories.GetNextSibling(aNode);
+  if not assigned(reselectNode) then
+    VSTCategories.GetPreviousSibling(aNode);
+  // remove the Category and its node
+  lc := VSTCategories.GetNodeData<TLibraryCategory>(aNode);
+  VSTCategories.DeleteNode(aNode);
+  FileCategories.Remove(lc);
+  lc.Free;
+  // select another node
+  if assigned(reselectNode) then begin
+    VSTCategories.FocusedNode := reselectNode;
+    VSTCategories.Selected[reselectNode] := True;
+  end;
+  EnsureDefaultCategoryIsSet;
+  EnsureNewCategoryIsSet;
+  RefreshCategoryButtons;
+  FillCategoryComboBoxes;
+end;
+
+{
+  ActionDeleteLayerExecute
+  Removes the selected Layer from the list
+}
+procedure TOptionsCompleteForm.ActionDeleteLayerExecute(Sender: TObject);
+var
+  aNode: PVirtualNode;
+  level: Integer;
+  rc: TRootCollection;
+begin
+  aNode := VSTSortings.FocusedNode;
+  if not assigned(aNode) then
+    exit;
+  fCollectionsChanged := True;
+  level := VSTSortings.GetNodeLevel(aNode);
+  if level = 0 then begin
+    // delete the RootCollection
+    rc := VSTSortings.GetNodeData<TRootCollection>(aNode);
+    VSTSortings.DeleteNode(aNode);
+    VSTSortings.Invalidate;
+    RootCollections.Remove(rc);
+    rc.Free;
+  end else
+  begin
+    // delete a sub-layer from the RootCollection
+    rc := VSTSortings.GetNodeData<TRootCollection>(aNode);
+    // delete the node first (i.e. the last child in this subtree)
+    while aNode.ChildCount > 0 do
+      aNode := aNode.FirstChild;
+    VSTSortings.DeleteNode(aNode);
+    // delete the collection layer
+    rc.RemoveSubCollection(level-1);
+    VSTSortings.Invalidate;
+  end;
+end;
+
+procedure TOptionsCompleteForm.ActionEditCategoryExecute(Sender: TObject);
+var
+  aNode: PVirtualNode;
+begin
+  aNode := VSTCategories.FocusedNode;
+  if not assigned(aNode) then
+    exit;
+  fCategoriesChanged := True;
+  VSTCategories.EditNode(aNode, 0);
+end;
+
+procedure TOptionsCompleteForm.ActionEditLayerExecute(Sender: TObject);
+var
+  aNode: PVirtualNode;
+  level: Integer;
+  rc: TRootCollection;
+begin
+  aNode := VSTSortings.FocusedNode;
+  if not assigned(aNode) then
+    exit;
+  fCollectionsChanged := True;
+  level := VSTSortings.GetNodeLevel(aNode);
+  if level > 0 then begin
+    rc := VSTSortings.GetNodeData<TRootCollection>(aNode);
+    PrepareEditLayerForm(rc.LayerDepth <= 1, rc.CollectionConfigList[level-1] );
+    if FormNewLayer.ShowModal = mrOk then begin
+      rc.ChangeSubCollectionType(level-1, FormNewLayer.NewConfig );
+      RefreshLayerActions(aNode, rc);
+      VSTSortings.Invalidate;
+    end;
+  end;
+end;
+
+procedure TOptionsCompleteForm.ActionLayerMoveDownExecute(Sender: TObject);
+begin
+  MoveLayer(mdDown);
+end;
+
+procedure TOptionsCompleteForm.ActionLayerMoveUpExecute(Sender: TObject);
+begin
+  MoveLayer(mdUp);
+end;
+
+procedure TOptionsCompleteForm.ActionMoveCategoryDownExecute(Sender: TObject);
+begin
+  MoveCategory(mdDown);
+end;
+
+procedure TOptionsCompleteForm.ActionMoveCategoryUpExecute(Sender: TObject);
+begin
+  MoveCategory(mdUp);
+end;
+
+
+procedure TOptionsCompleteForm.btnEditCoverflowClick(Sender: TObject);
+begin
+  PrepareEditCoverflowForm(OrganizerSettings.CoverFlowRootCollectionConfig[0]);
+  if FormNewLayer.ShowModal = mrOk then begin
+    fCollectionsChanged := True;
+
+    OrganizerSettings.CoverFlowRootCollectionConfig[0] := FormNewLayer.NewConfig;
+    FillCoverFlowSortingLabel(OrganizerSettings.CoverFlowRootCollectionConfig[0]);
+  end;
+end;
+
+procedure TOptionsCompleteForm.VSTCategoriesGetText(Sender: TBaseVirtualTree;
+  Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
+begin
+   CellText := Sender.GetNodeData<TLibraryCategory>(Node).Name;
+end;
+
+procedure TOptionsCompleteForm.VSTCategoriesEditing(Sender: TBaseVirtualTree;
+  Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
+begin
+  Allowed := True;
+end;
+
+procedure TOptionsCompleteForm.VSTCategoriesNewText(Sender: TBaseVirtualTree;
+  Node: PVirtualNode; Column: TColumnIndex; NewText: string);
+begin
+  // lc := Sender.GetNodeData<TLibraryCategory>(Node);
+  Sender.GetNodeData<TLibraryCategory>(Node).Name := NewText;
+  fCategoriesChanged := True;
+end;
+
+procedure TOptionsCompleteForm.VSTCategoriesPaintText(Sender: TBaseVirtualTree;
+  const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
+  TextType: TVSTTextType);
+begin
+  TargetCanvas.Font.Color := TStyleManager.ActiveStyle.GetSystemColor(clWindowText)
+end;
+
+procedure TOptionsCompleteForm.VSTCategoriesDragAllowed(
+  Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+  var Allowed: Boolean);
+begin
+  Allowed := True;
+end;
+
+procedure TOptionsCompleteForm.VSTCategoriesDragOver(Sender: TBaseVirtualTree;
+  Source: TObject; Shift: TShiftState; State: TDragState; Pt: TPoint;
+  Mode: TDropMode; var Effect: Integer; var Accept: Boolean);
+begin
+  Accept := Source = VSTCategories;
+end;
+
+procedure TOptionsCompleteForm.VSTCategoriesDragDrop(Sender: TBaseVirtualTree;
+  Source: TObject; DataObject: IDataObject; Formats: TFormatArray;
+  Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
+var
+  aNode, focusNode: PVirtualNode;
+  lc: TLibraryCategory;
+begin
+  fCategoriesChanged := True;
+  focusNode := VSTCategories.FocusedNode;
+  case Mode of
+    dmNowhere: VSTCategories.MoveTo(focusNode, VSTCategories.RootNode, amInsertAfter, False);
+    dmAbove: VSTCategories.MoveTo(focusNode, VSTCategories.DropTargetNode, amInsertBefore, False);
+    dmOnNode,
+    dmBelow: VSTCategories.MoveTo(focusNode, VSTCategories.DropTargetNode, amInsertAfter, False);
+  end;
+  VSTCategories.Invalidate;
+
+  // Fill the FileCategories according to the new Node order.
+  // Don't use "Move" here, as Index-Calculation would be a lot trickier here
+  aNode := Sender.GetFirst;
+  while assigned(aNode) do begin
+    lc := Sender.GetNodeData<TLibraryCategory>(aNode);
+    FileCategories[aNode.Index] := lc;
+    aNode := Sender.GetNextSibling(aNode);
+  end;
+end;
+
+procedure TOptionsCompleteForm.VSTSortingsGetText(Sender: TBaseVirtualTree;
+  Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
+  var CellText: string);
+var
+  rc: TRootCollection;
+  level: Integer;
+begin
+  rc := Sender.GetNodeData<TRootCollection>(Node);
+
+  level := Sender.GetNodeLevel(Node);
+  if Level = 0 then
+    CellText := rc.Caption
+  else begin
+    CellText := rc.LevelCaption[level-1];
+    if rc.GetCollectionCompareType(level-1) <> csDefault then
+      CellText := CellText + ' (' + _(CollectionSortingNames[rc.GetCollectionCompareType(level-1)])  + ')';
+  end;
+end;
+
+procedure TOptionsCompleteForm.VSTSortingsPaintText(Sender: TBaseVirtualTree;
+  const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
+  TextType: TVSTTextType);
+begin
+  TargetCanvas.Font.Color := TStyleManager.ActiveStyle.GetSystemColor(clWindowText)
+end;
+
+procedure TOptionsCompleteForm.VSTSortingsFocusChanged(Sender: TBaseVirtualTree;
+  Node: PVirtualNode; Column: TColumnIndex);
+begin
+  if not assigned(Node) then exit;
+  RefreshLayerActions(Node, Sender.GetNodeData<TRootCollection>(Node));
+end;
+
+procedure TOptionsCompleteForm.VSTSortingsDragAllowed(Sender: TBaseVirtualTree;
+  Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
+var
+  rcD: TRootCollection;
+begin
+  rcD := Sender.GetNodeData<TRootCollection>(Node);
+  Allowed := (Sender.GetNodeLevel(Node) = 0) or (rcD.LayerDepth > 1);
+end;
+
+procedure TOptionsCompleteForm.VSTSortingsDragOver(Sender: TBaseVirtualTree;
+  Source: TObject; Shift: TShiftState; State: TDragState; Pt: TPoint;
+  Mode: TDropMode; var Effect: Integer; var Accept: Boolean);
+var
+  rcF, rcD: TRootCollection;
+begin
+  Accept := Source = VSTSortings;
+  if not accept then
+    exit;  // nothing more to test
+
+  rcF := Sender.GetNodeData<TRootCollection>(Sender.FocusedNode);
+  if assigned(Sender.DropTargetNode) then
+    rcD := Sender.GetNodeData<TRootCollection>(Sender.DropTargetNode)
+  else
+    rcD := Sender.GetNodeData<TRootCollection>(Sender.GetLast);
+
+  // Accept within the same RootCollection ( => change Layer order)
+  // or move the complete RootCollection (=> Change order of RootCollections)
+  accept := (rcF = rCD) or (Sender.GetNodeLevel(Sender.FocusedNode) = 0);
+end;
+
+procedure TOptionsCompleteForm.VSTSortingsDragDrop(Sender: TBaseVirtualTree;
+  Source: TObject; DataObject: IDataObject; Formats: TFormatArray;
+  Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
+var
+  rcF, rcD: TRootCollection;
+  focusNode, aNode, DropRoot: PVirtualNode;
+  curIdx, targetIdx, idxModifier: Integer;
+begin
+  rcF := Sender.GetNodeData<TRootCollection>(Sender.FocusedNode);
+  fCollectionsChanged := True;
+
+  focusNode := Sender.FocusedNode;
+  DropRoot := VSTSortings.DropTargetNode;
+  while Sender.GetNodeLevel(DropRoot) > 0 do
+    DropRoot := DropRoot.Parent;
+
+  if (Sender.GetNodeLevel(focusNode) = 0) then begin
+    // correct DropMode if the user drops a "Level-0-Node" over a node which higher level
+    if assigned(VSTSortings.DropTargetNode) then begin
+      if (DropRoot.Index < focusNode.Index) and (Sender.GetNodeLevel(VSTSortings.DropTargetNode) > 0)  then
+        Mode := dmAbove;
+      if (DropRoot.Index > focusNode.Index) and (Sender.GetNodeLevel(VSTSortings.DropTargetNode) > 0) then
+        Mode := dmBelow;
+    end;
+    // Move the RootCollection to another position in the list
+    case Mode of
+      dmNowhere: VSTSortings.MoveTo(focusNode, VSTSortings.RootNode, amInsertAfter, False);
+      dmAbove: VSTSortings.MoveTo(focusNode, DropRoot, amInsertBefore, False);
+      dmOnNode,
+      dmBelow: VSTSortings.MoveTo(focusNode, DropRoot, amInsertAfter, False);
+    end;
+    // Fill the Category-Layers according to the new Node order.
+    aNode := Sender.GetFirst;
+    while assigned(aNode) do begin
+      rcD := Sender.GetNodeData<tRootCollection>(aNode);
+      RootCollections[aNode.Index] := rcD;
+      aNode := Sender.GetNextSibling(aNode);
+    end;
+  end else
+  begin
+    // we are moving a Layer within the same RootCollection
+    curIdx := Sender.GetNodeLevel(focusNode) - 1;
+    targetIdx := Sender.GetNodeLevel(VSTSortings.DropTargetNode) - 1;
+    // modify the targetIdx according to Drop-Direction
+    if (targetIdx < curIdx) then
+      idxModifier := 1
+    else
+      idxModifier := 0;
+
+    case Mode of
+      dmNowhere: targetIdx := rcF.LayerDepth - 1;
+      dmAbove: targetIdx := targetIdx + idxModifier - 1;
+      dmOnNode,
+      dmBelow: targetIdx := targetIdx + idxModifier;
+    end;
+
+    if targetIdx < 0 then
+      targetIdx := 0;
+
+    rcF.MoveSubCollectionType(curIdx, targetIdx);
+
+    // Repaint the tree and set the focussed node to the just moved node
+    VSTSortings.Invalidate;
+    aNode := DropRoot;
+    while assigned(aNode) and (Sender.GetNodeLevel(aNode) <= targetIdx) do
+      aNode := aNode.FirstChild;
+    Sender.FocusedNode := aNode;
+    Sender.Selected[aNode] := True;
+  end;
+
+end;
+
+{$ENDREGION}
 
 
 end.

@@ -36,7 +36,8 @@ interface
 uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTrees,
     NempAudioFiles, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, dialogs, CoverHelper,
     MyDialogs, System.UITypes, math, Vcl.ExtCtrls, Vcl.Graphics, RatingCtrls, SkinButtons,
-    LibraryOrganizer.Base, LibraryOrganizer.Files, LibraryOrganizer.Playlists, LibraryOrganizer.Webradio;
+    LibraryOrganizer.Base, LibraryOrganizer.Files, LibraryOrganizer.Playlists, LibraryOrganizer.Webradio,
+    MainFormLayout;
 
 type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
 
@@ -96,7 +97,7 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     procedure RepositionABRepeatButtons;
     procedure SwapABImagesIfNecessary(FixedImage: TImage);
 
-    procedure ShowTagCloudSearch(DoShow: Boolean);
+    // procedure ShowTagCloudSearch(DoShow: Boolean);
     procedure SetBrowseTabWarning(ShowWarning: Boolean);
     procedure SetBrowseTabCloudWarning(ShowWarning: Boolean);
     procedure SetGlobalWarningID3TagUpdate;
@@ -429,10 +430,19 @@ begin
         if aControl = Nemp_MainForm.PlaylistPanel then
             result := ws_Playlist
         else
-        if aControl = Nemp_MainForm._TopMainPanel then
+        if aControl = Nemp_MainForm.CloudPanel then
             result := ws_Library
         else
-        if aControl = Nemp_MainForm._VSTPanel then
+        if aControl = Nemp_MainForm.TreePanel then
+            result := ws_Library
+        else
+        if aControl = Nemp_MainForm.CoverflowPanel then
+            result := ws_Library
+        else
+        if aControl = Nemp_MainForm.MedienBibDetailPanel then
+            result := ws_Library
+        else
+        if aControl = Nemp_MainForm.MedialistPanel then
             result := ws_Library;
 
         aControl := aControl.Parent;
@@ -461,9 +471,18 @@ begin
         // TagCloud
         Nemp_MainForm.PanelTagCloudBrowse.Enabled := False;
         // Switch-Buttons
-        Nemp_MainForm.TabBtn_CoverFlow.Enabled := False;
-        Nemp_MainForm.TabBtn_Browse   .Enabled := False;
-        Nemp_MainForm.TabBtn_TagCloud .Enabled := False;
+        Nemp_MainForm.TabBtn_CoverFlow0.Enabled := False;
+        Nemp_MainForm.TabBtn_Browse0   .Enabled := False;
+        Nemp_MainForm.TabBtn_TagCloud0 .Enabled := False;
+
+        Nemp_MainForm.TabBtn_CoverFlow1.Enabled := False;
+        Nemp_MainForm.TabBtn_Browse1   .Enabled := False;
+        Nemp_MainForm.TabBtn_TagCloud1 .Enabled := False;
+
+        Nemp_MainForm.TabBtn_CoverFlow2.Enabled := False;
+        Nemp_MainForm.TabBtn_Browse2   .Enabled := False;
+        Nemp_MainForm.TabBtn_TagCloud2 .Enabled := False;
+
         // VST Panel (Complete) - no. Reason: Variable GUI
         //Nemp_MainForm._VSTPanel.Enabled := False;
         Nemp_MainForm.MedialistPanel.Enabled := False;
@@ -495,9 +514,18 @@ begin
     // TagCloud
     Nemp_MainForm.PanelTagCloudBrowse.Enabled := True;
     // Switch-Buttons
-    Nemp_MainForm.TabBtn_CoverFlow.Enabled := True;
-    Nemp_MainForm.TabBtn_Browse   .Enabled := True;
-    Nemp_MainForm.TabBtn_TagCloud .Enabled := True;
+    Nemp_MainForm.TabBtn_CoverFlow0.Enabled := True;
+    Nemp_MainForm.TabBtn_Browse0   .Enabled := True;
+    Nemp_MainForm.TabBtn_TagCloud0 .Enabled := True;
+
+    Nemp_MainForm.TabBtn_CoverFlow1.Enabled := True;
+    Nemp_MainForm.TabBtn_Browse1   .Enabled := True;
+    Nemp_MainForm.TabBtn_TagCloud1 .Enabled := True;
+
+    Nemp_MainForm.TabBtn_CoverFlow2.Enabled := True;
+    Nemp_MainForm.TabBtn_Browse2   .Enabled := True;
+    Nemp_MainForm.TabBtn_TagCloud2 .Enabled := True;
+
     // VST Panel (Complete)
     //Nemp_MainForm._VSTPanel.Enabled := True;
     Nemp_MainForm.MedialistPanel.Enabled := True;
@@ -540,13 +568,21 @@ begin
     with Nemp_MainForm do
     begin
         // the 3 menu buttons
-        TabBtn_Preselection .TabStop := NempOptions.TabStopAtTabs;
+        TabBtn_Preselection0 .TabStop := NempOptions.TabStopAtTabs;
+        TabBtn_Preselection1 .TabStop := NempOptions.TabStopAtTabs;
+        TabBtn_Preselection2 .TabStop := NempOptions.TabStopAtTabs;
         TabBtn_Playlist     .TabStop := NempOptions.TabStopAtTabs;
         TabBtn_Medialib     .TabStop := NempOptions.TabStopAtTabs;
         // browse-section
-        TabBtn_Browse   .TabStop := NempOptions.TabStopAtTabs;
-        TabBtn_CoverFlow.TabStop := NempOptions.TabStopAtTabs;
-        TabBtn_TagCloud .TabStop := NempOptions.TabStopAtTabs;
+        TabBtn_Browse0   .TabStop := NempOptions.TabStopAtTabs;
+        TabBtn_CoverFlow0.TabStop := NempOptions.TabStopAtTabs;
+        TabBtn_TagCloud0 .TabStop := NempOptions.TabStopAtTabs;
+        TabBtn_Browse1   .TabStop := NempOptions.TabStopAtTabs;
+        TabBtn_CoverFlow1.TabStop := NempOptions.TabStopAtTabs;
+        TabBtn_TagCloud1 .TabStop := NempOptions.TabStopAtTabs;
+        TabBtn_Browse2   .TabStop := NempOptions.TabStopAtTabs;
+        TabBtn_CoverFlow2.TabStop := NempOptions.TabStopAtTabs;
+        TabBtn_TagCloud2 .TabStop := NempOptions.TabStopAtTabs;
         // playlist
         TabBtn_Favorites.TabStop := NempOptions.TabStopAtTabs;
         // media list
@@ -662,12 +698,19 @@ procedure ResetBrowsePanels;
 begin
     with Nemp_MainForm do
     begin
-          PanelStandardBrowse.Visible := (MedienBib.BrowseMode = 0) and (MedienBib.Count > 0);
-          PanelCoverBrowse.Visible    := (MedienBib.BrowseMode = 1) and (MedienBib.Count > 0);
-          PanelTagCloudBrowse.Visible := (MedienBib.BrowseMode = 2) and (MedienBib.Count > 0);
-
-          if MedienBib.Count = 0 then
-              LblEmptyLibraryHint.Caption := MainForm_LibraryIsEmpty;
+      if MedienBib.Count = 0 then begin
+        PanelTagCloudBrowse.Visible := False;
+        PanelCoverBrowse.Visible := False;
+        PanelStandardBrowse.Visible := False;
+        EmptyLibraryPanel.Visible := True;
+        EmptyLibraryPanel.Align := alClient;
+        LblEmptyLibraryHint.Caption := MainForm_LibraryIsEmpty;
+      end else begin
+        EmptyLibraryPanel.Visible := False;
+        PanelTagCloudBrowse.Visible := True;
+        PanelCoverBrowse.Visible := True;
+        PanelStandardBrowse.Visible := True;
+      end;
     end;
 end;
 
@@ -676,7 +719,7 @@ begin
     with Nemp_MainForm do
     begin
         // Bib umschalten.
-        Nemp_MainForm.Enabled := False;
+        //Nemp_MainForm.Enabled := False;
         If Not assigned(FSplash) then
             Application.CreateForm(TFSplash, FSplash);
         FSplash.StatusLBL.Caption := (SplashScreen_PleasewaitaMoment);
@@ -685,6 +728,7 @@ begin
         FSplash.Update;
 
             MedienBib.BrowseMode := NewMode;
+            NempLayout.BrowseMode := NewMode;
 
             ///  Swapping the mode may cause deleting temporary created Audiofiles from Playlists
             ///  If such a tmporary File was currently selected, it may result in access violations later. => Nil it.
@@ -702,12 +746,16 @@ begin
             ResetBrowsePanels;
 
         FSplash.Close;
-        Nemp_MainForm.Enabled := True;
+        //Nemp_MainForm.Enabled := True;
         Nemp_MainForm.SetFocus;
     end;
 end;
 
 procedure SwitchBrowsePanel(NewMode: Integer);
+  function CanShowSelectionPnl: Boolean;
+  begin
+    result := Nemplayout.ShowBibSelection;
+  end;
 begin
     Nemp_MainForm.CloudViewer.Clear;
     MedienBib.NewCoverFlow.Clear;
@@ -716,55 +764,103 @@ begin
 
     with Nemp_MainForm do
     begin
-        ShowTagCloudSearch(NewMode = 2);
+        // ShowTagCloudSearch(NewMode = 2);
         SetBrowseTabWarning(False);
+
+        if MedienBib.Count = 0 then begin
+          PanelTagCloudBrowse.Visible := False;
+          PanelCoverBrowse.Visible := False;
+          PanelStandardBrowse.Visible := False;
+          EmptyLibraryPanel.Visible := True;
+          EmptyLibraryPanel.Align := alClient;
+        end else begin
+          EmptyLibraryPanel.Visible := False;
+          PanelTagCloudBrowse.Visible := True;
+          PanelCoverBrowse.Visible := True;
+          PanelStandardBrowse.Visible := True;
+        end;
+
         case Newmode of
             0: begin
                 // Zeige Browse-Listen
-                PanelCoverBrowse.visible := False;
-                PanelStandardBrowse.Visible := MedienBib.Count > 0;
-                PanelTagCloudBrowse.Visible := False;
+
+                // MedienBib.Count > 0 .....???  yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+                EmptyLibraryPanel.Parent := TreePanel;
+                if Nemplayout.ShowBibSelection then
+                  TreePanel.ShowPanel;
+                CloudPanel.HidePanel;
+                CoverflowPanel.HidePanel;
+
+                if NempOptions.AnzeigeMode = 0 then begin
+                  NempLayout.ReAlignMainForm;
+                  if Nemplayout.ShowBibSelection then
+                    ReSizeBrowseTrees;
+                end;
+
+                //PanelCoverBrowse.visible := False;
+                //PanelStandardBrowse.Visible := MedienBib.Count > 0;
+                //PanelTagCloudBrowse.Visible := False;
                 //ShowTagCloudSearch(False);
 
-                PanelStandardBrowse.Left := 2;
-                PanelStandardBrowse.Width := AuswahlPanel.Width - 4;
-                PanelStandardBrowse.Top := 2;
-                PanelStandardBrowse.Height := GRPBOXArtistsAlben.Height - 4;
-                PanelStandardBrowse.Anchors := [akleft, aktop, akright, akBottom];
+                //PanelStandardBrowse.Left := 2;        // das ist doch eh alClient ???????
+                //PanelStandardBrowse.Width := AuswahlPanel.Width - 4;
+                //PanelStandardBrowse.Top := 2;
+                //PanelStandardBrowse.Height := GRPBOXArtistsAlben.Height - 4;
+                //PanelStandardBrowse.Anchors := [akleft, aktop, akright, akBottom];
 
                 // TabButtons-Glyphs neu setzen
-                TabBtn_Browse.GlyphLine := 1;
-                TabBtn_CoverFlow.GlyphLine := 0;
-                TabBtn_TagCloud.GlyphLine := 0;
-                TabBtn_Browse.Refresh;
-                TabBtn_CoverFlow.Refresh;
-                TabBtn_CoverFlow.Refresh;
+                TabBtn_Browse0.GlyphLine := 1;
+                TabBtn_CoverFlow0.GlyphLine := 0;
+                TabBtn_TagCloud0.GlyphLine := 0;
+                TabBtn_Browse0.Refresh;
+                TabBtn_CoverFlow0.Refresh;
+                TabBtn_CoverFlow0.Refresh;
             end;
             1: begin
                 //AlbenVST.Clear;
                 // Zeige CoverFlow
-                PanelStandardBrowse.Visible := False;
-                PanelTagCloudBrowse.Visible := False;
-                PanelCoverBrowse.Visible := MedienBib.Count > 0;
+                EmptyLibraryPanel.Parent := CoverFlowPanel;
+
+                TreePanel.HidePanel;
+                CloudPanel.HidePanel;
+                if Nemplayout.ShowBibSelection then
+                  CoverflowPanel.ShowPanel;
+                if NempOptions.AnzeigeMode = 0 then
+                  NempLayout.ReAlignMainForm;
+
+                // MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
+
+                //PanelStandardBrowse.Visible := False;
+                //PanelTagCloudBrowse.Visible := False;
+                //PanelCoverBrowse.Visible := MedienBib.Count > 0;
                 //ShowTagCloudSearch(False);
 
-                PanelCoverBrowse.Left := 2;
-                PanelCoverBrowse.Width := AuswahlPanel.Width - 4;
-                PanelCoverBrowse.Top := 2;
-                PanelCoverBrowse.Height := GRPBOXArtistsAlben.Height - 4;
-                PanelCoverBrowse.Anchors := [akleft, aktop, akright, akBottom];
+                //PanelCoverBrowse.Left := 2;
+                //PanelCoverBrowse.Width := AuswahlPanel.Width - 4;
+                //PanelCoverBrowse.Top := 2;
+                //PanelCoverBrowse.Height := GRPBOXArtistsAlben.Height - 4;
+                //PanelCoverBrowse.Anchors := [akleft, aktop, akright, akBottom];
 
                 // TabButtons-Glyphs neu setzen
-                TabBtn_Browse.GlyphLine := 0;
-                TabBtn_CoverFlow.GlyphLine := 1;
-                TabBtn_TagCloud.GlyphLine := 0;
-                TabBtn_Browse.Refresh;
-                TabBtn_CoverFlow.Refresh;
-                TabBtn_CoverFlow.Refresh;
+                TabBtn_Browse1.GlyphLine := 0;
+                TabBtn_CoverFlow1.GlyphLine := 1;
+                TabBtn_TagCloud1.GlyphLine := 0;
+                TabBtn_Browse1.Refresh;
+                TabBtn_CoverFlow1.Refresh;
+                TabBtn_CoverFlow1.Refresh;
             end;
             2: begin
                 //AlbenVST.Clear;
-                PanelStandardBrowse.Visible := False;
+                EmptyLibraryPanel.Parent := CloudPanel;
+
+                TreePanel.HidePanel;
+                if Nemplayout.ShowBibSelection then
+                  CloudPanel.ShowPanel;
+                CoverflowPanel.HidePanel;
+                if NempOptions.AnzeigeMode = 0 then
+                  NempLayout.ReAlignMainForm;
+
+                {PanelStandardBrowse.Visible := False;
                 PanelTagCloudBrowse.Visible := MedienBib.Count > 0;
                 PanelCoverBrowse.Visible := False;
                 // ShowTagCloudSearch(True);
@@ -774,19 +870,16 @@ begin
                 PanelTagCloudBrowse.Top := 2;
                 PanelTagCloudBrowse.Height := GRPBOXArtistsAlben.Height - 4;
                 PanelTagCloudBrowse.Anchors := [akleft, aktop, akright, akBottom];
-
+                 }
                 // TabButtons-Glyphs neu setzen
-                TabBtn_Browse.GlyphLine := 0;
-                TabBtn_CoverFlow.GlyphLine := 0;
-                TabBtn_TagCloud.GlyphLine := 1;
-                TabBtn_Browse.Refresh;
-                TabBtn_CoverFlow.Refresh;
-                TabBtn_CoverFlow.Refresh;
-
+                TabBtn_Browse2.GlyphLine := 0;
+                TabBtn_CoverFlow2.GlyphLine := 0;
+                TabBtn_TagCloud2.GlyphLine := 1;
+                TabBtn_Browse2.Refresh;
+                TabBtn_CoverFlow2.Refresh;
+                TabBtn_CoverFlow2.Refresh;
             end;
         end;
-
-        //MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
     end;
 end;
 
@@ -914,6 +1007,7 @@ begin
             BackupComboboxes(MainFormBuilder);
             ReTranslateComponent(MainFormBuilder);
             RestoreComboboxes(MainFormBuilder);
+            MainFormBuilder.ReTranslateMenuItems;
         end;
         if assigned(FDetails) then
         begin
@@ -1535,7 +1629,7 @@ begin
     end;
 end;
 
-procedure ShowTagCloudSearch(DoShow: Boolean);
+(*procedure ShowTagCloudSearch(DoShow: Boolean);
 begin
   if DoShow then begin
     Nemp_MainForm.AuswahlControlPanel.Width := Nemp_MainForm.edtCloudSearch.Left + Nemp_MainForm.edtCloudSearch.Width +4;
@@ -1545,7 +1639,7 @@ begin
     Nemp_MainForm.AuswahlControlPanel.Width := Nemp_MainForm.edtCloudSearch.Left;
     Nemp_MainForm.edtCloudSearch.Visible := False;
   end;
-end;
+end;*)
 
 // When editing audiofiles, the browse-lists may become invalid
 // in this case, a Warning-Icon should be displayed in the first Browse-Button
@@ -1574,16 +1668,24 @@ begin
         // TabBtn_Browse.Refresh;
         }
         case MedienBib.BrowseMode of
-          0: aBtn :=  TabBtn_Browse;
-          1: aBtn :=  TabBtn_CoverFlow;
-          2: aBtn :=  TabBtn_TagCloud;
+          0: aBtn :=  TabBtn_Browse0;
+          1: aBtn :=  TabBtn_CoverFlow1;
+          2: aBtn :=  TabBtn_TagCloud2;
         else
-          aBtn :=  TabBtn_Browse;
+          aBtn :=  TabBtn_Browse0;
         end;
 
-        TabBtn_Browse.Hint := TabBtnBrowse_OriginalHint;
-        TabBtn_CoverFlow.Hint := TabBtnCoverFlow_OriginalHint;
-        TabBtn_TagCloud.Hint := TabBtnTagCloud_OriginalHint;
+        TabBtn_Browse0.Hint := TabBtnBrowse_OriginalHint;
+        TabBtn_CoverFlow0.Hint := TabBtnCoverFlow_OriginalHint;
+        TabBtn_TagCloud0.Hint := TabBtnTagCloud_OriginalHint;
+
+        TabBtn_Browse1.Hint := TabBtnBrowse_OriginalHint;
+        TabBtn_CoverFlow1.Hint := TabBtnCoverFlow_OriginalHint;
+        TabBtn_TagCloud1.Hint := TabBtnTagCloud_OriginalHint;
+
+        TabBtn_Browse2.Hint := TabBtnBrowse_OriginalHint;
+        TabBtn_CoverFlow2.Hint := TabBtnCoverFlow_OriginalHint;
+        TabBtn_TagCloud2.Hint := TabBtnTagCloud_OriginalHint;
 
         if ShowWarning then begin
           aBtn.GlyphLine := 2;
@@ -1606,11 +1708,10 @@ begin
             if Medienbib.BrowseMode = 2 then
             begin
                 // Browsing by tagcloud activated
-                TabBtn_TagCloud.GlyphLine := 2;
+                TabBtn_TagCloud2.GlyphLine := 2;
             end else
                 // Browsing by cover (or something else) activated
-                TabBtn_TagCloud.GlyphLine := 0;
-            //TabBtn_TagCloud.Hint := TabBtnTagCloud_Hint1 + #13#10 + TabBtnTagCloud_Hint2;
+               ;// TabBtn_TagCloud.GlyphLine := 0;
 
         end else
         begin
@@ -1618,14 +1719,13 @@ begin
             if Medienbib.BrowseMode = 2 then
             begin
                 // Browsing by artist-album activated
-                TabBtn_TagCloud.GlyphLine := 1;
+                TabBtn_TagCloud2.GlyphLine := 1;
             end else
                 // Browsing by cover (or something else) activated
-                TabBtn_TagCloud.GlyphLine := 0;
-            //TabBtn_TagCloud.Hint := TabBtnTagCloud_Hint1;
+                ;//TabBtn_TagCloud.GlyphLine := 0;
         end;
         // Refresh the Button
-        TabBtn_TagCloud.Refresh;
+        TabBtn_TagCloud2.Refresh;
     end;
 end;
 

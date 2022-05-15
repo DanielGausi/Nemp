@@ -54,6 +54,7 @@ type
   TExtendedControlForm = class(TNempSubForm)
     ContainerPanelExtendedControlsForm: TNempPanel;
     CloseImageE: TSkinButton;
+    pnlSplit: TPanel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -102,8 +103,7 @@ begin
     with Nemp_MainForm do
     begin
       NempOptions.FormPositions[fNempFormID].Visible := False;
-      PM_P_ViewSeparateWindows_Equalizer.Checked := NempOptions.FormPositions[fNempFormID].Visible;
-      MM_O_ViewSeparateWindows_Equalizer.Checked := NempOptions.FormPositions[fNempFormID].Visible;
+      actSplitToggleFileOverview.Checked := NempOptions.FormPositions[fNempFormID].Visible;
     end;
     close;
 end;
