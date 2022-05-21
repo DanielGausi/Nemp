@@ -94,7 +94,6 @@ type
     procedure mmUndoClick(Sender: TObject);
   private
     { Private declarations }
-    //LocalBuildOptions: TNempFormBuildOptions;
 
     TestLayout: TNempLayout;
     BackupLayout: TNempLayout;
@@ -569,7 +568,7 @@ begin
         NempLayout.Assign(TestLayout);
         NempLayout.BuildMainForm;
 
-        NempLayout.SaveSettings;
+        NempLayout.SaveSettings(True);
         NempSettingsManager.UpdateFile;
         // TestLayout.Clear;
         // TestLayout.BuildMainForm;

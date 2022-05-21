@@ -125,7 +125,7 @@ type
 
       procedure Clear;
       procedure LoadSettings;
-      procedure SaveSettings;
+      procedure SaveSettings(ReCreateBuildInstructions: Boolean);
       procedure ResetToDefault;
       function LoadPreset(Source: TMemIniFile; Section: String; ReloadRatios: Boolean): Boolean;
 
@@ -315,14 +315,12 @@ begin
   Source.ReadSectionValues(Section, fBuildInstructions);
   result := TestInstructions(fBuildInstructions);
 
-  if not result then begin
+  if not result then
     SetDefaultInstructions(fBuildInstructions);
-    exit;
-  end;
 
   if ReloadRatios then begin
-    fFileOverviewCoverRatio := NempSettingsManager.ReadInteger(cIniMainFormLayout, 'FileOverviewCoverRatio', 50);
-    fTreeViewRatio := NempSettingsManager.ReadInteger(cIniMainFormLayout, 'TreeViewRatio', 30);
+    fFileOverviewCoverRatio := Source.ReadInteger(cIniMainFormLayout, 'FileOverviewCoverRatio', 50);
+    fTreeViewRatio := Source.ReadInteger(cIniMainFormLayout, 'TreeViewRatio', 30);
   end;
 
   fTreeviewOrientation := Source.ReadInteger(Section, 'TreeviewOrientation', 1);
@@ -342,17 +340,21 @@ begin
 end;
 
 
-procedure TNempLayout.SaveSettings;
+procedure TNempLayout.SaveSettings(ReCreateBuildInstructions: Boolean);
 var
   i: Integer;
 begin
-  NempSettingsManager.EraseSection(cIniMainFormLayout);
-  NempSettingsManager.WriteString(cIniMainFormLayout, 'A', CreateInstructionLine(MainContainer));
-  NempSettingsManager.WriteString(cIniMainFormLayout, 'ARatio', CreateRatioLine(MainContainer));
+  ///  When Nemp is closed in "split window" mode, the InstructionLines would be empty
+  ///  Therefore: Do not rewrite this part of the section in this case.
+  if ReCreateBuildInstructions then begin
+    NempSettingsManager.EraseSection(cIniMainFormLayout);
+    NempSettingsManager.WriteString(cIniMainFormLayout, 'A', CreateInstructionLine(MainContainer));
+    NempSettingsManager.WriteString(cIniMainFormLayout, 'ARatio', CreateRatioLine(MainContainer));
 
-  for i := 0 to fContainerPanels.Count - 1 do begin
-    NempSettingsManager.WriteString(cIniMainFormLayout, fContainerPanels[i].ID, CreateInstructionLine(fContainerPanels[i]));
-    NempSettingsManager.WriteString(cIniMainFormLayout, fContainerPanels[i].ID + 'Ratio', CreateRatioLine(fContainerPanels[i]));
+    for i := 0 to fContainerPanels.Count - 1 do begin
+      NempSettingsManager.WriteString(cIniMainFormLayout, fContainerPanels[i].ID, CreateInstructionLine(fContainerPanels[i]));
+      NempSettingsManager.WriteString(cIniMainFormLayout, fContainerPanels[i].ID + 'Ratio', CreateRatioLine(fContainerPanels[i]));
+    end;
   end;
 
   NempSettingsManager.WriteInteger(cIniMainFormLayout, 'FileOverviewCoverRatio', fFileOverviewCoverRatio);

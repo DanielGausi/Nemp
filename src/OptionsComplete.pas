@@ -141,13 +141,6 @@ type
     CBEnqueueStandardLists: TCheckBox;
     CBDirectorySupport: TCheckBox;
     TabSystem3: TTabSheet;
-    GrpBox_Deskband: TGroupBox;
-    CBShowDeskbandOnStart: TCheckBox;
-    CBShowDeskbandOnMinimize: TCheckBox;
-    CBHideDeskbandOnRestore: TCheckBox;
-    CBHideDeskbandOnClose: TCheckBox;
-    Btn_InstallDeskband: TButton;
-    Btn_UninstallDeskband: TButton;
     GrpBox_Hibernate: TGroupBox;
     LBlConst_ReInitPlayerEngine_Hint: TLabel;
     cbPauseOnSuspend: TCheckBox;
@@ -628,6 +621,7 @@ type
     N1: TMenuItem;
     Moveup1: TMenuItem;
     Movedown1: TMenuItem;
+    clbViewMainColumns: TCheckListBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -667,20 +661,9 @@ type
     procedure BtnAutoScanDeleteClick(Sender: TObject);
     procedure LBAutoscanKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
-    procedure CB_Activate_PlayClick(Sender: TObject);
-    procedure CB_Activate_StopClick(Sender: TObject);
-    procedure CB_Activate_NextClick(Sender: TObject);
-    procedure CB_Activate_PrevClick(Sender: TObject);
-    procedure CB_Activate_JumpForwardClick(Sender: TObject);
-    procedure CB_Activate_JumpBackClick(Sender: TObject);
-    procedure CB_Activate_IncVolClick(Sender: TObject);
-    procedure CB_Activate_DecVolClick(Sender: TObject);
-    procedure CB_Activate_MuteClick(Sender: TObject);
     procedure CBRegisterHotKeysClick(Sender: TObject);
     procedure cbFilenameFormatChange(Sender: TObject);
     procedure BtnChooseDownloadDirClick(Sender: TObject);
-    procedure Btn_InstallDeskbandClick(Sender: TObject);
-    procedure Btn_UninstallDeskbandClick(Sender: TObject);
     procedure CB_AccelerateSearchClick(Sender: TObject);
     procedure CB_AutoCheckClick(Sender: TObject);
     procedure Btn_CHeckNowForUpdatesClick(Sender: TObject);
@@ -708,9 +691,6 @@ type
     procedure ChangeWebserverLinks(Sender: TObject);
     procedure CB_SilenceDetectionClick(Sender: TObject);
     procedure RecommendedFiletypesClick(Sender: TObject);
-    procedure OptionsVSTBeforeItemErase(Sender: TBaseVirtualTree;
-      TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect;
-      var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure btn_DefaultCoverClick(Sender: TObject);
     procedure btn_DefaultCoverResetClick(Sender: TObject);
     procedure mskEdt_BirthdayTimeExit(Sender: TObject);
@@ -808,6 +788,7 @@ type
     OrganizerSettings: TOrganizerSettings;
     fCategoriesChanged: Boolean;
     fCollectionsChanged: Boolean;
+    fCoverFlowGUIUpdating: Boolean;
 
     // Hilfsprozeduren für das Hotkey-Laden/Speichern
     Function ModToIndex(aMod: Cardinal): Integer;
@@ -819,6 +800,8 @@ type
     procedure LoadDefaultCover;
     procedure ApplyCoverFlowSettingsToGUI;
     procedure SetCoverFlowSettingsFromGUI;
+
+    procedure EnableHotKeyControls;
 
     // Media Library Configuration
     procedure ShowMediaLibraryConfiguration;
@@ -848,12 +831,13 @@ type
   public
     { Public-Deklarationen }
 
-    CBSpalten: Array of TCheckBox;
+    // CBSpalten: Array of TCheckBox;
     PlaylistNode: PVirtualNode;
     BirthdayNode: PVirtualNode;
     ScrobbleNode: PVirtualNode;
     WebServerNode: PVirtualNode;
     VorauswahlNode: pVirtualNode;
+    CategoriesNode: PVirtualNode;
 
     procedure ShowSettings(ExtendedSettings: Boolean);
     //procedure LoadStarGraphics;
@@ -928,45 +912,6 @@ begin
   close;
 end;
 
-(*
-procedure TOptionsCompleteForm.LoadStarGraphics;
-var s,h,u: TBitmap;
-    baseDir: String;
-
-begin
-  // exit;
-  s := TBitmap.Create;
-  h := TBitmap.Create;
-  u := TBitmap.Create;
-
-
-  if Nemp_MainForm.NempSkin.isActive
-      and (not Nemp_MainForm.NempSkin.UseDefaultStarBitmaps)
-      and Nemp_MainForm.NempSkin.UseAdvancedSkin
-      and NempOptions.GlobalUseAdvancedSkin
-  then
-      BaseDir := Nemp_MainForm.NempSkin.Path + '\'
-  else
-      // Detail-Form is not skinned, use default images
-      BaseDir := ExtractFilePath(ParamStr(0)) + 'Images\';
-
-  try
-      s.Transparent := True;
-      h.Transparent := True;
-      u.Transparent := True;
-
-      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(s, BaseDir + 'starset')    ;
-      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(h, BaseDir + 'starhalfset');
-      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(u, BaseDir + 'starunset')  ;
-
-      DetailRatingHelper.SetStars(s,h,u);
-  finally
-      s.Free;
-      h.Free;
-      u.Free;
-  end;
-end;
-*)
 
 procedure TOptionsCompleteForm.RefreshStarGraphics;
 begin
@@ -996,6 +941,7 @@ begin
   //optionsVST.Font.Color := clred;
   //BtnOK.StyleElements := [];
   //UnSkinForm(self);
+  fCoverFlowGUIUpdating := False;
 
   BackUpComboBoxes(self);
   TranslateComponent (self);
@@ -1165,16 +1111,20 @@ begin
   CBFontNameVBR.Items := Screen.Fonts;
 
   // Spalten-Checkboxen erzeugen
-  SetLength(CBSpalten, Spaltenzahl);
-  for i := 0 to Length(CBSpalten)-1 do
+  // SetLength(CBSpalten, Spaltenzahl);
+  for i := 0 to  Spaltenzahl - 1 do // Length(CBSpalten)-1 do
   begin
-    CBSpalten[i] := TCheckBox.Create(self);
-    CBSpalten[i].Parent := GrpBox_ViewMain_Columns;
+    //CBSpalten[i] := TCheckBox.Create(self);
+    //CBSpalten[i].Parent := GrpBox_ViewMain_Columns;
     s := GetColumnIDfromPosition(Nemp_MainForm.VST, i);
-    CBSpalten[i].Caption := Nemp_MainForm.VST.Header.Columns[s].Text;
-    CBSpalten[i].Checked := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
-    CBSpalten[i].Top := 20 + (i mod 7)*16;
-    CBSpalten[i].Left := 16 + (i div 7) * 100;
+    //CBSpalten[i].Caption := Nemp_MainForm.VST.Header.Columns[s].Text;
+    //CBSpalten[i].Checked := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
+    //CBSpalten[i].Top := 20 + (i mod 7)*16;
+    //CBSpalten[i].Left := 16 + (i div 7) * 100;
+
+    clbViewMainColumns.Items.Add(Nemp_MainForm.VST.Header.Columns[s].Text);
+    clbViewMainColumns.Checked[i] := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
+
   end;
 
   // cbCoverMode.ItemIndex := Nemp_MainForm.NempOptions.CoverMode;
@@ -1265,7 +1215,7 @@ begin
 
     // FILE MANAGEMENT
     MainNode := AddVSTOptions(OptionsVST, NIL, OptionsArrayFiles[0]);
-    AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[1]);
+    CategoriesNode := AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[1]);
 
     AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[2]);
     AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[3]);
@@ -1278,22 +1228,6 @@ begin
 
     OptionsVST.FocusedNode := Firstnode;
     PageControl1.ActivePage := TabSystem0;
-end;
-
-
-procedure TOptionsCompleteForm.OptionsVSTBeforeItemErase(
-  Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode;
-  ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-begin
-  exit;
-  with TargetCanvas do
-  begin
-      if Node.Index mod 2 = 0 then
-        ItemColor := $EEEEEE  //$49DDEF // $70A33F // $436BFF
-      else
-        ItemColor := Graphics.clWindow;
-      EraseAction := eaColor;
-  end;
 end;
 
 
@@ -1390,12 +1324,8 @@ begin
       ftr.Free;
   end;
 
-
   for i := 0 to CBIncludeFiles.Count - 1 do
-  begin
-      CBIncludeFiles.Checked[i] := Pos('*' + CBIncludeFiles.Items[i], MedienBib.IncludeFilter) > 0;
-  end;
-
+    CBIncludeFiles.Checked[i] := Pos('*' + CBIncludeFiles.Items[i], MedienBib.IncludeFilter) > 0;
 
 
   SE_Fade.Value := NempPlayer.FadingInterval;
@@ -1462,17 +1392,6 @@ begin
   else
       CB_TaskbarDelay.ItemIndex := 0
   end;
-
-  {
-  case NempPlayer.ScrollAnzeigeDelay of
-      0..1   : CB_AnzeigeDelay.ItemIndex := 4;
-      2..3   : CB_AnzeigeDelay.ItemIndex := 3;
-      4..5   : CB_AnzeigeDelay.ItemIndex := 2;
-      6..7  : CB_AnzeigeDelay.ItemIndex := 1;
-  else
-      CB_AnzeigeDelay.ItemIndex := 0
-  end;
-  }
 
   Lbl_Framerate.Caption := inttostr(1000 DIV NempPlayer.VisualizationInterval) + ' fps';
 
@@ -1588,11 +1507,13 @@ begin
   CBFontNameCBR.Enabled := CBChangeFontOnCbrVbr.Checked;
 
   // Checkboxen der Spalten ggf. aktualisieren
-  for i := 0 to Length(CBSpalten)-1 do
+  for i := 0 to SpaltenZahl - 1 do
   begin
     s := GetColumnIDfromPosition(Nemp_MainForm.VST, i);
-    CBSpalten[i].Caption := Nemp_MainForm.VST.Header.Columns[s].Text;
-    CBSpalten[i].Checked := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
+    clbViewMainColumns.Items[i] := Nemp_MainForm.VST.Header.Columns[s].Text;
+    clbViewMainColumns.Checked[i] := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
+    // CBSpalten[i].Caption := Nemp_MainForm.VST.Header.Columns[s].Text;
+    // CBSpalten[i].Checked := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
   end;
 
   CB_CoverSearch_inDir.Checked       := TCoverArtSearcher.UseDir;
@@ -1689,14 +1610,6 @@ begin
 
   cb_TaskTray.ItemIndex := NempOptions.NempWindowView;
 
-  CBShowDeskbandOnMinimize.Checked := NempOptions.ShowDeskbandOnMinimize;
-  CBShowDeskbandOnStart.Checked    := NempOptions.ShowDeskbandOnStart;
-  CBHideDeskbandOnRestore.Checked  := NempOptions.HideDeskbandOnRestore;
-  CBHideDeskbandOnClose.Checked    := NempOptions.HideDeskbandOnClose;
-
-  // hide this option in most cases now (for new users)
-  GrpBox_Deskband.Visible := FileExists(ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll');
-
 
   // Artist/alben-Größen
   SEArtistAlbenSIze.Value := NempOptions.ArtistAlbenFontSize;
@@ -1773,7 +1686,7 @@ begin
   CB_Mod_Mute.ItemIndex    := ModToIndex(NempOptions.HotKeys[hkMute].Modifier);
   CB_Key_Mute.ItemIndex    := KeyToIndex(NempOptions.HotKeys[hkMute].Key);
 
-  CBRegisterHotKeysClick(Nil);
+  EnableHotKeyControls;
 
 
   cb_StayOnTop.Checked := NempOptions.MiniNempStayOnTop;
@@ -2357,11 +2270,13 @@ var i, s: Integer;
 begin
   // Checkboxen der Spalten ggf. aktualisieren
   // Nötig, weil wir wegen dem Geburtstag Kein Modales Show machen
-  for i := 0 to Length(CBSpalten)-1 do
+  for i := 0 to Spaltenzahl - 1 do
   begin
     s := GetColumnIDfromPosition(Nemp_MainForm.VST, i);
-    CBSpalten[i].Caption := Nemp_MainForm.VST.Header.Columns[s].Text;
-    CBSpalten[i].Checked := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
+    clbViewMainColumns.Items[i] := Nemp_MainForm.VST.Header.Columns[s].Text;
+    clbViewMainColumns.Checked[i] := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
+    // CBSpalten[i].Caption := Nemp_MainForm.VST.Header.Columns[s].Text;
+    // CBSpalten[i].Checked := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
  end;
 end;
 
@@ -2535,7 +2450,6 @@ var i,s,l, maxfont:integer;
   oldfactor: single;
   currentLibraryLyricsUsage: TLibraryLyricsUsage;
 
-
 begin
   // Beta-Optionen
   //  MedienBib.BetaDontUseThreadedUpdate := cb_BetaDontUseThreadedUpdate.Checked;
@@ -2617,11 +2531,7 @@ begin
 
   NempPlayer.VisualizationInterval := 100 - TB_Refresh.Position;
   NempPlayer.ScrollTaskbarTitel := CB_ScrollTitelTaskBar.Checked;
-  // NempPlayer.ScrollAnzeigeTitel := CB_ScrollTitleInMainWindow.Checked;
-
   NempPlayer.ScrollTaskbarDelay :=  (4 - CB_TaskbarDelay.ItemIndex + 1)* 5;
-  // NempPlayer.ScrollAnzeigeDelay := (4 - CB_AnzeigeDelay.ItemIndex) * 2;
-  // Spectrum.ScrollDelay := (4 - CB_AnzeigeDelay.ItemIndex) * 2;
 
   NempPlayer.ReInitAfterSuspend := cbReInitAfterSuspend.Checked;
   NempPlayer.PauseOnSuspend := cbPauseOnSuspend.Checked;
@@ -2638,14 +2548,6 @@ begin
   Nemp_MainForm.WalkmanModeTimer.Enabled := cb_UseWalkmanMode.Checked;
   if Not NempPlayer.UseWalkmanMode then
       StopFluttering;
-
-  {
-  if Not NempPlayer.ScrollAnzeigeTitel then
-  begin
-    Spectrum.TextPosX := 0;
-    Spectrum.DrawText;
-  end;
-  }
 
   if not NempPlayer.ScrollTaskbarTitel then
       Application.Title := NempPlayer.GenerateTaskbarTitel;
@@ -2731,7 +2633,8 @@ begin
     s := GetColumnIDfromPosition(Nemp_MainForm.VST, i);
 
     //if CBSpaltenSetup.Checked[i] then
-    if CBSpalten[i].Checked then
+    // if CBSpalten[i].Checked then
+    if clbViewMainColumns.Checked[i] then
       Nemp_MainForm.VST.Header.Columns[s].Options := Nemp_MainForm.VST.Header.Columns[s].Options + [coVisible]
     else
       Nemp_MainForm.VST.Header.Columns[s].Options := Nemp_MainForm.VST.Header.Columns[s].Options - [coVisible];
@@ -2962,11 +2865,6 @@ begin
       end;
   end;
 
-  NempOptions.ShowDeskbandOnMinimize := CBShowDeskbandOnMinimize.Checked;
-  NempOptions.ShowDeskbandOnStart    := CBShowDeskbandOnStart.Checked;
-  NempOptions.HideDeskbandOnRestore  := CBHideDeskbandOnRestore.Checked;
-  NempOptions.HideDeskbandOnClose    := CBHideDeskbandOnClose.Checked;
-
   ReDrawVorauswahlTrees := (Nemp_MainForm.ArtistsVST.DefaultNodeHeight <> Cardinal(SEArtistAlbenRowHeight.Value));
 
   NempOptions.ArtistAlbenFontSize := SEArtistAlbenSIze.Value;
@@ -3098,28 +2996,6 @@ begin
   NempOptions.DefineHotKey(hkDecVol,       CB_Activate_DecVol.Checked, IndexToMod(CB_Mod_DecVol.ItemIndex), IndexToKey(CB_Key_DecVol.ItemIndex));
   NempOptions.DefineHotKey(hkMute,         CB_Activate_Mute.Checked, IndexToMod(CB_Mod_Mute.ItemIndex), IndexToKey(CB_Key_Mute.ItemIndex));
 
-{  ini := TMeminiFile.Create(SavePath + 'Hotkeys.ini', TEncoding.UTF8);
-  try
-        Ini.WriteBool('HotKeys','InstallHotkey_DecVol'     , CB_Activate_DecVol.Checked);
-          hMod := IndexToMod(CB_Mod_DecVol.ItemIndex);
-          hKey := IndexToKey(CB_Key_DecVol.ItemIndex);
-          Ini.WriteInteger('HotKeys', 'HotkeyMod_DecVol', hMod);
-          Ini.WriteInteger('HotKeys', 'HotkeyKey_DecVol', hKey);
-
-        Ini.WriteBool('HotKeys','InstallHotkey_Mute'       , CB_Activate_mute.Checked);
-          hMod := IndexToMod(CB_Mod_Mute.ItemIndex);
-          hKey := IndexToKey(CB_Key_Mute.ItemIndex);
-          Ini.WriteInteger('HotKeys', 'HotkeyMod_Mute', hMod);
-          Ini.WriteInteger('HotKeys', 'HotkeyKey_Mute', hKey);
-        try
-            Ini.UpdateFile;
-        except
-
-        end;
-  finally
-    Ini.Free;
-  end;
- }
   if NempOptions.RegisterHotKeys then
       NempOptions.InstallHotkeys;
   if NempOptions.RegisterMediaHotkeys then
@@ -3129,18 +3005,6 @@ begin
   //========================================================
 
   NempOptions.MiniNempStayOnTop := cb_StayOnTop.Checked;
-
-  {with Nemp_MainForm do
-  begin
-    PM_P_ViewSeparateWindows_Equalizer.Checked := NempOptions.FormPositions[nfExtendedControls].Visible;
-    MM_O_ViewSeparateWindows_Equalizer.Checked := NempOptions.FormPositions[nfExtendedControls].Visible;
-
-    PM_P_ViewSeparateWindows_Browse.Checked := NempOptions.FormPositions[nfBrowse].Visible;
-    MM_O_ViewSeparateWindows_Browse.Checked := NempOptions.FormPositions[nfBrowse].Visible;
-
-    PM_P_ViewSeparateWindows_Medialist.Checked := NempOptions.FormPositions[nfMediaLibrary].Visible;
-    MM_O_ViewSeparateWindows_Medialist.Checked := NempOptions.FormPositions[nfMediaLibrary].Visible;
-  end; }
 
   Nemp_MainForm.RepairZOrder;
   Show;
@@ -3305,7 +3169,6 @@ begin
   if MedienBib.InitialDialogFolder = '' then
       MedienBib.InitialDialogFolder := GetShellFolder(CSIDL_MYMUSIC);
 
-
   FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_BibCaption, MedienBib.InitialDialogFolder);
   try
       if fb.Execute then
@@ -3420,81 +3283,48 @@ begin
     ShellExecute(Handle, 'open', PChar(LblWebserverAdminURL.Caption), nil, nil, SW_SHOW);
 end;
 
-procedure TOptionsCompleteForm.CB_Activate_PlayClick(Sender: TObject);
+procedure TOptionsCompleteForm.EnableHotKeyControls;
+var
+  doRegisterChecked: Boolean;
 begin
-  CB_MOD_Play.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
-  CB_Key_Play.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
+  doRegisterChecked := CBRegisterHotKeys.Checked;
+  // Main CheckBoxes for each HotKey
+  LockWindowUpdate(GrpBox_Hotkeys.Handle);
+  CB_Activate_Play.Enabled := doRegisterChecked;
+  CB_Activate_Stop.Enabled := doRegisterChecked;
+  CB_Activate_Next.Enabled := doRegisterChecked;
+  CB_Activate_Prev.Enabled := doRegisterChecked;
+  CB_Activate_JumpForward.Enabled := doRegisterChecked;
+  CB_Activate_JumpBack.Enabled := doRegisterChecked;
+  CB_Activate_IncVol.Enabled := doRegisterChecked;
+  CB_Activate_DecVol.Enabled := doRegisterChecked;
+  CB_Activate_Mute.Enabled := doRegisterChecked;
+  // ComboBoxes for the individual Controls
+  CB_MOD_Play.Enabled := CB_Activate_Play.Checked AND doRegisterChecked;
+  CB_Key_Play.Enabled := CB_Activate_Play.Checked AND doRegisterChecked;
+  CB_MOD_Stop.Enabled := CB_Activate_Stop.Checked AND doRegisterChecked;
+  CB_Key_Stop.Enabled := CB_Activate_Stop.Checked AND doRegisterChecked;
+  CB_MOD_Next.Enabled := CB_Activate_Next.Checked AND doRegisterChecked;
+  CB_Key_Next.Enabled := CB_Activate_Next.Checked AND doRegisterChecked;
+  CB_MOD_Prev.Enabled := CB_Activate_Prev.Checked AND doRegisterChecked;
+  CB_Key_Prev.Enabled := CB_Activate_Prev.Checked AND doRegisterChecked;
+  CB_MOD_JumpForward.Enabled := CB_Activate_JumpForward.Checked AND doRegisterChecked;
+  CB_Key_JumpForward.Enabled := CB_Activate_JumpForward.Checked AND doRegisterChecked;
+  CB_MOD_JumpBack.Enabled := CB_Activate_JumpBack.Checked AND doRegisterChecked;
+  CB_Key_JumpBack.Enabled := CB_Activate_JumpBack.Checked AND doRegisterChecked;
+  CB_MOD_IncVol.Enabled := CB_Activate_IncVol.Checked AND doRegisterChecked;
+  CB_Key_IncVol.Enabled := CB_Activate_IncVol.Checked AND doRegisterChecked;
+  CB_MOD_DecVol.Enabled := CB_Activate_DecVol.Checked AND doRegisterChecked;
+  CB_Key_DecVol.Enabled := CB_Activate_DecVol.Checked AND doRegisterChecked;
+  CB_MOD_Mute.Enabled := CB_Activate_Mute.Checked AND doRegisterChecked;
+  CB_Key_Mute.Enabled := CB_Activate_Mute.Checked AND doRegisterChecked;
+  LockWindowUpdate(0);
 end;
 
-procedure TOptionsCompleteForm.CB_Activate_StopClick(Sender: TObject);
-begin
-  CB_MOD_Stop.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
-  CB_Key_Stop.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
-end;
-
-procedure TOptionsCompleteForm.CB_Activate_NextClick(Sender: TObject);
-begin
-  CB_MOD_Next.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
-  CB_Key_Next.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
-end;
-
-procedure TOptionsCompleteForm.CB_Activate_PrevClick(Sender: TObject);
-begin
-  CB_MOD_Prev.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
-  CB_Key_Prev.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
-end;
-
-procedure TOptionsCompleteForm.CB_Activate_JumpForwardClick(
-  Sender: TObject);
-begin
-  CB_MOD_JumpForward.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
-  CB_Key_JumpForward.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
-end;
-
-procedure TOptionsCompleteForm.CB_Activate_JumpBackClick(Sender: TObject);
-begin
-  CB_MOD_JumpBack.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
-  CB_Key_JumpBack.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
-end;
-
-procedure TOptionsCompleteForm.CB_Activate_IncVolClick(Sender: TObject);
-begin
-  CB_MOD_IncVol.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
-  CB_Key_IncVol.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
-end;
-
-procedure TOptionsCompleteForm.CB_Activate_DecVolClick(Sender: TObject);
-begin
-  CB_MOD_DecVol.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
-  CB_Key_DecVol.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
-end;
-
-procedure TOptionsCompleteForm.CB_Activate_MuteClick(Sender: TObject);
-begin
-  CB_MOD_Mute.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
-  CB_Key_Mute.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
-end;
 
 procedure TOptionsCompleteForm.CBRegisterHotKeysClick(Sender: TObject);
 begin
-  CB_Activate_Play.Enabled := CBRegisterHotKeys.Checked;
-  CB_Activate_Stop.Enabled := CBRegisterHotKeys.Checked;
-  CB_Activate_Next.Enabled := CBRegisterHotKeys.Checked;
-  CB_Activate_Prev.Enabled := CBRegisterHotKeys.Checked;
-  CB_Activate_JumpForward.Enabled := CBRegisterHotKeys.Checked;
-  CB_Activate_JumpBack.Enabled := CBRegisterHotKeys.Checked;
-  CB_Activate_IncVol.Enabled := CBRegisterHotKeys.Checked;
-  CB_Activate_DecVol.Enabled := CBRegisterHotKeys.Checked;
-  CB_Activate_Mute.Enabled := CBRegisterHotKeys.Checked;
-  CB_Activate_PlayClick(CB_Activate_Play);
-  CB_Activate_StopClick(CB_Activate_Stop);
-  CB_Activate_NextClick(CB_Activate_Next);
-  CB_Activate_PrevClick(CB_Activate_Prev);
-  CB_Activate_JumpForwardClick(CB_Activate_JumpForward);
-  CB_Activate_JumpBackClick(CB_Activate_JumpBack);
-  CB_Activate_IncVolClick(CB_Activate_IncVol);
-  CB_Activate_DecVolClick(CB_Activate_DecVol);
-  CB_Activate_MuteClick(CB_Activate_Mute);
+  EnableHotKeyControls;
 end;
 
 
@@ -3538,68 +3368,8 @@ end;
 
 procedure TOptionsCompleteForm.BtnClearCoverCacheClick(Sender: TObject);
 begin
-    //MedienBib.NewCoverFlow.ClearCoverCache;
-    CoverDownloadThread.ClearCacheList;
-    MedienBib.NewCoverFlow.ClearTextures;
-end;
-
-procedure TOptionsCompleteForm.Btn_InstallDeskbandClick(Sender: TObject);
-var WinVersionInfo: TWindowsVersionInfo;
-begin
-    WinVersionInfo := TWindowsVersionInfo.Create;
-    try
-        if WinVersionInfo.ProcessorArchitecture = pax64 then
-            MessageDLG((WinX64WarningDeskband), mtWarning, [MBOK], 0)
-        else
-        begin
-            if WinVersionInfo.MajorVersion >= 6 then
-            begin
-                if (WinVersionInfo.MajorVersion = 6) and (WinVersionInfo.MinorVersion = 0) then
-                    // Vista
-                    MessageDLG((WinVistaWarningDeskband), mtWarning, [MBOK], 0)
-                else
-                    if (WinVersionInfo.MajorVersion = 6) and (WinVersionInfo.MinorVersion = 1) then
-                        // Windows 7
-                        MessageDLG((Win7WarningDeskband), mtWarning, [MBOK], 0)
-                    else
-                        // unknown Windows
-                        MessageDLG((WinVistaWarningDeskband), mtWarning, [MBOK], 0)
-            end else
-            begin
-                // Windows XP/2000/...
-                if FileExists(ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll') then
-                    ShellExecute(Handle, 'open' ,'regsvr32.exe',
-                                    PChar('"' + ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll"'),
-                                     '', sw_ShowNormal)
-                else
-                  MessageDlg(_('NempDeskband.dll not found.'), mtError, [mbOK], 0);
-            end;
-        end;
-    finally
-        WinVersionInfo.Free;
-    end;
-end;
-
-procedure TOptionsCompleteForm.Btn_UninstallDeskbandClick(Sender: TObject);
-var WinVersionInfo: TWindowsVersionInfo;
-begin
-    WinVersionInfo := TWindowsVersionInfo.Create;
-    try
-        //if WinVersionInfo.ProcessorArchitecture = pax64 then
-        //    MessageDLG((WinX64WarningDeskband), mtWarning, [MBOK], 0)
-        //else
-        // uninstalling should be allowed. ;-)
-        begin
-            if FileExists(ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll') then
-                ShellExecute(Handle, 'open' ,'regsvr32.exe',
-                                PChar('/u "' + ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll"'),
-                                 '', sw_ShowNormal)
-            else
-              MessageDlg(_('NempDeskband.dll not found.'), mtError, [mbOK], 0);
-        end;
-    finally
-        WinVersionInfo.Free;
-    end;
+  CoverDownloadThread.ClearCacheList;
+  MedienBib.NewCoverFlow.ClearTextures;
 end;
 
 
@@ -3700,8 +3470,6 @@ begin
     BtnScrobbleWizard.Tag := 100;
     BtnScrobbleWizard.Enabled := True;
 end;
-
-
 
 
 procedure TOptionsCompleteForm.ResetScrobbleButton;
@@ -4190,28 +3958,10 @@ begin
     end;
 end;
 
-// new december 2020:
-// customizable coverflow
-
+{$REGION 'Customizable Coverflow'}
 procedure TOptionsCompleteForm.ApplyCoverFlowSettingsToGUI;
 begin
-  tbCoverZMain.OnChange := Nil;
-  tbCoverZLeft.OnChange := Nil;
-  tbCoverZRight.OnChange := Nil;
-  tbCoverGapRight.OnChange := Nil;
-  tbCoverGapLeft.OnChange := Nil;
-  tbCoverGapFirstRight.OnChange := Nil;
-  tbCoverGapFirstLeft.OnChange := Nil;
-  tbCoverAngleRight.OnChange := Nil;
-  tbCoverAngleLeft.OnChange := Nil;
-  tbCoverAngleMain.OnChange := Nil;
-
-  cbCoverFlowUseReflection.OnClick := Nil;
-	tbCoverReflexionIntensity.OnChange := Nil;
-	tbCoverReflexionGap.OnChange := Nil;
-  tbCoverViewPosition.OnChange := Nil;
-  //tbCoverViewDirection.OnChange := Nil;
-
+  fCoverFlowGUIUpdating := True;
   // z-axis
   tbCoverZMain.Position := MedienBib.NewCoverFlow.Settings.zMain;
   tbCoverZLeft.Position := MedienBib.NewCoverFlow.Settings.zLeft;
@@ -4227,7 +3977,6 @@ begin
   tbCoverAngleMain     .Position := MedienBib.NewCoverFlow.Settings.AngleMain;
   // view
   tbCoverViewPosition.Position  := MedienBib.NewCoverFlow.Settings.ViewPosX;
-  // tbCoverViewDirection.Position := MedienBib.NewCoverFlow.Settings.ViewDirX;
   // Reflexion
   cbCoverFlowUseReflection .Checked := MedienBib.NewCoverFlow.Settings.UseReflection;
 	tbCoverReflexionIntensity.Position := MedienBib.NewCoverFlow.Settings.ReflexionBlendFaktor;
@@ -4239,23 +3988,7 @@ begin
 	tbCoverReflexionGap.Enabled        := MedienBib.NewCoverFlow.Settings.UseReflection;
   // mixed settings
   seCoverflowTextureCache.Value := MedienBib.NewCoverFlow.Settings.MaxTextures;
-
-  tbCoverZMain.OnChange := tbCoverZMainChange;
-  tbCoverZLeft.OnChange := tbCoverZMainChange;
-  tbCoverZRight.OnChange := tbCoverZMainChange;
-  tbCoverGapRight.OnChange := tbCoverZMainChange;
-  tbCoverGapLeft.OnChange := tbCoverZMainChange;
-  tbCoverGapFirstRight.OnChange := tbCoverZMainChange;
-  tbCoverGapFirstLeft.OnChange := tbCoverZMainChange;
-  tbCoverAngleRight.OnChange := tbCoverZMainChange;
-  tbCoverAngleLeft.OnChange := tbCoverZMainChange;
-  tbCoverAngleMain.OnChange := tbCoverZMainChange;
-  cbCoverFlowUseReflection.OnClick := tbCoverZMainChange;
-	tbCoverReflexionIntensity.OnChange := tbCoverZMainChange;
-	tbCoverReflexionGap.OnChange := tbCoverZMainChange;
-  tbCoverViewPosition.OnChange := tbCoverZMainChange;
-  // tbCoverViewDirection.OnChange := tbCoverZMainChange;
-
+  fCoverFlowGUIUpdating := False;
 end;
 
 procedure TOptionsCompleteForm.SetCoverFlowSettingsFromGUI;
@@ -4279,19 +4012,17 @@ begin
   MedienBib.NewCoverFlow.Settings.UseReflection        := cbCoverFlowUseReflection .Checked;
 	MedienBib.NewCoverFlow.Settings.ReflexionBlendFaktor := tbCoverReflexionIntensity.Position;
 	MedienBib.NewCoverFlow.Settings.GapReflexion         := tbCoverReflexionGap      .Position;
-
   lblCoverFlowIntensity.Enabled      := MedienBib.NewCoverFlow.Settings.UseReflection;
 	lblCoverflowReflexionGap.Enabled   := MedienBib.NewCoverFlow.Settings.UseReflection;
 	tbCoverReflexionIntensity.Enabled  := MedienBib.NewCoverFlow.Settings.UseReflection;
 	tbCoverReflexionGap.Enabled        := MedienBib.NewCoverFlow.Settings.UseReflection;
-
   // mixed settings
   MedienBib.NewCoverFlow.Settings.MaxTextures := seCoverflowTextureCache.Value;
 end;
 
-
 procedure TOptionsCompleteForm.tbCoverZMainChange(Sender: TObject);
 begin
+  if fCoverFlowGUIUpdating then exit;
   SetCoverFlowSettingsFromGUI;
   MedienBib.NewCoverFlow.ApplySettings;
 end;
@@ -4300,7 +4031,6 @@ procedure TOptionsCompleteForm.BtnUndoCoverFlowSettingsClick(Sender: TObject);
 begin
   MedienBib.NewCoverFlow.Settings := BackUpCoverFlowSettings;
   ApplyCoverFlowSettingsToGUI;
-
   MedienBib.NewCoverFlow.ApplySettings;
 end;
 
@@ -4308,11 +4038,11 @@ procedure TOptionsCompleteForm.BtnCoverFlowDefaultClick(Sender: TObject);
 begin
   MedienBib.NewCoverFlow.Settings := DefaultCoverFlowSettings;
   ApplyCoverFlowSettingsToGUI;
-
   MedienBib.NewCoverFlow.ApplySettings;
 end;
+{$ENDREGION}
 
-{$REGION MediaLibrary: Category, Configuration}
+{$REGION 'MediaLibrary: Category, Configuration'}
 procedure TOptionsCompleteForm.ShowMediaLibraryConfiguration;
 var
   i, iRC: Integer;

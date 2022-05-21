@@ -688,7 +688,6 @@ procedure SplitMainForm;
 begin
     with Nemp_MainForm do
     begin
-        // NempFormBuildOptions.NilConstraints;
         __MainContainerPanel.Constraints.MinHeight := 10;
 
         Constraints.MinWidth := 0;
@@ -709,14 +708,7 @@ begin
     with Nemp_MainForm do
     begin
         // Constraints
-        Constraints.MaxHeight := Height;
-        Constraints.MinHeight := Height;
-        //if NempFormBuildOptions.ControlPanelTwoRows then
-        //    Constraints.MinWidth := 214
-        //else
-            Constraints.MinWidth := 400;
-
-        FixScrollbar;
+        //
 
         // show other forms
         PlaylistPanel.Parent  := PlaylistForm.pnlSplit;
@@ -797,6 +789,22 @@ begin
         MedienBibDetailStatusLbl      .OnMouseMove := ExtendedControlForm.OnMouseMove;
         MedienBibDetailFillPanel      .OnMouseUP := ExtendedControlForm.OnMouseUP;
         MedienBibDetailStatusLbl      .OnMouseUP := ExtendedControlForm.OnMouseUP;
+
+
+         Nemp_MainForm.Borderstyle := bsNone;
+    Nemp_MainForm.Top     := NempOptions.FormPositions[nfMainMini].Top;
+    Nemp_MainForm.Left    := NempOptions.FormPositions[nfMainMini].Left;
+    Nemp_MainForm.Width   := NempOptions.FormPositions[nfMainMini].Width;
+    Nemp_MainForm.Height  := Nemp_MainForm._ControlPanel.Height + 4;
+
+    Constraints.MaxHeight := Height;
+        //Constraints.MinHeight := Height;
+        //if NempFormBuildOptions.ControlPanelTwoRows then
+        //    Constraints.MinWidth := 214
+        //else
+            Constraints.MinWidth := 400;
+
+        FixScrollbar;
 
         // EditPlaylistSearchExit(Nil);
         EDITFastSearchExit(Nil);
@@ -1058,13 +1066,6 @@ begin
                 NempLayout.BuildMainForm(nil);
             end;
 
-            // after joining the MainForm: Apply the FormBuilder-Layout
-            {NempFormBuildOptions.BeginUpdate;
-            NempFormBuildOptions.RefreshBothRowsOrColumns(False);
-            NempFormBuildOptions.SwapMainLayout;
-            NempFormBuildOptions.ApplyRatios;
-            NempFormBuildOptions.EndUpdate;}
-
             Top    := NempOptions.FormPositions[nfMain].Top ;
             Left   := NempOptions.FormPositions[nfMain].Left;
             Height := NempOptions.FormPositions[nfMain].Height;
@@ -1077,6 +1078,7 @@ begin
             //if (Tag = -1) and NempFormBuildOptions.ControlPanelTwoRows then
             //    NempFormBuildOptions.RefreshControlPanel;
             SplitMainForm;
+            AfterLayoutBuild(Nil);
         end;
       end;
 
@@ -1085,17 +1087,6 @@ begin
       //CoverScrollbar.WindowProc := bckup;
       //SendMessage( CoverScrollbar.Handle, WM_SETREDRAW, 1, 0);
 
-
-      //Korrektur. Das ist manchmal nötig // Why? Both Controls are alClient (at least now, 2022)
-      {GRPBOXPlaylist.Left   := 4;
-      GRPBOXPlaylist.Top    := 28;
-      GRPBOXPlaylist.Height := PlaylistPanel.Height - 29;
-      GRPBOXPlaylist.Width  := PlaylistPanel.Width - 12;
-      PlaylistVST.Left := 8;
-      PlaylistVST.Width := GRPBOXPlaylist.Width - 16;
-      PlaylistVST.Top := 8;
-      PlaylistVST.Height := GRPBOXPlaylist.Height - 16;}
-      //PlaylistForm.FormResize(Nil);
 
       // 5. Constraints setzen
       {

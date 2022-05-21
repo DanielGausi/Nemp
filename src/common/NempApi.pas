@@ -311,12 +311,7 @@ const
         NEMP_DESKBAND_UPDATE: array [0..MAX_PATH] of Char = 'NEMP - Deskband Update'#0;
 
 var
-    NempDeskbandActivateMessage: UINT = 0;
-    NempDeskbandDeActivateMessage: UINT = 0;
-    NempDeskbandUpdateMessage: UINT = 0;
-
-    WINDOW_NAME : String =  NEMP_WINDOW_NAME;
-
+  WINDOW_NAME : String =  NEMP_WINDOW_NAME;
 
 implementation
 
@@ -1102,13 +1097,5 @@ procedure Nemp_SetDisplayApp(value: Boolean);
 begin
   SetNemp_User(Integer(value), IPC_SETUSEDISPLAYAPP);
 end;
-
-initialization
-  NempDeskbandActivateMessage := RegisterWindowMessage(NEMP_DESKBAND_ACTIVATE);
-  NempDeskbandDeActivateMessage := RegisterWindowMessage(NEMP_DESKBAND_DEACTIVATE);
-  NempDeskbandUpdateMessage := RegisterWindowMessage(NEMP_DESKBAND_UPDATE);
-
-finalization
-  // nothing todo
 
 end.

@@ -364,7 +364,6 @@ type
 
         NempPartyMode: TNempPartyMode;
 
-        // FormBuilder: TNempFormBuildOptions;
         FormLayout: TNempLayout;
 
         property ControlProgressLoaded: Boolean read fControlProgressLoaded;

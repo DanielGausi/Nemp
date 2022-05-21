@@ -329,9 +329,9 @@ SelectDirectoryDialog_RemoteNemp = 'Select download directory';
 AutoScanDir_AlreadyExists = 'The selected directory (or a parent directory) is already in the list.';
 AutoSacnDir_SubDirExisted = 'A subdirectory of the selected directory was removed from the list: ';
 
-WinX64WarningDeskband = 'You are using a 64Bit-Version of Windows. Installing a Deskband is unfortunately not possible.';
-WinVistaWarningDeskband = 'The Nemp Deskband is not compatible with Windows Vista or later.';
-Win7WarningDeskband = 'The Nemp Deskband is not compatible with Windows Vista or later. Use the buttons in the Windows Taskbar-preview instead.';
+// WinX64WarningDeskband = 'You are using a 64Bit-Version of Windows. Installing a Deskband is unfortunately not possible.';
+// WinVistaWarningDeskband = 'The Nemp Deskband is not compatible with Windows Vista or later.';
+// Win7WarningDeskband = 'The Nemp Deskband is not compatible with Windows Vista or later. Use the buttons in the Windows Taskbar-preview instead.';
 
     EQSetting_Custom = '(Custom)';
     Infostring_Webstream = 'Webstream';

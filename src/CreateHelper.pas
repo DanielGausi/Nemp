@@ -97,7 +97,6 @@ begin
         end;
         LoadWindowPosition; // Nemp_MainForm
 
-        //NempFormBuildOptions.LoadSettings;
         NempLayout.LoadSettings;
 
         TDrivemanager.LoadSettings;
@@ -471,8 +470,6 @@ begin
                      or WS_EX_TOOLWINDOW
                      and (not WS_EX_APPWINDOW));
         end;
-        if NempOptions.ShowDeskbandOnStart then
-            NotifyDeskband(NempDeskbandActivateMessage);
 
         if NempOptions.Useskin then
         begin
@@ -593,14 +590,8 @@ begin
 
         __MainContainerPanel.ID := 'A';
         ApplyLayout;
-
         UpdateSplashScreen(SplashScreen_GenerateWindows);
 
-        //_TopMainPanel.Constraints.MinHeight := NempFormBuildOptions.MainPanelMinHeight;
-        //_TopMainPanel.Constraints.MinWidth := NempFormBuildOptions.MainPanelMinWidth;
-        //GRPBOXArtistsAlben.Height := GRPBOXPlaylist.Height;
-        //GRPBOXArtistsAlben.Anchors := [akleft, aktop, akright, akBottom];
-        // yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
         UpdateFormDesignNeu(NempOptions.AnzeigeMode);
         NempLayout.ResizeSubPanel(TreePanel, ArtistsVST, NempLayout.TreeViewRatio);
 

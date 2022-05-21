@@ -1190,7 +1190,6 @@ type
     procedure SplitterFileOverviewCanResize(Sender: TObject; var NewSize: Integer;
       var Accept: Boolean);
     procedure AfterLayoutBuild(Sender: TObject);
-    procedure _TopMainPanelResize(Sender: TObject);
     procedure __MainContainerPanelResize(Sender: TObject);
     procedure Pnl_CoverFlowLabelPaint(Sender: TObject);
     procedure ControlPanelPaint(Sender: TObject);
@@ -1342,7 +1341,6 @@ type
     // MediaListPopupTag: Integer;
     LastPaintedTime: Integer;
     FormReadyAndActivated : Boolean;
-    DeleteAudioFilesAfterHandled: Boolean;  /////////////////////////////////////////// kann weg
     MostRecentInsertNodeForPlaylist: PVirtualNode;
 
     procedure OwnMessageProc(var msg: TMessage);
@@ -1447,7 +1445,6 @@ type
     procedure MinimizeNemp(Sender: TObject);
     procedure DeactivateNemp(Sender: TObject);
     procedure RestoreNemp;
-    procedure NotifyDeskband(aMsg: Integer);
     procedure ProcessCommandline(lpData: Pointer; StartPlay: Boolean) ; overload;
     procedure ProcessCommandline(filename: UnicodeString; StartPlay: Boolean; Enqueue: Boolean); overload;
 
@@ -2032,37 +2029,6 @@ begin
     NempLayout.MainContainer   := __MainContainerPanel;
     NempLayout.OnAfterBuild := AfterLayoutBuild;
 
-    (*
-    NempFormBuildOptions.NewLayout := Layout_TwoRows;
-    NempFormBuildOptions.MegaContainer  := self;
-    NempFormBuildOptions.SuperContainer := __MainContainerPanel;
-    NempFormBuildOptions.MainContainerA := _TopMainPanel;
-    NempFormBuildOptions.MainContainerB := _VSTPanel;
-    NempFormBuildOptions.ControlPanel.SetControlValues(_ControlPanel, ControlContainer1, ControlContainer2,
-                                                OutputControlPanel, PlayerControlCoverPanel, PlayerControlPanel, HeadsetControlPanel, NewPlayerPanel, {SpectrumPanel,}
-                                                'Player Control');
-    NempFormBuildOptions.MainSplitter := MainSplitter;
-    NempFormBuildOptions.ChildPanelMinHeight := CHILD_PANEL_MinHeight;
-    NempFormBuildOptions.ChildPanelMinWidth  := CHILD_PANEL_MinWidth;
-    NempFormBuildOptions.MainPanelMinHeight := MAIN_PANEL_MinHeight;
-    NempFormBuildOptions.MainPanelMinWidth := MAIN_PANEL_MinWidth;
-    // fill it with the default layout
-    // define the ChildPanels and its content
-    NempFormBuildOptions.BlockBrowse.SetValues(AuswahlPanel, AuswahlHeaderPanel, GRPBOXArtistsAlben, 'Nemp Coverflow');
-    NempFormBuildOptions.BlockPlaylist.SetValues(PlaylistPanel, PlayerHeaderPanel, GRPBOXPlaylist, 'Nemp Playlist');
-    NempFormBuildOptions.BlockMediaList.SetValues(MedialistPanel, MedienBibHeaderPanel, GRPBOXVST, 'Nemp Medialist');
-    NempFormBuildOptions.BlockFileOverview.SetValues(MedienBibDetailPanel, MedienBibDetailHeaderPanel, ContainerPanelMedienBibDetails, 'Nemp File overview');
-    // place them on the two MainPanels
-    NempFormBuildOptions.PanelAChilds.Add(NempFormBuildOptions.BlockBrowse);
-    NempFormBuildOptions.PanelAChilds.Add(NempFormBuildOptions.BlockPlaylist);
-    NempFormBuildOptions.PanelBChilds.Add(NempFormBuildOptions.BlockMediaList);
-    NempFormBuildOptions.PanelBChilds.Add(NempFormBuildOptions.BlockFileOverView);
-    // Place the Splitters
-    NempFormBuildOptions.SubSplitter1 := SubSplitter1;
-    NempFormBuildOptions.SubSplitter2 := SubSplitter2;
-    *)
-    ///////////////////////////////////////
-
     // Create Player
     NempPlayer            := TNempPlayer.Create(FOwnMessageHandler);
     NempPlayer.Statusproc := StatusProc;
@@ -2331,12 +2297,14 @@ begin
 
         NempOptions.SaveSettings;
         // NempFormBuildOptions.SaveSettings;
-        NempLayout.SaveSettings;
+        NempLayout.SaveSettings(NempOptions.AnzeigeMode = 0);
 
-        AuswahlForm.SaveWindowPosition;
-        ExtendedControlForm.SaveWindowPosition;
-        MedienlisteForm.SaveWindowPosition;
-        PlaylistForm.SaveWindowPosition;
+        if NempOptions.AnzeigeMode = 1 then begin
+          AuswahlForm.SaveWindowPosition;
+          ExtendedControlForm.SaveWindowPosition;
+          MedienlisteForm.SaveWindowPosition;
+          PlaylistForm.SaveWindowPosition;
+        end;
         self.SaveWindowPosition(NempOptions.AnzeigeMode);
 
         TDrivemanager.SaveSettings;
@@ -2372,9 +2340,6 @@ begin
         if assigned(MedienlisteForm) then MedienlisteForm.Hide;
         if assigned(PlaylistForm) then PlaylistForm.Hide;
         if assigned(ExtendedControlForm) then ExtendedControlForm.Hide;
-
-        if NempOptions.HideDeskbandOnClose then
-            NotifyDeskband(NempDeskbandDeActivateMessage);
 
         if MedienBib.AutoSaveMediaList AND {(MedienBib.Count > 0) AND} (MedienBib.Changed) then
         begin
@@ -2674,12 +2639,7 @@ begin
                  or WS_EX_TOOLWINDOW
                  //and (not WS_ICONIC)
                  and (not WS_EX_APPWINDOW));}
-
   end;
-
-
-  if NempOptions.ShowDeskbandOnMinimize then
-      NotifyDeskband(NempDeskbandActivateMessage);
 
   Application.ShowMainForm := False;
 //  hide;
@@ -2742,8 +2702,6 @@ procedure TNemp_MainForm.RestoreNemp;
       Finally
         AttachThreadInput (Thread1, Thread2, false);
       End;
-      if NempOptions.HideDeskbandOnRestore then
-        NotifyDeskband(NempDeskbandDeActivateMessage);
     End;
 begin
   // NEMPWINDOW_ONLYTASKBAR = 0;
@@ -2953,19 +2911,6 @@ begin
       NempPlaylist.Play(NempPlaylist.InsertIndex-1, 0, True);
   end;
 end;
-
-
-
-procedure TNemp_MainForm.NotifyDeskband(aMsg: Integer);
-var wnd: THandle;
-begin
-  wnd :=  FindWindow('Shell_TrayWnd', nil);
-  wnd :=  FindWindowEx(wnd, 0, 'ReBarWindow32', nil);
-  wnd :=  FindWindowEx(wnd, 0, 'TNempDeskBand', Nil);
-  SendMessage(wnd, aMsg, GetCurrentThreadId, 0);
-end;
-
-
 
 Procedure TNemp_MainForm.NempAPI_Commands(Var aMSG: tMessage);
 begin
@@ -4030,9 +3975,17 @@ end;
 
 procedure TNemp_MainForm.PM_ML_ConfigureMedialibraryClick(Sender: TObject);
 begin
-  if not assigned(FormLibraryConfiguration) then
-    Application.CreateForm(TFormLibraryConfiguration, FormLibraryConfiguration);
-  FormLibraryConfiguration.Show;
+//  if not assigned(FormLibraryConfiguration) then
+//    Application.CreateForm(TFormLibraryConfiguration, FormLibraryConfiguration);
+//  FormLibraryConfiguration.Show;
+
+
+    if Not Assigned(OptionsCompleteForm) then
+      Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
+    OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.CategoriesNode;
+    OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.CategoriesNode] := True;
+    OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabFiles4;
+    OptionsCompleteForm.Show;
 end;
 
 procedure TNemp_MainForm.PM_ML_FilesPlayEnqueueClick(Sender: TObject);
@@ -13667,19 +13620,10 @@ end;
 
 procedure TNemp_MainForm.ReSizeBrowseTrees;
 begin
-  if NempLayout.TreeviewOrientation = 0 then begin
-    // Side by side
-    //ArtistsVST.Align := alLeft;
-    ArtistsVST.Width := Round(PanelStandardBrowse.Width * NempLayout.TreeViewRatio / 100);
-    //SplitterBrowse.Align := alLeft;
-    //SplitterBrowse.Left := ArtistsVST.Width;
-  end else begin
-    // About each other
-    //ArtistsVST.Align := alTop;
+  if NempLayout.TreeviewOrientation = 0 then
+    ArtistsVST.Width := Round(PanelStandardBrowse.Width * NempLayout.TreeViewRatio / 100)
+  else
     ArtistsVST.Height := Round(PanelStandardBrowse.Height * NempLayout.TreeViewRatio / 100);
-    //SplitterBrowse.Align := alTop;
-    //SplitterBrowse.Top := ArtistsVST.Height;
-  end;
 end;
 
 procedure TNemp_MainForm.ReAlignBrowseTrees;
@@ -13810,15 +13754,6 @@ begin
   end;
 end;
 
-procedure TNemp_MainForm._TopMainPanelResize(Sender: TObject);
-begin
-    if not FormReadyAndActivated then
-        exit;
-
-    //if Assigned_NempFormBuildOptions then
-    //    NempFormBuildOptions.OnMainContainerResize(Sender);
-end;
-
 procedure TNemp_MainForm.__MainContainerPanelResize(Sender: TObject);
 begin
     if not FormReadyAndActivated then
@@ -13827,7 +13762,6 @@ begin
     //if Assigned_NempFormBuildOptions then
     //    NempFormBuildOptions.OnSuperContainerResize(Sender);
 end;
-
 
 
 

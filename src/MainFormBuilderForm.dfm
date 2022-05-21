@@ -94,11 +94,10 @@ object MainFormBuilder: TMainFormBuilder
         Width = 710
         Height = 73
         Align = alBottom
-        Caption = 'Nemp GUI-Elements'
+        Caption = 'Nemp GUI elements'
         TabOrder = 0
         OnDragDrop = pnlDefaultContainerDragDrop
         OnDragOver = pnlDefaultContainerDragOver
-        ExplicitTop = 0
         object pnlCloud: TNempPanel
           Tag = 208
           Left = 206
@@ -367,14 +366,13 @@ object MainFormBuilder: TMainFormBuilder
         Width = 710
         Height = 492
         Align = alClient
-        Caption = 'Form construction'
+        Caption = 'Nemp main window'
         TabOrder = 1
-        ExplicitTop = 73
         object MainContainer: TNempContainerPanel
           Left = 2
-          Top = 33
+          Top = 41
           Width = 706
-          Height = 457
+          Height = 449
           Align = alClient
           BorderWidth = 3
           Constraints.MinWidth = 50
@@ -387,6 +385,8 @@ object MainFormBuilder: TMainFormBuilder
           OwnerDraw = False
           HierarchyLevel = 0
           SplitterMinSize = 120
+          ExplicitLeft = 1
+          ExplicitTop = 38
           object lblMainContainer: TLabel
             Left = 11
             Top = 46
@@ -399,16 +399,17 @@ object MainFormBuilder: TMainFormBuilder
           Left = 2
           Top = 15
           Width = 706
-          Height = 18
+          Height = 26
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 1
           object lblElementCount: TLabel
             Left = 10
-            Top = 0
+            Top = 4
             Width = 4
             Height = 13
             Caption = '-'
+            ShowAccelChar = False
           end
         end
       end
@@ -427,7 +428,7 @@ object MainFormBuilder: TMainFormBuilder
         Width = 249
         Height = 131
         Align = alTop
-        Caption = 'Visible Elements in Nemp'
+        Caption = 'Visible elements in Nemp'
         TabOrder = 0
         DesignSize = (
           249
@@ -528,10 +529,10 @@ object MainFormBuilder: TMainFormBuilder
           Hint = 
             'Select how you want to align the two tree views in the main wind' +
             'ow'
+          Style = csDropDownList
           ParentShowHint = False
           ShowHint = True
           TabOrder = 3
-          Text = 'Side by side'
           Items.Strings = (
             'Side by side'
             'Stacked')
@@ -544,6 +545,7 @@ object MainFormBuilder: TMainFormBuilder
           Hint = 
             'Select how you want to align cover art and text in the section "' +
             'File overview"'
+          Style = csDropDownList
           ItemIndex = 0
           ParentShowHint = False
           ShowHint = True
@@ -559,6 +561,7 @@ object MainFormBuilder: TMainFormBuilder
           Width = 145
           Height = 21
           Hint = 'Select what you want to see in the section "File overview"'
+          Style = csDropDownList
           ItemIndex = 0
           ParentShowHint = False
           ShowHint = True

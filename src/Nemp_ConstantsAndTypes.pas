@@ -128,7 +128,7 @@ type
     end;
 
 
-    TMainLayout = (Layout_TwoRows, Layout_TwoColumns, Layout_Undef);
+    (*TMainLayout = (Layout_TwoRows, Layout_TwoColumns, Layout_Undef);
 
     TControlPanelPosition = (
         cp_FormTop, cp_FormCenter, cp_FormBottom, // on top or bottom of the MainForm, or between the two MainPanels (Layout 2Rows only)
@@ -139,6 +139,7 @@ type
     );
 
     TControlPanelSubPosition = (cp_SubTop, cp_SubBottom);
+
 
     TNempBlockPanel = class
         private
@@ -209,7 +210,9 @@ type
                                  aSelect, aCover, aPlayer, aHeadset, aProgress{, aVisualisation}: TPanel;
                                  aName: String);
     end;
+    *)
 
+    (*
     TNempFormBuildOptions = class
         private
             fMainLayout: TMainLayout;
@@ -339,6 +342,7 @@ type
             // on initializing the form, (?or after setting a new layuot?)
             procedure ApplyRatios;
     end;
+    *)
 
     TNempRegionsDistance = record
       Left: integer;
@@ -503,10 +507,10 @@ type
         //       wnd :=  FindWindow('Shell_TrayWnd', nil);
         //       wnd :=  FindWindowEx(wnd, 0, 'ReBarWindow32', nil);
         //       wnd :=  FindWindowEx(wnd, 0, 'TNempDeskBand', Nil);
-        ShowDeskbandOnMinimize: Boolean;
-        ShowDeskbandOnStart   : Boolean;
-        HideDeskbandOnRestore : Boolean;
-        HideDeskbandOnClose   : Boolean;
+        // ShowDeskbandOnMinimize: Boolean;
+        // ShowDeskbandOnStart   : Boolean;
+        // HideDeskbandOnRestore : Boolean;
+        // HideDeskbandOnClose   : Boolean;
 
         AnzeigeMode: Integer;
         UseSkin: Boolean;
@@ -554,16 +558,16 @@ const
     NEMP_CAPTION = 'Nemp - Noch ein MP3-Player';
     NEMP_NAME_TASK_LONG = '[ N e m p ]';
     NEMP_NAME_TASK = '[Nemp]';
-    NEMP_VERSION_SPLASH = 'version 4.15';// 'v3.3';
-    NEMP_BASS_DEFAULT_USERAGENT = 'Nemp/4.15';
+    NEMP_VERSION_SPLASH = 'version 4.91';// 'v3.3';
+    NEMP_BASS_DEFAULT_USERAGENT = 'Nemp/4.91';
 
     NEMP_TIPSIZE = 128;
 
     NEMP_PLAYER_COVERSIZE = 88;
 
-    BROWSE_PLAYLISTS =     '!!{A8F4183D-C8FE-4585-A6C6-36FCC402143D}';
-    BROWSE_RADIOSTATIONS = '!!{B3723948-3015-4E60-8727-4AC7663CE7A5}';
-    BROWSE_ALL =           '!!{F7B03349-5B91-4025-B439-EAF46875717B}';
+    // BROWSE_PLAYLISTS =     '!!{A8F4183D-C8FE-4585-A6C6-36FCC402143D}';
+    // BROWSE_RADIOSTATIONS = '!!{B3723948-3015-4E60-8727-4AC7663CE7A5}';
+    // BROWSE_ALL =           '!!{F7B03349-5B91-4025-B439-EAF46875717B}';
 
 
     //MAX_DRAGFILECOUNT = 2500; Now: NempOptions.maxDragFileCount
@@ -1033,7 +1037,7 @@ uses PlaylistUnit, MedienListeUnit, AuswahlUnit, ExtendedControlsUnit, BasicSett
 
 var fNempOptions: TNempOptions;
     fNempSettingsManager: TNempSettingsManager;
-    fNempFormBuildOptions: TNempFormBuildOptions;
+    // fNempFormBuildOptions: TNempFormBuildOptions;
 
 {function Assigned_NempFormBuildOptions: Boolean;
 begin
@@ -1075,6 +1079,7 @@ end;
 
 { TNempBlockPanel }
 
+(*
 constructor TNempBlockPanel.create;
 begin
     fBlock   := Nil;
@@ -1153,10 +1158,11 @@ procedure TNempBlockPanel.fSetWidth(Value: Integer);
 begin
     fBlock.Width := Value;
 end;
+*)
 {$endregion}
 
 { TControlPanel }
-
+(*
 constructor TControlPanel.create;
 begin
     //
@@ -1225,7 +1231,7 @@ procedure TControlPanel.fSetWidth(Value: Integer);
 begin
     Block.Width := Value;
 end;
-*)
+
 {$endregion}
 
 procedure TControlPanel.SetControlValues(aBlock, aContainer1, aContainer2, aSelect,
@@ -1243,12 +1249,12 @@ begin
     Name          := aName          ;
 end;
 
-
+  *)
 
 
 { TNempFormBuildOptions }
 
-
+(*
 constructor TNempFormBuildOptions.Create;
 begin
     // the List DO NOT owns the panels!
@@ -2583,6 +2589,7 @@ begin
         aChildList[i].Align := alClient;
     end;
 end;
+*)
 
 
 function GetDefaultEqualizerIndex(aEQSettingsName: String): Integer;
@@ -2829,10 +2836,10 @@ begin
   maxDragFileCount := NempSettingsManager.ReadInteger('Allgemein', 'maxDragFileCount', 2500);
 
   NempWindowView          := NempSettingsManager.ReadInteger('Fenster', 'NempWindowView', NEMPWINDOW_ONLYTASKBAR);
-  ShowDeskbandOnMinimize  := NempSettingsManager.ReadBool('Fenster', 'ShowDeskbandOnMinimize', False);
-  ShowDeskbandOnStart     := NempSettingsManager.ReadBool('Fenster', 'ShowDeskbandOnStart', True);
-  HideDeskbandOnRestore   := NempSettingsManager.ReadBool('Fenster', 'HideDeskbandOnRestore', False);
-  HideDeskbandOnClose     := NempSettingsManager.ReadBool('Fenster', 'HideDeskbandOnClose', True);
+  //ShowDeskbandOnMinimize  := NempSettingsManager.ReadBool('Fenster', 'ShowDeskbandOnMinimize', False);
+  //ShowDeskbandOnStart     := NempSettingsManager.ReadBool('Fenster', 'ShowDeskbandOnStart', True);
+  //HideDeskbandOnRestore   := NempSettingsManager.ReadBool('Fenster', 'HideDeskbandOnRestore', False);
+  //HideDeskbandOnClose     := NempSettingsManager.ReadBool('Fenster', 'HideDeskbandOnClose', True);
 
   FullRowSelect := NempSettingsManager.ReadBool('Fenster', 'FullRowSelect', True);
 
@@ -2919,10 +2926,10 @@ begin
   NempSettingsManager.WriteBool('Fenster', 'UseAdvancedSkin', GlobalUseAdvancedSkin);
 
   NempSettingsManager.WriteInteger('Fenster', 'NempWindowView', NempWindowView);
-  NempSettingsManager.WriteBool('Fenster', 'ShowDeskbandOnMinimize', ShowDeskbandOnMinimize);
-  NempSettingsManager.WriteBool('Fenster', 'ShowDeskbandOnStart', ShowDeskbandOnStart);
-  NempSettingsManager.WriteBool('Fenster', 'HideDeskbandOnRestore', HideDeskbandOnRestore);
-  NempSettingsManager.WriteBool('Fenster', 'HideDeskbandOnClose', HideDeskbandOnClose);
+  //NempSettingsManager.WriteBool('Fenster', 'ShowDeskbandOnMinimize', ShowDeskbandOnMinimize);
+  //NempSettingsManager.WriteBool('Fenster', 'ShowDeskbandOnStart', ShowDeskbandOnStart);
+  //NempSettingsManager.WriteBool('Fenster', 'HideDeskbandOnRestore', HideDeskbandOnRestore);
+  //NempSettingsManager.WriteBool('Fenster', 'HideDeskbandOnClose', HideDeskbandOnClose);
   NempSettingsManager.WriteBool('Fenster', 'FullRowSelect', FullRowSelect);
 
   NempSettingsManager.WriteInteger('Font','ArtistAlbenFontSize',ArtistAlbenFontSize);
@@ -3116,7 +3123,7 @@ end;
 initialization
   fNempOptions := Nil;
   fNempSettingsManager := Nil;
-  fNempFormBuildOptions := Nil;
+  // fNempFormBuildOptions := Nil;
 
 finalization
   if assigned(fNempOptions) then
@@ -3125,8 +3132,8 @@ finalization
   if assigned(fNempSettingsManager) then
     fNempSettingsManager.Free;
 
-  if assigned(fNempFormBuildOptions) then
-    fNempFormBuildOptions.Free;
+  //if assigned(fNempFormBuildOptions) then
+  //  fNempFormBuildOptions.Free;
 
 
 end.

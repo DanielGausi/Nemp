@@ -236,8 +236,6 @@ type
       procedure ResetPlayerVCL(GetCoverWasSuccessful: boolean);
       // set the play/pause button according to the current state of the player
       procedure ActualizePlayPauseBtn(wParam, lParam: Integer);
-      // send a Message to the Deskband (set play/pause-button there as well)
-      procedure UpdateDeskband(wParam, lParam: Integer);
 
       procedure StartPrescanThread;
       function GetTimeString: String;
@@ -1458,8 +1456,6 @@ begin
 
     MainStream := 0;
     SlideStream := 0;
-
-    UpdateDeskband(NEMP_API_STOPPED, 0);
     ActualizePlayPauseBtn(NEMP_API_STOPPED, 0);
 end;
 
@@ -1745,7 +1741,6 @@ begin
       begin
           fstatus := PLAYER_ISPLAYING;
           SendMessage(MainWindowHandle, WM_PlayerPlay, 0, 0);
-          UpdateDeskband(NEMP_API_PLAYING, 0);
           ActualizePlayPauseBtn(NEMP_API_PLAYING, 0);
 
           if (MainAudioFile.IsFile) or (MainAudioFile.isCDDA)  then
@@ -1761,7 +1756,6 @@ begin
           if MainAudioFile.isStream then
           begin
               fStatus := PLAYER_ISPAUSED; // Das ist wichtig fürs aufwecken nach einem Suspend und einem Reinit der Engine
-              UpdateDeskband(NEMP_API_PAUSED, 0);
               ActualizePlayPauseBtn(NEMP_API_PAUSED, 0);
           end;
       end;
@@ -1792,7 +1786,6 @@ begin
         BASS_ChannelPause(MainStream);
       end;
       fStatus := PLAYER_ISPAUSED;
-      UpdateDeskband(NEMP_API_PAUSED, 0);
       ActualizePlayPauseBtn(NEMP_API_PAUSED, 0);
   end;
 
@@ -1843,7 +1836,6 @@ begin
   // and playing. => Set Flag to allow Deleting from Playlist with "AutoDelete"
   MainAudioFileIsPresentAndPlaying := True;
   fStatus := PLAYER_ISPLAYING;
-  UpdateDeskband(NEMP_API_PLAYING, 0);
   ActualizePlayPauseBtn(NEMP_API_PLAYING, 0);
 end;
 
@@ -3657,15 +3649,6 @@ begin
 end;
 
 
-procedure TNempPlayer.UpdateDeskband(wParam, lParam: Integer);
-var wnd: THandle;
-begin
-  wnd :=  FindWindow('Shell_TrayWnd', nil);
-  wnd :=  FindWindowEx(wnd, 0, 'ReBarWindow32', nil);
-  wnd :=  FindWindowEx(wnd, 0, 'TNempDeskBand', Nil);
-  SendMessage(wnd, NempDeskbandUpdateMessage, wParam, lParam);
-end;
-
 procedure TNempPlayer.ResetPlayerVCL(GetCoverWasSuccessful: boolean);
 begin
   SendMessage(MainWindowHandle, WM_ResetPlayerVCL, wParam(GetCoverWasSuccessful), 0);
@@ -3770,7 +3753,6 @@ begin
         //  BASS_ChannelPause(MainStream);
         //end;
         fStatus := PLAYER_ISPAUSED;
-        UpdateDeskband(NEMP_API_PAUSED, 0);
         ActualizePlayPauseBtn(NEMP_API_PAUSED, 0);
     end;
 end;
