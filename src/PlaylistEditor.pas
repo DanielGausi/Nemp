@@ -236,9 +236,7 @@ begin
     Nemp_MainForm.ArtistsVST.Invalidate;
 
     if MedienBib.CurrentCategory = MedienBib.FavoritePlaylistCategory then
-      Nemp_MainForm.FillCollectionTree(MedienBib.FavoritePlaylistCategory, True);
-
-    //Nemp_MainForm.ReFillBrowseTrees(True);
+      Nemp_MainForm.ReFillBrowseTrees(True);
 end;
 
 procedure TPlaylistEditorForm.FormCloseQuery(Sender: TObject;

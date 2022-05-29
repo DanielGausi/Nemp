@@ -394,7 +394,7 @@ type
           procedure LoadSettings;
           procedure SaveSettings;
 
-          procedure GetThemes(out Themes: TStrings);
+          procedure GetThemes(dest: TStrings);
 
           // Im VCL-Thread ausführen, mit CS geschützt
           // d.h. Message an Form Senden, die das dann ausführt
@@ -2479,13 +2479,13 @@ begin
     LeaveCriticalSection(CS_AccessLibrary);
 end;
 
-procedure TNempWebServer.GetThemes(out Themes: TStrings);
+procedure TNempWebServer.GetThemes(dest: TStrings);
 var SR: TSearchRec;
 begin
     if (FindFirst(ExtractFilePath(Paramstr(0)) + 'HTML\' + '*', faDirectory, SR)=0) then
         repeat
           if (SR.Name<>'.') and (SR.Name<>'..') and ((SR.Attr AND faDirectory)= faDirectory) then
-              Themes.Add(Sr.Name);
+              dest.Add(Sr.Name);
         until FindNext(SR)<>0;
     FindClose(SR);
 end;

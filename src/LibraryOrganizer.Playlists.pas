@@ -60,6 +60,7 @@ type
       fDriveManager: TDriveManager;
       fSortDirection: teSortDirection;
       fSortOrder: tePlaylistCollectionSorting;
+      fAutoScan: Boolean;
       procedure NotifyLoading;
     protected
       function GetItemCount: Integer; override;
@@ -68,6 +69,7 @@ type
 
     public
       property DriveManager: TDriveManager read fDriveManager write fDriveManager;
+      property AutoScan: Boolean read fAutoScan write fAutoScan;
 
       constructor Create;
       destructor Destroy; override;
@@ -197,7 +199,10 @@ begin
   // do not Clear and relod the List, if not necessary!
   // reason: GetFiles will be called to view all files, and to handle drag&drop and play/enque
   if fPlaylistFiles.Count = 0 then
-    LoadPlaylistFromFile(fKey, fPlaylistFiles, True, TLibraryPlaylistCategory(fOwnerCategory).DriveManager);
+    LoadPlaylistFromFile(fKey,
+          fPlaylistFiles,
+          TLibraryPlaylistCategory(fOwnerCategory).AutoScan,
+          TLibraryPlaylistCategory(fOwnerCategory).DriveManager);
   for i := 0 to fPlaylistFiles.Count - 1 do
     dest.Add(fPlaylistFiles[i]);
 end;

@@ -76,7 +76,7 @@ object PlaylistEditorForm: TPlaylistEditorForm
         item
           Position = 0
           Text = 'Favorite playlists'
-          Width = 214
+          Width = 210
         end>
     end
     object BtnNew: TButton
@@ -158,7 +158,7 @@ object PlaylistEditorForm: TPlaylistEditorForm
         item
           Position = 0
           Text = 'Title'
-          Width = 261
+          Width = 257
         end
         item
           Alignment = taRightJustify

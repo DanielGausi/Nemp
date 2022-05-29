@@ -377,10 +377,10 @@ begin
         AutoShowDetailsTMP := False; /// NempOptions.AutoShowDetails;
 
         // Menüeinträge checken//unchecken
-        actSplitToggleFileOverview.Checked := NempOptions.FormPositions[nfExtendedControls].Visible;
-        actSplitTogglePlaylist.Checked  := NempOptions.FormPositions[nfPlaylist].Visible;
-        actSplitToggleTitleList.Checked := NempOptions.FormPositions[nfMediaLibrary].Visible;
-        actSplitToggleBrowseList.Checked    := NempOptions.FormPositions[nfBrowse].Visible;
+        actToggleFileOverview.Checked := NempOptions.FormPositions[nfExtendedControls].Visible;
+        actTogglePlaylist.Checked  := NempOptions.FormPositions[nfPlaylist].Visible;
+        actToggleTitleList.Checked := NempOptions.FormPositions[nfMediaLibrary].Visible;
+        actToggleBrowseList.Checked    := NempOptions.FormPositions[nfBrowse].Visible;
         // The Checked-Status for the Compact-Versions of these action will be done in the "NempLayout.OnAfterBuild"
 
 
@@ -456,20 +456,21 @@ begin
     with Nemp_MainForm do
     begin
         // Ggf. Tray-Icon erzeugen und das erzeugen in TrayIconAdded merken
-        if NempOptions.NempWindowView in [NEMPWINDOW_TRAYONLY, NEMPWINDOW_BOTH, NEMPWINDOW_BOTH_MIN_TRAY] then
-          NempTrayIcon.Visible := True
-        else
-          NempTrayIcon.Visible := False;
+        NempTrayIcon.Visible := NempOptions.ShowTrayIcon;
+        //if NempOptions.NempWindowView in [NEMPWINDOW_TRAYONLY, NEMPWINDOW_BOTH, NEMPWINDOW_BOTH_MIN_TRAY] then
+        //  NempTrayIcon.Visible := True
+        //else
+        //  NempTrayIcon.Visible := False;
 
-        NempWindowDefault := GetWindowLong(Application.Handle, GWL_EXSTYLE);
-        if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
+        // NempWindowDefault := GetWindowLong(Application.Handle, GWL_EXSTYLE);
+        {if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
         begin
             ShowWindow( Application.Handle, SW_HIDE );
             SetWindowLong( Application.Handle, GWL_EXSTYLE,
                      GetWindowLong(Application.Handle, GWL_EXSTYLE)
                      or WS_EX_TOOLWINDOW
                      and (not WS_EX_APPWINDOW));
-        end;
+        end;}
 
         if NempOptions.Useskin then
         begin

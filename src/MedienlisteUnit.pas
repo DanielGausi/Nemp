@@ -203,7 +203,7 @@ begin
   with Nemp_MainForm do
   begin
     NempOptions.FormPositions[fNempFormID].Visible := False;
-    actSplitToggleTitleList.Checked := NempOptions.FormPositions[fNempFormID].Visible;
+    actToggleTitleList.Checked := NempOptions.FormPositions[fNempFormID].Visible;
   end;
   close;
 end;

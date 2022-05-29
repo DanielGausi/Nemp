@@ -73,7 +73,7 @@ function SetSuspendState(Hibernate: Boolean): Boolean;
 function FindWindowByTitle(WindowTitle: string): Hwnd;
 
 // Get all LAN-IPs
-function getIPs: Tstrings;
+procedure getIPs(dest: Tstrings);
 
 // Get the Version-Information from a File.
 // used in About-Form and UpdateUtils
@@ -339,7 +339,7 @@ end;
 
 
 // http://www.delphipraxis.net/topic114668_wlan+ip+ermitteln.html
-function getIPs: Tstrings;
+procedure getIPs(dest: Tstrings);
 type
   PPInAddr= ^PInAddr;
 var
@@ -348,8 +348,7 @@ var
   HostName: Array[0..255] of AnsiChar;
   Addr: PPInAddr;
 begin
-  Result := TstringList.Create;
-  Result.Clear;
+  Dest.Clear;
   if WSAStartup($0102, wsaData)=0 then
   try
     if gethostname(HostName, SizeOf(HostName)) = 0 then Begin
@@ -358,7 +357,7 @@ begin
           Addr := Pointer(HostInfo^.h_addr_list);
           if (Addr<>nil) AND (Addr^<>nil) then
              Repeat
-                    Result.Add(String(AnsiStrings.StrPas(inet_ntoa(Addr^^))));
+                    Dest.Add(String(AnsiStrings.StrPas(inet_ntoa(Addr^^))));
                     inc(Addr);
              Until Addr^=nil;
        end;

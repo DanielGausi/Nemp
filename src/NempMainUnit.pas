@@ -152,10 +152,7 @@ type
     MM_Options: TMenuItem;
     MM_O_Preferences: TMenuItem;
     MM_O_View: TMenuItem;
-    MM_O_SplitToggleFileOverview: TMenuItem;
     MM_O_SplitToggle_Playlist: TMenuItem;
-    MM_O_SplitToggle_TitleList: TMenuItem;
-    MM_O_SplitToggle_Browselist: TMenuItem;
     N32: TMenuItem;
     MM_O_ToggleStayOnTop: TMenuItem;
     MM_O_Skins: TMenuItem;
@@ -645,13 +642,10 @@ type
     ActionList1: TActionList;
     actJoinWindows: TAction;
     actSplitWindows: TAction;
-    actCompactToggleFileOverview: TAction;
-    actCompactToggleTitleList: TAction;
-    actCompactToggleBrowseList: TAction;
-    actSplitToggleFileOverview: TAction;
-    actSplitTogglePlaylist: TAction;
-    actSplitToggleTitleList: TAction;
-    actSplitToggleBrowseList: TAction;
+    actToggleFileOverview: TAction;
+    actToggleTitleList: TAction;
+    actToggleBrowseList: TAction;
+    actTogglePlaylist: TAction;
     actToggleStayOnTop: TAction;
     PM_P_JoinWindows: TMenuItem;
     PM_P_SplitWindows: TMenuItem;
@@ -659,13 +653,13 @@ type
     PM_P_CompactToggleFileoverview: TMenuItem;
     PM_P_CompactToggleTitlelist: TMenuItem;
     PM_P_CompactToggleBrowseList: TMenuItem;
-    PM_P_SplitToggleFileOverview: TMenuItem;
     PM_P_SplitTogglePlaylist: TMenuItem;
-    PM_P_SplitToggleTitlelist: TMenuItem;
-    PM_P_SplitToggleBrowseList: TMenuItem;
     PM_P_ToggleStayOnTop: TMenuItem;
     SplitWindowTimer: TTimer;
     N33: TMenuItem;
+    PM_ML_FavPlaylistSeparator: TMenuItem;
+    PM_ML_SaveAsNewFavorite: TMenuItem;
+    PM_ML_EditFavorites: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1310,13 +1304,10 @@ type
     procedure CoverImageClick(Sender: TObject);
     procedure EmptyLibraryPanelResize(Sender: TObject);
     procedure actJoinSplitWindowsExecute(Sender: TObject);
-    procedure actCompactToggleFileOverviewExecute(Sender: TObject);
-    procedure actCompactToggleTitleListExecute(Sender: TObject);
-    procedure actCompactToggleBrowseListExecute(Sender: TObject);
-    procedure actSplitToggleFileOverviewExecute(Sender: TObject);
-    procedure actSplitTogglePlaylistExecute(Sender: TObject);
-    procedure actSplitToggleTitleListExecute(Sender: TObject);
-    procedure actSplitToggleBrowseListExecute(Sender: TObject);
+    procedure actToggleFileOverviewExecute(Sender: TObject);
+    procedure actToggleTitleListExecute(Sender: TObject);
+    procedure actToggleBrowseListExecute(Sender: TObject);
+    procedure actTogglePlaylistExecute(Sender: TObject);
     procedure actToggleStayOnTopExecute(Sender: TObject);
     procedure SplitWindowTimerTimer(Sender: TObject);
 
@@ -1432,7 +1423,7 @@ type
     Nemp_VersionString: String;
     Saved8087CW: Word;
     SelectedPlayListMp3s: TNodeArray;
-    NempWindowDefault: DWord;
+    // NempWindowDefault: DWord;
     MainPlayerControlsActive: Boolean;
     AlphaBlendBMP: TBitmap;
     BibRatingHelper: TRatingHelper;
@@ -2624,25 +2615,25 @@ begin
 
 
   // nur minimiert im Tray: Icon erzeugen
-  if NempOptions.NempWindowView = NEMPWINDOW_TASKBAR_MIN_TRAY then
-    NempTrayIcon.Visible := True;
+  //if NempOptions.NempWindowView = NEMPWINDOW_TASKBAR_MIN_TRAY then
+  //NempTrayIcon.Visible := NempOptions.ShowTrayIcon;
 
-  if NempOptions.NempWindowView in [NEMPWINDOW_TASKBAR_MIN_TRAY, NEMPWINDOW_BOTH_MIN_TRAY, NEMPWINDOW_TRAYONLY]
-  then // Taskbar-Eintrag weg, aber nur, wenn ein Icon da ist
-  begin
+  //if NempOptions.NempWindowView in [NEMPWINDOW_TASKBAR_MIN_TRAY, NEMPWINDOW_BOTH_MIN_TRAY, NEMPWINDOW_TRAYONLY]
+  //then // Taskbar-Eintrag weg, aber nur, wenn ein Icon da ist
+  //begin
   /// XXX das geht so nicht mehr, weil in der Taskleiste seit D2007 Form.Handle drin steckt. Aber das
   ///  einfach ausblenden bewirkt da nichts.
-    if NempTrayIcon.Visible then ShowWindow(Application.Handle, SW_HIDE); // vorher Application.Handle
+  //   if NempTrayIcon.Visible then ShowWindow(Application.Handle, SW_HIDE); // vorher Application.Handle
 
 {   SetWindowLong( Nemp_MainForm.Handle, GWL_EXSTYLE,
                  Nemp_MainForm.NempWindowDefault
                  or WS_EX_TOOLWINDOW
                  //and (not WS_ICONIC)
                  and (not WS_EX_APPWINDOW));}
-  end;
+  //end;
 
-  Application.ShowMainForm := False;
-//  hide;
+
+  // hide;
   MinimizedIndicator := True;
 end;
 
@@ -2689,7 +2680,7 @@ end;
 
 
 procedure TNemp_MainForm.RestoreNemp;
-    Procedure ShowApplication;
+    (*Procedure ShowApplication;
     Var
       Thread1,
       Thread2: Cardinal;
@@ -2702,19 +2693,16 @@ procedure TNemp_MainForm.RestoreNemp;
       Finally
         AttachThreadInput (Thread1, Thread2, false);
       End;
-    End;
+    End;*)
 begin
-  // NEMPWINDOW_ONLYTASKBAR = 0;
-  // NEMPWINDOW_TASKBAR_MIN_TRAY = 1;
-  // NEMPWINDOW_TRAYONLY = 2;
-  // NEMPWINDOW_BOTH = 3;
-  // NEMPWINDOW_BOTH_MIN_TRAY = 4;
 
-  if NempOptions.NempWindowView = NEMPWINDOW_TASKBAR_MIN_TRAY then
-      NempTrayIcon.Visible := False;
-
+  //if NempOptions.NempWindowView = NEMPWINDOW_TASKBAR_MIN_TRAY then
+  //    NempTrayIcon.Visible := False;
+  //Show;
   ///02.2017
-  ShowWindow(Application.Handle, SW_RESTORE);
+  //ShowWindow(Application.Handle, SW_RESTORE);
+
+  ShowWindow(Nemp_MainForm.Handle, SW_RESTORE);
   ///02.2017
   SetForegroundWindow(Nemp_MainForm.Handle);
 
@@ -2725,14 +2713,15 @@ begin
   //if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
   //    ShowWindow( Application.Handle, SW_HIDE );
 
-  Show;
-  ///02.2017
-  ShowApplication;
-  ///02.2017
-  Application.ShowMainForm := True;
 
-  if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
-      ShowWindow( Application.Handle, SW_HIDE );
+  ///02.2017
+  // ShowApplication;
+  ///02.2017
+
+  // Show;
+
+  // if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
+  //    ShowWindow( Application.Handle, SW_HIDE );
 
 
   if WindowState <> wsMaximized then
@@ -3984,7 +3973,7 @@ begin
       Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
     OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.CategoriesNode;
     OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.CategoriesNode] := True;
-    OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabFiles4;
+    OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.tabCategories;
     OptionsCompleteForm.Show;
 end;
 
@@ -4112,7 +4101,7 @@ var //o: TComponent;
     ac: TAudioCollection;
     lc: TLibraryCategory;
     acFile: TAudioFileCollection;
-    isAlbum, isDirectory, isSortable: Boolean;
+    isAlbum, isDirectory, isSortable, isFavPlLC: Boolean;
     levelCaption, enqueueCaption, CollectionCaption: String;
 begin
     // The (smaller) menu for the Browsing part (top left of the form)
@@ -4239,6 +4228,12 @@ begin
       PM_ML_SortPlaylistsAscending.Checked := NempOrganizerSettings.PlaylistSortDirection = sd_Ascending;
       PM_ML_SortPlaylistsDescending.Checked := NempOrganizerSettings.PlaylistSortDirection = sd_Descending;
     end;
+
+    // Show MenuItems for "Favorite Playlists", Actions will be the same as in PlaylistManager-Popup
+    isFavPlLC := LC = MedienBib.FavoritePlaylistCategory;
+    PM_ML_SaveAsNewFavorite.Visible := isFavPlLC;
+    PM_ML_EditFavorites.Visible := isFavPlLC;
+    PM_ML_FavPlaylistSeparator.Visible := isFavPlLC;
 
     if assigned(ac) then begin
       PM_ML_ChangeCategory.Enabled := LibraryIsIdle AND LibraryNotBlockedByPartymode
@@ -5275,15 +5270,24 @@ begin
     VK_F4: if ssShift in shift then
               PM_P_ViewSeparateWindows_BrowseClick(NIL);
     }
-    $54 {T}: if ssCtrl in shift then
-              //PM_P_ViewStayOnTopClick(NIL);
-              actToggleStayOnTopExecute(Nil);
+    $42 {B}: if (ssCtrl in shift) and (ssShift in shift) then
+                actToggleBrowseList.Execute;
 
-    $46: begin       // F
-        if (ssCtrl in Shift) then
-            EditFastSearch.SetFocus;
+    $44 {D}: if (ssCtrl in shift) and (ssShift in shift) then
+                actToggleFileOverview.Execute;
+
+    $4E {P}: if (ssCtrl in shift) and (ssShift in shift) then
+                actTogglePlaylist.Execute;
+
+    $54 {T}: if (ssCtrl in shift)  then begin
+              if (ssShift in shift) then
+                actToggleTitleList.Execute
+              else
+                actToggleStayOnTop.Execute;
     end;
 
+    $46 {F}: if (ssCtrl in Shift) then
+                EditFastSearch.SetFocus;
 
     VK_F7: begin
             if NOT NempSkin.NempPartyMode.Active then
@@ -5293,8 +5297,6 @@ begin
     VK_F8: NempPlayer.PlayJingle(Nil);
   end;
 end;
-
-
 
 
 procedure TNemp_MainForm.VSTChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
@@ -9866,6 +9868,14 @@ begin
             NempSkin.NempPartyMode.Active := not NempSkin.NempPartyMode.Active;
         end;
     end;
+
+    if NempSkin.NempPartyMode.Active then
+      CloudViewer.PartyModeMultiplier := NempSkin.NempPartyMode.ResizeFactor
+    else
+      CloudViewer.PartyModeMultiplier := 1;
+
+    if Medienbib.BrowseMode = 2 then
+      CloudViewer.PaintCloud;
 end;
 
 
@@ -10797,28 +10807,52 @@ begin
     SwapWindowMode(NempOptions.Anzeigemode + 1);
 end;
 
-procedure TNemp_MainForm.actCompactToggleBrowseListExecute(Sender: TObject);
+procedure TNemp_MainForm.actToggleBrowseListExecute(Sender: TObject);
 begin
-  NempLayout.ShowBibSelection := not NempLayout.ShowBibSelection ;
-  NempLayout.RefreshVisibilty;
-  NempLayout.ReAlignMainForm;
-  actCompactToggleBrowseList.Checked := NempLayout.ShowBibSelection;
+  if NempOptions.AnzeigeMode = 0 then begin
+    NempLayout.ShowBibSelection := not NempLayout.ShowBibSelection ;
+    NempLayout.RefreshVisibilty;
+    NempLayout.ReAlignMainForm;
+    actToggleBrowseList.Checked := NempLayout.ShowBibSelection;
+  end else
+  begin
+    var newVisible: Boolean := NOT NempOptions.FormPositions[nfBrowse].Visible;
+    NempOptions.FormPositions[nfBrowse].Visible := newVisible;
+    actToggleBrowseList.Checked := newVisible;
+    RefreshSubForm(AuswahlForm, newVisible);
+  end;
 end;
 
-procedure TNemp_MainForm.actCompactToggleFileOverviewExecute(Sender: TObject);
+procedure TNemp_MainForm.actToggleFileOverviewExecute(Sender: TObject);
 begin
-  NempLayout.ShowFileOverview := not NempLayout.ShowFileOverview;
-  NempLayout.RefreshVisibilty;
-  NempLayout.ReAlignMainForm;
-  actCompactToggleFileOverview.Checked := NempLayout.ShowFileOverview;
+  if NempOptions.AnzeigeMode = 0 then begin
+    NempLayout.ShowFileOverview := not NempLayout.ShowFileOverview;
+    NempLayout.RefreshVisibilty;
+    NempLayout.ReAlignMainForm;
+    actToggleFileOverview.Checked := NempLayout.ShowFileOverview;
+  end else
+  begin
+    var newVisible: Boolean := NOT NempOptions.FormPositions[nfExtendedControls].Visible;
+    NempOptions.FormPositions[nfExtendedControls].Visible := newVisible;
+    actToggleFileOverview.Checked := newVisible;
+    RefreshSubForm(ExtendedControlForm, newVisible);
+  end;
 end;
 
-procedure TNemp_MainForm.actCompactToggleTitleListExecute(Sender: TObject);
+procedure TNemp_MainForm.actToggleTitleListExecute(Sender: TObject);
 begin
-  NempLayout.ShowMedialist := not NempLayout.ShowMedialist;
-  NempLayout.RefreshVisibilty;
-  NempLayout.ReAlignMainForm;
-  actCompactToggleTitleList.Checked := NempLayout.ShowMedialist;
+  if NempOptions.AnzeigeMode = 0 then begin
+    NempLayout.ShowMedialist := not NempLayout.ShowMedialist;
+    NempLayout.RefreshVisibilty;
+    NempLayout.ReAlignMainForm;
+    actToggleTitleList.Checked := NempLayout.ShowMedialist;
+  end else
+  begin
+    var newVisible: Boolean := NOT NempOptions.FormPositions[nfMediaLibrary].Visible;
+    NempOptions.FormPositions[nfMediaLibrary].Visible := newVisible;
+    actToggleTitleList.Checked := newVisible;
+    RefreshSubForm(MedienListeForm, newVisible);
+  end;
 end;
 
 procedure TNemp_MainForm.RefreshSubForm(aForm: TNempSubForm; IsVisible: Boolean);
@@ -10831,40 +10865,18 @@ begin
   ReInitDocks;
 end;
 
-procedure TNemp_MainForm.actSplitToggleFileOverviewExecute(Sender: TObject);
+procedure TNemp_MainForm.actTogglePlaylistExecute(Sender: TObject);
 var newVisible: Boolean;
 begin
-  newVisible := NOT NempOptions.FormPositions[nfExtendedControls].Visible;
-  NempOptions.FormPositions[nfExtendedControls].Visible := newVisible;
-  actSplitToggleFileOverview.Checked := newVisible;
-  RefreshSubForm(ExtendedControlForm, newVisible);
-end;
-
-procedure TNemp_MainForm.actSplitTogglePlaylistExecute(Sender: TObject);
-var newVisible: Boolean;
-begin
-  newVisible := NOT NempOptions.FormPositions[nfPlaylist].Visible;
-  NempOptions.FormPositions[nfPlaylist].Visible := newVisible;
-  actSplitTogglePlaylist.Checked := newVisible;
-  RefreshSubForm(PlaylistForm, newVisible);
-end;
-
-procedure TNemp_MainForm.actSplitToggleTitleListExecute(Sender: TObject);
-var newVisible: Boolean;
-begin
-  newVisible := NOT NempOptions.FormPositions[nfMediaLibrary].Visible;
-  NempOptions.FormPositions[nfMediaLibrary].Visible := newVisible;
-  actSplitToggleTitleList.Checked := newVisible;
-  RefreshSubForm(MedienListeForm, newVisible);
-end;
-
-procedure TNemp_MainForm.actSplitToggleBrowseListExecute(Sender: TObject);
-var newVisible: Boolean;
-begin
-  newVisible := NOT NempOptions.FormPositions[nfBrowse].Visible;
-  NempOptions.FormPositions[nfBrowse].Visible := newVisible;
-  actSplitToggleBrowseList.Checked := newVisible;
-  RefreshSubForm(AuswahlForm, newVisible);
+  if NempOptions.AnzeigeMode = 0 then begin
+    // nothing to do. Playlist is always visible in CompactMode
+  end
+  else begin
+    newVisible := NOT NempOptions.FormPositions[nfPlaylist].Visible;
+    NempOptions.FormPositions[nfPlaylist].Visible := newVisible;
+    actTogglePlaylist.Checked := newVisible;
+    RefreshSubForm(PlaylistForm, newVisible);
+  end;
 end;
 
 procedure TNemp_MainForm.actToggleStayOnTopExecute(Sender: TObject);
@@ -11262,6 +11274,9 @@ begin
 
     // Refresh the Playlist-Header
     PlaylistPropertiesChanged(NempPlaylist);
+
+    // ReImport Playlists into the MediaLibrary
+    // todo !! (oder das doch woanders machen???)
 end;
 
 procedure TNemp_MainForm.PlaylistManagerPopupPopup(Sender: TObject);
@@ -11316,6 +11331,13 @@ begin
 
         // Refresh the Header - show a new Playlist Description in it
         PlaylistPropertiesChanged(NempPlaylist);
+
+
+        MedienBib.ImportFavoritePlaylists(NempPlaylist.PlaylistManager);
+        Nemp_MainForm.ArtistsVST.Invalidate;
+
+        if MedienBib.CurrentCategory = MedienBib.FavoritePlaylistCategory then
+          ReFillBrowseTrees(True);
     end;
 end;
 
@@ -11668,11 +11690,9 @@ begin
   else
   begin
     // Jetzt die Hautform NICHT in den Vordergrund setzen
-    SetWindowPos(Nemp_MainForm.Handle,HWND_NOTOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
+/// ??? 2022    SetWindowPos(Nemp_MainForm.Handle,HWND_NOTOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
 
-    // ggf. das Detailfenster nach oben holen
-//    if assigned(FDetails) and FDetails.CB_StayOnTop.Checked then
-//      SetWindowPos(FDetails.Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
+
   end;
 
   if assigned(PlaylistForm) and PlaylistForm.Visible then
@@ -12003,7 +12023,7 @@ begin
                 Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
             OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.BirthdayNode;
             OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.BirthdayNode] := True;
-            OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabPlayer6;
+            OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.tabBirthday;
             OptionsCompleteForm.Show;
           end;
           exit;
@@ -12405,7 +12425,7 @@ begin
     Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
   OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.BirthdayNode;
   OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.BirthdayNode] := True;
-  OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabPlayer6;
+  OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.tabBirthday;
   OptionsCompleteForm.Show;
 end;
 
@@ -12696,7 +12716,7 @@ begin
                 Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
             OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.ScrobbleNode;
             OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.ScrobbleNode] := True;
-            OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabPlayer7;
+            OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.tabLastfm;
             OptionsCompleteForm.Show;
         end;
         exit;
@@ -12709,7 +12729,7 @@ begin
         if assigned(OptionsCompleteForm) and (OptionsCompleteForm.Visible) then
         begin
             OptionsCompleteForm.CB_ScrobbleThisSession.Checked := True;
-            OptionsCompleteForm.GrpBox_ScrobbleLog.Caption := Scrobble_Inactive;
+            OptionsCompleteForm.cpScrobbleLog.Caption := Scrobble_Inactive;
         end;
         if assigned(NempPlayer.MainAudioFile) and (NempPlayer.Status = PLAYER_ISPLAYING) then
         begin
@@ -12728,7 +12748,7 @@ begin
         if assigned(OptionsCompleteForm) and (OptionsCompleteForm.Visible) then
         begin
             OptionsCompleteForm.CB_ScrobbleThisSession.Checked := False;
-            OptionsCompleteForm.GrpBox_ScrobbleLog.Caption := Scrobble_Offline;
+            OptionsCompleteForm.cpScrobbleLog.Caption := Scrobble_Offline;
         end;
     end;
     ReArrangeToolImages;
@@ -12740,7 +12760,7 @@ begin
       Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
   OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.ScrobbleNode;
   OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.ScrobbleNode] := True;
-  OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabPlayer7;
+  OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.tabLastfm;
   OptionsCompleteForm.Show;
 end;
 
@@ -12873,7 +12893,7 @@ begin
         Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
     OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.WebServerNode;
     OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.WebServerNode] := True;
-    OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabPlayer8;
+    OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.tabWebserver;
     OptionsCompleteForm.Show;
 end;
 
@@ -13708,10 +13728,18 @@ begin
   ReAlignBrowseTrees;
   ReAlignFileOverview;
 
-  actCompactToggleBrowseList.Checked := NempLayout.ShowBibSelection;
-  actCompactToggleFileOverview.Checked := NempLayout.ShowFileOverview;
-  actCompactToggleTitleList.Checked := NempLayout.ShowMedialist;
+  actToggleBrowseList.Checked := NempLayout.ShowBibSelection;
+  actToggleFileOverview.Checked := NempLayout.ShowFileOverview;
+  actToggleTitleList.Checked := NempLayout.ShowMedialist;
   CorrectSkinRegionsTimer.Enabled := True;
+
+  if NempSkin.isActive and (NempOptions.AnzeigeMode = 0) then
+  begin
+    NempSkin.RepairSkinOffset;
+    NempSkin.SetArtistAlbumOffsets;
+    NempSkin.SetVSTOffsets;
+    NempSkin.SetPlaylistOffsets;
+  end;
 end;
 
 // Splitter between Categories and Collections

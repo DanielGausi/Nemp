@@ -50,16 +50,23 @@ Resourcestring
   XcmbNoToAll = 'N&o to All';
   XcmbYesToAll = 'Yes to &All';
 
-// Optionen-Baum
-OptionsTree_Filetypes = 'Filetypes (Windows Registry)';
-OptionsTree_Controls = 'Controls';
-OptionsTree_Taskbar = 'Taskbar';
-OptionsTree_ListsAndColumns = 'Lists and Columns';
-OptionsTree_PlayerSettings = 'Player settings';
-OptionsTree_Playlist = 'Playlist';
-OptionsTree_LastFM = 'LastFM (scrobble)';
-OptionsTree_Extended = 'Extended settings';
-
+OptionsTree_SystemGeneral     = 'General settings';
+OptionsTree_SystemControl     = 'Controls';
+OptionsTree_PlayerSettings    = 'Playback';
+OptionsTree_Playlist          = 'Playlist';
+OptionsTree_FilesMain         = 'File management';
+OptionsTree_Categories        = 'Media library configuation';
+OptionsTree_ViewMain          = 'List view settings';
+OptionsTree_FontsAndPartyMode = 'Fonts and Party Mode';
+OptionsTree_CoverFlow         = '3D Coverflow';
+OptionsTree_MetaData          = 'Meta data (e.g. ID3Tags)';
+OptionsTree_MediabibSearch    = 'Search options';
+OptionsTree_PlayerWebradio    = 'Web radio';
+OptionsTree_PlayerEffects     = 'Effects and ReplayGain';
+OptionsTree_PlayerEvents      = 'Happy Birthday timer';
+OptionsTree_PlayerScrobbler   = 'LastFM (scrobble)';
+OptionsTree_PlayerWebServer   = 'WebServer';
+OptionsTree_SystemFiletyps    = 'Windows: File types registration';
 
 TreeHeader_Categories = 'Categories';
 TreeHeader_CatFiles = 'Music files';
@@ -239,43 +246,7 @@ FloatingPointChannels_On = 'Current status: On';
 FloatingPointChannels_Off = 'Current status: Off';
 
 
-    OptionsTree_SystemGeneral     = 'General settings';
-    OptionsTree_SystemFiletyps    = 'File types registration';
-    OptionsTree_SystemControl     = 'Controls';
-    OptionsTree_SystemSystem      = 'System';
-    OptionsTree_SystemTaskbar     = 'Taskbar and tray';
-    OptionsTree_SystemHibernate   = 'Hibernate / Stand by';
 
-    OptionsTree_ViewMain          = 'Viewing settings';
-    OptionsTree_ViewPlayer        = 'Player';
-    //OptionsTree_ViewView          = 'View';
-    OptionsTree_ViewFonts         = 'Fonts';
-    OptionsTree_PartyMode         = 'Party-Mode';
-    OptionsTree_ViewExtended      = 'Extended viewing settings';
-    OptionsTree_CoverFlow         = 'Coverflow';
-
-    OptionsTree_PlayerMain        = 'Player settings';
-    OptionsTree_PlayerPlaylist    = 'Playlist';
-    OptionsTree_AudioPlaylist     = 'Playlist';
-    OptionsTree_PlayerMedialibrary= 'Media library';
-    OptionsTree_PlayerMetaDataAccess = 'Metadata (e.g. ID3Tags)';
-    OptionsTree_PlayerWebradio    = 'Web radio';
-    OptionsTree_PlayerEffects     = 'Effects and ReplayGain';
-    OptionsTree_PlayerEvents      = 'Birthday mode';
-    OptionsTree_PlayerScrobbler   = 'LastFM (scrobble)';
-    OptionsTree_PlayerWebServer   = 'WebServer';
-    OptionsTree_PlayerExtendedPlayer   = 'Extended player settings';
-    OptionsTree_PlayerExtendedPlaylist = 'Extended playlist settings';
-    OptionsTree_PlayerRandom      = 'Random playback';
-
-    OptionsTree_FilesMain         = 'File management';
-    OptionsTree_FilesCover        = 'Cover & Lyrics';
-    OptionsTree_Categories        = 'Media Library: Categories';
-
-
-    OptionsTree_ExtendedMain      = 'Extended settings';
-    OptionsTree_MediabibSearch    = 'Search options';
-    OptionsTree_MediabibUnicode   = 'Unicode';
 
     OptionsForm_DefaultCoverResetFailed = 'The default cover cannot be restored because the original file "default_cover.jpg" was not found.';
     OptionsForm_DefaultCoverChangeFailed = 'Sorry, some error occured while saving the new default cover art in the Nemp cover archive.';
@@ -391,6 +362,8 @@ WebServer_InvalidParameter = 'Invalid parameter.';
 WebServer_EmptyPlaylist = 'No files to display. The playlist is empty.';
 WebServer_PlayerNotReady = 'The Player is not ready: No file was loaded.';
 WebServer_EmptyLibrary = 'Nothing to display. The library is empty.';
+
+WebServer_CurrentURLInQRCode = 'Current URL in QRCode: %s';
 
 NempUpdate_ConnectError = 'Could not connect to server. Please check your internet configuration.';
 NempUpdate_Error = 'Could not get update information from server.';

@@ -458,7 +458,8 @@ type
         FullRowSelect: Boolean;
         TippSpeed: Integer;
 
-        NempWindowView: Word;
+        // NempWindowView: Word;
+        ShowTrayIcon: Boolean;
         StartMinimized: Boolean;
         StartMinimizedByParameter: Boolean;
         // FixCoverFlowOnStart: Boolean;
@@ -497,7 +498,7 @@ type
 
         /// MOVED WriteAccessPossible: Boolean;
         AllowQuickAccessToMetadata: Boolean;
-        UseCDDB: Boolean;
+        // UseCDDB: Boolean;
 
         // Steuerung des Deskbands:
         //Folgende Nachrichten werden registriert und an ein Deskband gesendet:
@@ -807,11 +808,11 @@ const
     CON_EX_ALBUMTITELARTIST = 118;
     CON_EX_ALBUMTRACK = 119;
 
-    NEMPWINDOW_ONLYTASKBAR = 0;
+    {NEMPWINDOW_ONLYTASKBAR = 0;
     NEMPWINDOW_TASKBAR_MIN_TRAY = 1;
     NEMPWINDOW_TRAYONLY = 2;
     NEMPWINDOW_BOTH = 3;
-    NEMPWINDOW_BOTH_MIN_TRAY = 4;
+    NEMPWINDOW_BOTH_MIN_TRAY = 4;}
 
     SHUTDOWNMODE_StopNemp = 0;
     SHUTDOWNMODE_ExitNemp = 1;
@@ -2816,7 +2817,7 @@ begin
   UseDisplayApp := NempSettingsManager.ReadBool('Allgemein', 'UseDisplayApp', false);
 
   AllowQuickAccessToMetadata := NempSettingsManager.ReadBool('Allgemein', 'AllowQuickAccessToMetadata', False);
-  UseCDDB                    := NempSettingsManager.ReadBool('Allgemein', 'UseCDDB', False);
+  // UseCDDB                    := NempSettingsManager.ReadBool('Allgemein', 'UseCDDB', False);
 
   MiniNempStayOnTop := NempSettingsManager.ReadBool('Allgemein', 'MiniNempStayOnTop', False);
   DetailFormStayOnTop := NempSettingsManager.ReadBool('Allgemein', 'DetailFormStayOnTop', False);
@@ -2835,7 +2836,8 @@ begin
   Language := NempSettingsManager.ReadString('Allgemein', 'Language', '');
   maxDragFileCount := NempSettingsManager.ReadInteger('Allgemein', 'maxDragFileCount', 2500);
 
-  NempWindowView          := NempSettingsManager.ReadInteger('Fenster', 'NempWindowView', NEMPWINDOW_ONLYTASKBAR);
+  // NempWindowView          := NempSettingsManager.ReadInteger('Fenster', 'NempWindowView', NEMPWINDOW_ONLYTASKBAR);
+  ShowTrayIcon            := NempSettingsManager.ReadBool('Fenster', 'ShowTrayIcon', False);
   //ShowDeskbandOnMinimize  := NempSettingsManager.ReadBool('Fenster', 'ShowDeskbandOnMinimize', False);
   //ShowDeskbandOnStart     := NempSettingsManager.ReadBool('Fenster', 'ShowDeskbandOnStart', True);
   //HideDeskbandOnRestore   := NempSettingsManager.ReadBool('Fenster', 'HideDeskbandOnRestore', False);
@@ -2843,8 +2845,8 @@ begin
 
   FullRowSelect := NempSettingsManager.ReadBool('Fenster', 'FullRowSelect', True);
 
-  ArtistAlbenFontSize  := NempSettingsManager.ReadInteger('Font','ArtistAlbenFontSize',8);
-  ArtistAlbenRowHeight := NempSettingsManager.ReadInteger('Font','ArtistAlbenRowHeight',14);
+  ArtistAlbenFontSize  := NempSettingsManager.ReadInteger('Font','ArtistAlbenFontSize', 8);
+  ArtistAlbenRowHeight := NempSettingsManager.ReadInteger('Font','ArtistAlbenRowHeight', 16);
   RowHeight            := NempSettingsManager.ReadInteger('Font', 'RowHeight', 16 );
   DefaultFontSize      := NempSettingsManager.ReadInteger('Font', 'DefaultFontSize', 8);
   DefaultFontStyle     := NempSettingsManager.ReadInteger('Font', 'DefaultFontStyle', 0);
@@ -2906,7 +2908,7 @@ begin
   // Note: The Display-App-String is written by the G15-App only
 
   NempSettingsManager.WriteBool('Allgemein', 'AllowQuickAccessToMetadata', AllowQuickAccessToMetadata);
-  NempSettingsManager.WriteBool('Allgemein', 'UseCDDB', UseCDDB);
+  // NempSettingsManager.WriteBool('Allgemein', 'UseCDDB', UseCDDB);
 
   NempSettingsManager.WriteBool('Allgemein', 'MiniNempStayOnTop', MiniNempStayOnTop);
   NempSettingsManager.WriteBool('Allgemein', 'DetailFormStayOnTop', DetailFormStayOnTop);
@@ -2925,7 +2927,8 @@ begin
   NempSettingsManager.WriteString('Fenster','SkinName', SkinName);
   NempSettingsManager.WriteBool('Fenster', 'UseAdvancedSkin', GlobalUseAdvancedSkin);
 
-  NempSettingsManager.WriteInteger('Fenster', 'NempWindowView', NempWindowView);
+  // NempSettingsManager.WriteInteger('Fenster', 'NempWindowView', NempWindowView);
+  NempSettingsManager.WriteBool('Fenster', 'ShowTrayIcon', ShowTrayIcon);
   //NempSettingsManager.WriteBool('Fenster', 'ShowDeskbandOnMinimize', ShowDeskbandOnMinimize);
   //NempSettingsManager.WriteBool('Fenster', 'ShowDeskbandOnStart', ShowDeskbandOnStart);
   //NempSettingsManager.WriteBool('Fenster', 'HideDeskbandOnRestore', HideDeskbandOnRestore);

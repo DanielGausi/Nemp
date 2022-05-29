@@ -3157,9 +3157,9 @@ begin
 
             at_CDDA: begin
                 ClearCDDBCache;
-                if NempOptions.UseCDDB then
-                    CurrentAudioFile.GetAudioData(CurrentAudioFile.Pfad, gad_CDDB)
-                else
+                // if NempOptions.UseCDDB then
+                //     CurrentAudioFile.GetAudioData(CurrentAudioFile.Pfad, gad_CDDB)
+                // else
                     CurrentAudioFile.GetAudioData(CurrentAudioFile.Pfad, 0);
             end;
         end;

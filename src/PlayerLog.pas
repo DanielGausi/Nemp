@@ -130,7 +130,7 @@ begin
         Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
     OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.PlaylistNode;
     OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.PlaylistNode] := True;
-    OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabPlayer2;
+    OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.tabPlaylist;
     OptionsCompleteForm.Show;
 end;
 

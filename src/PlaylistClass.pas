@@ -1222,9 +1222,9 @@ begin
             // todo
             if ReloadDataFromFile then
             begin
-                if NempOptions.UseCDDB then
-                    AudioFile.GetAudioData(AudioFile.Pfad, GAD_CDDB)
-                else
+                //if NempOptions.UseCDDB then
+                //    AudioFile.GetAudioData(AudioFile.Pfad, GAD_CDDB)
+                //else
                     AudioFile.GetAudioData(AudioFile.Pfad, 0);
             end;
         end;

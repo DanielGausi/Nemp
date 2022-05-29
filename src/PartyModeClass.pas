@@ -277,8 +277,8 @@ procedure TNempPartyMode.BackupOriginalPositions;
 var i: Integer;
 begin
     // Store original positions of controls in an array
-    Setlength(fPositionArray, 54);  // 114
-    SetLength(fPartyControls, 54);
+    Setlength(fPositionArray, 56);  // 114
+    SetLength(fPartyControls, 56);
     i := 0;
     with Nemp_MainForm do
     begin
@@ -352,6 +352,8 @@ begin
         SetOriginalPosition(TabBtn_Medialib     , i);
         SetOriginalPosition(TabBtn_Marker       , i);
         SetOriginalPosition(TabBtn_Favorites    , i);
+        SetOriginalPosition(TabBtnTagCloudCategory, i);
+        SetOriginalPosition(TabBtnCoverCategory, i);
 
 
         Setlength(fPositionArray, i);
@@ -359,21 +361,21 @@ begin
 
         // Additional Controls
         i := 0;
-        Setlength(fAdditionalControls, 40);
-        SetLength(fAdditionalPositionsArray, 40);
+        Setlength(fAdditionalControls, 41);
+        SetLength(fAdditionalPositionsArray, 41);
 
         SetAdditionalOriginalPosition(AuswahlHeaderPanel0, i);
-        SetAdditionalOriginalPosition(AuswahlFillPanel0, i);
+        SetAdditionalOriginalPosition(AuswahlControlPanel0, i);
         SetAdditionalOriginalPosition(AuswahlStatusLBL0, i);
         SetAdditionalOriginalPosition(TreePanel, i);
 
         SetAdditionalOriginalPosition(PlayerHeaderPanel, i);
-        SetAdditionalOriginalPosition(PlaylistFillPanel, i);
+        SetAdditionalOriginalPosition(PlaylistControlPanel, i);
         SetAdditionalOriginalPosition(PlayListStatusLBL, i);
         SetAdditionalOriginalPosition(GRPBOXPlaylist   , i);
 
         SetAdditionalOriginalPosition(MedienBibHeaderPanel, i);
-        SetAdditionalOriginalPosition(MedienlisteFillPanel, i);
+        SetAdditionalOriginalPosition(MedienListeControlPanel, i);
         SetAdditionalOriginalPosition(MedienListeStatusLBL, i);
         SetAdditionalOriginalPosition(GRPBOXVST           , i);
 
@@ -382,7 +384,7 @@ begin
         SetAdditionalOriginalPosition(EditPlaylistSearch , i);
 
         SetAdditionalOriginalPosition(MedienBibDetailHeaderPanel, i);
-        SetAdditionalOriginalPosition(MedienBibDetailFillPanel, i);
+        SetAdditionalOriginalPosition(MedienBibDetailControlPanel, i);
         SetAdditionalOriginalPosition(MedienBibDetailStatusLbl, i);
         SetAdditionalOriginalPosition(ContainerPanelMedienBibDetails, i);
 
@@ -403,17 +405,17 @@ begin
 
         //
         SetAdditionalOriginalPosition(AuswahlHeaderPanel1, i);
-        SetAdditionalOriginalPosition(AuswahlFillPanel1, i);
+        SetAdditionalOriginalPosition(AuswahlControlPanel1, i);
         SetAdditionalOriginalPosition(AuswahlStatusLBL1, i);
         SetAdditionalOriginalPosition(CoverFlowPanel, i);
         //
         SetAdditionalOriginalPosition(AuswahlHeaderPanel2, i);
-        SetAdditionalOriginalPosition(AuswahlFillPanel2, i);
+        SetAdditionalOriginalPosition(AuswahlControlPanel2, i);
         SetAdditionalOriginalPosition(AuswahlStatusLBL2, i);
         SetAdditionalOriginalPosition(CloudPanel, i);
         SetAdditionalOriginalPosition(edtCloudSearch, i);
 
-
+        SetAdditionalOriginalPosition(Pnl_CoverFlowLabel, i);
         //SetAdditionalOriginalPosition(, i);
 
     end;
@@ -472,102 +474,62 @@ begin
 
         // Additional Controls
         AuswahlHeaderPanel0.Height := ChangeProc(fAdditionalPositionsArray[0].Height);
-        AuswahlFillPanel0.Left := ChangeProc(fAdditionalPositionsArray[1].Left);
-        ///AuswahlFillPanel.Height := ChangeProc(fAdditionalPositionsArray[1].Height);
-        ///AuswahlFillPanel.Top := ChangeProc(fAdditionalPositionsArray[1].Top);
-        //yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-        // AuswahlFillPanel.Width := AuswahlPanel.Width - AuswahlFillPanel.Left;
+        AuswahlControlPanel0.Width := ChangeProc(fAdditionalPositionsArray[1].Width);
         AuswahlStatusLBL0.Top := ChangeProc(fAdditionalPositionsArray[2].Top);
         AuswahlStatusLBL0.Height := ChangeProc(fAdditionalPositionsArray[2].Height);
         AuswahlStatusLBL0.Font.Size := ChangeProc(fAdditionalPositionsArray[2].FontSize);
-        //yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-        // GRPBOXArtistsAlben.Top := ChangeProc(fAdditionalPositionsArray[3].Top);
-
-        // Additional Controls
+        //
         AuswahlHeaderPanel1.Height := ChangeProc(fAdditionalPositionsArray[31].Height);
-        AuswahlFillPanel1.Left := ChangeProc(fAdditionalPositionsArray[32].Left);
-        ///AuswahlFillPanel.Height := ChangeProc(fAdditionalPositionsArray[1].Height);
-        ///AuswahlFillPanel.Top := ChangeProc(fAdditionalPositionsArray[1].Top);
-        //yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-        // AuswahlFillPanel.Width := AuswahlPanel.Width - AuswahlFillPanel.Left;
+        AuswahlControlPanel1.Width := ChangeProc(fAdditionalPositionsArray[32].Width);
         AuswahlStatusLBL1.Top := ChangeProc(fAdditionalPositionsArray[33].Top);
         AuswahlStatusLBL1.Height := ChangeProc(fAdditionalPositionsArray[33].Height);
         AuswahlStatusLBL1.Font.Size := ChangeProc(fAdditionalPositionsArray[33].FontSize);
-        //yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-        // GRPBOXArtistsAlben.Top := ChangeProc(fAdditionalPositionsArray[34].Top);
-
-        // Additional Controls
+        //
         AuswahlHeaderPanel2.Height := ChangeProc(fAdditionalPositionsArray[35].Height);
-        AuswahlFillPanel2.Left := ChangeProc(fAdditionalPositionsArray[36].Left);
-        ///AuswahlFillPanel.Height := ChangeProc(fAdditionalPositionsArray[1].Height);
-        ///AuswahlFillPanel.Top := ChangeProc(fAdditionalPositionsArray[1].Top);
-        //yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-        // AuswahlFillPanel.Width := AuswahlPanel.Width - AuswahlFillPanel.Left;
+        AuswahlControlPanel2.Width := ChangeProc(fAdditionalPositionsArray[36].Width);
         AuswahlStatusLBL2.Top := ChangeProc(fAdditionalPositionsArray[37].Top);
         AuswahlStatusLBL2.Height := ChangeProc(fAdditionalPositionsArray[37].Height);
         AuswahlStatusLBL2.Font.Size := ChangeProc(fAdditionalPositionsArray[37].FontSize);
-        //yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-        // GRPBOXArtistsAlben.Top := ChangeProc(fAdditionalPositionsArray[38].Top);
         edtCloudSearch.Height := ChangeProc(fAdditionalPositionsArray[39].Height);
         edtCloudSearch.Width := ChangeProc(fAdditionalPositionsArray[39].Width);
         edtCloudSearch.Left := ChangeProc(fAdditionalPositionsArray[39].Left);
         edtCloudSearch.Top := ChangeProc(fAdditionalPositionsArray[39].Top);
         edtCloudSearch.Font.Size := ChangeProc(fAdditionalPositionsArray[39].FontSize);
 
-
         PlayerHeaderPanel.Height := ChangeProc(fAdditionalPositionsArray[4].Height);
-        PlaylistFillPanel.Left := ChangeProc(fAdditionalPositionsArray[5].Left);
-        ///PlaylistFillPanel.Height := ChangeProc(fAdditionalPositionsArray[5].Height);
-        ///PlaylistFillPanel.Top := ChangeProc(fAdditionalPositionsArray[5].Top);
-
+        PlaylistControlPanel.Width := ChangeProc(fAdditionalPositionsArray[5].Width);
         PlayListStatusLBL.Top := ChangeProc(fAdditionalPositionsArray[6].Top);
         PlayListStatusLBL.Height := ChangeProc(fAdditionalPositionsArray[6].Height);
         PlayListStatusLBL.Font.Size := ChangeProc(fAdditionalPositionsArray[6].FontSize);
-
-        //GRPBOXPlaylist.Top := ChangeProc(fAdditionalPositionsArray[7].Top);
-
-        PlaylistFillPanel.Width := PlayerHeaderPanel.Width - PlaylistFillPanel.Left;
-        EditPlaylistSearch.Height := ChangeProc(fAdditionalPositionsArray[15].Height);
-        EditPlaylistSearch.Width := ChangeProc(fAdditionalPositionsArray[15].Width);
-        EditPlaylistSearch.Left := ChangeProc(fAdditionalPositionsArray[15].Left);
-        EditPlaylistSearch.Top := ChangeProc(fAdditionalPositionsArray[15].Top);
-        EditPlaylistSearch.Font.Size := ChangeProc(fAdditionalPositionsArray[15].FontSize);
-
-        MedienBibHeaderPanel.Height := ChangeProc(fAdditionalPositionsArray[8].Height);
-        MedienlisteFillPanel.Left := ChangeProc(fAdditionalPositionsArray[9].Left);
-        ///MedienlisteFillPanel.Height := ChangeProc(fAdditionalPositionsArray[9].Height);
-        ///MedienlisteFillPanel.Top := ChangeProc(fAdditionalPositionsArray[9].Top);
-        MedienListeStatusLBL.Top := ChangeProc(fAdditionalPositionsArray[10].Top);
-        MedienListeStatusLBL.Height := ChangeProc(fAdditionalPositionsArray[10].Height);
-        MedienListeStatusLBL.Font.Size := ChangeProc(fAdditionalPositionsArray[10].FontSize);
-        //GRPBOXVST.Top := ChangeProc(fAdditionalPositionsArray[11].Top);
-        MedienlisteFillPanel.Width := MedienBibHeaderPanel.Width - MedienlisteFillPanel.Left;
-        EDITFastSearch.Height := ChangeProc(fAdditionalPositionsArray[12].Height);
-        EDITFastSearch.Width := ChangeProc(fAdditionalPositionsArray[12].Width);
-        EDITFastSearch.Left := ChangeProc(fAdditionalPositionsArray[12].Left);
-        EDITFastSearch.Top := ChangeProc(fAdditionalPositionsArray[12].Top);
-        EDITFastSearch.Font.Size := ChangeProc(fAdditionalPositionsArray[12].FontSize);
-
-        Lbl_CoverFlow.Height := ChangeProc(fAdditionalPositionsArray[13].Height);
-        Lbl_CoverFlow.Font.Size := ChangeProc(fAdditionalPositionsArray[13].FontSize);
-        Lbl_CoverFlow.Top := (Pnl_CoverFlowLabel.Height Div 2) - (Lbl_CoverFlow.Height Div 2);
-
-
         EditPlaylistSearch.Height := ChangeProc(fAdditionalPositionsArray[14].Height);
         EditPlaylistSearch.Width := ChangeProc(fAdditionalPositionsArray[14].Width);
         EditPlaylistSearch.Left := ChangeProc(fAdditionalPositionsArray[14].Left);
         EditPlaylistSearch.Top := ChangeProc(fAdditionalPositionsArray[14].Top);
         EditPlaylistSearch.Font.Size := ChangeProc(fAdditionalPositionsArray[14].FontSize);
 
+        MedienBibHeaderPanel.Height := ChangeProc(fAdditionalPositionsArray[8].Height);
+        MedienListeControlPanel.Width := ChangeProc(fAdditionalPositionsArray[9].Width);
+        MedienListeStatusLBL.Top := ChangeProc(fAdditionalPositionsArray[10].Top);
+        MedienListeStatusLBL.Height := ChangeProc(fAdditionalPositionsArray[10].Height);
+        MedienListeStatusLBL.Font.Size := ChangeProc(fAdditionalPositionsArray[10].FontSize);
+        EDITFastSearch.Height := ChangeProc(fAdditionalPositionsArray[12].Height);
+        EDITFastSearch.Width := ChangeProc(fAdditionalPositionsArray[12].Width);
+        EDITFastSearch.Left := ChangeProc(fAdditionalPositionsArray[12].Left);
+        EDITFastSearch.Top := ChangeProc(fAdditionalPositionsArray[12].Top);
+        EDITFastSearch.Font.Size := ChangeProc(fAdditionalPositionsArray[12].FontSize);
+
+        Pnl_CoverFlowLabel.Height := ChangeProc(fAdditionalPositionsArray[40].Height);
+        Pnl_CoverFlowLabel.Top := CoverScrollbar.Top - Pnl_CoverFlowLabel.Height - 4;
+        Lbl_CoverFlow.Height := ChangeProc(fAdditionalPositionsArray[13].Height);
+        Lbl_CoverFlow.Font.Size := ChangeProc(fAdditionalPositionsArray[13].FontSize);
+        Lbl_CoverFlow.Top := (Pnl_CoverFlowLabel.Height Div 2) - (Lbl_CoverFlow.Height Div 2);
+
         MedienBibDetailHeaderPanel.Height := ChangeProc(fAdditionalPositionsArray[15].Height);
-        MedienBibDetailFillPanel.Left   := ChangeProc(fAdditionalPositionsArray[16].Left);
-        ///MedienBibDetailFillPanel.Height := ChangeProc(fAdditionalPositionsArray[16].Height);
-        ///MedienBibDetailFillPanel.Top    := ChangeProc(fAdditionalPositionsArray[16].Top);
+        MedienBibDetailControlPanel.Width   := ChangeProc(fAdditionalPositionsArray[16].Width);
         MedienBibDetailStatusLbl.Top       := ChangeProc(fAdditionalPositionsArray[17].Top);
         MedienBibDetailStatusLbl.Height    := ChangeProc(fAdditionalPositionsArray[17].Height);
         MedienBibDetailStatusLbl.Font.Size := ChangeProc(fAdditionalPositionsArray[17].FontSize);
-
-        ContainerPanelMedienBibDetails.Top := ChangeProc(fAdditionalPositionsArray[18].Top);
+        // ContainerPanelMedienBibDetails.Top := ChangeProc(fAdditionalPositionsArray[18].Top);
 
         // PlayerControls (more difficult now)
 

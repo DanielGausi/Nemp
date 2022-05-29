@@ -12,13 +12,11 @@ object PlayerLogForm: TPlayerLogForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
     584
     263)
-  PixelsPerInch = 96
   TextHeight = 13
   object BtnClose: TButton
     Left = 478
@@ -55,31 +53,33 @@ object PlayerLogForm: TPlayerLogForm
     TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect]
     OnGetText = vstPlayerLogGetText
+    Touch.InteractiveGestures = [igPan, igPressAndTap]
+    Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
     Columns = <
       item
         Position = 0
+        Text = 'Time'
         Width = 85
-        WideText = 'Time'
       end
       item
         Position = 1
+        Text = 'Title'
         Width = 120
-        WideText = 'Title'
       end
       item
         Position = 2
+        Text = 'Artist'
         Width = 96
-        WideText = 'Artist'
       end
       item
         Position = 3
+        Text = 'Filename'
         Width = 148
-        WideText = 'Filename'
       end
       item
         Position = 4
+        Text = 'Remark'
         Width = 69
-        WideText = 'Remark'
       end>
   end
   object cbSessionSelect: TComboBox

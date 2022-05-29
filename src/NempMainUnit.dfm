@@ -2084,6 +2084,7 @@ object Nemp_MainForm: TNemp_MainForm
           Height = 4
           Cursor = crVSplit
           Align = alTop
+          ResizeStyle = rsUpdate
           StyleElements = [seFont, seBorder]
           OnMoved = SplitterBrowseMoved
           ExplicitLeft = 4
@@ -2827,7 +2828,6 @@ object Nemp_MainForm: TNemp_MainForm
       object MM_T_CloudEditor: TMenuItem
         Caption = 'Tag cloud editor'
         ImageIndex = 19
-        ShortCut = 24660
         OnClick = PM_ML_CloudEditorClick
       end
       object N21: TMenuItem
@@ -2994,26 +2994,21 @@ object Nemp_MainForm: TNemp_MainForm
         object N29: TMenuItem
           Caption = '-'
         end
-        object MM_O_CompactToggleFileOverview: TMenuItem
-          Action = actCompactToggleFileOverview
-        end
-        object MM_O_CompactToggleTitleList: TMenuItem
-          Action = actCompactToggleTitleList
+        object MM_O_SplitToggle_Playlist: TMenuItem
+          Action = actTogglePlaylist
+          ShortCut = 24656
         end
         object MM_O_CompactToggleBrowselist: TMenuItem
-          Action = actCompactToggleBrowseList
+          Action = actToggleBrowseList
+          ShortCut = 24642
         end
-        object MM_O_SplitToggleFileOverview: TMenuItem
-          Action = actSplitToggleFileOverview
+        object MM_O_CompactToggleTitleList: TMenuItem
+          Action = actToggleTitleList
+          ShortCut = 24660
         end
-        object MM_O_SplitToggle_Playlist: TMenuItem
-          Action = actSplitTogglePlaylist
-        end
-        object MM_O_SplitToggle_TitleList: TMenuItem
-          Action = actSplitToggleTitleList
-        end
-        object MM_O_SplitToggle_Browselist: TMenuItem
-          Action = actSplitToggleBrowseList
+        object MM_O_CompactToggleFileOverview: TMenuItem
+          Action = actToggleFileOverview
+          ShortCut = 24644
         end
         object MM_O_ToggleStayOnTop: TMenuItem
           Action = actToggleStayOnTop
@@ -6285,26 +6280,21 @@ object Nemp_MainForm: TNemp_MainForm
       object N31: TMenuItem
         Caption = '-'
       end
-      object PM_P_CompactToggleFileoverview: TMenuItem
-        Action = actCompactToggleFileOverview
-      end
-      object PM_P_CompactToggleTitlelist: TMenuItem
-        Action = actCompactToggleTitleList
+      object PM_P_SplitTogglePlaylist: TMenuItem
+        Action = actTogglePlaylist
+        ShortCut = 24656
       end
       object PM_P_CompactToggleBrowseList: TMenuItem
-        Action = actCompactToggleBrowseList
+        Action = actToggleBrowseList
+        ShortCut = 24642
       end
-      object PM_P_SplitToggleFileOverview: TMenuItem
-        Action = actSplitToggleFileOverview
+      object PM_P_CompactToggleTitlelist: TMenuItem
+        Action = actToggleTitleList
+        ShortCut = 24660
       end
-      object PM_P_SplitTogglePlaylist: TMenuItem
-        Action = actSplitTogglePlaylist
-      end
-      object PM_P_SplitToggleTitlelist: TMenuItem
-        Action = actSplitToggleTitleList
-      end
-      object PM_P_SplitToggleBrowseList: TMenuItem
-        Action = actSplitToggleBrowseList
+      object PM_P_CompactToggleFileoverview: TMenuItem
+        Action = actToggleFileOverview
+        ShortCut = 24644
       end
       object PM_P_ToggleStayOnTop: TMenuItem
         Action = actToggleStayOnTop
@@ -7139,6 +7129,18 @@ object Nemp_MainForm: TNemp_MainForm
     object N27: TMenuItem
       Caption = '-'
     end
+    object PM_ML_SaveAsNewFavorite: TMenuItem
+      Caption = 'Save current playlist as new favorite'
+      OnClick = PM_PLM_SaveAsNewFavoriteClick
+    end
+    object PM_ML_EditFavorites: TMenuItem
+      Tag = -1
+      Caption = 'Edit favorite playlists'
+      OnClick = PM_PLM_EditFavouritesClick
+    end
+    object PM_ML_FavPlaylistSeparator: TMenuItem
+      Caption = '-'
+    end
     object PM_ML_ChangeCategory: TMenuItem
       Caption = 'Change Category of selected files'
       OnClick = PM_ML_ChangeCategoryClick
@@ -7470,8 +7472,8 @@ object Nemp_MainForm: TNemp_MainForm
     Top = 180
   end
   object ActionList1: TActionList
-    Left = 112
-    Top = 70
+    Left = 128
+    Top = 38
     object actJoinWindows: TAction
       Caption = 'Join windows'
       OnExecute = actJoinSplitWindowsExecute
@@ -7481,33 +7483,21 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Split windows'
       OnExecute = actJoinSplitWindowsExecute
     end
-    object actCompactToggleFileOverview: TAction
+    object actToggleFileOverview: TAction
       Caption = 'Show file overview'
-      OnExecute = actCompactToggleFileOverviewExecute
+      OnExecute = actToggleFileOverviewExecute
     end
-    object actCompactToggleTitleList: TAction
+    object actToggleTitleList: TAction
       Caption = 'Show title list'
-      OnExecute = actCompactToggleTitleListExecute
+      OnExecute = actToggleTitleListExecute
     end
-    object actCompactToggleBrowseList: TAction
+    object actToggleBrowseList: TAction
       Caption = 'Show treeview/coverflow/tagcloud'
-      OnExecute = actCompactToggleBrowseListExecute
+      OnExecute = actToggleBrowseListExecute
     end
-    object actSplitToggleFileOverview: TAction
-      Caption = 'Show file overview'
-      OnExecute = actSplitToggleFileOverviewExecute
-    end
-    object actSplitTogglePlaylist: TAction
+    object actTogglePlaylist: TAction
       Caption = 'Show playlist'
-      OnExecute = actSplitTogglePlaylistExecute
-    end
-    object actSplitToggleTitleList: TAction
-      Caption = 'Show title list'
-      OnExecute = actSplitToggleTitleListExecute
-    end
-    object actSplitToggleBrowseList: TAction
-      Caption = 'Show treeview/coverflow/tagcloud'
-      OnExecute = actSplitToggleBrowseListExecute
+      OnExecute = actTogglePlaylistExecute
     end
     object actToggleStayOnTop: TAction
       Caption = 'Stay on top'

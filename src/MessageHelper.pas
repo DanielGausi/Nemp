@@ -1414,12 +1414,12 @@ begin
 
         SC_BeginWork: begin
             if Assigned(OptionsCompleteForm) and OptionsCompleteForm.Visible then
-                OptionsCompleteForm.GrpBox_ScrobbleLog.Caption := Scrobble_Active;
+                OptionsCompleteForm.cpScrobbleLog.Caption := Scrobble_Active;
         end;
 
         SC_EndWork: begin
             if Assigned(OptionsCompleteForm) and OptionsCompleteForm.Visible then
-                OptionsCompleteForm.GrpBox_ScrobbleLog.Caption := Scrobble_InActive;
+                OptionsCompleteForm.cpScrobbleLog.Caption := Scrobble_InActive;
         end;
 
         SC_JobIsDone: NempPlayer.NempScrobbler.JobDone;
@@ -1472,7 +1472,7 @@ begin
                         Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
                     OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.ScrobbleNode;
                     OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.ScrobbleNode] := True;
-                    OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabPlayer7;
+                    OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.tabLastfm;
                     OptionsCompleteForm.Show;
                 end;
             end;

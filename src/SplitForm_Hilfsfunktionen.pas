@@ -1023,14 +1023,14 @@ begin
       actJoinWindows.Visible := newMode = 1;
       actSplitWindows.Visible := newMode = 0;
 
-      actCompactToggleFileOverview.Visible := newMode = 0;
-      actCompactToggleTitleList.Visible := newMode = 0;
-      actCompactToggleBrowseList.Visible := newMode = 0;
+      //actCompactToggleFileOverview.Visible := True; //newMode = 0;
+      //actCompactToggleTitleList.Visible := newMode = 0;
+      //actCompactToggleBrowseList.Visible := newMode = 0;
 
-      actSplitToggleFileOverview.Visible := newMode = 1;
-      actSplitTogglePlaylist.Visible := newMode = 1;
-      actSplitToggleTitleList.Visible := newMode = 1;
-      actSplitToggleBrowseList.Visible := newMode = 1;
+      //actSplitToggleFileOverview.Visible := False; //newMode = 1;
+      actTogglePlaylist.Visible := newMode = 1;
+      //actSplitToggleTitleList.Visible := newMode = 1;
+      //actSplitToggleBrowseList.Visible := newMode = 1;
 
       actToggleStayOnTop.Enabled := newMode = 1;
 

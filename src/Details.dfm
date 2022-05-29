@@ -12,7 +12,6 @@ object FDetails: TFDetails
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poMainFormCenter
   ShowHint = True
   OnCloseQuery = FormCloseQuery
@@ -20,7 +19,6 @@ object FDetails: TFDetails
   OnDestroy = FormDestroy
   OnHide = FormHide
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 13
   object MainPageControl: TPageControl
     AlignWithMargins = True
@@ -28,7 +26,7 @@ object FDetails: TFDetails
     Top = 3
     Width = 615
     Height = 503
-    ActivePage = Tab_MetaData
+    ActivePage = Tab_General
     Align = alClient
     TabOrder = 0
     OnChange = MainPageControlChange
@@ -1149,27 +1147,29 @@ object FDetails: TFDetails
           OnPaintText = VST_MetaDataPaintText
           OnNewText = VST_MetaDataNewText
           OnNodeDblClick = VST_MetaDataNodeDblClick
+          Touch.InteractiveGestures = [igPan, igPressAndTap]
+          Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
           Columns = <
             item
               Position = 0
-              WideText = 'Type'
+              Text = 'Type'
             end
             item
               Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coStyleColor]
               Position = 1
+              Text = 'Key'
               Width = 47
-              WideText = 'Key'
             end
             item
               Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coStyleColor]
               Position = 2
+              Text = 'Description'
               Width = 105
-              WideText = 'Description'
             end
             item
               Position = 3
+              Text = 'Value'
               Width = 220
-              WideText = 'Value'
             end>
         end
       end

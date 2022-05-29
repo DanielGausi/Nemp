@@ -11,12 +11,10 @@ object CDOpenDialog: TCDOpenDialog
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 13
   object BtnCancel: TButton
     Left = 286
@@ -74,9 +72,6 @@ object CDOpenDialog: TCDOpenDialog
     Align = alTop
     Caption = 'Tracklist'
     TabOrder = 3
-    ExplicitLeft = 8
-    ExplicitTop = 79
-    ExplicitWidth = 353
     object LblSelectionMode: TLabel
       Left = 9
       Top = 247
@@ -105,6 +100,7 @@ object CDOpenDialog: TCDOpenDialog
       Height = 17
       Caption = 'automatically get data from cddb/freedb'
       TabOrder = 1
+      Visible = False
       OnClick = cb_AutoCddbClick
     end
     object lbTracks: TListBox

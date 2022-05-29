@@ -224,7 +224,7 @@ begin
   with Nemp_MainForm do
   begin
     NempOptions.FormPositions[fNempFormID].Visible := False;
-    actSplitToggleBrowseList.Checked := NempOptions.FormPositions[fNempFormID].Visible;
+    actToggleBrowseList.Checked := NempOptions.FormPositions[fNempFormID].Visible;
   end;
   close;
 end;

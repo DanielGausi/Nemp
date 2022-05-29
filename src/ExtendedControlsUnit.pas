@@ -103,7 +103,7 @@ begin
     with Nemp_MainForm do
     begin
       NempOptions.FormPositions[fNempFormID].Visible := False;
-      actSplitToggleFileOverview.Checked := NempOptions.FormPositions[fNempFormID].Visible;
+      actToggleFileOverview.Checked := NempOptions.FormPositions[fNempFormID].Visible;
     end;
     close;
 end;
