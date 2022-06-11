@@ -646,8 +646,6 @@ begin
     // if we found an image, but the ID has changed: Change it on the other files with that ID as well
     if (aAudioFile.CoverID <> oldID) then
     begin
-        //if aAudioFile.CoverID = '' then
-        //  aAudioFile.CoverID := 'kaputt repaired';
         MedienBib.ChangeCoverID(oldID, aAudioFile.CoverID);
         if  MedienBib.NewCoverFlow.CurrentCoverID = oldID then
             MedienBib.NewCoverFlow.CurrentCoverID := aAudioFile.CoverID;

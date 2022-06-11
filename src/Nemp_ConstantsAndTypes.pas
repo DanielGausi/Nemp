@@ -51,6 +51,8 @@ const MAXCHILDS = 10;
       CONTROL_PANEL_MinWidth_1 = 550;
       CONTROL_PANEL_MinWidth_2 = 309;  // check later, maybe
 
+      MAINFORM_MinHeight = 300;
+      MAINFORM_MinWidth = 400;
 
       MAIN_PANEL_MinHeight = 250;
       MAIN_PANEL_MinWidth = 250;
@@ -64,7 +66,7 @@ type
     TAudioFileStringIndex = (siArtist, siAlbum, siOrdner, siGenre, siJahr, siFileAge, siDateiname);
 
     // pa_default is used only for putting files from the playlist into the media library
-    TEProgressActions = (pa_Default, pa_SearchFiles, pa_SearchFilesForPlaylist, pa_RefreshFiles, pa_CleanUp, pa_Searchlyrics, pa_SearchTags, pa_UpdateMetaData, pa_DeleteFiles, pa_ScanNewFiles);
+    TEProgressActions = (pa_Default, pa_SearchFiles, pa_SearchFilesForPlaylist, pa_RefreshFiles, pa_CleanUp, {pa_Searchlyrics,} pa_SearchTags, pa_UpdateMetaData, pa_DeleteFiles, pa_ScanNewFiles);
 
     TEDefaultCoverType = (dcFile, dcWebRadio, dcCDDA, dcNoCover_deprecated, dcError);
 
@@ -517,6 +519,7 @@ type
         UseSkin: Boolean;
         GlobalUseAdvancedSkin: Boolean;
         SkinName: UnicodeString;
+        PreferredLyricSearch: Integer;
 
         FormPositions: array[TENempFormIDs] of TNempFormData;
         MainFormMaximized: Boolean;
@@ -2835,6 +2838,9 @@ begin
   ShutDownAtEndOfPlaylist := False;
   Language := NempSettingsManager.ReadString('Allgemein', 'Language', '');
   maxDragFileCount := NempSettingsManager.ReadInteger('Allgemein', 'maxDragFileCount', 2500);
+  PreferredLyricSearch := NempSettingsManager.ReadInteger('Allgemein', 'PreferredLyricSearchIdx', 0);
+  if PreferredLyricSearch < 0 then
+    PreferredLyricSearch := 0;
 
   // NempWindowView          := NempSettingsManager.ReadInteger('Fenster', 'NempWindowView', NEMPWINDOW_ONLYTASKBAR);
   ShowTrayIcon            := NempSettingsManager.ReadBool('Fenster', 'ShowTrayIcon', False);
@@ -2921,6 +2927,7 @@ begin
 
   NempSettingsManager.WriteString('Allgemein', 'Language', Language);
   NempSettingsManager.WriteInteger('Allgemein', 'maxDragFileCount', maxDragFileCount);
+  NempSettingsManager.WriteInteger('Allgemein', 'PreferredLyricSearchIdx', PreferredLyricSearch);
 
   NempSettingsManager.WriteInteger('Fenster', 'Anzeigemode', AnzeigeMode);
   NempSettingsManager.WriteBool('Fenster', 'UseSkin', UseSkin);

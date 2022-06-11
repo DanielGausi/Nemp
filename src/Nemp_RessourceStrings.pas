@@ -61,7 +61,7 @@ OptionsTree_FontsAndPartyMode = 'Fonts and Party Mode';
 OptionsTree_CoverFlow         = '3D Coverflow';
 OptionsTree_MetaData          = 'Meta data (e.g. ID3Tags)';
 OptionsTree_MediabibSearch    = 'Search options';
-OptionsTree_PlayerWebradio    = 'Web radio';
+OptionsTree_PlayerWebradio    = 'Webradio';
 OptionsTree_PlayerEffects     = 'Effects and ReplayGain';
 OptionsTree_PlayerEvents      = 'Happy Birthday timer';
 OptionsTree_PlayerScrobbler   = 'LastFM (scrobble)';
@@ -71,7 +71,7 @@ OptionsTree_SystemFiletyps    = 'Windows: File types registration';
 TreeHeader_Categories = 'Categories';
 TreeHeader_CatFiles = 'Music files';
 TreeHeader_CatPlaylists = 'Playlists';
-TreeHeader_CatWebRadio = 'Webradio stations';
+TreeHeader_CatWebRadio = 'Webradio';
 
 TreeHeader_Artists = 'Artists';
 TreeHeader_Albums= 'Albums';
@@ -180,13 +180,6 @@ Warning_TooManyFiles = 'Warning: Too many files for Drag&Drop and Copy&Paste res
 Warning_MagicCopyFailed = 'Extended Copy&Paste failed. This method doesn''t work from write-protected drives (e.g. CD/DVD).';
 
 Error_ID3OnlyInMp3Files = 'ID3-tags can only be written to mp3-files.';
-//Error_EvilLyricsNotFound1 = 'This function needs another program called "EvilLyrics". Start this program and try again.';
-//Error_EvilLyricsNotFound2 = 'This program can easily be found on freeware-sites in the internet.';
-//Error_EvilLyricsIncompatible = 'If you started this program already, your version is maybe incompatible to Nemp.';
-//Error_EvilLyricsIncompatible2 = 'Your version of EvilLyrics is incompatible to Nemp.';
-//EvilLyrics_ManualHint = 'If you found proper lyrics, copy it to this window and click "save".';
-
-LyricsSearch_NotFoundMessage = 'No lyrics found. Do you want to search them manually?';
 
 //ErrorSavingPlaylist = 'An error occured while saving the playlist. This should not happen.';
 //ErrorSavingMediaLib = 'An error occured while saving the medialibrary. This should not happen.';
@@ -721,13 +714,11 @@ DeleteSelect_DeletingFilesComplete = 'The selected files have been removed from 
 // MediaLibrary_FilesNotFoundExternalDrive = 'There are %d missing files. Probably there is an external drive not connected to your computer.';
 
 MediaLibrary_DuplicatesWarning       = 'Nemp found some duplicate entries in your media library. This is not supposed to happen, unless you just added the current playlist to the media library. - If this message appears frequently, please contact me via e-mail. Thank you!';
-// MediaLibrary_SearchingLyrics         = 'Searching lyrics for %s %s';
 MediaLibrary_SearchingLyrics_JustFile= 'Searching lyrics for %s';
-// MediaLibrary_SearchingTags           = 'Searching tags for %s %s';
 MediaLibrary_SearchingTags_JustFile  = 'Searching tags for %s';
-MediaLibrary_LyricsFailed            = 'Connection to lyrics.wikia.com failed. Please check your internet configuration.';
+// MediaLibrary_LyricsFailed            = 'Connection to lyrics.wikia.com failed. Please check your internet configuration.';
 MediaLibrary_GetTagsFailed           = 'No additional Tags found.';
-MediaLibrary_SearchLyricsStats       = ' (found %d/%d)';
+// MediaLibrary_SearchLyricsStats       = ' (found %d/%d)';
 MediaLibrary_SearchTagsStats         = ' (found %d/%d)';
 
 MediaLibrary_RatingComplete = 'All ratings have been successfully updated.';
@@ -737,13 +728,15 @@ MediaLibrary_PermissionToChangeTagsRequired = 'You denied quick access to metada
                     +#13#10
                     +#13#10+'Do you want to allow Nemp changing metadata in the selected files?';
 
+/// LyricsSearch_NotFoundMessage = 'No lyrics found. Do you want to search them manually?';
 MediaLibrary_OperationCancelled = 'Operation cancelled';
-MediaLibrary_SearchLyricsComplete_SingleNotFound = 'Sorry, the lyrics for this file could not be found.';
-MediaLibrary_SearchLyricsComplete_AllFound = 'Lyric search complete. All lyrics found.';
-MediaLibrary_SearchLyricsComplete_ManyFound = 'Lyric search complete. %d of %d lyrics could be found.'#13#10#13#10'You can try to find some of the missing lyrics by a manual search on lyrics.wikia.com or other lyrics sites on the net.';
-MediaLibrary_SearchLyricsComplete_FewFound = 'Lyric search complete. Only %d of %d lyrics could be found.'#13#10#13#10'Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10#13#10'Please note, that lyrics are not supported for some audio formats.';
-MediaLibrary_SearchLyricsComplete_NoneFound = 'Lyric search complete. Sorry, but nothing could be found.'#13#10#13#10'Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10#13#10'Please note, that lyrics are not supported for some audio formats.';
-MediaLibrary_SearchLyricsComplete_SomeErrors = 'Lyric search complete. Some unexpected errors appeared during the process.'#13#10#13#10'Please view the Error-Log for details.';
+MediaLibrary_SearchLyricsDisabled = 'The automatic search for Lyrics has been removed from Nemp.';
+//MediaLibrary_SearchLyricsComplete_SingleNotFound = 'Sorry, the lyrics for this file could not be found.';
+//MediaLibrary_SearchLyricsComplete_AllFound = 'Lyric search complete. All lyrics found.';
+//MediaLibrary_SearchLyricsComplete_ManyFound = 'Lyric search complete. %d of %d lyrics could be found.'#13#10#13#10'You can try to find some of the missing lyrics by a manual search on lyrics.wikia.com or other lyrics sites on the net.';
+//MediaLibrary_SearchLyricsComplete_FewFound = 'Lyric search complete. Only %d of %d lyrics could be found.'#13#10#13#10'Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10#13#10'Please note, that lyrics are not supported for some audio formats.';
+//MediaLibrary_SearchLyricsComplete_NoneFound = 'Lyric search complete. Sorry, but nothing could be found.'#13#10#13#10'Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10#13#10'Please note, that lyrics are not supported for some audio formats.';
+//MediaLibrary_SearchLyricsComplete_SomeErrors = 'Lyric search complete. Some unexpected errors appeared during the process.'#13#10#13#10'Please view the Error-Log for details.';
 
 MediaLibrary_SearchTagsComplete_SingleNotFound = 'Sorry, for this file are no additional Tags available.';
 MediaLibrary_SearchTagsComplete_AllFound = 'Tag search complete. Added some Tags for every file.';
@@ -751,7 +744,6 @@ MediaLibrary_SearchTagsComplete_ManyFound = 'Tag search complete. Found Tags for
 MediaLibrary_SearchTagsComplete_FewFound = 'Tag search complete. Found Tags for only %d of %d files.'#13#10#13#10'Either the files are not properly tagged, or you have a special taste in music.'#13#10#13#10'Please note, that additional Tags are not supported for some audio formats.';
 MediaLibrary_SearchTagsComplete_NoneFound = 'Tag search complete. Sorry, no additional Tags could be found.'#13#10#13#10'Either the files are not properly tagged, or you have a special taste in music.'#13#10#13#10'Please note, that additional Tags are not supported for some audio formats.';
 MediaLibrary_SearchTagsComplete_SomeErrors = 'Tag search complete. Some unexpected errors appeared during the process.'#13#10#13#10'Please view the Error-Log for details.';
-
 
 MediaLibrary_OperationComplete_CloseWindowNow = 'You can close this window now.';
 MediaLibrary_OperationComplete_CBClose_NoTimer = 'Close window after completion';
@@ -1046,9 +1038,9 @@ Warning_LyricsUsage = 'Ignoring lyrics will remove all collected lyrics from the
 
 //MediaLibrarySize_Summary = 'Estimated library size: %s';
 
-Options_LyricPriority_LYRICWIKI   = 'LyricWiki (recommended)';
-Options_LyricPriority_CHARTLYRICS = 'ChartLyrics (beta)';
-Hint_LyricPriorities              = 'Search online for lyrics. Current settings: '+ #13#10 + '%s';
+//Options_LyricPriority_LYRICWIKI   = 'LyricWiki (recommended)';
+//Options_LyricPriority_CHARTLYRICS = 'ChartLyrics (beta)';
+//Hint_LyricPriorities              = 'Search online for lyrics. Current settings: '+ #13#10 + '%s';
 
 ProgressForm_DefaultHint = 'Some functions are disabled during this process. You can cancel the current operation at any time.';
 ProgressForm_DefaultAction  = 'Nemp is updating your media library right now.';
@@ -1056,7 +1048,7 @@ ProgressForm_SearchFiles    = 'Nemp is searching your computer for new music fil
 ProgressForm_SearchFilesPlaylist = 'Nemp is searching your computer for new files to add to your playlist.';
 ProgressForm_RefreshFiles   = 'Nemp is refreshing your media library.';
 ProgressForm_CleanUp        = 'Nemp is searching for missing files in your media library. ';
-ProgressForm_Searchlyrics   = 'Nemp is searching for lyrics for your music files.';
+// ProgressForm_Searchlyrics   = 'Nemp is searching for lyrics for your music files.';
 ProgressForm_SearchTags     = 'Nemp is searching for some additional tags for your music files.';
 ProgressForm_UpdateMetaData = 'Nemp is updating the meta data (ID3tags) of your music files.';
 ProgressForm_DeleteFiles    = 'Nemp is removing the selected files from your media library.';

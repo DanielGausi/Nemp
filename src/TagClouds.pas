@@ -571,6 +571,9 @@ begin
   fPaintTags := TPaintTagList.Create(True);
 
   fPartyModeMultiplier := 1;
+  BevelInner := bvNone;
+  BevelOuter := bvNone;
+  BorderStyle := bsNone;
 end;
 
 destructor TCloudView.Destroy;

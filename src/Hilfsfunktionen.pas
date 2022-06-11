@@ -82,7 +82,7 @@ function YearToDecadeString(aYear: Integer): String;
 
 function EscapeAmpersAnd(aWs: UnicodeString): UnicodeString;
 
-function ExtractRelativePathNew(const BaseName, DestName: UnicodeString): UnicodeString;
+// function ExtractRelativePathNew(const BaseName, DestName: UnicodeString): UnicodeString;
 function StringToURLString(aUTF8String: UTF8String): AnsiString;
 
 function GainStringToSingle(aGainString: String): Single;
@@ -664,6 +664,7 @@ begin
     end;
 end;
 
+(*
 function ExtractRelativePathNew(const BaseName, DestName: UnicodeString): UnicodeString;
 var
   BasePath, DestPath: UnicodeString;
@@ -689,6 +690,7 @@ begin
   else
       Result := DestName;
 end;
+*)
 
 
 ///  Convert a ReplayGainString (from the Metatags of an Audiofile) into a Single value

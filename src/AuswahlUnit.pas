@@ -110,14 +110,7 @@ begin
   Height := BHeight ;
   Width  := BWidth  ;
 
-  // Nemp_MainForm.AuswahlFillPanel.Width := Nemp_MainForm.AuswahlPanel.Width - Nemp_MainForm.AuswahlFillPanel.Left - 16;//26;
-  // yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
   PositionCloseImage(CloseImageA, Nemp_MainForm.TreePanel);
-  {CloseImageA.Left := Nemp_MainForm.AuswahlPanel.Width - CloseImageA.Width - 2;// - 5;//10;
-  CloseImageA.Top := 4;
-  CloseImageA.Parent := Nemp_MainForm.AuswahlPanel;
-  CloseImageA.BringToFront;}
-
   SetRegion(ContainerPanelAuswahlForm, self, NempRegionsDistance, handle);
 
   // Das ist nötig, um z.B. zu korrigieren, dass die Form komplett unter Form1 versteckt ist!!
@@ -130,7 +123,6 @@ begin
      (Left + NempRegionsDistance.Right <= Nemp_MainForm.Left + Nemp_MainForm.NempRegionsDistance.Right)
   then
     NempRegionsDistance.docked := False;
-
 end;
 
 procedure TAuswahlForm.ContainerPanelAuswahlformMouseDown(Sender: TObject;
@@ -167,12 +159,6 @@ end;
 procedure TAuswahlForm.FormActivate(Sender: TObject);
 begin
   PositionCloseImage(CloseImageA, Nemp_MainForm.TreePanel);
-  {Nemp_MainForm.AuswahlFillPanel.Width := Nemp_MainForm.AuswahlPanel.Width
-                                        - Nemp_MainForm.AuswahlFillPanel.Left - 16;//26;
-  CloseImageA.Left := Nemp_MainForm.AuswahlPanel.Width - CloseImageA.Width - 2;// - 5;//10;
-  CloseImageA.Top := 4;
-  CloseImageA.Parent := Nemp_MainForm.AuswahlPanel;
-  CloseImageA.BringToFront;}
 end;
 
 procedure TAuswahlForm.FormClose(Sender: TObject;

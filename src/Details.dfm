@@ -26,7 +26,7 @@ object FDetails: TFDetails
     Top = 3
     Width = 615
     Height = 503
-    ActivePage = Tab_General
+    ActivePage = Tab_Lyrics
     Align = alClient
     TabOrder = 0
     OnChange = MainPageControlChange
@@ -771,69 +771,59 @@ object FDetails: TFDetails
         Align = alClient
         Caption = 'Lyrics'
         TabOrder = 0
-        DesignSize = (
-          607
-          475)
-        object Btn_DeleteLyricFrame: TButton
-          Left = 451
-          Top = 168
-          Width = 144
-          Height = 25
-          Anchors = [akTop, akRight]
-          Caption = 'Delete lyrics'
-          Enabled = False
-          TabOrder = 4
-          OnClick = Btn_DeleteLyricFrameClick
-        end
-        object BtnLyricWiki: TButton
-          Left = 451
-          Top = 22
-          Width = 144
-          Height = 25
-          Anchors = [akTop, akRight]
-          Caption = 'Get Lyrics'
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 1
-          OnClick = BtnLyricWikiClick
-        end
-        object BtnLyricWikiManual: TButton
-          Left = 451
-          Top = 108
-          Width = 144
-          Height = 25
-          Anchors = [akTop, akRight]
-          Caption = 'Manual search'
-          TabOrder = 3
-          OnClick = BtnLyricWikiManualClick
-        end
         object Memo_Lyrics: TMemo
           AlignWithMargins = True
-          Left = 8
-          Top = 24
-          Width = 437
-          Height = 437
-          Anchors = [akLeft, akTop, akRight, akBottom]
+          Left = 5
+          Top = 18
+          Width = 597
+          Height = 416
+          Align = alClient
           Enabled = False
           ReadOnly = True
           ScrollBars = ssVertical
           TabOrder = 0
           OnChange = Memo_LyricsChange
           OnKeyDown = Memo_LyricsKeyDown
+          ExplicitLeft = 8
+          ExplicitTop = 97
+          ExplicitWidth = 437
+          ExplicitHeight = 333
         end
-        object cbLyricOptions: TComboBox
-          Left = 451
-          Top = 81
-          Width = 144
-          Height = 21
-          Style = csDropDownList
-          Anchors = [akTop, akRight]
-          ItemIndex = 0
-          TabOrder = 2
-          Text = 'LyricWiki'
-          Items.Strings = (
-            'LyricWiki'
-            'ChartLyrics')
+        object pnlSearchLyrics: TPanel
+          AlignWithMargins = True
+          Left = 5
+          Top = 440
+          Width = 597
+          Height = 30
+          Align = alBottom
+          BevelOuter = bvNone
+          TabOrder = 1
+          DesignSize = (
+            597
+            30)
+          object lblLyricSearchEngines: TLabel
+            AlignWithMargins = True
+            Left = 3
+            Top = 5
+            Width = 438
+            Height = 13
+            Alignment = taRightJustify
+            Anchors = [akLeft, akTop, akRight]
+            AutoSize = False
+            Caption = 'Search Lyrics'
+            ExplicitWidth = 444
+          end
+          object btnSearchLyrics: TButton
+            Left = 453
+            Top = 0
+            Width = 144
+            Height = 25
+            Caption = 'Search Lyrics'
+            DropDownMenu = PopupMenuSearchEngines
+            Style = bsSplitButton
+            TabOrder = 0
+            OnClick = btnSearchLyricsClick
+          end
         end
       end
     end
@@ -1771,5 +1761,9 @@ object FDetails: TFDetails
       'bmp'
     Left = 392
     Top = 248
+  end
+  object PopupMenuSearchEngines: TPopupMenu
+    Left = 527
+    Top = 283
   end
 end

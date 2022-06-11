@@ -3253,7 +3253,8 @@ begin
     if fFavorite <> 0    then result := result + WriteByteToStream(aStream, MP3DB_FAVORITE, fFavorite);
     if fCategory <> 0    then result := result + WriteCardinalToStream(aStream, MP3DB_CATEGORY, fCategory);
 
-    if Year <> ''        then result := result + WriteWordToStream(aStream, MP3DB_YEAR, StrToIntDef(Year, 0));
+    if trim(Year) <> ''        then
+      result := result + WriteWordToStream(aStream, MP3DB_YEAR, StrToIntDef(Year, 0));
 
     GenreIDXint := ID3Genres.IndexOf(Genre);
     if GenreIDXint = -1 then

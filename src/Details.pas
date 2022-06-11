@@ -89,10 +89,7 @@ type
     GrpBox_Lyrics: TGroupBox;
     PnlWarnung: TPanel;
     Image1: TImage;
-    Btn_DeleteLyricFrame: TButton;
     Tab_Pictures: TTabSheet;
-    BtnLyricWiki: TButton;
-    BtnLyricWikiManual: TButton;
     PM_URLCopy: TPopupMenu;
     PM_CopyURLToClipboard: TMenuItem;
     LBLName: TLabel;
@@ -109,7 +106,6 @@ type
     pm_AddTag: TMenuItem;
     pm_RenameTag: TMenuItem;
     pm_RemoveTag: TMenuItem;
-    cbLyricOptions: TComboBox;
     LBLSamplerate: TLabel;
     LlblConst_Samplerate: TLabel;
     LlblConst_Bitrate: TLabel;
@@ -221,6 +217,10 @@ type
     cbFrameTypeSelection: TComboBox;
     VST_MetaData: TVirtualStringTree;
     cbStayOnTop: TCheckBox;
+    btnSearchLyrics: TButton;
+    PopupMenuSearchEngines: TPopupMenu;
+    lblLyricSearchEngines: TLabel;
+    pnlSearchLyrics: TPanel;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -275,7 +275,7 @@ type
 
     // Methods for advanced ID3v2-Tag Editing
     // Lyrics and Pictures
-    procedure Btn_DeleteLyricFrameClick(Sender: TObject);
+    // procedure Btn_DeleteLyricFrameClick(Sender: TObject);
     procedure cbCoverArtMetadataChange(Sender: TObject);
     procedure Btn_NewPictureClick(Sender: TObject);
     procedure Btn_DeletePictureClick(Sender: TObject);
@@ -286,8 +286,10 @@ type
       Shift: TShiftState);
 
     // Getting Lyrics
+    procedure SelectLyricSourceClick(Sender: TObject);
     procedure BtnLyricWikiClick(Sender: TObject);
-    procedure BtnLyricWikiManualClick(Sender: TObject);
+
+
     procedure ReloadTimerTimer(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure Lblv1Change(Sender: TObject);
@@ -326,6 +328,7 @@ type
       Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure cbIDv1GenresChange(Sender: TObject);
     procedure cbStayOnTopClick(Sender: TObject);
+    procedure btnSearchLyricsClick(Sender: TObject);
   protected
     procedure CreateParams(var Params: TCreateParams); override;
 
@@ -403,6 +406,7 @@ type
     function CurrentFileHasBeenChanged: Boolean;
 
     function GetID3v1TagfromBaseAudioFile(aBaseAudioFile: TBaseAudioFile): TID3v1Tag;
+    procedure PrepareLyricSearchEngines;
 
   public
     CurrentTagObject: TBaseAudioFile;
@@ -414,7 +418,6 @@ type
     MetaTagType: TTagType;
 
     procedure RefreshStarGraphics;
-    procedure BuildGetLyricButtonHint;
   end;
 
 
@@ -539,6 +542,8 @@ begin
   CoverArtSearcher := TCoverArtSearcher.Create;
 
   cbStayOnTop.Checked := NempOptions.DetailFormStayOnTop;
+
+  PrepareLyricSearchEngines;
   // SetStayOnTop(NempOptions.DetailFormStayOnTop);
 end;
 
@@ -560,9 +565,6 @@ procedure TFDetails.FormShow(Sender: TObject);
 begin
 //    MainPageControl.ActivePageIndex := 0;
 //    MainPageControl.ActivePage := Tab_General;
-    BuildGetLyricButtonHint;
-    // refresh;
-
 end;
 
 
@@ -588,6 +590,7 @@ begin
     end;
 end;
 {$ENDREGION}
+
 
 procedure TFDetails.cbStayOnTopClick(Sender: TObject);
 begin
@@ -1299,6 +1302,8 @@ begin
     ClipBoard.AsText := LBLPfad.caption;
 end;
 
+
+
 {
     --------------------------------------------------------
     Btn_ExploreClick
@@ -1486,12 +1491,11 @@ begin
         at_Wav: Memo_Lyrics.Text := '';
     end;
 
-    Btn_DeleteLyricFrame.Enabled := ButtonsEnable and (Memo_Lyrics.Text <> '');
-    BtnLyricWiki.Enabled         := ButtonsEnable;
-    //BtnLyricWikiManual can be always activated
+    // Btn_DeleteLyricFrame.Enabled := ButtonsEnable and (Memo_Lyrics.Text <> '');
+    // btnSearchLyrics.Enabled      := ButtonsEnable;
 end;
 
-procedure TFDetails.Btn_DeleteLyricFrameClick(Sender: TObject);
+(*procedure TFDetails.Btn_DeleteLyricFrameClick(Sender: TObject);
 begin
     case CurrentTagObject.FileType of
         at_Mp3: begin
@@ -1527,6 +1531,7 @@ begin
     // Maybe there are some other Lyrics in the id3-tag ;-)
     ShowLyrics;
 end;
+*)
 
 {
     --------------------------------------------------------
@@ -1551,69 +1556,86 @@ procedure TFDetails.Memo_LyricsChange(Sender: TObject);
 begin
     LyricsHasChanged := True;
 end;
-{
-    --------------------------------------------------------
-    BtnLyricWikiClick
-    BtnLyricWikiManualClick
-    - Search on LyricWiki.org for Lyrics
-      ManualSearch opens URL in Webbrowser
-    --------------------------------------------------------
-}
-procedure TFDetails.BuildGetLyricButtonHint;
-var Prio1, Prio2: TLyricFunctionsEnum;
+
+
+procedure TFDetails.PrepareLyricSearchEngines;
+var
+  urlList: TStringList;
+  i: Integer;
+  aMenuItem: TMenuItem;
 begin
-    MedienBib.GetLyricPriorities(Prio1, Prio2);
-    BtnLyricWiki.Hint := Format(Hint_LyricPriorities, [GetGenericPriorityString(Prio1, Prio2)]);
+  urlList := TStringList.Create;
+  try
+    TLyrics.GetLyricSources(urlList);
+
+    for i := 0 to urlList.Count - 1 do begin
+      aMenuItem := TMenuItem.Create(self);
+      aMenuItem.AutoHotkeys := maManual;
+      aMenuItem.OnClick := SelectLyricSourceClick;
+      aMenuItem.Caption := urlList[i];
+      aMenuItem.Tag := i;
+      PopupMenuSearchEngines.Items.Add(aMenuItem);
+    end;
+
+    if NempOptions.PreferredLyricSearch >= urlList.Count then
+      NempOptions.PreferredLyricSearch := 0;
+
+    btnSearchLyrics.Tag := NempOptions.PreferredLyricSearch;
+    btnSearchLyrics.Caption := urlList[NempOptions.PreferredLyricSearch];
+
+  finally
+    urlList.Free;
+  end;
+end;
+
+procedure TFDetails.SelectLyricSourceClick(Sender: TObject);
+begin
+  btnSearchLyrics.Tag := (Sender as TMenuItem).Tag;
+  btnSearchLyrics.Caption := (Sender as TMenuItem).Caption;
+  NempOptions.PreferredLyricSearch := (Sender as TMenuItem).Tag;
+  btnSearchLyrics.Click;
+end;
+
+procedure TFDetails.btnSearchLyricsClick(Sender: TObject);
+var
+  SearchURL: String;
+begin
+  SearchURL := TLyrics.GetLyricsURL(btnSearchLyrics.Tag, CurrentAudioFile.Artist, CurrentAudioFile.Titel);
+
+  ShellExecute(Handle, 'open', PChar(SearchURL), nil, nil, SW_SHOW);
 end;
 
 
 procedure TFDetails.BtnLyricWikiClick(Sender: TObject);
-var Lyrics: TLyrics;
-    LyricString: String;
-    Prio1, Prio2: TLyricFunctionsEnum;
+//var Lyrics: TLyrics;
+//    LyricString: String;
 begin
-        // if ValidMp3File or ValidOggFile or ValidFlacFile or ValidApeFile or ValidM4AFile then
-        if CurrentTagObject.Valid then
-
+  MessageDLG((MediaLibrary_SearchLyricsDisabled), mtInformation, [MBOK], 0);
+  (*
+  if CurrentTagObject.Valid then
+  begin
+      CurrentAudioFile.FileIsPresent:=True;
+      Lyrics := TLyrics.Create;
+      try
+        LyricString := Lyrics.GetLyrics(CurrentAudioFile.Artist, CurrentAudioFile.Titel);
+        if LyricString = '' then
         begin
-            CurrentAudioFile.FileIsPresent:=True;
-            Lyrics := TLyrics.Create;
-            try
-                MedienBib.GetLyricPriorities(Prio1, Prio2);
-                Lyrics.SetLyricSearchPriorities(Prio1, Prio2);
-
-                // ShowMessage(Lyrics.PriorityString);
-                LyricString := Lyrics.GetLyrics(CurrentAudioFile.Artist, CurrentAudioFile.Titel);
-                if LyricString = '' then
-                begin
-                    // no lyrics found
-                    if (TranslateMessageDLG(LyricsSearch_NotFoundMessage, mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
-                        BtnLyricWikiManual.Click;
-                end else
-                begin
-                    // ok, Lyrics found
-                    Memo_Lyrics.Text := LyricString;
-                    LyricsHasChanged := True;
-                end;
-            finally
-                Lyrics.Free;
-            end;
-        end
-        else
-            CurrentAudioFile.FileIsPresent:=False;
-end;
-
-procedure TFDetails.BtnLyricWikiManualClick(Sender: TObject);
-var LyricQuery: AnsiString;
-begin
-    case cbLyricOptions.ItemIndex of
-        0: LyricQuery := AnsiString(BuildURL_LyricWiki(CurrentAudioFile.Artist, CurrentAudioFile.Titel));
-        1: LyricQuery := AnsiString(BuildURL_ChartLyricsManual(CurrentAudioFile.Artist, CurrentAudioFile.Titel));
-    else
-        LyricQuery := AnsiString(BuildURL_LyricWiki(CurrentAudioFile.Artist, CurrentAudioFile.Titel));
-    end;
-
-    ShellExecuteA(Handle, 'open', PAnsiChar(LyricQuery), nil, nil, SW_SHOW);
+            // no lyrics found
+            if (TranslateMessageDLG(LyricsSearch_NotFoundMessage, mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
+                BtnLyricWikiManual.Click;
+        end else
+        begin
+            // ok, Lyrics found
+            Memo_Lyrics.Text := LyricString;
+            LyricsHasChanged := True;
+        end;
+      finally
+        Lyrics.Free;
+      end;
+  end
+  else
+      CurrentAudioFile.FileIsPresent:=False;
+  *)
 end;
 
 
@@ -2197,6 +2219,7 @@ begin
     LblPlayCounter.Caption := Format(DetailForm_PlayCounter, [CurrentTagCounter]);
     BtnSynchRatingLibrary.Visible := False;
 end;
+
 
 procedure TFDetails.BtnSynchRatingLibraryClick(Sender: TObject);
 begin

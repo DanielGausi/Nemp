@@ -1031,8 +1031,8 @@ begin
     end else
     begin
         case fDataType of
-            ptJPG:  fNewCoverFilename := fCurrentDownloadItem.Directory + 'front (NempAutoCover).jpg';
-            ptPNG:  fNewCoverFilename := fCurrentDownloadItem.Directory + 'front (NempAutoCover).png';
+            ptJPG:  fNewCoverFilename := fCurrentDownloadItem.Directory + 'front (Downloaded by Nemp).jpg';
+            ptPNG:  fNewCoverFilename := fCurrentDownloadItem.Directory + 'front (Downloaded by Nemp).png';
         else
             fNewCoverFilename := '';
         end;

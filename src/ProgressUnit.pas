@@ -211,10 +211,10 @@ begin
           LoadImage('CleanUp.png');
           SetLabelWithHint(ProgressForm_CleanUp);
       end;
-      pa_Searchlyrics  : begin
+      {pa_Searchlyrics  : begin
           LoadImage('SearchLyrics.png');
           SetLabelWithHint(ProgressForm_Searchlyrics);
-      end;
+      end;}
       pa_SearchTags    : begin
           LoadImage('SearchTags.png');
           SetLabelWithHint(ProgressForm_SearchTags);

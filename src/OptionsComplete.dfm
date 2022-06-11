@@ -80,7 +80,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 0
       Width = 469
       Height = 638
-      ActivePage = tabCategories
+      ActivePage = tabViewingSettings
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -176,7 +176,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CB_AutoCheck: TCheckBox
               Left = 16
               Top = 16
-              Width = 327
+              Width = 276
               Height = 17
               Hint = 
                 'Check for updates and show a message if a newer version is avail' +
@@ -189,7 +189,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CB_AutoCheckNotifyOnBetas: TCheckBox
               Left = 16
               Top = 67
-              Width = 343
+              Width = 292
               Height = 17
               Hint = 
                 'Notify on Beta-releases. As Beta-software is normally instable, ' +
@@ -1304,6 +1304,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 461
           Height = 574
+          VertScrollBar.Position = 441
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -1314,7 +1315,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpExtendedViewingSettings: TCategoryPanel
-            Top = 905
+            Top = 464
             Height = 175
             Caption = 'Extended viewing settings'
             TabOrder = 4
@@ -1380,7 +1381,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpPlaylistFormatting: TCategoryPanel
-            Top = 715
+            Top = 274
             Height = 190
             Caption = 'Playlist formatting'
             TabOrder = 3
@@ -1434,12 +1435,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object cbPlaylistTitle: TComboBox
               AlignWithMargins = True
-              Left = 115
+              Left = 168
               Top = 11
               Width = 260
               Height = 21
               AutoComplete = False
-              Anchors = [akTop, akRight]
+              Anchors = [akLeft, akTop, akRight]
               Color = clBtnFace
               ItemIndex = 0
               TabOrder = 0
@@ -1457,12 +1458,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object cbPlaylistTitleCueAlbum: TComboBox
               AlignWithMargins = True
-              Left = 115
+              Left = 168
               Top = 57
               Width = 260
               Height = 21
               AutoComplete = False
-              Anchors = [akTop, akRight]
+              Anchors = [akLeft, akTop, akRight]
               Color = clBtnFace
               ItemIndex = 5
               TabOrder = 2
@@ -1480,12 +1481,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object cbPlaylistTitleCueTitle: TComboBox
               AlignWithMargins = True
-              Left = 115
+              Left = 168
               Top = 79
               Width = 260
               Height = 21
               AutoComplete = False
-              Anchors = [akTop, akRight]
+              Anchors = [akLeft, akTop, akRight]
               Color = clBtnFace
               ItemIndex = 4
               TabOrder = 3
@@ -1503,12 +1504,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object cbPlaylistTitleFB: TComboBox
               AlignWithMargins = True
-              Left = 115
+              Left = 168
               Top = 35
               Width = 260
               Height = 21
               AutoComplete = False
-              Anchors = [akTop, akRight]
+              Anchors = [akLeft, akTop, akRight]
               Color = clBtnFace
               ItemIndex = 2
               TabOrder = 1
@@ -1526,12 +1527,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object cbPlaylistWebradioTitle: TComboBox
               AlignWithMargins = True
-              Left = 115
+              Left = 168
               Top = 101
               Width = 260
               Height = 21
               AutoComplete = False
-              Anchors = [akTop, akRight]
+              Anchors = [akLeft, akTop, akRight]
               Color = clBtnFace
               ItemIndex = 0
               TabOrder = 4
@@ -1542,7 +1543,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpMissingMetaData: TCategoryPanel
-            Top = 293
+            Top = -148
             Height = 422
             Caption = 'Not available metadata'
             TabOrder = 2
@@ -1573,7 +1574,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object lblMissingMetaData: TLabel
               Left = 16
               Top = 16
-              Width = 359
+              Width = 308
               Height = 13
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -1599,7 +1600,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object lbl_DefaultCoverHint: TLabel
               Left = 16
               Top = 347
-              Width = 354
+              Width = 409
               Height = 38
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -1607,7 +1608,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
                 'Note: Cover art already displayed in the player will not change ' +
                 'until the cover art is loaded again.'
               WordWrap = True
-              ExplicitWidth = 385
             end
             object cbReplaceAlbumBy: TComboBox
               Left = 16
@@ -1685,7 +1685,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpViewCategoriesSettings: TCategoryPanel
-            Top = 200
+            Top = -241
             Height = 93
             Caption = 'Display of Albums, Directories, ...'
             TabOrder = 1
@@ -1709,7 +1709,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpVisibleColumns: TCategoryPanel
-            Top = 0
+            Top = -441
             Caption = 'Visible columns in the medialist'
             TabOrder = 0
             object clbViewMainColumns: TCheckListBox
@@ -1733,7 +1733,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 461
           Height = 574
-          VertScrollBar.Position = 14
           VertScrollBar.Tracking = True
           Align = alClient
           ChevronColor = clWindowText
@@ -1749,7 +1748,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           ParentBackground = True
           TabOrder = 0
           object cpPartyMode: TCategoryPanel
-            Top = 315
+            Top = 329
             Height = 255
             Caption = 'Party mode'
             TabOrder = 1
@@ -1820,7 +1819,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpFontSettings: TCategoryPanel
-            Top = -14
+            Top = 0
             Height = 329
             Caption = 'Font settings'
             TabOrder = 0
@@ -1983,7 +1982,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CBChangeFontColoronBitrate: TCheckBox
               Left = 16
               Top = 210
-              Width = 360
+              Width = 309
               Height = 17
               Hint = 'Use different colors for different bitrates.'
               Anchors = [akLeft, akTop, akRight]
@@ -1996,7 +1995,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CBChangeFontOnCbrVbr: TCheckBox
               Left = 16
               Top = 229
-              Width = 360
+              Width = 309
               Height = 17
               Hint = 'Use different fonts for files with fixed or variable bitrate.'
               Anchors = [akLeft, akTop, akRight]
@@ -2010,7 +2009,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CBChangeFontSizeOnLength: TCheckBox
               Left = 16
               Top = 191
-              Width = 360
+              Width = 309
               Height = 17
               Hint = 
                 'User bigger fonts for long tracks and smaller ones for short tra' +
@@ -2025,7 +2024,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CBChangeFontStyleOnMode: TCheckBox
               Left = 16
               Top = 172
-              Width = 360
+              Width = 309
               Height = 17
               Hint = 'Normal: Joint Stereo, Bold: Full Stereo, Italic: Mono'
               Anchors = [akLeft, akTop, akRight]
@@ -2062,7 +2061,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 461
           Height = 574
-          VertScrollBar.Position = 205
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -2073,7 +2071,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpLibraryCoverArt: TCategoryPanel
-            Top = 290
+            Top = 495
             Height = 280
             Caption = 'Cover art'
             TabOrder = 2
@@ -2094,7 +2092,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CB_CoverSearch_inDir: TCheckBox
               Left = 16
               Top = 36
-              Width = 346
+              Width = 295
               Height = 17
               Hint = 'Search for coverfiles within the directory of the audiofile'
               Anchors = [akLeft, akTop, akRight]
@@ -2106,7 +2104,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CB_CoverSearch_inParentDir: TCheckBox
               Left = 16
               Top = 56
-              Width = 346
+              Width = 295
               Height = 17
               Hint = 'Search for coverfiles in the parent directory of the audiofile.'
               Anchors = [akLeft, akTop, akRight]
@@ -2160,7 +2158,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CB_CoverSearch_LastFM: TCheckBox
               Left = 16
               Top = 188
-              Width = 346
+              Width = 295
               Height = 17
               Hint = 'Allow Nemp downloading missing cover files from the internet'
               Anchors = [akLeft, akTop, akRight]
@@ -2196,7 +2194,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpLibraryFileTypes: TCategoryPanel
-            Top = 55
+            Top = 260
             Height = 235
             Caption = 'File types for the media library'
             TabOrder = 1
@@ -2243,7 +2241,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpScanDirectories: TCategoryPanel
-            Top = -205
+            Top = 0
             Height = 260
             Caption = 'Directories'
             TabOrder = 0
@@ -2497,8 +2495,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object lblAlbumDefinitionHint: TLabel
               Left = 16
               Top = 16
-              Width = 328
-              Height = 65
+              Width = 409
+              Height = 78
               Anchors = [akLeft, akTop, akRight]
               Caption = 
                 'For music stored on CD or vinyl it is pretty clear, what an "Alb' +
@@ -2507,7 +2505,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
                 'an select what Nemp should consider as an "Album" in that sense,' +
                 ' so it matches with your music collection.'
               WordWrap = True
-              ExplicitWidth = 345
             end
             object cbAlbumKeymode: TComboBox
               Left = 16
@@ -2528,7 +2525,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cbIgnoreCDDirectories: TCheckBox
               Left = 16
               Top = 136
-              Width = 356
+              Width = 305
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Allow multi-folder albums (e.g. "CD 1" and "CD 2")'
@@ -2537,7 +2534,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object editCDNames: TLabeledEdit
               Left = 16
               Top = 174
-              Width = 285
+              Width = 234
               Height = 21
               Anchors = [akLeft, akTop, akRight]
               EditLabel.Width = 325
@@ -2698,7 +2695,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 461
           Height = 574
-          VertScrollBar.Position = 35
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -2709,7 +2705,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpMetaData: TCategoryPanel
-            Top = -35
+            Top = 0
             Height = 445
             Caption = 'Meta data (e.g. ID3-Tags)'
             TabOrder = 0
@@ -2781,7 +2777,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cb_AccessMetadata: TCheckBox
               Left = 16
               Top = 36
-              Width = 397
+              Width = 414
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Write changes directly to the metadata'
@@ -2790,7 +2786,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cb_IgnoreLyrics: TCheckBox
               Left = 16
               Top = 92
-              Width = 397
+              Width = 414
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Ignore Lyrics (recommended for very large  music collections)'
@@ -2800,7 +2796,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cb_RatingActive: TCheckBox
               Left = 16
               Top = 148
-              Width = 380
+              Width = 397
               Height = 17
               Hint = '(De)activate automatic rating/playcounter'
               Anchors = [akLeft, akTop, akRight]
@@ -2811,7 +2807,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cb_RatingChangeCounter: TCheckBox
               Left = 33
               Top = 188
-              Width = 380
+              Width = 397
               Height = 17
               Hint = 'Increase the playcounter of a file after it was played'
               Anchors = [akLeft, akTop, akRight]
@@ -2821,7 +2817,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cb_RatingDecreaseRating: TCheckBox
               Left = 33
               Top = 228
-              Width = 380
+              Width = 397
               Height = 17
               Hint = 
                 'Automatically decrease rating on aborted tracks. The change will' +
@@ -2833,7 +2829,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cb_RatingIgnoreShortFiles: TCheckBox
               Left = 33
               Top = 168
-              Width = 380
+              Width = 397
               Height = 17
               Hint = 'Do not change rating and playcounter on short tracks.'
               Anchors = [akLeft, akTop, akRight]
@@ -2843,7 +2839,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cb_RatingIncreaseRating: TCheckBox
               Left = 33
               Top = 208
-              Width = 380
+              Width = 397
               Height = 17
               Hint = 
                 'Automatically increase rating on played tracks. The change will ' +
@@ -2855,7 +2851,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cb_AskForAutoResolveInconsistencies: TCheckBox
               Left = 33
               Top = 304
-              Width = 380
+              Width = 397
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'If not: Show query dialog when inconsistencies occur'
@@ -2864,7 +2860,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cb_AutoResolveInconsistencies: TCheckBox
               Left = 16
               Top = 284
-              Width = 380
+              Width = 397
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Automatically resolve inconsistencies when entering new tags'
@@ -2873,7 +2869,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cb_ShowAutoResolveInconsistenciesHints: TCheckBox
               Left = 33
               Top = 324
-              Width = 380
+              Width = 397
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 
@@ -2884,7 +2880,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CBAutoDetectCharCode: TCheckBox
               Left = 16
               Top = 380
-              Width = 380
+              Width = 397
               Height = 17
               Hint = 
                 'Use a uber-ingenious special method for better tag-reading in fi' +
@@ -2892,60 +2888,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Auto-detect (probably) used character sets'
               TabOrder = 10
-            end
-          end
-          object cpOnlineLyrics: TCategoryPanel
-            Top = 410
-            Height = 160
-            Caption = 'Online search for lyrics'
-            TabOrder = 1
-            object LblLyricPriorities: TLabel
-              Left = 16
-              Top = 75
-              Width = 402
-              Height = 42
-              Anchors = [akLeft, akTop, akRight]
-              AutoSize = False
-              Caption = 
-                'Select the websites you want to download lyrics from. Use the ar' +
-                'row buttons to change priority. Double-Click an entry to visit t' +
-                'he website for more information.'
-              WordWrap = True
-              ExplicitWidth = 425
-            end
-            object BtnLyricPriorities: TUpDown
-              Left = 263
-              Top = 16
-              Width = 26
-              Height = 41
-              Position = 50
-              TabOrder = 1
-              OnClick = BtnLyricPrioritiesClick
-            end
-            object VSTLyricSettings: TVirtualStringTree
-              Left = 16
-              Top = 16
-              Width = 241
-              Height = 53
-              Colors.UnfocusedSelectionColor = clHighlight
-              Colors.UnfocusedSelectionBorderColor = clHighlight
-              Header.AutoSizeIndex = 0
-              Header.Options = [hoColumnResize, hoDrag, hoShowImages, hoShowSortGlyphs]
-              TabOrder = 0
-              TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick]
-              TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
-              OnChecked = VSTLyricSettingsChecked
-              OnGetText = VSTLyricSettingsGetText
-              OnInitNode = VSTLyricSettingsInitNode
-              OnNodeDblClick = VSTLyricSettingsNodeDblClick
-              Touch.InteractiveGestures = [igPan, igPressAndTap]
-              Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-              Columns = <
-                item
-                  Position = 0
-                  Text = 'SearchMethod'
-                  Width = 200
-                end>
             end
           end
         end
@@ -3105,7 +3047,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 461
           Height = 574
-          VertScrollBar.Position = 393
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -3116,7 +3057,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpAdvanced: TCategoryPanel
-            Top = 494
+            Top = 887
             Height = 76
             Caption = 'Advanced'
             TabOrder = 4
@@ -3131,7 +3072,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpVisualisation: TCategoryPanel
-            Top = 332
+            Top = 725
             Height = 162
             Caption = 'Visualzation'
             TabOrder = 3
@@ -3189,7 +3130,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpSilenceDetection: TCategoryPanel
-            Top = 145
+            Top = 538
             Height = 187
             Caption = 'Pause between tracks'
             TabOrder = 2
@@ -3264,7 +3205,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpFading: TCategoryPanel
-            Top = -43
+            Top = 350
             Height = 188
             Caption = 'Fading'
             TabOrder = 1
@@ -3363,7 +3304,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpOutputDevices: TCategoryPanel
-            Top = -393
+            Top = 0
             Height = 350
             Caption = 'Output devices'
             TabOrder = 0
@@ -3386,7 +3327,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object LblSoundFont: TLabel
               Left = 16
               Top = 116
-              Width = 341
+              Width = 290
               Height = 13
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -3439,7 +3380,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object MainDeviceCB: TComboBox
               Left = 16
               Top = 31
-              Width = 275
+              Width = 224
               Height = 21
               Hint = 'The main device.'
               Style = csDropDownList
@@ -3449,7 +3390,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object HeadphonesDeviceCB: TComboBox
               Left = 16
               Top = 81
-              Width = 275
+              Width = 224
               Height = 21
               Hint = 'The secondary device.'
               Style = csDropDownList
@@ -3457,7 +3398,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               TabOrder = 1
             end
             object BtnRefreshDevices: TButton
-              Left = 297
+              Left = 246
               Top = 77
               Width = 89
               Height = 25
@@ -3469,14 +3410,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object editSoundFont: TEdit
               Left = 16
               Top = 135
-              Width = 275
+              Width = 224
               Height = 21
               Hint = 'The SoundFont file used for MIDI playback'
               Anchors = [akLeft, akTop, akRight]
               TabOrder = 3
             end
             object BtnSelectSoundFontFile: TButton
-              Left = 297
+              Left = 246
               Top = 135
               Width = 25
               Height = 21
@@ -3538,7 +3479,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 461
           Height = 574
-          VertScrollBar.Position = 303
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -3549,7 +3489,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpPlaylistLog: TCategoryPanel
-            Top = 467
+            Top = 770
             Height = 120
             Caption = 'Playlist log'
             TabOrder = 3
@@ -3588,7 +3528,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpRandomPlayback: TCategoryPanel
-            Top = 117
+            Top = 420
             Height = 350
             Caption = 'Random playback'
             TabOrder = 2
@@ -3936,7 +3876,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpPlaylistBehaviour: TCategoryPanel
-            Top = -118
+            Top = 185
             Height = 235
             Caption = 'General playlist settings'
             TabOrder = 1
@@ -4030,7 +3970,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpPlaylistDefaultActions: TCategoryPanel
-            Top = -303
+            Top = 0
             Height = 185
             Caption = 'Default actions'
             TabOrder = 0
@@ -5126,7 +5066,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 461
           Height = 574
-          VertScrollBar.Position = 414
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -5137,7 +5076,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpWebServerUrls: TCategoryPanel
-            Top = -5
+            Top = 409
             Height = 650
             Caption = 'Webserver URLs'
             TabOrder = 2
@@ -5225,7 +5164,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               AlignWithMargins = True
               Left = 17
               Top = 138
-              Width = 346
+              Width = 295
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Include "\admin" in QRCode URL'
@@ -5236,7 +5175,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               AlignWithMargins = True
               Left = 17
               Top = 158
-              Width = 346
+              Width = 295
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Use Internet-IP'
@@ -5246,7 +5185,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cbWebserverUserRights: TCategoryPanel
-            Top = -205
+            Top = 209
             Caption = 'User rights'
             TabOrder = 1
             object LblConst_Password2: TLabel
@@ -5341,7 +5280,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpWebserverConfiguration: TCategoryPanel
-            Top = -414
+            Top = 0
             Height = 209
             Caption = 'Webserver configuration'
             TabOrder = 0
@@ -5497,7 +5436,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 461
           Height = 544
-          VertScrollBar.Position = 130
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -5507,7 +5445,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           HeaderFont.Style = []
           TabOrder = 0
           object cpCoverflowMixedSettings: TCategoryPanel
-            Top = 440
+            Top = 570
             Height = 100
             Caption = 'Mixed settings'
             TabOrder = 5
@@ -5539,7 +5477,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpCoverflowReflection: TCategoryPanel
-            Top = 315
+            Top = 445
             Height = 125
             Caption = 'Reflection'
             TabOrder = 4
@@ -5599,7 +5537,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpCoverflowAngles: TCategoryPanel
-            Top = 215
+            Top = 345
             Height = 100
             Caption = 'Angles'
             TabOrder = 3
@@ -5673,7 +5611,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpCoverflowSpacing: TCategoryPanel
-            Top = 85
+            Top = 215
             Height = 130
             Caption = 'Spacing between cover art'
             TabOrder = 2
@@ -5757,7 +5695,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpCoverflowViewPosition: TCategoryPanel
-            Top = 5
+            Top = 135
             Height = 80
             Caption = 'Viewing position (x-axis)'
             TabOrder = 1
@@ -5779,7 +5717,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpCoverflowPosition: TCategoryPanel
-            Top = -130
+            Top = 0
             Height = 135
             Caption = 'Position of cover art (z-axis)'
             TabOrder = 0

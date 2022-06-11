@@ -111,13 +111,6 @@ begin
   Width  := BWidth  ;
 
   PositionCloseImage(CloseImageP, Nemp_MainForm.PlaylistPanel);
-  {Nemp_MainForm.PlaylistFillPanel.Width := Nemp_MainForm.PlaylistPanel.Width - Nemp_MainForm.PlaylistFillPanel.Left - 16;
-  CloseImageP.Parent := Nemp_MainForm.PlaylistPanel;
-  CloseImageP.Left := Nemp_MainForm.PlaylistPanel.Width - CloseImageP.Width;
-  CloseImageP.Top := 3; //6              // PlaylistPanel
-  CloseImageP.BringToFront;
-  }
-
   SetRegion(ContainerPanelPlaylistForm, self, NempRegionsDistance, handle);
 
   // Das ist nötig, um z.B. zu korrigieren, dass die Form komplett unter Form1 versteckt ist!!
@@ -166,12 +159,6 @@ end;
 procedure TPlaylistForm.FormActivate(Sender: TObject);
 begin
   PositionCloseImage(CloseImageP, Nemp_MainForm.PlaylistPanel);
-
-{  Nemp_MainForm.PlaylistFillPanel.Width := Nemp_MainForm.PlaylistPanel.Width - Nemp_MainForm.PlaylistFillPanel.Left - 16;
-  CloseImageP.Parent := Nemp_MainForm.PlaylistPanel;
-  CloseImageP.Left := Nemp_MainForm.PlaylistPanel.Width - CloseImageP.Width;
-  CloseImageP.Top := 3; //6              // PlaylistPanel
-  CloseImageP.BringToFront;}
 end;
 
 procedure TPlaylistForm.FormClose(Sender: TObject;

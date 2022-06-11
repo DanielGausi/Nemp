@@ -840,7 +840,7 @@ begin
   NempSettingsManager.WriteString('Webserver', 'UsernameA'           , UsernameA         );
   NempSettingsManager.WriteString('Webserver', 'PasswordA'           , PasswordA         );
 
-  // delete deprecated Hotkeys.ini (not used any longer)
+  // delete deprecated .ini (not used any longer)
   if FileExists(NempSettingsManager.SavePath + 'NempWebServer.ini') then
     DeleteFile(NempSettingsManager.SavePath + 'NempWebServer.ini');
 end;

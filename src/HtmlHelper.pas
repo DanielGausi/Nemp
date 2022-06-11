@@ -48,6 +48,7 @@ function EscapeHTMLChars(s: String): String;
 // function StringToURLStringAnd(aUTF8String: UTF8String): String;
 function URLEncode_LastFM(const ASrc: String): String;
 
+function URLEncode_SpaceToPlus(const ASrc: String): String;
 function URLEncode_LyricWiki(const ASrc: String): String;
 function URLEncode_ChartLyricsManual(const ASrc: String): String;
 
@@ -252,6 +253,27 @@ begin
     for i := 1 to length(aUTF8String) do
         result := result + '%'  + IntToHex(Ord(aUTF8String[i]),2);
 end;}
+
+function URLEncode_SpaceToPlus(const ASrc: String): String;
+  var
+    i,j: Integer;
+    s: UTF8String;
+begin
+  Result := '';
+  for i := 1 to Length(ASrc) do
+    case ASrc[i] of
+      ' ': Result := Result + '+';
+      'A'..'Z', 'a'..'z', '0'..'9': Result := Result + ASrc[i];
+      else
+      begin
+          //Result := Result + '%' + IntToHex(Ord(ASrc[i]), 2);
+          // URL-encoded UTF8-encoding of this char
+          s := UTF8String(ASrc[i]);
+          for j := 1 to Length(s) do
+              Result := Result + '%' + IntToHex(Ord(s[j]), 2);
+      end;
+    end;
+end;
 
 function URLEncode_LastFM(const ASrc: String): String;
 var i, j: Integer;

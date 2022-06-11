@@ -141,11 +141,6 @@ end;
 procedure TExtendedControlForm.FormActivate(Sender: TObject);
 begin
   PositionCloseImage(CloseImageE, Nemp_MainForm.MedienBibDetailPanel);
-  {Nemp_MainForm.MedienBibDetailFillPanel.Width := Nemp_MainForm.MedienBibDetailPanel.Width - Nemp_MainForm.MedienBibDetailFillPanel.Left - 16;
-  CloseImageE.Left := Nemp_MainForm.MedienBibDetailPanel.Width - CloseImageE.Width;
-  CloseImageE.Top := 3;
-  CloseImageE.Parent := Nemp_MainForm.MedienBibDetailPanel;
-  CloseImageE.BringToFront;}
 end;
 
 procedure TExtendedControlForm.FormClose(Sender: TObject;
@@ -247,14 +242,7 @@ end;
 
 procedure TExtendedControlForm.RepaintForm;
 begin
-    Repaint;
-
-    // todo: Repaint subpanels of FileOverview ??
-
-    //Nemp_MainForm.AudioPanel.Repaint;
-    //Nemp_MainForm.GRPBOXHeadset.Repaint;
-    //Nemp_MainForm.GRPBOXLyrics.Repaint;
-    //Nemp_MainForm.GRPBOXCover.Repaint
+  Repaint;
 end;
 
 procedure TExtendedControlForm.FormShow(Sender: TObject);
@@ -264,18 +252,7 @@ begin
   Top    := BTop    ;
   Height := BHeight ;
   Width  := BWidth  ;
-
-  // rework needed .... somethin like in the other forms as well
-  // the different code for "regions" is due to the "header" in the other forms
-
   PositionCloseImage(CloseImageE, Nemp_MainForm.MedienBibDetailPanel);
-  {
-  Nemp_MainForm.MedienBibDetailFillPanel.Width := Nemp_MainForm.MedienBibDetailPanel.Width -  Nemp_MainForm.MedienBibDetailFillPanel.Left - 16;
-  CloseImageE.Left := Nemp_MainForm.MedienBibDetailPanel.Width - CloseImageE.Width;// - 10;
-  CloseImageE.Top := 3;
-  CloseImageE.Parent := Nemp_MainForm.MedienBibDetailPanel;
-  CloseImageE.BringToFront;}
-
   SetRegion(ContainerPanelExtendedControlsForm, self, NempRegionsDistance, handle);
 
   // Das ist nötig, um z.B. zu korrigieren, dass die Form komplett unter Form1 versteckt ist!!

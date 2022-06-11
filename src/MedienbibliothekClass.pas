@@ -197,13 +197,6 @@ type
         fIgnoreLyrics: Boolean;
         fIgnoreLyricsFlag: Integer;
 
-        // (LYR_NONE, LYR_LYRICWIKI, LYR_CHARTLYRICS)
-        // these temporary variables are set just before a Lyric-Search begins
-        // they are computed from the priorities stored in the LyricPriorities-Array
-        // !!! Access to these variables only within a CriticalSection !!!
-        fLyricFirstPriority  : TLyricFunctionsEnum;
-        fLyricSecondPriority : TLyricFunctionsEnum;
-
         // used for faster cover-initialisation.
         // i.e. do not search coverfiles for every audiofile.
         // use the same cover again, if the next audiofile is in the same directory
@@ -289,7 +282,7 @@ type
         // Refreshing Library
         procedure fRefreshFiles(aRefreshList: TAudioFileList);      // 1a. Refresh files OR
         procedure fScanNewFiles;
-        procedure fGetLyrics;         // 1b. get Lyrics
+        // procedure fGetLyrics;         // 1b. get Lyrics
         procedure fPrepareGetTags;    // 1c. get tags, but at first make a copy of the Ignore/rename-Rules in VCL-Thread
         procedure fGetTags;           //     get Tags (from LastFM)
         procedure fUpdateId3tags;     // 2.  Write Library-Data into the id3-Tags (used in CloudEditor)
@@ -465,8 +458,6 @@ type
             SortParams im Create initialisieren
             SortParams in Ini Speichern/Laden }
 
-        LyricPriorities: Array[TLyricFunctionsEnum] of Integer;
-
         // this is used to synchronize access to single mediafiles
         // Some threads are running and modifying the files: GetLyrics and the Player.PostProcessor
         // This is fine, but the VCL MUST NOT try to write the same files.
@@ -572,7 +563,6 @@ type
         //                                       false otherwise)
         // - Delete not existing files
         // - Refresh AudioFile-Information
-        // - Automatically get Lyrics from LyricWiki.org
         // These methods will start a new thread and call several private methods
         procedure NewFilesUpdateBib(NewBib: Boolean = False);
         procedure DeleteFilesUpdateBib;
@@ -584,7 +574,6 @@ type
         procedure CleanUpDeadFilesFromVCLLists;
         procedure RefreshFiles_All;
         procedure RefreshFiles_Selected;
-        procedure GetLyricPriorities(out Prio1, Prio2: TLyricFunctionsEnum);
         procedure GetLyrics;
         procedure GetTags;
         procedure UpdateId3tags;
@@ -596,6 +585,7 @@ type
         procedure BuildTotalLyricString;
         function DeleteAudioFile(aAudioFile: tAudioFile): Boolean;
         function DeletePlaylist(aPlaylist: TLibraryPlaylist): Boolean;
+        function DeleteWebRadioStation(aStation: TStation): Boolean;
 
         procedure Abort;        // abort running update-threads
         // Check, whether Key1 and Key2 matches strings[sortarray[1/2]]
@@ -649,7 +639,9 @@ type
         // procedure CleanUpCategories;
         procedure DeleteEmptyPlaylistCollections;
         procedure DeleteEmptyFileCollections;
+        procedure DeleteEmptyWebRadioCollections;
         procedure RefreshCollections(FullRefill: Boolean = True);
+        procedure RefreshWebRadioCategory;
 
         procedure ChangeFileCollectionSorting(RCIndex, Layer: Integer; newSorting: teCollectionSorting;
           newDirection: teSortDirection; OnlyDirection: Boolean);
@@ -767,7 +759,7 @@ type
   procedure fRefreshFilesThread_All(MB: TMedienbibliothek);
   procedure fRefreshFilesThread_Selected(MB: TMedienbibliothek);
 
-  procedure fGetLyricsThread(MB: TMedienBibliothek);
+  // procedure fGetLyricsThread(MB: TMedienBibliothek);
   procedure fGetTagsThread(MB: TMedienBibliothek);
 
   procedure fUpdateID3TagsThread(MB: TMedienBibliothek);
@@ -779,7 +771,6 @@ type
       CSUpdate: RTL_CRITICAL_SECTION;
       CSAccessDriveList: RTL_CRITICAL_SECTION;
       CSAccessBackupCoverList: RTL_CRITICAL_SECTION;
-      CSLyricPriorities: RTL_CRITICAL_SECTION;
 
 implementation
 
@@ -1347,11 +1338,6 @@ begin
         //NewCoverFlow.CurrentCoverID := NempSettingsManager.ReadString('MedienBib','SelectedCoverID', 'all');
         //NewCoverFlow.CurrentItem    := NempSettingsManager.ReadInteger('MedienBib', 'SelectedCoverIDX', 0);
 
-        // LYR_NONE, LYR_LYRICWIKI, LYR_CHARTLYRICS
-        LyricPriorities[LYR_NONE]        := 100;
-        LyricPriorities[LYR_LYRICWIKI]   := NempSettingsManager.ReadInteger('MedienBib', 'PriorityLyricWiki'  , 1);
-        LyricPriorities[LYR_CHARTLYRICS] := NempSettingsManager.ReadInteger('MedienBib', 'PriorityChartLyrics', 2);
-
         BibSearcher.LoadFromIni(NempSettingsManager);
         // TagCloud.LoadFromIni(NempSettingsManager);
 
@@ -1436,9 +1422,6 @@ begin
 
         NempSettingsManager.WriteInteger('MedienBib', 'CoverFlowMode', Integer(NewCoverFlow.Mode));
 
-        // LYR_NONE, LYR_LYRICWIKI, LYR_CHARTLYRICS
-        NempSettingsManager.WriteInteger('MedienBib', 'PriorityLyricWiki'  , LyricPriorities[LYR_LYRICWIKI]   );
-        NempSettingsManager.WriteInteger('MedienBib', 'PriorityChartLyrics', LyricPriorities[LYR_CHARTLYRICS] );
 
         BibSearcher.SaveToIni(NempSettingsManager);
         // TagCloud.SaveToIni(NempSettingsManager);
@@ -2312,76 +2295,9 @@ begin
 
   DeleteFilesFromPathList(DeadFiles);
   DeleteFilesFromOtherLists(DeadFiles);
-  DeletePlaylists(DeadPlaylists)
-  //AntiMergePlaylists(AllPlaylistsPfadSort, DeadPlaylists);
-
-
-
-  (*    fhfghfgh
-
-  Dateien rausnehmen, aber (erstmal) keine Kategorien löschen?
-  Danach:
-
-  ClearEmptyCollectionNodes(AlbenVST); per Message AUCH FÜR COVERFLOW NACHHOLEN
-    MedienBib.CleanUpCategories;
-    *)
-
-  (*
-
-  Frage 2021: Was ist nach dem AntiMerge der FileListen sinnvoller:
-  - Categorien komplett leeren und neu aufbauen?
-  - Oder: Dateien einzeln löschen aus den Collections, und am Ende Clear EmptyCollections?
-
-  // Der Rest geht nicht mit AntiMerge. :(
-  case BrowseMode of
-      0: begin
-          // Classic browse
-          tmpMp3ListeArtistSort.Clear;
-          for i := 0 to tmpMp3ListePfadSort.Count - 1 do
-            tmpMp3ListeArtistSort.Add(tmpMp3ListePfadSort[i]);
-          tmpMp3ListeArtistSort.Sort(Sort_String1String2Titel_asc);
-
-          tmpMp3ListeAlbenSort.Clear;
-          for i := 0 to tmpMp3ListePfadSort.Count - 1 do
-            tmpMp3ListeAlbenSort.Add(tmpMp3ListePfadSort[i]);
-          tmpMp3ListeAlbenSort.Sort(Sort_String2String1Titel_asc);
-
-          fBrowseListsNeedUpdate := False;
-
-          // BrowseListen vorbereiten.
-          InitAlbenlist(tmpMp3ListeAlbenSort, tmpAlleAlben);
-          Generateartistlist(tmpMp3ListeArtistSort, tmpAlleArtists);
-      end;
-      1: begin
-          // CoverFlow
-          tmpMp3ListeArtistSort.Clear;
-          tmpMp3ListeAlbenSort.Clear;
-          for i := 0 to tmpMp3ListePfadSort.Count - 1 do
-          begin
-            tmpMp3ListeArtistSort.Add(tmpMp3ListePfadSort[i]);
-            tmpMp3ListeAlbenSort.Add(tmpMp3ListePfadSort[i]);
-          end;
-          tmpMp3ListeArtistSort.Sort(Sort_CoverID);
-          tmpMp3ListeAlbenSort.Sort(Sort_CoverID);
-
-          // BrowseListen vorbereiten.
-          GenerateCoverList(tmpMp3ListeArtistSort, tmpCoverListData);
-      end;
-      2: begin
-          // tagCloud
-          tmpMp3ListeArtistSort.Clear;
-          tmpMp3ListeAlbenSort.Clear;
-          for i := 0 to tmpMp3ListePfadSort.Count - 1 do
-          begin
-              tmpMp3ListeArtistSort.Add(tmpMp3ListePfadSort[i]);
-              tmpMp3ListeAlbenSort.Add(tmpMp3ListePfadSort[i]);
-          end;
-          // Note: We do not need sorted BrowseLists in the TagCloud
-      end;
-  end;
-  *)
-
+  DeletePlaylists(DeadPlaylists);
 end;
+
 {
     --------------------------------------------------------
     CleanUpDeadFilesFromVCLLists
@@ -2630,44 +2546,7 @@ begin
 
       RefreshCollections;
       BuildSearchStrings;
-      (*
-      case BrowseMode of
-          0: SendMessage(MainWindowHandle, WM_MedienBib, MB_ClearEmptyNodes, 0);
-          1: ;
-          2: ;
-      end;
 
-      for catIdx := 0 to FileCategories.Count - 1 do begin
-        FileCategories[catIdx].RemoveEmptyCollections;      ///  XXXXX VORSICHT: Das würde auch RootCoolection löschen - wollen wir nicht
-        FileCategories[catIdx].AnalyseCollections(True);
-        FileCategories[catIdx].SortCollections(True);
-      end;
-        *)
-      (*
-      case BrowseMode of
-          0: begin
-              //Mp3ListeArtistSort.Sort(Sort_String1String2Titel_asc);
-              // BrowseListen neu füllen
-              SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 1);
-          end;
-          1: begin
-              //Mp3ListeArtistSort.Sort(Sort_CoverID);
-              SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 1);
-              //GenerateCoverList(Mp3ListeArtistSort, CoverListData);
-          end;
-          2: begin
-              // Nothing to do here. TagCloud will be rebuild in VCL-Thread
-              // by MB_RefillTrees
-              SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 1);
-          end;
-      end;  *)
-
-      // Build TotalStrings
-      //BibSearcher.BuildTotalString(Mp3ListePfadSort);
-      //BibSearcher.BuildTotalLyricString(Mp3ListePfadSort);
-
-      // refill view // done in RefreshCollections
-      //SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, LParam(True));
   end;
 
   // After this: Handle missing files
@@ -2722,38 +2601,20 @@ end;
     - Creates a secondary thread and load lyrics from LyricWiki.org
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.GetLyricPriorities(out Prio1, Prio2: TLyricFunctionsEnum);
-var i: TLyricFunctionsEnum;
-begin
-    Prio1 := LYR_NONE;
-    Prio2 := LYR_NONE;
-    for i := Low(TLyricFunctionsEnum) to High(TLyricFunctionsEnum) do
-    begin
-        if LyricPriorities[i] = 1 then
-            Prio1 := i;
-        if LyricPriorities[i] = 2 then
-            Prio2 := i;
-    end;
-end;
 
 procedure TMedienBibliothek.GetLyrics;
-  var Dummy: Cardinal;
-      Prio1, Prio2: TLyricFunctionsEnum;
 begin
+  MessageDLG((MediaLibrary_SearchLyricsDisabled), mtInformation, [MBOK], 0);
+  (*
+    Main construct still in comments, just for the case this feature will be revived later
     // Status MUST be set outside
     // (the updatelist is filled in VCL-Thread)
     // But, to be sure:
     StatusBibUpdate := 1;
     UpdateFortsetzen := True;
 
-    // Get the Priorities for the Lyric-Search-Methods
-    GetLyricPriorities(Prio1, Prio2);
-    EnterCriticalSection(CSLyricPriorities);
-        fLyricFirstPriority  := Prio1;
-        fLyricSecondPriority := Prio2;
-    LeaveCriticalSection(CSLyricPriorities);
-
     fHND_GetLyricsThread := BeginThread(Nil, 0, @fGetLyricsThread, Self, 0, Dummy);
+  *)
 end;
 
 {
@@ -2764,6 +2625,7 @@ end;
     so CleanUpTmpLists must be called after getting Lyrics.
     --------------------------------------------------------
 }
+(*
 procedure fGetLyricsThread(MB: TMedienBibliothek);
 begin
     MB.fGetLyrics;
@@ -2774,14 +2636,14 @@ begin
       CloseHandle(MB.fHND_GetLyricsThread);
     except
     end;
-end;
+end;*)
 {
     --------------------------------------------------------
     fGetLyrics
     - Block Update-Access
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.fGetLyrics;
+(*procedure TMedienBibliothek.fGetLyrics;
 var i: Integer;
     aAudioFile: TAudioFile;
     LyricWikiResponse, backup: String;
@@ -2805,14 +2667,6 @@ begin
 
     Lyrics :=  TLyrics.create;
     try
-            //Critical Section: Set Priorities
-            EnterCriticalSection(CSLyricPriorities);
-                tmpLyricFirstPriority := self.fLyricFirstPriority;
-                tmpLyricSecondPriority := self.fLyricSecondPriority;
-            LeaveCriticalSection(CSLyricPriorities);
-
-            Lyrics.SetLyricSearchPriorities(tmpLyricFirstPriority, tmpLyricSecondPriority);
-
             // Lyrics suchen
             for i := 0 to UpdateList.Count - 1 do
             begin
@@ -2947,6 +2801,7 @@ begin
           end;
     end;
 end;
+*)
 
 
 
@@ -3557,6 +3412,20 @@ begin
   Changed := True;
   // after that, the Library should also call "CleanUpCategories"
 end;
+
+function TMedienBibliothek.DeleteWebRadioStation(aStation: TStation): Boolean;
+begin
+  result := StatusBibUpdate = 0;
+  if StatusBibUpdate <> 0 then
+    exit;
+
+  TLibraryWebradioCategory(WebRadioCategory).RemoveStation(aStation);
+  RadioStationList.Remove(aStation);
+
+  Changed := True;
+  // after that, the Library should also call "CleanUpCategories"
+end;
+
 {
     --------------------------------------------------------
     Abort
@@ -5772,6 +5641,11 @@ begin
     PlaylistCategories[i].RemoveEmptyCollections;
 end;
 
+procedure TMedienBibliothek.DeleteEmptyWebRadioCollections;
+begin
+  WebRadioCategory.RemoveEmptyCollections;
+end;
+
 procedure TMedienBibliothek.RefreshCollections(FullRefill: Boolean);
 var
   catIdx: Integer;
@@ -5786,6 +5660,7 @@ begin
 
   DeleteEmptyFileCollections;
   DeleteEmptyPlaylistCollections;
+  DeleteEmptyWebRadioCollections;
 
   // Analysing and sorting the Collections in FileCategories will only be done, if there was a change in the Collection.
   // => After add/edit/delete only a few files, not everything will be analysed and sorted again; only the neccessary parts.
@@ -5796,6 +5671,24 @@ begin
 
   // refill view
   if FullRefill then
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, LParam(True));
+end;
+
+procedure TMedienBibliothek.RefreshWebRadioCategory;
+begin
+  {case BrowseMode of
+    // ClearEmptyNodes first: Otherwise we get some access violations (e.g. on GetImageIndex)
+    0: SendMessage(MainWindowHandle, WM_MedienBib, MB_ClearEmptyNodes, 0);
+    1: ;
+    2: ;
+  end;  }
+
+  // DeleteEmptyWebRadioCollections;
+  WebRadioCategory.Clear;
+  MergeWebradioIntoCategories(RadioStationList);
+
+
+  if (CurrentCategory is TLibraryWebradioCategory) then
     SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, LParam(True));
 end;
 
@@ -6622,13 +6515,11 @@ initialization
   InitializeCriticalSection(CSUpdate);
   InitializeCriticalSection(CSAccessDriveList);
   InitializeCriticalSection(CSAccessBackupCoverList);
-  InitializeCriticalSection(CSLyricPriorities);
 
 finalization
 
   DeleteCriticalSection(CSUpdate);
   DeleteCriticalSection(CSAccessDriveList);
   DeleteCriticalSection(CSAccessBackupCoverList);
-  DeleteCriticalSection(CSLyricPriorities);
 end.
 

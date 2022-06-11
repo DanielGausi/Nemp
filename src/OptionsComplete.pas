@@ -44,7 +44,7 @@ uses
   DateUtils,  IniFiles, jpeg, PNGImage,  math, Contnrs,
   bass, fldbrows, StringHelper, MainFormHelper, RatingCtrls,
   NempAudioFiles, Spectrum_vis, Hilfsfunktionen, Systemhelper, TreeHelper,
-  CoverHelper, UpdateUtils, HtmlHelper, Lyrics,
+  CoverHelper, UpdateUtils, HtmlHelper,
   Nemp_ConstantsAndTypes, filetypes, Buttons, gnuGettext,
   Nemp_RessourceStrings,  ScrobblerUtils, ExtDlgs, NempCoverFlowClass,
   MyDialogs, Vcl.Mask, System.UITypes, Generics.Collections,
@@ -58,15 +58,6 @@ uses
 type
 
   teMoveDirection = (mdUp, mdDown);
-
-  TLyricTreeData = class
-      public
-          SearchMethod: TLyricFunctionsEnum;
-          Priority: Integer;
-          constructor Create(aSearchMethod: TLyricFunctionsEnum; aPriority: Integer);
-  end;
-
-  TLyricTreeDataList = TObjectList<TLyricTreeData>;
 
   TOptionsCompleteForm = class(TForm)
     OpenDlg_CountdownSongs: TOpenDialog;
@@ -541,9 +532,6 @@ type
     cb_CoverSize: TComboBox;
     lblCoverArtQuality: TLabel;
     CBAutoScanPlaylistFilesOnView: TCheckBox;
-    LblLyricPriorities: TLabel;
-    VSTLyricSettings: TVirtualStringTree;
-    BtnLyricPriorities: TUpDown;
     cpgCoverFlowView: TCategoryPanelGroup;
     cpCoverflowPosition: TCategoryPanel;
     cpCoverflowViewPosition: TCategoryPanel;
@@ -610,7 +598,6 @@ type
     lblMetaDataAutomaticRating: TLabel;
     lblExtendedTags: TLabel;
     lbMetaDataAutoDetectCharset: TLabel;
-    cpOnlineLyrics: TCategoryPanel;
     cpgSearchSettings: TCategoryPanelGroup;
     cpGeneralSearchSettings: TCategoryPanel;
     lblSearchSettingsHint: TLabel;
@@ -700,16 +687,6 @@ type
     procedure BtnAutoScanNowClick(Sender: TObject);
     procedure cbSaveLogToFileClick(Sender: TObject);
     procedure cb_IgnoreLyricsClick(Sender: TObject);
-    procedure VSTLyricSettingsInitNode(Sender: TBaseVirtualTree; ParentNode,
-      Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-    procedure VSTLyricSettingsGetText(Sender: TBaseVirtualTree;
-      Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
-      var CellText: string);
-    procedure VSTLyricSettingsChecked(Sender: TBaseVirtualTree;
-      Node: PVirtualNode);
-    procedure BtnLyricPrioritiesClick(Sender: TObject; Button: TUDBtnType);
-    procedure VSTLyricSettingsNodeDblClick(Sender: TBaseVirtualTree;
-      const HitInfo: THitInfo);
     procedure cb_ApplyReplayGainClick(Sender: TObject);
     procedure tp_DefaultGainMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -788,7 +765,6 @@ type
     { Private-Deklarationen }
     // OldFontSize: integer;
     DetailRatingHelper: TRatingHelper;
-    fLyricTreeDataList: TLyricTreeDataList;
 
     FileCategories: TLibraryCategoryList;
     RootCollections: TAudioCollectionList;
@@ -961,7 +937,6 @@ end;
 procedure TOptionsCompleteForm.FormCreate(Sender: TObject);
 var i, s, count: integer;
   BassInfo: BASS_DEVICEINFO;
-  aLyricTreeData: TLyricTreeData;
 begin
 
   //optionsVST.StyleElements := [];
@@ -1059,36 +1034,12 @@ begin
 
   OpenDlg_CountdownSongs.Filter := Nemp_MainForm.PlaylistDateienOpenDialog.Filter;
 
-  // --------------------
-  // Create Lyrics-Stuff
-  fLyricTreeDataList := TLyricTreeDataList.Create(True);
-  // Fill the DataList with the settings from the MediaLibrary
-  // currently 2 methods for searching Lyrics available: LYR_LYRICWIKI and LYR_CHARTLYRICS
-  aLyricTreeData := TLyricTreeData.Create(LYR_LYRICWIKI, MedienBib.LyricPriorities[LYR_LYRICWIKI]);
-  fLyricTreeDataList.Add(aLyricTreeData);
-  aLyricTreeData := TLyricTreeData.Create(LYR_CHARTLYRICS, MedienBib.LyricPriorities[LYR_CHARTLYRICS]);
-  fLyricTreeDataList.Add(aLyricTreeData);
-
-  // Sort these by Priority, so that the index in the list matches somehow the priority
-  fLyricTreeDataList.Sort(
-      TComparer<TLyricTreeData>.Construct(
-        function (const a,b: TLyricTreeData): Integer
-        begin
-            result := CompareValue(a.Priority, b.Priority);
-        end
-      )
-  );
-
   // MediaLibrary-Configuration
   FileCategories := TLibraryCategoryList.Create(False);
   OrganizerSettings := TOrganizerSettings.create;
   RootCollections := TAudioCollectionList.Create(False);
   VSTCategories.NodeDataSize := SizeOf(TLibraryCategory);
   VSTSortings.NodeDataSize := SizeOf(TAudioCollection);
-
-  // prepare and fill the treeview
-  VSTLyricSettings.NodeDataSize := SizeOf(TLyricTreeData);
-  VSTLyricSettings.RootNodeCount := fLyricTreeDataList.Count;
 end;
 
 
@@ -1602,9 +1553,6 @@ begin
   OrganizerSettings.Free;
   RootCollections.OwnsObjects := True;
   RootCollections.Free;
-
-  VSTLyricSettings.Clear;
-  fLyricTreeDataList.Free;
 end;
 
 procedure TOptionsCompleteForm.OptionsVSTGetImageIndex(Sender: TBaseVirtualTree;
@@ -2766,11 +2714,6 @@ begin
   MedienBib.ShowAutoResolveInconsistenciesHints := cb_ShowAutoResolveInconsistenciesHints.checked;
   // Heuristics for charcode detections
   NempCharCodeOptions.AutoDetectCodePage := CBAutoDetectCharCode.Checked;
-  // Lyric-Priorities
-  for i := 0 to self.fLyricTreeDataList.Count - 1 do
-    MedienBib.LyricPriorities[fLyricTreeDataList[i].SearchMethod] := fLyricTreeDataList[i].Priority;
-  if assigned(FDetails) then
-    fDetails.BuildGetLyricButtonHint;
 end;
 
 function TOptionsCompleteForm.ApplySearchSettings: Boolean;
@@ -3557,131 +3500,6 @@ begin
   end;
 end;
 
-
-
-{ TLyricTreeData }
-
-constructor TLyricTreeData.Create(aSearchMethod: TLyricFunctionsEnum;
-  aPriority: Integer);
-begin
-    self.SearchMethod := aSearchMethod;
-    self.Priority := aPriority;
-end;
-
-
-procedure TOptionsCompleteForm.VSTLyricSettingsGetText(Sender: TBaseVirtualTree;
-  Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
-  var CellText: string);
-var aTreeData: TLyricTreeData;
-begin
-    aTreeData := Node.GetData<TLyricTreeData>;
-
-    if not assigned(aTreeData) then
-        exit;
-
-    case aTreeData.SearchMethod of
-        LYR_NONE        : CellText := 'N/A '; // should never be the case
-        LYR_LYRICWIKI   : CellText := Options_LyricPriority_LYRICWIKI  ; //'LyricWiki (recommended)';
-        LYR_CHARTLYRICS : CellText := Options_LyricPriority_CHARTLYRICS; //'ChartLyrics (beta)';
-    end;
-end;
-
-procedure TOptionsCompleteForm.VSTLyricSettingsInitNode(
-  Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode;
-  var InitialStates: TVirtualNodeInitStates);
-begin
-    Node.SetData<TLyricTreeData>(fLyricTreeDataList[Node.Index]);
-    Node.CheckType := ctCheckbox;
-
-    if fLyricTreeDataList[Node.Index].Priority < 100 then
-        Node.CheckState := csCheckedNormal
-    else
-        Node.CheckState := csUnCheckedNormal;
-end;
-
-
-
-procedure TOptionsCompleteForm.BtnLyricPrioritiesClick(Sender: TObject;
-  Button: TUDBtnType);
-var currentNode: PVirtualNode;
-    aTreeData: TLyricTreeData;
-    currentPrio: Integer;
-begin
-    currentNode := VSTLyricSettings.FocusedNode;
-
-    BtnLyricPriorities.Position := 50;
-
-
-    case Button of
-      btNext: begin
-            if assigned(VSTLyricSettings.GetPrevious(currentNode)) then
-                  VSTLyricSettings.MoveTo(currentNode,
-                          VSTLyricSettings.GetPrevious(currentNode),
-                          amInsertBefore, false);
-      end;
-      btPrev: begin
-            if assigned(VSTLyricSettings.GetNext(currentNode)) then
-                  VSTLyricSettings.MoveTo(currentNode,
-                          VSTLyricSettings.GetNext(currentNode),
-                          amInsertAfter, false);
-      end;
-    end;
-
-
-    currentNode := VSTLyricSettings.GetFirst();
-    currentPrio := 1;
-    while assigned(currentNode) do
-    begin
-        aTreeData := currentNode.GetData<TLyricTreeData>;
-        if currentNode.CheckState = csCheckedNormal  then
-        begin
-            aTreeData.Priority := currentPrio;
-            inc(currentPrio);
-        end
-        else
-            aTreeData.Priority := 100;
-
-        currentNode := VSTLyricSettings.GetNext(currentNode);
-    end;
-end;
-
-procedure TOptionsCompleteForm.VSTLyricSettingsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
-var currentNode: PVirtualNode;
-    aTreeData: TLyricTreeData;
-    currentPrio: Integer;
-begin
-    currentNode := VSTLyricSettings.GetFirst();
-    currentPrio := 1;
-    while assigned(currentNode) do
-    begin
-        aTreeData := currentNode.GetData<TLyricTreeData>;
-        if currentNode.CheckState = csCheckedNormal  then
-        begin
-            aTreeData.Priority := currentPrio;
-            inc(currentPrio);
-        end
-        else
-            aTreeData.Priority := 100;
-
-        currentNode := VSTLyricSettings.GetNext(currentNode);
-    end;
-end;
-
-procedure TOptionsCompleteForm.VSTLyricSettingsNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
-var currentNode: PVirtualNode;
-    aTreeData: TLyricTreeData;
-begin
-    currentNode := HitInfo.HitNode;
-    if not assigned(currentNode) then
-        exit;
-
-    aTreeData := currentNode.GetData<TLyricTreeData>;
-    case aTreeData.SearchMethod of
-        LYR_NONE: ;
-        LYR_LYRICWIKI  : ShellExecute(Handle, 'open', PChar(GetBaseURL_LyricWiki)  , nil, nil, SW_SHOW);
-        LYR_CHARTLYRICS: ShellExecute(Handle, 'open', PChar(GetBaseURL_ChartLyrics), nil, nil, SW_SHOW);
-    end;
-end;
 
 {$REGION 'Customizable Coverflow'}
 procedure TOptionsCompleteForm.ShowCoverFlowSettings;

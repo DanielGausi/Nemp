@@ -41,22 +41,7 @@ interface
 
 uses Windows, Contnrs, Sysutils,  Classes, dialogs, Messages, StrUtils, System.Net.HttpClient ;
 
-const COUNT_LYRIC_SEARCH_METHODS = 2;
-
   type
-      {TTitle = class
-          private
-              fTitle: String;
-              fLink: String;
-          public
-              constructor Create(aTitle, aLink: String);
-      end;}
-
-      TLyricFunctionsEnum = (LYR_NONE, LYR_LYRICWIKI, LYR_CHARTLYRICS);
-      TLyricGetFunction = function(aInt, aTitle: String): Boolean of object;
-      TLyricGetFunctions = Array[1..COUNT_LYRIC_SEARCH_METHODS] of TLyricGetFunction;
-
-
       TLyrics = class
           private
               fInterpret: String;  // the current artist we are searching for
@@ -66,13 +51,11 @@ const COUNT_LYRIC_SEARCH_METHODS = 2;
               fExceptionOccured: Boolean;
               fExceptionMessage: String;
 
-              fLyricGetFunctions: TLyricGetFunctions;
-
               // Get the HTML-Code and parse it
-              function GetLyrics_LyricWiki(aInterpret, aTitle: String): Boolean;
               function GetLyrics_Chartlyrics(aInterpret, aTitle: String): Boolean;
-              // a Dummy-function
-              function GetLyrics_Dummy(aInterpret, aTitle: String): Boolean;
+              // main method of the class
+              // everything else is done in the subroutines
+              function GetLyrics(aInterpret, aTitle: String): String;
 
           public
               constructor Create;
@@ -80,42 +63,14 @@ const COUNT_LYRIC_SEARCH_METHODS = 2;
               property ExceptionOccured: Boolean read fExceptionOccured;
               property ExceptionMessage: String read fExceptionMessage;
 
-              // main method of the class
-              // everything else is done in the subroutines
-              function GetLyrics(aInterpret, aTitle: String): String;
-
-              procedure SetLyricSearchPriorities(aFirst, aSecond: TLyricFunctionsEnum);
-
-              // temporary only
-              // for testing: Show Lyric-Priorities
-              function PriorityString: String;
+              class procedure GetLyricSources(dest: TStrings);
+              class function GetLyricsURL(SourceIndex: Integer; aInterpret, aTitle: String): String;
       end;
-
-
-// create the URL for the Lyrics
-function BuildURL_LyricWiki(aInterpret, aTitle: String): String;
-function BuildURL_ChartLyrics(aInterpret, aTitle: String): String; // for use with the API
-function BuildURL_ChartLyricsManual(aInterpret, aTitle: String): String; // for the website
-
-function GetBaseURL_LyricWiki: String;
-function GetBaseURL_ChartLyrics: String;
-
-// generate a String containing the search methods. used for the Hint-Text of the "GetLyrics"-Button (Form Details)
-function GetGenericPriorityString(Prio1, Prio2: TLyricFunctionsEnum): String;
 
 
 implementation
 
 uses HtmlHelper, Nemp_RessourceStrings;
-
-function GetBaseURL_LyricWiki: String;
-begin
-    result := 'https://lyrics.fandom.com/wiki/LyricWiki';
-end;
-function GetBaseURL_ChartLyrics: String;
-begin
-    result := 'http://www.chartlyrics.com';
-end;
 
 
 function BuildURL_ChartLyrics(aInterpret, aTitle: String): String;
@@ -133,84 +88,69 @@ begin
 end;
 
 
-function BuildURL_LyricWiki(aInterpret, aTitle: String): String;
+function RemoveSpaces(source: String): String;
 begin
-    // october 2016: + 'wiki/'
-    //'http://lyrics.wikia.com/wiki/'
-    // April 2019: "fandom"
-    result := 'https://lyrics.fandom.com/wiki/'
-                        + URLEncode_LyricWiki(WordUppercase(aInterpret))
-                  + ':' + URLEncode_LyricWiki(WordUppercase(aTitle));
+  result := Stringreplace(Source, ' ', '', [rfReplaceAll]);
 end;
 
-(*
-{ Get the Minimum of 3 Integers}
-function min3(a, b, c: Integer): Integer;
+function RemovePunctuationAndSpace(source: String): String;
 begin
-  result := a;
-  if b < result then result := b;
-  if c < result then result := c;
+  result := Stringreplace(Source, ' ', '', [rfReplaceAll]);
+  result := Stringreplace(result, ',', '', [rfReplaceAll]);
+  result := Stringreplace(result, ';', '', [rfReplaceAll]);
+  result := Stringreplace(result, '.', '', [rfReplaceAll]);
+  result := Stringreplace(result, ':', '', [rfReplaceAll]);
 end;
 
-{ Compute the Edit/Levenshtein-Distance by dynamic-programming  }
-function LevenshteinDistance(const AText, AOther: String): Integer;
-var i, im, n, m: Integer;
-    C: Array of Integer;
-    pC, nC: Integer;
+
+function SpacesToPlus(source: String): String;
 begin
-  n := length(AText);
-  m := length(AOther);
-
-  if m = 0 then
-      result := n
-  else begin
-      setlength(C, m+1);
-      for i := 0 to m do C[i] := i;
-
-      for i := 1 to n do
-      begin
-          pC := i-1;
-          nC := i;
-          for im  := 1 to m do
-          begin
-              if AText[i] = AOther[im] then
-                  nC := pC
-              else
-                  nC := 1 + min3(nC, pC, C[im]);
-              pC := C[im];
-              C[im] := nC;
-          end;
-      end;
-      result := C[m];
-  end;
+  result := Stringreplace(Source, ' ', '+', [rfReplaceAll]);
 end;
-*)
 
-(*
-{ TTitle }
-{
-    --------------------------------------------------------
-    Constructor TTitle.Create
-    - replace stuff entities like '&amp;' in the title
-    - store title lowercase
-    - add website-adress to intenal link
-    --------------------------------------------------------
-}
-constructor TTitle.Create(aTitle, aLink: String);
+function SearchURL_AZLyricsDirectURL(aInterpret, aTitle: String): String;
 begin
-    fTitle := ReplaceGeneralEntities(aTitle);
-    fTitle := AnsiLowerCase(fTitle);
-    fLink  := 'http://lyrics.wikia.com' + aLink;
-end;*)
+  result := 'https://www.azlyrics.com/lyrics/'
+    +  URLEncode_LyricWiki(Lowercase(RemovePunctuationAndSpace(aInterpret)))
+    + '/' + URLEncode_LyricWiki(Lowercase(RemovePunctuationAndSpace(aTitle))) + '.html';
+end;
+
+function SearchURL_AZLyrics(aInterpret, aTitle: String): String;
+begin
+  result := 'https://search.azlyrics.com/search.php?q='
+    + URLEncode_SpaceToPlus(Lowercase(aInterpret))
+    + '+' + URLEncode_SpaceToPlus(Lowercase(aTitle));
+end;
+
+function SearchURL_Google(aInterpret, aTitle: String): String;
+begin
+  result := 'https://www.google.com/search?q='
+    + URLEncode_SpaceToPlus(Lowercase(aInterpret))
+    + '+' + URLEncode_SpaceToPlus(Lowercase(aTitle))
+    + '+lyrics';
+end;
+
+function SearchURL_Bing(aInterpret, aTitle: String): String;
+begin
+  result := 'https://www.bing.com/search?q='
+    + URLEncode_SpaceToPlus(Lowercase(aInterpret))
+    + '+' + URLEncode_SpaceToPlus(Lowercase(aTitle))
+    + '+lyrics';
+end;
+
+function SearchURL_DuckDuckGo(aInterpret, aTitle: String): String;
+begin
+  result := 'https://duckduckgo.com/?q='
+    + URLEncode_SpaceToPlus(Lowercase(aInterpret))
+    + '+' + URLEncode_SpaceToPlus(Lowercase(aTitle))
+    + '+lyrics';
+end;
 
 { TLyrics }
 
 constructor TLyrics.Create;
 begin
     inherited;
-    // set Default Lyric-Search-Methods
-    fLyricGetFunctions[1] := self.GetLyrics_LyricWiki;
-    fLyricGetFunctions[2] := self.GetLyrics_Chartlyrics;
 end;
 
 destructor TLyrics.Destroy;
@@ -219,42 +159,39 @@ begin
 end;
 
 
-{
-    --------------------------------------------------------
-    SetLyricSearchPriorities
-    - Set the order of Lyric-Search-Functions
-      (if another method is implemented, the parameter-list must be extended)
-    --------------------------------------------------------
-}
-
-procedure TLyrics.SetLyricSearchPriorities(aFirst, aSecond: TLyricFunctionsEnum);
-    function EnumToFunction(aEnum: TLyricFunctionsEnum): TLyricGetFunction;
-    begin
-        case aEnum of
-          LYR_NONE:        result := self.GetLyrics_Dummy;
-          LYR_LYRICWIKI:   result := self.GetLyrics_LyricWiki;
-          LYR_CHARTLYRICS: result := self.GetLyrics_Chartlyrics;
-        end;
-    end;
-
+class procedure TLyrics.GetLyricSources(dest: TStrings);
 begin
-    fLyricGetFunctions[1] := EnumToFunction(aFirst);
-    fLyricGetFunctions[2] := EnumToFunction(aSecond);
+  dest.Clear;
+  dest.Add('AZLyrics');
+  dest.Add('Google');
+  dest.Add('Bing');
+  dest.Add('DuckDuckGo');
+end;
+
+class function TLyrics.GetLyricsURL(SourceIndex: Integer; aInterpret,
+  aTitle: String): String;
+begin
+  case SourceIndex of
+    0: result := SearchURL_AZLyricsDirectURL(aInterpret, aTitle);
+    1: result := SearchURL_Google(aInterpret, aTitle);
+    2: result := SearchURL_Bing(aInterpret, aTitle);
+    3: result := SearchURL_DuckDuckGo(aInterpret, aTitle);
+  else
+    result := '';
+  end;
+
 end;
 
 {
     --------------------------------------------------------
     GetLyrics (Main Method)
-    - try to get the lyrics directly
-      // nope, not anymore. or try to get it through the artist-page
+    (removed)
     --------------------------------------------------------
 }
 
 function TLyrics.GetLyrics(aInterpret, aTitle: String): String;
 var Success: Boolean;
-    i: Integer;
 begin
-    // fExceptionOccured := False;
     fInterpret := aInterpret;
     fTitle := aTitle;
     fCurrentLyrics := '';
@@ -263,11 +200,9 @@ begin
     fExceptionOccured := False;
     fExceptionMessage := '';
 
-    for i := 1 to COUNT_LYRIC_SEARCH_METHODS do
-    begin
-        if (not success) then
-            success := fLyricGetFunctions[i](aInterpret, aTitle);
-    end;
+    /// ----------
+    // Do some stuff (removed)
+    /// ----------
 
     if Success then
         result := fCurrentLyrics
@@ -275,17 +210,6 @@ begin
         result := '';
 end;
 
-{
-    --------------------------------------------------------
-    GetLyrics_Dummy
-     - Dummy method, does nothing
-    --------------------------------------------------------
-}
-function TLyrics.GetLyrics_Dummy(aInterpret, aTitle: String): Boolean;
-begin
-    fCurrentLyrics := '';
-    result := false;
-end;
 
 {
     --------------------------------------------------------
@@ -336,142 +260,6 @@ begin
             fExceptionOccured := True;
             fExceptionMessage := Format(HTTP_Connection_Error, [GetDomainFromURL(aURL), E.Message]);
         end;
-    end;
-end;
-
-{
-    --------------------------------------------------------
-    GetLyrics_LyricWiki
-    --------------------------------------------------------
-}
-
-function TLyrics.GetLyrics_LyricWiki(aInterpret, aTitle: String): Boolean;
-var code: String;
-    lStart, LEnd, i: Integer;
-    rawLyrics, charcode, newline, aURL: String;
-    sl: TStringList;
-    a,b, c: Integer;
-const LyricBox = '<div class=''lyricbox''>';
-      LyricBoxEnd = '<div class=''lyricsbreak''>';
-      //ScriptEnd = '</script>';
-begin
-    aURL := BuildURL_LyricWiki(aInterpret, aTitle);
-    try
-        code := GetURLAsString(aURL);
-        if code = '' then
-            result := false
-        else
-        begin
-            ///  April 2019
-            ///  <div class='lyricbox'>
-            ///  LYRICS
-            ///  <div class='lyricsbreak'>
-
-            // search for <div class=''lyricbox''>
-            lStart := Pos(LyricBox, code);
-
-            if lStart > 0 then
-                // inc Start, so at Start is the first interesting letter
-                lStart := lStart + length(LyricBox);
-
-            // search for the "end marker"
-            if lStart > 0 then
-                lEnd := PosEx(LyricBoxEnd, code, lStart)
-            else
-                lEnd := 0;
-
-
-            if (lStart > 0) and (lEnd > 0) then
-            begin
-                // copy the matching part into a string
-                rawLyrics := Copy(code, lStart, lEnd - lStart);
-                // Replace HTML Linebreaks with normal ones
-                rawLyrics := StringReplace(rawLyrics, '<br />', #13#10, [rfReplaceAll]);
-
-                sl := TStringList.Create;
-                try
-                    // put the text into a StringList, line by line
-                    sl.Text := rawLyrics;
-                    for i := 0 to sl.count - 1 do
-                    begin
-                        c := 1;
-                        newline := '';
-                        // for each line translate the &#111;-stuff into normal chars
-                        while c < length(sl[i]) do
-                        begin
-                            a := PosEx('&#', sl[i], c) + 2;
-                            b := PosEx(';',  sl[i], a+2) ;
-                            if (a > 2) and (b > 3) then
-                            begin
-                                charcode := copy(sl[i], a, b - a);
-                                newline := newline + chr(StrToIntDef(charcode, Ord('?')));
-                                c := b;
-                            end else
-                                c := length(sl[i]) + 1;
-                        end;
-                        sl[i] := newLine;
-                    end;
-                    // Set Self.fCurrentLyrics to our parsed text
-                    fCurrentLyrics := sl.Text;
-                    // Success :D
-                    result := True;
-                finally
-                  sl.Free;
-                end;
-            end
-            else
-                // no lyric-Box found :(
-                result := False;
-        end;
-    except
-        on E: ENetHTTPClientException do
-        begin
-            result := false;
-            fExceptionOccured := True;
-            fExceptionMessage := Format(HTTP_Connection_Error, [GetDomainFromURL(aURL), E.Message]);
-        end;
-    end;
-end;
-
-function GetGenericPriorityString(Prio1, Prio2: TLyricFunctionsEnum): String;
-begin
-    result := '';
-    case Prio1 of
-      //LYR_NONE        : result := result + 'N/A' +#13#10;
-      LYR_LYRICWIKI   : result := result + ' - ' + Options_LyricPriority_LYRICWIKI   +#13#10;
-      LYR_CHARTLYRICS : result := result + ' - ' + Options_LyricPriority_CHARTLYRICS +#13#10;
-    end;
-
-    case Prio2 of
-      //LYR_NONE        : result := result + 'N/A' +#13#10;
-      LYR_LYRICWIKI   : result := result + ' - ' + Options_LyricPriority_LYRICWIKI   +#13#10;
-      LYR_CHARTLYRICS : result := result + ' - ' + Options_LyricPriority_CHARTLYRICS +#13#10;
-    end;
-end;
-
-
-
-function TLyrics.PriorityString: String;
-var i: Integer;
-    f1, f2, f3: TLyricGetFunction;
-    fi: TLyricGetFunction;
-begin
-    f1 := GetLyrics_LyricWiki;
-    f2 := GetLyrics_Chartlyrics;
-    f3 := GetLyrics_Dummy;
-
-    result := '';
-    for i := 1 to COUNT_LYRIC_SEARCH_METHODS do
-    begin
-        fi := fLyricGetFunctions[i];
-        if (@f1 = @fi) then
-            result := result + IntToStr(i) + ' : LyricWiki' + #13#10;
-
-        if (@f2 = @fi) then
-            result := result + IntToStr(i) + ' : Chartlyrics' + #13#10;
-
-        if (@f3 = @fi) then
-            result := result + IntToStr(i) + ' : N/A' + #13#10;
     end;
 end;
 

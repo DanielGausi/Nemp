@@ -254,8 +254,8 @@ begin
       awc.fBitrate   := 0;
       awc.fGenre     := '';
       awc.fSortIndex := 0;
-
       awc.fKey := '';
+      awc.fStation := Nil;
       break;
     end;
   end;

@@ -5,8 +5,8 @@ object Nemp_MainForm: TNemp_MainForm
   ClientHeight = 749
   ClientWidth = 1090
   Color = clBtnFace
-  Constraints.MinHeight = 600
-  Constraints.MinWidth = 800
+  Constraints.MinHeight = 300
+  Constraints.MinWidth = 400
   DragMode = dmAutomatic
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -1811,6 +1811,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnStartDrag = VSTFilesStartDrag
           Touch.InteractiveGestures = [igPan, igPressAndTap]
           Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+          ExplicitTop = 3
           Columns = <
             item
               Position = 0
@@ -1913,6 +1914,7 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 4
       OnMouseDown = TreePanelMouseDown
       Ratio = 0
+      OnPaint = NewPanelPaint
       OwnerDraw = False
       object AuswahlHeaderPanel0: TNempPanel
         Tag = 2
@@ -2067,7 +2069,7 @@ object Nemp_MainForm: TNemp_MainForm
           end
         end
       end
-      object PanelStandardBrowse: TPanel
+      object PanelStandardBrowse: TNempPanel
         Tag = 2
         Left = 0
         Top = 28
@@ -2077,6 +2079,9 @@ object Nemp_MainForm: TNemp_MainForm
         BevelInner = bvRaised
         BevelOuter = bvLowered
         TabOrder = 1
+        Ratio = 0
+        OnPaint = NewPanelPaint
+        OwnerDraw = False
         object SplitterBrowse: TSplitter
           Left = 2
           Top = 81
@@ -2697,6 +2702,7 @@ object Nemp_MainForm: TNemp_MainForm
         OnMouseDown = PanelTagCloudBrowseMouseDown
         OnResize = PanelTagCloudBrowseResize
         Ratio = 0
+        OnPaint = NewPanelPaint
         OwnerDraw = False
         object TabBtnTagCloudCategory: TSkinButton
           Tag = 1
@@ -5807,12 +5813,6 @@ object Nemp_MainForm: TNemp_MainForm
         OnClick = PM_ML_SetmarkerClick
       end
     end
-    object PM_ML_GetLyrics: TMenuItem
-      Caption = 'Get lyrics for selected files'
-      ImageIndex = 25
-      ShortCut = 16460
-      OnClick = PM_ML_GetLyricsClick
-    end
     object PM_ML_GetTags: TMenuItem
       Caption = 'Get additional tags for selected files'
       ImageIndex = 18
@@ -7291,7 +7291,6 @@ object Nemp_MainForm: TNemp_MainForm
       object PM_ML_CloudEditor: TMenuItem
         Caption = 'Tag cloud editor'
         ImageIndex = 19
-        ShortCut = 24660
         OnClick = PM_ML_CloudEditorClick
       end
     end

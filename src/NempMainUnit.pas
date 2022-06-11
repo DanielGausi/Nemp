@@ -87,7 +87,7 @@ type
     Nemp_MainMenu: TMainMenu;
     PlayListImageList: TImageList;
     PlaylistPanel: TNempPanel;
-    PanelStandardBrowse: TPanel;
+    PanelStandardBrowse: TNempPanel;
     SplitterBrowse: TSplitter;
     ArtistsVST: TVirtualStringTree;
     AlbenVST: TVirtualStringTree;
@@ -199,7 +199,6 @@ type
     PM_ML_RefreshSelected: TMenuItem;
     PM_ML_HideSelected: TMenuItem;
     PM_ML_DeleteSelected: TMenuItem;
-    PM_ML_GetLyrics: TMenuItem;
     N3: TMenuItem;
     PM_ML_ShowInExplorer: TMenuItem;
     PM_ML_CopyToClipboard: TMenuItem;
@@ -724,7 +723,7 @@ type
 
     function ValidAudioFile(filename: UnicodeString; JustPlay: Boolean): boolean;
     function NempFileType(filename: UnicodeString): TNempFileType;
-    procedure PM_ML_GetLyricsClick(Sender: TObject);
+    // procedure PM_ML_GetLyricsClick(Sender: TObject);
 
     procedure VSTBeforeItemErase(Sender: TBaseVirtualTree;
       TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect;
@@ -4336,9 +4335,9 @@ begin
             PM_ML_Mark2.Enabled := LibraryIsIdle AND SomeFilesSelected;
             PM_ML_Mark3.Enabled := LibraryIsIdle AND SomeFilesSelected;
             PM_ML_Mark0.Enabled := LibraryIsIdle AND SomeFilesSelected;
-    PM_ML_GetLyrics      .Enabled := LibraryIsIdle AND SomeFilesSelected
-                                                   AND LibraryNotBlockedByPartymode
-                                                   AND (NOT MedienBib.AnzeigeShowsPlaylistFiles);
+    ///PM_ML_GetLyrics      .Enabled := LibraryIsIdle AND SomeFilesSelected
+    ///                                               AND LibraryNotBlockedByPartymode
+    ///                                               AND (NOT MedienBib.AnzeigeShowsPlaylistFiles); Disabled for now (06.2022)
     PM_ML_GetTags        .Enabled := LibraryIsIdle AND SomeFilesSelected
                                                    AND LibraryNotBlockedByPartymode
                                                    AND (NOT MedienBib.AnzeigeShowsPlaylistFiles);
@@ -5308,18 +5307,17 @@ var c, i: Integer;
   AudioFile: TAudioFile;
 begin
 
-
-  c := VST.SelectedCount;
   SelectedMP3s := VST.GetSortedSelection(False);
+  c := length(SelectedMp3s);
   if c = 0 then
   begin
       MedienListeStatusLBL.Caption := '';
       exit;
   end;
-  dauer:=0;
-  groesse:=0;
+  dauer := 0;
+  groesse := 0;
 
-  for i:=0 to VST.SelectedCount-1 do
+  for i := 0 to length(SelectedMp3s) - 1 do
   begin
       aNode := SelectedMP3s[i];
       AudioFile := VST.GetNodeData<TAudioFile>(aNode);
@@ -5341,9 +5339,7 @@ begin
       MedienListeStatusLBL.Caption := MedienListeStatusLBL.Caption + '; '
                                 + Format((MainForm_Summary_FileCountTotal), [c] );
 
-
   if c > 0 then begin
-
     RefreshVSTDetailsTimer.Enabled := False;
     RefreshVSTDetailsTimer.Enabled := True;
     RefreshVSTDetailsTimer.Tag := SD_MEDIENBIB;
@@ -6234,6 +6230,7 @@ begin
   end;
 end;
 
+(* Disabled for now (06.2022)
 procedure TNemp_MainForm.PM_ML_GetLyricsClick(Sender: TObject);
 var i: Integer;
     SelectedMp3s: TNodeArray;
@@ -6265,6 +6262,7 @@ begin
         MedienBib.GetLyrics;
     end;
 end;
+*)
 
 
 procedure TNemp_MainForm.PM_ML_GetTagsClick(Sender: TObject);
@@ -13732,6 +13730,9 @@ begin
   actToggleFileOverview.Checked := NempLayout.ShowFileOverview;
   actToggleTitleList.Checked := NempLayout.ShowMedialist;
   CorrectSkinRegionsTimer.Enabled := True;
+
+  if NempSkin.isActive then
+    NempLayout.SplitterColor := NempSkin.SkinColorScheme.SplitterColor;
 
   if NempSkin.isActive and (NempOptions.AnzeigeMode = 0) then
   begin

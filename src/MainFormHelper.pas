@@ -261,29 +261,8 @@ begin
 
                       FSplash.StatusLBL.Caption := (SplashScreen_NewDriveConnected2);
                       FSplash.Update;
-
-
                       MedienBib.ReBuildCategories;
                       ReFillBrowseTrees(True);
-                      {
-
-                      jetzt weniger zu tun?
-                      einfach nur den "C:\"-Key der Collections ändern (falls Verzeichnis-Anzeige)?
-
-                      // todo xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                      // Anzeige aktualisieren
-                      case MedienBib.BrowseMode of
-                          0 : MedienBib.ReBuildBrowseLists;
-
-                          1: begin
-                              MedienBib.ReBuildCoverList;
-                              MedienBib.NewCoverFlow.ClearTextures;
-                              SetCoverFlowScrollbarRange(MedienBib.CoverViewList);
-                              CoverScrollbarChange(Nil);
-                          end;
-
-                      end;
-                      }
 
                   FSplash.Close;
                   Nemp_MainForm.Enabled := True;
@@ -783,8 +762,6 @@ begin
         case Newmode of
             0: begin
                 // Zeige Browse-Listen
-
-                // MedienBib.Count > 0 .....???  yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
                 EmptyLibraryPanel.Parent := TreePanel;
                 if Nemplayout.ShowBibSelection then
                   TreePanel.ShowPanel;
@@ -797,17 +774,6 @@ begin
                     ReSizeBrowseTrees;
                 end;
 
-                //PanelCoverBrowse.visible := False;
-                //PanelStandardBrowse.Visible := MedienBib.Count > 0;
-                //PanelTagCloudBrowse.Visible := False;
-                //ShowTagCloudSearch(False);
-
-                //PanelStandardBrowse.Left := 2;        // das ist doch eh alClient ???????
-                //PanelStandardBrowse.Width := AuswahlPanel.Width - 4;
-                //PanelStandardBrowse.Top := 2;
-                //PanelStandardBrowse.Height := GRPBOXArtistsAlben.Height - 4;
-                //PanelStandardBrowse.Anchors := [akleft, aktop, akright, akBottom];
-
                 // TabButtons-Glyphs neu setzen
                 TabBtn_Browse0.GlyphLine := 1;
                 TabBtn_CoverFlow0.GlyphLine := 0;
@@ -817,7 +783,6 @@ begin
                 TabBtn_CoverFlow0.Refresh;
             end;
             1: begin
-                //AlbenVST.Clear;
                 // Zeige CoverFlow
                 EmptyLibraryPanel.Parent := CoverFlowPanel;
 
@@ -828,19 +793,6 @@ begin
                 if NempOptions.AnzeigeMode = 0 then
                   NempLayout.ReAlignMainForm;
 
-                // MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
-
-                //PanelStandardBrowse.Visible := False;
-                //PanelTagCloudBrowse.Visible := False;
-                //PanelCoverBrowse.Visible := MedienBib.Count > 0;
-                //ShowTagCloudSearch(False);
-
-                //PanelCoverBrowse.Left := 2;
-                //PanelCoverBrowse.Width := AuswahlPanel.Width - 4;
-                //PanelCoverBrowse.Top := 2;
-                //PanelCoverBrowse.Height := GRPBOXArtistsAlben.Height - 4;
-                //PanelCoverBrowse.Anchors := [akleft, aktop, akright, akBottom];
-
                 // TabButtons-Glyphs neu setzen
                 TabBtn_Browse1.GlyphLine := 0;
                 TabBtn_CoverFlow1.GlyphLine := 1;
@@ -850,7 +802,6 @@ begin
                 TabBtn_CoverFlow1.Refresh;
             end;
             2: begin
-                //AlbenVST.Clear;
                 EmptyLibraryPanel.Parent := CloudPanel;
 
                 TreePanel.HidePanel;
@@ -860,17 +811,6 @@ begin
                 if NempOptions.AnzeigeMode = 0 then
                   NempLayout.ReAlignMainForm;
 
-                {PanelStandardBrowse.Visible := False;
-                PanelTagCloudBrowse.Visible := MedienBib.Count > 0;
-                PanelCoverBrowse.Visible := False;
-                // ShowTagCloudSearch(True);
-
-                PanelTagCloudBrowse.Left := 2;
-                PanelTagCloudBrowse.Width := AuswahlPanel.Width - 4;
-                PanelTagCloudBrowse.Top := 2;
-                PanelTagCloudBrowse.Height := GRPBOXArtistsAlben.Height - 4;
-                PanelTagCloudBrowse.Anchors := [akleft, aktop, akright, akBottom];
-                 }
                 // TabButtons-Glyphs neu setzen
                 TabBtn_Browse2.GlyphLine := 0;
                 TabBtn_CoverFlow2.GlyphLine := 0;

@@ -1939,6 +1939,7 @@ var
   AudioFile: TAudioFile;
   aErr: TNempAudioError;
 begin
+  result := True;
   if FileList.Count = 0 then
     exit;
 

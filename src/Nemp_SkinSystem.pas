@@ -1613,12 +1613,9 @@ begin
         MedienBib.NewCoverFlow.SetColor(SkinColorScheme.FormCL);
 
     Color := SkinColorScheme.FormCL;
-    // yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-    //MainSplitter.Color := SkinColorScheme.SplitterColor;
-    //SubSplitter1.Color := SkinColorScheme.SplitterColor;
-    //SubSplitter2.Color := SkinColorScheme.SplitterColor;
     SplitterBrowse.Color := SkinColorScheme.SplitterColor;
     SplitterFileOverview.Color := SkinColorScheme.SplitterColor;
+    NempLayout.SplitterColor := NempSkin.SkinColorScheme.SplitterColor;
 
     LyricsMemo.Color := SkinColorScheme.MemoBackGroundCL;
     LyricsMemo.Font.Color := SkinColorScheme.MemoTextCL;
@@ -1925,12 +1922,9 @@ begin
   with Nemp_MainForm do
   begin
     Color := clBtnFace;
-    // yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-    //MainSplitter.Color := clBtnFace;
-    //SubSplitter1.Color := clBtnFace;
-    //SubSplitter2.Color := clBtnFace;
     SplitterBrowse.Color := clBtnFace;
     SplitterFileOverview.Color := clBtnFace;
+    NempLayout.SplitterColor := clBtnFace;
 
     LyricsMemo.Color := clWindow;
     LyricsMemo.Font.Color := clWindowText;

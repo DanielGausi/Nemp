@@ -813,63 +813,17 @@ end;
 
 procedure JoinMainForm;
 begin
-  //       yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-
   with Nemp_MainForm do
   begin
-    // AuswahlFillPanel.Width := TreePanel.Width - AuswahlFillPanel.Left; // is alClient
-    {TreePanel.Align := alNone;
-    TreePanel.Left := 0;
-    TreePanel.Parent := _TopMainPanel;
-
-    PlaylistPanel.Align := alNone;
-    PlaylistPanel.Parent := _TopMainPanel;
-
-    MedialistPanel.Align := alNone;
-    MedialistPanel.Parent := _VSTPanel;
-
-    MedienBibDetailPanel.Align := alNone;
-    MedienBibDetailPanel.Parent := _VSTPanel;  }
-
-(*  PartyMode is NEVER active here ...
-    if NempSkin.NempPartyMode.Active then
-        EditFastSearch.Width := Round(194 * NempSkin.NempPartyMode.ResizeFactor)
-    else
-        EditFastSearch.Width := 194;
-        *)
 
     MedienListeControlPanel.Width := EditFastSearch.Left + EditFastSearch.Width + 6;
-    //MedienlisteFillPanel.Left := EditFastSearch.Left + EditFastSearch.Width + 6;
-    //MedienlisteFillPanel.Width := MedialistPanel.Width - MedienlisteFillPanel.Left;// - 8;
     MedienListeStatusLBL.Width := MedienlisteFillPanel.Width - 16;
 
-(*  PartyMode is NEVER active here ...
-    if NempSkin.NempPartyMode.Active then
-        EditplaylistSearch.Width := Round(65 * NempSkin.NempPartyMode.ResizeFactor)
-    else
-        EditplaylistSearch.Width := 65;
-*)
-
-    //PlaylistFillPanel.Left := EditplaylistSearch.Left + EditplaylistSearch.Width + 6;
-    //PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left;// - 8;
-    //PlayListStatusLBL.Width := PlaylistFillPanel.Width - 16;
-
-    // set Resize-Handler again
-    /// Nemp_MainForm.OnResize := FormResize;
-    //_VSTPanel.OnResize     := _TopMainPanelResize;
-    //_TopMainPanel.OnResize := _TopMainPanelResize;
-
-    //MainSplitter.Visible := True;
-    //_VSTPanel.Visible := False;
-    //_TopMainPanel.Visible := False;
-
-      //__MainContainerPanel.Constraints.MinHeight := 0;
       Height := _ControlPanel.Height + 2;
       Constraints.MaxHeight := 0;
-      Constraints.MinWidth := 800;
-      Constraints.MinHeight := 600;
+      Constraints.MinWidth := MAINFORM_MinWidth;
+      Constraints.MinHeight := MAINFORM_MinHeight;
 
-      //Nemp_MainForm.OnResize := FormResize;
       Nemp_MainForm.Borderstyle := bsSizeable;
 
     FixScrollbar;
@@ -1022,31 +976,8 @@ begin
       // Menu-Einträge Dis-/Enablen
       actJoinWindows.Visible := newMode = 1;
       actSplitWindows.Visible := newMode = 0;
-
-      //actCompactToggleFileOverview.Visible := True; //newMode = 0;
-      //actCompactToggleTitleList.Visible := newMode = 0;
-      //actCompactToggleBrowseList.Visible := newMode = 0;
-
-      //actSplitToggleFileOverview.Visible := False; //newMode = 1;
       actTogglePlaylist.Visible := newMode = 1;
-      //actSplitToggleTitleList.Visible := newMode = 1;
-      //actSplitToggleBrowseList.Visible := newMode = 1;
-
       actToggleStayOnTop.Enabled := newMode = 1;
-
-      {PM_P_ViewSeparateWindows_Equalizer.Enabled := newMode = 1;
-      PM_P_ViewSeparateWindows_Playlist.Enabled := newMode = 1;
-      PM_P_ViewSeparateWindows_Medialist.Enabled := newMode = 1;
-      PM_P_ViewSeparateWindows_Browse.Enabled := newMode = 1;
-      PM_P_ViewStayOnTop.Enabled := newMode = 1;
-      MM_O_ViewSeparateWindows_Equalizer.Enabled := newMode = 1;
-      MM_O_ViewSeparateWindows_Playlist.Enabled := newMode = 1;
-      MM_O_ViewSeparateWindows_Medialist.Enabled := newMode = 1;
-      MM_O_ViewSeparateWindows_Browse.Enabled := newMode = 1;
-      MM_O_ViewStayOnTop.Enabled := newMode = 1;
-      // PM_P_ViewCompactComplete.Enabled := newMode = 0;
-     // MM_O_ViewCompactComplete.Enabled := newMode = 0;
-      }
 
       BtnClose.Visible := newMode = 1;
       BtnMinimize.Visible := newMode = 1;
@@ -1103,9 +1034,6 @@ begin
           NempRegionsDistance.Bottom := height;
           NempRegionsDistance.Right := width;
           NempRegionsDistance.Left := 0;
-          // yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-          //_TopMainPanel.Constraints.MinHeight := NempFormBuildOptions.MainPanelMinHeight;
-          //_TopMainPanel.Constraints.MinWidth := NempFormBuildOptions.MainPanelMinWidth;
       end
       else
       begin
@@ -1121,12 +1049,6 @@ begin
           FormPosAndSizeCorrect(ExtendedControlForm);
           ReInitRelativePositions;
       end;
-
-      {// Größenkorrekturen
-      if (ArtistsVST.Width > AuswahlPanel.width - 40)
-          OR (ArtistsVST.Width < 40) then
-              ArtistsVST.Width := AuswahlPanel.width DIV 2;
-      }
 
       SnapActive := True;
 
@@ -1150,16 +1072,6 @@ begin
           FormPosAndSizeCorrect(MedienlisteForm);
           FormPosAndSizeCorrect(ExtendedControlForm);
           ReInitRelativePositions;
-          { removed december 2020
-          if NempOptions.FixCoverFlowOnStart then
-          begin
-              // this is somehow needed on XP (or only in my virtual machine??)
-              if _TopMainPanel.Height Mod 2 = 0 then
-                  _TopMainPanel.Height := _TopMainPanel.Height + 1
-              else
-                  _TopMainPanel.Height := _TopMainPanel.Height - 1  ;
-          end;
-          }
       end;
 
       //02.2017 // MAXIMIZED-OVer TAskleiste????
@@ -1179,19 +1091,9 @@ begin
           InvalidateRect(handle, NIL, TRUE);
       end;
 
-
-      //MM_O_ViewCompactComplete.Checked := NempOptions.AnzeigeMode = 0;
-      // PM_P_ViewCompactComplete.Checked := NempOptions.AnzeigeMode = 0;
-
       CorrectSkinRegionsTimer.Enabled := True;
-      //Nemp_MainForm.CorrectSkinRegions;
-
       MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
-      // necessary on advanced skins
-      // ReAcceptDragFiles;  / done in CorrectSkinregiosnTimer
-
       Tag := NempOptions.AnzeigeMode;
-
 
       //CoverScrollbar.WindowProc := NewScrollBarWndProc;
       //SendMessage( CoverScrollbar.Handle, WM_SETREDRAW, 1, 0);

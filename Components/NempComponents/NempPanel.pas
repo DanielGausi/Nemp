@@ -3,8 +3,8 @@
 interface
 
 uses
-  Windows, SysUtils, Classes, Vcl.Controls, Vcl.StdCtrls, Vcl.ExtCtrls, Messages, math,
-  System.Generics.Collections, System.Generics.Defaults;
+  Windows, VCL.Forms, Classes, Vcl.Controls, Vcl.StdCtrls, Vcl.ExtCtrls, Messages, math,
+  System.Generics.Collections, System.Generics.Defaults, Graphics;
 
 type
   //TMouseWheelEvent = procedure(Sender: TObject; delta: Word) of object;
@@ -106,6 +106,7 @@ type
       function GetNewSplitter(aAlign: TAlign; aPos: Integer): TSplitter;
       // function CreateNewHorizontalSplitter(aAlign: TAlign; aLeft: Integer): TSplitter;
       // function CreateNewVerticalSplitter(aAlign: TAlign; aTop: Integer): TSplitter;
+      procedure SetSplitterColor(Value: TColor);
 
     public
       property ChildPanelCount: Integer read GetChildPanelCount;
@@ -121,6 +122,7 @@ type
       property OnSplitterCanResize: TCanResizeEvent read fOnSplitterCanResize write fOnSplitterCanResize;
       property OnEditButtonClick: TNotifyEvent read fOnEditButtonClick write fOnEditButtonClick;
       //property OnContainerResize: TNotifyEvent read fOnContainerResize write fOnContainerResize;
+      property SplitterColor: TColor write SetSplitterColor;
 
       constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
@@ -131,6 +133,7 @@ type
 
       procedure CheckVisibility;
       procedure AlignChildPanels(Recursive: Boolean);
+
       // procedure ResizeChildPanels;
       // Problem: How to deal with the fixed-size-ControlPanel here?
 
@@ -138,7 +141,6 @@ type
       procedure AddNempPanel(Source: TNempPanel);
       procedure RemovePanel(Source: TNempPanel);
       procedure MovePanel(curIndex, newIndex: Integer);
-
 
       procedure CreateEditButtons;
       procedure ShowEditButtons(EnableSplit: Boolean);
@@ -215,6 +217,10 @@ begin
   fEditButtons := Nil;
   fUpdating := False;
   fOrientation := poVertical;
+
+  BevelOuter := bvNone;
+  BevelInner := bvNone;
+  BorderStyle := bsNone;
 end;
 
 
@@ -485,6 +491,17 @@ begin
   result.OnMoved := DoOnSplitterMoved;
   result.OnCanResize := DoSplitterCanResize;
   inc(fCurrentSplitterIndex);
+end;
+
+procedure TNempContainerPanel.SetSplitterColor(Value: TColor);
+var
+  i: Integer;
+begin
+  for i := 0 to fChildSplitters.Count - 1 do
+    fChildSplitters[i].Color := Value;
+  for i := 0 to fChildPanels.Count - 1 do
+    if ChildPanel[i] is TNempContainerPanel then
+      TNempContainerPanel(ChildPanel[i]).SplitterColor := Value;
 end;
 
 procedure TNempContainerPanel.ResetAligning;

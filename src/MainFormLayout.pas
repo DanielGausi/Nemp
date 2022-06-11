@@ -3,7 +3,7 @@ unit MainFormLayout;
 interface
 
 uses
-  Windows, SysUtils, Classes, Controls, ExtCtrls, Messages, math, System.IniFiles,
+  Windows, SysUtils, Classes, Controls, ExtCtrls, Messages, math, System.IniFiles, Graphics,
   System.Generics.Collections, System.Generics.Defaults, Nemp_ConstantsAndTypes, NempPanel;
 
 
@@ -61,6 +61,7 @@ type
       fShowFileOverview: Boolean; // Show the File Overview Panel
 
       fBrowseMode: Integer;
+      fSplitterColor: TColor;
 
       procedure TestAddBlock(ID: teNempBlocks);
       procedure TestAddContainer(ID: Char; DummyContainers: TStringList);
@@ -77,9 +78,10 @@ type
       function TestInstructions(aBuildInstructions: TStrings): Boolean;
       procedure SetDefaultInstructions(aBuildInstructions: TStrings);
 
-
       function CreateInstructionLine(aContainer: TNempContainerPanel): string;
       function CreateRatioLine(aContainer: TNempContainerPanel): string;
+
+      procedure SetSplitterColor(Value: TColor);
 
 
     public
@@ -100,6 +102,7 @@ type
       // only relevant in the real MainWindow, not for the FormDesigner
       property FileOverviewCoverRatio: Integer read fFileOverviewCoverRatio write fFileOverviewCoverRatio;
       property TreeViewRatio         : Integer read fTreeViewRatio          write fTreeViewRatio         ;
+      property SplitterColor: TColor read fSplitterColor write SetSplitterColor;
 
 
       property BrowseMode: Integer read fBrowseMode write fBrowseMode;
@@ -656,6 +659,12 @@ begin
   //  if fContainerPanels[i].Visible then
   //    TNempContainerPanel(fContainerPanels[i]).AlignChildPanels;
   LockWindowUpdate(0);
+end;
+
+procedure TNempLayout.SetSplitterColor(Value: TColor);
+begin
+  fSplitterColor := Value;
+  fMainContainer.SplitterColor := Value;
 end;
 
 procedure TNempLayout.AddBlock(ID: teNempBlocks; aParent: TNempContainerPanel);

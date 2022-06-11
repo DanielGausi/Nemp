@@ -431,8 +431,6 @@ begin
     begin
         ChangeProc := Bigger;
         fResizeProc := Bigger;
-        // yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy das div 2 ist unsinn, nur behelfsweise
-        // fLastTopHeight := Nemp_MainForm.Height Div 2 ; // Nemp_MainForm._TopMainPanel.Height;
         fLastHeight    := Nemp_MainForm.Height;
         fLastWidth     := Nemp_MainForm.Width;
     end
@@ -619,10 +617,6 @@ begin
         CorrectVolButton;
         CorrectVCLForABRepeat;
 
-        // correct Splitter
-        //SubSplitter1.Left := AuswahlPanel.Width;
-        //yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-
         // Load correctly scaled graphics
         if Nemp_MainForm.NempSkin.isActive then
         begin
@@ -652,8 +646,8 @@ begin
     if assigned(OptionsCompleteForm) and OptionsCompleteForm.visible then
         OptionsCompleteForm.Close;
 
-    Nemp_MainForm.Constraints.MinWidth  := min(Screen.Width, ChangeProc(800));
-    Nemp_MainForm.Constraints.MinHeight := min(Screen.Height-50, ChangeProc(600));
+    Nemp_MainForm.Constraints.MinWidth  := min(Screen.Width, ChangeProc(MAINFORM_MinWidth));
+    Nemp_MainForm.Constraints.MinHeight := min(Screen.Height-50, ChangeProc(MAINFORM_MinHeight));
 
     if Not fActive then
     begin
@@ -689,7 +683,7 @@ begin
         // Medialist: View
         PM_ML_DeleteSelected                  .visible := ShowGeneralMenuItems;
         PM_ML_SetRatingsOfSelectedFilesCHOOSE .visible := ShowGeneralMenuItems;
-        PM_ML_GetLyrics                       .visible := ShowGeneralMenuItems;
+        // PM_ML_GetLyrics                       .visible := ShowGeneralMenuItems;  Disabled for now (06.2022)
         PM_ML_GetTags                         .visible := ShowGeneralMenuItems;
         PM_ML_RefreshSelected                 .visible := ShowGeneralMenuItems;
         PM_ML_PasteFromClipboard              .visible := ShowGeneralMenuItems;
