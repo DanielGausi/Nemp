@@ -562,8 +562,8 @@ const
     NEMP_CAPTION = 'Nemp - Noch ein MP3-Player';
     NEMP_NAME_TASK_LONG = '[ N e m p ]';
     NEMP_NAME_TASK = '[Nemp]';
-    NEMP_VERSION_SPLASH = 'version 4.91';// 'v3.3';
-    NEMP_BASS_DEFAULT_USERAGENT = 'Nemp/4.91';
+    NEMP_VERSION_SPLASH = 'version 4.92';// 'v3.3';
+    NEMP_BASS_DEFAULT_USERAGENT = 'Nemp/4.92';
 
     NEMP_TIPSIZE = 128;
 
@@ -2807,7 +2807,7 @@ begin
   LastKnownVersion := NempSettingsManager.ReadInteger('Allgemein','LastKnownVersion',0 );
   ShowSplashScreen := NempSettingsManager.ReadBool('Allgemein', 'ShowSplashScreen', True);
 
-  AutoCloseProgressWindow := NempSettingsManager.ReadBool('Allgemein', 'AutoCloseProgressWindow', False);
+  AutoCloseProgressWindow := NempSettingsManager.ReadBool('Allgemein', 'AutoCloseProgressWindow', True);
   StartMinimized          := NempSettingsManager.ReadBool('Allgemein', 'StartMinimized', False);
   AllowOnlyOneInstance    := NempSettingsManager.ReadBool('Allgemein', 'AllowOnlyOneInstance', True);
 

@@ -64,7 +64,7 @@ uses
   Lyrics, pngimage, ExPopupList, SilenceDetection,
   System.ImageList, System.Types, System.UITypes, ProgressShape,
   System.Win.TaskbarCore, Vcl.Taskbar, BaseForms, Vcl.VirtualImageList,
-  System.Actions, Vcl.ActnList
+  System.Actions, Vcl.ActnList, Vcl.AppEvnts
   {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF}
   ;
 
@@ -659,6 +659,9 @@ type
     PM_ML_FavPlaylistSeparator: TMenuItem;
     PM_ML_SaveAsNewFavorite: TMenuItem;
     PM_ML_EditFavorites: TMenuItem;
+    PM_ML_ResetTagCloudSeparator: TMenuItem;
+    PM_ML_ResetTagCloud: TMenuItem;
+    ApplicationEvents1: TApplicationEvents;
 
     procedure FormCreate(Sender: TObject);
 
@@ -878,7 +881,7 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure BtnCloseClick(Sender: TObject);
     procedure __BtnMinimizeClick(Sender: TObject);
-    procedure BtnMenuClick(Sender: TObject);
+    // procedure BtnMenuClick(Sender: TObject);
     procedure Nichtvorhandenelschen1Click(Sender: TObject);
     procedure TabPanelMedienlisteClick(Sender: TObject);
     Function GenerateSleepHint: String;
@@ -1049,6 +1052,7 @@ type
       X, Y: Integer);
     procedure PanelTagCloudBrowseClick(Sender: TObject);
     procedure DoExpandCloud(ac: TAudioFileCollection);
+    // procedure DoResetCloud(ac: TAudioFileCollection);
     procedure PanelTagCloudBrowseDblClick(Sender: TObject);
     procedure CloudTestKey(Sender: TObject; var Key: Char);
 
@@ -1309,6 +1313,11 @@ type
     procedure actTogglePlaylistExecute(Sender: TObject);
     procedure actToggleStayOnTopExecute(Sender: TObject);
     procedure SplitWindowTimerTimer(Sender: TObject);
+    procedure PM_ML_ResetTagCloudClick(Sender: TObject);
+    function ApplicationEvents1Help(Command: Word; Data: NativeInt;
+      var CallHelp: Boolean): Boolean;
+    procedure CloseHelpWnd;
+
 
   private
     { Private declarations }
@@ -1674,6 +1683,12 @@ begin
   end;
 end;
 
+(*procedure TNemp_MainForm.DoResetCloud(ac: TAudioFileCollection);
+begin
+  //if assigned(ac) then
+//    DoExpandCloud(ac.Root);
+end;*)
+
 procedure TNemp_MainForm.PanelTagCloudBrowseDblClick(Sender: TObject);
 begin
   CloudViewer.FocussedTag := CloudViewer.MouseOverTag;
@@ -1727,26 +1742,25 @@ begin
     DoExpandCloud(CloudViewer.FocussedCollection);
 end;
 
+procedure TNemp_MainForm.PM_ML_ResetTagCloudClick(Sender: TObject);
+begin
+  DoExpandCloud(CloudViewer.RootCollection);
+end;
+
 procedure TNemp_MainForm.CloudTestKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 var
   ac: TAudioFileCollection;
 begin
     CloudViewer.NavigateCloud(Key, Shift);
+    // NavigateCloud changes CloudViewer.FocussedCollection
 
     if (ssCtrl in Shift) and (key = $46) then
       edtCloudSearch.SetFocus;
 
     case key of
         vk_Escape,
-        vk_Back: begin
-                ac := CloudViewer.FocussedCollection;
-                if assigned(ac) and ac.ExpandTagCloud then begin
-                  CloudViewer.Collection := ac;
-                  CloudViewer.PaintCloud;
-                  MedienBib.GenerateAnzeigeListe(ac);
-                end;
-        end
+        vk_Back: DoExpandCloud(CloudViewer.FocussedCollection);
     else
       begin
         ac := CloudViewer.FocussedCollection;
@@ -1754,7 +1768,6 @@ begin
           MedienBib.GenerateAnzeigeListe(ac);
       end;
     end;
-
 end;
 
 procedure TNemp_MainForm.CloudAfterPaint(Sender: TObject);
@@ -3309,10 +3322,10 @@ end;
 
 
 procedure TNemp_MainForm.TabBtn_FavoritesClick(Sender: TObject);
-var point: TPoint;
+var pt: TPoint;
 begin
-    GetCursorPos(Point);
-    PlaylistManagerPopup.Popup(Point.X, Point.Y);
+  pt := TabBtn_Favorites.ClientToScreen(Point(0,0));
+  PlaylistManagerPopup.Popup(pt.X, pt.Y + TabBtn_Favorites.Height);
 end;
 
 function TNemp_MainForm.GetFocussedAudioFile:TAudioFile;
@@ -4277,7 +4290,10 @@ begin
     PM_ML_RemoveSelectedPlaylists.Enabled := LibraryIsIdle
                                   AND LibraryNotBlockedByPartymode
                                   and (MedienBib.CurrentCategory.CategoryType = ccPlaylists)
-                                  AND assigned(AlbenVST.FocusedNode)
+                                  AND assigned(AlbenVST.FocusedNode);
+
+    PM_ML_ResetTagCloudSeparator.Visible := MedienBib.BrowseMode = 2;
+    PM_ML_ResetTagCloud.Visible := MedienBib.BrowseMode = 2;
 end;
 
 procedure TNemp_MainForm.Medialist_View_PopupMenuPopup(Sender: TObject);
@@ -10884,12 +10900,12 @@ begin
   RepairZOrder;
 end;
 
-procedure TNemp_MainForm.BtnMenuClick(Sender: TObject);
+(*procedure TNemp_MainForm.BtnMenuClick(Sender: TObject);
 var point: TPoint;
 begin
   GetCursorPos(Point);
   Player_PopupMenu.Popup(Point.X, Point.Y+10);
-end;
+end;*)
 
 procedure TNemp_MainForm.BtnMinimizeClick(Sender: TObject);
 begin
@@ -10947,10 +10963,12 @@ begin
 end;
 
 procedure TNemp_MainForm.TabPanelMedienlisteClick(Sender: TObject);
-var point: TPoint;
+var pt: TPoint;
 begin
-  GetCursorPos(Point);
-  Medialist_View_PopupMenu.Popup(Point.X, Point.Y+10);
+  //GetCursorPos(Point);
+  //Medialist_View_PopupMenu.Popup(Point.X, Point.Y+10);
+  pt := TabBtn_Medialib.ClientToScreen(Point(0,0));
+  Medialist_View_PopupMenu.Popup(pt.X, pt.Y + TabBtn_Medialib.Height);
 end;
 
 Function TNemp_MainForm.GenerateSleepHint: String;
@@ -12429,16 +12447,13 @@ end;
 
 
 procedure TNemp_MainForm.TabPanelPlaylistClick(Sender: TObject);
-var point: TPoint;
+var pt: TPoint;
 begin
-    GetCursorPos(Point);
-    PlayListPOPUP.Popup(Point.X, Point.Y+10);
+  //GetCursorPos(Point);
+  //PlayListPOPUP.Popup(Point.X, Point.Y+10);
+  pt := TabBtn_Playlist.ClientToScreen(Point(0,0));
+  PlayListPOPUP.Popup(pt.X, pt.Y + TabBtn_Playlist.Height);
 end;
-
-
-
-
-
 
 
 
@@ -12681,18 +12696,22 @@ begin
 end;
 
 procedure TNemp_MainForm.TabBtn_Preselection0Click(Sender: TObject);
-var point: TPoint;
+var pt: TPoint;
 begin
-  GetCursorPos(Point);
-  Medialist_Browse_PopupMenu.Popup(Point.X, Point.Y+10);
+  // GetCursorPos(Point);
+  // Medialist_Browse_PopupMenu.Popup(Point.X, Point.Y+10);
+  pt := (Sender as TSkinButton).ClientToScreen(Point(0,0));
+  Medialist_Browse_PopupMenu.Popup(pt.X, pt.Y + (Sender as TSkinButton).Height);
 end;
 
 
 procedure TNemp_MainForm.TabBtnCoverCategoryClick(Sender: TObject);
-var point: TPoint;
+var pt: TPoint;
 begin
-  GetCursorPos(Point);
-  Medialist_Browse_Categories_PopupMenu.Popup(Point.X, Point.Y+10);
+  // GetCursorPos(Point);
+  // Medialist_Browse_Categories_PopupMenu.Popup(Point.X, Point.Y+10);
+  pt := (Sender as TSkinButton).ClientToScreen(Point(0,0));
+  Medialist_Browse_Categories_PopupMenu.Popup(pt.X, pt.Y + (Sender as TSkinButton).Height);
 end;
 
 procedure TNemp_MainForm.TabBtn_CoverMouseMove(Sender: TObject;
@@ -12764,10 +12783,12 @@ end;
 
 
 procedure TNemp_MainForm.ToolImageClick(Sender: TObject);
-var point: TPoint;
+var pt: TPoint;
 begin
-  GetCursorPos(Point);
-  PopupTools.Popup(Point.X, Point.Y+10);
+  // GetCursorPos(Point);
+  // PopupTools.Popup(Point.X, Point.Y+10);
+  pt := (Sender as TImage).ClientToScreen(Point(0,0));
+  PopupTools.Popup(pt.X, pt.Y + (Sender as TImage).Height);
 end;
 
 procedure TNemp_MainForm.WalkmanImageClick(Sender: TObject);
@@ -13790,6 +13811,28 @@ begin
 
     //if Assigned_NempFormBuildOptions then
     //    NempFormBuildOptions.OnSuperContainerResize(Sender);
+end;
+
+
+function TNemp_MainForm.ApplicationEvents1Help(Command: Word; Data: NativeInt;
+  var CallHelp: Boolean): Boolean;
+begin
+  CloseHelpWnd;
+  Result := ShellExecute(0,'open','hh.exe',
+                         PWideChar('-mapid '+IntToStr(Data)
+                                   +' ms-its:'+Application.HelpFile),
+                         nil,SW_SHOW) = 32;
+  CallHelp := false;
+end;
+
+procedure TNemp_MainForm.CloseHelpWnd;
+var
+  HlpWind: HWND;
+const
+  HelpTitle = 'Nemp - Noch ein Mp3-Player';
+begin
+  HlpWind := FindWindow('HH Parent',HelpTitle);
+  if HlpWind <> 0 then PostMessage(HlpWind,WM_Close,0,0);
 end;
 
 

@@ -19,6 +19,7 @@ uses
   vcl.themes,
   vcl.styles,
   WinApi.Messages,
+  // VCL.HtmlHelpViewer,
   NempMainUnit in 'NempMainUnit.pas' {Nemp_MainForm},
   Splash in 'Splash.pas' {FSplash},
   PlaylistUnit in 'PlaylistUnit.pas' {PlaylistForm},
@@ -165,7 +166,8 @@ begin
   Graphics.DefFontData.Name := 'Tahoma';
 
     Application.Title := NEMP_NAME_TASK;
-    Application.Name  := NEMP_NAME;
+    Application.HelpFile := 'F:\Nemp Github\Nemp\bin\nemp-de.chm';
+  Application.Name  := NEMP_NAME;
 
     // Show Mainform, but beyond all visible area
     Nemp_MainForm.Top := 10000;
@@ -191,6 +193,7 @@ begin
     Nemp_MainForm.Top := EVILHACKY;
     Nemp_MainForm.Left := EVILHACKX;
 
+    InitializeCoverflow;
     // for some reasons, there are some controls "unpainted" on startup on some skins
     Nemp_MainForm.RepaintAll;
 
@@ -201,6 +204,7 @@ begin
     end;
 
     FSplash.Visible := False;
+
 
     RunWizard;
 

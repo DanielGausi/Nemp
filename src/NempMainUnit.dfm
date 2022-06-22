@@ -1811,7 +1811,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnStartDrag = VSTFilesStartDrag
           Touch.InteractiveGestures = [igPan, igPressAndTap]
           Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-          ExplicitTop = 3
           Columns = <
             item
               Position = 0
@@ -7304,6 +7303,14 @@ object Nemp_MainForm: TNemp_MainForm
       ShortCut = 16430
       OnClick = PM_ML_RemoveSelectedPlaylistsClick
     end
+    object PM_ML_ResetTagCloudSeparator: TMenuItem
+      Caption = '-'
+    end
+    object PM_ML_ResetTagCloud: TMenuItem
+      Caption = 'Reset tag cloud'
+      ShortCut = 27
+      OnClick = PM_ML_ResetTagCloudClick
+    end
   end
   object PopupTools: TPopupMenu
     AutoHotkeys = maManual
@@ -7510,5 +7517,10 @@ object Nemp_MainForm: TNemp_MainForm
     OnTimer = SplitWindowTimerTimer
     Left = 112
     Top = 136
+  end
+  object ApplicationEvents1: TApplicationEvents
+    OnHelp = ApplicationEvents1Help
+    Left = 640
+    Top = 288
   end
 end

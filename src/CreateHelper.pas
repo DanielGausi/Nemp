@@ -51,13 +51,15 @@ interface
 
     procedure StuffToDoAfterCreate;
 
+    procedure InitializeCoverflow;
+
 implementation
 
 uses NempMainUnit, Splash, gnugettext, PlaylistClass, PlayerClass,
     MedienbibliothekClass, Nemp_SkinSystem, Spectrum_vis,
     Nemp_ConstantsAndTypes, NempApi, NempAudioFiles, Nemp_RessourceStrings,
     MainFormHelper, UpdateUtils, SystemHelper, TreeHelper, languagecodes,
-    SplitForm_Hilfsfunktionen, DriveRepairTools,
+    SplitForm_Hilfsfunktionen, DriveRepairTools, NempCoverFlowClass,
 
     MedienListeUnit, AuswahlUnit, ExtendedControlsUnit, PlaylistUnit,
     WindowsVersionInfo, AudioDisplayUtils,
@@ -445,7 +447,8 @@ begin
         Spectrum.BackColor := clBtnFace;
         // Spectrum.ScrollDelay := NempPlayer.ScrollAnzeigeDelay;
         Spectrum.DrawClear;
-        MedienBib.NewCoverFlow.ApplySettings;
+        // moved to CreateHelper.InitializeCoverflow
+        // MedienBib.NewCoverFlow.ApplySettings;
     end;
 end;
 
@@ -490,7 +493,7 @@ begin
         end;
 
         // Anzeige oben links initialisieren
-        SwitchBrowsePanel(MedienBib.BrowseMode);
+        SwitchBrowsePanel(MedienBib.BrowseMode, True);
 
         TabBtn_SummaryLock.Tag       := NempOptions.VSTDetailsLock;
         TabBtn_SummaryLock.GlyphLine := NempOptions.VSTDetailsLock;
@@ -629,6 +632,18 @@ begin
         AutoLoadBib;
         CheckWriteAccess;
     end;
+end;
+
+// InitializeCoverflow: Used in .dpr after moving the MainWindow into view
+procedure InitializeCoverflow;
+begin
+  if (ParamCount >= 1) and (ParamStr(1) = '/safemode') then
+    MedienBib.NewCoverFlow.Mode := cm_Classic
+  else
+    MedienBib.NewCoverFlow.Mode := TCoverFlowMode(NempSettingsManager.ReadInteger('MedienBib', 'CoverFlowMode', Integer(cm_OpenGL)));
+
+  MedienBib.NewCoverFlow.ApplySettings;
+
 end;
 
 

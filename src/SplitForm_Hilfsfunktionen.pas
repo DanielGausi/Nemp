@@ -61,7 +61,7 @@ uses Windows, forms, Classes, Controls, StdCtrls, ExtCtrls, Graphics, Nemp_Const
   procedure RevokeDragFiles;
 
   procedure UpdateSmallMainForm;
-  procedure UpdateFormDesignNeu(newMode: Integer);
+  procedure UpdateFormDesignNeu(newMode: Integer; NempStarting: Boolean = False);
 
   procedure PositionCloseImage(CloseBtn: TSkinButton; ParentPanel: TPanel);
 
@@ -926,7 +926,7 @@ begin
     end;
 end;
 
-procedure UpdateFormDesignNeu(newMode: Integer);
+procedure UpdateFormDesignNeu(newMode: Integer; NempStarting: Boolean = False);
 begin
   with Nemp_MainForm do
   begin
@@ -1092,7 +1092,8 @@ begin
       end;
 
       CorrectSkinRegionsTimer.Enabled := True;
-      MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
+      if not NempStarting then
+        MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
       Tag := NempOptions.AnzeigeMode;
 
       //CoverScrollbar.WindowProc := NewScrollBarWndProc;

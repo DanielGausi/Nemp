@@ -385,8 +385,6 @@ object MainFormBuilder: TMainFormBuilder
           OwnerDraw = False
           HierarchyLevel = 0
           SplitterMinSize = 120
-          ExplicitLeft = 1
-          ExplicitTop = 38
           object lblMainContainer: TLabel
             Left = 11
             Top = 46

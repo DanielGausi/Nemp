@@ -74,7 +74,7 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     // Switch MediaLibrary: Umschalten zwischen Listen/Coverflow/Tagwolke
     procedure SwitchMediaLibrary(NewMode: Integer);
     // SwitchBrowsePanel: entsprechendes Anzeigen der Liste
-    procedure SwitchBrowsePanel(NewMode: Integer);
+    procedure SwitchBrowsePanel(NewMode: Integer; NempStarting: Boolean = False);
 
     procedure SetCoverFlowScrollbarRange(aCount: Integer); overload;
     procedure RestoreCoverFlowAfterSearch(ForceUpdate: Boolean = False);
@@ -730,16 +730,18 @@ begin
     end;
 end;
 
-procedure SwitchBrowsePanel(NewMode: Integer);
+procedure SwitchBrowsePanel(NewMode: Integer; NempStarting: Boolean = False);
   function CanShowSelectionPnl: Boolean;
   begin
     result := Nemplayout.ShowBibSelection;
   end;
 begin
-    Nemp_MainForm.CloudViewer.Clear;
-    MedienBib.NewCoverFlow.Clear;
-    Nemp_MainForm.ArtistsVST.Clear;
-    Nemp_MainForm.AlbenVST.Clear;
+    if not NempStarting then begin
+      Nemp_MainForm.CloudViewer.Clear;
+      MedienBib.NewCoverFlow.Clear;
+      Nemp_MainForm.ArtistsVST.Clear;
+      Nemp_MainForm.AlbenVST.Clear;
+    end;
 
     with Nemp_MainForm do
     begin

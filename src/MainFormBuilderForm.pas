@@ -512,7 +512,7 @@ var
   cntSend: TNempContainerPanel;
 begin
   cntSend := Sender as TNempContainerPanel;
-
+  cntSend.BevelOuter := bvRaised;
   cntSend.OnEditButtonClick := BtnEditContainerClick;
   cntSend.OnDragOver := NempContainerDragOver;
   cntSend.OnDragDrop := NempContainerDragDrop;

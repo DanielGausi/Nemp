@@ -1327,10 +1327,13 @@ begin
 
         AutoActivateWebServer := NempSettingsManager.ReadBool('MedienBib', 'AutoActivateWebServer', False);
 
+        {
+        // moved to CreateHelper.InitializeCoverflow
         if (ParamCount >= 1) and (ParamStr(1) = '/safemode') then
             NewCoverFlow.Mode := cm_Classic
         else
             NewCoverFlow.Mode := TCoverFlowMode(NempSettingsManager.ReadInteger('MedienBib', 'CoverFlowMode', Integer(cm_OpenGL))); // cm_OpenGL; //cm_Classic; //cm_OpenGL; //
+}
 
         NewCoverFlow.LoadSettings;
         //CurrentArtist := NempSettingsManager.ReadString('MedienBib','SelectedArtist', BROWSE_ALL);

@@ -186,6 +186,7 @@ type
           procedure SetFocussedCollection(Value: TAudioFileCollection);
           procedure SetCollection(Value: TAudioFileCollection);
           function GetCollection: TAudioFileCollection;
+          function GetRootCollection: TAudioFileCollection;
 
           function CalcBreadCrumbMargin: Integer;
 
@@ -232,6 +233,7 @@ type
           property MouseOverTag: TPaintTag read fMouseOverTag write SetMouseOverTag;
           property FocussedTag: TPaintTag read fFocussedTag write SetFocussedTag;
           property FocussedCollection: TAudioFileCollection read GetFocussedCollection write SetFocussedCollection;
+          property RootCollection: TAudioFileCollection read GetRootCollection;
           property OnGetHint: TCloudGetHintEvent read fOnGetHint write fOnGetHint;
 
           property PartyModeMultiplier: Single read fPartyModeMultiplier write fPartyModeMultiplier;
@@ -606,6 +608,17 @@ end;
 function TCloudView.GetCollection: TAudioFileCollection;
 begin
   result := fCollection;
+end;
+
+function TCloudView.GetRootCollection: TAudioFileCollection;
+var
+  rootTag: TPaintTag;
+begin
+  rootTag := GetRootTag;
+  if assigned(rootTag) then
+    result := rootTag.fCollection
+  else
+    result := Nil;
 end;
 
 
