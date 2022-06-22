@@ -582,6 +582,7 @@ object MainFormBuilder: TMainFormBuilder
           'Memo1')
         ScrollBars = ssVertical
         TabOrder = 2
+        Visible = False
       end
     end
   end
