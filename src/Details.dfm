@@ -784,10 +784,6 @@ object FDetails: TFDetails
           TabOrder = 0
           OnChange = Memo_LyricsChange
           OnKeyDown = Memo_LyricsKeyDown
-          ExplicitLeft = 8
-          ExplicitTop = 97
-          ExplicitWidth = 437
-          ExplicitHeight = 333
         end
         object pnlSearchLyrics: TPanel
           AlignWithMargins = True

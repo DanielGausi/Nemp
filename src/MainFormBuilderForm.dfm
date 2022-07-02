@@ -123,6 +123,7 @@ object MainFormBuilder: TMainFormBuilder
             Top = 2
             Width = 25
             Height = 25
+            Hint = 'Reset'
             Anchors = [akTop, akRight]
             Caption = #10799
             Font.Charset = DEFAULT_CHARSET
@@ -131,6 +132,8 @@ object MainFormBuilder: TMainFormBuilder
             Font.Name = 'Tahoma'
             Font.Style = []
             ParentFont = False
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 0
             OnClick = BtnResetPanelClick
           end
@@ -161,6 +164,7 @@ object MainFormBuilder: TMainFormBuilder
             Top = 4
             Width = 25
             Height = 25
+            Hint = 'Reset'
             Anchors = [akTop, akRight]
             Caption = #10799
             Font.Charset = DEFAULT_CHARSET
@@ -169,6 +173,8 @@ object MainFormBuilder: TMainFormBuilder
             Font.Name = 'Tahoma'
             Font.Style = []
             ParentFont = False
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 0
             OnClick = BtnResetPanelClick
           end
@@ -198,6 +204,7 @@ object MainFormBuilder: TMainFormBuilder
             Top = 2
             Width = 25
             Height = 25
+            Hint = 'Reset'
             Anchors = [akTop, akRight]
             Caption = #10799
             Font.Charset = DEFAULT_CHARSET
@@ -206,6 +213,8 @@ object MainFormBuilder: TMainFormBuilder
             Font.Name = 'Tahoma'
             Font.Style = []
             ParentFont = False
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 0
             OnClick = BtnResetPanelClick
           end
@@ -235,6 +244,7 @@ object MainFormBuilder: TMainFormBuilder
             Top = 2
             Width = 25
             Height = 25
+            Hint = 'Reset'
             Anchors = [akTop, akRight]
             Caption = #10799
             Font.Charset = DEFAULT_CHARSET
@@ -243,6 +253,8 @@ object MainFormBuilder: TMainFormBuilder
             Font.Name = 'Tahoma'
             Font.Style = []
             ParentFont = False
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 0
             OnClick = BtnResetPanelClick
           end
@@ -272,6 +284,7 @@ object MainFormBuilder: TMainFormBuilder
             Top = 2
             Width = 25
             Height = 25
+            Hint = 'Reset'
             Anchors = [akTop, akRight]
             Caption = #10799
             Font.Charset = DEFAULT_CHARSET
@@ -280,6 +293,8 @@ object MainFormBuilder: TMainFormBuilder
             Font.Name = 'Tahoma'
             Font.Style = []
             ParentFont = False
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 0
             OnClick = BtnResetPanelClick
           end
@@ -309,6 +324,7 @@ object MainFormBuilder: TMainFormBuilder
             Top = 2
             Width = 25
             Height = 25
+            Hint = 'Reset'
             Anchors = [akTop, akRight]
             Caption = #10799
             Font.Charset = DEFAULT_CHARSET
@@ -317,6 +333,8 @@ object MainFormBuilder: TMainFormBuilder
             Font.Name = 'Tahoma'
             Font.Style = []
             ParentFont = False
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 0
             OnClick = BtnResetPanelClick
           end
@@ -343,10 +361,11 @@ object MainFormBuilder: TMainFormBuilder
             97
             50)
           object btnRemoveTree: TButton
-            Left = 68
+            Left = 69
             Top = 2
             Width = 25
             Height = 25
+            Hint = 'Reset'
             Anchors = [akTop, akRight]
             Caption = #10799
             Font.Charset = DEFAULT_CHARSET
@@ -355,6 +374,8 @@ object MainFormBuilder: TMainFormBuilder
             Font.Name = 'Tahoma'
             Font.Style = []
             ParentFont = False
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 0
             OnClick = BtnResetPanelClick
           end
@@ -428,6 +449,8 @@ object MainFormBuilder: TMainFormBuilder
         Align = alTop
         Caption = 'Visible elements in Nemp'
         TabOrder = 0
+        ExplicitLeft = 4
+        ExplicitTop = -6
         DesignSize = (
           249
           131)
@@ -486,30 +509,30 @@ object MainFormBuilder: TMainFormBuilder
         Left = 0
         Top = 131
         Width = 249
-        Height = 204
+        Height = 222
         Align = alTop
         Caption = 'Additional configuration'
         TabOrder = 1
         DesignSize = (
           249
-          204)
+          222)
         object lblTreeViewOrientation: TLabel
           Left = 16
-          Top = 127
+          Top = 24
           Width = 102
           Height = 13
           Caption = 'Tree view orientation'
         end
         object lblFileOverview: TLabel
           Left = 16
-          Top = 47
+          Top = 82
           Width = 63
           Height = 13
           Caption = 'File overview'
         end
         object cbControlPanelShowCover: TCheckBox
           Left = 16
-          Top = 24
+          Top = 188
           Width = 225
           Height = 17
           Hint = 'Show or hide the small cover art next to the player controls'
@@ -517,11 +540,11 @@ object MainFormBuilder: TMainFormBuilder
           Caption = 'Show cover on Control Panel'
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 0
+          TabOrder = 4
         end
         object cbTreeViewOrientation: TComboBox
           Left = 16
-          Top = 146
+          Top = 43
           Width = 145
           Height = 21
           Hint = 
@@ -530,14 +553,14 @@ object MainFormBuilder: TMainFormBuilder
           Style = csDropDownList
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 3
+          TabOrder = 0
           Items.Strings = (
             'Side by side'
             'Stacked')
         end
         object cbFileOverviewOrientation: TComboBox
           Left = 16
-          Top = 93
+          Top = 128
           Width = 145
           Height = 21
           Hint = 
@@ -555,7 +578,7 @@ object MainFormBuilder: TMainFormBuilder
         end
         object cbFileOverviewMode: TComboBox
           Left = 16
-          Top = 66
+          Top = 101
           Width = 145
           Height = 21
           Hint = 'Select what you want to see in the section "File overview"'
@@ -571,18 +594,15 @@ object MainFormBuilder: TMainFormBuilder
             'Only Cover'
             'Only Text')
         end
-      end
-      object Memo1: TMemo
-        Left = 0
-        Top = 335
-        Width = 249
-        Height = 230
-        Align = alClient
-        Lines.Strings = (
-          'Memo1')
-        ScrollBars = ssVertical
-        TabOrder = 2
-        Visible = False
+        object cbShowCategorySelection: TCheckBox
+          Left = 16
+          Top = 168
+          Width = 217
+          Height = 17
+          Anchors = [akLeft, akTop, akRight]
+          Caption = 'Show category selection'
+          TabOrder = 3
+        end
       end
     end
   end

@@ -179,6 +179,7 @@ type
           fOnGetHint: TCloudGetHintEvent;
 
           fPartyModeMultiplier: Single;
+          fCategorySelectionVisible: Boolean;
 
           procedure SetMouseOverTag(Value: TPaintTag);
           procedure SetFocussedTag(Value: TPaintTag);
@@ -237,6 +238,7 @@ type
           property OnGetHint: TCloudGetHintEvent read fOnGetHint write fOnGetHint;
 
           property PartyModeMultiplier: Single read fPartyModeMultiplier write fPartyModeMultiplier;
+          property CategorySelectionVisible: Boolean read fCategorySelectionVisible write fCategorySelectionVisible;
 
           constructor Create(AOwner: TComponent); override;
           destructor Destroy; override;
@@ -573,6 +575,7 @@ begin
   fPaintTags := TPaintTagList.Create(True);
 
   fPartyModeMultiplier := 1;
+  fCategorySelectionVisible := True;
   BevelInner := bvNone;
   BevelOuter := bvNone;
   BorderStyle := bsNone;
@@ -713,7 +716,10 @@ end;
 
 function TCloudView.CalcBreadCrumbMargin: Integer;
 begin
-  result := Ceil(FIRST_BREADCRUMB_MARGIN * fPartyModeMultiplier);
+  if fCategorySelectionVisible then
+    result := Ceil(FIRST_BREADCRUMB_MARGIN * fPartyModeMultiplier)
+  else
+    result := 0;
 end;
 
 function TCloudView.GetProperFontSize(aTag: TPaintTag): Integer;

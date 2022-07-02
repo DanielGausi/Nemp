@@ -50,7 +50,7 @@ uses
   MyDialogs, Vcl.Mask, System.UITypes, Generics.Collections,
   System.Generics.Defaults, NempTrackBar,
   LibraryOrganizer.Configuration.NewLayer,
-  LibraryOrganizer.Base, LibraryOrganizer.Files, LibraryOrganizer.Playlists,
+  LibraryOrganizer.Base, LibraryOrganizer.Files, LibraryOrganizer.Playlists, LibraryOrganizer.Webradio,
   Vcl.Menus, System.Actions, Vcl.ActnList, ActiveX, System.ImageList,
   Vcl.ImgList
   {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF};
@@ -611,6 +611,8 @@ type
     cbShowElementCount: TCheckBox;
     lblCategories: TLabel;
     lblTreeViewLayers: TLabel;
+    cbLibConfigShowPlaylistCategories: TCheckBox;
+    cbLibConfigShowWebradioCategory: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -3630,6 +3632,8 @@ begin
   editCDNames.Text := OrganizerSettings.CDNames.DelimitedText;
   cbShowElementCount.Checked := OrganizerSettings.ShowElementCount;
   cbShowCoverForAlbum.Checked := OrganizerSettings.ShowCoverArtOnAlbum;
+  cbLibConfigShowPlaylistCategories.Checked := OrganizerSettings.ShowPlaylistCategories;
+  cbLibConfigShowWebRadioCategory.Checked := OrganizerSettings.ShowWebradioCategory;
   cbPlaylistCaptionMode.ItemIndex := Integer(OrganizerSettings.PlaylistCaptionMode);
   cbPlaylistSortMode.ItemIndex := Integer(OrganizerSettings.PlaylistSorting);
   cbPlaylistSortDirection.ItemIndex := Integer(OrganizerSettings.PlaylistSortDirection);
@@ -3648,6 +3652,8 @@ begin
       or (OrganizerSettings.CDNames.DelimitedText <> editCDNames.Text)
       or (OrganizerSettings.ShowElementCount <> cbShowElementCount.Checked)
       or (OrganizerSettings.ShowCoverArtOnAlbum <> cbShowCoverForAlbum.Checked)
+      or (OrganizerSettings.ShowPlaylistCategories <> cbLibConfigShowPlaylistCategories.Checked)
+      or (OrganizerSettings.ShowWebradioCategory <> cbLibConfigShowWebRadioCategory.Checked)
       or (OrganizerSettings.PlaylistCaptionMode <> tePlaylistCaptionMode(cbPlaylistCaptionMode.ItemIndex))
       or (OrganizerSettings.PlaylistSorting <> tePlaylistCollectionSorting(cbPlaylistSortMode.ItemIndex))
       or (OrganizerSettings.PlaylistSortDirection <> teSortDirection(cbPlaylistSortDirection.ItemIndex));
@@ -3682,11 +3688,18 @@ begin
   OrganizerSettings.CDNames.DelimitedText := editCDNames.Text;
   OrganizerSettings.ShowElementCount := cbShowElementCount.Checked;
   OrganizerSettings.ShowCoverArtOnAlbum := cbShowCoverForAlbum.Checked;
+  OrganizerSettings.ShowPlaylistCategories := cbLibConfigShowPlaylistCategories.Checked;
+  OrganizerSettings.ShowWebradioCategory := cbLibConfigShowWebRadioCategory.Checked;
   OrganizerSettings.PlaylistCaptionMode := tePlaylistCaptionMode(cbPlaylistCaptionMode.ItemIndex);
   OrganizerSettings.PlaylistSorting := tePlaylistCollectionSorting(cbPlaylistSortMode.ItemIndex);
   OrganizerSettings.PlaylistSortDirection := teSortDirection(cbPlaylistSortDirection.ItemIndex);
   NempOrganizerSettings.Assign(OrganizerSettings);
   MedienBib.ChangePlaylistCollectionSorting(NempOrganizerSettings.PlaylistSorting, NempOrganizerSettings.PlaylistSortDirection);
+  // if hide Playlist/WebRadioCategory now, we should switch to a FileCategory
+  if (MedienBib.CurrentCategory is TLibraryPlaylistCategory) and (not OrganizerSettings.ShowPlaylistCategories) then
+    MedienBib.CurrentCategory := MedienBib.DefaultFileCategory;
+  if (MedienBib.CurrentCategory is TLibraryWebradioCategory) then
+    MedienBib.CurrentCategory := MedienBib.DefaultFileCategory;
   MedienBib.ReFillFileCategories;
 end;
 

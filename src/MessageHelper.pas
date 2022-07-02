@@ -1620,9 +1620,40 @@ begin
                  end;
 
     WM_PrepareNextFile: begin
-      NempPlaylist.PreparePlayNext;
-      RefreshPaintFrameHint(True);
-      NempPlayer.StartPauseBetweenTracksTimer;
+                      NempPlaylist.AcceptInput := True;
+                      case NempPlaylist.WiedergabeMode of
+                          0,2: begin
+                                  NempPlaylist.PreparePlayNext;
+                                  RefreshPaintFrameHint(True);
+                                  NempPlayer.StartPauseBetweenTracksTimer;
+                                  PlayerScrollIntoView;
+                          end;
+                          1: begin
+                                  NempPlaylist.PreparePlayAgain;
+                                  RefreshPaintFrameHint(True);
+                                  NempPlayer.StartPauseBetweenTracksTimer;
+                                  PlayerScrollIntoView;
+                          end;
+                          3: begin
+                              if (NempPlaylist.PlayingIndex <> NempPlaylist.Count -1) then
+                              begin
+                                  NempPlaylist.PreparePlayNext;
+                                  RefreshPaintFrameHint(True);
+                                  NempPlayer.StartPauseBetweenTracksTimer;
+                                  PlayerScrollIntoView;
+                              end
+                              else
+                              begin
+                                  if NempOptions.ShutDownAtEndOfPlaylist then
+                                    InitShutDown
+                                  else
+                                  begin
+                                    NempPlayer.LastUserWish := USER_WANT_STOP;
+                                    NempPlaylist.Stop;
+                                  end;
+                               end
+                          end;
+                      end;
     end;
 
     WM_PlayerDelayedPlayNext: NempPlayer.ProgressDelayedPlayNext;
@@ -2367,7 +2398,10 @@ begin
                     NempPlaylist.Status := 0;
                     NempTaskbarManager.ProgressState := TTaskBarProgressState.None;
 
-                    ProgressFormPlaylist.LblMain.Caption := Playlist_SearchingNewFilesComplete;
+                    if NempPlaylist.FileSearchCounter = 0 then
+                      ProgressFormPlaylist.LblMain.Caption := Playlist_SearchingNewFilesCompleteNothingFound
+                    else
+                      ProgressFormPlaylist.LblMain.Caption := Playlist_SearchingNewFilesComplete;
                     ProgressFormPlaylist.lblCurrentItem.Caption := '';
                     ProgressFormPlaylist.FinishProcess(jt_WorkingPlaylist);
                 end;

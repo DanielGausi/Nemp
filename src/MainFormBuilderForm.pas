@@ -46,7 +46,6 @@ type
     grpBoxNempConstruction: TGroupBox;
     pnlConstructionHint: TPanel;
     lblElementCount: TLabel;
-    Memo1: TMemo;
     pnlConstruction: TPanel;
     MainMenu: TMainMenu;
     mmLayout: TMenuItem;
@@ -62,6 +61,7 @@ type
     lblPlaylistAlwaysVisible: TLabel;
     BtnNewLayout: TButton;
     mmExampleLayouts: TMenuItem;
+    cbShowCategorySelection: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure BtnApplyClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -70,8 +70,6 @@ type
     procedure BtnOKClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure cbSelectionClick(Sender: TObject);
-
-    procedure NewLayoutSplitterMoved(Sender: TObject);
     procedure AfterContainerCreated(Sender: TObject);
 
     procedure MainContainerResize(Sender: TObject);
@@ -150,7 +148,7 @@ begin
   TestLayout.ControlsPanel   := pnlControls;
   TestLayout.MainContainer   := MainContainer;
   TestLayout.OnAfterContainerCreate := AfterContainerCreated;
-  TestLayout.OnSplitterMoved := NewLayoutSplitterMoved;
+  //TestLayout.OnSplitterMoved := NewLayoutSplitterMoved;
   TestLayout.BlockHeapControl := grpBoxNempElements;
 
   BackupLayout := TNempLayout.Create;
@@ -354,8 +352,7 @@ begin
 
   TestLayout.RefreshEditButtons(lc=7);
   TestLayout.ReNumberContainerPanels;
-
-  TestLayout.CreateBuildInstructions(Memo1.Lines);
+  // TestLayout.CreateBuildInstructions(Memo1.Lines);
 end;
 
 procedure TMainFormBuilder.RefreshFileOverViewGUI;
@@ -538,12 +535,6 @@ begin
 end;
 
 
-procedure TMainFormBuilder.NewLayoutSplitterMoved(Sender: TObject);
-begin
-  TestLayout.CreateBuildInstructions(Memo1.Lines);
-end;
-
-
 procedure TMainFormBuilder.BtnApplyClick(Sender: TObject);
 begin
     if NempOptions.AnzeigeMode = 1 then
@@ -556,6 +547,7 @@ begin
         TestLayout.ShowFileOverview  := cbeDetails.Checked;
         // Additional Settings
         TestLayout.ShowControlCover := cbControlPanelShowCover.Checked;
+        TestLayout.ShowCategoryTree := cbShowCategorySelection.Checked;
         TestLayout.TreeviewOrientation := cbTreeViewOrientation.ItemIndex;
         TestLayout.FileOVerviewOrientation := cbFileOverviewOrientation.ItemIndex;
         TestLayout.FileOverviewMode := teFileOverViewMode(cbFileOverviewMode.ItemIndex);
@@ -589,6 +581,7 @@ begin
   cbeDetails.Checked := TestLayout.ShowFileOverview;
   // Additional Settings
   cbControlPanelShowCover.Checked := TestLayout.ShowControlCover;
+  cbShowCategorySelection.Checked := TestLayout.ShowCategoryTree;
   cbTreeViewOrientation.ItemIndex := TestLayout.TreeviewOrientation;
   cbFileOverviewOrientation.ItemIndex := TestLayout.FileOVerviewOrientation;
   cbFileOverviewMode.ItemIndex := Integer(TestLayout.FileOverviewMode);

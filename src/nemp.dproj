@@ -119,7 +119,9 @@
         <DCC_DebugInformation>2</DCC_DebugInformation>
         <DCC_LocalDebugSymbols>true</DCC_LocalDebugSymbols>
         <Icon_MainIcon>nemp_Icon2.ico</Icon_MainIcon>
-        <DCC_ExeOutput>F:\Nemp Github\Nemp 5\bin\</DCC_ExeOutput>
+        <DCC_ExeOutput>F:\Nemp Github\Nemp\bin\</DCC_ExeOutput>
+        <DCC_Define>madExcept;$(DCC_Define)</DCC_Define>
+        <DCC_DcuOutput>F:\Nemp Github\Nemp\dcu\</DCC_DcuOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>

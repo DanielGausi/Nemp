@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 749
+  ClientHeight = 769
   ClientWidth = 1090
   Color = clBtnFace
   Constraints.MinHeight = 300
@@ -34,7 +34,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 0
     Width = 1090
-    Height = 749
+    Height = 769
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
@@ -48,7 +48,7 @@ object Nemp_MainForm: TNemp_MainForm
     SplitterMinSize = 110
     object _ControlPanel: TNempPanel
       Left = 0
-      Top = 649
+      Top = 669
       Width = 1090
       Height = 100
       Align = alBottom
@@ -2989,6 +2989,7 @@ object Nemp_MainForm: TNemp_MainForm
       end
       object MM_O_View: TMenuItem
         Caption = '&View'
+        OnClick = PM_P_ViewClick
         object MM_O_JoinWindows: TMenuItem
           Action = actJoinWindows
         end
@@ -3017,6 +3018,42 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object MM_O_ToggleStayOnTop: TMenuItem
           Action = actToggleStayOnTop
+        end
+        object N40: TMenuItem
+          Caption = '-'
+        end
+        object MM_O_ShowCategorySelection: TMenuItem
+          Action = actToggleShowCategorySelection
+        end
+        object MM_O_Treeview: TMenuItem
+          Caption = 'Treeview'
+          object MM_O_TreeviewStacked: TMenuItem
+            Action = actTreeviewStacked
+          end
+          object MM_O_TreeviewSideBySide: TMenuItem
+            Action = actTreeViewSideBySide
+          end
+        end
+        object MM_O_Overview: TMenuItem
+          Caption = 'File overview'
+          object MM_O_OverviewCoverAndDetails: TMenuItem
+            Action = actFileOverviewBoth
+          end
+          object MM_O_OverviewOnlyCover: TMenuItem
+            Action = actFileOverviewOnlyCover
+          end
+          object MM_O_OverviewOnlyDetails: TMenuItem
+            Action = actFileOverviewOnlyDetails
+          end
+          object N39: TMenuItem
+            Caption = '-'
+          end
+          object MM_O_OverviewStacked: TMenuItem
+            Action = actFileOverviewStacked
+          end
+          object MM_O_OverviewSideBySide: TMenuItem
+            Action = actFileOverviewSideBySide
+          end
         end
       end
       object MM_O_Skins: TMenuItem
@@ -6269,6 +6306,7 @@ object Nemp_MainForm: TNemp_MainForm
     end
     object PM_P_View: TMenuItem
       Caption = 'View'
+      OnClick = PM_P_ViewClick
       object PM_P_JoinWindows: TMenuItem
         Action = actJoinWindows
       end
@@ -6297,6 +6335,42 @@ object Nemp_MainForm: TNemp_MainForm
       end
       object PM_P_ToggleStayOnTop: TMenuItem
         Action = actToggleStayOnTop
+      end
+      object N34: TMenuItem
+        Caption = '-'
+      end
+      object PM_P_ShowCategorySelection: TMenuItem
+        Action = actToggleShowCategorySelection
+      end
+      object PM_P_TreeView: TMenuItem
+        Caption = 'Treeview'
+        object PM_P_TreeViewStacked: TMenuItem
+          Action = actTreeviewStacked
+        end
+        object PM_P_TreeViewSideBySide: TMenuItem
+          Action = actTreeViewSideBySide
+        end
+      end
+      object PM_P_FileOverview: TMenuItem
+        Caption = 'File overview'
+        object PM_P_OverviewCoverAndDetails: TMenuItem
+          Action = actFileOverviewBoth
+        end
+        object PM_P_OverviewOnlyCover: TMenuItem
+          Action = actFileOverviewOnlyCover
+        end
+        object PM_P_OverviewOnlyDetails: TMenuItem
+          Action = actFileOverviewOnlyDetails
+        end
+        object Onlydetails2: TMenuItem
+          Caption = '-'
+        end
+        object PM_P_OverviewStacked: TMenuItem
+          Action = actFileOverviewStacked
+        end
+        object PM_P_OverviewSideBySide: TMenuItem
+          Action = actFileOverviewSideBySide
+        end
       end
     end
     object PM_P_FormBuilder: TMenuItem
@@ -7034,6 +7108,30 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Properties'
       OnClick = pm_TagDetailsClick
     end
+    object N37: TMenuItem
+      Caption = '-'
+    end
+    object pm_FO_FileOverview: TMenuItem
+      Caption = 'File overview'
+      object pm_FO_CoverAndDetails: TMenuItem
+        Action = actFileOverviewBoth
+      end
+      object pm_FO_OnlyCover: TMenuItem
+        Action = actFileOverviewOnlyCover
+      end
+      object pm_FO_OnlyDetails: TMenuItem
+        Action = actFileOverviewOnlyDetails
+      end
+      object N41: TMenuItem
+        Caption = '-'
+      end
+      object pm_FO_Stacked: TMenuItem
+        Action = actFileOverviewStacked
+      end
+      object pm_FO_SideBySide: TMenuItem
+        Action = actFileOverviewSideBySide
+      end
+    end
   end
   object QuickSearchHistory_PopupMenu: TPopupMenu
     OnPopup = QuickSearchHistory_PopupMenuPopup
@@ -7241,6 +7339,18 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Configure Media library'
       ImageIndex = 42
       OnClick = PM_ML_ConfigureMedialibraryClick
+    end
+    object PM_ML_ShowCategorySelection: TMenuItem
+      Action = actToggleShowCategorySelection
+    end
+    object PM_ML_Treeview: TMenuItem
+      Caption = 'Treeview'
+      object PM_ML_TreeViewStacked: TMenuItem
+        Action = actTreeviewStacked
+      end
+      object PM_ML_TreeViewSideBySide: TMenuItem
+        Action = actTreeViewSideBySide
+      end
     end
     object N16: TMenuItem
       Caption = '-'
@@ -7477,7 +7587,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 456
     Top = 180
   end
-  object ActionList1: TActionList
+  object ActionListLayout: TActionList
     Left = 128
     Top = 38
     object actJoinWindows: TAction
@@ -7509,6 +7619,38 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Stay on top'
       ShortCut = 16468
       OnExecute = actToggleStayOnTopExecute
+    end
+    object actTreeviewStacked: TAction
+      Caption = 'Stacked'
+      OnExecute = actTreeviewStackedExecute
+    end
+    object actTreeViewSideBySide: TAction
+      Caption = 'Side by side'
+      OnExecute = actTreeViewSideBySideExecute
+    end
+    object actToggleShowCategorySelection: TAction
+      Caption = 'Show category selection'
+      OnExecute = actToggleShowCategorySelectionExecute
+    end
+    object actFileOverviewBoth: TAction
+      Caption = 'Cover/lyrics and details'
+      OnExecute = actFileOverviewBothExecute
+    end
+    object actFileOverviewOnlyCover: TAction
+      Caption = 'Only cover/lyrics'
+      OnExecute = actFileOverviewOnlyCoverExecute
+    end
+    object actFileOverviewOnlyDetails: TAction
+      Caption = 'Only details'
+      OnExecute = actFileOverviewOnlyDetailsExecute
+    end
+    object actFileOverviewStacked: TAction
+      Caption = 'Stacked'
+      OnExecute = actFileOverviewStackedExecute
+    end
+    object actFileOverviewSideBySide: TAction
+      Caption = 'Side by side'
+      OnExecute = actFileOverviewSideBySideExecute
     end
   end
   object SplitWindowTimer: TTimer

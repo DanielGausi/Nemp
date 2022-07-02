@@ -55,10 +55,10 @@ type
       fFileOVerviewOrientation: Integer;
       fFileOverviewMode: teFileOverViewMode;
 
-
       fShowBibSelection: Boolean; // Show TreeView, Coverflow, tagCloud
       fShowMedialist: Boolean; // Show the MediaList (if not: Only access to full Albums/Directories/Artists/whatever the Library is configured by)
       fShowFileOverview: Boolean; // Show the File Overview Panel
+      fShowCategoryTree: Boolean; // Show the Category-Selection tree
 
       fBrowseMode: Integer;
       fSplitterColor: TColor;
@@ -99,6 +99,7 @@ type
       property ShowBibSelection : Boolean read fShowBibSelection  write fShowBibSelection;
       property ShowMedialist    : Boolean read fShowMedialist     write fShowMedialist   ;
       property ShowFileOverview : Boolean read fShowFileOverview  write fShowFileOverview;
+      property ShowCategoryTree : Boolean read fShowCategoryTree write fShowCategoryTree;
       // only relevant in the real MainWindow, not for the FormDesigner
       property FileOverviewCoverRatio: Integer read fFileOverviewCoverRatio write fFileOverviewCoverRatio;
       property TreeViewRatio         : Integer read fTreeViewRatio          write fTreeViewRatio         ;
@@ -251,6 +252,7 @@ begin
   fShowBibSelection  := Source.fShowBibSelection;
   fShowMedialist     := Source.fShowMedialist;
   fShowFileOverview  := Source.fShowFileOverview;
+  fShowCategoryTree  := Source.fShowCategoryTree;
 end;
 
 procedure TNempLayout.Clear;
@@ -340,6 +342,7 @@ begin
   fShowBibSelection := Source.ReadBool(Section, 'ShowBibSelection', True);
   fShowMedialist    := Source.ReadBool(Section, 'ShowMedialist', True);
   fShowFileOverview := Source.ReadBool(Section, 'ShowFileOverview', True);
+  fShowCategoryTree := Source.ReadBool(Section, 'ShowCategoryTree', True);
 end;
 
 
@@ -370,6 +373,7 @@ begin
   NempSettingsManager.WriteBool(cIniMainFormLayout, 'ShowBibSelection', fShowBibSelection);
   NempSettingsManager.WriteBool(cIniMainFormLayout, 'ShowMedialist', fShowMedialist);
   NempSettingsManager.WriteBool(cIniMainFormLayout, 'ShowFileOverview', fShowFileOverview);
+  NempSettingsManager.WriteBool(cIniMainFormLayout, 'ShowCategoryTree', fShowCategoryTree);
 end;
 
 procedure TNempLayout.ResetToDefault;
@@ -380,6 +384,7 @@ begin
   fShowBibSelection := True;
   fShowMedialist    := True;
   fShowFileOverview := True;
+  fShowCategoryTree := True;
 end;
 
 procedure TNempLayout.ReNumberContainerPanels;

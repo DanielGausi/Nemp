@@ -973,12 +973,6 @@ begin
               Nemp_MainForm.Menu := Nemp_MainMenu;
       end;
 
-      // Menu-Einträge Dis-/Enablen
-      actJoinWindows.Visible := newMode = 1;
-      actSplitWindows.Visible := newMode = 0;
-      actTogglePlaylist.Visible := newMode = 1;
-      actToggleStayOnTop.Enabled := newMode = 1;
-
       BtnClose.Visible := newMode = 1;
       BtnMinimize.Visible := newMode = 1;
       // temporary for this procedure

@@ -188,6 +188,8 @@ type
       fPlaylistSortDirection: teSortDirection;
       fTrimCDFromDirectory: Boolean;
       fCDNames: TStringList;
+      fShowPlaylistCategories: Boolean;
+      fShowWebradioCategory: Boolean;
       // fShowCollectionCount: Boolean;
       // fShowCategoryCount: Boolean;
       fShowElementCount: Boolean;
@@ -217,6 +219,8 @@ type
       //property GroupFileAgeByYear   : Boolean read fGroupFileAgeByYear   write fGroupFileAgeByYear   ;
       //property ShowCollectionCount  : Boolean read fShowCollectionCount write fShowCollectionCount;
       //property ShowCategoryCount    : Boolean read fShowCategoryCount write fShowCategoryCount;
+      property ShowPlaylistCategories: Boolean read fShowPlaylistCategories write fShowPlaylistCategories;
+      property ShowWebradioCategory: Boolean read fShowWebradioCategory write fShowWebradioCategory;
       property ShowElementCount     : Boolean read fShowElementCount write fShowElementCount;
       property ShowCoverArtOnAlbum  : Boolean read fShowCoverArtOnAlbum write fShowCoverArtOnAlbum;
       // property UseNewCategory       : Boolean read fUseNewCategory write fUseNewCategory;
@@ -746,6 +750,8 @@ begin
   fShowCoverArtOnAlbum := Source.fShowCoverArtOnAlbum;
   // fUseNewCategory      := Source.fUseNewCategory;
   // fUseSmartAdd         := Source.fUseSmartAdd;
+  fShowPlaylistCategories := Source.fShowPlaylistCategories;
+  fShowWebradioCategory   := Source.fShowWebradioCategory;
 
   // assign CategoryConfig
   ClearCategoryConfig;
@@ -928,6 +934,8 @@ begin
   //fShowCategoryCount   := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowCategoryCount', True);
   fShowElementCount   := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowElementCount', True);
   fShowCoverArtOnAlbum := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowCoverArtOnAlbum', True);
+  fShowPlaylistCategories := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowPlaylistCategories', True);
+  fShowWebradioCategory := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowWebradioCategory', True);
 
   // fUseNewCategory := NempSettingsManager.ReadBool('LibraryOrganizer', 'UseNewCategory', True);
   // fUseSmartAdd := NempSettingsManager.ReadBool('LibraryOrganizer', 'UseSmartAdd', True);
@@ -954,6 +962,8 @@ begin
   //NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowCategoryCount', fShowCategoryCount);
   NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowElementCount', fShowElementCount);
   NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowCoverArtOnAlbum', fShowCoverArtOnAlbum);
+  NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowPlaylistCategories', fShowPlaylistCategories);
+  NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowWebradioCategory', fShowWebradioCategory);
 
   // NempSettingsManager.WriteBool('LibraryOrganizer', 'UseNewCategory', fUseNewCategory);
   // NempSettingsManager.WriteBool('LibraryOrganizer', 'UseSmartAdd', fUseSmartAdd);

@@ -638,7 +638,7 @@ type
     MM_O_CompactToggleFileOverview: TMenuItem;
     MM_O_CompactToggleTitleList: TMenuItem;
     MM_O_CompactToggleBrowselist: TMenuItem;
-    ActionList1: TActionList;
+    ActionListLayout: TActionList;
     actJoinWindows: TAction;
     actSplitWindows: TAction;
     actToggleFileOverview: TAction;
@@ -662,6 +662,50 @@ type
     PM_ML_ResetTagCloudSeparator: TMenuItem;
     PM_ML_ResetTagCloud: TMenuItem;
     ApplicationEvents1: TApplicationEvents;
+    N34: TMenuItem;
+    PM_P_TreeView: TMenuItem;
+    PM_P_FileOverview: TMenuItem;
+    PM_P_TreeViewStacked: TMenuItem;
+    PM_P_TreeViewSideBySide: TMenuItem;
+    PM_P_OverviewCoverAndDetails: TMenuItem;
+    PM_P_OverviewOnlyCover: TMenuItem;
+    PM_P_OverviewOnlyDetails: TMenuItem;
+    Onlydetails2: TMenuItem;
+    PM_P_OverviewStacked: TMenuItem;
+    PM_P_OverviewSideBySide: TMenuItem;
+    PM_P_ShowCategorySelection: TMenuItem;
+    actTreeviewStacked: TAction;
+    actTreeViewSideBySide: TAction;
+    MM_O_Treeview: TMenuItem;
+    MM_O_TreeviewSideBySide: TMenuItem;
+    MM_O_TreeviewStacked: TMenuItem;
+    MM_O_Overview: TMenuItem;
+    MM_O_OverviewSideBySide: TMenuItem;
+    MM_O_OverviewStacked: TMenuItem;
+    N39: TMenuItem;
+    MM_O_OverviewOnlyDetails: TMenuItem;
+    MM_O_OverviewOnlyCover: TMenuItem;
+    MM_O_OverviewCoverAndDetails: TMenuItem;
+    MM_O_ShowCategorySelection: TMenuItem;
+    N40: TMenuItem;
+    actToggleShowCategorySelection: TAction;
+    actFileOverviewBoth: TAction;
+    actFileOverviewOnlyCover: TAction;
+    actFileOverviewOnlyDetails: TAction;
+    actFileOverviewStacked: TAction;
+    actFileOverviewSideBySide: TAction;
+    N37: TMenuItem;
+    pm_FO_FileOverview: TMenuItem;
+    pm_FO_SideBySide: TMenuItem;
+    pm_FO_Stacked: TMenuItem;
+    N41: TMenuItem;
+    pm_FO_OnlyDetails: TMenuItem;
+    pm_FO_OnlyCover: TMenuItem;
+    pm_FO_CoverAndDetails: TMenuItem;
+    PM_ML_ShowCategorySelection: TMenuItem;
+    PM_ML_Treeview: TMenuItem;
+    PM_ML_TreeViewSideBySide: TMenuItem;
+    PM_ML_TreeViewStacked: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1317,6 +1361,15 @@ type
     function ApplicationEvents1Help(Command: Word; Data: NativeInt;
       var CallHelp: Boolean): Boolean;
     procedure CloseHelpWnd;
+    procedure actTreeviewStackedExecute(Sender: TObject);
+    procedure actTreeViewSideBySideExecute(Sender: TObject);
+    procedure actToggleShowCategorySelectionExecute(Sender: TObject);
+    procedure actFileOverviewStackedExecute(Sender: TObject);
+    procedure actFileOverviewSideBySideExecute(Sender: TObject);
+    procedure actFileOverviewBothExecute(Sender: TObject);
+    procedure actFileOverviewOnlyCoverExecute(Sender: TObject);
+    procedure actFileOverviewOnlyDetailsExecute(Sender: TObject);
+    procedure PM_P_ViewClick(Sender: TObject);
 
 
   private
@@ -1471,6 +1524,8 @@ type
     procedure ReSizeBrowseTrees;
     procedure ReAlignBrowseTrees;
     procedure ReAlignFileOverview;
+    procedure RefreshActionLayoutCheckedStatus;
+    procedure RefreshCategorySelectionVisibility;
   protected
     Procedure WMDropFiles (Var aMsg: tMessage);  message WM_DROPFILES;
     procedure MediaKey (Var aMSG: tMessage); message WM_APPCOMMAND;
@@ -4146,6 +4201,8 @@ begin
       end;
     end;
 
+    RefreshActionLayoutCheckedStatus;
+
     enqueueCaption := MainForm_MenuCaptionsEnqueue;
     if assigned(ac) then begin
       if (ac is TRootCollection) and assigned(lc) then begin
@@ -5476,7 +5533,6 @@ begin
     CurrentTagToChange :=  '';
     if (PopupEditExtendedTags.PopupComponent is TLabel) then
     begin
-
         CurrentTagToChange := (PopupEditExtendedTags.PopupComponent as TLabel).Caption;
     end;
 
@@ -5494,6 +5550,8 @@ begin
     PM_RenameTagThisFile.Enabled := enableEditExtendeTag and NempOptions.AllowQuickAccessToMetadata;
     PM_TagIgnoreList    .Enabled := enableEditExtendeTag and NempOptions.AllowQuickAccessToMetadata;
     PM_TagMergeList     .Enabled := enableEditExtendeTag and NempOptions.AllowQuickAccessToMetadata;
+
+    RefreshActionLayoutCheckedStatus;
 end;
 
 procedure TNemp_MainForm.pm_TagDetailsClick(Sender: TObject);
@@ -6456,22 +6514,25 @@ begin
   end;
   if MedienBib.BrowseMode <> 2  then begin
     // Playlists-Categories
-    for i := 0 to MedienBib.PlaylistCategories.Count - 1 do begin
+    if NempOrganizerSettings.ShowPlaylistCategories then
+      for i := 0 to MedienBib.PlaylistCategories.Count - 1 do begin
+        aMenuItem := TMenuItem.Create(Nemp_MainForm);
+        aMenuItem.OnClick := CoverFlowCategoryMenuItemClick;
+        aMenuItem.Caption := MedienBib.PlaylistCategories[i].CaptionCount;
+        aMenuItem.Checked := MedienBib.PlaylistCategories[i] = MedienBib.CurrentCategory;
+        aMenuItem.Tag := 1000 + i;
+        Medialist_Browse_Categories_PopupMenu.Items.Add(aMenuItem);
+      end;
+    // Webradio-Category
+    if NempOrganizerSettings.ShowWebradioCategory then begin
       aMenuItem := TMenuItem.Create(Nemp_MainForm);
       aMenuItem.OnClick := CoverFlowCategoryMenuItemClick;
-      aMenuItem.Caption := MedienBib.PlaylistCategories[i].CaptionCount;
-      aMenuItem.Checked := MedienBib.PlaylistCategories[i] = MedienBib.CurrentCategory;
-      aMenuItem.Tag := 1000 + i;
+      aMenuItem.Caption := MedienBib.WebRadioCategory.CaptionCount;
+
+      aMenuItem.Checked := MedienBib.WebRadioCategory = MedienBib.CurrentCategory;
+      aMenuItem.Tag := 2000;
       Medialist_Browse_Categories_PopupMenu.Items.Add(aMenuItem);
     end;
-    // Webradio-Category
-    aMenuItem := TMenuItem.Create(Nemp_MainForm);
-    aMenuItem.OnClick := CoverFlowCategoryMenuItemClick;
-    aMenuItem.Caption := MedienBib.WebRadioCategory.CaptionCount;
-
-    aMenuItem.Checked := MedienBib.WebRadioCategory = MedienBib.CurrentCategory;
-    aMenuItem.Tag := 2000;
-    Medialist_Browse_Categories_PopupMenu.Items.Add(aMenuItem);
   end;
 end;
 
@@ -6486,10 +6547,12 @@ begin
   for i := 0 to MedienBib.FileCategories.Count - 1 do
     ArtistsVST.AddChild(Nil, MedienBib.FileCategories[i]);
 
-  for i := 0 to MedienBib.PlaylistCategories.Count - 1 do
-    ArtistsVST.AddChild(Nil, MedienBib.PlaylistCategories[i]);
+  if NempOrganizerSettings.ShowPlaylistCategories then
+    for i := 0 to MedienBib.PlaylistCategories.Count - 1 do
+      ArtistsVST.AddChild(Nil, MedienBib.PlaylistCategories[i]);
 
-  ArtistsVST.AddChild(Nil, MedienBib.WebRadioCategory);
+  if NempOrganizerSettings.ShowWebradioCategory then
+    ArtistsVST.AddChild(Nil, MedienBib.WebRadioCategory);
 
   //ShowMessage('ReFillCategoryTree: ' +  MedienBib.CurrentCategory.Name);
 
@@ -6569,7 +6632,7 @@ begin
       CoverScrollbar.Position := 0;
 
     CoverScrollbarChange(Nil);
-    MedienBib.NewCoverFlow.Paint(1);
+    MedienBib.NewCoverFlow.Paint(50);
   end;
 end;
 
@@ -7180,8 +7243,6 @@ begin
     SlideBarButton.Tag := 1;
     ClipCursor(@Arect);
 end;
-
-
 
 
 procedure TNemp_MainForm.ab1EndDrag(Sender, Target: TObject; X, Y: Integer);
@@ -9002,6 +9063,7 @@ begin
     BlockGUI(3);
     KeepOnWithLibraryProcess := True; // ok, apm is used
 
+    MedienBib.InitTargetCategory(MedienBib.CurrentCategory);
     // Create a List of the playlist filenames first
     // Do not work in the long loop with the playlist itself, as the user may delete some files during the longer process
     newFilenames := TStringList.Create;
@@ -9025,6 +9087,7 @@ begin
                 begin
                     AudioFile := TAudioFile.Create;
                     aErr := AudioFile.GetAudioData(newFilenames[i], {GAD_Cover or} GAD_Rating or MedienBib.IgnoreLyricsFlag);
+                    AudioFile.Category := MedienBib.TargetCategory;
                     HandleError(afa_NewFile, AudioFile, aErr);
                     MedienBib.CoverArtSearcher.InitCover(AudioFile, tm_VCL, INIT_COVER_DEFAULT);
                     MedienBib.UpdateList.Add(AudioFile);
@@ -9467,17 +9530,19 @@ begin
 
               case VST.Header.Columns[column].Tag of
                   CON_LYRICSEXISTING :
-                      if af.LyricsExisting then imageIndex := 6
-                      else imageIndex := 7;
+                      if af.LyricsExisting then ImageIndex := 6
+                      else ImageIndex := 7;
 
                   CON_LASTFMTAGS :
-                          if Length(af.RawTagLastFM) > 0 then imageIndex := 11;
+                          if Length(af.RawTagLastFM) > 0 then ImageIndex := 11;
                       //else imageIndex := 15;
                       // Con_Titel: imageIndex := 10;
 
-                  CON_Favorite: begin
-                      imageIndex := 12 + (af.Favorite mod 4);
-                  end;
+                  CON_Favorite: ImageIndex := 12 + (af.Favorite mod 4);
+
+                  CON_ARTIST: if (trim(af.Artist) = '') and (NempDisplay.ArtistSubstitute <> svEmpty) then ImageIndex := 22;
+                  CON_TITEL: if (trim(af.Titel) = '') and (NempDisplay.TitleSubstitute <> svEmpty) then ImageIndex := 22;
+                  CON_ALBUM: if (trim(af.Album) = '') and (NempDisplay.AlbumSubstitute <> svEmpty) then ImageIndex := 22;
               end;
       end;
   end;
@@ -10827,12 +10892,10 @@ begin
     NempLayout.ShowBibSelection := not NempLayout.ShowBibSelection ;
     NempLayout.RefreshVisibilty;
     NempLayout.ReAlignMainForm;
-    actToggleBrowseList.Checked := NempLayout.ShowBibSelection;
   end else
   begin
     var newVisible: Boolean := NOT NempOptions.FormPositions[nfBrowse].Visible;
     NempOptions.FormPositions[nfBrowse].Visible := newVisible;
-    actToggleBrowseList.Checked := newVisible;
     RefreshSubForm(AuswahlForm, newVisible);
   end;
 end;
@@ -10843,12 +10906,10 @@ begin
     NempLayout.ShowFileOverview := not NempLayout.ShowFileOverview;
     NempLayout.RefreshVisibilty;
     NempLayout.ReAlignMainForm;
-    actToggleFileOverview.Checked := NempLayout.ShowFileOverview;
   end else
   begin
     var newVisible: Boolean := NOT NempOptions.FormPositions[nfExtendedControls].Visible;
     NempOptions.FormPositions[nfExtendedControls].Visible := newVisible;
-    actToggleFileOverview.Checked := newVisible;
     RefreshSubForm(ExtendedControlForm, newVisible);
   end;
 end;
@@ -10859,12 +10920,10 @@ begin
     NempLayout.ShowMedialist := not NempLayout.ShowMedialist;
     NempLayout.RefreshVisibilty;
     NempLayout.ReAlignMainForm;
-    actToggleTitleList.Checked := NempLayout.ShowMedialist;
   end else
   begin
     var newVisible: Boolean := NOT NempOptions.FormPositions[nfMediaLibrary].Visible;
     NempOptions.FormPositions[nfMediaLibrary].Visible := newVisible;
-    actToggleTitleList.Checked := newVisible;
     RefreshSubForm(MedienListeForm, newVisible);
   end;
 end;
@@ -10888,7 +10947,6 @@ begin
   else begin
     newVisible := NOT NempOptions.FormPositions[nfPlaylist].Visible;
     NempOptions.FormPositions[nfPlaylist].Visible := newVisible;
-    actTogglePlaylist.Checked := newVisible;
     RefreshSubForm(PlaylistForm, newVisible);
   end;
 end;
@@ -10896,9 +10954,91 @@ end;
 procedure TNemp_MainForm.actToggleStayOnTopExecute(Sender: TObject);
 begin
   NempOptions.MiniNempStayOnTop := NOT NempOptions.MiniNempStayOnTop;
-  actToggleStayOnTop.Checked := NempOptions.MiniNempStayOnTop;
   RepairZOrder;
 end;
+
+procedure TNemp_MainForm.actTreeViewSideBySideExecute(Sender: TObject);
+begin
+  NempLayout.TreeviewOrientation := 0;
+  ReAlignBrowseTrees;
+end;
+
+procedure TNemp_MainForm.actTreeviewStackedExecute(Sender: TObject);
+begin
+  NempLayout.TreeviewOrientation := 1;
+  ReAlignBrowseTrees;
+end;
+
+procedure TNemp_MainForm.actToggleShowCategorySelectionExecute(Sender: TObject);
+begin
+  NempLayout.ShowCategoryTree := not NempLayout.ShowCategoryTree;
+  ReAlignBrowseTrees;
+  RefreshCategorySelectionVisibility;
+end;
+
+procedure TNemp_MainForm.actFileOverviewSideBySideExecute(Sender: TObject);
+begin
+  NempLayout.FileOVerviewOrientation := 0;
+  ReAlignFileOverview;
+end;
+
+procedure TNemp_MainForm.actFileOverviewStackedExecute(Sender: TObject);
+begin
+  NempLayout.FileOVerviewOrientation := 1;
+  ReAlignFileOverview;
+end;
+
+procedure TNemp_MainForm.actFileOverviewBothExecute(Sender: TObject);
+begin
+  NempLayout.FileOverviewMode := fovBoth;
+  ReAlignFileOverview;
+end;
+
+procedure TNemp_MainForm.actFileOverviewOnlyCoverExecute(Sender: TObject);
+begin
+  NempLayout.FileOverviewMode := fovCover;
+  ReAlignFileOverview;
+end;
+
+procedure TNemp_MainForm.actFileOverviewOnlyDetailsExecute(Sender: TObject);
+begin
+  NempLayout.FileOverviewMode := fovText;
+  ReAlignFileOverview;
+end;
+
+// Set the Checked/Visible/Enabled status of the Layout-Actions.
+// Called in OnClick of the "View" MenuItems
+procedure TNemp_MainForm.RefreshActionLayoutCheckedStatus;
+begin
+  actJoinWindows.Visible := NempOptions.Anzeigemode = 1;
+  actSplitWindows.Visible := NempOptions.Anzeigemode = 0;
+  actTogglePlaylist.Visible := NempOptions.Anzeigemode = 1;
+  actToggleStayOnTop.Enabled := NempOptions.Anzeigemode = 1;
+
+  if NempOptions.AnzeigeMode = 0 then begin
+    actToggleBrowseList.Checked := NempLayout.ShowBibSelection;
+    actToggleFileOverview.Checked := NempLayout.ShowFileOverview;
+    actToggleTitleList.Checked := NempLayout.ShowMedialist;
+    actToggleStayOnTop.Checked := False;
+  end else
+  begin
+    actToggleFileOverview.Checked := NempOptions.FormPositions[nfExtendedControls].Visible;
+    actTogglePlaylist.Checked  := NempOptions.FormPositions[nfPlaylist].Visible;
+    actToggleTitleList.Checked := NempOptions.FormPositions[nfMediaLibrary].Visible;
+    actToggleBrowseList.Checked := NempOptions.FormPositions[nfBrowse].Visible;
+    actToggleStayOnTop.Checked := NempOptions.MiniNempStayOnTop;
+  end;
+
+  actTreeviewStacked.Checked := NempLayout.TreeviewOrientation = 1;
+  actTreeViewSideBySide.Checked := NempLayout.TreeviewOrientation = 0;
+  actToggleShowCategorySelection.Checked := NempLayout.ShowCategoryTree;
+  actFileOverviewBoth.Checked := NempLayout.FileOverviewMode = fovBoth;
+  actFileOverviewOnlyCover.Checked := NempLayout.FileOverviewMode = fovCover;
+  actFileOverviewOnlyDetails.Checked := NempLayout.FileOverviewMode = fovText;
+  actFileOverviewStacked.Checked := NempLayout.FileOVerviewOrientation = 1;
+  actFileOverviewSideBySide.Checked := NempLayout.FileOVerviewOrientation = 0;
+end;
+
 
 (*procedure TNemp_MainForm.BtnMenuClick(Sender: TObject);
 var point: TPoint;
@@ -12782,6 +12922,11 @@ begin
 end;
 
 
+procedure TNemp_MainForm.PM_P_ViewClick(Sender: TObject);
+begin
+  RefreshActionLayoutCheckedStatus
+end;
+
 procedure TNemp_MainForm.ToolImageClick(Sender: TObject);
 var pt: TPoint;
 begin
@@ -13080,23 +13225,19 @@ begin
 
   lc := MedienBib.CurrentCategory;
   LCName := MedienBib.GetTargetFileCategoryName(lc, TargetCount);
-  //if assigned(lc) then
-  //  LCName := lc.Name
-  //else
-  //  LCName := '';
 
   if assigned(fDropManager.DragSource) then begin
     // We are dragging from the library itself, or from the playlist.
-    // Either way, dropping files will do nothing
-    //if fDropManager.DragSource = PlaylistVST then     ??? think about it.... Allow Playlist -> Library ???
-    //  SetFeedBackParams(DROPEFFECT_NONE, False, DragDropHintTargetPlaylist)
-    //else
+    if fDropManager.DragSource = PlaylistVST then     //??? think about it.... Allow Playlist -> Library ???
+      SetFeedBackParams(DROPEFFECT_COPY, True, DragDropLibrary)                  // TODO in DROP QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ
+    else
+      // moving within the library without specifying a different category doesn't make sense
       SetFeedBackParams(DROPEFFECT_NONE, False, DragDropHintTargetPlaylistOrCategory);
   end else
   begin
     // dragging from an external source (probably the Windows Explorer)
     if not ObjContainsFiles(DataObject) then
-      // for example: Dragged Text from an editor,
+      // for example: Dragged Text from an editor ?
       SetFeedBackParams(DROPEFFECT_NONE, False, '')
     else
     begin
@@ -13155,14 +13296,12 @@ begin
 
   lc := ArtistsVST.GetNodeData<TLibraryCategory>(ArtistsVST.DropTargetNode);
   LCName := MedienBib.GetTargetFileCategoryName(lc, TargetCount);
-  //if assigned(lc) then
-  //  LCName := lc.Name
-  //else
-  //  LCName := '';
+
 
   if assigned(fDropManager.DragSource) then begin
     {
       // todo: DropOver mit Quelle PLaylist/PlayerControls deaktivieren
+      // oder: Im Drop auch passend reagieren
     }
 
     if assigned(lc) and (LC.CategoryType = ccFiles) then begin
@@ -13183,6 +13322,7 @@ begin
       SetFeedBackParams(DROPEFFECT_NONE, False, '')
     else
     begin
+      // Files from the Windows Explorer (or something like that)
       if assigned(lc) and (LC.CategoryType = ccFiles) then begin
         if TargetCount <= 1 then
           SetFeedBackParams(DROPEFFECT_COPY, True, DragDropLibraryCategory)
@@ -13659,16 +13799,35 @@ end;
 
 procedure TNemp_MainForm.ReSizeBrowseTrees;
 begin
+  if not NempLayout.ShowCategoryTree then
+    exit;
+
   if NempLayout.TreeviewOrientation = 0 then
     ArtistsVST.Width := Round(PanelStandardBrowse.Width * NempLayout.TreeViewRatio / 100)
   else
     ArtistsVST.Height := Round(PanelStandardBrowse.Height * NempLayout.TreeViewRatio / 100);
 end;
 
+procedure TNemp_MainForm.RefreshCategorySelectionVisibility;
+begin
+   // Show/Hide category selection
+  TabBtnCoverCategory.Visible := NempLayout.ShowCategoryTree;
+  TabBtnTagCloudCategory.Visible := NempLayout.ShowCategoryTree;
+  CloudViewer.CategorySelectionVisible := NempLayout.ShowCategoryTree;
+  if (not NempLayout.ShowCategoryTree) and (MedienBib.CurrentCategory <> MedienBib.DefaultFileCategory)  then begin
+    MedienBib.CurrentCategory := MedienBib.DefaultFileCategory;
+    ReFillBrowseTrees(False);
+  end;
+  if MedienBib.BrowseMode = 2 then
+    CloudViewer.ResizePaint(''); // just in case
+end;
+
+
 procedure TNemp_MainForm.ReAlignBrowseTrees;
 begin
   if ((ArtistsVST.Align = alTop) and (NempLayout.TreeviewOrientation = 0))
     OR ((ArtistsVST.Align = alLeft) and (NempLayout.TreeviewOrientation = 1))
+    OR (ArtistsVST.Visible <> NempLayout.ShowCategoryTree)
   then begin
     LockWindowUpdate(PanelStandardBrowse.Handle);
     // current Layout does not match the NempLayout.TreeviewOrientation
@@ -13677,18 +13836,26 @@ begin
     if (NempLayout.TreeViewRatio <= 5) or (NempLayout.TreeViewRatio >= 95) then
       NempLayout.TreeViewRatio := 30;
 
-    if NempLayout.TreeviewOrientation = 0 then begin
-      // Side by side
-      ArtistsVST.Align := alLeft;
-      ArtistsVST.Width := Round(PanelStandardBrowse.Width * NempLayout.TreeViewRatio / 100);
-      SplitterBrowse.Align := alLeft;
-      SplitterBrowse.Left := ArtistsVST.Width;
-    end else begin
-      // About each other
-      ArtistsVST.Align := alTop;
-      ArtistsVST.Height := Round(PanelStandardBrowse.Height * NempLayout.TreeViewRatio / 100);
-      SplitterBrowse.Align := alTop;
-      SplitterBrowse.Top := ArtistsVST.Height;
+    if not NempLayout.ShowCategoryTree then begin
+      ArtistsVST.Visible := False;
+      SplitterBrowse.Visible := False;
+    end else
+    begin
+      ArtistsVST.Visible := True;
+      SplitterBrowse.Visible := True;
+      if NempLayout.TreeviewOrientation = 0 then begin
+        // Side by side
+        ArtistsVST.Align := alLeft;
+        ArtistsVST.Width := Round(PanelStandardBrowse.Width * NempLayout.TreeViewRatio / 100);
+        SplitterBrowse.Align := alLeft;
+        SplitterBrowse.Left := ArtistsVST.Width;
+      end else begin
+        // About each other
+        ArtistsVST.Align := alTop;
+        ArtistsVST.Height := Round(PanelStandardBrowse.Height * NempLayout.TreeViewRatio / 100);
+        SplitterBrowse.Align := alTop;
+        SplitterBrowse.Top := ArtistsVST.Height;
+      end;
     end;
     AlbenVST.Align := alClient;
     LockWindowUpdate(0);
@@ -13747,9 +13914,8 @@ begin
   ReAlignBrowseTrees;
   ReAlignFileOverview;
 
-  actToggleBrowseList.Checked := NempLayout.ShowBibSelection;
-  actToggleFileOverview.Checked := NempLayout.ShowFileOverview;
-  actToggleTitleList.Checked := NempLayout.ShowMedialist;
+  // Show/Hide category selection
+  RefreshCategorySelectionVisibility;
   CorrectSkinRegionsTimer.Enabled := True;
 
   if NempSkin.isActive then
@@ -13767,7 +13933,6 @@ end;
 // Splitter between Categories and Collections
 procedure TNemp_MainForm.SplitterBrowseMoved(Sender: TObject);
 begin
-  if not FormReadyAndActivated then exit;
   if not FormReadyAndActivated then exit;
 
   // This is a special Splitter, NOT part of the new FormLayout concept

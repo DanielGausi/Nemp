@@ -545,6 +545,9 @@ begin
 
   PrepareLyricSearchEngines;
   // SetStayOnTop(NempOptions.DetailFormStayOnTop);
+
+  MainPageControl.ActivePageIndex := 0;
+  MainPageControl.ActivePage := Tab_General;
 end;
 
 
@@ -563,8 +566,8 @@ end;
 
 procedure TFDetails.FormShow(Sender: TObject);
 begin
-//    MainPageControl.ActivePageIndex := 0;
-//    MainPageControl.ActivePage := Tab_General;
+//  MainPageControl.ActivePageIndex := 0;
+//  MainPageControl.ActivePage := Tab_General;
 end;
 
 

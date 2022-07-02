@@ -176,7 +176,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CB_AutoCheck: TCheckBox
               Left = 16
               Top = 16
-              Width = 259
+              Width = 208
               Height = 17
               Hint = 
                 'Check for updates and show a message if a newer version is avail' +
@@ -189,7 +189,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CB_AutoCheckNotifyOnBetas: TCheckBox
               Left = 16
               Top = 67
-              Width = 275
+              Width = 224
               Height = 17
               Hint = 
                 'Notify on Beta-releases. As Beta-software is normally instable, ' +
@@ -1436,7 +1436,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               AlignWithMargins = True
               Left = 168
               Top = 11
-              Width = 243
+              Width = 192
               Height = 21
               AutoComplete = False
               Anchors = [akLeft, akTop, akRight]
@@ -1459,7 +1459,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               AlignWithMargins = True
               Left = 168
               Top = 57
-              Width = 243
+              Width = 192
               Height = 21
               AutoComplete = False
               Anchors = [akLeft, akTop, akRight]
@@ -1482,7 +1482,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               AlignWithMargins = True
               Left = 168
               Top = 79
-              Width = 243
+              Width = 192
               Height = 21
               AutoComplete = False
               Anchors = [akLeft, akTop, akRight]
@@ -1505,7 +1505,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               AlignWithMargins = True
               Left = 168
               Top = 35
-              Width = 243
+              Width = 192
               Height = 21
               AutoComplete = False
               Anchors = [akLeft, akTop, akRight]
@@ -1528,7 +1528,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               AlignWithMargins = True
               Left = 168
               Top = 101
-              Width = 243
+              Width = 192
               Height = 21
               AutoComplete = False
               Anchors = [akLeft, akTop, akRight]
@@ -1573,7 +1573,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object lblMissingMetaData: TLabel
               Left = 16
               Top = 16
-              Width = 291
+              Width = 240
               Height = 13
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -1599,7 +1599,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object lbl_DefaultCoverHint: TLabel
               Left = 16
               Top = 347
-              Width = 392
+              Width = 341
               Height = 38
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -1982,7 +1982,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CBChangeFontColoronBitrate: TCheckBox
               Left = 16
               Top = 210
-              Width = 292
+              Width = 400
               Height = 17
               Hint = 'Use different colors for different bitrates.'
               Anchors = [akLeft, akTop, akRight]
@@ -1995,7 +1995,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CBChangeFontOnCbrVbr: TCheckBox
               Left = 16
               Top = 229
-              Width = 292
+              Width = 400
               Height = 17
               Hint = 'Use different fonts for files with fixed or variable bitrate.'
               Anchors = [akLeft, akTop, akRight]
@@ -2009,7 +2009,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CBChangeFontSizeOnLength: TCheckBox
               Left = 16
               Top = 191
-              Width = 292
+              Width = 400
               Height = 17
               Hint = 
                 'User bigger fonts for long tracks and smaller ones for short tra' +
@@ -2024,7 +2024,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CBChangeFontStyleOnMode: TCheckBox
               Left = 16
               Top = 172
-              Width = 292
+              Width = 400
               Height = 17
               Hint = 'Normal: Joint Stereo, Bold: Full Stereo, Italic: Mono'
               Anchors = [akLeft, akTop, akRight]
@@ -2092,7 +2092,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CB_CoverSearch_inDir: TCheckBox
               Left = 16
               Top = 36
-              Width = 278
+              Width = 227
               Height = 17
               Hint = 'Search for coverfiles within the directory of the audiofile'
               Anchors = [akLeft, akTop, akRight]
@@ -2104,7 +2104,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CB_CoverSearch_inParentDir: TCheckBox
               Left = 16
               Top = 56
-              Width = 278
+              Width = 227
               Height = 17
               Hint = 'Search for coverfiles in the parent directory of the audiofile.'
               Anchors = [akLeft, akTop, akRight]
@@ -2158,7 +2158,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CB_CoverSearch_LastFM: TCheckBox
               Left = 16
               Top = 188
-              Width = 278
+              Width = 227
               Height = 17
               Hint = 'Allow Nemp downloading missing cover files from the internet'
               Anchors = [akLeft, akTop, akRight]
@@ -2378,10 +2378,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpCategoryCoverflow: TCategoryPanel
-            Top = 706
+            Top = 714
             Height = 125
             Caption = 'Display as "Coverflow"'
             TabOrder = 3
+            ExplicitTop = 706
             object btnEditCoverflow: TButton
               Left = 375
               Top = 32
@@ -2418,10 +2419,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpCategoryPlaylists: TCategoryPanel
-            Top = 561
+            Top = 569
             Height = 145
             Caption = 'Category "Playlists"'
             TabOrder = 2
+            ExplicitTop = 561
             object lblPlaylistCaptionMode: TLabel
               Left = 16
               Top = 16
@@ -2481,10 +2483,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpAlbumDefinition: TCategoryPanel
-            Top = 321
+            Top = 329
             Height = 240
             Caption = 'Definition of an "Album" (e.g. in Coverflow or layer "Album")'
             TabOrder = 1
+            ExplicitTop = 321
             object lblDefineAlbum: TLabel
               Left = 16
               Top = 87
@@ -2495,9 +2498,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object lblAlbumDefinitionHint: TLabel
               Left = 16
               Top = 16
-              Width = 391
-              Height = 52
+              Width = 409
+              Height = 65
               Anchors = [akLeft, akTop, akRight]
+              AutoSize = False
               Caption = 
                 'For music stored on CD or vinyl it is pretty clear, what an "Alb' +
                 'um" is: All the tracks contained on this disc. For music files s' +
@@ -2505,7 +2509,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
                 'an select what Nemp should consider as an "Album" in that sense,' +
                 ' so it matches with your music collection.'
               WordWrap = True
-              ExplicitWidth = 408
             end
             object cbAlbumKeymode: TComboBox
               Left = 16
@@ -2526,7 +2529,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cbIgnoreCDDirectories: TCheckBox
               Left = 16
               Top = 136
-              Width = 288
+              Width = 237
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Allow multi-folder albums (e.g. "CD 1" and "CD 2")'
@@ -2535,7 +2538,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object editCDNames: TLabeledEdit
               Left = 16
               Top = 174
-              Width = 217
+              Width = 166
               Height = 21
               Anchors = [akLeft, akTop, akRight]
               EditLabel.Width = 325
@@ -2547,26 +2550,26 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object cpCategories: TCategoryPanel
             Top = 0
-            Height = 321
+            Height = 329
             Caption = 'Categories and tree view layers'
             TabOrder = 0
             object lblDefaultCategory: TLabel
               Left = 16
-              Top = 238
+              Top = 190
               Width = 81
               Height = 13
               Anchors = [akLeft, akBottom]
               Caption = 'Default category'
-              ExplicitTop = 280
+              ExplicitTop = 166
             end
             object lblRecentlyAddedCategory: TLabel
               Left = 232
-              Top = 238
+              Top = 190
               Width = 131
               Height = 13
               Anchors = [akLeft, akBottom]
               Caption = 'Category "Recently added"'
-              ExplicitTop = 280
+              ExplicitTop = 166
             end
             object lblCategories: TLabel
               Left = 16
@@ -2586,7 +2589,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Left = 16
               Top = 32
               Width = 196
-              Height = 160
+              Height = 112
               Anchors = [akLeft, akTop, akBottom]
               Colors.UnfocusedSelectionColor = clHighlight
               Colors.UnfocusedSelectionBorderColor = clHighlight
@@ -2608,6 +2611,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               OnNewText = VSTCategoriesNewText
               Touch.InteractiveGestures = [igPan, igPressAndTap]
               Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+              ExplicitHeight = 88
               Columns = <
                 item
                   Position = 0
@@ -2616,49 +2620,53 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object btnCategoryEdit: TButton
               Left = 16
-              Top = 198
+              Top = 150
               Width = 99
               Height = 21
               Anchors = [akLeft, akBottom]
               Caption = 'Edit'
               TabOrder = 1
               OnClick = btnCategoryEditClick
+              ExplicitTop = 126
             end
             object cbDefaultCategory: TComboBox
               Left = 16
-              Top = 256
+              Top = 208
               Width = 179
               Height = 21
               Style = csDropDownList
               Anchors = [akLeft, akBottom]
               TabOrder = 4
               OnChange = cbDefaultCategoryChange
+              ExplicitTop = 184
             end
             object cbNewFilesCategory: TComboBox
               Left = 232
-              Top = 256
+              Top = 208
               Width = 177
               Height = 21
               Style = csDropDownList
               Anchors = [akLeft, akBottom]
               TabOrder = 5
               OnChange = cbNewFilesCategoryChange
+              ExplicitTop = 184
             end
             object btnLayerEdit: TButton
               Left = 232
-              Top = 198
+              Top = 150
               Width = 99
               Height = 21
               Anchors = [akLeft, akBottom]
               Caption = 'Edit'
               TabOrder = 3
               OnClick = btnLayerEditClick
+              ExplicitTop = 126
             end
             object VSTSortings: TVirtualStringTree
               Left = 232
-              Top = 32
+              Top = 31
               Width = 196
-              Height = 160
+              Height = 113
               Anchors = [akLeft, akTop, akBottom]
               BevelInner = bvNone
               BevelOuter = bvNone
@@ -2679,11 +2687,32 @@ object OptionsCompleteForm: TOptionsCompleteForm
               OnPaintText = VSTSortingsPaintText
               Touch.InteractiveGestures = [igPan, igPressAndTap]
               Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+              ExplicitHeight = 89
               Columns = <
                 item
                   Position = 0
                   Width = 192
                 end>
+            end
+            object cbLibConfigShowPlaylistCategories: TCheckBox
+              Left = 16
+              Top = 248
+              Width = 409
+              Height = 17
+              Anchors = [akLeft, akRight, akBottom]
+              Caption = 'Show playlist categories'
+              TabOrder = 6
+              ExplicitTop = 224
+            end
+            object cbLibConfigShowWebradioCategory: TCheckBox
+              Left = 16
+              Top = 268
+              Width = 409
+              Height = 17
+              Anchors = [akLeft, akRight, akBottom]
+              Caption = 'Show web radio category'
+              TabOrder = 7
+              ExplicitTop = 244
             end
           end
         end
@@ -3328,7 +3357,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object LblSoundFont: TLabel
               Left = 16
               Top = 116
-              Width = 273
+              Width = 222
               Height = 13
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -3381,7 +3410,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object MainDeviceCB: TComboBox
               Left = 16
               Top = 31
-              Width = 207
+              Width = 156
               Height = 21
               Hint = 'The main device.'
               Style = csDropDownList
@@ -3391,7 +3420,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object HeadphonesDeviceCB: TComboBox
               Left = 16
               Top = 81
-              Width = 207
+              Width = 156
               Height = 21
               Hint = 'The secondary device.'
               Style = csDropDownList
@@ -3399,7 +3428,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               TabOrder = 1
             end
             object BtnRefreshDevices: TButton
-              Left = 229
+              Left = 178
               Top = 77
               Width = 89
               Height = 25
@@ -3411,14 +3440,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object editSoundFont: TEdit
               Left = 16
               Top = 135
-              Width = 207
+              Width = 156
               Height = 21
               Hint = 'The SoundFont file used for MIDI playback'
               Anchors = [akLeft, akTop, akRight]
               TabOrder = 3
             end
             object BtnSelectSoundFontFile: TButton
-              Left = 229
+              Left = 178
               Top = 135
               Width = 25
               Height = 21
@@ -5165,7 +5194,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               AlignWithMargins = True
               Left = 17
               Top = 138
-              Width = 278
+              Width = 227
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Include "\admin" in QRCode URL'
@@ -5176,7 +5205,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               AlignWithMargins = True
               Left = 17
               Top = 158
-              Width = 278
+              Width = 227
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Use Internet-IP'

@@ -1061,6 +1061,7 @@ ProgressForm_CompleteCaption = 'Nemp: Process completed.';
 Playlist_StartSearchingFiles  = 'Searching for music files ...';
 Playlist_SearchingNewFilesDir    = 'Searching for music files ... %s';
 Playlist_SearchingNewFilesComplete = 'Searching for music files completed. The new files have been added to your playlist.';
+Playlist_SearchingNewFilesCompleteNothingFound = 'Searching for music files completed. No music files could be found.';
 
 HTTP_Connection_Error = 'Error connecting %s: %s';
 

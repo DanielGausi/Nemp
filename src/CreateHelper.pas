@@ -378,14 +378,6 @@ begin
         actToggleStayOnTop.Checked := NempOptions.MiniNempStayOnTop;
         AutoShowDetailsTMP := False; /// NempOptions.AutoShowDetails;
 
-        // Menüeinträge checken//unchecken
-        actToggleFileOverview.Checked := NempOptions.FormPositions[nfExtendedControls].Visible;
-        actTogglePlaylist.Checked  := NempOptions.FormPositions[nfPlaylist].Visible;
-        actToggleTitleList.Checked := NempOptions.FormPositions[nfMediaLibrary].Visible;
-        actToggleBrowseList.Checked    := NempOptions.FormPositions[nfBrowse].Visible;
-        // The Checked-Status for the Compact-Versions of these action will be done in the "NempLayout.OnAfterBuild"
-
-
         if NempOptions.FullRowSelect then
             VST.TreeOptions.SelectionOptions := VST.TreeOptions.SelectionOptions + [toFullRowSelect]
         else
@@ -643,7 +635,8 @@ begin
     MedienBib.NewCoverFlow.Mode := TCoverFlowMode(NempSettingsManager.ReadInteger('MedienBib', 'CoverFlowMode', Integer(cm_OpenGL)));
 
   MedienBib.NewCoverFlow.ApplySettings;
-
+  if MedienBib.BrowseMode = 1  then
+    MedienBib.NewCoverFlow.Paint(50);
 end;
 
 

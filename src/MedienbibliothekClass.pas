@@ -111,7 +111,7 @@ type
         fHND_ScanFilesAndUpdateThread: DWord;
         fHND_DeleteFilesThread: DWord;
         fHND_RefreshFilesThread: DWord;
-        fHND_GetLyricsThread: DWord;
+        // fHND_GetLyricsThread: DWord;
         fHND_GetTagsThread: DWord;
         fHND_UpdateID3TagsThread: DWord;
         fHND_BugFixID3TagsThread: DWord;

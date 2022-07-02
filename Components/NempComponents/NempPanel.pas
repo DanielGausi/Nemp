@@ -162,6 +162,12 @@ const
   MIN_WIDTH = 50;
   MIN_HEIGHT = 50;
 
+resourcestring
+  rsEditBtnHint_DeletePanel = 'Delete pane';
+  rsEditBtnHint_SplitH = 'Split horizontally';
+  rsEditBtnHint_SplitV = 'Split vertically';
+
+
 procedure TNempPanel.Paint;
 begin
 //  inherited paint;
@@ -272,7 +278,7 @@ end;
 
 procedure TNempContainerPanel.CreateEditButtons;
 
-  procedure AddButton(newLeft, newTag: Integer; newCaption: String);
+  procedure AddButton(newLeft, newTag: Integer; newCaption, newHint: String);
   var
     newButton: TButton;
   begin
@@ -284,6 +290,8 @@ procedure TNempContainerPanel.CreateEditButtons;
     newButton.Tag := newTag;
     newButton.Font.Size := 12;
     newButton.Caption := newCaption;
+    newButton.Hint := newHint;
+    newButton.ShowHint := True;
     newButton.OnClick := DoOnEditButtonClicked;
     newButton.Parent := self;
     fEditButtons.Add(newButton);
@@ -293,10 +301,18 @@ begin
   if Assigned(fEditButtons) then exit; // Buttons are already created, nothing to do
   fEditButtons := TButtonList.Create(False);
 
-  AddButton(4, 1, #$25E7);      // SQUARE WITH TOP HALF BLACK; Split vertically
-  AddButton(4+25+4, 2, #$2B12); // SQUARE WITH TOP HALF BLACK; Split vertically
+  AddButton(4, 1, #$25E7, rsEditBtnHint_SplitV);      // SQUARE WITH Left HALF BLACK; Split vertically
+  AddButton(4+25+4, 2, #$2B12, rsEditBtnHint_SplitH); // SQUARE WITH TOP HALF BLACK; Split horizontally
   if HierarchyLevel > 0 then
-    AddButton(4+50+8, 3, #$2A2F); // Vector or Cross Product; Delete
+    AddButton(4+50+8, 3, #$2A2F, rsEditBtnHint_DeletePanel); // Vector or Cross Product; Delete
+
+    {
+
+     rsEditBtnHint_DeletePanel = 'Delete pane';
+  rsEditBtnHint_SplitH = 'Split horizontally';
+  rsEditBtnHint_SplitV = 'Split vertically';
+    }
+
 end;
 
 procedure TNempContainerPanel.ShowEditButtons(EnableSplit: Boolean);
