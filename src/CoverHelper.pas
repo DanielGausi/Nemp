@@ -270,6 +270,7 @@ type
   //       Possible fix for that: when creating user-defined cover art: Create thumbnails for all sizes at once
   function RepairCoverFileVCL(oldID: string; aAudioFile: TAudioFile; aPic: TPicture; out newID: String): Boolean;
 
+  function StringToColorDef(const S: String; const Default: TColor): TColor;
 
 implementation
 
@@ -655,6 +656,16 @@ begin
   finally
     lCoverArtSearcher.Free;
   end;
+end;
+
+function StringToColorDef(const S: String; const Default: TColor): TColor;
+var
+  LColor: Integer;
+begin
+  if not IdentToColor(S, LColor) then
+    Result := TColor(StrToIntDef(S, Default))
+  else
+    Result := TColor(LColor);
 end;
 
 

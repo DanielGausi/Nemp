@@ -90,6 +90,7 @@ type
     ViewDirX: Integer;
     //
     MaxTextures: Integer;
+    DefaultColor: TColor;
   end;
 
 const
@@ -113,6 +114,7 @@ const
     ViewPosX: 0;
     ViewDirX: 0;
     MaxTextures: 100;
+    DefaultColor: clWhite;
   );
 
 type
@@ -363,13 +365,15 @@ end;
 
 procedure TFlyingCow.SetNewHandle(aWnd: HWND);
 begin
-    fThread.PauseRender;
-    fThread.fNewHandle := aWnd;
-    fThread.fNewHandleNeeded := True;
-    // clear textures, we need to reinit rendering completeley
-    fThread.QueryToClearTextures;
-    fThread.ResumeRender;
-    DoSomeDrawing(20);
+    if aWnd <> fThread.fWindow then begin
+      fThread.PauseRender;
+      fThread.fNewHandle := aWnd;
+      fThread.fNewHandleNeeded := True;
+      // clear textures, we need to reinit rendering completeley
+      fThread.QueryToClearTextures;
+      fThread.ResumeRender;
+      DoSomeDrawing(20);
+    end;
 end;
 
 procedure TFlyingCow.SetColor(r,g,b: Integer);

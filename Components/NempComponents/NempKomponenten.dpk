@@ -9,7 +9,7 @@ package NempKomponenten;
 {$EXTENDEDSYNTAX ON}
 {$IMPORTEDDATA ON}
 {$IOCHECKS ON}
-{$LOCALSYMBOLS ON}
+{$LOCALSYMBOLS OFF}
 {$LONGSTRINGS ON}
 {$OPENSTRINGS ON}
 {$OPTIMIZATION ON}
@@ -23,7 +23,7 @@ package NempKomponenten;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DEFINE DEBUG}
+{$DEFINE RELEASE}
 {$ENDIF IMPLICITBUILDING}
 {$IMPLICITBUILD ON}
 
@@ -33,7 +33,6 @@ requires
 
 contains
   NempGroupBox in 'NempGroupBox.pas',
-  uDragFilesSrc in 'uDragFilesSrc.pas',
   NempPanel in 'NempPanel.pas',
   Ole2 in 'Ole2.pas',
   SkinButtons in 'SkinButtons.pas',

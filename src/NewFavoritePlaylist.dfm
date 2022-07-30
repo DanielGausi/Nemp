@@ -11,13 +11,11 @@ object NewFavoritePlaylistForm: TNewFavoritePlaylistForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
     371
     186)
-  PixelsPerInch = 96
   TextHeight = 13
   object lbl_Hint: TLabel
     AlignWithMargins = True
@@ -43,6 +41,7 @@ object NewFavoritePlaylistForm: TNewFavoritePlaylistForm
     EditLabel.Height = 13
     EditLabel.Caption = 'Playlist name'
     TabOrder = 0
+    Text = ''
     OnChange = edit_PlaylistDescriptionChange
   end
   object edit_PlaylistFilename: TLabeledEdit
@@ -57,6 +56,7 @@ object NewFavoritePlaylistForm: TNewFavoritePlaylistForm
     EditLabel.Caption = 'Filename'
     Enabled = False
     TabOrder = 1
+    Text = ''
     OnChange = edit_PlaylistFilenameChange
   end
   object cb_AutoCreateFilename: TCheckBox

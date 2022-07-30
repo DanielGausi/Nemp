@@ -168,7 +168,9 @@ type
         fNewFilesCategory: TLibraryFileCategory;
         // fCollectionMetaInfo: TCollectionMetaInfo;
         fCurrentCategoryIdx: Integer;
-        fTargetCategory: Cardinal;
+        fNewCategoryMask: Cardinal;
+        fChangeCategoryMask: Cardinal;
+        fChangeCategory: TLibraryFileCategory;
         //fArtist: UnicodeString;    // currently selected artist/album
         //fAlbum: UnicodeString;     // Note: OnChange-Events of the trees MUST set these!
         //fArtistIndex: Cardinal;
@@ -236,8 +238,10 @@ type
         procedure SetBrowseMode(Value: Integer);
         function GetCoverSortOrder: Integer;
         procedure SetCoverSortOrder(Value: Integer);
-        procedure SetTargetCategory(Value: Cardinal);
-        function GetTargetCategory: Cardinal;
+        procedure SetNewCategoryMask(Value: Cardinal);
+        function GetNewCategoryMask: Cardinal;
+        procedure SetChangeCategoryMask(Value: Cardinal);
+        function GetChangeCategoryMask: Cardinal;
 
         procedure fSetIgnoreLyrics(aValue: Boolean);
 
@@ -401,6 +405,7 @@ type
         // und auch die Laderoutine
         UpdateList: TAudioFileList;
         PlaylistUpdateList: TLibraryPlaylistList;
+        CategoryChangeList: TAudioFileList;
 
         // Speichert die zu durchsuchenden Ordner für SearchTool
         ST_Ordnerlist: TStringList;
@@ -525,7 +530,8 @@ type
 
         property UpdateFortsetzen: LongBool read GetUpdateFortsetzen Write SetUpdateFortsetzen;
         property FileSearchAborted: LongBool read GetFileSearchAborted write SetFileSearchAborted;
-        property TargetCategory: Cardinal read GetTargetCategory write SetTargetCategory;
+        property NewCategoryMask: Cardinal read GetNewCategoryMask write SetNewCategoryMask;
+        property ChangeCategoryMask: Cardinal read GetChangeCategoryMask write SetChangeCategoryMask;
 
         property SavePath: UnicodeString read fSavePath write fSavePath;
 
@@ -623,14 +629,19 @@ type
         procedure FillRootCollection(Dest: TRootCollection; SourceCategory: TLibraryCategory);
 
         // On DragOver: Get the proper Name for the target category for the DragOver-Hint.
-        // Consider the case when lc is the "Recently Added"-Category
+        // Consider the case when lc is the "Default" ot "Recently Added"-Category
         function GetTargetFileCategoryName(lc: TLibraryCategory; out CatCount: Integer): String;
         // On Drop: Init the Target Category(Categories)
         // Consider Categories "Default" and "Recently Added"
         procedure InitTargetCategory(lc: TLibraryCategory);
 
-        //procedure ReBuildCoverList(FromScratch: Boolean = True);       // -"- of CoverLists
         procedure ChangeCategory(Current, Target: TLibraryCategory; Files: TAudioFileList; Action: teCategoryAction);
+        procedure RemoveFromCategory(Current: TLibraryCategory; Files: TAudioFileList);
+
+        // AudioFileCategoryShouldChange: used while "adding" already existing files to the library
+        // If files are added to a category they do not already belong to, this should be changed
+        function AudioFileCategoryShouldChange(AudioFile: TAudioFile): Boolean;
+        // function AddFileToCategory(AudioFile: TAudioFile; newCategory: TLibraryCategory): Boolean;
 
         procedure GenerateCoverCategoryFromSearchresult(Source: TAudioFileList);
         //procedure ReBuildTagCloud;        // -"- of the TagCloud
@@ -846,6 +857,7 @@ begin
 
   RadioStationList    := TObjectlist.Create;
   UpdateList   := TAudioFileList.create(False);
+  CategoryChangeList := TAudioFileList.create(False);
   ST_Ordnerlist := TStringList.Create;
   AutoScanDirList := TStringList.Create;
   AutoScanDirList.Sorted := True;
@@ -884,6 +896,7 @@ begin
 
   fJobList := TJobList.Create;
   fJobList.OwnsObjects := True;
+  fChangeCategory := Nil;
 end;
 
 destructor TMedienBibliothek.Destroy;
@@ -936,6 +949,7 @@ begin
   BaseMarkerList        := Nil;
 
   UpdateList.Free;
+  CategoryChangeList.Free;
   PlaylistUpdateList.Free;
   ST_Ordnerlist.Free;
   BibSearcher.Free;
@@ -968,6 +982,7 @@ begin
   InitFileCategories; // create Default-Lists
 
   UpdateList.Clear;
+  CategoryChangeList.Clear;
   PlaylistUpdateList.Clear;
   ST_Ordnerlist.Clear;
 
@@ -1004,6 +1019,7 @@ begin
   CurrentCategory := Nil;
   fNewFilesCategory := Nil;
   fDefaultFileCategory := Nil;
+  fChangeCategory := Nil;
   // CoverSearchCategory.Clear;
   SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, 0);
 end;
@@ -1178,14 +1194,24 @@ begin
     InterLockedExchange(Integer(fFileSearchAborted), Integer(Value));
 end;
 
-procedure TMedienBibliothek.SetTargetCategory(Value: Cardinal);
+procedure TMedienBibliothek.SetNewCategoryMask(Value: Cardinal);
 begin
-  InterlockedExchange(Integer(fTargetCategory), Integer(Value));
+  InterlockedExchange(Integer(fNewCategoryMask), Integer(Value));
 end;
 
-function TMedienBibliothek.GetTargetCategory: Cardinal;
+function TMedienBibliothek.GetNewCategoryMask: Cardinal;
 begin
-  InterLockedExchange(Integer(Result), Integer(fTargetCategory));
+  InterLockedExchange(Integer(Result), Integer(fNewCategoryMask));
+end;
+
+procedure TMedienBibliothek.SetChangeCategoryMask(Value: Cardinal);
+begin
+  InterlockedExchange(Integer(fChangeCategoryMask), Integer(Value));
+end;
+
+function TMedienBibliothek.GetChangeCategoryMask: Cardinal;
+begin
+  InterLockedExchange(Integer(Result), Integer(fChangeCategoryMask));
 end;
 
 function TMedienBibliothek.GetFileSearchAborted: LongBool;
@@ -1463,6 +1489,7 @@ begin
         for i := 0 to UpdateList.Count - 1 do
             UpdateList[i].Free;
         UpdateList.Clear;
+        CategoryChangeList.Clear;
          
         // we are in the main VCL Thread here.
         // however, use the same methods to finish the jobs as in the threaded methods
@@ -1479,7 +1506,7 @@ end;
 
 procedure fScanNewFilesAndUpdateBib(MB: TMedienbibliothek);
 begin
-    if (MB.UpdateList.Count > 0) or (MB.PlaylistUpdateList.Count > 0) then
+    if (MB.UpdateList.Count > 0) or (MB.PlaylistUpdateList.Count > 0) or (MB.CategoryChangeList.Count > 0) then
     begin
         // new part here: Scan the files first
         MB.UpdateFortsetzen := True;
@@ -1560,7 +1587,7 @@ begin
               begin
                   AudioFile.FileIsPresent:=True;
                   AudioFile.GetAudioData(AudioFile.Pfad, GAD_Rating or IgnoreLyricsFlag);
-                  AudioFile.Category := TargetCategory;
+                  AudioFile.Category := NewCategoryMask;
                   CoverArtSearcher.InitCover(AudioFile, tm_Thread, INIT_COVER_DEFAULT);
               end
               else
@@ -1649,7 +1676,7 @@ end;
 }
 procedure fNewFilesUpdate(MB: TMedienbibliothek);
 begin
-  if (MB.UpdateList.Count > 0) or (MB.PlaylistUpdateList.Count > 0) then
+  if (MB.UpdateList.Count > 0) or (MB.PlaylistUpdateList.Count > 0) or (MB.CategoryChangeList.Count > 0) then
   begin                        // status: Temporary comments, as I found a concept-bug here ;-)
     MB.PrepareNewFilesUpdate;  // status: ok (no StatusChange needed)
     MB.BuildSearchStrings;
@@ -1713,6 +1740,10 @@ begin
       fDriveManager.AddDrivesFromPlaylistFiles(PlaylistUpdateList);
       LeaveCriticalSection(CSAccessDriveList);
   end;
+
+  // Change Category for previously existing files
+  if CategoryChangeList.Count > 0 then
+    ChangeCategory(Nil, fChangeCategory, CategoryChangeList, caCategoryCopy);
 
   // Build proper Browse-Lists
   case BrowseMode of
@@ -1816,6 +1847,7 @@ procedure TMedienBibliothek.CleanUpTmpLists;
 begin
   Updatelist.Clear;
   PlaylistUpdateList.Clear;
+  CategoryChangeList.Clear;
   {.$Message Warn 'Status darf im Thread nicht gesetzt werden'}
   {.$Message Warn 'Und auf 0 gar nicht, weil es hier evtl. noch weitergeht!!'}
 end;
@@ -4458,7 +4490,6 @@ begin
       SourceList := Mp3ListePfadSort;
     end;
 
-
     PlaylistFillOptions.CheckCategory := PlaylistFillOptions.SelectionRange = rprCategory;
     if assigned(CurrentCategory) and (CurrentCategory.CategoryType = ccFiles) then
       PlaylistFillOptions.CategoryIdx := CurrentCategory.Index
@@ -5496,8 +5527,11 @@ var
     NewCategory: TLibraryFileCategory;
   begin
     NewCategory := TLibraryFileCategory.Create;
+
+
     NewCategory.Name := aName;
     NewCategory.Index := aIndex;
+    NewCategory.IsUserDefined := False;
     //NewCategory.SortIndex := aIndex;
     FileCategories.Add(NewCategory);
   end;
@@ -5515,12 +5549,29 @@ var
     PlaylistCategories.Add(NewCategory);
   end;
 
+  procedure DummyForGetText;
+  var s: String;
+  begin
+    s := _('Music');
+    s := _('Recently added');
+    s := _('Audio books');
+  end;
+
 begin
     DoInitNemp5 := FileCategories.Count = 0;
     if DoInitNemp5 then begin
-      AddFileCategory(rsDefaultCategoryAll, 0);
-      AddFileCategory(rsDefaultCategoryNew, 1);
-      AddFileCategory(rsDefaultCategoryAudioBook, 2);
+      AddFileCategory('Music', 0);
+      AddFileCategory('Recently added', 1);
+      AddFileCategory('Audio books', 2);
+
+
+    //  rsDefaultCategoryAll = 'Music';
+//  rsDefaultCategoryNew = 'Recently added';
+  //rsDefaultCategoryAudioBook = 'Audio books';
+
+
+
+
     end;
     if not assigned(CurrentCategory) then
       CurrentCategory := FileCategories[0];
@@ -5690,7 +5741,6 @@ begin
   WebRadioCategory.Clear;
   MergeWebradioIntoCategories(RadioStationList);
 
-
   if (CurrentCategory is TLibraryWebradioCategory) then
     SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, LParam(True));
 end;
@@ -5768,9 +5818,20 @@ begin
     result := ''
   else
   if not (lc.CategoryType = ccFiles) then
-    result := '' // but this case should not occur
+    result := '' // but this case should not occur, i.e. in this case the "Name" would not be used
   else
   begin
+    // simple setup: Use Category Name only if it is neither the "default" nor the "recently added" category
+    if lc.IsDefault or lc.IsNew then
+      result := lc.Name
+    else
+    begin
+      inc(CatCount);
+      result := lc.Name;
+    end;
+    {
+    // different setup:
+    // Show category names in more cases (but I think that's too much and kind of confusing)
     inc(CatCount);
     result := lc.Name;
     // if the actual DropOver-Category is our "Recently Added"-Category, the dropped files
@@ -5788,6 +5849,7 @@ begin
       result := result + ', ' + NewFilesCategory.Name;
       inc(CatCount);
     end;
+    }
   end;
 end;
 
@@ -5809,7 +5871,18 @@ begin
   if assigned(NewFilesCategory) then
     CategoryMask := CategoryMask or (1 shl NewFilesCategory.Index);
 
-  TargetCategory := Categorymask;
+  NewCategoryMask := Categorymask;
+
+  // CategoryMask for changing category:
+  // Use lc.Index, if it is not one of the "special" categories
+  if assigned(lc) and (lc.CategoryType = ccFiles) and (not lc.IsDefault) and (not lc.IsNew) then begin
+    ChangeCategoryMask := 1 shl lc.Index;
+    fChangeCategory := TLibraryFileCategory(lc);
+  end
+  else begin
+    ChangeCategoryMask := 0;
+    fChangeCategory := NIL;
+  end;
 end;
 
 procedure TMedienBibliothek.ChangeCategory(Current, Target: TLibraryCategory; Files: TAudioFileList; Action: teCategoryAction);
@@ -5820,17 +5893,17 @@ begin
   if Action = caNone then
     exit;
 
-  curIdx := Current.Index;
-  targetIdx := Target.Index;
   // remove Files from the current Category
   if (Action = caCategoryMove) and (Current is TLibraryFileCategory) then begin
+    curIdx := Current.Index;
     for i := 0 to Files.Count - 1 do begin
       Files[i].RemoveFromCategory(curIdx);
       TLibraryFileCategory(Current).RemoveAudioFile(Files[i]);
     end;
   end;
 
-  if (Target is TLibraryFileCategory) then begin
+  if assigned(Target) and (Target is TLibraryFileCategory) then begin
+    targetIdx := Target.Index;
     for i := 0 to Files.Count - 1 do begin
       if not Files[i].IsCategory(targetIdx) then begin // do not add it again, if it is already in the TargetCategory
         Files[i].AddToCategory(targetIdx);
@@ -5838,7 +5911,51 @@ begin
       end;
     end;
   end;
+  Changed := True;
 end;
+
+procedure TMedienBibliothek.RemoveFromCategory(Current: TLibraryCategory; Files: TAudioFileList);
+var
+  i: Integer;
+  curIdx, defIdx: Byte;
+begin
+  curIdx := Current.Index;
+  defIdx := DefaultFileCategory.Index;
+
+  for i := 0 to Files.Count - 1 do begin
+    Files[i].RemoveFromCategory(curIdx);
+    TLibraryFileCategory(Current).RemoveAudioFile(Files[i]);
+
+    // make sure that the files remain in at least one category.
+    // If not, add it to the Default Category
+    if (Files[i].Category = 0) then begin
+      Files[i].AddToCategory(defIdx);
+      TLibraryFileCategory(DefaultFileCategory).AddAudioFile(Files[i]);
+    end;
+  end;
+  Changed := True;
+end;
+
+function TMedienBibliothek.AudioFileCategoryShouldChange(AudioFile: TAudioFile): Boolean;
+begin
+  result := (AudioFile.Category or ChangeCategoryMask) <> AudioFile.Category;
+end;
+
+(*function TMedienBibliothek.AddFileToCategory(AudioFile: TAudioFile; newCategory: TLibraryCategory): Boolean;
+var
+  i: Integer;
+  curIdx, targetIdx: Byte;
+begin
+  result := False;
+  if (newCategory is TLibraryFileCategory) then begin
+    targetIdx := newCategory.Index;
+    if not AudioFile.IsCategory(targetIdx) then begin
+      result := True;
+      AudioFile.AddToCategory(targetIdx);
+      TLibraryFileCategory(newCategory).AddAudioFile(AudioFile);
+    end;
+  end;
+end;*)
 
 function TMedienBibliothek.LoadFileCategoriesFromStream(aStream: TStream): Boolean;
 var

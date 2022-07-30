@@ -123,6 +123,7 @@ type
     FDataObject: IDataObject;
 
     FDragSource: TControl; // replaces the old "DragSource"-Integer from the NempMainForm
+    FSourceIsPlayer: Boolean;
 
     IsWinVistaOrAbove: Boolean;
     fListFilenames: TStringList;
@@ -158,6 +159,7 @@ type
     //property AudioFiles[Index: Integer]: TAudioFile read GetAudioFile;
     property FileNames[Index: Integer]: String read GetFileName;
     property DragSource: TControl read FDragSource write FDragSource;
+    property SourceIsPlayer: Boolean read FSourceIsPlayer;
     //property MaxDropFiles: Integer read fMaxDropFiles write fMaxDropFiles;
     property Files: tStringList read fListFilenames;
 
@@ -174,7 +176,7 @@ type
 
     function RenderFilenames(out Medium: TStgMedium): HResult;
 
-    procedure InitDrag(Source: TControl);
+    procedure InitDrag(Source: TControl; IsPlayer: Boolean);
     procedure FinishDrag;
     function Execute: TDragResult;
 
@@ -1000,10 +1002,11 @@ begin
 end;
 
 
-procedure TNempDragManager.InitDrag(Source: TControl);
+procedure TNempDragManager.InitDrag(Source: TControl; IsPlayer: Boolean);
 begin
   ClearFiles;
   FDragSource := Source;
+  FSourceIsPlayer := IsPlayer;
 end;
 
 procedure TNempDragManager.FinishDrag;

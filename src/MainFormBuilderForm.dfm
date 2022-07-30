@@ -72,6 +72,15 @@ object MainFormBuilder: TMainFormBuilder
       TabOrder = 3
       OnClick = BtnNewLayoutClick
     end
+    object BtnHelp: TButton
+      Left = 135
+      Top = 6
+      Width = 75
+      Height = 25
+      Caption = 'Help'
+      TabOrder = 4
+      OnClick = BtnHelpClick
+    end
   end
   object pnlConstruction: TPanel
     Left = 0
@@ -123,7 +132,7 @@ object MainFormBuilder: TMainFormBuilder
             Top = 2
             Width = 25
             Height = 25
-            Hint = 'Reset'
+            Hint = 'Remove from form'
             Anchors = [akTop, akRight]
             Caption = #10799
             Font.Charset = DEFAULT_CHARSET
@@ -164,7 +173,7 @@ object MainFormBuilder: TMainFormBuilder
             Top = 4
             Width = 25
             Height = 25
-            Hint = 'Reset'
+            Hint = 'Remove from form'
             Anchors = [akTop, akRight]
             Caption = #10799
             Font.Charset = DEFAULT_CHARSET
@@ -204,7 +213,7 @@ object MainFormBuilder: TMainFormBuilder
             Top = 2
             Width = 25
             Height = 25
-            Hint = 'Reset'
+            Hint = 'Remove from form'
             Anchors = [akTop, akRight]
             Caption = #10799
             Font.Charset = DEFAULT_CHARSET
@@ -244,7 +253,7 @@ object MainFormBuilder: TMainFormBuilder
             Top = 2
             Width = 25
             Height = 25
-            Hint = 'Reset'
+            Hint = 'Remove from form'
             Anchors = [akTop, akRight]
             Caption = #10799
             Font.Charset = DEFAULT_CHARSET
@@ -284,7 +293,7 @@ object MainFormBuilder: TMainFormBuilder
             Top = 2
             Width = 25
             Height = 25
-            Hint = 'Reset'
+            Hint = 'Remove from form'
             Anchors = [akTop, akRight]
             Caption = #10799
             Font.Charset = DEFAULT_CHARSET
@@ -324,7 +333,7 @@ object MainFormBuilder: TMainFormBuilder
             Top = 2
             Width = 25
             Height = 25
-            Hint = 'Reset'
+            Hint = 'Remove from form'
             Anchors = [akTop, akRight]
             Caption = #10799
             Font.Charset = DEFAULT_CHARSET
@@ -365,7 +374,7 @@ object MainFormBuilder: TMainFormBuilder
             Top = 2
             Width = 25
             Height = 25
-            Hint = 'Reset'
+            Hint = 'Remove from form'
             Anchors = [akTop, akRight]
             Caption = #10799
             Font.Charset = DEFAULT_CHARSET
@@ -391,9 +400,9 @@ object MainFormBuilder: TMainFormBuilder
         TabOrder = 1
         object MainContainer: TNempContainerPanel
           Left = 2
-          Top = 41
+          Top = 69
           Width = 706
-          Height = 449
+          Height = 421
           Align = alClient
           BorderWidth = 3
           Constraints.MinWidth = 50
@@ -406,29 +415,60 @@ object MainFormBuilder: TMainFormBuilder
           OwnerDraw = False
           HierarchyLevel = 0
           SplitterMinSize = 120
+          DesignSize = (
+            706
+            421)
           object lblMainContainer: TLabel
             Left = 11
             Top = 46
-            Width = 4
-            Height = 13
+            Width = 662
+            Height = 43
+            Anchors = [akLeft, akTop, akRight]
+            AutoSize = False
             Caption = '-'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -15
+            Font.Name = 'Tahoma'
+            Font.Style = []
+            ParentFont = False
+            Visible = False
+            WordWrap = True
           end
         end
         object pnlConstructionHint: TPanel
           Left = 2
           Top = 15
           Width = 706
-          Height = 26
+          Height = 54
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 1
+          DesignSize = (
+            706
+            54)
           object lblElementCount: TLabel
-            Left = 10
-            Top = 4
-            Width = 4
-            Height = 13
+            Left = 56
+            Top = 8
+            Width = 646
+            Height = 36
+            Anchors = [akLeft, akTop, akRight]
+            AutoSize = False
             Caption = '-'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -15
+            Font.Name = 'Tahoma'
+            Font.Style = []
+            ParentFont = False
             ShowAccelChar = False
+            WordWrap = True
+          end
+          object imgInfo: TImage
+            Left = 11
+            Top = 10
+            Width = 32
+            Height = 32
           end
         end
       end
@@ -449,8 +489,6 @@ object MainFormBuilder: TMainFormBuilder
         Align = alTop
         Caption = 'Visible elements in Nemp'
         TabOrder = 0
-        ExplicitLeft = 4
-        ExplicitTop = -6
         DesignSize = (
           249
           131)
@@ -607,6 +645,7 @@ object MainFormBuilder: TMainFormBuilder
     end
   end
   object MainMenu: TMainMenu
+    AutoHotkeys = maManual
     Left = 43
     Top = 203
     object mmLayout: TMenuItem
@@ -617,13 +656,13 @@ object MainFormBuilder: TMainFormBuilder
       end
       object mmClear: TMenuItem
         AutoHotkeys = maManual
-        Caption = 'Clear layout'
+        Caption = 'New layout'
         Hint = 'Create a new Form Layout from scratch'
         OnClick = BtnNewLayoutClick
       end
       object mmUndo: TMenuItem
         AutoHotkeys = maManual
-        Caption = 'Undo'
+        Caption = 'Undo all changes'
         Hint = 'Undo all changes and restore the currently used Form Layout '
         OnClick = mmUndoClick
       end

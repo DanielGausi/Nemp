@@ -1775,11 +1775,11 @@ procedure TAudioFileCollection.RemoveAudioFile(aAudioFile: TAudioFile);
 var
   aIdx: Integer;
 begin
-  //
   aIdx := fFileList.IndexOf(aAudioFile);
   if aIdx > -1 then begin
     fFileList.Delete(aIdx);
     DecreaseCount(True);
+    fNeedAnalysis := True;
   end;
 end;
 
@@ -1804,8 +1804,11 @@ var
   ac: TAudioFileCollection;
 begin
   ac := SearchAudioFile(aAudioFile, True);
-  if assigned(ac) then
-    result := False
+  fNeedAnalysis := True;
+  if assigned(ac) then begin
+    result := True;  //False
+    ac.fNeedAnalysis := True;
+  end
   else begin
     // the relevant file properties has changed
     result := True;
@@ -2116,7 +2119,7 @@ begin
     AddAudioFile(aAudioFile);
   end else
   begin
-    result := inherited RelocateAudioFile(AAudioFile);
+    result := inherited RelocateAudioFile(aAudioFile);
   end;
 end;
 

@@ -1,6 +1,7 @@
 object OptionsCompleteForm: TOptionsCompleteForm
   Left = 968
   Top = 125
+  HelpContext = 30
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsDialog
   Caption = 'Preferences'
@@ -80,7 +81,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 0
       Width = 469
       Height = 638
-      ActivePage = tabCategories
+      ActivePage = tabFileManagement
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -176,12 +177,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CB_AutoCheck: TCheckBox
               Left = 16
               Top = 16
-              Width = 208
+              Width = 401
               Height = 17
               Hint = 
                 'Check for updates and show a message if a newer version is avail' +
                 'able'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Automatically check for new versions of Nemp'
               TabOrder = 0
               OnClick = CB_AutoCheckClick
@@ -189,12 +189,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CB_AutoCheckNotifyOnBetas: TCheckBox
               Left = 16
               Top = 67
-              Width = 224
+              Width = 409
               Height = 17
               Hint = 
                 'Notify on Beta-releases. As Beta-software is normally instable, ' +
                 'this is recommended for advanced users only.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Notify on Beta-releases'
               TabOrder = 2
             end
@@ -1317,13 +1316,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Top = 905
             Height = 175
             Caption = 'Extended viewing settings'
-            TabOrder = 4
+            TabOrder = 0
             object cb_limitMarkerToCurrentFiles: TCheckBox
               Left = 16
               Top = 56
               Width = 402
               Height = 17
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Show marked files only from the current preselection'
               TabOrder = 2
             end
@@ -1333,7 +1331,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 402
               Height = 17
               Hint = 'Always sort the displayed files in the library.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Always sort view (slower)'
               TabOrder = 0
               OnClick = CBAlwaysSortAnzeigeListClick
@@ -1344,7 +1341,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 402
               Height = 17
               Hint = 'Skip this sorting when the list is too large.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Skip sort on large lists (> 5000)'
               TabOrder = 1
             end
@@ -1354,7 +1350,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 402
               Height = 17
               Hint = 'Show hints in the playlist or not.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Show hints in playlist'
               TabOrder = 4
             end
@@ -1364,7 +1359,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 402
               Height = 17
               Hint = 'Select full row or just a single cell in the library.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Select full row in media list'
               TabOrder = 5
             end
@@ -1374,7 +1368,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 402
               Height = 17
               Hint = 'Show hints in the library or not.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Show hints in the media list'
               TabOrder = 3
             end
@@ -1383,7 +1376,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Top = 715
             Height = 190
             Caption = 'Playlist formatting'
-            TabOrder = 3
+            TabOrder = 1
             object lblPlaylistTitle: TLabel
               Left = 16
               Top = 16
@@ -1436,10 +1429,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
               AlignWithMargins = True
               Left = 168
               Top = 11
-              Width = 192
+              Width = 250
               Height = 21
               AutoComplete = False
-              Anchors = [akLeft, akTop, akRight]
               Color = clBtnFace
               ItemIndex = 0
               TabOrder = 0
@@ -1459,10 +1451,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
               AlignWithMargins = True
               Left = 168
               Top = 57
-              Width = 192
+              Width = 250
               Height = 21
               AutoComplete = False
-              Anchors = [akLeft, akTop, akRight]
               Color = clBtnFace
               ItemIndex = 5
               TabOrder = 2
@@ -1482,10 +1473,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
               AlignWithMargins = True
               Left = 168
               Top = 79
-              Width = 192
+              Width = 250
               Height = 21
               AutoComplete = False
-              Anchors = [akLeft, akTop, akRight]
               Color = clBtnFace
               ItemIndex = 4
               TabOrder = 3
@@ -1505,10 +1495,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
               AlignWithMargins = True
               Left = 168
               Top = 35
-              Width = 192
+              Width = 250
               Height = 21
               AutoComplete = False
-              Anchors = [akLeft, akTop, akRight]
               Color = clBtnFace
               ItemIndex = 2
               TabOrder = 1
@@ -1528,10 +1517,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
               AlignWithMargins = True
               Left = 168
               Top = 101
-              Width = 192
+              Width = 250
               Height = 21
               AutoComplete = False
-              Anchors = [akLeft, akTop, akRight]
               Color = clBtnFace
               ItemIndex = 0
               TabOrder = 4
@@ -1549,7 +1537,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object LblReplaceAlbumBy: TLabel
               Left = 16
               Top = 126
-              Width = 97
+              Width = 201
               Height = 13
               AutoSize = False
               Caption = 'Album'
@@ -1557,7 +1545,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object LblReplaceArtistBy: TLabel
               Left = 16
               Top = 36
-              Width = 97
+              Width = 201
               Height = 13
               AutoSize = False
               Caption = 'Artist'
@@ -1565,7 +1553,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object LblReplaceTitletBy: TLabel
               Left = 16
               Top = 81
-              Width = 97
+              Width = 201
               Height = 13
               AutoSize = False
               Caption = 'Title'
@@ -1573,13 +1561,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object lblMissingMetaData: TLabel
               Left = 16
               Top = 16
-              Width = 240
+              Width = 385
               Height = 13
-              Anchors = [akLeft, akTop, akRight]
               AutoSize = False
               Caption = 'If property ... is not available, display ... instead.'
               WordWrap = True
-              ExplicitWidth = 433
             end
             object img_DefaultCover: TImage
               Left = 16
@@ -1599,15 +1585,13 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object lbl_DefaultCoverHint: TLabel
               Left = 16
               Top = 347
-              Width = 341
+              Width = 401
               Height = 38
-              Anchors = [akLeft, akTop, akRight]
               AutoSize = False
               Caption = 
                 'Note: Cover art already displayed in the player will not change ' +
                 'until the cover art is loaded again.'
               WordWrap = True
-              ExplicitWidth = 409
             end
             object cbReplaceAlbumBy: TComboBox
               Left = 16
@@ -1688,14 +1672,13 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Top = 200
             Height = 93
             Caption = 'Display of Albums, Directories, ...'
-            TabOrder = 1
+            TabOrder = 3
             object cbShowCoverForAlbum: TCheckBox
               Left = 16
               Top = 16
               Width = 421
               Height = 17
-              Anchors = [akLeft, akTop, akRight]
-              Caption = 'Show cover art for albums  in tree view'
+              Caption = 'Show cover art for albums in tree view'
               TabOrder = 0
             end
             object cbShowElementCount: TCheckBox
@@ -1703,7 +1686,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Top = 36
               Width = 421
               Height = 17
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Show number of contained elements'
               TabOrder = 1
             end
@@ -1711,7 +1693,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object cpVisibleColumns: TCategoryPanel
             Top = 0
             Caption = 'Visible columns in the medialist'
-            TabOrder = 0
+            TabOrder = 4
             object clbViewMainColumns: TCheckListBox
               Left = 0
               Top = 0
@@ -1720,7 +1702,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Align = alClient
               Columns = 3
               ItemHeight = 13
+              Style = lbOwnerDrawFixed
               TabOrder = 0
+              OnDrawItem = clbViewMainColumnsDrawItem
             end
           end
         end
@@ -1985,7 +1969,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 400
               Height = 17
               Hint = 'Use different colors for different bitrates.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Change font color according to bitrate'
               ParentShowHint = False
               ShowHint = True
@@ -1998,7 +1981,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 400
               Height = 17
               Hint = 'Use different fonts for files with fixed or variable bitrate.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Change font according to constant/variable bitrate'
               ParentShowHint = False
               ShowHint = True
@@ -2014,7 +1996,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Hint = 
                 'User bigger fonts for long tracks and smaller ones for short tra' +
                 'cks.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Change font size according to track length'
               ParentShowHint = False
               ShowHint = True
@@ -2027,7 +2008,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 400
               Height = 17
               Hint = 'Normal: Joint Stereo, Bold: Full Stereo, Italic: Mono'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Change font style according to channel mode'
               ParentShowHint = False
               ShowHint = True
@@ -2091,11 +2071,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object CB_CoverSearch_inDir: TCheckBox
               Left = 16
-              Top = 36
-              Width = 227
+              Top = 34
+              Width = 201
               Height = 17
               Hint = 'Search for coverfiles within the directory of the audiofile'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Directory itself'
               ParentShowHint = False
               ShowHint = True
@@ -2103,11 +2082,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object CB_CoverSearch_inParentDir: TCheckBox
               Left = 16
-              Top = 56
-              Width = 227
+              Top = 54
+              Width = 201
               Height = 17
               Hint = 'Search for coverfiles in the parent directory of the audiofile.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Parent directory'
               ParentShowHint = False
               ShowHint = True
@@ -2115,7 +2093,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object CB_CoverSearch_inSisterDir: TCheckBox
               Left = 16
-              Top = 96
+              Top = 94
               Width = 201
               Height = 17
               Hint = 
@@ -2129,7 +2107,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object CB_CoverSearch_inSubDir: TCheckBox
               Left = 16
-              Top = 76
+              Top = 74
               Width = 201
               Height = 17
               Hint = 'Search for coverfiles in the specified subdirectory.'
@@ -2158,10 +2136,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CB_CoverSearch_LastFM: TCheckBox
               Left = 16
               Top = 188
-              Width = 227
+              Width = 273
               Height = 17
               Hint = 'Allow Nemp downloading missing cover files from the internet'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Download missing covers from LastFM'
               ParentShowHint = False
               ShowHint = True
@@ -2223,7 +2200,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Hint = 
                 'When searching for files: Add every supported file or just some ' +
                 'special types.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'All types supported by the player'
               TabOrder = 0
               OnClick = cbIncludeAllClick
@@ -2237,12 +2213,15 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Anchors = [akLeft, akTop, akRight]
               Columns = 4
               ItemHeight = 13
+              Style = lbOwnerDrawFixed
               TabOrder = 1
+              OnDrawItem = clbViewMainColumnsDrawItem
             end
           end
           object cpScanDirectories: TCategoryPanel
             Top = 0
             Height = 260
+            HelpContext = 4
             Caption = 'Directories'
             TabOrder = 0
             object BtnAutoScanAdd: TButton
@@ -2287,7 +2266,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Hint = 
                 'Check for missing files in your music directories when starting ' +
                 'Nemp and remove them from the media library.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Automatically delete missing files from the media library'
               TabOrder = 7
               OnClick = CBAutoScanClick
@@ -2298,7 +2276,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 397
               Height = 17
               Hint = 'Create a log message about missing files'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Log summary about deleted files'
               TabOrder = 8
             end
@@ -2310,7 +2287,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Hint = 
                 'When selecting a new directory: Show query whether it should be ' +
                 'added to this list or not.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Show query dialog when adding new directories'
               TabOrder = 6
             end
@@ -2320,7 +2296,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 397
               Height = 17
               Hint = 'Add new directories to this list'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Automatically monitor new directories'
               TabOrder = 5
             end
@@ -2341,9 +2316,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Top = 39
               Width = 261
               Height = 70
+              Style = lbOwnerDrawVariable
               Anchors = [akLeft, akTop, akRight]
               ItemHeight = 13
               TabOrder = 1
+              OnDrawItem = clbViewMainColumnsDrawItem
               OnKeyDown = LBAutoscanKeyDown
             end
             object CBAutoScanPlaylistFilesOnView: TCheckBox
@@ -2368,6 +2345,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 461
           Height = 574
+          VertScrollBar.Position = 269
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -2378,11 +2356,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpCategoryCoverflow: TCategoryPanel
-            Top = 714
+            Top = 445
             Height = 125
             Caption = 'Display as "Coverflow"'
             TabOrder = 3
-            ExplicitTop = 706
             object btnEditCoverflow: TButton
               Left = 375
               Top = 32
@@ -2419,11 +2396,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpCategoryPlaylists: TCategoryPanel
-            Top = 569
+            Top = 300
             Height = 145
             Caption = 'Category "Playlists"'
             TabOrder = 2
-            ExplicitTop = 561
             object lblPlaylistCaptionMode: TLabel
               Left = 16
               Top = 16
@@ -2483,11 +2459,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpAlbumDefinition: TCategoryPanel
-            Top = 329
+            Top = 60
             Height = 240
             Caption = 'Definition of an "Album" (e.g. in Coverflow or layer "Album")'
             TabOrder = 1
-            ExplicitTop = 321
             object lblDefineAlbum: TLabel
               Left = 16
               Top = 87
@@ -2498,7 +2473,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object lblAlbumDefinitionHint: TLabel
               Left = 16
               Top = 16
-              Width = 409
+              Width = 375
               Height = 65
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -2509,6 +2484,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
                 'an select what Nemp should consider as an "Album" in that sense,' +
                 ' so it matches with your music collection.'
               WordWrap = True
+              ExplicitWidth = 409
             end
             object cbAlbumKeymode: TComboBox
               Left = 16
@@ -2528,19 +2504,19 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object cbIgnoreCDDirectories: TCheckBox
               Left = 16
-              Top = 136
-              Width = 237
+              Top = 131
+              Width = 401
               Height = 17
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Allow multi-folder albums (e.g. "CD 1" and "CD 2")'
               TabOrder = 1
             end
             object editCDNames: TLabeledEdit
               Left = 16
               Top = 174
-              Width = 166
+              Width = 375
               Height = 21
               Anchors = [akLeft, akTop, akRight]
+              AutoSize = False
               EditLabel.Width = 325
               EditLabel.Height = 13
               EditLabel.Caption = 'Folder names not forming an album of their own (comma separated)'
@@ -2549,7 +2525,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpCategories: TCategoryPanel
-            Top = 0
+            Top = -269
             Height = 329
             Caption = 'Categories and tree view layers'
             TabOrder = 0
@@ -2611,7 +2587,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               OnNewText = VSTCategoriesNewText
               Touch.InteractiveGestures = [igPan, igPressAndTap]
               Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-              ExplicitHeight = 88
               Columns = <
                 item
                   Position = 0
@@ -2627,7 +2602,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Caption = 'Edit'
               TabOrder = 1
               OnClick = btnCategoryEditClick
-              ExplicitTop = 126
             end
             object cbDefaultCategory: TComboBox
               Left = 16
@@ -2638,7 +2612,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Anchors = [akLeft, akBottom]
               TabOrder = 4
               OnChange = cbDefaultCategoryChange
-              ExplicitTop = 184
             end
             object cbNewFilesCategory: TComboBox
               Left = 232
@@ -2649,7 +2622,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Anchors = [akLeft, akBottom]
               TabOrder = 5
               OnChange = cbNewFilesCategoryChange
-              ExplicitTop = 184
             end
             object btnLayerEdit: TButton
               Left = 232
@@ -2660,7 +2632,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Caption = 'Edit'
               TabOrder = 3
               OnClick = btnLayerEditClick
-              ExplicitTop = 126
             end
             object VSTSortings: TVirtualStringTree
               Left = 232
@@ -2687,7 +2658,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               OnPaintText = VSTSortingsPaintText
               Touch.InteractiveGestures = [igPan, igPressAndTap]
               Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-              ExplicitHeight = 89
               Columns = <
                 item
                   Position = 0
@@ -2699,20 +2669,18 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Top = 248
               Width = 409
               Height = 17
-              Anchors = [akLeft, akRight, akBottom]
+              Anchors = [akLeft, akBottom]
               Caption = 'Show playlist categories'
               TabOrder = 6
-              ExplicitTop = 224
             end
             object cbLibConfigShowWebradioCategory: TCheckBox
               Left = 16
               Top = 268
               Width = 409
               Height = 17
-              Anchors = [akLeft, akRight, akBottom]
+              Anchors = [akLeft, akBottom]
               Caption = 'Show web radio category'
               TabOrder = 7
-              ExplicitTop = 244
             end
           end
         end
@@ -2809,7 +2777,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Top = 36
               Width = 414
               Height = 17
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Write changes directly to the metadata'
               TabOrder = 0
             end
@@ -2818,7 +2785,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Top = 92
               Width = 414
               Height = 17
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Ignore Lyrics (recommended for very large  music collections)'
               TabOrder = 1
               OnClick = cb_IgnoreLyricsClick
@@ -2829,7 +2795,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 397
               Height = 17
               Hint = '(De)activate automatic rating/playcounter'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Change rating and play counter of played files'
               TabOrder = 2
               OnClick = cb_RatingActiveClick
@@ -2840,7 +2805,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 397
               Height = 17
               Hint = 'Increase the playcounter of a file after it was played'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Increase play counter'
               TabOrder = 4
             end
@@ -2852,7 +2816,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Hint = 
                 'Automatically decrease rating on aborted tracks. The change will' +
                 ' be smaller the higher the playcounter is.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Decrease rating on aborted tracks'
               TabOrder = 6
             end
@@ -2862,7 +2825,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 397
               Height = 17
               Hint = 'Do not change rating and playcounter on short tracks.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Ignore short tracks (i.e. less than 30 seconds)'
               TabOrder = 3
             end
@@ -2874,7 +2836,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Hint = 
                 'Automatically increase rating on played tracks. The change will ' +
                 'be smaller the higher the playcounter is.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Increase rating on played tracks'
               TabOrder = 5
             end
@@ -2883,7 +2844,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Top = 304
               Width = 397
               Height = 17
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'If not: Show query dialog when inconsistencies occur'
               TabOrder = 8
             end
@@ -2892,7 +2852,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Top = 284
               Width = 397
               Height = 17
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Automatically resolve inconsistencies when entering new tags'
               TabOrder = 7
             end
@@ -2901,7 +2860,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Top = 324
               Width = 397
               Height = 17
-              Anchors = [akLeft, akTop, akRight]
               Caption = 
                 'If not: Show information dialog when minor inconsistencies occur' +
                 ' '
@@ -2915,7 +2873,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Hint = 
                 'Use a uber-ingenious special method for better tag-reading in fi' +
                 'les with "unicode-filenames".'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Auto-detect (probably) used character sets'
               TabOrder = 10
             end
@@ -2976,7 +2933,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 414
               Height = 17
               Hint = 'Use some tricky algorithms to accelerate the search for lyrics.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Accelerate lyrics search'
               TabOrder = 4
             end
@@ -2986,7 +2942,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 414
               Height = 17
               Hint = 'Use some tricky algorithms to accelerate the search.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Accelerate search'
               TabOrder = 0
               OnClick = CB_AccelerateSearchClick
@@ -2997,7 +2952,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 414
               Height = 17
               Hint = 'Include comments to the accelerated search algorithms.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Including comments'
               TabOrder = 2
             end
@@ -3007,7 +2961,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 414
               Height = 17
               Hint = 'Include genres to the accelerated search algorithms.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Including genre'
               TabOrder = 3
             end
@@ -3017,7 +2970,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 414
               Height = 17
               Hint = 'Include filenames to the accelerated search algorithms.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Including filenames'
               TabOrder = 1
             end
@@ -3026,7 +2978,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Top = 260
               Width = 397
               Height = 17
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Change coverflow according to results'
               TabOrder = 8
             end
@@ -3038,7 +2989,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Hint = 
                 'Do a fuzzy search after pressing "enter" (e.g. show files from "' +
                 'Amy MacDonald" when you search for "Amy McDonald")'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Allow errors on [Enter]'
               TabOrder = 6
             end
@@ -3050,7 +3000,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Hint = 
                 'Always use a fuzzy search (e.g. show files from "Amy MacDonald" ' +
                 'when you search for "Amy McDonald")'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Allow errors while typing'
               TabOrder = 7
             end
@@ -3062,7 +3011,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Hint = 
                 'Show search results in "real time" or just after pressing the "e' +
                 'nter"-key.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = '"While you type"'
               TabOrder = 5
             end
@@ -3094,9 +3042,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cb_SafePlayback: TCheckBox
               Left = 16
               Top = 16
-              Width = 433
+              Width = 420
               Height = 17
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Use safe playback'
               TabOrder = 0
             end
@@ -3104,7 +3051,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object cpVisualisation: TCategoryPanel
             Top = 725
             Height = 162
-            Caption = 'Visualzation'
+            Caption = 'Visualization'
             TabOrder = 3
             object Lbl_Framerate: TLabel
               Left = 191
@@ -3357,7 +3304,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object LblSoundFont: TLabel
               Left = 16
               Top = 116
-              Width = 222
+              Width = 35
               Height = 13
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -3409,30 +3356,27 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object MainDeviceCB: TComboBox
               Left = 16
-              Top = 31
-              Width = 156
+              Top = 35
+              Width = 250
               Height = 21
               Hint = 'The main device.'
               Style = csDropDownList
-              Anchors = [akLeft, akTop, akRight]
               TabOrder = 0
             end
             object HeadphonesDeviceCB: TComboBox
               Left = 16
               Top = 81
-              Width = 156
+              Width = 250
               Height = 21
               Hint = 'The secondary device.'
               Style = csDropDownList
-              Anchors = [akLeft, akTop, akRight]
               TabOrder = 1
             end
             object BtnRefreshDevices: TButton
-              Left = 178
-              Top = 77
+              Left = 272
+              Top = 79
               Width = 89
               Height = 25
-              Anchors = [akTop, akRight]
               Caption = 'Refresh'
               TabOrder = 2
               OnClick = BtnRefreshDevicesClick
@@ -3440,19 +3384,17 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object editSoundFont: TEdit
               Left = 16
               Top = 135
-              Width = 156
+              Width = 250
               Height = 21
               Hint = 'The SoundFont file used for MIDI playback'
-              Anchors = [akLeft, akTop, akRight]
               TabOrder = 3
             end
             object BtnSelectSoundFontFile: TButton
-              Left = 178
+              Left = 272
               Top = 135
               Width = 25
               Height = 21
               Hint = 'Select file'
-              Anchors = [akTop, akRight]
               Caption = '...'
               TabOrder = 4
               OnClick = BtnSelectSoundFontFileClick
@@ -3486,7 +3428,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object CB_Mixing: TComboBox
               Left = 16
-              Top = 284
+              Top = 287
               Width = 145
               Height = 21
               Hint = 'Try to change this, if the playback is distorted.'
@@ -3912,20 +3854,19 @@ object OptionsCompleteForm: TOptionsCompleteForm
             TabOrder = 1
             object CB_AutoScanPlaylist: TCheckBox
               Left = 16
-              Top = 13
-              Width = 425
+              Top = 16
+              Width = 415
               Height = 17
               Hint = 
                 'Read metadata from the audiofiles or just use the data stored in' +
                 ' the playlistfile.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Check files when loading a playlist'
               TabOrder = 0
             end
             object CB_JumpToNextCue: TCheckBox
               Left = 16
               Top = 36
-              Width = 409
+              Width = 415
               Height = 17
               Hint = 'When clicking "next", jump to the next cuesheet (if available)'
               Caption = 'Jump to next entry in cuesheet on "next"'
@@ -3934,7 +3875,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cb_PlaylistManagerAutoSave: TCheckBox
               Left = 16
               Top = 96
-              Width = 401
+              Width = 415
               Height = 17
               Caption = 'Autosave favorite playlists'
               TabOrder = 4
@@ -3943,7 +3884,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cb_PlaylistManagerAutoSaveUserInput: TCheckBox
               Left = 28
               Top = 116
-              Width = 397
+              Width = 415
               Height = 17
               Caption = 'Decide individually when loading a new playlist '
               TabOrder = 5
@@ -3951,7 +3892,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CB_RememberInterruptedPlayPosition: TCheckBox
               Left = 16
               Top = 76
-              Width = 409
+              Width = 415
               Height = 17
               Hint = 'Used in combination with "Just play focussed file"'
               Caption = 
@@ -3962,7 +3903,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cb_ReplayCue: TCheckBox
               Left = 16
               Top = 56
-              Width = 409
+              Width = 415
               Height = 17
               Hint = 
                 'Repeat only the current part of a file instead of the whole trac' +
@@ -3973,7 +3914,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CB_AutoDeleteFromPlaylist: TCheckBox
               Left = 16
               Top = 136
-              Width = 401
+              Width = 415
               Height = 17
               Hint = 'remove a track from the playlist after it is completely played.'
               Caption = 'Delete completely played tracks from the playlist'
@@ -3983,7 +3924,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CB_AutoMixPlaylist: TCheckBox
               Left = 16
               Top = 176
-              Width = 409
+              Width = 415
               Height = 17
               Hint = 'Randomize playlist after the last track.'
               Caption = 'Mix playlist after last track'
@@ -3992,7 +3933,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CB_DisableAutoDeleteAtUserInput: TCheckBox
               Left = 36
               Top = 156
-              Width = 381
+              Width = 415
               Height = 17
               Hint = 'Exceptions for deleting a file from the playlist.'
               Caption = 'Do not delete after manual stop/pause/slide/next/previous'
@@ -4192,7 +4133,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 25
               Height = 21
               Hint = 'Choose a download directory'
-              Anchors = [akTop, akRight]
               Caption = '...'
               TabOrder = 1
               OnClick = BtnChooseDownloadDirClick
@@ -4200,10 +4140,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cbAutoSplitBySize: TCheckBox
               Left = 16
               Top = 192
-              Width = 407
+              Width = 420
               Height = 17
               Hint = 'Split recordings by size.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Split files by size'
               TabOrder = 5
               OnClick = cbAutoSplitBySizeClick
@@ -4211,10 +4150,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cbAutoSplitByTime: TCheckBox
               Left = 16
               Top = 240
-              Width = 407
+              Width = 420
               Height = 17
               Hint = 'Split recordings by time.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Split files by time'
               TabOrder = 7
               OnClick = cbAutoSplitByTimeClick
@@ -4222,12 +4160,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cbAutoSplitByTitle: TCheckBox
               Left = 16
               Top = 172
-              Width = 407
+              Width = 420
               Height = 17
               Hint = 
                 'Try to split the stream when a new title begins. This will work ' +
                 'only if the station submits proper title information.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Begin new file for every title'
               Checked = True
               State = cbChecked
@@ -4236,7 +4173,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cbFilenameFormat: TComboBox
               Left = 16
               Top = 95
-              Width = 379
+              Width = 393
               Height = 21
               TabOrder = 3
               Text = '<date>, <time> - <title>'
@@ -4250,7 +4187,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cbUseStreamnameAsDirectory: TCheckBox
               Left = 16
               Top = 56
-              Width = 393
+              Width = 420
               Height = 17
               Caption = 'Use streamname as directory'
               TabOrder = 2
@@ -4260,7 +4197,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Top = 32
               Width = 394
               Height = 21
-              Anchors = [akLeft, akTop, akRight]
               TabOrder = 0
             end
             object SE_AutoSplitMaxSize: TSpinEdit
@@ -4357,12 +4293,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cb_ApplyReplayGain: TCheckBox
               Left = 16
               Top = 16
-              Width = 397
+              Width = 420
               Height = 17
               Hint = 
                 'Use ReplayGain values to achieve a more consistent loudness duri' +
                 'ng playback.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Use ReplayGain for a more consistent loudness during playback'
               TabOrder = 0
               OnClick = cb_ApplyReplayGainClick
@@ -4370,22 +4305,20 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cb_PreferAlbumGain: TCheckBox
               Left = 16
               Top = 34
-              Width = 397
+              Width = 420
               Height = 17
               Hint = 
                 'Use AlbumGain values to maintain intentional loudness changes wi' +
                 'thin albums'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Prefer AlbumGain'
               TabOrder = 1
             end
             object cb_ReplayGainPreventClipping: TCheckBox
               Left = 16
               Top = 52
-              Width = 397
+              Width = 420
               Height = 17
               Hint = 'Limit amplification to prevent playback from clipping, if needed'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Prevent clipping'
               TabOrder = 2
             end
@@ -4468,7 +4401,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 414
               Height = 17
               Hint = 'Disable effects when Nemp starts'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Reset effects on start'
               Checked = True
               State = cbChecked
@@ -4480,7 +4412,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 414
               Height = 17
               Hint = 'Disable equalizer when Nemp starts'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Reset equalizer on start'
               TabOrder = 0
             end
@@ -4490,7 +4421,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 414
               Height = 17
               Hint = 'Just as those cassette players did before "mp3" was invented.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Flutter playback when battery is low ("Walkman mode")'
               TabOrder = 2
             end
@@ -4500,7 +4430,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 414
               Height = 17
               Hint = 'Reduce main volume before when playing a jingle'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Reduce main volume to'
               TabOrder = 3
               OnClick = CBJingleReduceClick
@@ -4660,7 +4589,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 410
               Height = 17
               Hint = 'Continue with the playlist after the birthday song.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Continue with the playlist after playing the birthday song'
               TabOrder = 8
             end
@@ -4708,7 +4636,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CBStartCountDown: TCheckBox
               Left = 16
               Top = 196
-              Width = 361
+              Width = 417
               Height = 17
               Hint = 'Signalize birthday song with a countdown.'
               Caption = 'Start a countdown before the actual time'
@@ -4791,7 +4719,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 414
               Height = 17
               Hint = 'Always begin scrobbling when nemp starts.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Scrobble always'
               TabOrder = 0
             end
@@ -4801,7 +4728,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 414
               Height = 17
               Hint = 'Begin scrobbling now.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Scrobble this session'
               TabOrder = 1
             end
@@ -4813,7 +4739,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Hint = 
                 'Ignore hard failures like "no internet connection", "invalid use' +
                 'rname/password", ...'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 
                 'Ignore hard failures - just stop scrobbling if something goes wr' +
                 'ong'
@@ -5194,9 +5119,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
               AlignWithMargins = True
               Left = 17
               Top = 138
-              Width = 227
+              Width = 315
               Height = 17
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Include "\admin" in QRCode URL'
               TabOrder = 3
               OnClick = ChangeWebserverLinks
@@ -5205,9 +5129,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
               AlignWithMargins = True
               Left = 17
               Top = 158
-              Width = 227
+              Width = 315
               Height = 17
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Use Internet-IP'
               Enabled = False
               TabOrder = 4
@@ -5255,7 +5178,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 397
               Height = 15
               Hint = 'Let the user control the player (play/stop/next/volume/...)'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Permit remote control of the player'
               TabOrder = 5
               OnClick = ChangeWebserverLinks
@@ -5266,7 +5188,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 397
               Height = 15
               Hint = 'Let the user search and browse in your library'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Permit access to the media library (read only)'
               TabOrder = 3
             end
@@ -5276,7 +5197,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 397
               Height = 15
               Hint = 'Let the user download files from your playlist and/or library'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Permit downloading files from the playlist'
               TabOrder = 4
             end
@@ -5288,7 +5208,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Hint = 
                 'Let the user vote for files - files with many votes will be play' +
                 'ed first'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Permit voting for files'
               TabOrder = 2
             end
@@ -5476,7 +5395,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           object cpCoverflowMixedSettings: TCategoryPanel
             Top = 570
-            Height = 100
+            Height = 150
             Caption = 'Mixed settings'
             TabOrder = 5
             object lblCoverflowTextures: TLabel
@@ -5485,6 +5404,20 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Width = 159
               Height = 13
               Caption = 'max. number of displayed covers'
+            end
+            object shapeCoverflowColor: TShape
+              Left = 16
+              Top = 88
+              Width = 21
+              Height = 21
+              OnMouseDown = shapeCoverflowColorMouseDown
+            end
+            object lblCoverFlowColor: TLabel
+              Left = 16
+              Top = 69
+              Width = 243
+              Height = 13
+              Caption = 'Default background color (Windows standard only)'
             end
             object cb_UseClassicCoverflow: TCheckBox
               Left = 16
@@ -5504,6 +5437,22 @@ object OptionsCompleteForm: TOptionsCompleteForm
               MinValue = 20
               TabOrder = 0
               Value = 20
+            end
+            object edtCoverFlowColor: TEdit
+              Left = 43
+              Top = 88
+              Width = 121
+              Height = 21
+              TabOrder = 2
+            end
+            object btnSelectCoverFlowColor: TButton
+              Left = 170
+              Top = 88
+              Width = 31
+              Height = 21
+              Caption = '...'
+              TabOrder = 3
+              OnClick = btnSelectCoverFlowColorClick
             end
           end
           object cpCoverflowReflection: TCategoryPanel
@@ -5530,7 +5479,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cbCoverFlowUseReflection: TCheckBox
               Left = 16
               Top = 16
-              Width = 121
+              Width = 217
               Height = 17
               Caption = 'Enabled'
               TabOrder = 0
@@ -5921,12 +5870,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CBDirectorySupport: TCheckBox
               Left = 16
               Top = 300
-              Width = 397
+              Width = 420
               Height = 17
               Hint = 
                 'Add "Play/Enqueue in Nemp" to the context menu in the Windows Ex' +
                 'plorer.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = 'Context menus on directories'
               Checked = True
               State = cbChecked
@@ -5935,12 +5883,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CBEnqueueStandard: TCheckBox
               Left = 16
               Top = 260
-              Width = 397
+              Width = 420
               Height = 17
               Hint = 
                 'Add a file to the playlist when double-clicking it in the Window' +
                 's-Explorer. Otherwise the current playlist will be deleted.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = '"Enqueue" as default action for audio files'
               Checked = True
               State = cbChecked
@@ -5949,13 +5896,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CBEnqueueStandardLists: TCheckBox
               Left = 16
               Top = 280
-              Width = 397
+              Width = 420
               Height = 17
               Hint = 
                 'Add the files of a playlist to the current playlist when double-' +
                 'clicking it in the Windows-Explorer. Otherwise the current playl' +
                 'ist will be deleted.'
-              Anchors = [akLeft, akTop, akRight]
               Caption = '"Enqueue" as default action for playlists'
               Checked = True
               State = cbChecked
@@ -6033,6 +5979,15 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Caption = 'Apply'
       TabOrder = 3
       OnClick = BTNApplyClick
+    end
+    object BtnHelp: TButton
+      Left = 215
+      Top = 0
+      Width = 75
+      Height = 25
+      Caption = 'Help'
+      TabOrder = 4
+      OnClick = BtnHelpClick
     end
   end
   object OpenDlg_CountdownSongs: TOpenDialog
@@ -8810,5 +8765,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000}
+  end
+  object ColorDlgCoverflow: TColorDialog
+    Left = 43
+    Top = 555
   end
 end

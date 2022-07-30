@@ -80,7 +80,7 @@ type
     ResizeFlag: Cardinal;
 
     procedure WMWindowPosChanging(var Message: TWMWINDOWPOSCHANGING); message WM_WINDOWPOSCHANGING;
-    Procedure WMDropFiles (Var aMsg: tMessage);  message WM_DROPFILES;
+    // Procedure WMDropFiles (Var aMsg: tMessage);  message WM_DROPFILES;
   public
     { Public-Deklarationen }
     // Resizing-Flag: On WMWindowPosChanging the RelativPositions must be changed
@@ -176,11 +176,13 @@ begin
     CloseImageP.Parent := PlaylistForm;
 end;
 
+(*
 Procedure TPlaylistForm.WMDropFiles (Var aMsg: tMessage);
 Begin
     Inherited;
     Handle_DropFilesForPlaylist(aMsg, False);
 end;
+*)
 
 
 procedure TPlaylistForm.FormMouseDown(Sender: TObject;

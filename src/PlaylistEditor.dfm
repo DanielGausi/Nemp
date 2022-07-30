@@ -68,6 +68,7 @@ object PlaylistEditorForm: TPlaylistEditorForm
       OnFocusChanged = PlaylistSelectionVSTFocusChanged
       OnFocusChanging = PlaylistSelectionVSTFocusChanging
       OnGetText = PlaylistSelectionVSTGetText
+      OnPaintText = PlaylistSelectionVSTPaintText
       OnNewText = PlaylistSelectionVSTNewText
       OnStartDrag = PlaylistSelectionVSTStartDrag
       Touch.InteractiveGestures = [igPan, igPressAndTap]
@@ -215,6 +216,7 @@ object PlaylistEditorForm: TPlaylistEditorForm
     Top = 89
   end
   object PopUpPlaylist: TPopupMenu
+    OnPopup = PopUpPlaylistPopup
     Left = 176
     Top = 32
     object PM_PL_AddFiles: TMenuItem

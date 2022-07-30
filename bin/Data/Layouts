@@ -2,29 +2,10 @@
 ; Some predefined Layouts for Nemp
 ; Do not modify this file, unless you know what you're doing
 ;
-[Default1]
-en=Default (1)
-de=Standard (1)
-A=haCD
-ARatio=20,80,40
-C=vEmx
-CRatio=50,50,50
-D=vpd
-DRatio=60,40
-E=hbc
-ERatio=50,50
-TreeViewRatio=30
-TreeviewOrientation=1
-FileOVerviewOrientation=0
-FileOverviewMode=0
-ShowControlCover=1
-ShowBibSelection=1
-ShowMedialist=1
-ShowFileOverview=1
 
-[Default2]
-en=Default (2)
-de=Standard (2)
+[Default1]
+en=Controls: Full width
+de=Steuerung: Volle Breite
 A=vBx
 ARatio=50,50
 B=haEF
@@ -36,6 +17,26 @@ FRatio=51,48
 G=hbc
 GRatio=50,50
 TreeViewRatio=22
+TreeviewOrientation=1
+FileOVerviewOrientation=0
+FileOverviewMode=0
+ShowControlCover=1
+ShowBibSelection=1
+ShowMedialist=1
+ShowFileOverview=1
+
+[Default2]
+en=Controls: small
+de=Steuerung: schmal
+A=haCD
+ARatio=20,80,40
+C=vEmx
+CRatio=50,50,50
+D=vpd
+DRatio=60,40
+E=hbc
+ERatio=50,50
+TreeViewRatio=30
 TreeviewOrientation=1
 FileOVerviewOrientation=0
 FileOverviewMode=0

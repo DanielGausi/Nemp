@@ -43,7 +43,7 @@ iniFiles, jpeg, NempPanel, Classes, oneinst, SkinButtons, PNGImage, ProgressShap
 Nemp_ConstantsAndTypes, PartyModeClass{$IFDEF USESTYLES}, vcl.themes, vcl.styles, Vcl.CheckLst {$ENDIF};
 
 const MAX_MENUIMAGE_INDEX = 43;
-      MAX_PLAYLIST_IMAGE_INDEX = 23;
+      MAX_PLAYLIST_IMAGE_INDEX = 24;
 
 type
   // Achtung: Reihenfolge hier jetzt so lassen!!
@@ -71,6 +71,7 @@ type
   // Typ Zur Farbverwaltung des Skins
   TNempColorScheme = record
       FormCL: TColor;
+      CoverFlowCl: TColor;
       //TabTextCL: TColor;
       //TabTextBackGroundCL: TColor;
       SpecTitelCL: TColor;
@@ -768,6 +769,10 @@ begin
         BlendFaktorTagCloud2    := Ini.ReadInteger('Options','BlendFaktorTagCloud2'      , 100);
 
         SkinColorScheme.FormCL                := StringToColor(Ini.ReadString('Colors','FormCL'               , 'clWindow'   ));
+        if ini.ValueExists('Colors','CoverFlowCl') then
+          SkinColorScheme.CoverFlowCl           := StringToColor(Ini.ReadString('Colors','CoverFlowCl'          , 'clWindow'   ))
+        else
+          SkinColorScheme.CoverFlowCl := SkinColorScheme.FormCL;
         SkinColorScheme.SpecTitelCL           := StringToColor(Ini.ReadString('Colors','SpecTitelCL'          , 'clWindowText'     ));
         SkinColorScheme.SpecTimeCL            := StringToColor(Ini.ReadString('Colors','SpecTimeCL'           , 'clWindowText'  ));
         if ini.ValueExists('Colors','SpecArtistCL') then
@@ -978,7 +983,8 @@ begin
                       Nemp_MainForm.MenuSkinImageList.AddMasked(ButtonTmp,Buttontmp.Canvas.Pixels[0,0]);
                   end;
                   Nemp_MainForm.Nemp_MainMenu             .Images := Nemp_MainForm.MenuSkinImageList;
-                  Nemp_MainForm.Medialist_Browse_PopupMenu.Images := Nemp_MainForm.MenuSkinImageList;
+                  Nemp_MainForm.Medialist_Collection_PopupMenu.Images := Nemp_MainForm.MenuSkinImageList;
+                  Nemp_MainForm.Medialist_Category_PopupMenu.Images := Nemp_MainForm.MenuSkinImageList;
                   Nemp_MainForm.Medialist_View_PopupMenu  .Images := Nemp_MainForm.MenuSkinImageList;
                   Nemp_MainForm.PlayListPOPUP             .Images := Nemp_MainForm.MenuSkinImageList;
                   Nemp_MainForm.Player_PopupMenu          .Images := Nemp_MainForm.MenuSkinImageList;
@@ -998,7 +1004,8 @@ end;
 procedure TNempSkin.SetDefaultMenuImages;
 begin
     Nemp_MainForm.Nemp_MainMenu             .Images := Nemp_MainForm.MenuImages;
-    Nemp_MainForm.Medialist_Browse_PopupMenu.Images := Nemp_MainForm.MenuImages;
+    Nemp_MainForm.Medialist_Collection_PopupMenu.Images := Nemp_MainForm.MenuImages;
+    Nemp_MainForm.Medialist_Category_PopupMenu.Images := Nemp_MainForm.MenuImages;
     Nemp_MainForm.Medialist_View_PopupMenu  .Images := Nemp_MainForm.MenuImages;
     Nemp_MainForm.PlayListPOPUP             .Images := Nemp_MainForm.MenuImages;
     Nemp_MainForm.Player_PopupMenu          .Images := Nemp_MainForm.MenuImages;
@@ -1610,7 +1617,7 @@ begin
 
     if NotTheFirstActivation then
         // Dont do this on startup. On some systems the complete Desktop is painted
-        MedienBib.NewCoverFlow.SetColor(SkinColorScheme.FormCL);
+        MedienBib.NewCoverFlow.SetColor(SkinColorScheme.CoverFlowCl);
 
     Color := SkinColorScheme.FormCL;
     SplitterBrowse.Color := SkinColorScheme.SplitterColor;
@@ -1762,7 +1769,8 @@ begin
 
         Nemp_MainMenu             .Images := MenuImages;
         Medialist_View_PopupMenu  .Images := MenuImages;
-        Medialist_Browse_PopupMenu.Images := MenuImages;
+        Medialist_Collection_PopupMenu.Images := MenuImages;
+        Medialist_Category_PopupMenu.Images := MenuImages;
         PlayListPOPUP             .Images := MenuImages;
         Player_PopupMenu          .Images := MenuImages;
         PopupTools                .Images := MenuImages;
@@ -1916,8 +1924,8 @@ begin
 
   if NotTheFirstActivation then
       // Dont do this on startup. On some systems the complete Desktop is painted white
-      MedienBib.NewCoverFlow.SetColor(clWhite);
-  
+      MedienBib.NewCoverFlow.SetColor(MedienBib.NewCoverFlow.Settings.DefaultColor);
+
   // Weitere Eigenschaften der Form setzen
   with Nemp_MainForm do
   begin

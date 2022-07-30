@@ -81,7 +81,7 @@ type
 
     ResizeFlag: Cardinal;
     procedure WMWindowPosChanging(var Message: TWMWINDOWPOSCHANGING); message WM_WINDOWPOSCHANGING;
-    Procedure WMDropFiles (Var aMsg: tMessage);  message WM_DROPFILES;
+    //Procedure WMDropFiles (Var aMsg: tMessage);  message WM_DROPFILES;
   public
     { Public-Deklarationen }
     // Resizing-Flag: On WMWindowPosChanging the RelativPositions must be changed
@@ -301,11 +301,13 @@ begin
   Message.Result := 0;
 end;
 
+(*
 Procedure TMedienlisteForm.WMDropFiles (Var aMsg: tMessage);
 Begin
     Inherited;
     Handle_DropFilesForLibrary(aMsg);
 end;
+*)
 
 
 

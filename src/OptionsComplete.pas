@@ -613,6 +613,12 @@ type
     lblTreeViewLayers: TLabel;
     cbLibConfigShowPlaylistCategories: TCheckBox;
     cbLibConfigShowWebradioCategory: TCheckBox;
+    ColorDlgCoverflow: TColorDialog;
+    edtCoverFlowColor: TEdit;
+    btnSelectCoverFlowColor: TButton;
+    shapeCoverflowColor: TShape;
+    lblCoverFlowColor: TLabel;
+    BtnHelp: TButton;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -762,6 +768,12 @@ type
     procedure OptionsVSTMeasureTextWidth(Sender: TBaseVirtualTree;
       TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
       const Text: string; var Extent: Integer);
+    procedure btnSelectCoverFlowColorClick(Sender: TObject);
+    procedure shapeCoverflowColorMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure clbViewMainColumnsDrawItem(Control: TWinControl; Index: Integer;
+      Rect: TRect; State: TOwnerDrawState);
+    procedure BtnHelpClick(Sender: TObject);
 
   private
     { Private-Deklarationen }
@@ -820,6 +832,7 @@ type
     procedure ApplyCoverFlowSettings;
     procedure ShowMediaLibraryConfiguration;
     function ApplyMediaLibraryConfiguration: Boolean;
+    procedure SelectCoverFlowColor;
 
     procedure EnableHotKeyControls;
     procedure EnableFadingControls;
@@ -883,7 +896,7 @@ implementation
 
 uses NempMainUnit, Details, SplitForm_Hilfsfunktionen, WindowsVersionInfo,
   WebServerLog, MedienBibliothekClass, DriveRepairTools, WebQRCodes,
-  AudioDisplayUtils, unitFlyingCow, RedeemerQR;
+  AudioDisplayUtils, unitFlyingCow, RedeemerQR, NempHelp;
 
 {$R *.dfm}
 
@@ -1329,6 +1342,8 @@ begin
 
   EnableReplayGainControls;
 end;
+
+
 
 procedure TOptionsCompleteForm.ShowBirthdaySettings;
 begin
@@ -2253,6 +2268,8 @@ begin
   end;
   ApplyCoverFlowSettings;
   MedienBib.NewCoverFlow.ApplySettings;
+  if not Nemp_MainForm.NempSkin.isActive then
+    MedienBib.NewCoverFlow.SetColor(MedienBib.NewCoverFlow.Settings.DefaultColor);
   BackUpCoverFlowSettings := MedienBib.NewCoverFlow.Settings;
 
   if not ApplySearchSettings then
@@ -2884,6 +2901,7 @@ begin
         MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
 end;
 
+
 procedure TOptionsCompleteForm.LBAutoscanKeyDown(Sender: TObject;
   var Key: Word; Shift: TShiftState);
 begin
@@ -2958,6 +2976,30 @@ begin
     RefreshQRCode(QRURL);
 end;
 
+
+procedure TOptionsCompleteForm.clbViewMainColumnsDrawItem(Control: TWinControl;
+  Index: Integer; Rect: TRect; State: TOwnerDrawState);
+var
+  Flags: Longint;
+begin
+  with (Control as TCustomListBox) do
+  begin
+    Canvas.FillRect(Rect);
+    // modifying the Canvas.Font.Color here will adjust the item font color
+
+    if enabled then
+      Canvas.Font.Color := TStyleManager.ActiveStyle.GetSystemColor(clWindowText)
+    else
+      Canvas.Font.Color := TStyleManager.ActiveStyle.GetSystemColor(clGrayText);
+
+    Flags := DrawTextBiDiModeFlags(DT_SINGLELINE or DT_VCENTER or DT_NOPREFIX);
+    if not UseRightToLeftAlignment then
+      Inc(Rect.Left, 2)
+    else
+      Dec(Rect.Right, 2);
+    DrawText(Canvas.Handle, Items[Index], Length(Items[Index]), Rect, Flags);
+  end;
+end;
 
 procedure TOptionsCompleteForm.CreateParams(var Params: TCreateParams);
 begin
@@ -3245,6 +3287,7 @@ begin
 end;
 
 
+
 procedure TOptionsCompleteForm.Btn_ScrobbleAgainClick(Sender: TObject);
 begin
     NempPlayer.NempScrobbler.ProblemSolved;
@@ -3503,6 +3546,34 @@ begin
 end;
 
 
+procedure TOptionsCompleteForm.BtnHelpClick(Sender: TObject);
+begin
+  case PageControl1.ActivePageIndex of
+    0: Application.HelpContext(Help_Settings); // General
+    1: Application.HelpContext(Help_Settings); // Controls
+    2: Application.HelpContext(Help_Settings); // View
+    3: Application.HelpContext(Help_Settings); // Fonts and PartyMode
+    4: Application.HelpContext(Help_Settings); // FileManagement
+    5: Application.HelpContext(Help_Categories); // MediaLib Configuration
+    6: Application.HelpContext(Help_Settings); // MetaData
+    7: Application.HelpContext(Help_Settings); // Search
+    8: Application.HelpContext(Help_Settings); // Player
+    9: Application.HelpContext(Help_Settings); // Playlist
+    10: Application.HelpContext(Help_Settings); // Webradio
+    11: Application.HelpContext(Help_EqualizerAndEffects); // Effects
+    // 12: Application.HelpContext(Help_Settings); // Birthday
+    13: Application.HelpContext(Help_Settings); // LastFM
+    14: Application.HelpContext(Help_Settings); // Webserver
+    15: Application.HelpContext(Help_Settings); // Coverflow
+    16: Application.HelpContext(Help_Settings); // Filetypes
+
+
+    else
+      Application.HelpContext(Help_Settings);
+  end;
+
+end;
+
 {$REGION 'Customizable Coverflow'}
 procedure TOptionsCompleteForm.ShowCoverFlowSettings;
 begin
@@ -3535,6 +3606,10 @@ begin
   // mixed settings
   seCoverflowTextureCache.Value := MedienBib.NewCoverFlow.Settings.MaxTextures;
   cb_UseClassicCoverflow.Checked := MedienBib.NewCoverFlow.Mode = cm_Classic;
+  edtCoverFlowColor.Text := ColorToString(MedienBib.NewCoverFlow.Settings.DefaultColor);
+  shapeCoverflowColor.Brush.Color := MedienBib.NewCoverFlow.Settings.DefaultColor;
+  ColorDlgCoverflow.Color := MedienBib.NewCoverFlow.Settings.DefaultColor;
+
   fCoverFlowGUIUpdating := False;
 end;
 
@@ -3565,6 +3640,11 @@ begin
 	tbCoverReflexionGap.Enabled        := MedienBib.NewCoverFlow.Settings.UseReflection;
   // mixed settings
   MedienBib.NewCoverFlow.Settings.MaxTextures := seCoverflowTextureCache.Value;
+  MedienBib.NewCoverFlow.Settings.DefaultColor := StringToColorDef(edtCoverFlowColor.Text, clWhite);
+  // Correct color display, if the user entered an invalid color
+  edtCoverFlowColor.Text := ColorToString(MedienBib.NewCoverFlow.Settings.DefaultColor);
+  shapeCoverflowColor.Brush.Color := MedienBib.NewCoverFlow.Settings.DefaultColor;
+  ColorDlgCoverflow.Color := MedienBib.NewCoverFlow.Settings.DefaultColor;
 end;
 
 procedure TOptionsCompleteForm.tbCoverZMainChange(Sender: TObject);
@@ -3587,6 +3667,27 @@ begin
   ShowCoverFlowSettings;
   MedienBib.NewCoverFlow.ApplySettings;
 end;
+
+procedure TOptionsCompleteForm.SelectCoverFlowColor;
+begin
+  if ColorDlgCoverflow.Execute then begin
+    edtCoverFlowColor.Text := ColorToString(ColorDlgCoverflow.Color);
+    shapeCoverflowColor.Brush.Color := ColorDlgCoverflow.Color;
+  end;
+end;
+
+procedure TOptionsCompleteForm.shapeCoverflowColorMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  SelectCoverFlowColor;
+end;
+
+
+procedure TOptionsCompleteForm.btnSelectCoverFlowColorClick(Sender: TObject);
+begin
+  SelectCoverFlowColor;
+end;
+
 {$ENDREGION}
 
 {$REGION 'MediaLibrary: Category, Configuration'}
@@ -3715,8 +3816,8 @@ begin
 
   cbNewFilesCategory.Items.Add(CategoryRecentlyAddedEmpty);
   for i := 0 to FileCategories.Count - 1 do begin
-    cbDefaultCategory.Items.Add(FileCategories[i].Name);
-    cbNewFilesCategory.Items.Add(FileCategories[i].Name);
+    cbDefaultCategory.Items.Add(FileCategories[i].Caption);
+    cbNewFilesCategory.Items.Add(FileCategories[i].Caption);
   end;
 
   cbDefaultCategory.ItemIndex := GetDefaultCategoryIndex(FileCategories);
@@ -4057,7 +4158,7 @@ begin
   newCat := TLibraryFileCategory.Create;
   newCat.Name := NewUniqueCategoryName(FileCategories);
   newCat.Index := NewUniqueCategoryIndex(self.FileCategories, MedienBib.FileCategories);
-
+  newCat.IsUserDefined := True;
   if newCat.Index < 32 then begin
     FileCategories.Add(newCat);
     VSTCategories.AddChild(Nil, newCat);
@@ -4258,7 +4359,7 @@ end;
 procedure TOptionsCompleteForm.VSTCategoriesGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
 begin
-   CellText := Sender.GetNodeData<TLibraryCategory>(Node).Name;
+   CellText := Sender.GetNodeData<TLibraryCategory>(Node).Caption;
 end;
 
 procedure TOptionsCompleteForm.VSTCategoriesEditing(Sender: TBaseVirtualTree;
@@ -4269,9 +4370,12 @@ end;
 
 procedure TOptionsCompleteForm.VSTCategoriesNewText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; NewText: string);
+var
+  lc: TLibraryCategory;
 begin
-  // lc := Sender.GetNodeData<TLibraryCategory>(Node);
-  Sender.GetNodeData<TLibraryCategory>(Node).Name := NewText;
+  lc := Sender.GetNodeData<TLibraryCategory>(Node);
+  lc.Name := NewText;
+  lc.IsUserDefined := True;
   fCategoriesChanged := True;
 end;
 

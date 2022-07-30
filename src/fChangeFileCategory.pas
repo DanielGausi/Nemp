@@ -25,6 +25,7 @@ type
     pnlCurrent: TPanel;
     lblCurrentCategory: TLabel;
     lblHeadline: TLabel;
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
 
@@ -48,9 +49,19 @@ var
 
 implementation
 
+uses Hilfsfunktionen;
+
 {$R *.dfm}
 
+
 { TFormChangeCategory }
+
+procedure TFormChangeCategory.FormCreate(Sender: TObject);
+begin
+  BackupComboboxes(self);
+  TranslateComponent(self);
+  RestoreComboboxes(self);
+end;
 
 function TFormChangeCategory.GetEffect: teCategoryAction;
 begin

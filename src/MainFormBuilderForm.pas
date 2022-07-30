@@ -62,6 +62,8 @@ type
     BtnNewLayout: TButton;
     mmExampleLayouts: TMenuItem;
     cbShowCategorySelection: TCheckBox;
+    imgInfo: TImage;
+    BtnHelp: TButton;
     procedure FormCreate(Sender: TObject);
     procedure BtnApplyClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -90,6 +92,7 @@ type
     procedure mmLayoutPresetClick(Sender: TObject);
     procedure cbFileOverviewModeChange(Sender: TObject);
     procedure mmUndoClick(Sender: TObject);
+    procedure BtnHelpClick(Sender: TObject);
   private
     { Private declarations }
 
@@ -119,7 +122,7 @@ var
 
 implementation
 
-uses Nemp_RessourceStrings, Hilfsfunktionen, gnugettext, SplitForm_Hilfsfunktionen;
+uses Nemp_RessourceStrings, Hilfsfunktionen, gnugettext, SplitForm_Hilfsfunktionen, NempHelp;
 
 {$R *.dfm}
 
@@ -129,7 +132,7 @@ const
 
 procedure TMainFormBuilder.FormCreate(Sender: TObject);
 var
-  fnIni: String;
+  fnIni, imgFile: String;
 begin
   BackupComboboxes(self);
   TranslateComponent (self);
@@ -170,6 +173,10 @@ begin
     LayoutDefaults := Nil;
     AvailableLayouts := Nil;
   end;
+
+  imgFile := ExtractFilePath(ParamStr(0)) + 'Images\info.png';
+  if FileExists(imgFile) then
+    imgInfo.Picture.LoadFromFile(imgFile);
 
   BuildMainMenu;
 end;
@@ -316,7 +323,7 @@ var
   AllPanelsPlaced: Boolean;
 begin
   lc := MainContainer.LeafCount;
-  lblMainContainer.Visible := lc = 1;
+  lblMainContainer.Visible := False; //lc = 1;
 
   AllPanelsPlaced := (pnlTree.Parent <> grpBoxNempElements)
           and (pnlCoverflow.Parent <> grpBoxNempElements)
@@ -341,13 +348,16 @@ begin
     lblElementCount.Caption := FormBuilder_ConstructionComplete
   else
   begin
-    if lc < 7 then
-      lblElementCount.Caption := Format(FormBuilder_ElementCount, [7 - lc])
+    if lc = 1 then
+      lblElementCount.Caption := Format(FormBuilder_MainContainerCaption, [#$25E7, #$2B12])
     else
-      if lc = 7 then
-        lblElementCount.Caption := FormBuilder_ElementCountComplete
+      if lc < 7 then
+        lblElementCount.Caption := Format(FormBuilder_ElementCount, [7 - lc])
       else
-        lblElementCount.Caption := FormBuilder_ElementCountTooMany;
+        if lc = 7 then
+          lblElementCount.Caption := FormBuilder_ElementCountComplete
+        else
+          lblElementCount.Caption := FormBuilder_ElementCountTooMany;
   end;
 
   TestLayout.RefreshEditButtons(lc=7);
@@ -534,6 +544,11 @@ begin
   RefreshEditGUI;
 end;
 
+
+procedure TMainFormBuilder.BtnHelpClick(Sender: TObject);
+begin
+  Application.HelpContext(Help_FormDesigner);
+end;
 
 procedure TMainFormBuilder.BtnApplyClick(Sender: TObject);
 begin

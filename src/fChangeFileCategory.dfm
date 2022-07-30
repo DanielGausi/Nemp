@@ -11,9 +11,8 @@ object FormChangeCategory: TFormChangeCategory
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poOwnerFormCenter
-  PixelsPerInch = 96
+  OnCreate = FormCreate
   TextHeight = 13
   object pnlButtons: TPanel
     Left = 0
@@ -23,9 +22,6 @@ object FormChangeCategory: TFormChangeCategory
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitLeft = 352
-    ExplicitTop = 184
-    ExplicitWidth = 185
     DesignSize = (
       467
       41)
@@ -40,7 +36,6 @@ object FormChangeCategory: TFormChangeCategory
       Caption = 'Cancel'
       ModalResult = 2
       TabOrder = 0
-      ExplicitLeft = 441
     end
     object BtnOK: TButton
       AlignWithMargins = True
@@ -53,7 +48,6 @@ object FormChangeCategory: TFormChangeCategory
       Default = True
       ModalResult = 1
       TabOrder = 1
-      ExplicitLeft = 312
     end
   end
   object pnlNewCategory: TPanel
@@ -64,8 +58,6 @@ object FormChangeCategory: TFormChangeCategory
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitTop = 384
-    ExplicitWidth = 459
     DesignSize = (
       467
       96)
@@ -85,7 +77,6 @@ object FormChangeCategory: TFormChangeCategory
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
-      ExplicitWidth = 419
     end
     object rbMoveFiles: TRadioButton
       AlignWithMargins = True
@@ -98,7 +89,6 @@ object FormChangeCategory: TFormChangeCategory
       Checked = True
       TabOrder = 1
       TabStop = True
-      ExplicitWidth = 419
     end
     object rbCopyFiles: TRadioButton
       AlignWithMargins = True
@@ -109,7 +99,6 @@ object FormChangeCategory: TFormChangeCategory
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Copy files into the new category'
       TabOrder = 2
-      ExplicitWidth = 419
     end
   end
   object pnlFiles: TPanel
@@ -120,8 +109,6 @@ object FormChangeCategory: TFormChangeCategory
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitTop = 71
-    ExplicitHeight = 234
     DesignSize = (
       467
       149)
@@ -143,7 +130,6 @@ object FormChangeCategory: TFormChangeCategory
       ScrollBars = ssVertical
       TabOrder = 0
       WordWrap = False
-      ExplicitHeight = 154
     end
   end
   object pnlCurrent: TPanel
@@ -154,9 +140,6 @@ object FormChangeCategory: TFormChangeCategory
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 3
-    ExplicitLeft = 3
-    ExplicitTop = 3
-    ExplicitWidth = 461
     object lblCurrentCategory: TLabel
       Left = 16
       Top = 41

@@ -19,7 +19,6 @@ uses
   vcl.themes,
   vcl.styles,
   WinApi.Messages,
-  // VCL.HtmlHelpViewer,
   NempMainUnit in 'NempMainUnit.pas' {Nemp_MainForm},
   Splash in 'Splash.pas' {FSplash},
   PlaylistUnit in 'PlaylistUnit.pas' {PlaylistForm},
@@ -129,7 +128,6 @@ uses
   LibraryOrganizer.Playlists in 'LibraryOrganizer.Playlists.pas',
   LibraryOrganizer.Files in 'LibraryOrganizer.Files.pas',
   LibraryOrganizer.Webradio in 'LibraryOrganizer.Webradio.pas',
-  LibraryOrganizer.Configuration in 'LibraryOrganizer.Configuration.pas' {FormLibraryConfiguration},
   LibraryOrganizer.Configuration.NewLayer in 'LibraryOrganizer.Configuration.NewLayer.pas' {FormNewLayer},
   NempDragFiles in 'NempDragFiles.pas',
   fChangeFileCategory in 'fChangeFileCategory.pas' {FormChangeCategory},
@@ -139,7 +137,8 @@ uses
   RedeemerQR in '3rd Party Units\RedeemerQR.pas',
   RedeemerInheritablePNG in '3rd Party Units\RedeemerInheritablePNG.pas',
   ReplayGain in '3rd Party Units\ReplayGain.pas',
-  MainFormLayout in 'MainFormLayout.pas';
+  MainFormLayout in 'MainFormLayout.pas',
+  NempHelp in 'NempHelp.pas';
 
 {$R *.res}
 
@@ -165,8 +164,7 @@ begin
   Application.CreateForm(TReplayGainProgressForm, ReplayGainProgressForm);
   Graphics.DefFontData.Name := 'Tahoma';
 
-    Application.Title := NEMP_NAME_TASK;
-    Application.HelpFile := 'F:\Nemp Github\Nemp\bin\nemp-de.chm';
+  Application.Title := NEMP_NAME_TASK;
   Application.Name  := NEMP_NAME;
 
     // Show Mainform, but beyond all visible area

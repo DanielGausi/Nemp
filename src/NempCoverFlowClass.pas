@@ -336,6 +336,7 @@ begin
     NempSettingsManager.WriteInteger('CoverFlow', 'GapReflexion', Settings.GapReflexion  );
     NempSettingsManager.WriteInteger('CoverFlow', 'ViewPosX', Settings.ViewPosX);
     NempSettingsManager.WriteInteger('CoverFlow', 'ViewDirX', Settings.ViewDirX);
+    NempSettingsManager.WriteString('CoverFlow', 'DefaultColor', ColorToString(Settings.DefaultColor));
 end;
 
 procedure TNempCoverFlow.LoadSettings;
@@ -360,6 +361,7 @@ begin
 
     Settings.ViewPosX := NempSettingsManager.ReadInteger('CoverFlow', 'ViewPosX', DefaultCoverFlowSettings.ViewPosX);
     Settings.ViewDirX := NempSettingsManager.ReadInteger('CoverFlow', 'ViewDirX', DefaultCoverFlowSettings.ViewDirX);
+    Settings.DefaultColor := StringToColorDef(NempSettingsManager.ReadString('CoverFlow', 'DefaultColor', 'clWhite'), clWhite);
 end;
 
 procedure TNempCoverFlow.ApplySettings;

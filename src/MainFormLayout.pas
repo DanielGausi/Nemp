@@ -166,37 +166,21 @@ const
 
   cMAXBUILD = 25;
   // note: Changes should also be done in "SetDefaultInstructions"
-  cInitBuild: String = 'haCD'; // TreeView
-  cInitRatio: String = '20,80,40';
+  cInitBuild: String = 'vBx';
+  cInitRatio: String = '50,50';
   cDefaultBuild: Array[0..cMAXBUILD] of String = (
-    'vEmx', // MediaList, Controls
-    'vpd',  // Playlist, FileOverwiew
-    'hbc',  // CoverFlow, TagClouD
-    '','','','','','','','','','','','','','','','','','','','','','',''
+    'haEF', //
+    'vGm',  //
+    'vpd',  //
+    'hbc',
+    '','','','','','','','','','','','','','','','','','','','','',''
   );
   cDefaultRatio: Array[0..cMAXBUILD] of String = (
-    '50,50,50', // last 50 is ignored (fixed height Controls)
-    '60,40',
-    '50,50', // doesn't matter, only one is visible
-    '','','','','','','','','','','','','','','','','','','','','','',''
+    '26,72,50',
+    '50,50', //
+    '51,48',
+    '50,50','','','','','','','','','','','','','','','','','','','','','',''
   );
-
-  {
-  cInitBuild: String = 'hBC';
-  cInitRatio: String = '75,25';
-  cDefaultBuild: Array[0..cMAXBUILD] of String = (
-    'vDmx', // Medialist, Controls
-    'vpd',  // Playlist, FileOverwiew
-    'habc', // TreeView, CoverFlow, TagClouD
-    '','','','','','','','','','','','','','','','','','','','','','',''
-  );
-  cDefaultRatio: Array[0..cMAXBUILD] of String = (
-    '34,66',
-    '80,20',
-    '20,40,20',
-    '','','','','','','','','','','','','','','','','','','','','','',''
-  );
-  }
 
 function NempLayout: TNempLayout;
 begin
@@ -282,35 +266,8 @@ begin
 end;
 
 procedure TNempLayout.LoadSettings;
-//var
-//  intFovMode: Integer;
 begin
-
   LoadPreset(NempSettingsManager, cIniMainFormLayout, True);
-
-{
-  NempSettingsManager.ReadSectionValues(cIniMainFormLayout, fBuildInstructions);
-
-  if not TestInstructions(fBuildInstructions) then
-    SetDefaultInstructions(fBuildInstructions);
-
-  fFileOverviewCoverRatio := NempSettingsManager.ReadInteger(cIniMainFormLayout, 'FileOverviewCoverRatio', 50);
-  fTreeViewRatio := NempSettingsManager.ReadInteger(cIniMainFormLayout, 'TreeViewRatio', 30);
-  fTreeviewOrientation := NempSettingsManager.ReadInteger(cIniMainFormLayout, 'TreeviewOrientation', 0);
-  fFileOVerviewOrientation := NempSettingsManager.ReadInteger(cIniMainFormLayout, 'FileOVerviewOrientation', 0);
-  intFovMode := NempSettingsManager.ReadInteger(cIniMainFormLayout, 'FileOverviewMode', 0);
-  case intFovMode of
-    1: fFileOverviewMode := fovCover;
-    2:  fFileOverviewMode := fovText;
-  else
-     fFileOverviewMode := fovBoth;
-  end;
-
-  fShowControlCover := NempSettingsManager.ReadBool(cIniMainFormLayout, 'ShowControlCover', True);
-  fShowBibSelection := NempSettingsManager.ReadBool(cIniMainFormLayout, 'ShowBibSelection', True);
-  fShowMedialist    := NempSettingsManager.ReadBool(cIniMainFormLayout, 'ShowMedialist', True);
-  fShowFileOverview := NempSettingsManager.ReadBool(cIniMainFormLayout, 'ShowFileOverview', True);
-}
 end;
 
 function TNempLayout.LoadPreset(Source: TMemIniFile; Section: String; ReloadRatios: Boolean): Boolean;
@@ -461,11 +418,9 @@ begin
       end;
     end;
 
-    if Changed then begin
+    if Changed then
       fBuildInstructions.Assign(Instructions);
-      // Clear;           // das löscht alles, und macht auch dei Block-Panels auf NIL-Parent (also unsichtbar)
-      // BuildMainForm(Instructions);
-    end;
+
   finally
     Instructions.Free;
   end;
@@ -514,20 +469,19 @@ end;
 procedure TNempLayout.SetDefaultInstructions(aBuildInstructions: TStrings);
 begin
   aBuildInstructions.Clear;
-  aBuildInstructions.Add('A=haCD');
-  aBuildInstructions.Add('C=vEmx');
-  aBuildInstructions.Add('D=vpd');
-  aBuildInstructions.Add('E=hbc');
+  aBuildInstructions.Add('A=vBx');
+  aBuildInstructions.Add('B=haEF');
+  aBuildInstructions.Add('E=vGm');
+  aBuildInstructions.Add('F=vpd');
+  aBuildInstructions.Add('G=hbc');
 
-  aBuildInstructions.Add('ARatio=20,80,40');
-  aBuildInstructions.Add('CRatio=50,50,50');
-  aBuildInstructions.Add('DRatio=60,40');
+  aBuildInstructions.Add('ARatio=50,50');
+  aBuildInstructions.Add('BRatio=26,72,50');
   aBuildInstructions.Add('ERatio=50,50');
+  aBuildInstructions.Add('FRatio=51,48');
+  aBuildInstructions.Add('GRatio=50,50');
 end;
 
-  {
-  ratios/Height/remainingSize bei Panels mit Child mit FixedHeight besser machen
-  }
 
 procedure TNempLayout.PrepareRebuild;
 var
@@ -564,10 +518,6 @@ begin
   if assigned(Instructions) then
     fBuildInstructions.Assign(Instructions);
 
-
-  //if Instructions = Nil then
-  //  Instructions := fBuildInstructions;
-
   LockWindowUpdate(fMainContainer.Handle);
   fBuildInProcess := True;
   PrepareRebuild;
@@ -593,12 +543,7 @@ begin
   end;
 
   RefreshVisibilty;
-
   fMainContainer.AlignChildPanels(True);
-  {for i := 0 to fContainerPanels.Count - 1 do
-    if fContainerPanels[i].Visible then
-      TNempContainerPanel(fContainerPanels[i]).AlignChildPanels;}
-
   fMainContainer.OnSplitterMoved := OnSplitterMoved;
   for i := 0 to fContainerPanels.Count - 1 do
     fContainerPanels[i].OnSplitterMoved := OnSplitterMoved;
@@ -659,10 +604,6 @@ procedure TNempLayout.ReAlignMainForm;
 begin
   LockWindowUpdate(fMainContainer.Handle);
   fMainContainer.AlignChildPanels(True);
-
-  //for var i: Integer := 0 to fContainerPanels.Count - 1 do
-  //  if fContainerPanels[i].Visible then
-  //    TNempContainerPanel(fContainerPanels[i]).AlignChildPanels;
   LockWindowUpdate(0);
 end;
 
@@ -752,13 +693,11 @@ begin
     RatioStringList.DelimitedText := aRatioLine;
     if RatioStringList.Count = aPanel.ChildPanelCount then begin
       for i := 0 to RatioStringList.Count - 1 do
-        //aPanel.SetRatio(i, StrToIntDef(RatioStringList[i], 20));
         aPanel.ChildRatio[i] := StrToIntDef(RatioStringList[i], 20);
 
     end else
     begin
       for i := 0 to aPanel.ChildPanelCount - 1 do
-        // aPanel.SetRatio(i, Round(100 / aPanel.ChildPanelCount));
         aPanel.ChildRatio[i] := Round(100 / aPanel.ChildPanelCount);
     end;
 

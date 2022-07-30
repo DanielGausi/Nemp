@@ -591,15 +591,10 @@ begin
         UpdateFormDesignNeu(NempOptions.AnzeigeMode);
         NempLayout.ResizeSubPanel(TreePanel, ArtistsVST, NempLayout.TreeViewRatio);
 
-        if NempSkin.isActive then
-            MedienBib.NewCoverFlow.SetColor(NempSkin.SkinColorScheme.FormCL)
-        else
-            MedienBib.NewCoverFlow.SetColor(clWhite);
-
         ReTranslateNemp(GetCurrentLanguage);
 
         if NempPlayer.MainStream = 0 then
-            ReInitPlayerVCL(False); // otherwise it has been done in player.play
+          ReInitPlayerVCL(False); // otherwise it has been done in player.play
         ReArrangeToolImages;
 
         if NempSkin.isActive then
@@ -633,6 +628,11 @@ begin
     MedienBib.NewCoverFlow.Mode := cm_Classic
   else
     MedienBib.NewCoverFlow.Mode := TCoverFlowMode(NempSettingsManager.ReadInteger('MedienBib', 'CoverFlowMode', Integer(cm_OpenGL)));
+
+  if Nemp_MainForm.NempSkin.isActive then
+    MedienBib.NewCoverFlow.SetColor(Nemp_MainForm.NempSkin.SkinColorScheme.CoverFlowCl)
+  else
+    MedienBib.NewCoverFlow.SetColor(MedienBib.NewCoverFlow.Settings.DefaultColor);
 
   MedienBib.NewCoverFlow.ApplySettings;
   if MedienBib.BrowseMode = 1  then

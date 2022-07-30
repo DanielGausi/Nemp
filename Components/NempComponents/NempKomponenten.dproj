@@ -82,7 +82,6 @@
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="vcl.dcp"/>
         <DCCReference Include="NempGroupBox.pas"/>
-        <DCCReference Include="uDragFilesSrc.pas"/>
         <DCCReference Include="NempPanel.pas"/>
         <DCCReference Include="Ole2.pas"/>
         <DCCReference Include="SkinButtons.pas"/>
@@ -154,6 +153,12 @@
             </Platforms>
             <Deployment Version="3">
                 <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\NempKomponenten.bpl" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>NempKomponenten.bpl</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\NempKomponenten.bpl" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>NempKomponenten.bpl</RemoteName>
                         <Overwrite>true</Overwrite>

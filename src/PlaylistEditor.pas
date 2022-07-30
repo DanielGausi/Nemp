@@ -39,7 +39,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, VirtualTrees, Vcl.StdCtrls, Generics.Collections,
   WinApi.ShellApi, WinApi.ActiveX, MyDialogs,
   NempAudioFiles, PlayerClass, PlaylistClass, PlaylistManagement, AudioFileHelper, DriveRepairTools,
-  uDragFilesSrc, Vcl.Menus, VCL.Clipbrd, NempDragFiles;
+  Vcl.Menus, VCL.Clipbrd, NempDragFiles, vcl.themes;
 
 type
   TPlaylistEditorForm = class(TForm)
@@ -129,6 +129,10 @@ type
     procedure PlaylistFilesVSTRenderOLEData(Sender: TBaseVirtualTree;
       const FormatEtcIn: tagFORMATETC; out Medium: tagSTGMEDIUM;
       ForClipboard: Boolean; var Result: HRESULT);
+    procedure PopUpPlaylistPopup(Sender: TObject);
+    procedure PlaylistSelectionVSTPaintText(Sender: TBaseVirtualTree;
+      const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
+      TextType: TVSTTextType);
   private
     { Private declarations }
     currentQuickPlaylist: TQuickLoadPlaylist;
@@ -141,6 +145,8 @@ type
       TargetNode: PVirtualNode; Mode: TDropMode): Boolean;
     procedure InsertFile(aFileName: String; var InsertIndex: Integer);
     procedure RefreshPlaylistHeader;
+
+    procedure RefreshEditButtons;
 
   public
     { Public declarations }
@@ -219,6 +225,11 @@ begin
         PlaylistSelectionVST.Selected[aNode] := True;
     end;
     currentPlaylistChanged := False;
+
+    RefreshEditButtons;
+
+
+//    assigned(currentQuickPlaylist)
 
     {
     LocalPlaylistManager.RecentPlaylists.Clear;
@@ -339,6 +350,7 @@ procedure TPlaylistEditorForm.PlaylistFilesVSTPaintText(
   Column: TColumnIndex; TextType: TVSTTextType);
 var AudioFile:TAudioFile;
 begin
+    TargetCanvas.Font.Color := TStyleManager.ActiveStyle.GetSystemColor(clWindowText);
     AudioFile := PlaylistFilesVST.GetNodeData<TAudioFile>(Node);
     if NOT AudioFile.FileIsPresent then
         TargetCanvas.Font.Style := TargetCanvas.Font.Style + [fsStrikeOut]
@@ -401,6 +413,7 @@ begin
         FillPlaylistTree;
         currentQuickPlaylist := Nil;
         currentPlaylistChanged := False;
+        RefreshEditButtons;
         exit;
     end;
 
@@ -415,9 +428,37 @@ begin
     // ... refresh Header
     RefreshPlaylistHeader;
     currentPlaylistChanged := False;
+    RefreshEditButtons;
 end;
 
+procedure TPlaylistEditorForm.RefreshEditButtons;
+var
+  enable: Boolean;
+begin
+  enable := assigned(self.currentQuickPlaylist);
+  BtnAdd.Enabled := enable;
+  BtnImport.Enabled := enable;
+  BtnSave.Enabled := enable;
+end;
 
+procedure TPlaylistEditorForm.PopUpPlaylistPopup(Sender: TObject);
+var
+  enable, selected: Boolean;
+
+begin
+  enable := assigned(self.currentQuickPlaylist);
+  PM_PL_AddFiles.Enabled := enable;
+  PM_PL_AddPlaylist.Enabled := enable;
+  PM_PL_Save.Enabled := enable;
+  PM_PL_Paste.Enabled := enable;
+
+  selected := PlaylistFilesVST.SelectedCount > 0;
+
+  PM_PL_ShowinExplorer.Enabled := enable and selected;
+  PM_PL_Delete.Enabled := enable and selected;
+  PM_PL_Copy.Enabled := enable and selected;
+
+end;
 
 
 
@@ -441,6 +482,13 @@ begin
     ql.Description := NewText;
 end;
 
+
+procedure TPlaylistEditorForm.PlaylistSelectionVSTPaintText(
+  Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode;
+  Column: TColumnIndex; TextType: TVSTTextType);
+begin
+  TargetCanvas.Font.Color := TStyleManager.ActiveStyle.GetSystemColor(clWindowText)
+end;
 
 procedure TPlaylistEditorForm.PlaylistSelectionVSTEdited(
   Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
@@ -470,7 +518,10 @@ end;
 procedure TPlaylistEditorForm.PlaylistFilesVSTStartDrag(Sender: TObject;
   var DragObject: TDragObject);
 begin
-  InitiateDragDrop(PlaylistFilesVST, Nemp_MainForm.fDropManager, False);
+  InitiateDragDrop(PlaylistFilesVST, Nemp_MainForm.fDropManager, False, True);
+  // last parameter=True:
+  // Actually, we do not know, whether the source is the "player".
+  // But it's safer to assume it is
 end;
 
 procedure TPlaylistEditorForm.PlaylistFilesVSTGetUserClipboardFormats(
@@ -544,23 +595,28 @@ begin
     Accept := True;
   end else
   begin
-      // DragSource is NOT the Playlist, so we are expecting new Files for the Playlist
-      // Either from the Library or from external sources
-      if assigned(Nemp_MainForm.fDropManager.DragSource) then
-        // From internal sources: Always Accept  (except on cueNodes)
-        SetFeedBackParams(DROPEFFECT_COPY, TRUE {ValidNode}, DragDropPlaylistAdd)
-      else begin
-        // From external sources: Do accept only "Files", but not things like "Text"
-        // Note: Some other stuff like "E-Mails" dragged from Thunderbird are also considered as "Files"
-        if ObjContainsFiles(Sender.DragManager.DataObject) then
-          SetFeedBackParams(DROPEFFECT_COPY, True, DragDropPlaylistAdd)
-        else
-          // Definitely no Files - don't accept
-          SetFeedBackParams(DROPEFFECT_NONE, False, '')
+      if not assigned(currentQuickPlaylist) then
+        SetFeedBackParams(DROPEFFECT_NONE, False, PlaylistManager_CreatePlaylistFirstDragDrop)
+      else
+      begin
+          // DragSource is NOT the Playlist, so we are expecting new Files for the Playlist
+          // Either from the Library or from external sources
+          if assigned(Nemp_MainForm.fDropManager.DragSource) then
+            // From internal sources: Always Accept  (except on cueNodes)
+            SetFeedBackParams(DROPEFFECT_COPY, TRUE {ValidNode}, DragDropPlaylistAdd)
+          else begin
+            // From external sources: Do accept only "Files", but not things like "Text"
+            // Note: Some other stuff like "E-Mails" dragged from Thunderbird are also considered as "Files"
+            if ObjContainsFiles(Sender.DragManager.DataObject) then
+              SetFeedBackParams(DROPEFFECT_COPY, True, DragDropPlaylistAdd)
+            else
+              // Definitely no Files - don't accept
+              SetFeedBackParams(DROPEFFECT_NONE, False, '')
+          end;
       end;
   end;
   // correct Efect/Hintstr if Accept is False
-  if not Accept then
+  if (not Accept) and assigned(currentQuickPlaylist) then
     SetFeedBackParams(DROPEFFECT_NONE, False, '');
 
   SetDragHint(Sender.DragManager.DataObject, szMessage, '', Effect);
@@ -897,11 +953,19 @@ begin
     // Set the Changed-Flag
     currentPlaylistChanged := True;
 end;
+
 ///  Save Current Playlist
 procedure TPlaylistEditorForm.PM_PL_SaveClick(Sender: TObject);
 begin
+    if not assigned(currentQuickPlaylist) then begin
+      // should not happen with the disabled button and Drag/Drop now
+      TranslateMessageDLG(PlaylistManager_CreatePlaylistFirstSave, mtError, [mbOK], 0);
+      exit;
+    end;
+
     LocalPlaylistManager.SaveCurrentPlaylist(EditorPlaylist, False);
     currentPlaylistChanged := False;
+
     if NempPlaylist.PlaylistManager.QuickLoadPlaylists.IndexOf(currentQuickPlaylist) = -1 then
     begin
         // the current Playlist is ot yet part of the original Favorite List
@@ -914,6 +978,7 @@ begin
             NempPlaylist.PlaylistManager.BackupPlaylistFilenames(EditorPlaylist);
     end;
 end;
+
 ///  Show AudioFile in Windows Explorer
 procedure TPlaylistEditorForm.PM_PL_ShowinExplorerClick(Sender: TObject);
 var af: TAudioFile;

@@ -26,7 +26,7 @@ object FDetails: TFDetails
     Top = 3
     Width = 615
     Height = 503
-    ActivePage = Tab_Lyrics
+    ActivePage = Tab_Pictures
     Align = alClient
     TabOrder = 0
     OnChange = MainPageControlChange

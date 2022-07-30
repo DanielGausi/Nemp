@@ -10,14 +10,14 @@ uses
 resourcestring
   rsCollectionDataUnknown = '- ? -';
 
-  rsDefaultCategoryAll = 'Music';
-  rsDefaultCategoryNew = 'Recently added';
-  rsDefaultCategoryAudioBook = 'Audio books';
-  rsNewCategoryName = 'New category';
-
 const
   // these category names are set automatically. The "name" should always be exactly like this
   // Translation will be done in the GetCaption
+  //rsDefaultCategoryAll = 'Music';
+  //rsDefaultCategoryNew = 'Recently added';
+  //rsDefaultCategoryAudioBook = 'Audio books';
+  rsNewCategoryName = 'New category';
+
   rsDefaultCategoryPlaylist = 'Playlists';
   rsDefaultCategoryFavPlaylist = 'Favourite playlists';
   rsDefaultCategoryWebradio = 'Webradio';
@@ -31,6 +31,7 @@ const
   MP3DB_CAT_TAG = 4;
   MP3DB_CAT_ISDEFAULT = 5;
   MP3DB_CAT_ISNEW = 6;
+  MP3DB_CAT_ISUSERDEFINED = 7;
 
 const
 {
@@ -359,6 +360,7 @@ type
       fCaptionMode: Integer; // Only used in PlaylistCategory
       fIsDefault: Boolean;
       fIsNew: Boolean;
+      fIsUserDefined: Boolean; // automatically created categories should be "multlanguage"
 
       function GetCollection(Index: Integer): TAudioCollection;
       function GetCollectionCount: Integer;
@@ -384,6 +386,7 @@ type
 
       property IsDefault: Boolean read fIsDefault write fIsDefault;
       property IsNew    : Boolean read fIsNew     write fIsNew    ;
+      property IsUserDefined: Boolean read fIsUserDefined    write fIsUserDefined   ;
       property BrowseMode: Integer read fBrowseMode write fBrowseMode;
 
       property Index: Byte read fIndex write fIndex;
@@ -978,6 +981,7 @@ begin
   fCollections := TAudioCollectionList.Create(True);
   fIsDefault := False;
   fIsNew := False;
+  fIsUserDefined := False;
   for i := 0 to 2 do
     fLastSelectedCollectionData[i] := TCollectionMetaInfo.Create;
 end;
@@ -998,6 +1002,7 @@ begin
   Index := Source.Index;
   IsDefault := Source.IsDefault;
   IsNew := Source.IsNew;
+  IsUserDefined := Source.IsUserDefined;
 end;
 
 procedure TLibraryCategory.Clear;
@@ -1037,6 +1042,7 @@ begin
       MP3DB_CAT_TAG       : fCaptionMode := ReadIntegerFromStream(aStream);
       MP3DB_CAT_ISDEFAULT : fIsDefault := ReadBoolFromStream(aStream);
       MP3DB_CAT_ISNEW     : fIsNew := ReadBoolFromStream(aStream);
+      MP3DB_CAT_ISUSERDEFINED: fIsUserDefined := ReadBoolFromStream(aStream);
 
       DATA_END_ID      : ; // Explicitly do Nothing
     else
@@ -1056,6 +1062,7 @@ begin
   result := result + WriteIntegerToStream(aStream, MP3DB_CAT_TAG, fCaptionMode);
   result := result + WriteBoolToStream(aStream, MP3DB_CAT_ISDEFAULT, fIsDefault);
   result := result + WriteBoolToStream(aStream, MP3DB_CAT_ISNEW, fIsNew);
+  result := result + WriteBoolToStream(aStream, MP3DB_CAT_ISUSERDEFINED, fIsUserDefined);
   result := result + WriteDataEnd(aStream);
 end;
 
@@ -1076,14 +1083,16 @@ end;
 
 function TLibraryCategory.GetCaption: String;
 begin
-  result := fName;
+  if fIsUserDefined then
+    result := fName
+  else
+    result := _(fName);
 end;
 
 function TLibraryCategory.GetCaptionCount: String;
 begin
   result := Format('%s (%d)', [Caption, ItemCount]);
 end;
-
 
 procedure TLibraryCategory.SortCollections(doRecursive: Boolean);
 var
@@ -1097,8 +1106,9 @@ procedure TLibraryCategory.AnalyseCollections(recursive: Boolean);
 var
   i: Integer;
 begin
-  for i := 0 to fCollections.Count - 1 do
+  for i := 0 to fCollections.Count - 1 do begin
     fCollections[i].Analyse(recursive, False);
+  end;
 end;
 
 

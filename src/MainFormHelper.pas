@@ -134,7 +134,8 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     CDOpenDialogs, LowBattery, PlayWebstream, Taghelper, MedienbibliothekClass,
     PlayerLog, progressUnit, Hilfsfunktionen, EffectsAndEqualizer, MainFormBuilderForm,
     ReplayGainProgress, NewMetaFrame, WebQRCodes, PlaylistEditor, NewFavoritePlaylist,
-    AudioDisplayUtils, PlaylistDuplicates, LibraryOrganizer.Configuration, LibraryOrganizer.Configuration.NewLayer;
+    AudioDisplayUtils, PlaylistDuplicates, LibraryOrganizer.Configuration.NewLayer,
+    fChangeFileCategory;
 
 procedure CorrectVolButton;
 begin
@@ -877,6 +878,11 @@ begin
     begin
         Uselanguage(LanguageCode);
 
+        if LanguageCode = 'de' then
+          Application.HelpFile := ExtractFilePath(Paramstr(0)) + 'nemp_de.chm'
+        else
+          Application.HelpFile := ExtractFilePath(Paramstr(0)) + 'nemp_de.chm';
+
         //c := Nemp_MainForm.CBHeadSetControlInsertMode.ItemIndex;
         //BackupComboboxes(Nemp_MainForm);
         ReTranslateComponent (Nemp_MainForm);
@@ -1019,15 +1025,15 @@ begin
         if assigned(PlaylistEditorForm) then ReTranslateComponent(PlaylistEditorForm);
         if assigned(NewFavoritePlaylistForm) then ReTranslateComponent(NewFavoritePlaylistForm);
 
-        if assigned(FormLibraryConfiguration) then begin
-            BackUpComboBoxes(FormLibraryConfiguration);
-            ReTranslateComponent(FormLibraryConfiguration);
-            RestoreComboboxes(FormLibraryConfiguration);
-        end;
         if assigned(FormNewLayer) then begin
             BackUpComboBoxes(FormNewLayer);
             ReTranslateComponent(FormNewLayer);
             RestoreComboboxes(FormNewLayer);
+        end;
+        if assigned(FormChangeCategory) then begin
+            BackUpComboBoxes(FormChangeCategory);
+            ReTranslateComponent(FormChangeCategory);
+            RestoreComboboxes(FormChangeCategory);
         end;
 
          // Todo:

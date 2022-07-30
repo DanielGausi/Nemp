@@ -587,6 +587,9 @@ MainForm_MenuCaptionsSortDirectoriesBy = 'Sort Directories by';
 MainForm_MenuCaptionsSortTagCloudBy = 'Sort Tags by';
 
 MainForm_MenuCaptionsSortCollectionBy = 'Sort "%s" by';
+MainForm_MenuCaptionsClearCollection = 'Clear category "%s"';
+MainForm_MenuCaptionsClearCollectionBlanko = 'Clear category';
+MainForm_ConfirmClearCategory = 'This will remove all %d files from this category. Do you want to continue?';
 
 MainForm_MenuCaptionsPlayAllArtist      = 'Play all tracks of this artist (and delete current playlist)';
 MainForm_MenuCaptionsPlayAllAlbum       = 'Play all tracks of this album (and delete current playlist)';
@@ -1101,6 +1104,9 @@ PlaylistManager_CheckOK    = 'Check: Ok';
 Playlist_Saved             = 'Playlist saved.';
 PlaylistManager_Saved      = 'Playlist saved: "%s"';
 
+PlaylistManager_CreatePlaylistFirstDragDrop = 'Please create a new favorite playlist first.';
+PlaylistManager_CreatePlaylistFirstSave = 'Saving is not possible. Please select favorite playlist first or create a new one.';
+
 PlaylistAutoDelay = 'A little break before the next track starts.' + #13#10#13#10 + 'You can change this behavior in the player settings.';
 
 PlaylistDuplicates_NoDuplicatesFound = 'No duplicates found in the playlist.';
@@ -1134,7 +1140,7 @@ DragDropHintTargetPlaylist = 'Drop the files into the Playlist.';
 DragDropLibraryInternFailCategory = 'You can''t add files into this category';
 //DragDropLibraryCategory = 'Add to Media Library, category %1';
 DragDropLibraryCategory = 'Add to category %1';
-DragDropLibraryCategories = 'Add to categories %1';
+// DragDropLibraryCategories = 'Add to categories %1';
 
 DragDropPlaylistAdd = 'Add to Playlist here';
 DragDropPlaylistMove = 'Move here';

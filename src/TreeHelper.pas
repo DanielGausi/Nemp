@@ -33,7 +33,7 @@ unit TreeHelper;
 interface
 
 uses Windows, Graphics, SysUtils, VirtualTrees, Forms, Controls, NempAudioFiles, Types, StrUtils,
-  Contnrs, Classes, Jpeg, PNGImage, {uDragFilesSrc,} NempDragFiles, math, WinApi.ActiveX, ShlObj, ComObj,
+  Contnrs, Classes, Jpeg, PNGImage, NempDragFiles, math, WinApi.ActiveX, ShlObj, ComObj,
   ShellApi,
   Id3v2Frames, dialogs, Hilfsfunktionen, LibraryOrganizer.Base, LibraryOrganizer.Files,
   Nemp_ConstantsAndTypes, CoverHelper, MedienbibliothekClass, BibHelper,
@@ -68,8 +68,8 @@ uses Windows, Graphics, SysUtils, VirtualTrees, Forms, Controls, NempAudioFiles,
   //procedure InitiateDragDrop(SourceTree: TVirtualStringTree; Dest: TStringList; DragDrop: TDragFilesSrc; maxFiles: Integer); overload;
   // procedure InitiateDragDrop(Source, Dest: TAudioFileList; DragDrop: TDragFilesSrc; maxFiles: Integer); overload;
 
-  procedure InitiateDragDrop(SourceTree: TVirtualStringTree; DragDrop: TNempDragManager; DoExecute: Boolean); overload;
-  procedure InitiateDragDrop(Source: TAudioFileList; SourceControl: TControl; DragDrop: TNempDragManager; DoExecute: Boolean); overload;
+  procedure InitiateDragDrop(SourceTree: TVirtualStringTree; DragDrop: TNempDragManager; DoExecute: Boolean; SourceIsPlayer: Boolean); overload;
+  procedure InitiateDragDrop(Source: TAudioFileList; SourceControl: TControl; DragDrop: TNempDragManager; DoExecute: Boolean; SourceIsPlayer: Boolean); overload;
 
   function ValidPlaylistDropNode(Source: TVirtualStringTree; Node: PVirtualNode): Boolean;
 
@@ -531,12 +531,13 @@ begin
 end;
 
 
-procedure InitiateDragDrop(SourceTree: TVirtualStringTree; DragDrop: TNempDragManager; DoExecute: Boolean);
+procedure InitiateDragDrop(SourceTree: TVirtualStringTree; DragDrop: TNempDragManager;
+  DoExecute: Boolean; SourceIsPlayer: Boolean);
 var
   i: Integer;
   SelectedMp3s: TNodeArray;
 begin
-    DragDrop.InitDrag(SourceTree);
+    DragDrop.InitDrag(SourceTree, SourceIsPlayer);
     SelectedMp3s := SourceTree.GetSortedSelection(False);
     for i := 0 to length(SelectedMp3s) - 1 do //maxC - 1 do
       DragDrop.AddFile(SourceTree.GetNodeData<TAudioFile>(SelectedMp3s[i]), True);
@@ -549,11 +550,12 @@ begin
 end;
 
 
-procedure InitiateDragDrop(Source: TAudioFileList; SourceControl: TControl; DragDrop: TNempDragManager; DoExecute: Boolean);
+procedure InitiateDragDrop(Source: TAudioFileList; SourceControl: TControl; DragDrop: TNempDragManager;
+  DoExecute: Boolean; SourceIsPlayer: Boolean);
 var
   i: Integer;
 begin
-    DragDrop.InitDrag(SourceControl);
+    DragDrop.InitDrag(SourceControl, SourceIsPlayer);
     for i := 0 to Source.Count - 1 do // maxC - 1 do
       DragDrop.AddFile(Source[i], True);
 

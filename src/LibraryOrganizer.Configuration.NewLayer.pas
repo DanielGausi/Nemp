@@ -68,9 +68,9 @@ var
 resourcestring
   rcHeaderNewLayer = 'Add a new layer to organize your audiofiles';
   rcHeaderEditLayer = 'Change layer properties';
-  rcHeaderEditCoverflow = 'Select Coverflow sort parameters';
-  rcCaptionNew = 'Nemp: New category layer';
-  rcCaptionEdit = 'Nemp: Edit category layer';
+  rcHeaderEditCoverflow = 'Select coverflow sort parameters';
+  rcCaptionNew = 'Nemp: New layer in tree view';
+  rcCaptionEdit = 'Nemp: Edit layer in tree view';
   rcCaptionEditCoverFlow = 'Nemp: Edit Coverflow';
 
 implementation
