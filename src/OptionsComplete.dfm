@@ -81,7 +81,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 0
       Width = 469
       Height = 638
-      ActivePage = tabFileManagement
+      ActivePage = tabPlayer
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -2345,7 +2345,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 461
           Height = 574
-          VertScrollBar.Position = 269
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -2356,7 +2355,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpCategoryCoverflow: TCategoryPanel
-            Top = 445
+            Top = 714
             Height = 125
             Caption = 'Display as "Coverflow"'
             TabOrder = 3
@@ -2396,7 +2395,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpCategoryPlaylists: TCategoryPanel
-            Top = 300
+            Top = 569
             Height = 145
             Caption = 'Category "Playlists"'
             TabOrder = 2
@@ -2459,7 +2458,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpAlbumDefinition: TCategoryPanel
-            Top = 60
+            Top = 329
             Height = 240
             Caption = 'Definition of an "Album" (e.g. in Coverflow or layer "Album")'
             TabOrder = 1
@@ -2473,7 +2472,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object lblAlbumDefinitionHint: TLabel
               Left = 16
               Top = 16
-              Width = 375
+              Width = 358
               Height = 65
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -2513,7 +2512,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object editCDNames: TLabeledEdit
               Left = 16
               Top = 174
-              Width = 375
+              Width = 358
               Height = 21
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -2525,7 +2524,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpCategories: TCategoryPanel
-            Top = -269
+            Top = 0
             Height = 329
             Caption = 'Categories and tree view layers'
             TabOrder = 0
@@ -3025,6 +3024,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 461
           Height = 574
+          VertScrollBar.Position = 393
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -3035,7 +3035,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpAdvanced: TCategoryPanel
-            Top = 887
+            Top = 494
             Height = 76
             Caption = 'Advanced'
             TabOrder = 4
@@ -3049,7 +3049,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpVisualisation: TCategoryPanel
-            Top = 725
+            Top = 332
             Height = 162
             Caption = 'Visualization'
             TabOrder = 3
@@ -3107,7 +3107,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpSilenceDetection: TCategoryPanel
-            Top = 538
+            Top = 145
             Height = 187
             Caption = 'Pause between tracks'
             TabOrder = 2
@@ -3182,7 +3182,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpFading: TCategoryPanel
-            Top = 350
+            Top = -43
             Height = 188
             Caption = 'Fading'
             TabOrder = 1
@@ -3281,7 +3281,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpOutputDevices: TCategoryPanel
-            Top = 0
+            Top = -393
             Height = 350
             Caption = 'Output devices'
             TabOrder = 0
@@ -3304,12 +3304,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object LblSoundFont: TLabel
               Left = 16
               Top = 116
-              Width = 35
+              Width = 250
               Height = 13
-              Anchors = [akLeft, akTop, akRight]
               AutoSize = False
               Caption = 'SoundFont file for MIDI playback'
-              ExplicitWidth = 659
             end
             object LblConst_Buffersize: TLabel
               Left = 16

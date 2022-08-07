@@ -442,8 +442,6 @@ begin
     2: CellText := Station.Genre;
     3: CellText := Station.URL;
   end;
-
-  CellText := CellText + ' ' + node.Index.ToString;
 end;
 
 procedure TFormStreamVerwaltung.VST_FavoritesKeyDown(Sender: TObject;

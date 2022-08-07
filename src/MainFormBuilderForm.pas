@@ -59,7 +59,6 @@ type
     lblFileOverview: TLabel;
     cbFileOverviewMode: TComboBox;
     lblPlaylistAlwaysVisible: TLabel;
-    BtnNewLayout: TButton;
     mmExampleLayouts: TMenuItem;
     cbShowCategorySelection: TCheckBox;
     imgInfo: TImage;

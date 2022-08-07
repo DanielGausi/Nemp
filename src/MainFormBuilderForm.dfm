@@ -63,22 +63,13 @@ object MainFormBuilder: TMainFormBuilder
       TabOrder = 2
       OnClick = BtnCancelClick
     end
-    object BtnNewLayout: TButton
+    object BtnHelp: TButton
       Left = 8
       Top = 8
-      Width = 121
-      Height = 25
-      Caption = 'New layout'
-      TabOrder = 3
-      OnClick = BtnNewLayoutClick
-    end
-    object BtnHelp: TButton
-      Left = 135
-      Top = 6
-      Width = 75
+      Width = 105
       Height = 25
       Caption = 'Help'
-      TabOrder = 4
+      TabOrder = 3
       OnClick = BtnHelpClick
     end
   end

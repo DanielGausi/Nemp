@@ -9741,28 +9741,49 @@ end;
 procedure TNemp_MainForm.PaintFrameMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  ReInitDocks;
-  PaintFrameDownX := X;
-  PaintFrameDownY := Y;
+  if (Sender = NewPlayerPanel) and (x >= NewPlayerPanel.Width - 8) then begin
+
+    if button = mbLeft then
+    begin
+      Resizing := True;
+      ReleaseCapture;
+      PerForm(WM_SysCommand, ResizeFlag , 0);
+    end;
 
 
-  // Andere Formen auch in den Vordergund!!!
-  //if Tag = 3 then
-    RepairZOrder;
 
-    PlaylistForm.Resizing := False;
-    MedienlisteForm.Resizing := False;
-    AuswahlForm.Resizing := False;
-    ExtendedControlForm.Resizing := False;
+
+  end else
+  begin
+
+    ReInitDocks;
+    PaintFrameDownX := X;
+    PaintFrameDownY := Y;
+
+
+    // Andere Formen auch in den Vordergund!!!
+    //if Tag = 3 then
+      RepairZOrder;
+
+      PlaylistForm.Resizing := False;
+      MedienlisteForm.Resizing := False;
+      AuswahlForm.Resizing := False;
+      ExtendedControlForm.Resizing := False;
+  end;
 end;
 
 procedure TNemp_MainForm.PaintFrameMouseMove(Sender: TObject; Shift: TShiftState;
   X, Y: Integer);
 begin
+  if (Sender = NewPlayerPanel) and (NempOptions.AnzeigeMode = 1) and (x >= NewPlayerPanel.Width - 8) then begin
+    (Sender as TControl).Cursor := crSizeWE;
+    ResizeFlag := SC_SIZE or WMSZ_RIGHT;
+    exit;
+  end else
+    (Sender as TControl).Cursor := crDefault;
+
 
       ClipCursor(Nil);
-
-
 
       if (Sender = NewPlayerPanel) and (not (ssLeft in Shift)) then
       begin
@@ -9906,6 +9927,7 @@ begin
     AuswahlForm.NempRegionsDistance.RelativPositionY := AuswahlForm.Top - Top;
   end;
 
+  Resizing := False;
 end;
 
 
@@ -11053,8 +11075,6 @@ procedure TNemp_MainForm._ControlPanelMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
 begin
     ResizeFlag := GetResizeDirection(Sender, Shift, X, Y);
-
-    playerArtistLabel.Caption := Inttostr(random(4999));
 end;
 
 procedure TNemp_MainForm._ControlPanelResize(Sender: TObject);

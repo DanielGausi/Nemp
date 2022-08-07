@@ -1,6 +1,7 @@
 object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
+  HelpContext = 10000
   Caption = 'Nemp - Noch ein MP3-Player'
   ClientHeight = 769
   ClientWidth = 1090
@@ -55,7 +56,9 @@ object Nemp_MainForm: TNemp_MainForm
       BevelOuter = bvNone
       PopupMenu = Player_PopupMenu
       TabOrder = 0
-      OnMouseMove = _ControlPanelMouseMove
+      OnMouseDown = __MainContainerPanelMouseDown
+      OnMouseMove = __MainContainerPanelMouseMove
+      OnMouseUp = __MainContainerPanelMouseUp
       OnResize = _ControlPanelResize
       Ratio = 0
       FixedHeight = True

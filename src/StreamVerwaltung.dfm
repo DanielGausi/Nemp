@@ -24,20 +24,24 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     Height = 13
   end
   object pnlMain: TPanel
-    Left = 0
-    Top = 0
-    Width = 712
-    Height = 416
+    AlignWithMargins = True
+    Left = 3
+    Top = 3
+    Width = 706
+    Height = 404
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitHeight = 406
+    ExplicitLeft = 0
+    ExplicitTop = 0
+    ExplicitWidth = 712
+    ExplicitHeight = 416
     object VST_Favorites: TVirtualStringTree
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 706
-      Height = 410
+      Width = 700
+      Height = 398
       Align = alClient
       Colors.UnfocusedSelectionColor = clHighlight
       Colors.UnfocusedSelectionBorderColor = clHighlight
@@ -63,10 +67,8 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
       OnKeyDown = VST_FavoritesKeyDown
       Touch.InteractiveGestures = [igPan, igPressAndTap]
       Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-      ExplicitLeft = 31
-      ExplicitTop = 34
-      ExplicitWidth = 666
-      ExplicitHeight = 376
+      ExplicitWidth = 706
+      ExplicitHeight = 410
       Columns = <
         item
           Position = 0
@@ -91,15 +93,19 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     end
   end
   object pnlButtons: TPanel
-    Left = 0
-    Top = 416
-    Width = 712
+    AlignWithMargins = True
+    Left = 3
+    Top = 413
+    Width = 706
     Height = 38
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
+    ExplicitLeft = 0
+    ExplicitTop = 416
+    ExplicitWidth = 712
     DesignSize = (
-      712
+      706
       38)
     object Btn_Icecast: TButton
       AlignWithMargins = True
@@ -113,7 +119,7 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     end
     object Btn_Ok: TButton
       AlignWithMargins = True
-      Left = 637
+      Left = 628
       Top = 6
       Width = 75
       Height = 25
@@ -122,7 +128,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
       Caption = 'Ok'
       TabOrder = 1
       OnClick = Btn_OkClick
-      ExplicitLeft = 634
     end
     object BtnNewStation: TButton
       AlignWithMargins = True

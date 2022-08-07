@@ -948,7 +948,7 @@ const
         (Bezeichnung: 'Year' ;Inhalt: CON_YEAR             ;visible: True  ;width: 50  ;sortAscending: True),
         (Bezeichnung: 'Genre' ;Inhalt: CON_GENRE           ;visible: True  ;width: 100 ;sortAscending: True),
         (Bezeichnung: 'Lyrics' ;Inhalt: CON_LYRICSEXISTING ;visible: False  ;width: 50 ;sortAscending: True),
-        (Bezeichnung: 'Track' ;Inhalt: CON_TRACKNR         ;visible: false  ;width: 50 ;sortAscending: True),
+        (Bezeichnung: 'Track' ;Inhalt: CON_TRACKNR         ;visible: true  ;width: 50 ;sortAscending: True),
         (Bezeichnung: 'Rating' ;Inhalt: CON_RATING         ;visible: true  ;width: 100 ;sortAscending: True),
         (Bezeichnung: 'Play counter' ;Inhalt: CON_PLAYCOUNTER;visible: false  ;width: 44;sortAscending: True),
         (Bezeichnung: 'Tags' ;Inhalt: CON_LASTFMTAGS       ;visible: false  ;width: 44;sortAscending: True),

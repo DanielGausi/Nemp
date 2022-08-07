@@ -3549,27 +3549,25 @@ end;
 procedure TOptionsCompleteForm.BtnHelpClick(Sender: TObject);
 begin
   case PageControl1.ActivePageIndex of
-    0: Application.HelpContext(Help_Settings); // General
-    1: Application.HelpContext(Help_Settings); // Controls
-    2: Application.HelpContext(Help_Settings); // View
-    3: Application.HelpContext(Help_Settings); // Fonts and PartyMode
-    4: Application.HelpContext(Help_Settings); // FileManagement
-    5: Application.HelpContext(Help_Categories); // MediaLib Configuration
-    6: Application.HelpContext(Help_Settings); // MetaData
-    7: Application.HelpContext(Help_Settings); // Search
-    8: Application.HelpContext(Help_Settings); // Player
-    9: Application.HelpContext(Help_Settings); // Playlist
-    10: Application.HelpContext(Help_Settings); // Webradio
-    11: Application.HelpContext(Help_EqualizerAndEffects); // Effects
-    // 12: Application.HelpContext(Help_Settings); // Birthday
-    13: Application.HelpContext(Help_Settings); // LastFM
-    14: Application.HelpContext(Help_Settings); // Webserver
-    15: Application.HelpContext(Help_Settings); // Coverflow
-    16: Application.HelpContext(Help_Settings); // Filetypes
-
-
-    else
-      Application.HelpContext(Help_Settings);
+    0: Application.HelpContext(HELP_SettingsGeneral); // General
+    1: Application.HelpContext(HELP_SettingsControls); // Controls
+    2: Application.HelpContext(HELP_SettingsListView); // View
+    3: Application.HelpContext(HELP_SettingsFonts); // Fonts and PartyMode
+    4: Application.HelpContext(HELP_SettingsFileManagement); // FileManagement
+    5: Application.HelpContext(Help_Categories); // MediaLib Configuration      // => HELP_SettingsConfigLibrary ?
+    6: Application.HelpContext(HELP_SettingsMetadata); // MetaData
+    7: Application.HelpContext(HELP_SettingsSearch); // Search
+    8: Application.HelpContext(HELP_SettingsPlayback); // Player
+    9: Application.HelpContext(HELP_SettingsPlaylist); // Playlist
+    10: Application.HelpContext(HELP_SettingsWebradio); // Webradio
+    11: Application.HelpContext(Help_EqualizerAndEffects); // Effects  // => HELP_SettingsEffects
+    12: Application.HelpContext(HELP_SettingsBirthday); // Birthday
+    13: Application.HelpContext(HELP_SettingsLastFM); // LastFM
+    14: Application.HelpContext(HELP_SettingsWebserver); // Webserver
+    15: Application.HelpContext(HELP_SettingsCoverflow); // Coverflow
+    16: Application.HelpContext(HELP_WindowsRegistry); // Filetypes
+  else
+    Application.HelpContext(HELP_Einstellungen);
   end;
 
 end;
