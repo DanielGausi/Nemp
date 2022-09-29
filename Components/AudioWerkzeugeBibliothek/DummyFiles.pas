@@ -82,6 +82,7 @@ type
             procedure fSetYear            (aValue: UnicodeString); override;
             procedure fSetTrack           (aValue: UnicodeString); override;
             procedure fSetGenre           (aValue: UnicodeString); override;
+            procedure fSetAlbumArtist (value: UnicodeString); override;
 
             function fGetTitle            : UnicodeString; override;
             function fGetArtist           : UnicodeString; override;
@@ -91,6 +92,7 @@ type
             function fGetGenre            : UnicodeString; override;
             function fGetFileType            : TAudioFileType; override;
             function fGetFileTypeDescription : String;         override;
+            function fGetAlbumArtist : UnicodeString; override;
 
         public
             { Public declarations }
@@ -136,6 +138,12 @@ begin
   // nothing. This Unit is read-Only
 end;
 
+procedure TDummyFile.fSetAlbumArtist(value: UnicodeString);
+begin
+  inherited;
+  // nothing. This Unit is read-Only
+end;
+
 procedure TDummyFile.fSetArtist(aValue: UnicodeString);
 begin
   inherited;
@@ -171,6 +179,11 @@ end;
 function TDummyFile.fGetAlbum: UnicodeString;
 begin
     result := '';
+end;
+
+function TDummyFile.fGetAlbumArtist: UnicodeString;
+begin
+  result := '';
 end;
 
 function TDummyFile.fGetArtist: UnicodeString;

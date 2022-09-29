@@ -12,14 +12,12 @@ object ReplayGainProgressForm: TReplayGainProgressForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
     494
     241)
-  PixelsPerInch = 96
   TextHeight = 13
   object MainImage: TImage
     Left = 8

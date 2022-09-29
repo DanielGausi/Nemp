@@ -10,11 +10,9 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  PixelsPerInch = 96
   TextHeight = 13
   object pnlMain: TPanel
     Left = 0
@@ -87,28 +85,30 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
         OnChange = VstDuplicatesChange
         OnColumnDblClick = VstDuplicatesColumnDblClick
         OnGetText = VstDuplicatesGetText
+        Touch.InteractiveGestures = [igPan, igPressAndTap]
+        Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
         Columns = <
           item
             Alignment = taRightJustify
             CaptionAlignment = taRightJustify
             Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coUseCaptionAlignment, coEditable, coStyleColor]
             Position = 0
+            Text = 'Index'
             Width = 30
-            WideText = 'Index'
           end
           item
             Position = 1
             Spacing = 0
+            Text = 'Title'
             Width = 211
-            WideText = 'Title'
           end
           item
             Alignment = taRightJustify
             Margin = 0
             Position = 2
             Spacing = 50
+            Text = 'Time'
             Width = 40
-            WideText = 'Time'
           end>
       end
       object btnDeleteOriginal: TButton

@@ -58,47 +58,6 @@ type
 
     CoverScanThreadMode = (tm_VCL, tm_Thread);
 
-    TNempCover = class
-    private
-        fTranslateArtist: Boolean;
-        fTranslateAlbum: Boolean;
-
-        fArtist    : UnicodeString;
-        fAlbum     : UnicodeString;
-        fYear      : Integer;
-        fGenre     : UnicodeString;
-        fDirectory : UnicodeString;
-        fFileAge   : TDateTime;
-
-        function fGetInfoString: String;
-        function fGetArtist: String;
-        function fGetAlbum: String;
-        function fCheckInvalidData: Boolean;
-
-    public
-      ID: String;
-      key: String;    // init: a copy of ID, but ID can be changed without resorting
-
-      property InfoString: String read fGetInfoString;
-      property InvalidData: Boolean read fCheckInvalidData;
-
-      property Artist     : UnicodeString  read fGetArtist write fArtist    ;
-      property Album      : UnicodeString  read fGetAlbum  write fAlbum     ;
-      property Year       : Integer        read fYear      write fYear      ;
-      property Genre      : UnicodeString  read fGenre     write fGenre     ;
-      property Directory  : UnicodeString  read fDirectory write fDirectory ;
-      property FileAge    : TDateTime      read fFileAge   write fFileAge   ;
-
-      constructor create(CompleteLibrary: Boolean=False);
-      procedure Assign(aCover: TNempCover);
-
-      // Try to get some "Common Strings" from a list of audioFiles with the same coverfile
-      procedure GetCoverInfos(AudioFileList: TAudioFileList);
-    end;
-
-    //TNempCoverList = class(TObjectList<TNempCover>);
-    //TNempCoverCompare = function(a1,a2: TNempCover): Integer;
-
     TCoverArtSearcher = class
     private
         class var fUseDir         : LongBool      ;
@@ -111,7 +70,6 @@ type
         class var fBaseSavePath   : UnicodeString ;
         class var fCoverSize      : Integer       ;
         class var fCoverSizeIndex : Integer       ;
-
 
         var fCurrentPath,                      // the last Path a CoverList was created for
             fCurrentCoverName,                 // the last Filename for the Coverart used as "FrontCover"
@@ -292,161 +250,6 @@ begin
            OR (aExt = '.gif')
            OR (aExt = '.jfif');
 end;
-
-{ TNempCover }
-
-procedure TNempCover.Assign(aCover: TNempCover);
-begin
-    fTranslateArtist := aCover.fTranslateArtist;
-    fTranslateAlbum  := aCover.fTranslateAlbum ;
-
-    ID        := aCover.ID         ;
-    key       := aCover.key        ;
-    fArtist   := aCover.fArtist    ;
-    fAlbum    := aCover.fAlbum     ;
-    fYear     := aCover.fYear      ;
-    fGenre    := aCover.fGenre     ;
-    fDirectory:= aCover.fDirectory ;
-    fFileAge  := aCover.fFileAge   ;
-end;
-
-constructor TNempCover.create(CompleteLibrary: Boolean=False);
-begin
-    fTranslateArtist := CompleteLibrary;
-    fTranslateAlbum  := CompleteLibrary;
-end;
-
-function TNempCover.fCheckInvalidData: Boolean;
-begin
-    result := (fArtist = AUDIOFILE_UNKOWN) and (fAlbum = AUDIOFILE_UNKOWN);
-end;
-
-function TNempCover.fGetAlbum: String;
-begin
-    if fTranslateAlbum then
-        result := _(fAlbum)
-    else
-        result := fAlbum;
-end;
-
-function TNempCover.fGetArtist: String;
-begin
-    if fTranslateArtist then
-        result := _(fArtist)
-    else
-        result := fArtist;
-end;
-
-
-function TNempCover.fGetInfoString: String;
-begin
-    if self.ID = 'all' then
-        result := _(CoverFlowText_VariousArtists) + ' - ' + _(CoverFlowText_WholeLibrary)
-    else
-    begin
-        if (self.Year >= 1000) and (year <= 2500) then
-            // note: NOT fArtist and fAlbum!
-            result := Artist  + ' - ' + Album + ' (' + IntToStr(fYear) + ')'
-        else
-            result := Artist  + ' - ' + Album
-    end;
-end;
-
-procedure TNempCover.GetCoverInfos(AudioFileList: TAudioFileList);
-var str1: UnicodeString;
-    maxidx, i, fehlstelle: Integer;
-    aStringlist: TStringList;
-    newestAge, currentAge: TDateTime;
-begin
-
-  if ID = '' then
-  begin
-      fArtist := CoverFlowText_VariousArtists; //'Various artists';
-      fAlbum := CoverFlowText_UnkownCompilation; // 'Unknown';
-      fYear := 0;
-      fGenre := 'Other';
-      fDirectory := ' ';
-      fFileAge := 0;
-      exit;
-  end;
-
-  if AudioFileList.Count <= 25 then maxIdx := AudioFileList.Count-1 else maxIdx := 25;
-
-  aStringlist := TStringList.Create;
-  for i := 0 to maxIdx do
-      if (AudioFileList[i].Artist <> '') then
-          aStringlist.Add(AudioFileList[i].Artist);
-
-  fehlstelle := 0;
-  str1 := GetCommonString(aStringlist, 0, fehlstelle);  // bei Test auf "String gleich?" keinen Fehler zulassen
-  if str1 = '' then
-  begin
-      fArtist := CoverFlowText_VariousArtists; // 'Various artists';
-      fTranslateArtist := True;
-  end
-  else
-  begin
-      fArtist := str1; // Fehlstelle ist irrelevant
-      fTranslateArtist := False;
-  end;
-
-
-  aStringlist.Clear;
-  // Dasselbe jetzt mit Album, aber mit Toleranz 1 bei den Strings
-  for i := 0 to maxIdx do
-      if (AudioFileList[i].Album <> '') then
-          aStringlist.Add(AudioFileList[i].Album);
-
-  fehlstelle := 0;
-  str1 := GetCommonString(aStringlist, 1, fehlstelle);  // bei Test auf "String gleich?" einen Fehler zulassen  (cd1/2...)
-  if str1 = '' then
-  begin
-      fAlbum := CoverFlowText_UnkownCompilation; // 'Unknown compilation';
-      fTranslateAlbum := True;
-  end
-  else
-  begin
-      fTranslateAlbum := False;
-      if fehlstelle <= length(str1) Div 2 +1 then
-          fAlbum := str1
-      else
-          fAlbum := copy(str1, 1, fehlstelle-1) + ' ... ';
-  end;
-
-  aStringlist.Clear;
-  // Dasselbe jetzt mit Genre
-  for i := 0 to maxIdx do
-      aStringlist.Add(AudioFileList[i].Genre);
-  fehlstelle := 0;
-  str1 := GetCommonString(aStringlist, 1, fehlstelle);  // bei Test auf "String gleich?" einen Fehler zulassen  (cd1/2...)
-  if str1 = '' then
-      fGenre := 'Other'
-  else
-      fGenre := str1;
-
-  if AudioFileList.Count = 0 then
-  begin
-      fYear := 0;
-      fDirectory := ' ';
-  end else
-  begin
-      AudioFileList.Sort(Sort_Jahr_asc);
-      fYear := StrToIntDef(AudioFileList[AudioFileList.Count Div 2].Year, 0);
-      fDirectory := IncludeTrailingPathDelimiter(AudioFileList[0].Ordner);
-  end;
-
-  newestAge := 0;
-  for i := 0 to AudioFileList.Count - 1 do
-  begin
-      currentAge := AudioFileList[i].FileAge;
-      if currentAge > newestAge then
-          newestAge := currentAge;
-  end;
-  fFileAge := newestAge;
-
-  aStringlist.Free;
-end;
-
 
 
 function PicStreamToBitmap(aStream: TStream; Mime: AnsiString; aBmp: TBitmap): Boolean;
@@ -1561,7 +1364,6 @@ const
       result := 0;
       for j := 0 to aRootCollection.CollectionCount - 1 do
       begin
-        //if TNempCover(MainCoverList[j]).ID = aCoverID then
         if aRootCollection.Collection[j].Key = aKey then
         begin
           result := j + 1;

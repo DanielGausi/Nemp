@@ -50,6 +50,7 @@ var
 type
 
     TTagType = ( TT_ID3v2, TT_OggVorbis, TT_Flac, TT_Ape, TT_M4A);
+    TTagTypeSet = set of TTagType;
 
 const
     MIN_CUESHEET_DURATION = 600; // no automatic scanning for cue sheets for short tracks
@@ -231,6 +232,8 @@ type
         fTitle: UnicodeString;
         fComment: UnicodeString;
         fLyrics: UTF8String;
+        fAlbumArtist: UnicodeString;
+        fComposer: UnicodeString;
         //fDescription: UnicodeString;
         fTrack: Integer;
         fCD: UnicodeString;
@@ -395,6 +398,8 @@ type
         property Year:   UnicodeString Index siJahr read GetString write SetString;    // 9
         property Comment:UnicodeString read fComment write fComment;
         property Lyrics : UTF8String   read fLyrics write fLyrics;
+        property AlbumArtist: UnicodeString read fAlbumArtist write fAlbumArtist;
+        property Composer: UnicodeString read fComposer write fComposer;
         property LyricsExisting: Boolean read fGetLyricsExisting;
         property Description: UnicodeString read fComment write fComment;//read fDescription write fDescription;
         property Dateiname: UnicodeString Index siDateiname read GetString;
@@ -460,7 +465,8 @@ type
         // and set FileIsPresent again
         function ReCheckExistence: Boolean;
 
-        function GetAudioData(filename: UnicodeString; Flags: Integer = 0): TNempAudioError;
+        function GetAudioData(aFile: TBaseAudioFile; Flags: Integer = 0): TNempAudioError; overload;
+        function GetAudioData(filename: UnicodeString; Flags: Integer = 0): TNempAudioError; overload;
         function GetCueList(aCueFilename: UnicodeString =''; aAudioFilename: UnicodeString = ''): boolean; // Rückgabewert: Liste erstellt/nicht erstellt
         function CueDuration(aCueIndex: Cardinal): Integer;
 
@@ -480,9 +486,6 @@ type
         // new in 4.12: Get Front-Cover for the Player from the Metadata.
         function GetCoverFromMetaData(aCoverBmp: TBitmap; scaled: Boolean): boolean;
         function GetCoverStreamFromMetaData(aCoverStream: TMemoryStream; TagFile: TBaseAudioFile): boolean;
-
-        // save the data here in a ";"-separated string for csv-export
-        // function GenerateCSVString: UnicodeString;
 
         // Load the data from a .gmp-file (medialib-format)
         function LoadSizeInfoFromStream_DEPRECATED(aStream: TStream): Integer;
@@ -622,10 +625,6 @@ const
 
       MP3DB_CUEPRESENT   = 30;
 
-      // some dummy IDs for future use.
-      // Ints are Integer, Bytes are Bytes, Texts are strings
-      // note: some of them are already in use
-      //MP3DB_DUMMY_Byte2  = 29;
       MP3DB_FAVORITE  = 29;
       MP3DB_CATEGORY = 39;
 
@@ -648,9 +647,12 @@ const
       MP3DB_TRACKPEAK = 38;
       MP3DB_BPM = 14;
 
+      MP3DB_ALBUMARTIST = 40;
+      MP3DB_COMPOSER = 41;
 
       // 42 marked the end of an AudioFile (until Nemp 4.12)
       MP3DB_ENDOFINFO = 42;
+      MP3DB_MAXID = 255;
 
       // Some Constant-Arrays
 
@@ -865,6 +867,8 @@ begin
     FileIsPresent      := aAudioFile.FileIsPresent       ;
     Titel              := aAudioFile.Titel               ;
     Artist             := aAudioFile.Artist              ;
+    AlbumArtist        := aAudioFile.AlbumArtist         ;
+    Composer           := aAudioFile.Composer            ;
     Album              := aAudioFile.Album               ;
     Genre              := aAudioFile.Genre               ;
     Year               := aAudioFile.Year                ;
@@ -900,6 +904,8 @@ begin
 
     Titel              := aAudioFile.Titel               ;
     Artist             := aAudioFile.Artist              ;
+    AlbumArtist        := aAudioFile.AlbumArtist         ;
+    Composer           := aAudioFile.Composer            ;
     Album              := aAudioFile.Album               ;
     Genre              := aAudioFile.Genre               ;
     Year               := aAudioFile.Year                ;
@@ -1114,6 +1120,7 @@ begin
     result := FormatDateTime('yyyymm', fFileAge);
 end;
 
+
 {
     --------------------------------------------------------
     "Setter" for Samplerate.
@@ -1185,6 +1192,47 @@ end;
         If the user wants to reset the ratings: Use "reset ratings".
     --------------------------------------------------------
 }
+function TAudioFile.GetAudioData(aFile: TBaseAudioFile; Flags: Integer = 0): TNempAudioError;
+begin
+  // get detailed information (format-specific)
+  case aFile.FileType of
+      at_Invalid: SetUnknown;
+      at_Mp3:  GetMp3Info(TMP3File(aFile), aFile.Filename, Flags);   // aFile.Filename should have been set during ReadFromFile
+      at_Ogg: GetOggInfo(TOggVorbisFile(aFile), Flags);
+      at_Flac: GetFlacInfo(TFlacFile(aFile), Flags);
+      at_M4A: GetM4AInfo(TM4AFile(aFile), Flags);
+      at_Monkey,
+      at_WavPack,
+      at_MusePack,
+      at_OptimFrog,
+      at_TrueAudio: GetExoticInfo(TBaseApeFile(aFile), aFile.FileType, Flags);
+      at_Wma: GetWmaInfo(TWmaFile(aFile));
+      at_wav: GetWavInfo(TWavFile(aFile));
+  end;
+
+  // get general information from the file
+  // do this AFTER the specialized information because:
+  // the id3-stuff is a little bit more complicated here (charcode...)
+  // in the mp3-special-method the contained ID3-Settings are done.
+  // this should affect also the Getters in the TGeneralAudioFile
+  Artist := aFile.Artist;
+  Titel  := aFile.Title;
+  Album  := aFile.Album;
+  AlbumArtist := aFile.AlbumArtist;
+  Year   := aFile.Year;
+  Track  := GetTrackFromV2TrackString(aFile.Track);
+  Genre  := aFile.Genre;
+  // Audio
+  fFileSize := aFile.FileSize;
+  fDuration := aFile.Duration;
+  fBitrate := aFile.Bitrate Div 1000;
+  SetSampleRate(aFile.Samplerate);
+
+  // Ignore Lyrics (far saving RAM on huge collections)
+  if (Flags AND GAD_NOLYRICS) = GAD_NOLYRICS then
+      Lyrics := '';
+end;
+
 function TAudioFile.GetAudioData(filename: UnicodeString; Flags: Integer = 0): TNempAudioError;
 var MainFile: TBaseAudioFile;
     fs: TFastFileStream;
@@ -1210,42 +1258,7 @@ begin
                       //result := AudioToNempAudioError(MainFile.LastError);
                       result := AudioToNempAudioError(MainFile.ReadFromFile(filename));
 
-                      // get detailed information (format-specific)
-                      case MainFile.FileType of
-                          at_Invalid: SetUnknown;
-                          at_Mp3:  GetMp3Info(TMP3File(MainFile), filename, Flags);
-                          at_Ogg: GetOggInfo(TOggVorbisFile(Mainfile), Flags);
-                          at_Flac: GetFlacInfo(TFlacFile(MainFile), Flags);
-                          at_M4A: GetM4AInfo(TM4AFile(MainFile), Flags);
-                          at_Monkey,
-                          at_WavPack,
-                          at_MusePack,
-                          at_OptimFrog,
-                          at_TrueAudio: GetExoticInfo(TBaseApeFile(MainFile), MainFile.FileType, Flags);
-                          at_Wma: GetWmaInfo(TWmaFile(MainFile));
-                          at_wav: GetWavInfo(TWavFile(MainFile));
-                      end;
-
-                      // get general information from the file
-                      // do this AFTER the specialized information because:
-                      // the id3-stuff is a little bit more complicated here (charcode...)
-                      // in the mp3-special-method the contained ID3-Settings are done.
-                      // this should affect also the Getters in the TGeneralAudioFile
-                      Artist := MainFile.Artist;
-                      Titel  := MainFile.Title;
-                      Album  := MainFile.Album;
-                      Year   := MainFile.Year;
-                      Track  := GetTrackFromV2TrackString(MainFile.Track);
-                      Genre  := MainFile.Genre;
-                      // Audio
-                      fFileSize := MainFile.FileSize;
-                      fDuration := MainFile.Duration;
-                      fBitrate := MainFile.Bitrate Div 1000;
-                      SetSampleRate(MainFile.Samplerate);
-
-                      // Ignore Lyrics (far saving RAM on huge collections)
-                      if (Flags AND GAD_NOLYRICS) = GAD_NOLYRICS then
-                          Lyrics := '';
+                      GetAudioData(MainFile, Flags);
 
                   finally
                       MainFile.Free;
@@ -1356,6 +1369,10 @@ begin
         TagStream.Free;
     end;
 
+    fComposer := aMp3File.ID3v2Tag.Composer;
+    if fComposer = '' then
+      fComposer := aMp3File.ApeTag.Composer;
+
     fBPM := aMp3File.ID3v2Tag.BPM;
     if fBPM = '' then
       fBPM := aMp3File.ApeTag.GetValueByKey(TRACK_BPM);
@@ -1389,6 +1406,7 @@ begin
     Rating :=  StrToIntDef(aFlacFile.GetPropertyByFieldname(VORBIS_RATING), 0);
 
     fBPM := aFlacFile.GetPropertyByFieldname(TRACK_BPM);
+    fComposer := aFlacFile.GetPropertyByFieldname(VORBIS_COMPOSER);
     TrackGain := GainStringToSingle(aFlacFile.GetPropertyByFieldname(REPLAYGAIN_TRACK_GAIN));
     AlbumGain := GainStringToSingle(aFlacFile.GetPropertyByFieldname(REPLAYGAIN_ALBUM_GAIN));
     TrackPeak := PeakStringToSingle(aFlacFile.GetPropertyByFieldname(REPLAYGAIN_TRACK_PEAK));
@@ -1438,6 +1456,7 @@ begin
     RawTagLastFM := UTF8String(aOggFile.GetPropertyByFieldname(VORBIS_CATEGORIES));
 
     fBPM := aOggFile.GetPropertyByFieldname(TRACK_BPM);
+    fComposer := aOggFile.GetPropertyByFieldname(VORBIS_COMPOSER);
     TrackGain := GainStringToSingle(aOggFile.GetPropertyByFieldname(REPLAYGAIN_TRACK_GAIN));
     AlbumGain := GainStringToSingle(aOggFile.GetPropertyByFieldname(REPLAYGAIN_ALBUM_GAIN));
     TrackPeak := PeakStringToSingle(aOggFile.GetPropertyByFieldname(REPLAYGAIN_TRACK_PEAK));
@@ -1473,6 +1492,7 @@ begin
     Rating      := StrToIntDef(aM4AFile.GetSpecialData(DEFAULT_MEAN, M4ARating), 0);
 
     fBPM := aM4AFile.GetSpecialData(DEFAULT_MEAN, TRACK_BPM);
+    fComposer := aM4AFile.Composer;
     TrackGain := GainStringToSingle(aM4AFile.GetSpecialData(DEFAULT_MEAN, REPLAYGAIN_TRACK_GAIN));
     AlbumGain := GainStringToSingle(aM4AFile.GetSpecialData(DEFAULT_MEAN, REPLAYGAIN_ALBUM_GAIN));
     TrackPeak := PeakStringToSingle(aM4AFile.GetSpecialData(DEFAULT_MEAN, REPLAYGAIN_TRACK_PEAK));
@@ -1508,6 +1528,7 @@ begin
     Rating       := StrToIntDef(aBaseApeFile.ApeTag.GetValueByKey(APE_RATING), 0);
     RawTagLastFM := UTF8String(aBaseApeFile.ApeTag.GetValueByKey(APE_CATEGORIES));
     BPM       := aBaseApeFile.ApeTag.GetValueByKey(TRACK_BPM);
+    Composer  := aBaseApeFile.ApeTag.Composer;
     TrackGain := GainStringToSingle(aBaseApeFile.ApeTag.GetValueByKey(REPLAYGAIN_TRACK_GAIN));
     AlbumGain := GainStringToSingle(aBaseApeFile.ApeTag.GetValueByKey(REPLAYGAIN_ALBUM_GAIN));
     TrackPeak := PeakStringToSingle(aBaseApeFile.ApeTag.GetValueByKey(REPLAYGAIN_TRACK_PEAK));
@@ -1573,6 +1594,7 @@ begin
         begin
             fTrack := cdFile.Track;
             Artist := cdFile.Artist;
+            AlbumArtist := '';
             Titel := cdFile.Title;
             Album := cdFile.Album;
             fDuration := cdFile.Duration;
@@ -1583,6 +1605,7 @@ begin
         begin
             fTrack := 0;
             Artist := '';
+            AlbumArtist := '';
             Titel := 'Invalid Track';
             Album := '';
             fDuration := 0;
@@ -1915,6 +1938,7 @@ begin
   Titel := ''; //before Nemp 4.1: Dateiname;
   Artist := '';
   Album := '';
+  Composer := '';
   Year := '';
   Genre := '';
   Duration := 0;
@@ -2062,6 +2086,8 @@ begin
     AutoTags.Add(AnsiLowerCase(Artist));
   if not UnKownInformation(Album) then
     AutoTags.Add(AnsiLowerCase(Album));
+  if not UnKownInformation(AlbumArtist) then
+    AutoTags.Add(AnsiLowerCase(AlbumArtist));
   if (Year <> '0') and (trim(Year) <> '')  then
   begin
     AutoTags.Add(Year);
@@ -2111,7 +2137,7 @@ begin
     begin
         // we DO need the ID3v2-Tag now, so write ID3v2Tag as well // *both*
         // (we have to assume that there is already some metadata, so ID3v1 should exist anyway ...)
-        aMp3File.TagsToBeWritten := [mt_Existing, mt_ID3v2];
+        aMp3File.TagsToBeWritten := aMp3File.TagsToBeWritten + [mt_ID3v2];
         // aMp3File.ID3v2Tag.Exists := True; // so that it is written into the file later
         // copy basic information to ID3v2Tag
         aMp3File.ID3v2Tag.Artist  := self.Artist  ;
@@ -2140,6 +2166,7 @@ begin
                 case ColumnIndex of
 
                     CON_ARTIST : MainFile.Artist := aValue;
+                    CON_ALBUMARTIST : MainFile.AlbumArtist := aValue;
                     CON_TITEL  : MainFile.Title  := aValue ;
                     CON_ALBUM  : MainFile.Album  := aValue ;
                     CON_YEAR   : MainFile.Year := aValue;
@@ -2745,28 +2772,36 @@ begin
         CUE_ID_INDEX: begin
                         if assigned(aCue) then
                         begin
-                            CueParselist := Explode(' ', trim(tmplist[i]));
-                            if CueParselist.Count > 0 then
-                            begin
-                                CueTimelist := explode(':', CueParselist[CueParselist.Count - 1]);
-                                try
-                                    // cue-Format: mm:ss:ff
-                                    // mm: minutes
-                                    // ss: seconds
-                                    // ff: frames, 75 frames per second
-                                    if CueTimeList.Count > 0 then
-                                      aCue.FIndex01 := 60 * StrToInt(CueTimelist[0]);
-                                    if CueTimeList.Count > 1 then
-                                      aCue.FIndex01 := aCue.FIndex01 + StrToInt(CueTimelist[1]);
-                                    if CueTimeList.Count > 2 then
-                                      aCue.FIndex01 := aCue.FIndex01 + (StrToInt(CueTimelist[2]) / 75);
-                                except
-                                    CueList.Extract(aCue);
-                                    FreeAndNil(aCue);
+                            CueParselist := TStringList.Create;
+                            try
+                                Explode(' ', trim(tmplist[i]), CueParselist);
+                                if CueParselist.Count > 0 then
+                                begin
+                                    CueTimelist := TStringList.Create;
+                                    try
+                                        explode(':', CueParselist[CueParselist.Count - 1], CueTimelist);
+                                        try
+                                            // cue-Format: mm:ss:ff
+                                            // mm: minutes
+                                            // ss: seconds
+                                            // ff: frames, 75 frames per second
+                                            if CueTimeList.Count > 0 then
+                                              aCue.FIndex01 := 60 * StrToInt(CueTimelist[0]);
+                                            if CueTimeList.Count > 1 then
+                                              aCue.FIndex01 := aCue.FIndex01 + StrToInt(CueTimelist[1]);
+                                            if CueTimeList.Count > 2 then
+                                              aCue.FIndex01 := aCue.FIndex01 + (StrToInt(CueTimelist[2]) / 75);
+                                        except
+                                            CueList.Extract(aCue);
+                                            FreeAndNil(aCue);
+                                        end;
+                                    finally
+                                      CueTimelist.free;
+                                    end;
                                 end;
-                                CueTimelist.free;
+                            finally
+                              CueParselist.Free;
                             end;
-                            CueParselist.Free;
                         end;
                       end;
         CUE_ID_FILE: break;
@@ -2803,52 +2838,6 @@ begin
     else
         result := round(CueList[aCueIndex+1].Index01 - CueList[aCueIndex].Index01)
 end;
-
-{
-    --------------------------------------------------------
-    GenerateCSVString
-    --------------------------------------------------------
-}
-{
-function TAudioFile.GenerateCSVString: UnicodeString;
-var vbrstr, Lyricsstr : UnicodeString;
-begin
-  if fvbr then
-    vbrstr := 'vbr'
-  else
-    vbrstr := 'cbr';
-
-  if LyricsExisting then
-    Lyricsstr := 'ok'
-  else
-    Lyricsstr := 'N/A';
-
-  result :=
-    StringReplace(Artist, ';', ',', [rfReplaceAll]) + ';' +
-    StringReplace(Titel, ';', ',', [rfReplaceAll]) + ';' +
-    StringReplace(Album, ';', ',', [rfReplaceAll]) + ';' +
-    StringReplace(Genre, ';', ',', [rfReplaceAll]) + ';' +
-    StringReplace(Year, ';', ',', [rfReplaceAll]) + ';' +
-    IntToStr(Track) + ';' +
-    StringReplace(CD, ';', ',', [rfReplaceAll]) + ';' +
-    StringReplace(Ordner, ';', ',', [rfReplaceAll]) + ';' +
-    StringReplace(Dateiname, ';', ',', [rfReplaceAll]) + ';' +
-    StringReplace(Extension, ';', ',', [rfReplaceAll]) + ';' +
-    IntToStr(fFileSize) + ';' +
-    IntToStr(Duration) + ';' +
-    IntToStr(fBitrate) + ';' +
-    vbrstr + ';' +
-    //ChannelMode + ';' +         // !!!!   31.10.2020 - wieder einfügen XXXXXXXXXXXXXXX
-    //SamplerateShort + ';' +     // !!!!   31.10.2020 - wieder einfügen XXXXXXXXXXXXXXX
-    IntToStr(Rating) + ';' +
-    IntToStr(PlayCounter) + ';' +
-    Lyricsstr + ';' +
-    GainValueToString(TrackGain) + ';' +
-    GainValueToString(AlbumGain) + ';' +
-    PeakValueToString(TrackPeak) + ';' +
-    PeakValueToString(AlbumPeak) + ';' ;
-end;
-}
 
 {
     --------------------------------------------------------
@@ -2927,6 +2916,8 @@ begin
                               end;
                          end;
             MP3DB_ARTIST:  Artist     := ReadTextFromStream(aStream);
+            MP3DB_ALBUMARTIST: AlbumArtist := ReadTextFromStream(aStream);
+            MP3DB_COMPOSER: Composer := ReadTextFromStream(aStream);
             MP3DB_TITEL:   Titel      := ReadTextFromStream(aStream);
             MP3DB_ALBUM:   Album      := ReadTextFromStream(aStream);
             MP3DB_DAUER:   fDuration  := ReadIntegerFromStream(aStream);
@@ -3085,10 +3076,10 @@ begin
 
             else begin
               // Something is wrong. Stop reading.
-               c := MP3DB_ENDOFINFO;
+               c := MP3DB_MAXID;
             end;
         end;
-    until (ID = MP3DB_ENDOFINFO) OR (c >= MP3DB_ENDOFINFO);
+    until (ID = MP3DB_ENDOFINFO) OR (c >= MP3DB_MAXID);
 
 end;
 procedure TAudioFile.LoadFromStream_DEPRECATED(aStream: Tstream);
@@ -3185,10 +3176,10 @@ begin
             MP3DB_ALBUMGAIN : DummyStr := ReadTextFromStream_DEPRECATED(aStream);
 
             else begin
-              c := MP3DB_ENDOFINFO;
+              c := MP3DB_MAXID;
             end;
         end;
-    until (ID = MP3DB_ENDOFINFO) OR (c >= MP3DB_ENDOFINFO); 
+    until (ID = MP3DB_ENDOFINFO) OR (c >= MP3DB_MAXID);
 end;
 
 
@@ -3222,6 +3213,9 @@ begin
     end;
 
     if length(Artist) > 0 then result := result + WriteTextToStream(aStream, MP3DB_ARTIST, Artist);
+    if length(AlbumArtist) > 0 then result := result + WriteTextToStream(aStream, MP3DB_ALBUMARTIST, AlbumArtist);
+    if length(Composer) > 0 then result := result + WriteTextToStream(aStream, MP3DB_COMPOSER, Composer);
+
     // Don't save the Title for Webstreams - it doesn't make sense to save the current Title here
     if (length(titel) > 0) and (AudioType <> at_Stream) then result := result + WriteTextToStream(aStream, MP3DB_TITEL, Titel);
     if length(Album) > 0  then result := result + WriteTextToStream(aStream, MP3DB_ALBUM, Album);

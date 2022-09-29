@@ -11,7 +11,6 @@ object PlaylistCopyForm: TPlaylistCopyForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poMainFormCenter
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
@@ -20,7 +19,6 @@ object PlaylistCopyForm: TPlaylistCopyForm
   DesignSize = (
     415
     388)
-  PixelsPerInch = 96
   TextHeight = 13
   object BtnCopyFiles: TButton
     AlignWithMargins = True
@@ -35,7 +33,6 @@ object PlaylistCopyForm: TPlaylistCopyForm
     ShowHint = True
     TabOrder = 0
     OnClick = BtnCopyFilesClick
-    ExplicitLeft = 304
   end
   object cbCloseWindow: TCheckBox
     AlignWithMargins = True
@@ -59,9 +56,6 @@ object PlaylistCopyForm: TPlaylistCopyForm
     Align = alTop
     Caption = 'Settings'
     TabOrder = 2
-    ExplicitLeft = 8
-    ExplicitTop = 8
-    ExplicitWidth = 403
     object LblRenameSetting: TLabel
       Left = 16
       Top = 65
@@ -108,6 +102,7 @@ object PlaylistCopyForm: TPlaylistCopyForm
       ParentShowHint = False
       ShowHint = True
       TabOrder = 2
+      Text = ''
     end
     object cbCreatePlaylistFile: TCheckBox
       Left = 16
@@ -158,9 +153,6 @@ object PlaylistCopyForm: TPlaylistCopyForm
     Align = alTop
     Caption = 'Status'
     TabOrder = 3
-    ExplicitLeft = 8
-    ExplicitTop = 199
-    ExplicitWidth = 403
     object LblProgressFile: TLabel
       Left = 18
       Top = 20
@@ -199,6 +191,5 @@ object PlaylistCopyForm: TPlaylistCopyForm
     Caption = 'Close'
     TabOrder = 4
     OnClick = BtnCloseClick
-    ExplicitLeft = 198
   end
 end

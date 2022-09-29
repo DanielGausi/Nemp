@@ -1,3 +1,36 @@
+{
+
+    Unit NempDragFiles
+
+    - Drag&Drop for Nemp.
+      Basically a Cop&Paste-Party from different sources, mainly VirtualStringTree
+      and uDragFilesSrc  by Angus Johnson
+
+    ---------------------------------------------------------------
+    Nemp - Noch ein Mp3-Player
+    Copyright (C) 2005-2022, Daniel Gaussmann
+    http://www.gausi.de
+    mail@gausi.de
+    ---------------------------------------------------------------
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+
+    See license.txt for more information
+
+    ---------------------------------------------------------------
+}
+
 unit NempDragFiles;
 
 interface
@@ -119,7 +152,6 @@ type
                                        // tree is the current drop target).
     FDropTargetHelper: IDropTargetHelper; // Win2k > Drag image support
     FFullDragging: BOOL;               // True, if full dragging is currently enabled in the system.
-    fValidSource: Boolean;
     FDataObject: IDataObject;
 
     FDragSource: TControl; // replaces the old "DragSource"-Integer from the NempMainForm
@@ -1194,11 +1226,6 @@ begin
     FDropTargetHelper.Drop(DataObject, Pt, Effect);
 
   result := DoDrop(DataObject, KeyState, Pt, Effect);
-
-  {
-  TNempDragOverEvent = procedure(Shift: TShiftState; State: TDragState;
-    Pt: TPoint; var Effect: Integer; var Accept: Boolean) of object;
-  }
 
   FIsDropTarget := False;
   FDataObject := nil;

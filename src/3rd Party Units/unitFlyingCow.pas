@@ -42,7 +42,7 @@ unit unitFlyingCow;
 
 interface
 
-uses Windows, Messages, SysUtils, Graphics, Classes, dglOpenGL;// , unitGLText;
+uses Windows, Messages, SysUtils, Graphics, Classes, dglOpenGL, Math;// , unitGLText;
 
 {.$R FlyingCowIcons.res}
 
@@ -203,6 +203,7 @@ type
     procedure PauseRender;
     procedure ResumeRender;
     procedure StepItems;
+    procedure StepItemsNew(Steps: Integer);
     procedure UpdateItems;
     procedure QueryToClearTextures;
     procedure SetPreview (index : Integer; width, height : Integer; pixels : PByteArray);
@@ -604,12 +605,17 @@ begin
                 begin
                     // Animar las imágenes
                     delta_t := GetTickCount - fTimer;
-                    While delta_t >= 10 do
+                    {While delta_t >= 10 do
                     begin
                       inc (fTimer);
                       dec (delta_t);
                       StepItems;
-                    end;
+                    end;}
+
+                    StepItemsNew(max(delta_t - 10, 1));
+                    fTimer := GetTickCount - 10;
+
+
                     // Mostrar las imágenes
                     //glClear (GL_DEPTH_BUFFER_BIT);
                     //glClear (GL_COLOR_BUFFER_BIT);
@@ -650,12 +656,14 @@ begin
                 end
                 else
                 begin
-                    delta_t := GetTickCount - fTimer;
+                  fTimer := GetTickCount - 10;
+                    {delta_t := GetTickCount - fTimer;
                     While delta_t >= 10 do
                     begin
                       inc (fTimer);
                       dec (delta_t);
                     end;
+                    }
                 end;
 
                 if fDoRender then
@@ -675,9 +683,11 @@ begin
                   begin
                     // We need more to do. Release Semaphore, so this
                     // will be done again.
-                    localDoRender := True;
-                    if (fSelectedItem <> fCurrentItem) or (MoreNeeded) then
-                      ReleaseSemaphore(fSemaphore, 1, Nil);
+                    if (High(fItem) > 0) then begin
+                      localDoRender := True;
+                      if (fSelectedItem <> fCurrentItem) or (MoreNeeded) then
+                        ReleaseSemaphore(fSemaphore, 1, Nil);
+                    end;
                   end;
 
                   if fPendingPreview then
@@ -1235,8 +1245,8 @@ begin
   end;
   fSelectedItem := 0;
   // the following lines are needed for swapping Categories
-  if fCurrentItem > fQueryUpdateItemCount then // xxxxxxxxxxxxxxxxxx
-    fCurrentItem := 0;   // xxxxxxxxxxxxxxxxxx
+  if fCurrentItem > fQueryUpdateItemCount then
+    fCurrentItem := 0;
 
   fQueryUpdateItemCount := -1;
 end;
@@ -1253,6 +1263,20 @@ begin
     fItem[i].x := fItem[i].x * 0.995 + fItem[i].nx * 0.005;
     fItem[i].r := fItem[i].r * 0.995 + fItem[i].nr * 0.005;
     fItem[i].z := fItem[i].z * 0.995 + fItem[i].nz * 0.005;
+  end;
+end;
+
+procedure TRenderThread.StepItemsNew(Steps: Integer);
+var
+  i : Integer;
+  v1, v2: Double;
+begin
+  v1 := power(0.995, Steps);
+  v2 := 1 - v1;
+  for i := 0 to High(fItem) do begin
+    fItem[i].x := fItem[i].x * v1 + fItem[i].nx * v2;
+    fItem[i].r := fItem[i].r * v1 + fItem[i].nr * v2;
+    fItem[i].z := fItem[i].z * v1 + fItem[i].nz * v2;
   end;
 end;
 

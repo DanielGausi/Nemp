@@ -1,3 +1,33 @@
+{
+
+    Unit MainFormBuilderForm
+
+    - Construction of the MainForm Layout
+
+    ---------------------------------------------------------------
+    Nemp - Noch ein Mp3-Player
+    Copyright (C) 2005-2022, Daniel Gaussmann
+    http://www.gausi.de
+    mail@gausi.de
+    ---------------------------------------------------------------
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+
+    See license.txt for more information
+
+    ---------------------------------------------------------------
+}
 unit MainFormBuilderForm;
 
 interface
@@ -7,7 +37,8 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, MyDialogs, MainFormLayout,
   System.Generics.Collections, System.Generics.Defaults,
 
-  Nemp_ConstantsAndTypes, Vcl.ComCtrls, NempPanel, Vcl.Menus, System.IniFiles;
+  Nemp_ConstantsAndTypes, Vcl.ComCtrls, NempPanel, Vcl.Menus, System.IniFiles,
+  Vcl.Imaging.pngimage;
 
 type
 
@@ -63,6 +94,7 @@ type
     cbShowCategorySelection: TCheckBox;
     imgInfo: TImage;
     BtnHelp: TButton;
+    ImgHelp: TImage;
     procedure FormCreate(Sender: TObject);
     procedure BtnApplyClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -136,6 +168,7 @@ begin
   BackupComboboxes(self);
   TranslateComponent (self);
   RestoreComboboxes(self);
+  HelpContext := HELP_FormDesigner;
 
   MainContainer.ID := 'A';
   TestLayout := TNempLayout.Create;

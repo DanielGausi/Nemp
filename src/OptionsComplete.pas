@@ -10,7 +10,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2019, Daniel Gaussmann
+    Copyright (C) 2005-2022, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -340,7 +340,6 @@ type
     EdtUsername: TEdit;
     EdtPassword: TEdit;
     Panel2: TPanel;
-    _XXX_cb_SettingsMode: TComboBox;
     BTNok: TButton;
     BTNCancel: TButton;
     BTNApply: TButton;
@@ -502,8 +501,6 @@ type
     cpVisualisation: TCategoryPanel;
     cpgCategories: TCategoryPanelGroup;
     cpCategories: TCategoryPanel;
-    cpAlbumDefinition: TCategoryPanel;
-    lblAlbumDefinitionHint: TLabel;
     cpCategoryPlaylists: TCategoryPanel;
     cpCategoryCoverflow: TCategoryPanel;
     cpgViewingSettings: TCategoryPanelGroup;
@@ -619,6 +616,16 @@ type
     shapeCoverflowColor: TShape;
     lblCoverFlowColor: TLabel;
     BtnHelp: TButton;
+    cpCategorySettings: TCategoryPanel;
+    lblSamplerSorting: TLabel;
+    cbSamplerSortingIgnoreReleaseYear: TCheckBox;
+    lblAlbumArtist: TLabel;
+    cbPreferAlbumArtist: TCheckBox;
+    cpIgnoreAlbumArtistVariousArtists: TCheckBox;
+    lblAlbumDefinition: TLabel;
+    ImgHelp: TImage;
+    CB_AccelerateSearchIncludeAlbumArtist: TCheckBox;
+    CB_AccelerateSearchIncludeComposer: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -774,6 +781,11 @@ type
     procedure clbViewMainColumnsDrawItem(Control: TWinControl; Index: Integer;
       Rect: TRect; State: TOwnerDrawState);
     procedure BtnHelpClick(Sender: TObject);
+    procedure VSTSortingsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle;
+      var HintText: string);
+    procedure cbPreferAlbumArtistClick(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 
   private
     { Private-Deklarationen }
@@ -832,7 +844,26 @@ type
     procedure ApplyCoverFlowSettings;
     procedure ShowMediaLibraryConfiguration;
     function ApplyMediaLibraryConfiguration: Boolean;
+
     procedure SelectCoverFlowColor;
+
+    function SettingsChanged: Boolean;
+      function NempSettingsChanged: Boolean;
+      function ControlsChanged: Boolean;
+      function PlayerSettingsChanged: Boolean;
+      function PlaylistSettingsChanged: Boolean;
+      function WebServerSettingsChanged: Boolean;
+      function EffectReplayGainSettingsChanged: Boolean;
+      function BirthdaySettingsChanged: Boolean;
+      function FontsAndPartyModeChanged: Boolean;
+      function FileSearchSettingsChanged: Boolean;
+      function ListViewSettingsChanged: Boolean;
+      function WebRadioSettingsChanged: Boolean;
+      function MetadataSettingsChanged: Boolean;
+      function SearchSettingsChanged: Boolean;
+      function LastFMSettingsChanged: Boolean;
+      function CoverFlowSettingsChanged: Boolean;
+      function MediaLibraryConfigurationChanged: Boolean;
 
     procedure EnableHotKeyControls;
     procedure EnableFadingControls;
@@ -901,12 +932,29 @@ uses NempMainUnit, Details, SplitForm_Hilfsfunktionen, WindowsVersionInfo,
 {$R *.dfm}
 
 var
- // OptionsArraySystem : array[0..1] of TOptionData;
- // OptionsArrayAnzeige: array[0..2] of TOptionData;
- // OptionsArrayAudio  : array[0..6] of TOptionData;
- // OptionsArrayFiles  : Array[0..4] of TOptionData;
+  BackUpCoverFlowSettings: TCoverFlowSettings;
 
- BackUpCoverFlowSettings: TCoverFlowSettings;
+const
+  HelpContexts: Array[0..16] of Integer = (
+    HELP_SettingsGeneral, // General
+    HELP_SettingsControls, // Controls
+    HELP_SettingsListView, // View
+    HELP_SettingsFonts, // Fonts and PartyM
+    HELP_SettingsFileManagement, // FileMan
+    Help_Categories, // MediaLib Configurat
+    HELP_SettingsMetadata, // MetaData
+    HELP_SettingsSearch, // Search
+    HELP_SettingsPlayback, // Player
+    HELP_SettingsPlaylist, // Playlist
+    HELP_SettingsWebradio, // Webradio
+    Help_EqualizerAndEffects, // Effects
+    HELP_HappyBirthdayTimer, // Birthday
+    HELP_Scrobbeln, // LastFM
+    HELP_Webserver, // Webserver
+    HELP_SettingsCoverflow, // Coverflow
+    HELP_WindowsRegistry // Filetypes
+  );
+
 
 function getNextIdx(const aIdx: Integer; Button: teMoveDirection): Integer;
 begin
@@ -930,7 +978,9 @@ begin
   ShowCoverFlowSettings;
   MedienBib.NewCoverFlow.ApplySettings;
 
+  OnCloseQuery := Nil;
   close;
+  OnCloseQuery := FormCloseQuery;
 end;
 
 
@@ -947,6 +997,78 @@ begin
     DetailRatingHelper.DrawRatingInStarsOnBitmap(3*51+26 + 1, RatingImage40.Picture.Bitmap, RatingImage40.Width, RatingImage40.Height);
     DetailRatingHelper.DrawRatingInStarsOnBitmap(4*51 + 1, RatingImage45.Picture.Bitmap, RatingImage45.Width, RatingImage45.Height);
     DetailRatingHelper.DrawRatingInStarsOnBitmap(4*51+26 + 1, RatingImage50.Picture.Bitmap, RatingImage50.Width, RatingImage50.Height);
+end;
+
+procedure TOptionsCompleteForm.FormCloseQuery(Sender: TObject;
+  var CanClose: Boolean);
+begin
+  if not SettingsChanged then
+    CanClose := True
+  else begin
+
+      case TranslateMessageDLG((OptionsForm_UnSavedChangesQuery), mtConfirmation, [MBYes, MBNo, MBAbort], 0) of
+          mrYes   : begin
+                BtnApply.Click;   // save Changes
+                CanClose := True;
+          end;
+          mrNo    : CanClose := True;
+          mrAbort : CanClose := False;
+        end;
+
+
+
+     (*
+    with TTaskDialog.Create(self) do
+    begin
+      try
+        Caption := OptionsForm_UnSavedChangesCaption;
+        Title := OptionsForm_UnSavedChangesTitle;
+        Text := OptionsForm_UnSavedChangesText;
+
+        CommonButtons := [tcbCancel];
+        with TTaskDialogButtonItem(Buttons.Add) do
+        begin
+          Caption := OptionsForm_UnSavedChangesKeep;
+          CommandLinkHint := OptionsForm_UnSavedChangesKeepHint;
+          ModalResult := mrYes;
+        end;
+        with TTaskDialogButtonItem(Buttons.Add) do
+        begin
+          Caption := OptionsForm_UnSavedChangesDiscard;
+          CommandLinkHint := OptionsForm_UnSavedChangesDiscardHint;
+          ModalResult := mrNo;
+        end;
+        MainIcon := tdiInformation;
+        Flags := [tfUseCommandLinks];
+        if Execute then
+          case ModalResult of
+            mrYes: begin
+                BTNApplyClick(nil);
+                CanClose := True
+            end;
+            mrNo: begin
+                CanClose := True
+            end;
+          else
+            CanClose := False;
+          end;
+      finally
+        Free;
+      end
+    end;   *)
+
+  end;
+
+  {
+    OptionsForm_UnSavedChangesKeep = 'Apply';
+    OptionsForm_UnSavedChangesKeepHint = 'Apply the changes and close the settings window.';
+    OptionsForm_UnSavedChangesDiscard = 'Discard';
+    OptionsForm_UnSavedChangesDiscardHint = 'Discard the changes and close the settings window.';
+
+  }
+
+
+
 end;
 
 procedure TOptionsCompleteForm.FormCreate(Sender: TObject);
@@ -966,6 +1088,11 @@ begin
   BackUpComboBoxes(self);
   TranslateComponent(self);
   RestoreComboboxes(self);
+
+  HelpContext := HELP_Einstellungen;
+  for i := 0 to 16 do
+    PageControl1.Pages[i].HelpContext := HelpContexts[i];
+
 
   DetailRatingHelper := TRatingHelper.Create;
   LoadStarGraphics(DetailRatingHelper);
@@ -1086,8 +1213,6 @@ end;
 
 
 procedure TOptionsCompleteForm.FillMainTreeView;
-var
-  i: Integer;
 begin
   OptionsVST.BeginUpdate;
   OptionsVST.Clear;
@@ -1524,6 +1649,8 @@ begin
   CB_AccelerateSearchIncludePath      .Checked := MedienBib.BibSearcher.AccelerateSearchIncludePath;
   CB_AccelerateSearchIncludeComment   .Checked := MedienBib.BibSearcher.AccelerateSearchIncludeComment;
   CB_AccelerateSearchIncludeGenre     .Checked := MedienBib.BibSearcher.AccelerateSearchIncludeGenre;
+  CB_AccelerateSearchIncludeAlbumArtist .Checked := MedienBib.BibSearcher.AccelerateSearchIncludeAlbumArtist;
+  CB_AccelerateSearchIncludeComposer   .Checked := MedienBib.BibSearcher.AccelerateSearchIncludeComposer;
   CB_AccelerateLyricSearch            .Checked := MedienBib.BibSearcher.AccelerateLyricSearch;
   CB_QuickSearchWhileYouType          .Checked := MedienBib.BibSearcher.QuickSearchOptions.WhileYouType;
   CB_QuickSearchAllowErrorsOnEnter    .Checked := MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter;
@@ -1558,6 +1685,11 @@ begin
   if not Assigned(aNode) then
       Exit;
   PageControl1.ActivePage := OptionsVST.GetNodeData<TTabSheet>(aNode);
+
+  if PageControl1.ActivePageIndex in [0..16] then
+    HelpContext := HelpContexts[PageControl1.ActivePageIndex]
+  else
+    HelpContext := HELP_Einstellungen;
 end;
 
 procedure TOptionsCompleteForm.FormDestroy(Sender: TObject);
@@ -2507,7 +2639,7 @@ begin
     maxFont := NempOptions.DefaultFontSize;
   Nemp_MainForm.PlaylistVST.Canvas.Font.Size := maxFont;
   Nemp_MainForm.PlaylistVST.Header.Columns[2].Width := Nemp_MainForm.PlaylistVST.Canvas.TextWidth('@99:99hm');
-  Nemp_MainForm.PlaylistVSTResize(Nil);
+  // Nemp_MainForm.PlaylistVSTResize(Nil);
   Nemp_MainForm.PlaylistVST.Invalidate;
   Nemp_MainForm.VST.Invalidate;
   Nemp_MainForm.ArtistsVST.Invalidate;
@@ -2567,15 +2699,12 @@ begin
 end;
 
 procedure TOptionsCompleteForm.ApplyBirthdaySettings;
-var
-  eventTime: TDateTime;
 begin
   // Happy-Birthday-Timer
   NempPlayer.NempBirthdayTimer.CountDownFileName := EditCountdownSong.Text;
   NempPlayer.NempBirthdayTimer.BirthdaySongFilename := EditBirthdaySong.Text;
   if not ValidTime(mskEdt_BirthdayTime.Text) then
     mskEdt_BirthdayTime.Text := '00:00';
-  eventTime := StrToTime(mskEdt_BirthdayTime.Text);
   NempPlayer.NempBirthdayTimer.StartTime := StrToTime(mskEdt_BirthdayTime.Text);
   NempPlayer.NempBirthdayTimer.UseCountDown := CBStartCountDown.Checked AND (Trim(EditCountdownSong.Text) <> '');
   if NempPlayer.NempBirthdayTimer.UseCountDown then
@@ -2716,8 +2845,6 @@ begin
 end;
 
 procedure TOptionsCompleteForm.ApplyMetadataSettings;
-var
-  i: Integer;
 begin
   NempOptions.AllowQuickAccessToMetadata := cb_AccessMetadata.checked;
   // Automatic rating
@@ -2744,7 +2871,9 @@ begin
   NeedTotalStringUpdate := (MedienBib.BibSearcher.AccelerateSearch <> CB_AccelerateSearch.Checked)
                           or (MedienBib.BibSearcher.AccelerateSearchIncludePath <> CB_AccelerateSearchIncludePath.Checked)
                           or (MedienBib.BibSearcher.AccelerateSearchIncludeComment <> CB_AccelerateSearchIncludeComment.Checked)
-                          or (MedienBib.BibSearcher.AccelerateSearchIncludeGenre <> CB_AccelerateSearchIncludeGenre.Checked);
+                          or (MedienBib.BibSearcher.AccelerateSearchIncludeGenre <> CB_AccelerateSearchIncludeGenre.Checked)
+                          or (MedienBib.BibSearcher.AccelerateSearchIncludeAlbumArtist <> CB_AccelerateSearchIncludeAlbumArtist.Checked)
+                          or (MedienBib.BibSearcher.AccelerateSearchIncludeComposer <> CB_AccelerateSearchIncludeComposer.Checked);
   result := (MedienBib.StatusBibUpdate = 0) or ((not NeedTotalLyricStringUpdate) and (not NeedTotalStringUpdate));
 
   if (MedienBib.StatusBibUpdate <> 0) then
@@ -2767,6 +2896,9 @@ begin
   MedienBib.BibSearcher.AccelerateSearchIncludePath := CB_AccelerateSearchIncludePath.Checked;
   MedienBib.BibSearcher.AccelerateSearchIncludeComment := CB_AccelerateSearchIncludeComment.Checked;
   MedienBib.BibSearcher.AccelerateSearchIncludeGenre := CB_AccelerateSearchIncludeGenre.Checked;
+  MedienBib.BibSearcher.AccelerateSearchIncludeAlbumArtist := CB_AccelerateSearchIncludeAlbumArtist.Checked;
+  MedienBib.BibSearcher.AccelerateSearchIncludeComposer := CB_AccelerateSearchIncludeComposer.Checked;
+
   MedienBib.BibSearcher.AccelerateLyricSearch := CB_AccelerateLyricSearch.Checked;
 
   // update the quicksearch strings
@@ -3111,6 +3243,8 @@ begin
   CB_AccelerateSearchIncludePath.Enabled    := CB_AccelerateSearch.Checked;
   CB_AccelerateSearchIncludeComment.Enabled := CB_AccelerateSearch.Checked;
   CB_AccelerateSearchIncludeGenre.Enabled   := CB_AccelerateSearch.Checked;
+  CB_AccelerateSearchIncludeAlbumArtist.Enabled := CB_AccelerateSearch.Checked;
+  CB_AccelerateSearchIncludeComposer.Enabled := CB_AccelerateSearch.Checked;
 end;
 
 procedure TOptionsCompleteForm.CB_AccelerateSearchClick(Sender: TObject);
@@ -3548,7 +3682,12 @@ end;
 
 procedure TOptionsCompleteForm.BtnHelpClick(Sender: TObject);
 begin
-  case PageControl1.ActivePageIndex of
+  if PageControl1.ActivePageIndex in [0..16] then
+    Application.HelpContext(HelpContexts[PageControl1.ActivePageIndex])
+  else
+    Application.HelpContext(HELP_Einstellungen);
+
+{  case PageControl1.ActivePageIndex of
     0: Application.HelpContext(HELP_SettingsGeneral); // General
     1: Application.HelpContext(HELP_SettingsControls); // Controls
     2: Application.HelpContext(HELP_SettingsListView); // View
@@ -3568,7 +3707,7 @@ begin
     16: Application.HelpContext(HELP_WindowsRegistry); // Filetypes
   else
     Application.HelpContext(HELP_Einstellungen);
-  end;
+  end;}
 
 end;
 
@@ -3728,6 +3867,10 @@ begin
 
   cbAlbumKeymode.ItemIndex := Integer(OrganizerSettings.AlbumKeyMode);
   cbIgnoreCDDirectories.Checked := OrganizerSettings.TrimCDFromDirectory;
+  cbSamplerSortingIgnoreReleaseYear.Checked := OrganizerSettings.SamplerSortingIgnoreReleaseYear;
+  cbPreferAlbumArtist.Checked := OrganizerSettings.PreferAlbumArtist;
+  cpIgnoreAlbumArtistVariousArtists.Checked := OrganizerSettings.IgnoreVariousAlbumArtists;
+  cpIgnoreAlbumArtistVariousArtists.Enabled := OrganizerSettings.PreferAlbumArtist;
   editCDNames.Text := OrganizerSettings.CDNames.DelimitedText;
   cbShowElementCount.Checked := OrganizerSettings.ShowElementCount;
   cbShowCoverForAlbum.Checked := OrganizerSettings.ShowCoverArtOnAlbum;
@@ -3738,25 +3881,17 @@ begin
   cbPlaylistSortDirection.ItemIndex := Integer(OrganizerSettings.PlaylistSortDirection);
 end;
 
+procedure TOptionsCompleteForm.cbPreferAlbumArtistClick(Sender: TObject);
+begin
+  cpIgnoreAlbumArtistVariousArtists.Enabled := cbPreferAlbumArtist.Checked;
+end;
+
 function TOptionsCompleteForm.ApplyMediaLibraryConfiguration: boolean;
 var
   i: Integer;
   newCat: TLibraryFileCategory;
-  dataChanged: Boolean;
 begin
-  dataChanged := fCategoriesChanged or fCollectionsChanged
-      or (MedienBib.MissingCoverMode <> teMissingCoverPreSorting(cbMissingCoverMode.ItemIndex))
-      or (OrganizerSettings.AlbumKeyMode <> teAlbumKeyMode(cbAlbumKeymode.ItemIndex))
-      or (OrganizerSettings.TrimCDFromDirectory <> cbIgnoreCDDirectories.Checked)
-      or (OrganizerSettings.CDNames.DelimitedText <> editCDNames.Text)
-      or (OrganizerSettings.ShowElementCount <> cbShowElementCount.Checked)
-      or (OrganizerSettings.ShowCoverArtOnAlbum <> cbShowCoverForAlbum.Checked)
-      or (OrganizerSettings.ShowPlaylistCategories <> cbLibConfigShowPlaylistCategories.Checked)
-      or (OrganizerSettings.ShowWebradioCategory <> cbLibConfigShowWebRadioCategory.Checked)
-      or (OrganizerSettings.PlaylistCaptionMode <> tePlaylistCaptionMode(cbPlaylistCaptionMode.ItemIndex))
-      or (OrganizerSettings.PlaylistSorting <> tePlaylistCollectionSorting(cbPlaylistSortMode.ItemIndex))
-      or (OrganizerSettings.PlaylistSortDirection <> teSortDirection(cbPlaylistSortDirection.ItemIndex));
-  result := (MedienBib.StatusBibUpdate = 0) or (not dataChanged);
+  result := (MedienBib.StatusBibUpdate = 0) or (not MediaLibraryConfigurationChanged);
 
   if (MedienBib.StatusBibUpdate <> 0) then
     exit;
@@ -3781,8 +3916,14 @@ begin
       OrganizerSettings.AddConfig(TRootCollection(RootCollections[i]).CollectionConfigList);
   end;
 
+  fCategoriesChanged := False;
+  fCollectionsChanged := False;
+
   MedienBib.MissingCoverMode := teMissingCoverPreSorting(cbMissingCoverMode.ItemIndex);
   OrganizerSettings.AlbumKeyMode := teAlbumKeyMode(cbAlbumKeymode.ItemIndex);
+  OrganizerSettings.SamplerSortingIgnoreReleaseYear := cbSamplerSortingIgnoreReleaseYear.Checked;
+  OrganizerSettings.PreferAlbumArtist := cbPreferAlbumArtist.Checked;
+  OrganizerSettings.IgnoreVariousAlbumArtists := cpIgnoreAlbumArtistVariousArtists.Checked;
   OrganizerSettings.TrimCDFromDirectory := cbIgnoreCDDirectories.Checked;
   OrganizerSettings.CDNames.DelimitedText := editCDNames.Text;
   OrganizerSettings.ShowElementCount := cbShowElementCount.Checked;
@@ -3801,6 +3942,364 @@ begin
     MedienBib.CurrentCategory := MedienBib.DefaultFileCategory;
   MedienBib.ReFillFileCategories;
 end;
+
+function TOptionsCompleteForm.SettingsChanged: Boolean;
+begin
+  result :=
+      NempSettingsChanged or
+      ControlsChanged or
+      PlayerSettingsChanged or
+      PlaylistSettingsChanged or
+      WebServerSettingsChanged or
+      EffectReplayGainSettingsChanged or
+      BirthdaySettingsChanged or
+      FontsAndPartyModeChanged or
+      FileSearchSettingsChanged or
+      ListViewSettingsChanged or
+      WebRadioSettingsChanged or
+      MetadataSettingsChanged or
+      SearchSettingsChanged or
+      LastFMSettingsChanged or
+      CoverFlowSettingsChanged or
+      MediaLibraryConfigurationChanged;
+end;
+
+function TOptionsCompleteForm.NempSettingsChanged: Boolean;
+begin
+  result :=
+  (NempPlaylist.AutoPlayOnStart <> CB_AutoPlayOnStart.Checked) or
+  (NempPlaylist.SavePositionInTrack <> cb_SavePositionInTrack.Checked) or
+  (NempPlaylist.AutoPlayNewTitle <> CB_AutoPlayNewTitle.Checked) or
+  (NempPlaylist.AutoPlayEnqueuedTitle <> CB_AutoPlayEnqueueTitle.Checked) or
+  (MedienBib.AutoLoadMediaList <> CBAutoLoadMediaList.Checked) or
+  (MedienBib.AutoSaveMediaList <> CBAutoSaveMediaList.Checked) or
+  (NempOptions.ShowSplashScreen <> cb_ShowSplashScreen.Checked) or
+  (NempOptions.AllowOnlyOneInstance <> Not CB_AllowMultipleInstances.Checked) or
+  (NempOptions.StartMinimized  <> CB_StartMinimized.Checked) or
+  (NempOptions.ShowTrayIcon <> cbShowTrayIcon.Checked) or
+  (Nemp_MainForm.NempTrayIcon.Visible <> NempOptions.ShowTrayIcon) or
+  (TDrivemanager.EnableUSBMode <> cb_EnableUSBMode.Checked) or
+  (TDrivemanager.EnableCloudMode <> cb_EnableCloudMode.Checked) or
+  (NempUpdater.AutoCheck <> CB_AutoCheck.Checked) or
+  (NempUpdater.NotifyOnBetas <> CB_AutoCheckNotifyOnBetas.Checked) or
+  (NempPlayer.ReInitAfterSuspend <> cbReInitAfterSuspend.Checked) or
+  (NempPlayer.PauseOnSuspend <> cbPauseOnSuspend.Checked);
+  {case CBBOX_UpdateInterval.ItemIndex  of
+    0: NempUpdater.CheckInterval := 0;
+    1: NempUpdater.CheckInterval := 1;
+    2: NempUpdater.CheckInterval := 7;
+    3: NempUpdater.CheckInterval := 14;
+    4: NempUpdater.CheckInterval := 30;
+  else
+    NempUpdater.CheckInterval := 7;
+  end;}
+end;
+
+function TOptionsCompleteForm.ControlsChanged: Boolean;
+begin
+  result :=
+  (NempOptions.RegisterMediaHotkeys <> cb_RegisterMediaHotkeys.Checked) or
+  (NempOptions.IgnoreVolumeUpDownKeys <> CB_IgnoreVolume.Checked) or
+  (cb_UseG15Display.Checked <> NempOptions.UseDisplayApp) or
+  (NempOptions.UseDisplayApp <> cb_UseG15Display.Checked) or
+  (NempOptions.RegisterHotKeys <> CBRegisterHotKeys.Checked) or
+  (NempOptions.TabStopAtPlayerControls <> CB_TabStopAtPlayerControls.Checked) or
+  (NempOptions.TabStopAtTabs <> CB_TabStopAtTabs.Checked);
+
+  {NempOptions.DefineHotKey(hkPlay,         CB_Activate_Play.Checked, IndexToMod(CB_Mod_Play.ItemIndex), IndexToKey(CB_Key_Play.ItemIndex));
+  NempOptions.DefineHotKey(hkStop,         CB_Activate_Stop.Checked, IndexToMod(CB_Mod_Stop.ItemIndex), IndexToKey(CB_Key_Stop.ItemIndex));
+  NempOptions.DefineHotKey(hkNext,         CB_Activate_Next.Checked, IndexToMod(CB_Mod_Next.ItemIndex), IndexToKey(CB_Key_Next.ItemIndex));
+  NempOptions.DefineHotKey(hkPrev,         CB_Activate_Prev.Checked, IndexToMod(CB_Mod_Prev.ItemIndex), IndexToKey(CB_Key_Prev.ItemIndex));
+  NempOptions.DefineHotKey(hkSlideForward, CB_Activate_JumpForward.Checked, IndexToMod(CB_Mod_JumpForward.ItemIndex), IndexToKey(CB_Key_JumpForward.ItemIndex));
+  NempOptions.DefineHotKey(hkSlideBack,    CB_Activate_JumpBack.Checked, IndexToMod(CB_Mod_JumpBack.ItemIndex), IndexToKey(CB_Key_JumpBack.ItemIndex));
+  NempOptions.DefineHotKey(hkIncVol,       CB_Activate_IncVol.Checked, IndexToMod(CB_Mod_IncVol.ItemIndex), IndexToKey(CB_Key_IncVol.ItemIndex));
+  NempOptions.DefineHotKey(hkDecVol,       CB_Activate_DecVol.Checked, IndexToMod(CB_Mod_DecVol.ItemIndex), IndexToKey(CB_Key_DecVol.ItemIndex));
+  NempOptions.DefineHotKey(hkMute,         CB_Activate_Mute.Checked, IndexToMod(CB_Mod_Mute.ItemIndex), IndexToKey(CB_Key_Mute.ItemIndex));}
+end;
+
+function TOptionsCompleteForm.PlayerSettingsChanged: Boolean;
+begin
+  Result :=
+  (NempPlayer.MainDevice <> MainDeviceCB.ItemIndex + 1) or
+  (NempPlayer.HeadsetDevice <> HeadPhonesDeviceCB.ItemIndex +1) or
+  (NempPlayer.SoundfontFilename <> editSoundFont.Text) or
+  (NempPlayer.PlayBufferSize <> SEBufferSize.Value) or
+  (NempPlayer.UseFloatingPointChannels <> CB_FloatingPoint.ItemIndex) or
+  (NempPlayer.UseHardwareMixing <> (CB_Mixing.ItemIndex = 0)) or
+  (NempPlayer.UseFading <> CB_Fading.Checked) or
+  (NempPlayer.FadingInterval <> SE_Fade.Value) or
+  (NempPlayer.SeekFadingInterval <> SE_SeekFade.Value) or
+  (NempPlayer.IgnoreFadingOnShortTracks <> CB_IgnoreFadingOnShortTracks.Checked) or
+  (NempPlayer.IgnoreFadingOnPause <> CB_IgnoreFadingOnPause.Checked) or
+  (NempPlayer.IgnoreFadingOnStop <> CB_IgnoreFadingOnStop.Checked) or
+  (NempPlayer.DoSilenceDetection <> CB_SilenceDetection.Checked ) or
+  (NempPlayer.SilenceThreshold   <> SE_SilenceThreshold.Value) or
+  (NempPlayer.DoPauseBetweenTracks  <> cb_AddBreakBetweenTracks.Checked) or
+  (NempPlayer.PauseBetweenTracksDuration <> SE_BreakBetweenTracks.Value) or
+  (NempPlayer.UseVisualization <> CB_Visual.Checked) or
+  (NempPlayer.VisualizationInterval <> 100 - TB_Refresh.Position) or
+  (Nemp_MainForm.BassTimer.Interval <> NempPlayer.VisualizationInterval) or
+  (Nemp_MainForm.HeadsetTimer.Interval <> NempPlayer.VisualizationInterval) or
+  (NempPlayer.ScrollTaskbarTitel <> CB_ScrollTitelTaskBar.Checked) or
+  (NempPlayer.ScrollTaskbarDelay <>  (4 - CB_TaskbarDelay.ItemIndex + 1)* 5) or
+  (NempPlayer.SafePlayback <> cb_SafePlayback.Checked);
+end;
+function TOptionsCompleteForm.PlaylistSettingsChanged: Boolean;
+begin
+  result :=
+  (NempPlaylist.DefaultAction <> GrpBox_DefaultAction.ItemIndex) or
+  (NempPlaylist.HeadSetAction <> GrpBox_HeadsetDefaultAction.ItemIndex) or
+  (NempPlaylist.AutoStopHeadsetSwitchTab <> cb_AutoStopHeadsetSwitchTab.Checked) or
+  (NempPlaylist.AutoStopHeadsetAddToPlayist <> cb_AutoStopHeadsetAddToPlayist.Checked) or
+  (NempPlaylist.AutoScan <> CB_AutoScanPlaylist.checked) or
+  (NempPlaylist.JumpToNextCueOnNextClick <> CB_JumpToNextCue.Checked) or
+  (NempPlaylist.RepeatCueOnRepeatTitle <> cb_ReplayCue.Checked) or
+  (NempPlaylist.RememberInterruptedPlayPosition <> CB_RememberInterruptedPlayPosition.Checked) or
+  (NempPlaylist.AutoDelete <> CB_AutoDeleteFromPlaylist.Checked) or
+  (NempPlaylist.DisableAutoDeleteAtUserInput <> CB_DisableAutoDeleteAtUserInput.Checked) or
+  (NempPlaylist.AutoMix <> CB_AutoMixPlaylist.Checked) or
+  (NempPlaylist.PlaylistManager.AutoSaveOnPlaylistChange <> cb_PlaylistManagerAutoSave.Checked) or
+  (NempPlaylist.PlaylistManager.UserInputOnPlaylistChange <> cb_PlaylistManagerAutoSaveUserInput.Checked) or
+  (NempPlaylist.RandomRepeat <> TBRandomRepeat.Position) or
+  (NempPlaylist.UseWeightedRNG <> cb_UseWeightedRNG.Checked) or
+  (NempPlaylist.RNGWeights[1]  <> StrToIntDef(RandomWeight05.Text, 1)) or
+  (NempPlaylist.RNGWeights[2]  <> StrToIntDef(RandomWeight10.Text, 1)) or
+  (NempPlaylist.RNGWeights[3]  <> StrToIntDef(RandomWeight15.Text, 1)) or
+  (NempPlaylist.RNGWeights[4]  <> StrToIntDef(RandomWeight20.Text, 1)) or
+  (NempPlaylist.RNGWeights[5]  <> StrToIntDef(RandomWeight25.Text, 1)) or
+  (NempPlaylist.RNGWeights[6]  <> StrToIntDef(RandomWeight30.Text, 1)) or
+  (NempPlaylist.RNGWeights[7]  <> StrToIntDef(RandomWeight35.Text, 1)) or
+  (NempPlaylist.RNGWeights[8]  <> StrToIntDef(RandomWeight40.Text, 1)) or
+  (NempPlaylist.RNGWeights[9]  <> StrToIntDef(RandomWeight45.Text, 1)) or
+  (NempPlaylist.RNGWeights[10] <> StrToIntDef(RandomWeight50.Text, 1)) or
+  (NempPlayer.NempLogFile.DoLogToFile <> cbSaveLogToFile.Checked) or
+  (NempPlayer.NempLogFile.KeepLogRangeInDays <> seLogDuration.Value);
+end;
+function TOptionsCompleteForm.WebServerSettingsChanged: Boolean;
+begin
+  result :=
+  (NempWebServer.UsernameU <> EdtUsername.Text) or
+  (NempWebServer.PasswordU <> EdtPassword.Text) or
+  (NempWebServer.UsernameA <> EdtUsernameAdmin.Text) or
+  (NempWebServer.PasswordA <> EdtPasswordAdmin.Text) or
+  (NempWebServer.Theme <> cbWebServerRootDir.Text) or
+  (NempWebServer.Port <> seWebServer_Port.Value) or
+  (NempWebServer.AllowLibraryAccess    <> cbPermitLibraryAccess.Checked) or
+  (NempWebServer.AllowFileDownload     <> cbPermitPlaylistDownload.Checked) or
+  (NempWebServer.AllowRemoteControl    <> cbAllowRemoteControl.Checked) or
+  (MedienBib.AutoActivateWebServer     <> CBAutoStartWebServer.Checked) or
+  (NempWebServer.AllowVotes            <> cbPermitVote.Checked);
+end;
+function TOptionsCompleteForm.EffectReplayGainSettingsChanged: Boolean;
+begin
+  result :=
+  (NempPlayer.ApplyReplayGain  <> cb_ApplyReplayGain.Checked) or
+  (NempPlayer.PreferAlbumGain  <> cb_PreferAlbumGain.Checked) or
+  (NempPlayer.DefaultGainWithoutRG <> tp_DefaultGain.Position / 10) or
+  (NempPlayer.DefaultGainWithRG    <> tp_DefaultGain2.Position / 10) or
+  (NempPlayer.PreventClipping      <> cb_ReplayGainPreventClipping.Checked) or
+  (NempPlayer.UseDefaultEffects <> CB_UseDefaultEffects.Checked) or
+  (NempPlayer.UseDefaultEqualizer <> CB_UseDefaultEqualizer.Checked) or
+  (NempPlayer.UseWalkmanMode <> cb_UseWalkmanMode.Checked) or
+  (Nemp_MainForm.WalkmanModeTimer.Enabled <> cb_UseWalkmanMode.Checked) or
+  (NempPlayer.ReduceMainVolumeOnJingle <> CBJingleReduce.Checked) or
+  (NempPlayer.ReduceMainVolumeOnJingleValue <> SEJingleReduce.Value) or
+  (NempPlayer.JingleVolume <> SEJingleVolume.Value)
+end;
+function TOptionsCompleteForm.BirthdaySettingsChanged: Boolean;
+begin
+  result :=
+  (NempPlayer.NempBirthdayTimer.CountDownFileName <> EditCountdownSong.Text) or
+  (NempPlayer.NempBirthdayTimer.BirthdaySongFilename <> EditBirthdaySong.Text) or
+  (NempPlayer.NempBirthdayTimer.StartTime <> StrToTime(mskEdt_BirthdayTime.Text)) or
+  (NempPlayer.NempBirthdayTimer.UseCountDown <> CBStartCountDown.Checked) or
+  (NempPlayer.NempBirthdayTimer.ContinueAfter <> CBContinueAfter.Checked);
+end;
+function TOptionsCompleteForm.FontsAndPartyModeChanged: Boolean;
+begin
+  result :=
+  (NempOptions.DefaultFontSize <> SEFontSize.Value) or
+  (NempOptions.RowHeight <> SERowHeight.Value) or
+  (NempOptions.DefaultFontStyle <> cb_Medialist_FontStyle.ItemIndex) or
+  (NempOptions.DefaultFontStyles <> FontSelectorItemIndexToStyle(NempOptions.DefaultFontStyle)) or
+  (NempOptions.ArtistAlbenFontSize <> SEArtistAlbenSIze.Value) or
+  (NempOptions.ArtistAlbenRowHeight <> SEArtistAlbenRowHeight.Value) or
+  (NempOptions.ArtistAlbenFontStyle <> cb_Browselist_FontStyle.ItemIndex) or
+  (NempOptions.ArtistAlbenFontStyles <> FontSelectorItemIndexToStyle(NempOptions.ArtistAlbenFontStyle)) or
+  (NempOptions.ChangeFontColorOnBitrate <> CBChangeFontColorOnBitrate.Checked) or
+  (NempOptions.ChangeFontSizeOnLength <> CBChangeFontSizeOnLength.Checked) or
+  (NempOptions.ChangeFontStyleOnMode <> CBChangeFontStyleOnMode.Checked) or
+  (NempOptions.ChangeFontOnCbrVbr <> CBChangeFontOnCbrVbr.Checked) or
+  (NempOptions.FontNameCBR <> CBFontNameCBR.Items[CBFontNameCBR.itemindex]) or
+  (NempOptions.FontNameVBR <> CBFontNameVBR.Items[CBFontNameVBR.itemindex]) or
+  (Nemp_MainForm.NempSkin.NempPartyMode.ResizeFactor <> Nemp_MainForm.NempSkin.NempPartyMode.IndexToFactor(CB_PartyMode_ResizeFactor.ItemIndex)) or
+  (Nemp_MainForm.NempSkin.NempPartyMode.BlockTreeEdit <> cb_PartyMode_BlockTreeEdit.Checked) or
+  (Nemp_MainForm.NempSkin.NempPartyMode.BlockCurrentTitleRating <> cb_PartyMode_BlockCurrentTitleRating.Checked) or
+  (Nemp_MainForm.NempSkin.NempPartyMode.BlockTools <> cb_PartyMode_BlockTools.Checked) or
+  (Nemp_MainForm.NempSkin.NempPartyMode.ShowPasswordOnActivate <> cb_PartyMode_ShowPasswordOnActivate.Checked) or
+  (Nemp_MainForm.NempSkin.NempPartyMode.password <> Edt_PartyModePassword.Text);
+end;
+function TOptionsCompleteForm.FileSearchSettingsChanged: Boolean;
+begin
+  result :=
+  (MedienBib.AutoScanDirs <> CBAutoScan.Checked) or
+  //for i := 0 to LBAutoScan.Items.Count - 1 do
+  //  MedienBib.AutoScanDirList.Add(LBAutoScan.Items[i]);
+  (MedienBib.AskForAutoAddNewDirs <> CBAskForAutoAddNewDirs.Checked) or
+  (MedienBib.AutoAddNewDirs <> CBAutoAddNewDirs.Checked) or
+  (MedienBib.AutoDeleteFiles <> cb_AutoDeleteFiles.checked) or
+  (MedienBib.AutoDeleteFilesShowInfo <> cb_AutoDeleteFilesShowInfo.checked) or
+  (MedienBib.AutoScanPlaylistFilesOnView <> CBAutoScanPlaylistFilesOnView.Checked) or
+  (MedienBib.IncludeAll <> cbIncludeAll.Checked) or
+  {if not MedienBib.IncludeAll then begin
+    MedienBib.IncludeFilter := '';
+    for i := 0 to CBIncludeFiles.Count - 1 do begin
+      if CBIncludeFiles.Checked[i] then
+        MedienBib.IncludeFilter := MedienBib.IncludeFilter + ';*' + CBIncludeFiles.Items[i];
+    end;
+    // delete first ';'
+    if (MedienBib.IncludeFilter <> '') AND (MedienBib.IncludeFilter[1] = ';') then
+      MedienBib.IncludeFilter := copy(MedienBib.IncludeFilter, 2, length(MedienBib.IncludeFilter));
+    if MedienBib.IncludeFilter = '' then
+      MedienBib.IncludeFilter := '*.mp3'
+  end;}
+  (TCoverArtSearcher.UseDir       <> CB_CoverSearch_inDir.Checked) or
+  (TCoverArtSearcher.UseParentDir <> CB_CoverSearch_inParentDir.Checked) or
+  (TCoverArtSearcher.UseSubDir    <> CB_CoverSearch_inSubDir.Checked) or
+  (TCoverArtSearcher.UseSisterDir <> CB_CoverSearch_inSisterDir.Checked) or
+  (TCoverArtSearcher.SubDirName <> EDTCoverSubDirName.Text ) or
+  (TCoverArtSearcher.SisterDirName <> EDTCoverSisterDirName.Text) or
+  (TCoverArtSearcher.CoverSizeIndex <> cb_CoverSize.ItemIndex) or
+  (MedienBib.CoverSearchLastFM <> CB_CoverSearch_LastFM.Checked);
+end;
+function TOptionsCompleteForm.ListViewSettingsChanged: Boolean;
+begin
+  result :=
+  // visible columns
+  {for i := 0 to Spaltenzahl-1 do begin
+    s := GetColumnIDfromPosition(Nemp_MainForm.VST, i);
+    if clbViewMainColumns.Checked[i] then
+      Nemp_MainForm.VST.Header.Columns[s].Options := Nemp_MainForm.VST.Header.Columns[s].Options + [coVisible]
+    else
+      Nemp_MainForm.VST.Header.Columns[s].Options := Nemp_MainForm.VST.Header.Columns[s].Options - [coVisible];
+  end;}
+  // missing metadata
+  (NempDisplay.ArtistSubstitute <> TESubstituteValue(cbReplaceArtistBy.ItemIndex)) or
+  (NempDisplay.TitleSubstitute  <> TESubstituteValue(cbReplaceTitleBy .ItemIndex)) or
+  (NempDisplay.AlbumSubstitute  <> TESubstituteValue(cbReplaceAlbumBy .ItemIndex)) or
+  (NempDisplay.PlaylistTitleFormat    <> cbPlaylistTitle.Text         ) or
+  (NempDisplay.PlaylistTitleFormatFB  <> cbPlaylistTitleFB.Text       ) or
+  (NempDisplay.PlaylistCueAlbumFormat <> cbPlaylistTitleCueAlbum.Text ) or
+  (NempDisplay.PlaylistCueTitleFormat <> cbPlaylistTitleCueTitle.Text ) or
+  (NempDisplay.PlaylistWebradioFormat <> cbPlaylistWebradioTitle.Text ) or
+  (NempPlaylist.ShowIndexInTreeview <> cb_ShowIndexInTreeview.Checked) or
+  (MedienBib.AlwaysSortAnzeigeList <> cbAlwaysSortAnzeigeList.Checked) or
+  (MedienBib.SkipSortOnLargeLists <> CBSkipSortOnLargeLists.Checked) or
+  (MedienBib.limitMarkerToCurrentFiles <> cb_limitMarkerToCurrentFiles.Checked) or
+  (MedienBib.ShowHintsInMedialist <> CBShowHintsInMedialist.Checked) or
+  (NempPlaylist.ShowHintsInPlaylist <> CB_ShowHintsInPlaylist.Checked) or
+  (NempOptions.FullRowSelect <> cbFullRowSelect.Checked) or
+  (Nemp_MainForm.VST.ShowHint <> MedienBib.ShowHintsInMedialist) or
+  (Nemp_MainForm.PlaylistVST.ShowHint <> NempPlaylist.ShowHintsInPlaylist);
+end;
+function TOptionsCompleteForm.WebRadioSettingsChanged: Boolean;
+begin
+  result :=
+  (NempPlayer.DownloadDir <> IncludeTrailingPathDelimiter(EdtDownloadDir.Text)) or
+  (NempPlayer.UseStreamnameAsDirectory <> cbUseStreamnameAsDirectory.Checked) or
+  (NempPlayer.FilenameFormat <> cbFilenameFormat.Text) or
+  (NempPlayer.AutoSplitByTitle <> cbAutoSplitByTitle.Checked) or
+  (NempPlayer.AutoSplitByTime <> cbAutoSplitBySize.Checked) or
+  (NempPlayer.AutoSplitBySize <> cbAutoSplitByTime.Checked) or
+  (NempPlayer.AutoSplitMaxSize <> SE_AutoSplitMaxSize.Value) or
+  (NempPlayer.AutoSplitMaxTime <> SE_AutoSplitMaxTime.Value) or
+  (NempPlaylist.BassHandlePlaylist <> rbWebRadioHandledByBass.Checked);
+end;
+function TOptionsCompleteForm.MetadataSettingsChanged: Boolean;
+begin
+  result :=
+  (NempOptions.AllowQuickAccessToMetadata <> cb_AccessMetadata.checked) or
+  (NempPlayer.PostProcessor.Active <> cb_RatingActive.checked) or
+  (NempPlayer.PostProcessor.IgnoreShortFiles <> cb_RatingIgnoreShortFiles.checked) or
+  (NempPlayer.PostProcessor.WriteToFiles <> cb_AccessMetadata.checked) or
+  (NempPlayer.PostProcessor.ChangeCounter <> cb_RatingChangeCounter.checked) or
+  (NempPlayer.PostProcessor.IncPlayedFiles <> cb_RatingIncreaseRating.checked) or
+  (NempPlayer.PostProcessor.DecAbortedFiles <> cb_RatingDecreaseRating.checked) or
+  (MedienBib.AutoResolveInconsistencies <> cb_AutoResolveInconsistencies.checked) or
+  (MedienBib.AskForAutoResolveInconsistencies <> cb_AskForAutoResolveInconsistencies.checked) or
+  (MedienBib.ShowAutoResolveInconsistenciesHints <> cb_ShowAutoResolveInconsistenciesHints.checked) or
+  (NempCharCodeOptions.AutoDetectCodePage <> CBAutoDetectCharCode.Checked);
+end;
+function TOptionsCompleteForm.SearchSettingsChanged: Boolean;
+begin
+  result :=
+  (MedienBib.BibSearcher.QuickSearchOptions.WhileYouType <> CB_QuickSearchWhileYouType.Checked) or
+  (MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow <> cb_ChangeCoverflowOnSearch.Checked) or
+  (MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter <> CB_QuickSearchAllowErrorsOnEnter.Checked) or
+  (MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnType <> CB_QuickSearchAllowErrorsWhileTyping.Checked) or
+  (MedienBib.IgnoreLyrics <> cb_IgnoreLyrics.Checked) or
+  (MedienBib.BibSearcher.AccelerateSearch <> CB_AccelerateSearch .Checked) or
+  (MedienBib.BibSearcher.AccelerateSearchIncludePath <> CB_AccelerateSearchIncludePath.Checked) or
+  (MedienBib.BibSearcher.AccelerateSearchIncludeComment <> CB_AccelerateSearchIncludeComment.Checked) or
+  (MedienBib.BibSearcher.AccelerateSearchIncludeGenre <> CB_AccelerateSearchIncludeGenre.Checked) or
+  (MedienBib.BibSearcher.AccelerateSearchIncludeAlbumArtist <> CB_AccelerateSearchIncludeAlbumArtist.Checked) or
+  (MedienBib.BibSearcher.AccelerateSearchIncludeComposer <> CB_AccelerateSearchIncludeComposer.Checked) or
+  (MedienBib.BibSearcher.AccelerateLyricSearch <> CB_AccelerateLyricSearch.Checked);
+end;
+function TOptionsCompleteForm.LastFMSettingsChanged: Boolean;
+begin
+  result :=
+  (NempPlayer.NempScrobbler.IgnoreErrors <> CB_SilentError.Checked) or
+  (NempPlayer.NempScrobbler.AlwaysScrobble <> CB_AlwaysScrobble.Checked) or
+  (NempPlayer.NempScrobbler.DoScrobble <> CB_ScrobbleThisSession.Checked);
+end;
+function TOptionsCompleteForm.CoverFlowSettingsChanged: Boolean;
+begin
+  result :=
+  (MedienBib.NewCoverFlow.Settings.zMain  <> tbCoverZMain.Position ) or
+  (MedienBib.NewCoverFlow.Settings.zLeft  <> tbCoverZLeft.Position) or
+  (MedienBib.NewCoverFlow.Settings.zRight <> tbCoverZRight.Position) or
+  (MedienBib.NewCoverFlow.Settings.GapRight      <> tbCoverGapRight      .Position) or
+  (MedienBib.NewCoverFlow.Settings.GapLeft       <> tbCoverGapLeft       .Position) or
+  (MedienBib.NewCoverFlow.Settings.GapFirstRight <> tbCoverGapFirstRight .Position) or
+  (MedienBib.NewCoverFlow.Settings.GapFirstLeft  <> tbCoverGapFirstLeft  .Position) or
+  (MedienBib.NewCoverFlow.Settings.AngleRight    <> tbCoverAngleRight    .Position) or
+  (MedienBib.NewCoverFlow.Settings.AngleLeft     <> tbCoverAngleLeft     .Position) or
+  (MedienBib.NewCoverFlow.Settings.AngleMain     <> tbCoverAngleMain     .Position) or
+  (MedienBib.NewCoverFlow.Settings.ViewPosX <> tbCoverViewPosition.Position) or
+  (MedienBib.NewCoverFlow.Settings.UseReflection        <> cbCoverFlowUseReflection .Checked) or
+	(MedienBib.NewCoverFlow.Settings.ReflexionBlendFaktor <> tbCoverReflexionIntensity.Position) or
+	(MedienBib.NewCoverFlow.Settings.GapReflexion         <> tbCoverReflexionGap      .Position) or
+  (lblCoverFlowIntensity.Enabled      <> MedienBib.NewCoverFlow.Settings.UseReflection) or
+	(lblCoverflowReflexionGap.Enabled   <> MedienBib.NewCoverFlow.Settings.UseReflection) or
+	(tbCoverReflexionIntensity.Enabled  <> MedienBib.NewCoverFlow.Settings.UseReflection) or
+	(tbCoverReflexionGap.Enabled        <> MedienBib.NewCoverFlow.Settings.UseReflection) or
+  (MedienBib.NewCoverFlow.Settings.MaxTextures <> seCoverflowTextureCache.Value) or
+  (MedienBib.NewCoverFlow.Settings.DefaultColor <> StringToColorDef(edtCoverFlowColor.Text, clWhite)) or
+  (edtCoverFlowColor.Text <> ColorToString(MedienBib.NewCoverFlow.Settings.DefaultColor)) or
+  (shapeCoverflowColor.Brush.Color <> MedienBib.NewCoverFlow.Settings.DefaultColor) or
+  (ColorDlgCoverflow.Color <> MedienBib.NewCoverFlow.Settings.DefaultColor);
+end;
+function TOptionsCompleteForm.MediaLibraryConfigurationChanged: Boolean;
+begin
+    result :=
+      fCategoriesChanged or fCollectionsChanged
+      or (MedienBib.MissingCoverMode <> teMissingCoverPreSorting(cbMissingCoverMode.ItemIndex))
+      or (OrganizerSettings.AlbumKeyMode <> teAlbumKeyMode(cbAlbumKeymode.ItemIndex))
+      or (OrganizerSettings.TrimCDFromDirectory <> cbIgnoreCDDirectories.Checked)
+      or (OrganizerSettings.SamplerSortingIgnoreReleaseYear <> cbSamplerSortingIgnoreReleaseYear.Checked)
+      or (OrganizerSettings.PreferAlbumArtist <> cbPreferAlbumArtist.Checked)
+      or (OrganizerSettings.IgnoreVariousAlbumArtists <> cpIgnoreAlbumArtistVariousArtists.Checked)
+      or (OrganizerSettings.CDNames.DelimitedText <> editCDNames.Text)
+      or (OrganizerSettings.ShowElementCount <> cbShowElementCount.Checked)
+      or (OrganizerSettings.ShowCoverArtOnAlbum <> cbShowCoverForAlbum.Checked)
+      or (OrganizerSettings.ShowPlaylistCategories <> cbLibConfigShowPlaylistCategories.Checked)
+      or (OrganizerSettings.ShowWebradioCategory <> cbLibConfigShowWebRadioCategory.Checked)
+      or (OrganizerSettings.PlaylistCaptionMode <> tePlaylistCaptionMode(cbPlaylistCaptionMode.ItemIndex))
+      or (OrganizerSettings.PlaylistSorting <> tePlaylistCollectionSorting(cbPlaylistSortMode.ItemIndex))
+      or (OrganizerSettings.PlaylistSortDirection <> teSortDirection(cbPlaylistSortDirection.ItemIndex));
+end;
+
 
 procedure TOptionsCompleteForm.FillCategoryComboBoxes;
 var
@@ -4090,6 +4589,7 @@ begin
   VSTCategories.Invalidate;
   fCategoriesChanged := True;
 end;
+
 
 procedure TOptionsCompleteForm.PopupCategoriesPopup(Sender: TObject);
 var
@@ -4425,6 +4925,41 @@ begin
   end;
 end;
 
+procedure TOptionsCompleteForm.VSTSortingsGetHint(Sender: TBaseVirtualTree;
+  Node: PVirtualNode; Column: TColumnIndex;
+  var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: string);
+var
+  rc: TRootCollection;
+  aConfig: TCollectionConfig;
+  level: Integer;
+begin
+  rc := Sender.GetNodeData<TRootCollection>(Node);
+  level := Sender.GetNodeLevel(Node);
+
+  if level = 0 then begin
+    HintText := Format(LibConfigHint_Root, [rc.Caption]);
+  end else
+  begin
+    aConfig := rc.CollectionConfigList[level-1];
+
+    HintText := Format(LibConfigHint_LayerMain, [rc.LevelCaption[level-1]])
+      + #13#10 + LibConfigHint_LayerSorting + #13#10;
+
+    if aConfig.PrimarySorting = csDefault then
+      HintText := HintText + _(CollectionSorting_Default)
+    else
+    begin
+      HintText := HintText + _(CollectionSortingNames[aConfig.PrimarySorting]);
+      if aConfig.SecondarySorting <> csDefault then begin
+        HintText := HintText + #13#10 + _(CollectionSortingNames[aConfig.SecondarySorting]);
+        if aConfig.TertiarySorting <> csDefault then
+          HintText := HintText + #13#10 + _(CollectionSortingNames[aConfig.TertiarySorting]);
+      end;
+    end;
+  end;
+
+end;
+
 procedure TOptionsCompleteForm.VSTSortingsGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
   var CellText: string);
@@ -4438,9 +4973,12 @@ begin
   if Level = 0 then
     CellText := rc.Caption
   else begin
-    CellText := rc.LevelCaption[level-1];
-    if rc.GetCollectionCompareType(level-1) <> csDefault then
-      CellText := CellText + ' (' + _(CollectionSortingNames[rc.GetCollectionCompareType(level-1)])  + ')';
+    if rc.GetCollectionCompareType(level-1) = csDefault then
+      CellText := rc.LevelCaption[level-1]
+    else
+      CellText := Format(LibConfigText_LayerSortedBy, [rc.LevelCaption[level-1], _(CollectionSortingNames[rc.GetCollectionCompareType(level-1)]) ])
+
+       //CellText + ' (' + _(CollectionSortingNames[rc.GetCollectionCompareType(level-1)])  + ')';
   end;
 end;
 

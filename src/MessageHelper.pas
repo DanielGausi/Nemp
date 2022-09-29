@@ -742,6 +742,7 @@ begin
             end;
             if MedienBib.ST_Ordnerlist.Count > 0 then
             begin
+                MedienBib.InitTargetCategory(Nil);
                 MedienBib.StatusBibUpdate := 1;
                 BlockGUI(1);
                 StartMediaLibraryFileSearch(True); // True: autoclose progress window
@@ -789,15 +790,8 @@ begin
             af := TAudioFile(aMsg.LParam);
             NempPlaylist.UnifyRating(af.Pfad, af.Rating, af.PlayCounter);
 
-
-            if assigned(FDetails)
-                and FDetails.Visible
-                and assigned(af)
-                and assigned(FDetails.CurrentAudioFile)
-                and (FDetails.CurrentAudioFile.Pfad = af.Pfad)
-            then
-                FDetails.ReloadTimer.Enabled := True;
-
+            if assigned(fDetails) then
+              fDetails.AudioFileEdited(af);
         end;
 
         MB_ErrorLog: begin
@@ -1030,25 +1024,6 @@ begin
                                           NempWebserver.QueriedPlaylistFilename := NempPlaylist.Playlist[idx].Pfad;
                                   end;
                               end;
-
-                                 {
-                                  if aMsg.LParam = -1 then
-                                  begin
-                                      if assigned(NempPlayer.MainAudioFile) then
-                                          NempWebserver.QueriedPlaylistFilename := NempPlayer.MainAudioFile.Pfad
-                                      else
-                                          NempWebserver.QueriedPlaylistFilename := '';
-                                  end else
-                                  begin
-                                      idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
-                                      if (idx > -1) then
-                                      begin
-                                          if NempPlaylist.Count > idx then
-                                              NempWebserver.QueriedPlaylistFilename := T---AudioFile(NempPlaylist.Playlist[idx]).Pfad
-                                          else NempWebserver.QueriedPlaylistFilename := '';
-                                      end else NempWebserver.QueriedPlaylistFilename := '';
-                                  end;
-                                  }
 
                               end;
 
@@ -1906,11 +1881,10 @@ function Handle_DropFilesForLibrary(FileList: TStringList; TargetCategory: TLibr
 var
   i: Integer;
   AudioFile, BibFile: TAudioFile;
-  aErr: tNempAudioError;
-  CategoryMask: Cardinal;
   CategoryChangeWanted: Boolean;
   lastFilename: String;
 begin
+  result := True;
   if Nemp_MainForm.NempSkin.NempPartyMode.DoBlockBibOperations then
   begin
       Nemp_MainForm.fDropManager.FinishDrag;
@@ -1951,11 +1925,7 @@ begin
               if not assigned(BibFile) then begin
                 AudioFile:=TAudioFile.Create;
                 AudioFile.Pfad := FileList[i];
-
-                // aErr := AudioFile.GetAudioData(FileList[i], GAD_Rating or MedienBib.IgnoreLyricsFlag);
                 AudioFile.Category := MedienBib.NewCategoryMask;
-                //HandleError(afa_DroppedFiles, AudioFile, aErr);
-                // MedienBib.CoverArtSearcher.InitCover(AudioFile, tm_VCL, INIT_COVER_DEFAULT);
                 MedienBib.UpdateList.Add(AudioFile);
               end
               else begin
@@ -1976,7 +1946,6 @@ begin
       // Die Dateien einpflegen, die evtl. einzeln in die Updatelist geaten sind
       // MedienBib.NewFilesUpdateBib;
       MedienBib.ScanNewFilesAndUpdateBib;
-
 end;
 
 function Handle_DropFilesForHeadPhone(FileList: TStringList): Boolean;
@@ -2064,7 +2033,6 @@ begin
                     MedienBib.PlaylistUpdateList.Add(newPlaylist);
                 end;
             end else
-
 
                 BibFile := MedienBib.GetAudioFileWithFilename(NewFile);
                 if not assigned(BibFile) then begin

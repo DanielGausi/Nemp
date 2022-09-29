@@ -89,6 +89,7 @@ type
             procedure fSetTrack      (aValue: UnicodeString); override;
             procedure fSetGenre      (aValue: UnicodeString); override;
             procedure fSetComment    (aValue: UnicodeString);
+            procedure fSetAlbumArtist (value: UnicodeString); override;
             // Getter
             function fGetTitle       : UnicodeString; override;
             function fGetArtist      : UnicodeString; override;
@@ -97,6 +98,7 @@ type
             function fGetTrack       : UnicodeString; override;
             function fGetGenre       : UnicodeString; override;
             function fGetComment     : UnicodeString;
+            function fGetAlbumArtist : UnicodeString; override;
 
             procedure fSetDisc      (aValue: UnicodeString);
             function fGetDisc       : UnicodeString;
@@ -270,6 +272,11 @@ begin
     result := MOOV.UdtaAtom.GetTextData('©alb');
 end;
 
+function TM4AFile.fGetAlbumArtist: UnicodeString;
+begin
+  result := MOOV.UdtaAtom.GetTextData('aART');
+end;
+
 function TM4AFile.fGetComment: UnicodeString;
 begin
     result := MOOV.UdtaAtom.GetTextData('©cmt');
@@ -304,6 +311,11 @@ end;
 procedure TM4AFile.fSetAlbum(aValue: UnicodeString);
 begin
     MOOV.UdtaAtom.SetTextData('©alb', aValue);
+end;
+
+procedure TM4AFile.fSetAlbumArtist(value: UnicodeString);
+begin
+  MOOV.UdtaAtom.SetTextData('aART', Value);
 end;
 
 procedure TM4AFile.fSetComment(aValue: UnicodeString);

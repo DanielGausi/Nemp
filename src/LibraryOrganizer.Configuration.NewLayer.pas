@@ -1,3 +1,33 @@
+{
+
+    Unit LibraryOrganizer.Configuration.NewLayer
+
+    - Form to add a new Layer to teh Library Configuration
+
+    ---------------------------------------------------------------
+    Nemp - Noch ein Mp3-Player
+    Copyright (C) 2005-2022, Daniel Gaussmann
+    http://www.gausi.de
+    mail@gausi.de
+    ---------------------------------------------------------------
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+
+    See license.txt for more information
+
+    ---------------------------------------------------------------
+}
 unit LibraryOrganizer.Configuration.NewLayer;
 
 interface
@@ -5,7 +35,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, math, NempAudioFiles,
-  LibraryOrganizer.Base, LibraryOrganizer.Files, Nemp_RessourceStrings;
+  LibraryOrganizer.Base, LibraryOrganizer.Files, Nemp_RessourceStrings, NempHelp;
 
 type
   teCategoryEditMode = (teNew, teEdit, teCoverflow);
@@ -84,6 +114,7 @@ begin
   BackUpComboBoxes(self);
   TranslateComponent (self);
   RestoreComboboxes(self);
+  HelpContext := HELP_Treeview;
 end;
 
 procedure TFormNewLayer.BtnOKClick(Sender: TObject);
@@ -133,9 +164,9 @@ procedure TFormNewLayer.FillSortingsSelection(aCollectionType: teCollectionConte
 
   procedure AddSorting(str: String; obj: TObject);
   begin
-    cbPrimarySorting.Items.AddObject(str, obj);
-    cbSecondarySorting.Items.AddObject(str, obj);
-    cbTertiarySorting.Items.AddObject(str, obj);
+    cbPrimarySorting.Items.AddObject(_(str), obj);
+    cbSecondarySorting.Items.AddObject(_(str), obj);
+    cbTertiarySorting.Items.AddObject(_(str), obj);
   end;
 
 begin

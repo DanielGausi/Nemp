@@ -262,6 +262,7 @@ type
             procedure fSetYear   (Value: UnicodeString); override;
             procedure fSetTrack  (Value: UnicodeString); override;
             procedure fSetGenre  (Value: UnicodeString); override;
+            procedure fSetAlbumArtist (value: UnicodeString); override;
 
             function fGetTitle   : UnicodeString; override;
             function fGetArtist  : UnicodeString; override;
@@ -269,6 +270,7 @@ type
             function fGetYear    : UnicodeString; override;
             function fGetTrack   : UnicodeString; override;
             function fGetGenre   : UnicodeString; override;
+            function fGetAlbumArtist : UnicodeString; override;
 
         public
             property UsePadding: Boolean read fUsePadding write fUsePadding;
@@ -699,6 +701,12 @@ begin
     ValidateFlacCommentsBlock;
     result := fFlacCommentsBlock.Comments.Album;
 end;
+function TFlacFile.fGetAlbumArtist: UnicodeString;
+begin
+  ValidateFlacCommentsBlock;
+  result := fFlacCommentsBlock.Comments.AlbumArtist;
+end;
+
 function TFlacFile.fGetArtist: UnicodeString;
 begin
     ValidateFlacCommentsBlock;
@@ -774,6 +782,11 @@ procedure TFlacFile.fSetAlbum(value: UnicodeString);
 begin
     ValidateFlacCommentsBlock;
     fFlacCommentsBlock.Comments.Album := value;
+end;
+procedure TFlacFile.fSetAlbumArtist(value: UnicodeString);
+begin
+  ValidateFlacCommentsBlock;
+  fFlacCommentsBlock.Comments.AlbumArtist := value;
 end;
 procedure TFlacFile.fSetArtist(value: UnicodeString);
 begin

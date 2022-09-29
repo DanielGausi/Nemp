@@ -1564,7 +1564,6 @@ end;
 // Hints by https://www.delphipraxis.net/1098737-post7.html
 procedure TCloudView.CMHintShow(var Message: TCMHintShow);
 var
-   HintCollection: TAudioCollection;
    HintPaintTag: TPaintTag;
    MinHintPosY: Integer;
    HintInfo: PHintInfo;

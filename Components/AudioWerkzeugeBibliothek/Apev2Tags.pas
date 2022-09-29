@@ -117,6 +117,7 @@ type
             function fGetLanguage         : UnicodeString;
             function fGetBibliography     : UnicodeString;
             function fGetIntroplay        : UnicodeString;
+            function fGetAlbumArtist      : UnicodeString;
 
             procedure fSetComment         (aValue: UnicodeString);
             procedure fSetSubTitle        (aValue: UnicodeString);
@@ -141,6 +142,7 @@ type
             procedure fSetLanguage        (aValue: UnicodeString);
             procedure fSetBibliography    (aValue: UnicodeString);
             procedure fSetIntroplay       (aValue: UnicodeString);
+            procedure fSetAlbumArtist     (aValue: UnicodeString);
 
             function fComputeNewTagSize: Integer;  // Used to get the new ApeTag size before writing (EXcluding the Header)
             function fGetTagSize: Cardinal;        // The Size of the ApeTag in the File. Including Header AND Footer.
@@ -210,6 +212,8 @@ type
             property Language         : UnicodeString read fGetLanguage          write fSetLanguage         ;
             property Bibliography     : UnicodeString read fGetBibliography      write fSetBibliography     ;
             property Introplay        : UnicodeString read fGetIntroplay         write fSetIntroplay        ;
+            // Additional properties
+            property AlbumArtist      : UnicodeString read fGetAlbumArtist       write fSetAlbumArtist      ;
 
             constructor Create;
             destructor Destroy; override;
@@ -380,6 +384,11 @@ procedure TApeTag.fSetAlbum(aValue: UnicodeString);
 begin
     SetValueByKey('Album', aValue);
 end;
+procedure TApeTag.fSetAlbumArtist(aValue: UnicodeString);
+begin
+  SetValueByKey('albumartist', aValue);
+end;
+
 procedure TApeTag.fSetArtist(aValue: UnicodeString);
 begin
     SetValueByKey('Artist', aValue);
@@ -514,6 +523,10 @@ end;
 function TApeTag.fGetAlbum: UnicodeString;
 begin
     result := GetValueByKey('Album');
+end;
+function TApeTag.fGetAlbumArtist: UnicodeString;
+begin
+  result := GetValueByKey('albumartist');
 end;
 function TApeTag.fGetArtist: UnicodeString;
 begin

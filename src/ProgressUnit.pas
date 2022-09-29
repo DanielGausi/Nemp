@@ -118,13 +118,14 @@ begin
                   ST_Medienliste.Break;
                   Nemp_MainForm.KeepOnWithLibraryProcess := False;
               end;
+              BtnCancel.Tag := BTN_TAG_CLOSE;
         end;
     end;
 end;
 
 procedure TProgressForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
-    CanClose := (self.fCurrentVisibleJobType = jt_Idle);
+    CanClose := (self.fCurrentVisibleJobType = jt_Idle) or (BtnCancel.Tag = BTN_TAG_CLOSE);
 end;
 
 procedure TProgressForm.FormCreate(Sender: TObject);

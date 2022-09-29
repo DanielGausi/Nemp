@@ -37,7 +37,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Spin, CheckLst, ExtCtrls, ComCtrls,
   MedienBibliothekClass, Nemp_ConstantsAndTypes, Nemp_RessourceStrings,
-  ID3GenreList, BibSearchClass, gnugettext;
+  ID3GenreList, BibSearchClass, gnugettext, NempHelp;
 
 type
   TFormBibSearch = class(TForm)
@@ -125,6 +125,7 @@ begin
     BackUpComboBoxes(self);
     TranslateComponent (self);
     RestoreComboboxes(self);
+    HelpContext := HELP_SearchMediaLibrary;
 
     cbGenres.Items.Clear;
     // Genres: StringList defined in MP3FileUtils

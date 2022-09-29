@@ -141,6 +141,7 @@ type
     function GetStandardLyrics: UnicodeString;
     function GetComposer: UnicodeString;
     function GetOriginalArtist: UnicodeString;
+    function GetAlbumArtist: UnicodeString;
     function GetCopyright: UnicodeString;
     function GetEncodedBy: UnicodeString;
     function GetLanguages: UnicodeString;
@@ -166,6 +167,7 @@ type
     procedure SetStandardLyrics(Value: UnicodeString);
     procedure SetComposer(Value: UnicodeString);
     procedure SetOriginalArtist(Value: UnicodeString);
+    procedure SetAlbumArtist(Value: UnicodeString);
     procedure SetCopyright(Value: UnicodeString);
     procedure SetEncodedBy(Value: UnicodeString);
     procedure SetLanguages(Value: UnicodeString);
@@ -219,6 +221,7 @@ type
 
     property Composer:         UnicodeString read  GetComposer           write  SetComposer        ;
     property OriginalArtist:   UnicodeString read  GetOriginalArtist     write  SetOriginalArtist  ;
+    property AlbumArtist:      UnicodeString read  GetAlbumArtist        write  SetAlbumArtist     ;
     property Copyright:        UnicodeString read  GetCopyright          write  SetCopyright       ;
     property EncodedBy:        UnicodeString read  GetEncodedBy          write  SetEncodedBy       ;
     property Languages:        UnicodeString read  GetLanguages          write  SetLanguages       ;
@@ -1897,6 +1900,11 @@ procedure TID3v2Tag.SetAlbum(Value: UnicodeString);
 begin
   SetText(IDv2_ALBUM, Value);
 end;
+procedure TID3v2Tag.SetAlbumArtist(Value: UnicodeString);
+begin
+  SetText(IDv2_BANDACCOMPANIMENT, Value);
+end;
+
 function TID3v2Tag.BuildID3v2Genre(value: UnicodeString): UnicodeString;
 begin
   // (<Index>)<Name>
@@ -2010,6 +2018,11 @@ function TID3v2Tag.GetAlbum: UnicodeString;
 begin
   result := GetText(IDv2_ALBUM);
 end;
+function TID3v2Tag.GetAlbumArtist: UnicodeString;
+begin
+  result := GetText(IDv2_BANDACCOMPANIMENT);
+end;
+
 function TID3v2Tag.ParseID3v2Genre(value: UnicodeString): UnicodeString;
 var posauf, poszu: integer;
   GenreID:Byte;

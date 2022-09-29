@@ -11,7 +11,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2019, Daniel Gaussmann
+    Copyright (C) 2005-2022, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -51,8 +51,6 @@ var Sort_Pfad_asc,
     Sort_AlbumTrack_asc           ,
     Sort_Jahr_asc                 ,
     Sort_Genre_asc                ,
-    //Sort_String1String2Titel_asc  ,
-    //Sort_String2String1Titel_asc  ,
     Sort_CoverID                  : IComparer<TAudioFile>;
 
 function binaersuche(Liste: TAudioFileList; FilePath, FileName: UnicodeString; l,r:integer):integer;
@@ -84,6 +82,8 @@ procedure SavePlaylistToNPL(aFilename: UnicodeString; SourceList: TAudioFileList
 
 
 function AFCompareArtist(a1,a2: tAudioFile): Integer;
+function AFCompareAlbumArtist(a1,a2: tAudioFile): Integer;
+function AFCompareComposer(a1,a2: tAudioFile): Integer;
 function AFCompareTitle(a1,a2: tAudioFile): Integer;
 function AFCompareAlbum(a1,a2: tAudioFile): Integer;
 function AFCompareComment(a1,a2: tAudioFile): Integer;
@@ -132,7 +132,14 @@ function AFCompareArtist(a1,a2: tAudioFile): Integer;
 begin
     result := AnsiCompareText_Nemp(a1.Artist, a2.Artist);
 end;
-
+function AFCompareAlbumArtist(a1,a2: tAudioFile): Integer;
+begin
+    result := AnsiCompareText_Nemp(a1.AlbumArtist, a2.AlbumArtist);
+end;
+function AFCompareComposer(a1,a2: tAudioFile): Integer;
+begin
+  result := AnsiCompareText_Nemp(a1.Composer, a2.Composer);
+end;
 function AFCompareTitle(a1,a2: tAudioFile): Integer;
 begin
     result := AnsiCompareText_Nemp(a1.Titel, a2.Titel);
@@ -765,7 +772,6 @@ begin
                     if quote1 < quote2 then
                     begin
                         tmp := copy(myList[i], quote1+1, quote2-quote1-1);
-                        //Showmessage(tmp);
                         s := (tmp);
 
                         aAudiofile := TPlaylistfile.Create;
@@ -777,7 +783,6 @@ begin
                                 aAudioFile.FileIsPresent := True;
                                 if AutoScan then
                                 begin
-                                    //SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
                                     SynchNewFileWithBib(aAudioFile, False);
                                     aAudiofile.GetCueList;
                                 end else
@@ -995,15 +1000,13 @@ Sort_Jahr_asc := TComparer<TAudioFile>.Construct( function (const item1,item2: T
 begin
     result := AnsiCompareText_Nemp(item1.Year,item2.Year);
     if result = 0 then
-      result := Sortieren_ArtistTitel_asc(item1,item2); //Sortieren_ArtistAlbumTitel_asc
+      result := Sortieren_ArtistTitel_asc(item1,item2);
 end);
 
 Sort_Genre_asc := TComparer<TAudioFile>.Construct( function(const item1,item2: TAudioFile): Integer
 begin
     result := AnsiCompareText_Nemp(item1.Genre, item2.Genre)
 end);
-
-
 
 Sort_CoverID := TComparer<TAudioFile>.Construct( function (const item1,item2: TAudioFile): Integer
 begin

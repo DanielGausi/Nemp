@@ -1,10 +1,41 @@
+{
+
+    Unit LibraryOrganizer.Base
+
+    - Basic classes for the new (2022) MediaLibrary concept with Categories
+      and different Layers in the TreeView
+
+    ---------------------------------------------------------------
+    Nemp - Noch ein Mp3-Player
+    Copyright (C) 2005-2022, Daniel Gaussmann
+    http://www.gausi.de
+    mail@gausi.de
+    ---------------------------------------------------------------
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+
+    See license.txt for more information
+
+    ---------------------------------------------------------------
+}
 unit LibraryOrganizer.Base;
 
 interface
 
 uses
   Windows, System.Classes, System.SysUtils, System.Generics.Collections, System.Generics.Defaults,
-  System.Math, DriveRepairTools,        dialogs,
+  System.Math, DriveRepairTools,
   NempAudioFiles, NempFileUtils, Nemp_ConstantsAndTypes, Nemp_RessourceStrings;
 
 resourcestring
@@ -41,7 +72,7 @@ const
   Layer1,sort+,sort+,sort-;Layer2,sort+;Layer3,sort+,sort-,sort+
 }
 
-  cDefaultCategoryConfigStrings: Array [0..1] of String = ('c,0+;d,0+', 'e,0+');  // Interpret-Alben und Verzeichnis-Struktur
+  cDefaultCategoryConfigStrings: Array [0..2] of String = ('d,2+,4-,0+', 'c,0+;d,0+', 'e,0+');  // Albums, Interpret-Alben und Verzeichnis-Struktur
   cDefaultCategoryConfigStr = 'e,0+'; // Verzeichnis-Struktur
   cDefaultCoverFlowConfigStr  = 'd,2+,4-';  // Alben sortiert nach Interpret + Erscheinungsjahr
 
@@ -139,7 +170,7 @@ const
   rcTagGloud = 'TagCloud';
   rcCoverID = 'CoverID';
 
-  CollectionSorting_Default  = 'Name';
+  CollectionSorting_Default  = 'Default';
   CollectionSorting_ByAlbum  = 'Album';
   CollectionSorting_ByArtist  = 'Artist';
   CollectionSorting_ByCount  = 'Count';
@@ -195,6 +226,11 @@ type
       // fShowCategoryCount: Boolean;
       fShowElementCount: Boolean;
       fShowCoverArtOnAlbum: Boolean;
+
+      fSamplerSortingIgnoreReleaseYear: Boolean;
+      fPreferAlbumArtist: Boolean;
+      fIgnoreVariousAlbumArtists: Boolean;
+
       // fUseNewCategory: Boolean;
       // fUseSmartAdd: Boolean;
       fDefaultRootCollectionConfig: TCollectionConfigList;
@@ -227,6 +263,9 @@ type
       // property UseNewCategory       : Boolean read fUseNewCategory write fUseNewCategory;
       // property UseSmartAdd          : Boolean read fUseSmartAdd write fUseSmartAdd;
       property AlbumKeyMode: teAlbumKeyMode read fAlbumKeyMode write fAlbumKeyMode;
+      property SamplerSortingIgnoreReleaseYear: Boolean read fSamplerSortingIgnoreReleaseYear write fSamplerSortingIgnoreReleaseYear;
+      property PreferAlbumArtist: Boolean read fPreferAlbumArtist write fPreferAlbumArtist;
+      property IgnoreVariousAlbumArtists: Boolean read fIgnoreVariousAlbumArtists write fIgnoreVariousAlbumArtists;
       property PlaylistCaptionMode: tePlaylistCaptionMode read fPlaylistCaptionMode write fPlaylistCaptionMode;
       property PlaylistSorting: tePlaylistCollectionSorting read fPlaylistSorting write fPlaylistSorting;
       property PlaylistSortDirection: teSortDirection read fPlaylistSortDirection write fPlaylistSortDirection;
@@ -741,6 +780,9 @@ var
   i, iRC: Integer;
 begin
   fAlbumKeyMode        := Source.fAlbumKeyMode;
+  fSamplerSortingIgnoreReleaseYear := Source.SamplerSortingIgnoreReleaseYear;
+  fPreferAlbumArtist := Source.fPreferAlbumArtist;
+  fIgnoreVariousAlbumArtists := Source.fIgnoreVariousAlbumArtists;
   fPlaylistCaptionMode := Source.fPlaylistCaptionMode;
   fPlaylistSorting       := Source.fPlaylistSorting;
   fPlaylistSortDirection := Source.fPlaylistSortDirection;
@@ -901,7 +943,7 @@ var
   categoryString, defStr: String;
   i, categoryCount: Integer;
 begin
-  categoryCount := NempSettingsManager.ReadInteger('LibraryOrganizer', 'RootCount', 2);
+  categoryCount := NempSettingsManager.ReadInteger('LibraryOrganizer', 'RootCount', 3);
   if categoryCount = 0 then
     categoryCount := 1;
   if categoryCount > 10 then
@@ -911,7 +953,7 @@ begin
   SetLength(fCategoryConfig, categoryCount);
   for i := 0 to categoryCount-1 do begin
     fCategoryConfig[i] := TCollectionConfigList.Create;
-    if i <= 1 then
+    if i <= 2 then
       defStr := cDefaultCategoryConfigStrings[i]
     else
       defStr := cDefaultCategoryConfigStr;
@@ -926,6 +968,9 @@ begin
   CheckCoverFlowConfig;
 
   SetAlbumKeyMode(NempSettingsManager.ReadInteger('LibraryOrganizer', 'AlbumKeyMode', Integer(akAlbumDirectory)));
+  fSamplerSortingIgnoreReleaseYear := NempSettingsManager.ReadBool('LibraryOrganizer', 'SamplerSortingIgnoreReleaseYear', True);
+  fPreferAlbumArtist := NempSettingsManager.ReadBool('LibraryOrganizer', 'PreferAlbumArtist', True);
+  fIgnoreVariousAlbumArtists := NempSettingsManager.ReadBool('LibraryOrganizer', 'IgnoreVariousAlbumArtists', True);
   SetPlaylistCaptionMode(NempSettingsManager.ReadInteger('LibraryOrganizer', 'PlaylistCaptionMode', Integer(pcmFilename)));
   SetPlaylistSorting(NempSettingsManager.ReadInteger('LibraryOrganizer', 'PlaylistSorting', Integer(pcsFilename)));
   SetPlaylistDirection(NempSettingsManager.ReadInteger('LibraryOrganizer', 'PlaylistSortDirection', Integer(sd_Ascending)));
@@ -956,6 +1001,9 @@ begin
   NempSettingsManager.WriteString('LibraryOrganizer', 'CoverflowConfig', RootConfigToIniStr(fCoverFlowRootCollectionConfig) );
 
   NempSettingsManager.WriteInteger('LibraryOrganizer', 'AlbumKeyMode', Integer(fAlbumKeyMode));
+  NempSettingsManager.WriteBool('LibraryOrganizer', 'SamplerSortingIgnoreReleaseYear', fSamplerSortingIgnoreReleaseYear);
+  NempSettingsManager.WriteBool('LibraryOrganizer', 'PreferAlbumArtist', fPreferAlbumArtist);
+  NempSettingsManager.WriteBool('LibraryOrganizer', 'IgnoreVariousAlbumArtists', fIgnoreVariousAlbumArtists);
   NempSettingsManager.WriteInteger('LibraryOrganizer', 'PlaylistCaptionMode', Integer(fPlaylistCaptionMode));
   NempSettingsManager.WriteInteger('LibraryOrganizer', 'PlaylistSorting', Integer(fPlaylistSorting));
   NempSettingsManager.WriteInteger('LibraryOrganizer', 'PlaylistSortDirection', Integer(fPlaylistSortDirection));

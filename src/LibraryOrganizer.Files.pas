@@ -1,3 +1,34 @@
+{
+
+    Unit LibraryOrganizer.Files
+
+    - File-Class for the new (2022) MediaLibrary concept with Categories
+      and different Layers in the TreeView
+
+    ---------------------------------------------------------------
+    Nemp - Noch ein Mp3-Player
+    Copyright (C) 2005-2022, Daniel Gaussmann
+    http://www.gausi.de
+    mail@gausi.de
+    ---------------------------------------------------------------
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+
+    See license.txt for more information
+
+    ---------------------------------------------------------------
+}
 unit LibraryOrganizer.Files;
 
 interface
@@ -82,6 +113,9 @@ type
       // to distinguish automatically created Tags and LastFM-Tags in the TagCloud
       fIsAutoTag: Boolean;
 
+      fValidArtist: Boolean;
+      fValidAlbum: Boolean;
+
       function GenerateDirectoryAlbumKey(aAudioFile: TAudioFile): String;
       function GenerateArtistKey(aAudioFile: TAudioFile): String;
       //function AdjustedAlbum(aAudioFile: TAudioFile): String;
@@ -107,6 +141,7 @@ type
       procedure AddForTagCloud(aAudioFile: TAudioFile);
       procedure AddByPath(aAudioFile: TAudioFile);
       procedure AddByCoverID(aAudioFile: TAudioFile);
+      function GetAlbumArtistOrArtist(af: TAudioFile): String;
 
       function SearchAudioFileByKey (aKey: String; aAudioFile: TAudioFile; CheckExist: Boolean): TAudioFileCollection;
       function SearchAudioFileByPath (aAudioFile: TAudioFile; CheckExist: Boolean): TAudioFileCollection;
@@ -153,6 +188,9 @@ type
       property FileAge : TDateTime   read fFileAge;
       property MissingCoverMode: teMissingCoverPreSorting read fMissingCoverMode write fMissingCoverMode;
       property IsAutoTag: Boolean read fIsAutoTag write fIsAutoTag;
+      // The "Valid" properties should only be called directly after a call of "Analyse"
+      property ValidArtist: Boolean read fValidArtist;
+      property ValidAlbum: Boolean  read fValidAlbum;
 
       // CategoryCaption: Used for the TagCloud. The RootCollection should show the Category there
       property CategoryCaption: String read GetCategoryCaption;
@@ -258,11 +296,9 @@ type
       procedure AddSubCollectionType(aType: teCollectionContent; aSortingType: teCollectionSorting; aDirection: teSortDirection) overload;
       procedure AddSubCollectionType(aConfig: TCollectionConfig); overload;
 
-      //procedure InsertSubCollectionType(Index: Integer; aType: teCollectionContent; aSortingType: teCollectionSorting); overload; deprecated;
       procedure InsertSubCollectionType(Index: Integer; aConfig: TCollectionConfig); overload;
 
       procedure MoveSubCollectionType(curIndex, newIndex: Integer);
-      //procedure ChangeSubCollectionType(Index: Integer; aType: teCollectionContent; aSortingType: teCollectionSorting);
       procedure ChangeSubCollectionType(Index: Integer; aConfig: TCollectionConfig);
 
       procedure ChangeSubCollectionSorting(Index: Integer; newSortingType: teCollectionSorting;
@@ -282,13 +318,10 @@ type
   TLibraryFileCategory = class(TLibraryCategory)
     protected
       function GetItemCount: Integer; override;
-      // function AddRootCollection(const Properties: Array of teCollectionContent; const Sortings: Array of teCollectionSorting): TRootCollection; overload;
     public
       constructor Create;
       destructor Destroy; override;
 
-      // creates a new RootCollection, adds it to the internal list and returns.
-      //function AddRootCollection: TRootCollection;
       procedure RememberLastCollection(aCollection: TAudioCollection); override;
       function FindLastCollectionAgain: TAudioCollection;  override;
       function FindLastCollectionAgainTagCloud(var LastKeyFound, ExpandLastKey: Boolean): TAudioCollection;
@@ -328,16 +361,13 @@ uses
 
 type
   TKeyCache = record
-    //RawAlbum,
     RawDirectory: String;
-    //ProcessedAlbum,
     ProcessedDirectory: String;
   end;
 
 var
   fLibraryFormatSettings: TFormatSettings;
   KeyCache: TKeyCache;
-
 
 const
   NempCollectionComparer: TCollectionCompareArray = (
@@ -358,45 +388,31 @@ end;
 function CompareCollection_Album(const item1,item2: TAudioFileCollection): Integer;
 begin
   result := AnsiCompareText_NempIgnoreCase(item1.fAlbum, item2.fAlbum);
-  //if result = 0 then
-  //  result := AnsiCompareText_NempIgnoreCase(item1.fArtist, item2.fArtist);
 end;
 
 function CompareCollection_Artist(const item1,item2: TAudioFileCollection): Integer;
 begin
   result := AnsiCompareText_NempIgnoreCase(item1.fArtist, item2.fArtist);
-  //if result = 0 then
-  //  result := AnsiCompareText_NempIgnoreCase(item1.fAlbum, item2.fAlbum);
 end;
 
 function CompareCollection_Count(const item1,item2: TAudioFileCollection): Integer;
 begin
   result := CompareValue(item1.Count, item2.Count); // reverse order
-  //if result = 0 then
-  //  result := AnsiCompareText_NempIgnoreCase(item1.fKey, item2.fKey);
 end;
 
 function CompareCollection_Year(const item1,item2: TAudioFileCollection): Integer;
 begin
   result := CompareValue(item1.fYear, item2.fYear); // reverse order
-  //if result = 0 then
-  //  result := AnsiCompareText_NempIgnoreCase(item1.fKey, item2.fKey);
 end;
 
 function CompareCollection_FileAge(const item1,item2: TAudioFileCollection): Integer;
 begin
   result := CompareValue(item1.fFileAge, item2.fFileAge); // reverse order
-  //if result = 0 then
-  //  result := AnsiCompareText_NempIgnoreCase(item1.fKey, item2.fKey);
 end;
 
 function CompareCollection_Genre(const item1,item2: TAudioFileCollection): Integer;
 begin
   result := AnsiCompareText_NempIgnoreCase(item1.Genre, item2.Genre);
-  //if result = 0 then
-  //  result := AnsiCompareText_NempIgnoreCase(item1.fArtist, item2.fArtist);
-  //if result = 0 then
-  //  result := AnsiCompareText_NempIgnoreCase(item1.fAlbum, item2.fAlbum);
 end;
 
 function CompareCollection_Directory(const item1,item2: TAudioFileCollection): Integer;
@@ -476,32 +492,20 @@ begin
         // note: aLevel >= 1 here, and therefore aLevel-1 >= 0
         fConfig := aRoot.GetSubCollectionConfig(aLevel-1);
         fChildConfig := aRoot.GetSubCollectionConfig(aLevel);
-        // fContent := aRoot.GetSubCollectionType(aLevel-1);
-        // fChildContent := aRoot.GetSubCollectionType(aLevel);
-        // fChildSorting := aRoot.GetCollectionCompareType(aLevel);
       end;
       cmDirectory: begin
         fConfig := cDirectoryCollectionConfig;
         fChildConfig := cDirectoryCollectionConfig;
-        // fContent    := ccDirectory;
-        // fChildContent := ccDirectory;
-        // fChildSorting := csDefault;
       end;
       cmCloud: begin
         fConfig := cTagCloudCollectionConfig;
         fChildConfig := cEmptyCollectionConfig;
-        // fContent    := ccTagCloud;
-        // fChildContent := ccNone;
-        // fChildSorting := csDefault;
       end;
     end;
   end else
   begin
     fConfig := cEmptyCollectionConfig;
     fChildConfig := cEmptyCollectionConfig;
-    // fContent    := ccNone;
-    // fChildContent := ccNone;
-    // fChildSorting := csDefault;
   end;
   fFileList := TAudioFileList.Create(False);
   fLastAddedAudioFile := Nil;
@@ -640,19 +644,33 @@ end;
 
 function TAudioFileCollection.BuildCaption(IncludeCount: Boolean): String;
 var
-  mainValue: String;
+  mainValue, displayArtist, displayAlbum: String;
+
+  procedure GetDisplayValues;
+  begin
+    if ValidArtist then
+      displayArtist := self.fArtist
+    else
+      displayArtist := _(CoverFlowText_VariousArtists);
+    if ValidAlbum then
+      displayAlbum := self.fAlbum
+    else
+      displayAlbum := _(CoverFlowText_UnkownCompilation)
+  end;
+
 begin
   case self.Content of
     ccNone: mainValue := '<Error>'; //
     ccRoot: mainValue := ''; // should be handled by TRootCollection
-    ccArtist: mainValue := self.fArtist;
+    ccArtist:  mainValue := self.fArtist;
     ccAlbum: begin
+      GetDisplayValues;
       if assigned(fParent)
         and (fParent.ChildSorting = csArtist)
       then
-        mainValue := Format('%s - %s', [fArtist, fAlbum])
+        mainValue := Format('%s - %s', [displayArtist, displayAlbum])
       else begin
-        mainValue := Format('%s - %s', [fArtist, fAlbum]); //fKeyData.Album;    // todo: empty string
+        mainValue := Format('%s - %s', [displayArtist, displayAlbum]); //fKeyData.Album;
       end;
     end;
     ccDirectory: mainValue := fKey; //  .Directory;
@@ -704,13 +722,12 @@ var
   i, maxIdx: Integer;
   aStringlist: TStringList;
   mismatchPos: Integer;
-  str1: String;
+  str1, tmpArtist : String;
 
 begin
   // for a common "Artist", we should not work with collections.
   // On some albums, there are a lot tracks from "main artist feat. other artist"
   // or something like that. That should be recognized as "main artist"
-
   if fFileList.Count <= 50 then
     maxIdx := fFileList.Count-1
   else
@@ -718,16 +735,22 @@ begin
 
   aStringlist := TStringList.Create;
   try
-    for i := 0 to maxIdx do
-      if (fFileList[i].Artist <> '') then
-        aStringlist.Add(fFileList[i].Artist);
+    for i := 0 to maxIdx do begin
+      tmpArtist := GetAlbumArtistOrArtist(fFileList[i]);
+      if (tmpArtist <> '') then
+        aStringlist.Add(tmpArtist);
+    end;
 
     mismatchPos := 0;
     str1 := GetCommonString(aStringlist, 0, mismatchPos);  // error tolerance: 0
-    if str1 = '' then
-      fArtist := CoverFlowText_VariousArtists
-    else
-        fArtist := str1;
+    if str1 = '' then begin
+      fArtist := CoverFlowText_VariousArtists;
+      fValidArtist := False;
+    end
+    else begin
+      fArtist := str1;
+      fValidArtist := True;
+    end;
   finally
     aStringList.Free;
   end;
@@ -753,14 +776,20 @@ begin
 
     mismatchPos := 0;
     str1 := GetCommonString(aStringlist, 1, mismatchPos);
-    if str1 = '' then
-      fAlbum := '' //CoverFlowText_UnkownCompilation // 'Unknown compilation';
+    if str1 = '' then begin
+      fAlbum := ''; // CoverFlowText_UnkownCompilation; // 'Unknown compilation';
+      fValidAlbum := False;
+    end
     else
     begin
-      if mismatchPos <= length(str1) Div 2 +1 then
-        fAlbum := str1
-      else
+      if mismatchPos <= length(str1) Div 2 +1 then begin
+        fAlbum := str1;
+        fValidAlbum := True;
+      end
+      else begin
         fAlbum := copy(str1, 1, mismatchPos-1) + ' ... ';
+        fValidAlbum := True;
+      end;
     end;
   finally
     aStringList.Free;
@@ -960,9 +989,21 @@ begin
   fNeedAnalysis := False;
 end;
 
+function TAudioFileCollection.GetAlbumArtistOrArtist(af: TAudioFile): String;
+begin
+  if NempOrganizerSettings.PreferAlbumArtist then begin
+    result := af.AlbumArtist;
+    if (result = '')
+      or (NempOrganizerSettings.IgnoreVariousAlbumArtists and (AnsiSameText(result, 'Various Artists')))
+    then
+      result := af.Artist;
+  end else
+    result := af.Artist;
+end;
+
 function TAudioFileCollection.GenerateArtistKey(aAudioFile: TAudioFile): String;
 begin
-  result := AnsiLowerCase(aAudioFile.Artist);
+  result := AnsiLowerCase(GetAlbumArtistOrArtist(aAudioFile));
 end;
 
 function TAudioFileCollection.GenerateDirectoryAlbumKey(aAudioFile: TAudioFile): String;
@@ -1066,7 +1107,7 @@ begin
   // todo: different key depending on settings (e.g. include Artist and/or Directory, the latter stripped by stuff like "CD 1")
   case NempOrganizerSettings.AlbumKeyMode of
     akAlbumOnly: result := AnsiLowerCase(aAudioFile.Album);
-    akAlbumArtist: result := Format('%s||%s', [AnsiLowerCase(aAudioFile.Album), AnsiLowerCase(aAudioFile.Artist)]);
+    akAlbumArtist: result := Format('%s||%s', [AnsiLowerCase(aAudioFile.Album), GenerateArtistKey(aAudioFile)]); //  AnsiLowerCase(aAudioFile.Artist)]
     akAlbumDirectory: result := Format('%s||%s', [AnsiLowerCase(aAudioFile.Album), GenerateDirectoryAlbumKey(aAudioFile)]);
     akDirectoryOnly: result := GenerateDirectoryAlbumKey(aAudioFile);
     akCoverID: result := aAudioFile.CoverID;
@@ -1206,7 +1247,7 @@ begin
   aKey := GenerateArtistKey(aAudioFile);
   if not TryGetCollection(aKey, aCollection) then begin
     aCollection := InitNewCollection(aKey);
-    aCollection.fArtist := aAudioFile.Artist;
+    aCollection.fArtist := GetAlbumArtistOrArtist(aAudioFile);
   end;
   aCollection.AddAudioFile(aAudioFile);
 end;
@@ -1599,6 +1640,7 @@ begin
 end;
 
 function TAudioFileCollection.CompareCollection_Main(const item1,item2: TAudioFileCollection): Integer;
+var actSorting: teCollectionSorting;
 begin
   result := 0;
   case fChildConfig.SortDirection1 of
@@ -1606,20 +1648,40 @@ begin
     sd_Descending : result := NempCollectionComparer[fChildConfig.PrimarySorting](item2, item1);
   end;
 
-  if result = 0 then
-    case fChildConfig.SortDirection2 of
-      sd_Ascending  : result := NempCollectionComparer[fChildConfig.SecondarySorting](item1, item2);
-      sd_Descending : result := NempCollectionComparer[fChildConfig.SecondarySorting](item2, item1);
-    end;
+  if result = 0 then begin
+      if (fChildConfig.PrimarySorting = csArtist)
+        and (fChildConfig.SecondarySorting = csYear)
+        and (not Item1.ValidArtist)
+        and (NempOrganizerSettings.SamplerSortingIgnoreReleaseYear)
+      then
+        actSorting := csAlbum
+      else
+        actSorting := fChildConfig.SecondarySorting;
 
-  if result = 0 then
-    case fChildConfig.SortDirection3 of
-      sd_Ascending  : result := NempCollectionComparer[fChildConfig.TertiarySorting](item1, item2);
-      sd_Descending : result := NempCollectionComparer[fChildConfig.TertiarySorting](item2, item1);
-    end;
+      case fChildConfig.SortDirection2 of
+        sd_Ascending  : result := NempCollectionComparer[actSorting](item1, item2);
+        sd_Descending : result := NempCollectionComparer[actSorting](item2, item1);
+      end;
 
-  if result = 0 then
-    result := AnsiCompareText_NempIgnoreCase(item1.fKey, item2.fKey);
+      if result = 0 then begin
+          if (fChildConfig.SecondarySorting = csArtist)
+            and (fChildConfig.TertiarySorting = csYear)
+            and (not Item1.ValidArtist)
+            and (NempOrganizerSettings.SamplerSortingIgnoreReleaseYear)
+          then
+            actSorting := csAlbum
+          else
+            actSorting := fChildConfig.TertiarySorting;
+
+          case fChildConfig.SortDirection3 of
+            sd_Ascending  : result := NempCollectionComparer[actSorting](item1, item2);
+            sd_Descending : result := NempCollectionComparer[actSorting](item2, item1);
+          end;
+
+          if result = 0 then
+            result := AnsiCompareText_NempIgnoreCase(item1.fKey, item2.fKey);
+        end;
+  end;
 end;
 
 procedure TAudioFileCollection.Sort(doRecursive: Boolean = True);
@@ -1945,18 +2007,6 @@ begin
   fChildConfig := fCollectionConfigList[0];
   AddCaptionConfig(aConfig);
 end;
-
-(*procedure TRootCollection.InsertSubCollectionType(Index: Integer; aType: teCollectionContent; aSortingType: teCollectionSorting);
-var
-  newConfig: TCollectionConfig;
-begin
-  newConfig := cEmptyCollectionConfig;
-  newConfig.Content := aType;
-  newConfig.PrimarySorting := aSortingType;
-  fCollectionConfigList.Insert(Index, newConfig);
-  fChildConfig := fCollectionConfigList[0];
-  ReBuildCaptionTypes;
-end;*)
 
 procedure TRootCollection.InsertSubCollectionType(Index: Integer;
   aConfig: TCollectionConfig);
@@ -2318,26 +2368,6 @@ begin
   end;
 end;
 
-(*
-function TLibraryFileCategory.AddRootCollection(
-  const Properties: Array of teCollectionContent; const Sortings: Array of teCollectionSorting): TRootCollection;
-var
-  i, maxSort: Integer;
-  newRoot: TRootCollection;
-begin
-  newRoot := TRootCollection.Create(self);
-  maxSort := length(Sortings) - 1;
-
-  for i := 0 to length(Properties) - 1 do
-    if i <= maxSort then
-      newRoot.AddSubCollectionType(Properties[i], Sortings[i])
-    else
-      newRoot.AddSubCollectionType(Properties[i], csDefault);
-
-  fCollections.Add(newRoot);
-  result := newRoot;
-end;
-*)
 
 function TLibraryFileCategory.AddRootCollection(
   aRootConfig: TCollectionConfigList): TRootCollection;
@@ -2345,10 +2375,8 @@ var
   i: Integer;
 begin
   result := TRootCollection.Create(self);
-  for i := 0 to aRootConfig.Count - 1 do begin
-    // result.AddSubCollectionType(aRootConfig[i].Content, aRootConfig[i].PrimarySorting);
+  for i := 0 to aRootConfig.Count - 1 do
     result.AddSubCollectionType(aRootConfig[i]);
-  end;
 
   fCollections.Add(result);
 end;
@@ -2359,52 +2387,5 @@ fLibraryFormatSettings := TFormatSettings.Create;
 
 KeyCache.RawDirectory := '';
 KeyCache.ProcessedDirectory := '';
-
-(*
-SortCollection_Default := TComparer<TAudioFileCollection>.Construct( function (const item1,item2: TAudioFileCollection): Integer
-begin
-  result := AnsiCompareText_NempIgnoreCase(item1.fKey, item2.fKey);
-end);
-
-SortCollection_Album := TComparer<TAudioFileCollection>.Construct( function (const item1,item2: TAudioFileCollection): Integer
-begin
-  result := AnsiCompareText_NempIgnoreCase(item1.fAlbum, item2.fAlbum);
-end);
-
-SortCollection_ArtistAlbum := TComparer<TAudioFileCollection>.Construct( function (const item1,item2: TAudioFileCollection): Integer
-begin
-  result := AnsiCompareText_NempIgnoreCase(item1.fArtist, item2.fArtist);
-  if result = 0 then
-    result := AnsiCompareText_NempIgnoreCase(item1.fAlbum, item2.fAlbum);
-end);
-
-SortCollection_Count := TComparer<TAudioFileCollection>.Construct( function (const item1,item2: TAudioFileCollection): Integer
-begin
-  result := CompareValue(item2.Count, item1.Count);
-end);
-
-SortCollection_Year := TComparer<TAudioFileCollection>.Construct( function (const item1,item2: TAudioFileCollection): Integer
-begin
-  result := CompareValue(item1.fYear, item2.fYear);
-end);
-
-SortCollection_FileAge := TComparer<TAudioFileCollection>.Construct( CompareCollection_FileAge);
-
-{function (const item1,item2: TAudioFileCollection): Integer
-begin
-  result := CompareValue(Item2.fFileAge, Item1.fFileAge);
-end);}
-
-SortCollection_Genre := TComparer<TAudioFileCollection>.Construct( function (const item1,item2: TAudioFileCollection): Integer
-begin
-  result := AnsiCompareText_NempIgnoreCase(Item2.Genre, Item1.Genre);
-  if result = 0 then
-    result := AnsiCompareText_NempIgnoreCase(item1.fArtist, item2.fArtist);
-  if result = 0 then
-    result := AnsiCompareText_NempIgnoreCase(item1.fAlbum, item2.fAlbum);
-end);
-*)
-
-
 
 end.

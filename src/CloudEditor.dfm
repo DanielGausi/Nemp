@@ -13,7 +13,6 @@ object CloudEditorForm: TCloudEditorForm
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
-  OldCreateOrder = False
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
@@ -23,7 +22,6 @@ object CloudEditorForm: TCloudEditorForm
   DesignSize = (
     551
     465)
-  PixelsPerInch = 96
   TextHeight = 13
   object LblUpdateWarning: TLabel
     Left = 8
@@ -53,9 +51,9 @@ object CloudEditorForm: TCloudEditorForm
     OnClick = BtnUpdateID3TagsClick
   end
   object BtnBugFix: TButton
-    Left = 266
+    Left = 192
     Top = 432
-    Width = 107
+    Width = 77
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'BugFix'
@@ -128,16 +126,18 @@ object CloudEditorForm: TCloudEditorForm
         OnHeaderClick = TagVSTHeaderClick
         OnIncrementalSearch = TagVSTIncrementalSearch
         OnKeyDown = TagVSTKeyDown
+        Touch.InteractiveGestures = [igPan, igPressAndTap]
+        Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
         Columns = <
           item
             Position = 0
+            Text = 'Tag'
             Width = 217
-            WideText = 'Tag'
           end
           item
             Position = 1
+            Text = 'Count'
             Width = 100
-            WideText = 'Count'
           end>
       end
       object BtnMerge: TButton
@@ -216,16 +216,18 @@ object CloudEditorForm: TCloudEditorForm
         TreeOptions.SelectionOptions = [toFullRowSelect, toMultiSelect]
         OnGetText = MergeTagVSTGetText
         OnHeaderClick = MergeTagVSTHeaderClick
+        Touch.InteractiveGestures = [igPan, igPressAndTap]
+        Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
         Columns = <
           item
             Position = 0
+            Text = 'Original key'
             Width = 150
-            WideText = 'Original key'
           end
           item
             Position = 1
+            Text = 'Replace with'
             Width = 150
-            WideText = 'Replace with'
           end>
       end
       object BtnDeleteMergeTag: TButton
@@ -275,11 +277,13 @@ object CloudEditorForm: TCloudEditorForm
         TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
         TreeOptions.SelectionOptions = [toFullRowSelect, toMultiSelect]
         OnGetText = IgnoreTagVSTGetText
+        Touch.InteractiveGestures = [igPan, igPressAndTap]
+        Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
         Columns = <
           item
             Position = 0
+            Text = 'Key'
             Width = 200
-            WideText = 'Key'
           end>
       end
       object BtnDeleteIgnoreTag: TButton
@@ -293,6 +297,16 @@ object CloudEditorForm: TCloudEditorForm
         OnClick = BtnDeleteIgnoreRuleClick
       end
     end
+  end
+  object BtnHelp: TButton
+    Left = 308
+    Top = 432
+    Width = 75
+    Height = 25
+    Anchors = [akRight, akBottom]
+    Caption = 'Help'
+    TabOrder = 3
+    OnClick = BtnHelpClick
   end
   object PopupExistingTags: TPopupMenu
     Left = 48

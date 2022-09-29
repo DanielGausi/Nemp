@@ -7,7 +7,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch efin Mp3-Player
-    Copyright (C) 2005-2020, Daniel Gaussmann
+    Copyright (C) 2005-2022, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -717,6 +717,9 @@ type
     PM_ML_ShowPlaylistCategories: TMenuItem;
     PM_ML_ShowWebradioCategory: TMenuItem;
     N42: TMenuItem;
+    actShowControlCover: TAction;
+    Showcoverinconrtolpanel1: TMenuItem;
+    Showcoverinconrtolpanel2: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -838,7 +841,6 @@ type
     procedure PM_PL_SavePlaylistClick(Sender: TObject);
     procedure PM_PL_LoadPlaylistClick(Sender: TObject);
 
-    //procedure LoadCueSheet(filename: UnicodeString);
     procedure SlideBackBTNIMGClick(Sender: TObject);
     procedure SlideForwardBTNIMGClick(Sender: TObject);
     procedure PlaylistVSTDragDrop(Sender: TBaseVirtualTree;
@@ -864,7 +866,6 @@ type
     procedure PM_ML_CopyToClipboardClick(Sender: TObject);
     procedure PM_ML_PasteFromClipboardClick(Sender: TObject);
 
-    procedure SubSplitter1Moved(Sender: TObject);
     procedure PlayListSaveDialogTypeChange(Sender: TObject);
     procedure PM_TNA_CloseClick(Sender: TObject);
     procedure PM_TNA_RestoreClick(Sender: TObject);
@@ -893,7 +894,7 @@ type
     procedure VSTAdvancedHeaderDraw(Sender: TVTHeader;
       var PaintInfo: THeaderPaintInfo;
       const Elements: THeaderPaintElements);
-    procedure PlaylistVSTResize(Sender: TObject);
+    // procedure PlaylistVSTResize(Sender: TObject);
     procedure ArtistsVSTResize(Sender: TObject);
     procedure AlbenVSTResize(Sender: TObject);
     procedure PaintFrameMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -962,12 +963,8 @@ type
     procedure RepaintAll;
     Procedure RepaintVisOnPause;
     procedure TABPanelPaint(Sender: TObject);
-    procedure MainSplitterMoved(Sender: TObject);
 
-    procedure PlaylistVSTCollapsAndExpanded(Sender: TBaseVirtualTree;
-      Node: PVirtualNode);
-
-    procedure AktualisiereDetailForm(aAudioFile: TAudioFile; Source: Integer; Foreground: Boolean = False);
+    procedure ShowDetailForm(aAudioFile: TAudioFile; DoShow: Boolean);
     procedure TNAMenuPopup(Sender: TObject);
     Procedure TNA_PlaylistClick(Sender: TObject);
     procedure BirthdayTimerTimer(Sender: TObject);
@@ -1079,11 +1076,6 @@ type
     procedure PanelCoverBrowseAfterPaint(Sender: TObject);
     procedure VSTHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
     procedure VSTHeaderDblClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
-    procedure VSTInitNode(Sender: TBaseVirtualTree; ParentNode,
-      Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-    procedure VSTFocusChanging(Sender: TBaseVirtualTree; OldNode,
-      NewNode: PVirtualNode; OldColumn, NewColumn: TColumnIndex;
-      var Allowed: Boolean);
     procedure DetailID3TagPanelResize(Sender: TObject);
     procedure ImgBibRatingMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
@@ -1136,7 +1128,6 @@ type
     procedure PM_ML_SetRatingsOfSelectedFilesClick(Sender: TObject);
     procedure GRPBOXArtistsAlbenResize(Sender: TObject);
     procedure SplitterBrowseMoved(Sender: TObject);
-    procedure SubSplitter2Moved(Sender: TObject);
 
     procedure VolButton_HeadsetStartDrag(Sender: TObject;
       var DragObject: TDragObject);
@@ -1186,7 +1177,6 @@ type
     procedure EditPlaylistSearchKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure PaintFrameDblClick(Sender: TObject);
-    procedure PM_ML_BrowseByMoreClick(Sender: TObject);
     //procedure VST_ColumnPopupCoverClick(Sender: TObject);
     procedure PM_RemoveTagThisFileClick(Sender: TObject);
     procedure PopupEditExtendedTagsPopup(Sender: TObject);
@@ -1240,7 +1230,7 @@ type
     procedure SplitterFileOverviewCanResize(Sender: TObject; var NewSize: Integer;
       var Accept: Boolean);
     procedure AfterLayoutBuild(Sender: TObject);
-    procedure __MainContainerPanelResize(Sender: TObject);
+    // procedure __MainContainerPanelResize(Sender: TObject);
     procedure Pnl_CoverFlowLabelPaint(Sender: TObject);
     procedure ControlPanelPaint(Sender: TObject);
     procedure EmptyLibraryPanelPaint(Sender: TObject);
@@ -1322,7 +1312,6 @@ type
     procedure TabBtnCoverCategoryClick(Sender: TObject);
     procedure PM_ML_FilesPlayEnqueueClick(Sender: TObject);
     procedure PM_ML_ConfigureMedialibraryClick(Sender: TObject);
-    // procedure PM_ML_SortCollectionByClick(Sender: TObject);
     procedure CategoryVSTDragOver(Sender: TBaseVirtualTree; Source: TObject;
       Shift: TShiftState; State: TDragState; Pt: TPoint; Mode: TDropMode;
       var Effect: Integer; var Accept: Boolean);
@@ -1388,7 +1377,7 @@ type
     procedure PM_ML_ShowPlaylistCategoriesClick(Sender: TObject);
     procedure PM_ML_ShowWebradioCategoryClick(Sender: TObject);
     procedure PM_ML_ClearCategoryClick(Sender: TObject);
-
+    procedure actShowControlCoverExecute(Sender: TObject);
 
   private
     { Private declarations }
@@ -1420,9 +1409,6 @@ type
 
     procedure CMMenuClosed(var Msg: TMessage ); message CM_MENUCLOSED;
     procedure CM_ENTERMENULOOP(var Msg: TMessage ); message CM_ENTERMENULOOP;
-
-    //function ArtistDragContainsFiles: Boolean;
-    //function ArtistAlbumDragContainsFiles: Boolean;
 
     procedure HandleRemoteFilename(filename: UnicodeString; Mode: Integer);
     procedure CatchAllExceptionsOnShutDown(Sender: TObject; E: Exception);
@@ -1468,20 +1454,10 @@ type
     MenuSkinImageList: TImageList;
 
     ActivationMessage: Cardinal;
-
     MinimizedIndicator: Boolean;
-//-----------------------
-
-    // DragDropAudioFiles: TAudioFileList;
-    //DragDropList: TStringList;  // Liste mir interne gedraggten Dateien, da der normale
-                                   // Drag&Drop bei WS nicht so richtig klappt.
 
     NempDockedForms: Array [1..3] of Boolean;
     NempSkin: TNempSkin;
-
-    // Laufzeit-tmp-Variablen
-    AutoShowDetailsTMP: Boolean;
-    // DragSource: Integer; // Woher kommen die Gedraggten Files?
 
     TaskBarDelay: integer;
 
@@ -1545,10 +1521,10 @@ type
     procedure ReSizeBrowseTrees;
     procedure ReAlignBrowseTrees;
     procedure ReAlignFileOverview;
+    procedure ReAlignControlCover;
     procedure RefreshActionLayoutCheckedStatus;
     procedure RefreshCategorySelectionVisibility;
   protected
-    //Procedure WMDropFiles (Var aMsg: tMessage);  message WM_DROPFILES;
     procedure MediaKey (Var aMSG: tMessage); message WM_APPCOMMAND;
 
     Procedure NempAPI_Commands(Var aMSG: tMessage); message WM_COMMAND;
@@ -2005,6 +1981,8 @@ begin
     AlbenVST.NodeDataSize    := SizeOf(TLibraryCategory);
     PlaylistVST.NodeDataSize := SizeOf(TAudioFile);
 
+    VST.EmptyListMessage := MainForm_LibraryIsEmpty;
+
     ErrorLog := TStringList.Create;
     ErrorLogCount := 0;
     AlphaBlendBMP := TBitmap.Create;
@@ -2030,9 +2008,6 @@ begin
         MCurrentDir := mkNoneMessage;
         MFound      := mkSendMessage;
     end;
-
-    //DragDropList := TStringList.Create;
-    // DragDropAudioFiles := TAudioFileList.Create(False);
 
     // Get Savepath for settings and other data
     if UseUserAppData then
@@ -2407,31 +2382,17 @@ begin
         if MedienBib.AutoSaveMediaList AND {(MedienBib.Count > 0) AND} (MedienBib.Changed) then
         begin
             RefreshAuswahlStatusLBL(MainForm_ShuttingDownHint_MediaLib);
-            //AuswahlStatusLBL.Caption := (MainForm_ShuttingDownHint_MediaLib);
-            //AuswahlStatusLBL.Update;
             MedienBib.SaveToFile(SavePath + NEMP_NAME + '.gmp', True);
         end;
-
-        {
-        PlaylistPanel.Parent := __MainContainerPanel;
-        TreePanel.Parent := __MainContainerPanel;
-        CloudPanel.Parent := __MainContainerPanel;
-        CoverflowPanel.Parent := __MainContainerPanel;
-        MedialistPanel.Parent := __MainContainerPanel;
-        MedienBibDetailPanel.Parent := __MainContainerPanel;
-        }
 
         CoverScrollbar.WindowProc := OldScrollbarWindowProc;
         LyricsMemo.WindowProc := OldLyricMemoWindowProc;
 
         ST_Playlist.Free;
         ST_Medienliste.Free;
-        //FreeAndNil(DragDropList);
-        // FreeAndNil(DragDropAudioFiles);
         TagLabelList.Clear;
 
         Set8087CW(Default8087CW);
-
     except
         halt;
     end;
@@ -2493,7 +2454,6 @@ procedure TNemp_MainForm.OnCoverDownloadComplete(DownloadItem: TCoverDownloadIte
   begin
       if DownloadItem.Index <= MedienBib.NewCoverFlow.CoverCount - 1 then
       begin
-          // !!! Mögliche AV, out of range here  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
           aCollection := TAudioFileCollection(MedienBib.NewCoverFlow.Collection[DownloadItem.Index]);
           result := (aCollection.Artist = DownloadItem.Artist)
                     and (aCollection.Album = DownloadItem.Album);
@@ -2544,16 +2504,11 @@ var
   newID: String;
 begin
   NewID := Medienbib.CoverArtSearcher.InitCoverFromFilename(DownloadItem.newFilename, tm_VCL);
-  // as DownloadItemStillMatchesCoverFlow, the access to this index is ok
-  // OldID := TAudioFileCollection(MedienBib.NewCoverFlow.Collection[fCurrentDownloadItem.Index]).CoverID;
-  //TNempCover(MedienBib.CoverViewList[fCurrentDownloadItem.Index]).ID;
-
   ArchivedCollection := CoverDownloadThread.GetArchivedCollection(DownloadItem.ArchiveID);
   if assigned(ArchivedCollection) and (newID <> '')then
     ArchivedCollection.ApplyNewCoverID(newID);
 
   MedienBib.Changed := True;
-
   if (MedienBib.BrowseMode = 0) and (DownloadItem.QueryType = qtTreeView) then
     Nemp_MainForm.AlbenVST.Invalidate;
 end;
@@ -2653,10 +2608,6 @@ begin
               success := RepairCoverFileVCL(aCollection.CoverID, Nil, pic, newID);
               if success and (aCollection.CoverID <> newID) then
                 aCollection.ApplyNewCoverID(newID);
-
-              // todo xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-              //if success then
-              //    aCollection.CoverID := newID;
           end;
 
           bmp.Height := TCoverArtSearcher.CoverSize;
@@ -2665,10 +2616,8 @@ begin
 
           Medienbib.NewCoverFlow.SetPreview (msg.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
 
-          // todo  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
           if (not success) and (MedienBib.CoverSearchLastFM) then
             CoverDownloadThread.AddJob(aCollection, msg.index, qtCoverFlow);
-            //Medienbib.NewCoverFlow.DownloadCover(aCollection, msg.index, qtCoverFlow);
       end;
   finally
       pic.free;
@@ -2679,33 +2628,6 @@ end;
 
 procedure TNemp_MainForm.MinimizeNemp(Sender: TObject);
 begin
-  // NEMPWINDOW_ONLYTASKBAR = 0;
-  // NEMPWINDOW_TASKBAR_MIN_TRAY = 1;
-  // NEMPWINDOW_TRAYONLY = 2;
-  // NEMPWINDOW_BOTH = 3;
-  // NEMPWINDOW_BOTH_MIN_TRAY = 4;
-
-
-  // nur minimiert im Tray: Icon erzeugen
-  //if NempOptions.NempWindowView = NEMPWINDOW_TASKBAR_MIN_TRAY then
-  //NempTrayIcon.Visible := NempOptions.ShowTrayIcon;
-
-  //if NempOptions.NempWindowView in [NEMPWINDOW_TASKBAR_MIN_TRAY, NEMPWINDOW_BOTH_MIN_TRAY, NEMPWINDOW_TRAYONLY]
-  //then // Taskbar-Eintrag weg, aber nur, wenn ein Icon da ist
-  //begin
-  /// XXX das geht so nicht mehr, weil in der Taskleiste seit D2007 Form.Handle drin steckt. Aber das
-  ///  einfach ausblenden bewirkt da nichts.
-  //   if NempTrayIcon.Visible then ShowWindow(Application.Handle, SW_HIDE); // vorher Application.Handle
-
-{   SetWindowLong( Nemp_MainForm.Handle, GWL_EXSTYLE,
-                 Nemp_MainForm.NempWindowDefault
-                 or WS_EX_TOOLWINDOW
-                 //and (not WS_ICONIC)
-                 and (not WS_EX_APPWINDOW));}
-  //end;
-
-
-  // hide;
   MinimizedIndicator := True;
 end;
 
@@ -3199,28 +3121,6 @@ begin
   end;
 end;
 
-(*
-  // not needed any more ...
-Procedure TNemp_MainForm.WMDropFiles (Var aMsg: tMessage);
-var o: TWinControl;
-Begin
-    Inherited;
-
-    o := FindVCLWindow(Mouse.CursorPos);
-    case GetDropWindowSection(o) of
-          ws_none    : Handle_DropFilesForLibrary(aMsg); // default: add files also into the library
-          ws_Library : Handle_DropFilesForLibrary(aMsg);
-          ws_Playlist: Handle_DropFilesForPlaylist(aMsg, False);
-          ws_Controls: begin
-                          if MainPlayerControlsActive then
-                              Handle_DropFilesForPlaylist(aMsg, True)
-                          else
-                              Handle_DropFilesForHeadPhone(aMsg)
-                        end;
-    end;
-end;
-*)
-
 
 procedure TNemp_MainForm.MediaKey (Var aMSG: tMessage);
 begin
@@ -3678,7 +3578,6 @@ begin
         Caption:= Nemp_Caption;
         ResetBrowsePanels;
     end;
-    // AktualisiereDetailForm(NIL, SD_MEDIENBIB);
 end;
 
 procedure TNemp_MainForm.MM_ML_SearchClick(Sender: TObject);
@@ -4523,11 +4422,10 @@ procedure TNemp_MainForm.PM_ML_SetRatingsOfSelectedFilesClick(
 var CurrentAF, listFile :TAudioFile;
     iSel, iGes, iList: Integer;
     SelectedMp3s: TNodeArray;
-    Node:PVirtualNode;
     ListOfFiles: TAudioFileList;
     newRating: Integer;
     resetCounter: Boolean;
-    detUpdate, TagMod100: Integer;
+    TagMod100: Integer;
     LocalTree: TVirtualStringTree;
     aErr: TNempAudioError;
     nt, ct: Cardinal;
@@ -4642,16 +4540,6 @@ begin
     MedienBib.StatusBibUpdate := 0;
     ShowSummary;
     NempTaskbarManager.ProgressState := TTaskBarProgressState.None;
-    Node := LocalTree.FocusedNode;
-    if LocalTree = VST then
-        detUpdate := SD_MEDIENBIB
-    else
-        detUpdate := SD_PLAYLIST;
-
-    if Assigned(Node) then
-        AktualisiereDetailForm( LocalTree.GetNodeData<TAudioFile>(Node)  , detUpdate)
-    else
-        AktualisiereDetailForm(NIL, detUpdate);
 end;
 
 procedure TNemp_MainForm.PM_ML_SetmarkerClick(Sender: TObject);
@@ -4687,12 +4575,12 @@ begin
             CurrentAF := LocalTree.GetNodeData<TAudioFile>(SelectedMP3s[iSel]);
             CurrentAF.Favorite := aValue;
             // get List of this AudioFile
-            GetListOfAudioFileCopies(CurrentAF, ListOfFiles);
+            GetListOfAudioFileCopies(CurrentAF, ListOfFiles, False);
             // edit all these files
             for iList := 0 to ListOfFiles.Count - 1 do
                 ListOfFiles[iList].Favorite := aValue;
             // correct GUI
-            CorrectVCLAfterAudioFileEdit(CurrentAF);
+            CorrectVCLAfterAudioFileEdit(CurrentAF, False);
         end;
     finally
         ListOfFiles.Free;
@@ -4821,24 +4709,6 @@ begin
       end;
     end;
 
-
-   {   if (MedienBib.BrowseMode = 0) and (MedienBib.CurrentArtist = BROWSE_PLAYLISTS) then
-      begin
-          if MedienBib.Alben.Count = 1 then
-              AuswahlStatusLBL.Caption := Format(MainForm_Summary_PlaylistCountSingle, [MedienBib.Alben.Count])
-          else
-              AuswahlStatusLBL.Caption := Format(MainForm_Summary_PlaylistCountMulti, [MedienBib.Alben.Count])
-      end
-      else
-      if (MedienBib.BrowseMode = 0) and (MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS) then
-      begin
-          if MedienBib.RadioStationList.Count = 1 then
-              AuswahlStatusLBL.Caption := Format(MainForm_Summary_WebradioCountSingle, [MedienBib.RadioStationList.Count])
-          else
-              AuswahlStatusLBL.Caption := Format(MainForm_Summary_WebradioCountMulti, [MedienBib.RadioStationList.Count])
-      end
-      else   }
-
   end;
 end;
 
@@ -4935,9 +4805,7 @@ begin
       exit;
 
     AudioFile := VST.GetNodeData<TAudioFile>(Node);
-    AutoShowDetailsTMP := True;
-
-    AktualisiereDetailForm(AudioFile, SD_MEDIENBIB, True);
+    ShowDetailForm(AudioFile, True);
 
     if not FileExists(AudioFile.Pfad) then
     begin
@@ -4952,21 +4820,12 @@ procedure TNemp_MainForm.VSTGetText(Sender: TBaseVirtualTree; Node: PVirtualNode
   Column: TColumnIndex; TextType: TVSTTextType; var CellText: String);
 var af: TAudioFile;
 begin
-
-    if (vsDisabled in Node.States) then
-    begin
-        af := Sender.GetNodeData<TAudioFile>(Node);
-
-        if VST.Header.Columns[column].Position = 0 then
-            Celltext := af.Titel
-        else
-            CellText := '';
-    end else
-    begin
         af := Sender.GetNodeData<TAudioFile>(Node);
 
         case VST.Header.Columns[column].Tag of
           CON_ARTIST    : CellText := NempDisplay.TreeArtist(af);// af.GetArtistForVST(NempOptions.ReplaceNAArtistBy);
+          CON_ALBUMARTIST : CellText := af.AlbumArtist;
+          CON_COMPOSER  : CellText := af.Composer;
           CON_TITEL     : CellText := NempDisplay.TreeTitle(af); // af.GetTitleForVST(NempOptions.ReplaceNATitleBy);
           CON_ALBUM     : CellText := NempDisplay.TreeAlbum(af); // af.GetAlbumForVST(NempOptions.ReplaceNAAlbumBy);
           CON_DAUER     : CellText := NempDisplay.TreeDuration(af); //  af.GetDurationForVST;
@@ -5005,7 +4864,7 @@ begin
         end;
         // Correct CellText for toAutoSpan to a non-empty-string
         if CellText = '' then Celltext := ' ';
-    end;
+
 
 end;
 
@@ -5016,9 +4875,6 @@ var af: TAudioFile;
     st: Integer;
 begin
   af := Sender.GetNodeData<TAudioFile>(Node);
-
-  if af = MedienBib.BibSearcher.DummyAudioFile then
-      exit;
 
   case VST.Header.Columns[column].Tag of
      CON_RATING: begin
@@ -5041,6 +4897,7 @@ var aFile: TAudioFile;
     newMark: Byte;
     FileIsInLibrary: Boolean;
 begin
+
     case VST.Header.Columns[column].Tag of
       CON_FAVORITE: begin
           aFile := GetFocussedAudioFile;
@@ -5270,6 +5127,8 @@ begin
 
     case VST.Header.Columns[VST.FocusedColumn].Tag of
         CON_ARTIST:   aString := aAudioFile.Artist;
+        CON_ALBUMARTIST: aString := aAudioFile.AlbumArtist;
+        CON_COMPOSER: aString := aAudioFile.Composer;
         CON_TITEL:    aString := aAudioFile.Titel;
         CON_ALBUM:    aString := aAudioFile.Album;
         CON_PFAD,
@@ -5280,30 +5139,6 @@ begin
         aString := aAudioFile.Artist;
     end;
     Result := StrLIComp(PChar(SearchText), PChar(aString), length(SearchText));
-end;
-
-procedure TNemp_MainForm.VSTInitNode(Sender: TBaseVirtualTree; ParentNode,
-  Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-var af: TAudioFile;
-begin
-    af := Sender.GetNodeData<TAudioFile>(Node);
-    if af = MedienBib.BibSearcher.DummyAudioFile then
-        InitialStates := [ivsDisabled];
-end;
-
-procedure TNemp_MainForm.VSTFocusChanging(Sender: TBaseVirtualTree; OldNode,
-  NewNode: PVirtualNode; OldColumn, NewColumn: TColumnIndex;
-  var Allowed: Boolean);
-var tmpNode: PVirtualNode;
-begin
-
-    if assigned(NewNode) then
-    begin
-        tmpNode := NewNode;
-        Allowed:= not (vsDisabled in tmpNode.States);
-    end
-    else
-        Allowed := True; // or better false ???
 end;
 
 procedure TNemp_MainForm.VSTKeyDown(Sender: TObject; var Key: Word;
@@ -5328,6 +5163,8 @@ var Node,ScrollNode: PVirtualNode;
 
             case FocussedAttribut of
                 CON_ARTIST    : aString := AudioFile.Artist;
+                CON_ALBUMARTIST: aString := AudioFile.AlbumArtist;
+                CON_COMPOSER  : aString := AudioFile.Composer;
                 CON_TITEL     : aString := AudioFile.Titel;
                 CON_ALBUM     : aString := AudioFile.Album;
                 CON_PFAD,
@@ -5498,17 +5335,6 @@ begin
     RefreshVSTDetailsTimer.Enabled := True;
     RefreshVSTDetailsTimer.Tag := SD_MEDIENBIB;
   end;
-  {aNode := VST.FocusedNode;
-  if Assigned(aNode) then
-  begin
-      AudioFile := VST.GetNodeData<TAudioFile>(aNode);
-
-      if AudioFile.IsLocalFile then
-          AudioFile.ReCheckExistence;
-
-      ShowVSTDetails(AudioFile, SD_MEDIENBIB);
-      AktualisiereDetailForm(AudioFile, SD_MEDIENBIB);
-  end}
 end;
 
 procedure TNemp_MainForm.FillBibDetailLabels(aAudioFile: TAudioFile);
@@ -5637,10 +5463,9 @@ end;
 
 procedure TNemp_MainForm.pm_TagDetailsClick(Sender: TObject);
 begin
-    if not assigned(MedienBib.CurrentAudioFile) then
-        exit;
-    AutoShowDetailsTMP := True;
-    AktualisiereDetailForm(MedienBib.CurrentAudioFile, pm_TagDetails.Tag, True);
+  if not assigned(MedienBib.CurrentAudioFile) then
+    exit;
+  ShowDetailForm(MedienBib.CurrentAudioFile, True);
 end;
 
 
@@ -6031,31 +5856,29 @@ begin
   if (RefreshVSTDetailsTimer.Tag = SD_MEDIENBIB) then
   begin
     // Show Details from Medialibrary
-
     if AudioFile.IsLocalFile then
         AudioFile.ReCheckExistence;
 
     ShowVSTDetails(AudioFile, SD_MEDIENBIB);
-    AktualisiereDetailForm(AudioFile, SD_MEDIENBIB);
-
+    ShowDetailForm(AudioFile, False);
   end else
   begin
     // Show Details from Playlist
-      if AudioFile.AudioType = at_Cue then
-        CueParentFile := AudioFile.Parent
-      else
-        CueParentFile := AudioFile;
+    if AudioFile.AudioType = at_Cue then
+      CueParentFile := AudioFile.Parent
+    else
+      CueParentFile := AudioFile;
 
-      if aVST.GetNodeLevel(aNode) = 0 then
-        NempPlaylist.RefreshAudioFile(aNode.Index, false);
+    if aVST.GetNodeLevel(aNode) = 0 then
+      NempPlaylist.RefreshAudioFile(aNode.Index, false);
 
-      ShowVSTDetails(AudioFile, SD_PLAYLIST);
-      AktualisiereDetailForm(CueParentFile, SD_PLAYLIST);
+    ShowVSTDetails(AudioFile, SD_PLAYLIST);
+    ShowDetailForm(CueParentFile, False);
 
-      if assigned(FormPlaylistDuplicates)
-        and FormPlaylistDuplicates.Visible
-      then
-        FormPlaylistDuplicates.ShowDuplicateAnalysis(CueParentFile);
+    if assigned(FormPlaylistDuplicates)
+      and FormPlaylistDuplicates.Visible
+    then
+      FormPlaylistDuplicates.ShowDuplicateAnalysis(CueParentFile);
   end;
 end;
 
@@ -6083,7 +5906,7 @@ begin
   if not DoShowDetails then
     exit;
 
-  MedienBib.CurrentAudioFile := MainFile; //aAudioFile;
+  MedienBib.CurrentAudioFile := MainFile;
   if Source <> - 1 then
       pm_TagDetails.Tag := Source;
 
@@ -6100,7 +5923,6 @@ begin
   LblBibReplayGain  .Visible :=  assigned(aAudioFile);
 
   ImgBibRating  .Visible :=  assigned(aAudioFile);
-
 
   if assigned(MainFile) and (MainFile.isCDDA) then
   begin
@@ -6167,10 +5989,7 @@ end;
 procedure TNemp_MainForm.ImgDetailCoverDblClick(Sender: TObject);
 begin
     if assigned(MedienBib.CurrentAudioFile) then
-    begin
-        AutoShowDetailsTMP := True;
-        AktualisiereDetailForm(MedienBib.CurrentAudioFile, SD_PLAYLIST, True);
-    end;
+      ShowDetailForm(MedienBib.CurrentAudioFile, True);
 end;
 
 procedure TNemp_MainForm.ImgDetailCoverMouseDown(Sender: TObject;
@@ -6203,21 +6022,11 @@ begin
 
           if Assigned(af) then
           begin
-              //DragSource := DS_INTERN;
               // Add selected file to DropManager
               fDropManager.InitDrag(ImgDetailCover, True);
               fDropManager.AddFile(af, True);
               PrepareDragImage(fDropManager, af);
               fDropManager.Execute;
-
-              //DragFilesSrc1.ClearFiles;
-              // DragDropList.Clear;
-              //DragDropAudioFiles.Clear;
-              //DragFilesSrc1.AddFile(af.Pfad);
-              //DragDropList.Add(af.Pfad);
-              //DragDropAudioFiles.Add(af);
-              // This is the START of the drag (FROM) operation.
-              //DragFilesSrc1.Execute;
           end;
       end;
     end
@@ -6346,11 +6155,6 @@ begin
       else
         if NempPlayer.ValidExtensions.IndexOf(extension) > -1 then
           result := nftSupported
-
-
-
-// TNempFileType = (nftSupported, nftBibWanted, , , , );
-
 end;
 
 
@@ -6635,8 +6439,6 @@ begin
   if NempOrganizerSettings.ShowWebradioCategory then
     ArtistsVST.AddChild(Nil, MedienBib.WebRadioCategory);
 
-  //ShowMessage('ReFillCategoryTree: ' +  MedienBib.CurrentCategory.Name);
-
   if RemarkOldNodes then
     oldNode := GetOldNode(MedienBib.CurrentCategory, ArtistsVST)
   else
@@ -6773,10 +6575,6 @@ var
   i: Integer;
   ac, lastSelectedCollection: TAudioCollection;
 begin
-  //AlbenVST.BeginUpdate;
-  //AlbenVST.Clear;
-  //VST.Clear;
-
   if not assigned(Source) then
     source := GetFocussedCategory;
 
@@ -6821,8 +6619,6 @@ begin
         MedienBib.GenerateAnzeigeListe(ac);
     end;
   end;
-
-  //AlbenVST.EndUpdate;
 end;
 
 procedure TNemp_MainForm.ReFillBrowseTrees(RemarkOldNodes: LongBool);
@@ -6925,71 +6721,7 @@ begin
       and RandomPlaylistForm.Visible
     then
       RandomPlaylistForm.RefillTagListFromMainWindow;
-
   end;
-
-  // XXXXXXXXXXXXXXX ersten Knoten bei Alben markieren, Liste unten anezigen
-
-  (*
-  // Vorher: alten Alben Knoten merken.
-  // Könnte sein, dass jetzt Artist <Alle> markiert ist
-  // Dann sollen alle Titel des Albums angezeigt werden
-  OldAlbumNode := AlbenVST.FocusedNode;
-  if Assigned(OldAlbumNode) then
-  begin
-    OldAlbumData := AlbenVST.GetNodeData(OldAlbumNode);
-    OldAlbum := TJustAstring(OldAlbumData^.FString).DataString;
-  end else
-    OldAlbum := BROWSE_ALL;
-  AlbenVST.OnFocusChanged := NIL;
-
-  Data := ArtistsVST.GetNodeData(aNode);
-
-  MedienBib.CurrentArtist := TJustAstring(Data^.FString).DataString;
-  MedienBib.ArtistIndex := aNode.Index;
-  Medienbib.GetAlbenList(MedienBib.CurrentArtist);
-
-  if MedienBib.NempSortArray[2] = siOrdner then
-    FillStringTreeWithSubNodes(Medienbib.Alben, AlbenVST)
-  else
-    FillStringTree(Medienbib.Alben, AlbenVST);
-
-
-  // Alten Knoten wieder suchen
-  // Der Index kann erst hier bestimmt werden, da sich die Alben liste geändert hat!
-  OldAlbumIDX := -1;
-  for i:=0 to MedienBib.Alben.Count - 1 do
-    if (MedienBib.Alben[i] as TJustaString).DataString = OldAlbum then
-    begin
-      OldAlbumIDX := i;
-      break;
-    end;
-
-  if OldAlbumIDX > -1 then                       // Knoten existiert noch
-  begin
-    OldAlbumNode := AlbenVST.GetFirst;
-    for i := 0 to OldAlbumIDX-1 do
-      if assigned(OldAlbumNode) then
-        OldAlbumNode := AlbenVST.GetNext(OldAlbumNode)
-  end else                                       // Knoten existiert nicht mehr
-  begin
-    OldAlbumNode := AlbenVST.GetFirst;
-    OldAlbum := BROWSE_ALL;
-    MedienBib.CurrentAlbum := BROWSE_ALL;
-  end;
-  // alten Knoten focussieren
-  AlbenVST.ScrollIntoView(OldAlbumNode, True);
-  AlbenVST.FocusedNode := OldAlbumNode;
-  AlbenVST.Selected[OldAlbumNode] := True;
-
-
-  // Fill Auswahlliste
-  MedienBib.GenerateAnzeigeListe(TJustAstring(Data^.FString).DataString, OldAlbum);
-
-  // OnChange wieder umsetzen? Muss das überhaupt?
-  AlbenVST.OnFocusChanged := AlbenVSTFocusChanged;
-  // ????
-  *)
 end;
 
 procedure TNemp_MainForm.ArtistsVSTIncrementalSearch(Sender: TBaseVirtualTree;
@@ -7082,11 +6814,6 @@ begin
   ac := AlbenVST.GetNodeData<TAudioCollection>(Node);
   if assigned(ac) then begin
     MedienBib.GenerateAnzeigeListe(ac);
-    //MedienBib.AnzeigeListe.Clear;
-
-    //ac.GetFiles(MedienBib.AnzeigeListe, true);
-    //FillTreeView(MedienBib.AnzeigeListe, Nil);
-    //Nemp_MainForm.ShowSummary;
   end;
 end;
 
@@ -7351,9 +7078,6 @@ var NewPos: Integer;
     end;
 
 begin
-    //if self.DragDropAudioFiles.Count > 0 then
-     // accept := True;
-
     if Source = SlideBarButton then
     begin
         if (Sender is TNempPanel) then
@@ -8005,38 +7729,6 @@ begin
 end;
 
 
-
-(*
-procedure TNemp_MainForm.LoadCueSheet(filename: UnicodeString);
-var tmplist: TStringList;
-    i: Integer;
-    AudioFilename: UnicodeString;
-begin
-  if Not FileExists(filename) then exit;
-
-  tmplist := TStringList.Create;
-  try
-      tmplist.LoadFromFile(filename);
-      for i:=0 to tmplist.Count - 1 do
-      begin
-          // nach einem "FILE"-Eintrag suchen
-          if (GetCueID(tmplist[i]) = CUE_ID_FILE) then
-          begin
-            // FILE-Eintrag gefunden.
-            AudioFilename := ExtractFilePath(filename) + GetFileNameFromCueString(tmplist[i]);
-            // Wenn diese Datei existiert, dann Audiofile createn und in die Playlist einfügen
-            // Sämtliches Einfügen wird in der Insert-Prozedur erledigt!
-            if FileExists(AudioFilename) then
-              NempPlaylist.AddFileToPlaylist(AudioFilename, filename);
-          end;
-      end;
-  finally
-      tmplist.Free;
-  end;
-end;
-*)
-
-
 procedure TNemp_MainForm.MM_T_PlaylistLogClick(Sender: TObject);
 begin
     if not assigned(PlayerLogForm) then
@@ -8045,23 +7737,21 @@ begin
 end;
 
 procedure TNemp_MainForm.PM_PL_PropertiesClick(Sender: TObject);
-var AudioFile:TAudioFile;
-    Node: PVirtualNode;
+var
+  Node: PVirtualNode;
 begin
-    if NempSkin.NempPartyMode.DoBlockDetailWindow then
-        exit;
-
-    Node:=PlaylistVST.FocusedNode;
-    if not Assigned(Node) then
-      Node := PlaylistVST.GetFirstSelected;
-    if not Assigned(Node) then
+  if NempSkin.NempPartyMode.DoBlockDetailWindow then
       exit;
-    if PlaylistVST.GetNodeLevel(Node) = 1 then
-      Node := Node.Parent;
 
-    AudioFile := PlaylistVST.GetNodeData<TAudioFile>(Node);
-    AutoShowDetailsTMP := True;
-    AktualisiereDetailForm(AudioFile, SD_Playlist, True);
+  Node:=PlaylistVST.FocusedNode;
+  if not Assigned(Node) then
+    Node := PlaylistVST.GetFirstSelected;
+  if not Assigned(Node) then
+    exit;
+  if PlaylistVST.GetNodeLevel(Node) = 1 then
+    Node := Node.Parent;
+
+  ShowDetailForm(PlaylistVST.GetNodeData<TAudioFile>(Node), True);
 end;
 
 procedure TNemp_MainForm.PM_PL_ReplayGain_Click(Sender: TObject);
@@ -8205,26 +7895,6 @@ begin
   RefreshVSTDetailsTimer.Tag := SD_Playlist;
   RefreshVSTDetailsTimer.Enabled := False;
   RefreshVSTDetailsTimer.Enabled := True;
-  {aNode := PlaylistVST.FocusedNode;
-  if not Assigned(aNode) then Exit;
-
-  AudioFile := PlaylistVST.GetNodeData<TAudioFile>(aNode);
-  if AudioFile.AudioType = at_Cue then
-    CueParentFile := AudioFile.Parent
-  else
-    CueParentFile := AudioFile;
-
-  if PlaylistVST.GetNodeLevel(aNode) = 0 then
-    NempPlaylist.RefreshAudioFile(aNode.Index, false); // ActualizeNode(aNode, false);
-
-  ShowVSTDetails(AudioFile, SD_PLAYLIST);
-  AktualisiereDetailForm(CueParentFile, SD_PLAYLIST);
-
-  if assigned(FormPlaylistDuplicates)
-    and FormPlaylistDuplicates.Visible
-  then
-    FormPlaylistDuplicates.ShowDuplicateAnalysis(CueParentFile);
-    }
 end;
 
 
@@ -8835,18 +8505,13 @@ end;
 procedure TNemp_MainForm.CoverImageDblClick(Sender: TObject);
 var af: TAudioFile;
 begin
-    if  MainPlayerControlsActive then
-        af := NempPlaylist.PlayingFile    // MainControls -> show Details of current PlayingFile
-    else
-       af := NempPlayer.HeadSetAudioFile; // HeadsetControls -> show Details of current HeadsetFile
+  if MainPlayerControlsActive then
+    af := NempPlaylist.PlayingFile    // MainControls -> show Details of current PlayingFile
+  else
+    af := NempPlayer.HeadSetAudioFile; // HeadsetControls -> show Details of current HeadsetFile
 
-    if assigned(af) then
-    begin
-        AutoShowDetailsTMP := True;
-        AktualisiereDetailForm(af, SD_PLAYLIST, True);
-        // note: there may be an issue with "SD_PLAYLIST vs, SD_MEDIENBIB" here
-        //      ( or not?)
-    end;
+  if assigned(af) then
+    ShowDetailForm(af, True);
 end;
 
 procedure TNemp_MainForm.PlaylistVSTKeyDown(Sender: TObject; var Key: Word;
@@ -9330,21 +8995,6 @@ begin
         exit;
     end;
 
-    // switch to TagCloud
-    {
-      neu machen - am besten eine "temporäre Cloud-Collection" in der EditorForm erstellen
-    if MedienBib.BrowseMode <> 2 then
-        MedienBib.ReBuildTagCloud;
-
-    }
-    //begin
-    //    SwitchBrowsePanel(TabBtn_TagCloud.Tag);
-    //    SwitchMediaLibrary(TabBtn_TagCloud.Tag);
-    //end;
-    // navigate to whole library
-    //MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.ClearTag, True);
-    //MedienBib.TagCloud.ShowTags(True);
-
     if not assigned(CloudEditorForm) then
         Application.CreateForm(TCloudEditorForm, CloudEditorForm);
     CloudEditorForm.Show;
@@ -9453,13 +9103,11 @@ procedure TNemp_MainForm.PlaylistVSTGetImageIndex(Sender: TBaseVirtualTree;
   var Ghosted: Boolean; var ImageIndex: TImageIndex);
 var af: TAudioFile;
 begin
-    //exit;
- case Kind of
+
+  case Kind of
     ikNormal, ikSelected:
       begin
-        //Data := Sender.GetNodeData(Node);
         af := Sender.GetNodeData<TAudioFile>(Node);
-
         //if (Column = 0) and (af.PrebookIndex > 0) then
         //     ImageIndex := 18 // timer image
         //else
@@ -9531,27 +9179,22 @@ begin
     ikNormal, ikSelected:
       begin
           af := Sender.GetNodeData<TAudioFile>(Node);
+          case VST.Header.Columns[column].Tag of
+              CON_LYRICSEXISTING :
+                  if af.LyricsExisting then ImageIndex := 6
+                  else ImageIndex := 7;
 
-          if af = MedienBib.BibSearcher.DummyAudioFile then
-              imageIndex := -1
-          else
+              CON_LASTFMTAGS :
+                      if Length(af.RawTagLastFM) > 0 then ImageIndex := 11;
+                  //else imageIndex := 15;
+                  // Con_Titel: imageIndex := 10;
 
-              case VST.Header.Columns[column].Tag of
-                  CON_LYRICSEXISTING :
-                      if af.LyricsExisting then ImageIndex := 6
-                      else ImageIndex := 7;
+              CON_Favorite: ImageIndex := 12 + (af.Favorite mod 4);
 
-                  CON_LASTFMTAGS :
-                          if Length(af.RawTagLastFM) > 0 then ImageIndex := 11;
-                      //else imageIndex := 15;
-                      // Con_Titel: imageIndex := 10;
-
-                  CON_Favorite: ImageIndex := 12 + (af.Favorite mod 4);
-
-                  CON_ARTIST: if (trim(af.Artist) = '') and (NempDisplay.ArtistSubstitute <> svEmpty) then ImageIndex := 24;
-                  CON_TITEL: if (trim(af.Titel) = '') and (NempDisplay.TitleSubstitute <> svEmpty) then ImageIndex := 24;
-                  CON_ALBUM: if (trim(af.Album) = '') and (NempDisplay.AlbumSubstitute <> svEmpty) then ImageIndex := 24;
-              end;
+              CON_ARTIST: if (trim(af.Artist) = '') and (NempDisplay.ArtistSubstitute <> svEmpty) then ImageIndex := 24;
+              CON_TITEL: if (trim(af.Titel) = '') and (NempDisplay.TitleSubstitute <> svEmpty) then ImageIndex := 24;
+              CON_ALBUM: if (trim(af.Album) = '') and (NempDisplay.AlbumSubstitute <> svEmpty) then ImageIndex := 24;
+          end;
       end;
   end;
 end;
@@ -9622,8 +9265,6 @@ end;
 
 
 
-
-
 procedure TNemp_MainForm.PopupRepeatPopup(Sender: TObject);
 begin
     case NempPlaylist.WiedergabeMode of
@@ -9682,28 +9323,6 @@ begin
         end
     end;
   end;
-end;
-
-procedure TNemp_MainForm.PlaylistVSTResize(Sender: TObject);
-begin
-  if not FormReadyAndActivated then
-        exit;
-
- { if (NempSkin.isActive and Nempskin.DisablePlaylistScrollbar)
-       OR // Oder Scrollbar unsichtbar
-     (PlaylistVST.Height > Integer(playlistVST.RootNode.TotalHeight))
-  then
-    PlaylistVST.Header.Columns[0].Width := PlayListVST.Width - PlaylistVST.Header.Columns[1].Width - 4 // - 12;
-  else
-    PlaylistVST.Header.Columns[0].Width := PlayListVST.Width - PlaylistVST.Header.Columns[1].Width - 22;// - 12;
-  }
-end;
-
-procedure TNemp_MainForm.PlaylistVSTCollapsAndExpanded(Sender: TBaseVirtualTree;
-  Node: PVirtualNode);
-begin
-  // Wichtig
-  PlaylistVSTResize(Sender);
 end;
 
 procedure TNemp_MainForm.ArtistsVSTResize(Sender: TObject);
@@ -10123,52 +9742,6 @@ begin
   NempPlaylist.SaveToFile(SavePath + 'temp.npl', True);
 end;
 
-(*
-function TNemp_MainForm.ArtistDragContainsFiles: Boolean;
-var SDataArtist: PStringTreeData;
-    ArtistNode: PVirtualNode;
-begin
-    ArtistNode := ArtistsVST.FocusedNode;
-    if assigned(ArtistNode) then
-    begin
-        SDataArtist := ArtistsVST.GetNodeData(ArtistNode);
-        result := (TJustAstring(SDataArtist^.FString).DataString <> BROWSE_PLAYLISTS)
-             AND (TJustAstring(SDataArtist^.FString).DataString <> BROWSE_RADIOSTATIONS);
-    end else
-        // no artist selected, no files to drag
-        result := False
-end;
-
-
-function TNemp_MainForm.ArtistAlbumDragContainsFiles: Boolean;
-var SDataArtist: PStringTreeData;
-    ArtistNode, AlbumNode: PVirtualNode;
-begin
-    ArtistNode := ArtistsVST.FocusedNode;
-    if assigned(ArtistNode) then
-    begin
-        SDataArtist := ArtistsVST.GetNodeData(ArtistNode);
-        if (TJustAstring(SDataArtist^.FString).DataString <> BROWSE_PLAYLISTS)
-             AND (TJustAstring(SDataArtist^.FString).DataString <> BROWSE_RADIOSTATIONS)
-        then
-            // Artist is not All-Webradio or Playlists -> there are files to drag
-            result := True
-        else
-        begin
-            // we need to check for a focused album node
-            AlbumNode  := AlbenVST.FocusedNode;
-            // Dragging files does make sense, if an "album" is selected,
-            // provided that it is not a webradio station (regular playlist files are ok!)
-            result := assigned(AlbumNode) and (TJustAstring(SDataArtist^.FString).DataString <> BROWSE_RADIOSTATIONS);
-        end;
-    end else
-        // no artist selected, no files to drag
-        result := False
-end;
-*)
-
-
-
 
 procedure TNemp_MainForm.FormResize(Sender: TObject);
 begin
@@ -10413,6 +9986,8 @@ end;
 
 procedure TNemp_MainForm.EDITFastSearchChange(Sender: TObject);
 begin
+  if MedienBib.Count = 0 then exit;
+
   If MedienBib.BibSearcher.QuickSearchOptions.WhileYouType then
   begin
       if Trim(EDITFastSearch.Text)= '' then
@@ -10440,8 +10015,10 @@ begin
               RefreshCoverFlowTimer.Enabled := False;
               if Trim(EDITFastSearch.Text) = '*' then
                   MedienBib.QuickSearchShowAllFiles
-              else
-                  FillTreeViewQueryTooShort;
+              else begin
+                VST.EmptyListMessage := MedienBib.BibSearcher.GetNewEmptyListMessage(elmShortSearch);
+                VST.Invalidate;
+              end;
           end;
   end;
 end;
@@ -10523,53 +10100,6 @@ begin
 end;
 
 
-(*
-procedure TNemp_MainForm.PM_ML_SortCollectionByClick(Sender: TObject);
-var
-  aNode: PVirtualNode;
-  ac: TAudioCollection;
-  acFile: TAudioFileCollection;
-  newSorting: teCollectionSorting;
-begin
-  if MedienBib.StatusBibUpdate >= 2 then
-  begin
-    TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
-    exit;
-  end;
-
-  newSorting := teCollectionSorting((Sender as TMenuItem).Tag);
-  case MedienBib.BrowseMode of
-      0: begin
-            // classic browse mode
-            ac := Nil;
-            aNode := AlbenVST.FocusedNode;
-
-            if assigned(aNode) then
-              ac := AlbenVST.GetNodeData<TAudioCollection>(aNode);
-            if assigned(ac) and (ac is TAudioFileCollection) then begin
-              acFile := TAudioFileCollection(ac);
-              if not (acFile is TRootCollection) and (acFile.CollectionCount = 0) then
-                acFile := acFile.Parent;
-              // sort the selected collection (and only this one!)
-              acFile.ReSort(newSorting);
-               // refill Tree
-              AlbenVST.OnFocusChanged := NIL;
-              FillCollectionTree(Nil, True);
-              AlbenVST.OnFocusChanged := AlbenVSTFocusChanged;
-            end;
-       end;
-      1: begin
-        // todo
-      end
-      else
-      begin
-          // Tagcloud. Do nothing (menu item is disabled anyway)
-      end;
-  end;
-end;
-*)
-
-
 
 procedure TNemp_MainForm.SortierAuswahl1POPUPClick(Sender: TObject);
 var
@@ -10630,23 +10160,9 @@ begin
       OnlyChangeDirection := True;
       AddSecondSorter := False; //True; das geht nicht so ohne weiteres, wenn man nur die sortierrichtung umdreht ...
       newSorting := csDefault; // actually not used later
-      //secondSorting := csDefault; // actually not used later
       newDirection := teSortDirection(sndTag mod 2);
-      //secondDirection := teSortDirection(sndTag mod 2);
     end;
   end;
-
-
-(*  if (sndTag >= Ord(Low(teCollectionSorting))) and (sndTag <= Ord(High(teCollectionSorting))) then begin
-    OnlyChangeDirection := False;
-    newSorting := teCollectionSorting(sndTag);
-    newDirection := sd_Ascending;
-  end else
-  begin
-    OnlyChangeDirection := True;
-    newSorting := csDefault; // actually not used later
-    newDirection := teSortDirection(sndTag mod 2);
-  end;*)
 
   case MedienBib.BrowseMode of
       0: begin
@@ -10735,19 +10251,6 @@ begin
 end;
 
 
-
-
-procedure TNemp_MainForm.PM_ML_BrowseByMoreClick(Sender: TObject);
-begin
-{    if Not Assigned(OptionsCompleteForm) then
-        Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
-
-    OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.VorauswahlNode;
-    OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabView0;
-    OptionsCompleteForm.Show;
-}
-end;
-
 procedure TNemp_MainForm.TreePanelMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
@@ -10765,15 +10268,6 @@ begin
 
         RevokeDragFiles;
         IDropSource(fDropManager)._Release;// := Nil;
-        {try
-          IDropSource(fDropManager)._Release;
-          IDropSource(fDropManager)._Release;
-          IDropSource(fDropManager)._Release;
-          IDropSource(fDropManager)._Release;
-          IDropSource(fDropManager)._Release;
-        except
-
-        end; }
 
         TagLabelList.Free;
         CoverScrollbar.WindowProc := OldScrollbarWindowProc;
@@ -10792,9 +10286,6 @@ begin
         LanguageList.Free;
         NempUpdater.Free;
         FreeAndNil(ErrorLog);
-        //DeallocateHWnd(FOwnMessageHandler);
-        //ST_Playlist.Free;
-        //ST_Medienliste.Free;
     except
         halt;
     end;
@@ -11025,6 +10516,12 @@ begin
   ReAlignFileOverview;
 end;
 
+procedure TNemp_MainForm.actShowControlCoverExecute(Sender: TObject);
+begin
+  NempLayout.ShowControlCover := not NempLayout.ShowControlCover;
+  ReAlignControlCover;
+end;
+
 // Set the Checked/Visible/Enabled status of the Layout-Actions.
 // Called in OnClick of the "View" MenuItems
 procedure TNemp_MainForm.RefreshActionLayoutCheckedStatus;
@@ -11056,6 +10553,7 @@ begin
   actFileOverviewOnlyDetails.Checked := NempLayout.FileOverviewMode = fovText;
   actFileOverviewStacked.Checked := NempLayout.FileOVerviewOrientation = 1;
   actFileOverviewSideBySide.Checked := NempLayout.FileOVerviewOrientation = 0;
+  actShowControlCover.Checked := NempLayout.ShowControlCover;
 end;
 
 
@@ -11078,27 +10576,10 @@ begin
 end;
 
 procedure TNemp_MainForm._ControlPanelResize(Sender: TObject);
-var WidthLimit: Integer;
 begin
     if not FormReadyAndActivated then exit;
     if not NempLayout_Ready then exit;
-
-    //if NempFormBuildOptions.ControlPanelTwoRows then
-    //    WidthLimit := 305
-    //else
-        WidthLimit := 400;
-
-    //if not NempFormBuildOptions.ControlPanelTwoRows then
-    begin
-        PlayerControlCoverPanel.Visible := (_ControlPanel.Width > WidthLimit) and NempLayout.ShowControlCover;  //  NempFormBuildOptions.ControlPanelShowCover;
-        if PlayerControlCoverPanel.Visible then
-            ControlContainer1.Width := OutputControlPanel.Width
-                               + PlayerControlCoverPanel.Width
-                               + PlayerControlPanel.Width
-        else
-            ControlContainer1.Width := OutputControlPanel.Width
-                               + PlayerControlPanel.Width
-    end;
+    ReAlignControlCover;
 end;
 
 procedure TNemp_MainForm.NewPlayerPanelResize(Sender: TObject);
@@ -11673,6 +11154,8 @@ begin
                 // Set the Delete-Shortcut to 0, otherwise the DEL-Key wont work in Edit
                 case VST.Header.Columns[column].Tag of
                     CON_ARTIST,
+                    CON_ALBUMARTIST,
+                    CON_COMPOSER,
                     CON_TITEL,
                     CON_ALBUM,
                     CON_STANDARDCOMMENT,
@@ -11804,6 +11287,8 @@ begin
     WriteNewStringData := True;
     case VST.Header.Columns[column].Tag of
         CON_ARTIST : af.Artist := NewText;
+        CON_ALBUMARTIST: af.AlbumArtist := NewText;
+        CON_COMPOSER: af.Composer := NewText;
         CON_TITEL  : af.Titel := NewText;
         CON_ALBUM  : af.Album := NewText;
         CON_STANDARDCOMMENT : af.Comment := NewText;
@@ -11826,9 +11311,9 @@ begin
         begin
             SyncAudioFilesWith(af);
             MedienBib.Changed := True;
-            CorrectVCLAfterAudioFileEdit(af, True);
+            CorrectVCLAfterAudioFileEdit(af);
 
-            // using variables, as we need to perform *both* checks
+            // using variables, as we need to perform *both* checks, even if the first one is already TRUE
             SearchDirty := MedienBib.SearchStringIsDirty(VST.Header.Columns[column].Tag);
             CollectionDirty := MedienBib.CollectionsAreDirty(VST.Header.Columns[column].Tag);
 
@@ -11863,9 +11348,7 @@ begin
   else
   begin
     // Jetzt die Hautform NICHT in den Vordergrund setzen
-/// ??? 2022    SetWindowPos(Nemp_MainForm.Handle,HWND_NOTOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
-
-
+    /// ??? 2022    SetWindowPos(Nemp_MainForm.Handle,HWND_NOTOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
   end;
 
   if assigned(PlaylistForm) and PlaylistForm.Visible then
@@ -12104,19 +11587,13 @@ begin
     CorrectVolButton;
 end;
 
-
-procedure TNemp_MainForm.AktualisiereDetailForm(aAudioFile: TAudioFile; Source: Integer; Foreground: Boolean = False);
+procedure TNemp_MainForm.ShowDetailForm(aAudioFile: TAudioFile; DoShow: Boolean);
 begin
-  if (not NempSkin.NempPartyMode.DoBlockDetailWindow) and AutoShowDetailsTMP then
-  begin
-    if not assigned(FDetails) then
-      Application.CreateForm(TFDetails, FDetails);
+  if NempSkin.NempPartyMode.DoBlockDetailWindow then exit;
+  if not assigned(FDetails) then
+    Application.CreateForm(TFDetails, FDetails);
 
-    FDetails.ShowDetails(aAudioFile, Source);
-    //fDetails.BringToFront;
-    if ForeGround then
-      SetForeGroundWindow(FDetails.Handle);
-  end;
+  FDetails.NewAudioFileSelected(aAudioFile, DoShow);
 end;
 
 
@@ -13223,7 +12700,7 @@ end;
 ///  5. During Dragging: DragOver (many different options ...)
 ///  -------------------------------------------------
 ///  * Trees listing Files/Collections from the Library:
-///    - possible Actions are "add to the Library"
+///    - possible Actions are "add to the Library" and "add to category"
 ///    - give Feedback when no proper action will be executed
 ///      (i.e. the user is just dragging within the library )
 
@@ -13239,7 +12716,6 @@ procedure TNemp_MainForm.HandleLibraryDragOver(lc: TLibraryCategory; DataObject:
 
   procedure SetExternalOrPlayerFeedback;
   begin
-    // SetFeedBackParams(DROPEFFECT_COPY, True, DragDropLibrary)   // TODO in DROP QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ
     if assigned(lc) and (LC.CategoryType = ccFiles) and (not lc.IsDefault) and (not lc.IsNew) then
       SetFeedBackParams(DROPEFFECT_COPY, True, DragDropLibraryCategory)
     else
@@ -13250,8 +12726,7 @@ begin
   if assigned(fDropManager.DragSource) then begin
     if fDropManager.SourceIsPlayer then begin
       // Dragging from the Player/Playlist to the Library
-      //SetFeedBackParams(DROPEFFECT_COPY, True, DragDropLibrary)
-      SetExternalOrPlayerFeedback    // TODO in DROP QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ
+      SetExternalOrPlayerFeedback;
     end
     else begin
       // DragSource is the MediaLibrary itself
@@ -13462,13 +12937,12 @@ end;
 ///  6. Dropping (many different options ...)
 ///  -------------------------------------------------
 ///  * Trees listing Files/Collections from the Library:
-///    - possible Actions are "add to the Library"
-///    - DropSource is always "Extern" (unless we allow D&D from the playlist into the library later)     !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+///    - possible Actions are "add to the Library" or "add to category"
 procedure TNemp_MainForm.LibraryCollectionTreeDragDrop(Sender: TBaseVirtualTree;
   Source: TObject; DataObject: IDataObject; Formats: TFormatArray;
   Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
 begin
-  LibraryMetaDragDrop(Shift, Pt, Mode, DataObject, Effect);     ////  QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ
+  LibraryMetaDragDrop(Shift, Pt, Mode, DataObject, Effect);
 end;
 
 procedure TNemp_MainForm.LibraryMetaDragDrop(Shift: TShiftState; Pt: TPoint;
@@ -13517,7 +12991,7 @@ begin
 
     // Target is Library: Do the same as for the CollectionTree/FileTree
     ws_Library : begin
-      LibraryMetaDragDrop(Shift, Pt, dmOnNode, DataObject, Effect);    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      LibraryMetaDragDrop(Shift, Pt, dmOnNode, DataObject, Effect);
     end;
 
     // Target is one of the Player Controls
@@ -13618,40 +13092,6 @@ begin
             end;
           end;
         end;
-
-  {
-
-  if assigned(fDropManager.DragSource) then begin
-     //for i := 0 to DragDropList.Count - 1 do
-      ShowMessage(IntToStr(fDropManager.FileNameCount));
-      // DragSource := DS_EXTERN;
-      // todo: Move/Copy files into the category
-  end
-  else
-  begin
-    MyList := TStringList.Create;
-    try
-      for i := 0 to High(formats) - 1 do
-      begin
-
-        if (Formats[i] = CF_HDROP) then
-        begin
-          wuppdi;
-          GetFileListFromObj(DataObject, MyList);
-          // todo: Add Files To Library, into the specific category (if available)
-          //here we have all filenames
-          for j:=0 to MyList.Count - 1 do
-          begin
-            ShowMessage(MyList[j]);
-          end;
-        end;
-      end;
-    finally
-      MyList.Free;
-    end;
-  end;
-    }
-
 end;
 
 
@@ -13770,58 +13210,6 @@ begin
 end;
 
 
-// horizontal splitter between Top and VST
-procedure TNemp_MainForm.MainSplitterMoved(Sender: TObject);
-begin
-{    if not FormReadyAndActivated then exit;
-    if not Assigned_NempFormBuildOptions then exit;
-
-    //NempOptions.NempFormRatios.VSTHeight := Round(_TopMainPanel.Height / Height * 100);
-    NempFormBuildOptions.OnMainSplitterMoved(Sender);
-
-    if NempSkin.isActive then
-    begin
-        NempSkin.RepairSkinOffset;
-        NempSkin.SetVSTOffsets;
-        RepaintPanels;
-    end;
-}
-end;
-
-// vertical splitter between player and Browse
-procedure TNemp_MainForm.SubSplitter1Moved(Sender: TObject);
-begin
-{    if not FormReadyAndActivated then exit;
-
-    if Assigned_NempFormBuildOptions then
-        NempFormBuildOptions.OnSplitterMoved(Sender);
-
-    if NempSkin.isActive then
-    begin
-        NempSkin.FitSkinToNewWindow;
-        RepaintPanels;
-    end;
-}
-end;
-
-// vertical splitter between VST and Cover
-procedure TNemp_MainForm.SubSplitter2Moved(Sender: TObject);
-begin
-{    if not FormReadyAndActivated then exit;
-    if not Assigned_NempFormBuildOptions then exit;
-
-    if Assigned_NempFormBuildOptions then
-      NempFormBuildOptions.OnSplitterMoved(Sender);
-
-    if NempSkin.isActive then
-    begin
-        NempSkin.RepairSkinOffset;
-        NempSkin.SetVSTOffsets;
-        RepaintPanels;
-    end;
-}
-end;
-
 procedure TNemp_MainForm.ReSizeBrowseTrees;
 begin
   if not NempLayout.ShowCategoryTree then
@@ -13894,8 +13282,6 @@ begin
   DetailCoverLyricsPanel.Align := alNone;
   DetailID3TagPanel.Align := alNone;
 
-  // := NempLayout.FileOverviewMode = fovBoth;
-
   case NempLayout.FileOverviewMode of
     fovCover: begin
       SplitterFileOverview.Visible := False;
@@ -13932,6 +13318,18 @@ begin
     end;
   end;
   LockWindowUpdate(0);
+end;
+
+procedure TNemp_MainForm.ReAlignControlCover;
+begin
+  PlayerControlCoverPanel.Visible := (_ControlPanel.Width > 550) and NempLayout.ShowControlCover;
+  if PlayerControlCoverPanel.Visible then
+      ControlContainer1.Width := OutputControlPanel.Width
+                         + PlayerControlCoverPanel.Width
+                         + PlayerControlPanel.Width
+  else
+      ControlContainer1.Width := OutputControlPanel.Width
+                         + PlayerControlPanel.Width
 end;
 
 procedure TNemp_MainForm.AfterLayoutBuild(Sender: TObject);
@@ -13996,24 +13394,30 @@ begin
   end;
 end;
 
-procedure TNemp_MainForm.__MainContainerPanelResize(Sender: TObject);
+{procedure TNemp_MainForm.__MainContainerPanelResize(Sender: TObject);
 begin
     if not FormReadyAndActivated then
         exit;
 
     //if Assigned_NempFormBuildOptions then
     //    NempFormBuildOptions.OnSuperContainerResize(Sender);
-end;
+end;}
 
 
 function TNemp_MainForm.ApplicationEvents1Help(Command: Word; Data: NativeInt;
   var CallHelp: Boolean): Boolean;
 begin
   CloseHelpWnd;
-  Result := ShellExecute(0,'open','hh.exe',
+  if FileExists(Application.HelpFile) then
+    Result := ShellExecute(0,'open','hh.exe',
                          PWideChar('-mapid '+IntToStr(Data)
                                    +' ms-its:'+Application.HelpFile),
-                         nil,SW_SHOW) = 32;
+                         nil,SW_SHOW) = 32
+  else begin
+    result := false;
+    TranslateMessageDLG((Error_HelpFileNotFound), mtError, [MBOK], 0);
+  end;
+
   CallHelp := false;
 end;
 

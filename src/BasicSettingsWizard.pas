@@ -8,7 +8,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2019, Daniel Gaussmann
+    Copyright (C) 2005-2022, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -39,13 +39,13 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtCtrls, StdCtrls, ComCtrls, gnuGettext, Nemp_SkinSystem, MyDialogs,
-  MainFormHelper ;
+  MainFormHelper, NempHelp ;
 
 const
     //WIZ_SHOW_AGAIN     = 41;
     WIZ_CURRENT_VERSION = 42;
-
     WIZ_CURRENT_SKINVERSION = 46;
+    // WIZ_CURRENT_TAGSVERSION = 50;
 
 type
 
@@ -172,19 +172,23 @@ begin
         end;
     end;
 
-    if NempOptions.LastKnownVersion < WIZ_CURRENT_SKINVERSION then
+    if (NempOptions.LastKnownVersion < WIZ_CURRENT_SKINVERSION) then
     begin
-        if (NempOptions.SkinName <> '<public> Dark') and  NempSettingsManager.WriteAccessPossible then
+        if (NempOptions.SkinName <> 'Dark') and  NempSettingsManager.WriteAccessPossible then
         begin
           if TranslateMessageDLG((Wizard_NewSkin), mtInformation, [MBYES, MBNO], 0) = mrYES then
           begin
               NempOptions.UseSkin := True;
-              NempOptions.SkinName := '<public> Dark';
+              NempOptions.SkinName := 'Dark';
               Nemp_MainForm.ActivateSkin(ExtractFilePath(ParamStr(0)) + 'Skins\Dark');
               SetSkinRadioBox(NempOptions.SkinName);
           end;
         end;
     end;
+
+    //if (NempOptions.LastKnownVersion < WIZ_CURRENT_TAGSVERSION) and (NempOptions.LastKnownVersion > 0) then begin
+    //  if NempSettingsManager.WriteAccessPossible then
+    //    TranslateMessageDLG((Wizard_NewTags), mtInformation, [MBOK], 0)
 end;
 
 procedure TWizard.BtnCancelClick(Sender: TObject);
@@ -199,6 +203,7 @@ var filename: String;
 
 begin
     TranslateComponent (self);
+    HelpContext := HELP_Wizard;
 
     TabSheet1.TabVisible := False;
     TabSheet2.TabVisible := False;

@@ -276,6 +276,7 @@ type
             function fGetArtist      : UnicodeString;  override;
             function fGetYear        : UnicodeString;  override;
             function fGetGenre       : UnicodeString;  override;
+            function fGetAlbumArtist : UnicodeString; override;
 
             procedure fSetTitle       (value: UnicodeString);  override;
             procedure fSetAlbum       (value: UnicodeString);  override;
@@ -283,6 +284,7 @@ type
             procedure fSetArtist      (value: UnicodeString);  override;
             procedure fSetGenre       (value: UnicodeString);  override;
             procedure fSetYear        (value: UnicodeString);  override;
+            procedure fSetAlbumArtist (value: UnicodeString); override;
 
             function fGetFileType            : TAudioFileType; override;
             function fGetFileTypeDescription : String;         override;
@@ -590,6 +592,10 @@ function TOggVorbisFile.fGetAlbum: UnicodeString;
 begin
     result := SecondOggVorbisPage.Comments.Album;
 end;
+function TOggVorbisFile.fGetAlbumArtist: UnicodeString;
+begin
+  result := SecondOggVorbisPage.Comments.AlbumArtist;
+end;
 function TOggVorbisFile.fGetArtist: UnicodeString;
 begin
     result := SecondOggVorbisPage.Comments.Artist;
@@ -654,6 +660,11 @@ procedure TOggVorbisFile.fSetAlbum(value: UnicodeString);
 begin
     SecondOggVorbisPage.Comments.Album := value;
 end;
+procedure TOggVorbisFile.fSetAlbumArtist(value: UnicodeString);
+begin
+  SecondOggVorbisPage.Comments.AlbumArtist := value;
+end;
+
 procedure TOggVorbisFile.fSetArtist(value: UnicodeString);
 begin
     SecondOggVorbisPage.Comments.Artist := value;

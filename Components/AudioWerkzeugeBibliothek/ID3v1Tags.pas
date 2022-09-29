@@ -405,12 +405,9 @@ begin
     if AutoCorrectCodepage then
     begin
       if IsUTf8String(Value) then
-        result := UTF8Decode(Value)
+        result := UTF8ToString(Value)
       else
       begin
-
-
-
 
                 L := MultiByteToWideChar(FCharCode.CodePage,
                           MB_PRECOMPOSED,  // Flags

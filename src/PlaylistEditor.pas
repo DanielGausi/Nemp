@@ -37,7 +37,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, VirtualTrees, Vcl.StdCtrls, Generics.Collections,
-  WinApi.ShellApi, WinApi.ActiveX, MyDialogs,
+  WinApi.ShellApi, WinApi.ActiveX, MyDialogs, NempHelp,
   NempAudioFiles, PlayerClass, PlaylistClass, PlaylistManagement, AudioFileHelper, DriveRepairTools,
   Vcl.Menus, VCL.Clipbrd, NempDragFiles, vcl.themes;
 
@@ -188,6 +188,8 @@ begin
 
     RegisterDragDrop(PlaylistFilesVST.Handle, Nemp_MainForm.fDropManager as IDropTarget);
     TranslateComponent (self);
+
+    HelpContext := HELP_FavoritePlaylists;
 end;
 
 procedure TPlaylistEditorForm.FormDestroy(Sender: TObject);

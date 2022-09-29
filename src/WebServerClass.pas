@@ -1929,29 +1929,32 @@ begin
 
     EnterCriticalSection(CS_AccessLibrary);
 
-    Keywords := ExplodeWithQuoteMarks('+', Keyword);
-
-    SetLength(KeywordsUTF8, Keywords.Count);
-    for i := 0 to Keywords.Count - 1 do
-        KeywordsUTF8[i] := UTF8Encode(AnsiLowerCase(Keywords[i]));
-
-    tmpList := TAudioFileList.Create(False);
+    Keywords := TStringList.Create;
     try
-        for i := 0 to fWebMedienBib.Count - 1 do
-        begin
-            if AudioFileMatchesKeywords(fWebMedienBib[i], Keywords) then
-                DestList.Add(fWebMedienBib[i])
-            else
-                if AudioFileMatchesKeywordsApprox(fWebMedienBib[i], KeywordsUTF8) then
-                    tmpList.Add(fWebMedienBib[i]);
-        end;
-        for i := 0 to tmpList.Count - 1 do
-            DestList.Add(tmpList[i]);
-    finally
-        tmpList.Free;
-    end;
-    Keywords.Free;
+        ExplodeWithQuoteMarks('+', Keyword, Keywords);
 
+        SetLength(KeywordsUTF8, Keywords.Count);
+        for i := 0 to Keywords.Count - 1 do
+            KeywordsUTF8[i] := UTF8Encode(AnsiLowerCase(Keywords[i]));
+
+        tmpList := TAudioFileList.Create(False);
+        try
+            for i := 0 to fWebMedienBib.Count - 1 do
+            begin
+                if AudioFileMatchesKeywords(fWebMedienBib[i], Keywords) then
+                    DestList.Add(fWebMedienBib[i])
+                else
+                    if AudioFileMatchesKeywordsApprox(fWebMedienBib[i], KeywordsUTF8) then
+                        tmpList.Add(fWebMedienBib[i]);
+            end;
+            for i := 0 to tmpList.Count - 1 do
+                DestList.Add(tmpList[i]);
+        finally
+            tmpList.Free;
+        end;
+    finally
+      Keywords.Free;
+    end;
     LeaveCriticalSection(CS_AccessLibrary);
 end;
 

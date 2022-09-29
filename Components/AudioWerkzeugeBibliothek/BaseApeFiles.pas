@@ -94,6 +94,7 @@ type
             procedure fSetYear  (aValue: UnicodeString); override;
             procedure fSetTrack (aValue: UnicodeString); override;
             procedure fSetGenre (aValue: UnicodeString); override;
+            procedure fSetAlbumArtist (value: UnicodeString); override;
 
             function fGetTitle  : UnicodeString; override;
             function fGetArtist : UnicodeString; override;
@@ -101,6 +102,7 @@ type
             function fGetYear   : UnicodeString; override;
             function fGetTrack  : UnicodeString; override;
             function fGetGenre  : UnicodeString; override;
+            function fGetAlbumArtist : UnicodeString; override;
 
             function ReadAudioDataFromStream(aStream: TStream): Boolean; virtual;
             function fGetFileType            : TAudioFileType; override;
@@ -242,6 +244,11 @@ begin
     ApeTag.Album := aValue;
     fID3v1Tag.Album := aValue;
 end;
+procedure TBaseApeFile.fSetAlbumArtist(value: UnicodeString);
+begin
+  ApeTag.AlbumArtist := Value;
+end;
+
 procedure TBaseApeFile.fSetArtist(aValue: UnicodeString);
 begin
     ApeTag.Artist := aValue;
@@ -274,6 +281,10 @@ begin
     result := ApeTag.Album;
     if result = '' then
         result := fID3v1Tag.Album;
+end;
+function TBaseApeFile.fGetAlbumArtist: UnicodeString;
+begin
+  result := ApeTag.AlbumArtist;
 end;
 function TBaseApeFile.fGetArtist: UnicodeString;
 begin

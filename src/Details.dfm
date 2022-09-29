@@ -1,6 +1,9 @@
 object FDetails: TFDetails
   Left = 220
   Top = 125
+  Hint = 
+    'Refresh this form whenever you select another file in the main w' +
+    'indow.'
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'File properties'
@@ -12,13 +15,13 @@ object FDetails: TFDetails
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  Menu = MainMenu1
   Position = poMainFormCenter
   ShowHint = True
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnHide = FormHide
-  OnShow = FormShow
   TextHeight = 13
   object MainPageControl: TPageControl
     AlignWithMargins = True
@@ -26,28 +29,29 @@ object FDetails: TFDetails
     Top = 3
     Width = 615
     Height = 503
-    ActivePage = Tab_Pictures
+    ActivePage = Tab_General
     Align = alClient
+    MultiLine = True
     TabOrder = 0
     OnChange = MainPageControlChange
-    OnChanging = MainPageControlChanging
     object Tab_General: TTabSheet
-      Caption = 'Summary'
+      Caption = 'Overview'
       DoubleBuffered = False
       ParentDoubleBuffered = False
+      PopupMenu = PM_FileOverview
       object GrpBox_File: TGroupBox
         Left = 0
         Top = 0
         Width = 607
-        Height = 169
+        Height = 145
         Align = alTop
-        Caption = 'File'
+        Caption = 'File properties'
         Color = clBtnFace
         ParentColor = False
         TabOrder = 0
         DesignSize = (
           607
-          169)
+          145)
         object LBLName: TLabel
           Left = 103
           Top = 31
@@ -176,7 +180,7 @@ object FDetails: TFDetails
         object LblFormat: TLabel
           Left = 103
           Top = 111
-          Width = 335
+          Width = 126
           Height = 13
           AutoSize = False
           Caption = '...'
@@ -202,7 +206,7 @@ object FDetails: TFDetails
         object LBLBitrate: TLabel
           Left = 103
           Top = 95
-          Width = 335
+          Width = 126
           Height = 13
           AutoSize = False
           Caption = '...'
@@ -237,42 +241,24 @@ object FDetails: TFDetails
         end
         object CoverLibrary1: TImage
           AlignWithMargins = True
-          Left = 449
+          Left = 476
           Top = 13
-          Width = 150
-          Height = 150
+          Width = 120
+          Height = 120
           Anchors = [akTop, akRight]
           Center = True
           OnDblClick = CoverIMAGEDblClick
         end
-        object Btn_Explore: TButton
-          Left = 16
-          Top = 131
-          Width = 102
-          Height = 25
-          Caption = 'Explorer'
-          TabOrder = 0
-          OnClick = Btn_ExploreClick
-        end
-        object Btn_Properties: TButton
-          Left = 127
-          Top = 131
-          Width = 102
-          Height = 25
-          Caption = 'Properties'
-          TabOrder = 1
-          OnClick = Btn_PropertiesClick
-        end
         object PnlWarnung: TPanel
           Left = 235
-          Top = 128
+          Top = 101
           Width = 208
-          Height = 35
+          Height = 24
           BevelOuter = bvNone
-          TabOrder = 2
+          TabOrder = 0
           object Image1: TImage
             Left = 0
-            Top = 4
+            Top = 0
             Width = 24
             Height = 24
             Picture.Data = {
@@ -335,7 +321,7 @@ object FDetails: TFDetails
             Left = 30
             Top = 0
             Width = 170
-            Height = 35
+            Height = 24
             AutoSize = False
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
@@ -352,410 +338,399 @@ object FDetails: TFDetails
       end
       object PnlLibraryMetadata: TPanel
         Left = 0
-        Top = 169
+        Top = 145
         Width = 607
-        Height = 306
+        Height = 330
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
-        object GrpBox_ID3v2: TGroupBox
+        object GrpBox_MetaDataLibrary: TGroupBox
           Left = 0
           Top = 0
-          Width = 409
-          Height = 306
-          Align = alLeft
-          Caption = 'Metadata'
+          Width = 607
+          Height = 330
+          Align = alClient
+          Caption = 'Metadata overview'
           DoubleBuffered = False
           ParentDoubleBuffered = False
           TabOrder = 0
-          object LblConst_Artist: TLabel
-            Left = 10
-            Top = 29
-            Width = 80
-            Height = 13
-            Alignment = taRightJustify
-            AutoSize = False
-            Caption = 'Artist'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentFont = False
-            ShowAccelChar = False
-            Transparent = True
-          end
-          object LblConst_Title: TLabel
-            Left = 12
-            Top = 51
-            Width = 80
-            Height = 13
-            Alignment = taRightJustify
-            AutoSize = False
-            Caption = 'Title'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentFont = False
-            ShowAccelChar = False
-            Transparent = True
-          end
-          object LblConst_Album: TLabel
-            Left = 12
-            Top = 75
-            Width = 80
-            Height = 13
-            Alignment = taRightJustify
-            AutoSize = False
-            Caption = 'Album'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentFont = False
-            ShowAccelChar = False
-            Transparent = True
-          end
-          object LblConst_Year: TLabel
-            Left = 291
-            Top = 123
-            Width = 48
-            Height = 13
-            Alignment = taRightJustify
-            AutoSize = False
-            Caption = 'Year'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentFont = False
-            ShowAccelChar = False
-            Transparent = True
-          end
-          object LblConst_Genre: TLabel
-            Left = 11
-            Top = 123
-            Width = 80
-            Height = 13
-            Alignment = taRightJustify
-            AutoSize = False
-            Caption = 'Genre'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentFont = False
-            ShowAccelChar = False
-            Transparent = True
-          end
-          object LblConst_Comment: TLabel
-            Left = 14
-            Top = 99
-            Width = 80
-            Height = 13
-            Alignment = taRightJustify
-            AutoSize = False
-            Caption = 'Comment'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentFont = False
-            ShowAccelChar = False
-            Transparent = True
-          end
-          object LblConst_Track: TLabel
-            Left = 62
-            Top = 147
-            Width = 30
-            Height = 13
-            Alignment = taRightJustify
-            AutoSize = False
-            Caption = 'Track'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentFont = False
-            ShowAccelChar = False
-            Transparent = True
-          end
-          object LblConst_Rating: TLabel
-            Left = 8
-            Top = 171
-            Width = 80
-            Height = 13
-            Alignment = taRightJustify
-            AutoSize = False
-            Caption = 'Rating'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentFont = False
-            Transparent = True
-          end
-          object IMG_LibraryRating: TImage
-            Left = 96
-            Top = 171
-            Width = 70
-            Height = 14
-            ParentShowHint = False
-            ShowHint = False
-            Transparent = True
-            OnMouseDown = IMG_LibraryRatingMouseDown
-            OnMouseLeave = IMG_LibraryRatingMouseLeave
-            OnMouseMove = IMG_LibraryRatingMouseMove
-          end
-          object LblConst_CD: TLabel
-            Left = 171
-            Top = 147
-            Width = 14
-            Height = 13
-            Alignment = taRightJustify
-            Caption = 'CD'
-          end
-          object LblPlayCounter: TLabel
-            Left = 179
-            Top = 171
-            Width = 12
-            Height = 13
-            Caption = '...'
-          end
-          object lblConst_ReplayGain: TLabel
-            Left = 12
-            Top = 218
-            Width = 80
-            Height = 13
-            Alignment = taRightJustify
-            AutoSize = False
-            Caption = 'ReplayGain'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentFont = False
-            Transparent = True
-          end
-          object LblReplayGainTitle: TLabel
-            Left = 96
-            Top = 218
-            Width = 12
-            Height = 13
-            Caption = '...'
-            ParentShowHint = False
-            ShowAccelChar = False
-            ShowHint = True
-            Transparent = True
-            OnClick = LBLPfadClick
-          end
-          object LblReplayGainAlbum: TLabel
-            Left = 96
-            Top = 237
-            Width = 12
-            Height = 13
-            Caption = '...'
-            ParentShowHint = False
-            ShowAccelChar = False
-            ShowHint = True
-            Transparent = True
-            OnClick = LBLPfadClick
-          end
-          object Edit_LibraryArtist: TEdit
-            Left = 96
-            Top = 24
-            Width = 300
-            Height = 21
+          object pnlExtendedTags: TPanel
+            Left = 409
+            Top = 15
+            Width = 196
+            Height = 313
+            Align = alClient
+            BevelOuter = bvNone
             TabOrder = 0
-            OnChange = EditLibraryChange
+            DesignSize = (
+              196
+              313)
+            object lblExtendedTags: TLabel
+              Left = 6
+              Top = 8
+              Width = 80
+              Height = 13
+              AutoSize = False
+              Caption = 'Extended tags'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ShowAccelChar = False
+              Transparent = True
+            end
+            object lb_Tags: TListBox
+              AlignWithMargins = True
+              Left = 6
+              Top = 24
+              Width = 179
+              Height = 273
+              Anchors = [akLeft, akTop, akRight, akBottom]
+              ItemHeight = 13
+              PopupMenu = PM_EditExtendedTags
+              TabOrder = 0
+              OnDblClick = lb_TagsDblClick
+            end
           end
-          object Edit_LibraryTitle: TEdit
-            Left = 96
-            Top = 48
-            Width = 300
-            Height = 21
+          object pnlMetadataOverview: TPanel
+            Left = 2
+            Top = 15
+            Width = 407
+            Height = 313
+            Align = alLeft
+            BevelOuter = bvNone
             TabOrder = 1
-            OnChange = EditLibraryChange
-          end
-          object Edit_LibraryAlbum: TEdit
-            Left = 96
-            Top = 72
-            Width = 300
-            Height = 21
-            TabOrder = 2
-            OnChange = EditLibraryChange
-          end
-          object Edit_LibraryYear: TEdit
-            Left = 345
-            Top = 120
-            Width = 51
-            Height = 21
-            NumbersOnly = True
-            TabOrder = 5
-            OnChange = Edit_LibraryYearChange
-          end
-          object Edit_LibraryComment: TEdit
-            Left = 96
-            Top = 96
-            Width = 300
-            Height = 21
-            TabOrder = 3
-            OnChange = EditLibraryChange
-          end
-          object Edit_LibraryTrack: TEdit
-            Left = 96
-            Top = 144
-            Width = 51
-            Height = 21
-            TabOrder = 6
-            OnChange = Edit_LibraryTrackChange
-          end
-          object BtnResetRating: TButton
-            Left = 96
-            Top = 191
-            Width = 102
-            Height = 25
-            Hint = 'Set rating and playcounter to zero'
-            Caption = 'Reset'
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 8
-            OnClick = BtnResetRatingClick
-          end
-          object CB_LibraryGenre: TComboBox
-            Left = 96
-            Top = 120
-            Width = 146
-            Height = 21
-            AutoComplete = False
-            Sorted = True
-            TabOrder = 4
-            OnChange = EditLibraryChange
-          end
-          object BtnSynchRatingLibrary: TButton
-            Left = 207
-            Top = 191
-            Width = 142
-            Height = 25
-            Hint = 
-              'Synchronize rating/playcounter in the Metadata of the file with ' +
-              'the rating/playcounter in the library'
-            Caption = 'Synchronize rating'
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 9
-            OnClick = BtnSynchRatingLibraryClick
-          end
-          object Edit_LibraryCD: TEdit
-            Left = 191
-            Top = 144
-            Width = 51
-            Height = 21
-            TabOrder = 7
-            OnChange = Edit_LibraryYearChange
-          end
-          object Btn_Refresh: TButton
-            Left = 96
-            Top = 256
-            Width = 102
-            Height = 25
-            Caption = 'Refresh'
-            TabOrder = 10
-            OnClick = Btn_RefreshClick
-          end
-          object Btn_RenameTag: TButton
-            AlignWithMargins = True
-            Left = 344
-            Top = 275
-            Width = 27
-            Height = 25
-            Hint = 'Edit the selected tag'
-            Caption = '[...]'
-            TabOrder = 11
-            Visible = False
-            OnClick = Btn_RenameTagClick
-          end
-          object Btn_RemoveTag: TButton
-            AlignWithMargins = True
-            Left = 377
-            Top = 272
-            Width = 26
-            Height = 25
-            Hint = 'Remove the selected tag from the file'
-            Caption = '[ - ]'
-            TabOrder = 12
-            Visible = False
-            OnClick = Btn_RemoveTagClick
-          end
-        end
-        object GrpBox_TagCloud: TGroupBox
-          Left = 409
-          Top = 0
-          Width = 198
-          Height = 306
-          Align = alClient
-          Caption = 'Tag cloud'
-          TabOrder = 1
-          DesignSize = (
-            198
-            306)
-          object lb_Tags: TListBox
-            AlignWithMargins = True
-            Left = 8
-            Top = 24
-            Width = 179
-            Height = 206
-            Anchors = [akLeft, akTop, akRight]
-            ItemHeight = 13
-            PopupMenu = PM_EditExtendedTags
-            TabOrder = 3
-            OnDblClick = lb_TagsDblClick
-          end
-          object Btn_GetTagsLastFM: TButton
-            AlignWithMargins = True
-            Left = 102
-            Top = 236
-            Width = 85
-            Height = 25
-            Hint = 'Add Tags from LastFM'
-            Anchors = [akTop, akRight]
-            Caption = 'LastFM'
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 1
-            OnClick = Btn_GetTagsLastFMClick
-          end
-          object btn_AddTag: TButton
-            AlignWithMargins = True
-            Left = 8
-            Top = 236
-            Width = 85
-            Height = 25
-            Hint = 'Add a new tag to the file'
-            Caption = '[ + ]'
-            TabOrder = 0
-            OnClick = btn_AddTagClick
-          end
-          object Btn_TagCloudEditor: TButton
-            AlignWithMargins = True
-            Left = 6
-            Top = 265
-            Width = 181
-            Height = 25
-            Hint = 'Open tag cloud editor'
-            Anchors = [akLeft, akTop, akRight]
-            Caption = 'Cloud editor'
-            TabOrder = 2
-            OnClick = Btn_TagCloudEditorClick
+            object IMG_LibraryRating: TImage
+              Left = 96
+              Top = 222
+              Width = 70
+              Height = 14
+              ParentShowHint = False
+              ShowHint = False
+              Transparent = True
+              OnMouseDown = IMG_LibraryRatingMouseDown
+              OnMouseLeave = IMG_LibraryRatingMouseLeave
+              OnMouseMove = IMG_LibraryRatingMouseMove
+            end
+            object lblAlbumArtist: TLabel
+              Left = 14
+              Top = 123
+              Width = 80
+              Height = 13
+              Alignment = taRightJustify
+              AutoSize = False
+              Caption = 'Album-Artist'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ShowAccelChar = False
+              Transparent = True
+            end
+            object lblComposer: TLabel
+              Left = 14
+              Top = 147
+              Width = 80
+              Height = 13
+              Alignment = taRightJustify
+              AutoSize = False
+              Caption = 'Composer'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ShowAccelChar = False
+              Transparent = True
+            end
+            object LblConst_Album: TLabel
+              Left = 12
+              Top = 75
+              Width = 80
+              Height = 13
+              Alignment = taRightJustify
+              AutoSize = False
+              Caption = 'Album'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ShowAccelChar = False
+              Transparent = True
+            end
+            object LblConst_Artist: TLabel
+              Left = 10
+              Top = 29
+              Width = 80
+              Height = 13
+              Alignment = taRightJustify
+              AutoSize = False
+              Caption = 'Artist'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ShowAccelChar = False
+              Transparent = True
+            end
+            object LblConst_CD: TLabel
+              Left = 171
+              Top = 195
+              Width = 14
+              Height = 13
+              Alignment = taRightJustify
+              Caption = 'CD'
+            end
+            object LblConst_Comment: TLabel
+              Left = 14
+              Top = 99
+              Width = 80
+              Height = 13
+              Alignment = taRightJustify
+              AutoSize = False
+              Caption = 'Comment'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ShowAccelChar = False
+              Transparent = True
+            end
+            object LblConst_Genre: TLabel
+              Left = 10
+              Top = 171
+              Width = 80
+              Height = 13
+              Alignment = taRightJustify
+              AutoSize = False
+              Caption = 'Genre'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ShowAccelChar = False
+              Transparent = True
+            end
+            object LblConst_Rating: TLabel
+              Left = 8
+              Top = 222
+              Width = 80
+              Height = 13
+              Alignment = taRightJustify
+              AutoSize = False
+              Caption = 'Rating'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              Transparent = True
+            end
+            object lblConst_ReplayGain: TLabel
+              Left = 12
+              Top = 242
+              Width = 80
+              Height = 13
+              Alignment = taRightJustify
+              AutoSize = False
+              Caption = 'ReplayGain'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              Transparent = True
+            end
+            object LblConst_Title: TLabel
+              Left = 12
+              Top = 51
+              Width = 80
+              Height = 13
+              Alignment = taRightJustify
+              AutoSize = False
+              Caption = 'Title'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ShowAccelChar = False
+              Transparent = True
+            end
+            object LblConst_Track: TLabel
+              Left = 62
+              Top = 195
+              Width = 30
+              Height = 13
+              Alignment = taRightJustify
+              AutoSize = False
+              Caption = 'Track'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ShowAccelChar = False
+              Transparent = True
+            end
+            object LblConst_Year: TLabel
+              Left = 289
+              Top = 171
+              Width = 48
+              Height = 13
+              Alignment = taRightJustify
+              AutoSize = False
+              Caption = 'Year'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ShowAccelChar = False
+              Transparent = True
+            end
+            object LblPlayCounter: TLabel
+              Left = 179
+              Top = 222
+              Width = 12
+              Height = 13
+              Caption = '...'
+            end
+            object LblReplayGainAlbum: TLabel
+              Left = 96
+              Top = 261
+              Width = 12
+              Height = 13
+              Caption = '...'
+              ParentShowHint = False
+              ShowAccelChar = False
+              ShowHint = True
+              Transparent = True
+              OnClick = LBLPfadClick
+            end
+            object LblReplayGainTitle: TLabel
+              Left = 96
+              Top = 242
+              Width = 12
+              Height = 13
+              Caption = '...'
+              ParentShowHint = False
+              ShowAccelChar = False
+              ShowHint = True
+              Transparent = True
+              OnClick = LBLPfadClick
+            end
+            object CB_LibraryGenre: TComboBox
+              Left = 96
+              Top = 168
+              Width = 146
+              Height = 21
+              AutoComplete = False
+              Sorted = True
+              TabOrder = 0
+              OnChange = EditLibraryChange
+              OnExit = Edit_LibraryExit
+            end
+            object Edit_LibraryAlbum: TEdit
+              Left = 96
+              Top = 72
+              Width = 300
+              Height = 21
+              TabOrder = 1
+              OnChange = EditLibraryChange
+              OnExit = Edit_LibraryExit
+            end
+            object Edit_LibraryArtist: TEdit
+              Left = 96
+              Top = 24
+              Width = 300
+              Height = 21
+              TabOrder = 2
+              OnChange = EditLibraryChange
+              OnExit = Edit_LibraryExit
+            end
+            object Edit_LibraryCD: TEdit
+              Left = 191
+              Top = 192
+              Width = 51
+              Height = 21
+              TabOrder = 3
+              OnChange = Edit_LibraryYearChange
+              OnExit = Edit_LibraryExit
+            end
+            object Edit_LibraryComment: TEdit
+              Left = 96
+              Top = 96
+              Width = 300
+              Height = 21
+              TabOrder = 4
+              OnChange = EditLibraryChange
+              OnExit = Edit_LibraryExit
+            end
+            object Edit_LibraryTitle: TEdit
+              Left = 96
+              Top = 48
+              Width = 300
+              Height = 21
+              TabOrder = 5
+              OnChange = EditLibraryChange
+              OnExit = Edit_LibraryExit
+            end
+            object Edit_LibraryTrack: TEdit
+              Left = 96
+              Top = 192
+              Width = 51
+              Height = 21
+              TabOrder = 6
+              OnChange = Edit_LibraryTrackChange
+              OnExit = Edit_LibraryExit
+            end
+            object Edit_LibraryYear: TEdit
+              Left = 345
+              Top = 168
+              Width = 51
+              Height = 21
+              NumbersOnly = True
+              TabOrder = 7
+              OnChange = Edit_LibraryYearChange
+              OnExit = Edit_LibraryExit
+            end
+            object Edit_LibraryAlbumArtist: TEdit
+              Left = 96
+              Top = 120
+              Width = 300
+              Height = 21
+              TabOrder = 8
+              OnChange = EditLibraryChange
+              OnExit = Edit_LibraryExit
+            end
+            object Edit_LibraryComposer: TEdit
+              Left = 96
+              Top = 144
+              Width = 300
+              Height = 21
+              TabOrder = 9
+              OnChange = EditLibraryChange
+              OnExit = Edit_LibraryExit
+            end
           end
         end
       end
@@ -778,11 +753,10 @@ object FDetails: TFDetails
           Width = 597
           Height = 416
           Align = alClient
-          Enabled = False
-          ReadOnly = True
           ScrollBars = ssVertical
           TabOrder = 0
           OnChange = Memo_LyricsChange
+          OnExit = Memo_LyricsExit
           OnKeyDown = Memo_LyricsKeyDown
         end
         object pnlSearchLyrics: TPanel
@@ -815,7 +789,7 @@ object FDetails: TFDetails
             Width = 144
             Height = 25
             Caption = 'Search Lyrics'
-            DropDownMenu = PopupMenuSearchEngines
+            DropDownMenu = PM_SearchEngines
             Style = bsSplitButton
             TabOrder = 0
             OnClick = btnSearchLyricsClick
@@ -826,166 +800,106 @@ object FDetails: TFDetails
     object Tab_Pictures: TTabSheet
       Caption = 'Pictures (cover art)'
       ImageIndex = 3
+      PopupMenu = PM_CoverArt
       object PanelCoverArtFile: TPanel
         AlignWithMargins = True
         Left = 3
         Top = 3
-        Width = 333
+        Width = 357
         Height = 469
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
-        object gpBoxCurrentSelection: TGroupBox
-          Left = 0
-          Top = 159
-          Width = 333
-          Height = 310
-          Align = alClient
-          Caption = 'Current selection'
-          TabOrder = 1
-          DesignSize = (
-            333
-            310)
-          object ImgCurrentSelection: TImage
-            Left = 16
-            Top = 24
-            Width = 299
-            Height = 268
-            Anchors = [akLeft, akTop, akRight, akBottom]
-            Center = True
-            Proportional = True
-            Stretch = True
-            ExplicitHeight = 265
-          end
-        end
-        object PanelCoverArtSelection: TPanel
+        object gpBoxExistingCoverArt: TGroupBox
           Left = 0
           Top = 0
-          Width = 333
-          Height = 159
-          Align = alTop
-          BevelOuter = bvNone
+          Width = 357
+          Height = 469
+          Align = alClient
+          Caption = 'Cover art (meta data and image files)'
           TabOrder = 0
-          object GrpBox_Cover: TGroupBox
-            Left = 167
-            Top = 0
-            Width = 166
-            Height = 159
-            Align = alClient
-            Caption = 'Existing cover art (Files)'
-            TabOrder = 1
-            DesignSize = (
-              166
-              159)
-            object Btn_OpenImage: TButton
-              AlignWithMargins = True
-              Left = 8
-              Top = 51
-              Width = 150
-              Height = 25
-              Hint = 'Open the image with the default image viewer'
-              Anchors = [akLeft, akTop, akRight]
-              Caption = 'Open'
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 1
-              OnClick = Btn_OpenImageClick
-            end
-            object cbCoverArtFiles: TComboBox
-              AlignWithMargins = True
-              Left = 8
-              Top = 24
-              Width = 150
-              Height = 21
-              AutoComplete = False
-              Style = csDropDownList
-              Anchors = [akLeft, akTop, akRight]
-              TabOrder = 0
-              OnChange = cbCoverArtFilesChange
-              OnEnter = cbCoverArtFilesChange
-            end
+          DesignSize = (
+            357
+            469)
+          object lblCoverInfo: TLabel
+            Left = 16
+            Top = 430
+            Width = 12
+            Height = 13
+            Caption = '...'
           end
-          object GrpBox_Pictures: TGroupBox
-            Left = 0
-            Top = 0
-            Width = 167
-            Height = 159
-            Align = alLeft
-            Caption = 'Existing cover art (Metadata)'
+          object VSTCover: TVirtualStringTree
+            Left = 16
+            Top = 24
+            Width = 323
+            Height = 94
+            Anchors = [akLeft, akRight, akBottom]
+            Colors.UnfocusedSelectionColor = clHighlight
+            Colors.UnfocusedSelectionBorderColor = clHighlight
+            Header.AutoSizeIndex = 0
+            Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs]
+            Images = imgListCovertypes
+            Indent = 4
             TabOrder = 0
-            object Btn_NewPicture: TButton
-              AlignWithMargins = True
-              Left = 8
-              Top = 51
-              Width = 150
-              Height = 25
-              Hint = 'Add a cover art to the metadata'
-              Caption = 'New'
-              Enabled = False
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 1
-              OnClick = Btn_NewPictureClick
-            end
-            object Btn_DeletePicture: TButton
-              AlignWithMargins = True
-              Left = 8
-              Top = 81
-              Width = 150
-              Height = 25
-              Hint = 'Remove the selected cover art from the metadata'
-              Caption = 'Delete'
-              Enabled = False
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 2
-              OnClick = Btn_DeletePictureClick
-            end
-            object Btn_SavePictureToFile: TButton
-              AlignWithMargins = True
-              Left = 8
-              Top = 111
-              Width = 150
-              Height = 25
-              Hint = 'Save the selected cover at into a file'
-              Caption = 'Save to file'
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 3
-              OnClick = Btn_SavePictureToFileClick
-            end
-            object cbCoverArtMetadata: TComboBox
-              AlignWithMargins = True
-              Left = 8
-              Top = 24
-              Width = 150
-              Height = 21
-              Style = csDropDownList
-              TabOrder = 0
-              OnChange = cbCoverArtMetadataChange
-              OnEnter = cbCoverArtMetadataChange
+            TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
+            TreeOptions.SelectionOptions = [toFullRowSelect]
+            OnFocusChanged = VSTCoverFocusChanged
+            OnFreeNode = VSTCoverFreeNode
+            OnGetText = VSTCoverGetText
+            OnPaintText = VSTCoverPaintText
+            OnGetImageIndex = VSTCoverGetImageIndex
+            Touch.InteractiveGestures = [igPan, igPressAndTap]
+            Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+            Columns = <
+              item
+                Position = 0
+                Width = 319
+              end>
+          end
+          object pnlCoverCurrentSelection: TPanel
+            Left = 16
+            Top = 124
+            Width = 323
+            Height = 300
+            BevelKind = bkFlat
+            BevelOuter = bvNone
+            TabOrder = 1
+            object ImgCurrentSelection: TImage
+              Left = 0
+              Top = 0
+              Width = 319
+              Height = 296
+              Align = alClient
+              Center = True
+              Proportional = True
+              Stretch = True
+              OnDblClick = ImgCurrentSelectionDblClick
+              ExplicitLeft = 33
+              ExplicitTop = 24
+              ExplicitWidth = 263
+              ExplicitHeight = 127
             end
           end
         end
       end
       object GrpBox_CoverLibrary: TGroupBox
         AlignWithMargins = True
-        Left = 342
+        Left = 366
         Top = 3
-        Width = 262
+        Width = 238
         Height = 469
         Align = alRight
-        Caption = 'Cover art (Media library)'
+        Caption = 'Cover art for the Media library'
         TabOrder = 1
         DesignSize = (
-          262
+          238
           469)
         object CoverLibrary2: TImage
           AlignWithMargins = True
-          Left = 8
-          Top = 24
-          Width = 240
-          Height = 240
+          Left = 19
+          Top = 126
+          Width = 201
+          Height = 197
           Hint = 'The current cover art used in the media library'
           Center = True
           ParentShowHint = False
@@ -993,71 +907,34 @@ object FDetails: TFDetails
           ShowHint = True
           Stretch = True
         end
-        object BtnChangeCoverArtInLibrary: TButton
-          AlignWithMargins = True
-          Left = 8
-          Top = 301
-          Width = 241
-          Height = 25
-          Hint = 'Use the currently selected image as cover art'
-          Anchors = [akLeft, akTop, akRight]
-          Caption = 'Use current selection'
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 1
-          WordWrap = True
-          OnClick = BtnUseCurrentSelectionInLibraryClick
+        object lblChangeCoverArt: TLabel
+          Left = 19
+          Top = 330
+          Width = 98
+          Height = 13
+          Caption = 'Apply changes to ...'
         end
-        object BtnRemoveUserCover: TButton
-          AlignWithMargins = True
-          Left = 8
-          Top = 332
-          Width = 241
-          Height = 25
-          Hint = 
-            'Remove a manually set cover art and let Nemp choose it automatic' +
-            'ally'
-          Anchors = [akLeft, akTop, akRight]
-          Caption = 'Reset'
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 2
-          WordWrap = True
-          OnClick = BtnRemoveUserCoverClick
-        end
-        object BtnLoadCoverArt: TButton
-          AlignWithMargins = True
-          Left = 8
-          Top = 270
-          Width = 241
-          Height = 25
-          Hint = 'Load an image file for cover art'
-          Anchors = [akLeft, akTop, akRight]
-          Caption = 'Load cover art'
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 0
-          OnClick = BtnLoadAnotherImageClick
-        end
-        object rgChangeCoverArt: TRadioGroup
-          Left = 8
-          Top = 363
-          Width = 241
-          Height = 97
-          Anchors = [akLeft, akTop, akRight, akBottom]
-          Caption = 'Update cover art ...'
+        object cbChangeCoverArt: TComboBox
+          Left = 19
+          Top = 350
+          Width = 201
+          Height = 21
+          Style = csDropDownList
+          Anchors = [akTop, akRight]
           ItemIndex = 0
+          TabOrder = 0
+          Text = 'this file only'
           Items.Strings = (
-            'just for this file'
-            'for all files with this cover art'
-            'for all files in the same directory')
-          TabOrder = 3
+            'this file only'
+            'all files with this cover art'
+            'all files in the same directory')
         end
       end
     end
     object Tab_MetaData: TTabSheet
-      Caption = 'Metadata'
+      Caption = 'Metadata structure'
       ImageIndex = 1
+      PopupMenu = PM_TagStructure
       object GrpBox_TextFrames: TGroupBox
         Left = 0
         Top = 0
@@ -1066,63 +943,21 @@ object FDetails: TFDetails
         Align = alClient
         Caption = 'Metadata frames'
         TabOrder = 0
-        DesignSize = (
-          607
-          286)
-        object Btn_NewMetaFrame: TButton
-          AlignWithMargins = True
-          Left = 465
-          Top = 16
-          Width = 130
-          Height = 25
-          Anchors = [akTop, akRight]
-          Caption = 'New frame'
-          TabOrder = 0
-          OnClick = Btn_NewMetaFrameClick
-        end
-        object BtnCopyFromV1: TButton
-          Left = 465
-          Top = 250
-          Width = 130
-          Height = 25
-          Hint = 'Copy data from the ID3v1-Tag'
-          Anchors = [akRight, akBottom]
-          Caption = 'Copy from ID3 v1'
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 1
-          OnClick = BtnCopyFromV1Click
-        end
-        object cbFrameTypeSelection: TComboBox
-          AlignWithMargins = True
-          Left = 465
-          Top = 47
-          Width = 130
-          Height = 21
-          Style = csDropDownList
-          Anchors = [akTop, akRight]
-          ItemIndex = 0
-          TabOrder = 2
-          Text = 'ID3v2-Frame'
-          Items.Strings = (
-            'ID3v2-Frame'
-            'Apev2-Frame')
-        end
         object VST_MetaData: TVirtualStringTree
-          Left = 8
-          Top = 16
-          Width = 434
-          Height = 265
-          Anchors = [akLeft, akTop, akBottom]
+          Left = 2
+          Top = 15
+          Width = 603
+          Height = 269
+          Align = alClient
           BorderStyle = bsNone
           BorderWidth = 1
           Colors.UnfocusedSelectionColor = clHighlight
           Colors.UnfocusedSelectionBorderColor = clHighlight
-          Header.AutoSizeIndex = 0
+          Header.AutoSizeIndex = 3
           Header.MainColumn = 3
-          Header.Options = [hoColumnResize, hoDrag, hoVisible]
+          Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoVisible]
           Indent = 0
-          TabOrder = 3
+          TabOrder = 0
           TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toWheelPanning, toEditOnClick, toEditOnDblClick]
           TreeOptions.PaintOptions = [toShowBackground, toShowRoot, toThemeAware, toUseBlendedImages]
           TreeOptions.SelectionOptions = [toFullRowSelect]
@@ -1132,19 +967,19 @@ object FDetails: TFDetails
           OnGetText = VST_MetaDataGetText
           OnPaintText = VST_MetaDataPaintText
           OnNewText = VST_MetaDataNewText
-          OnNodeDblClick = VST_MetaDataNodeDblClick
           Touch.InteractiveGestures = [igPan, igPressAndTap]
           Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
           Columns = <
             item
               Position = 0
               Text = 'Type'
+              Width = 59
             end
             item
               Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coStyleColor]
               Position = 1
               Text = 'Key'
-              Width = 47
+              Width = 56
             end
             item
               Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coStyleColor]
@@ -1155,7 +990,7 @@ object FDetails: TFDetails
             item
               Position = 3
               Text = 'Value'
-              Width = 220
+              Width = 381
             end>
         end
       end
@@ -1177,7 +1012,7 @@ object FDetails: TFDetails
           TabOrder = 0
           object LblConst_ID3v1Artist: TLabel
             Left = 8
-            Top = 17
+            Top = 27
             Width = 83
             Height = 13
             Alignment = taRightJustify
@@ -1194,7 +1029,7 @@ object FDetails: TFDetails
           end
           object LblConst_ID3v1Title: TLabel
             Left = 8
-            Top = 41
+            Top = 51
             Width = 83
             Height = 13
             Alignment = taRightJustify
@@ -1211,7 +1046,7 @@ object FDetails: TFDetails
           end
           object LblConst_ID3v1Album: TLabel
             Left = 8
-            Top = 63
+            Top = 73
             Width = 83
             Height = 13
             Alignment = taRightJustify
@@ -1228,7 +1063,7 @@ object FDetails: TFDetails
           end
           object LblConst_ID3v1Year: TLabel
             Left = 256
-            Top = 109
+            Top = 119
             Width = 43
             Height = 13
             Alignment = taRightJustify
@@ -1245,7 +1080,7 @@ object FDetails: TFDetails
           end
           object LblConst_ID3v1Genre: TLabel
             Left = 8
-            Top = 104
+            Top = 114
             Width = 83
             Height = 13
             Alignment = taRightJustify
@@ -1262,7 +1097,7 @@ object FDetails: TFDetails
           end
           object LblConst_ID3v1Comment: TLabel
             Left = 8
-            Top = 85
+            Top = 95
             Width = 83
             Height = 13
             Alignment = taRightJustify
@@ -1279,7 +1114,7 @@ object FDetails: TFDetails
           end
           object LblConst_ID3v1Track: TLabel
             Left = 269
-            Top = 85
+            Top = 95
             Width = 30
             Height = 13
             Alignment = taRightJustify
@@ -1294,78 +1129,72 @@ object FDetails: TFDetails
             ShowAccelChar = False
             Transparent = True
           end
-          object BtnCopyFromV2: TButton
-            Left = 216
-            Top = 148
-            Width = 130
-            Height = 25
-            Hint = 'Copy data from the ID3v2-Tag'
-            Caption = 'Copy from ID3 v2'
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 7
-            OnClick = BtnCopyFromV2Click
-          end
           object Lblv1Album: TEdit
             Tag = 3
             Left = 96
-            Top = 60
+            Top = 70
             Width = 250
             Height = 21
             TabOrder = 2
-            OnChange = Lblv1Change
+            OnChange = edtID3v1Change
+            OnExit = edtID3v1Exit
           end
           object Lblv1Artist: TEdit
             Tag = 1
             Left = 96
-            Top = 14
+            Top = 24
             Width = 250
             Height = 21
             TabOrder = 0
-            OnChange = Lblv1Change
+            OnChange = edtID3v1Change
+            OnExit = edtID3v1Exit
           end
           object Lblv1Titel: TEdit
             Tag = 2
-            Left = 96
-            Top = 38
+            Left = 97
+            Top = 46
             Width = 250
             Height = 21
             TabOrder = 1
-            OnChange = Lblv1Change
+            OnChange = edtID3v1Change
+            OnExit = edtID3v1Exit
           end
           object Lblv1Year: TEdit
             Tag = 7
             Left = 305
-            Top = 104
+            Top = 114
             Width = 41
             Height = 21
             NumbersOnly = True
             TabOrder = 6
             OnChange = Lblv1YearChange
+            OnExit = edtID3v1Exit
           end
           object Lblv1Comment: TEdit
             Tag = 4
             Left = 96
-            Top = 82
+            Top = 92
             Width = 154
             Height = 21
             TabOrder = 3
-            OnChange = Lblv1Change
+            OnChange = edtID3v1Change
+            OnExit = edtID3v1Exit
           end
           object Lblv1Track: TEdit
             Tag = 5
             Left = 305
-            Top = 82
+            Top = 92
             Width = 41
             Height = 21
             NumbersOnly = True
             TabOrder = 4
             OnChange = Lblv1TrackChange
+            OnExit = edtID3v1Exit
           end
           object cbIDv1Genres: TComboBox
             Tag = 6
-            Left = 96
-            Top = 104
+            Left = 97
+            Top = 119
             Width = 154
             Height = 21
             AutoCloseUp = True
@@ -1647,7 +1476,7 @@ object FDetails: TFDetails
       end
     end
   end
-  object Panel1: TPanel
+  object pnlButtons: TPanel
     AlignWithMargins = True
     Left = 3
     Top = 512
@@ -1695,25 +1524,28 @@ object FDetails: TFDetails
       Top = 0
       Width = 157
       Height = 25
+      Anchors = [akTop, akRight]
       Caption = 'Refresh Coverflow'
       TabOrder = 3
       Visible = False
       OnClick = BtnRefreshCoverflowClick
     end
-    object cbStayOnTop: TCheckBox
-      AlignWithMargins = True
+    object cbQuickRefresh: TCheckBox
       Left = 12
       Top = 4
       Width = 179
       Height = 17
-      Caption = 'Stay on top'
+      Hint = 
+        'Refresh this form whenever you select another file in the main w' +
+        'indow.'
+      Caption = 'Quick refresh'
       TabOrder = 4
-      OnClick = cbStayOnTopClick
+      OnClick = cbQuickRefreshClick
     end
   end
   object PM_URLCopy: TPopupMenu
-    Left = 404
-    Top = 64
+    Left = 144
+    Top = 115
     object PM_CopyURLToClipboard: TMenuItem
       Caption = 'Copy URL to clipboard'
       OnClick = PM_CopyURLToClipboardClick
@@ -1723,43 +1555,450 @@ object FDetails: TFDetails
     DefaultExt = 'jpg'
     Filter = 'Supported files (*.jpg;*.jpeg;*.png)|*.jpg;*.jpeg;*.png;'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
-    Left = 20
-    Top = 456
+    Left = 508
+    Top = 96
   end
   object ReloadTimer: TTimer
     Enabled = False
     Interval = 50
     OnTimer = ReloadTimerTimer
-    Left = 216
-    Top = 440
+    Left = 320
+    Top = 40
   end
   object PM_EditExtendedTags: TPopupMenu
-    Left = 280
-    Top = 440
+    Left = 48
+    Top = 163
     object pm_AddTag: TMenuItem
-      Caption = 'Add tag'
-      OnClick = btn_AddTagClick
+      Action = ActionTagAdd
     end
     object pm_RenameTag: TMenuItem
-      Caption = 'Rename tag'
-      ShortCut = 113
-      OnClick = Btn_RenameTagClick
+      Action = ActionTagRename
     end
     object pm_RemoveTag: TMenuItem
-      Caption = 'Remove tag'
-      ShortCut = 46
-      OnClick = Btn_RemoveTagClick
+      Action = ActionTagRemove
+    end
+    object Getextendedtagsfromlastfm1: TMenuItem
+      Action = ActionTagGetLastFM
+    end
+    object N2: TMenuItem
+      Caption = '-'
+    end
+    object Opencloudeditor1: TMenuItem
+      Action = ActionTagOpenCloudEditor
     end
   end
   object OpenDlgCoverArt: TOpenPictureDialog
     Filter = 
       'Supported files (*.jpg;*.jpeg;*.png;*.bmp)|*.jpg;*.jpeg;*.png;*.' +
       'bmp'
-    Left = 392
-    Top = 248
+    Left = 504
+    Top = 40
   end
-  object PopupMenuSearchEngines: TPopupMenu
-    Left = 527
-    Top = 283
+  object PM_SearchEngines: TPopupMenu
+    Left = 47
+    Top = 210
+  end
+  object MainMenu1: TMainMenu
+    Left = 144
+    Top = 67
+    object mmFile: TMenuItem
+      Caption = 'File'
+      OnClick = mmFileClick
+      object mmShowInExplorer: TMenuItem
+        Action = ActionShowInExplorer
+      end
+      object mmWindowsProperties: TMenuItem
+        Action = ActionWindowsProperties
+      end
+      object mmResetRating: TMenuItem
+        Action = ActionResetRating
+      end
+      object mmSynchronizeRating: TMenuItem
+        Action = ActionSynchronizeRating
+      end
+      object mmRefresh: TMenuItem
+        Action = ActionRefreshFile
+      end
+    end
+    object mmExtendedTags: TMenuItem
+      Caption = 'Extended tags'
+      OnClick = mmExtendedTagsClick
+      object mmAddTag: TMenuItem
+        Action = ActionTagAdd
+      end
+      object mmEditTag: TMenuItem
+        Action = ActionTagRename
+      end
+      object mmRemoveTag: TMenuItem
+        Action = ActionTagRemove
+      end
+      object mmGetExtendedTagsFromLastFM: TMenuItem
+        Action = ActionTagGetLastFM
+      end
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object mmOpenCloudEditor: TMenuItem
+        Action = ActionTagOpenCloudEditor
+      end
+    end
+    object mmLyrics: TMenuItem
+      Caption = 'Lyrics'
+      OnClick = mmLyricsClick
+    end
+    object mmCoverArt: TMenuItem
+      Caption = 'Cover art'
+      OnClick = PM_CoverArtPopup
+      object mmAddCoverToMetadata: TMenuItem
+        Action = ActionCoverNewMetaData
+      end
+      object mmCoverDelete: TMenuItem
+        Action = ActionCoverDeleteMetaData
+      end
+      object mmCoverSaveToFile: TMenuItem
+        Action = ActionCoverMetaDataSaveToFile
+      end
+      object mmOpenSelectedFile: TMenuItem
+        Action = ActionCoverMetaDataOpenFile
+      end
+      object N3: TMenuItem
+        Caption = '-'
+      end
+      object mmCoverUseSelectedForLibrary: TMenuItem
+        Action = ActionCoverUseCurrentSelectionForMediaLibrary
+      end
+      object mmCoverLoadLibrary: TMenuItem
+        Action = ActionCoverLoadLibrary
+      end
+      object mmCoverReset: TMenuItem
+        Action = ActionCoverResetMediaLibrary
+      end
+    end
+    object mmMetaData: TMenuItem
+      Caption = 'Metadata structure'
+      OnClick = mmMetaDataClick
+      object mmNewDataFrame: TMenuItem
+        Action = ActionMetaNewFrame
+      end
+      object N5: TMenuItem
+        Caption = '-'
+      end
+      object mmCopyfromID3v1: TMenuItem
+        Action = ActionMetaCopyFromID3v1
+      end
+      object mmCopyfromID3v2: TMenuItem
+        Action = ActionMetaCopyFromID3v2
+      end
+    end
+  end
+  object imgListCovertypes: TImageList
+    ColorDepth = cd32Bit
+    DrawingStyle = dsTransparent
+    Left = 509
+    Top = 158
+    Bitmap = {
+      494C010102000800040010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      0000000000003600000028000000400000001000000001002000000000000010
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000F8F8F8FFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBF9F9FFFBF9F9FFFBF9F9FFFBF9
+      F9FFFBF9F9FFFBF9F9FFFBF9F9FFFBF9F9FFFBF9F9FFFBF9F9FFFBF9F9FFFBF9
+      F9FFFBF9F9FFFBF9F9FFFBF9F9FFFBF9F9FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000F9F9F9FFC8C5C3FFC1C3BEFFB9C0
+      B9FFBABCBBFFC7C7C6FFD9DAD6FFD7D6D6FFD7D4D5FFD7D4D4FFDAD8D9FFDEDD
+      DEFFE4E3E3FFD3D8D6FFC5CECBFFFFFFFFFFFBF9F9FF34544DFF41524EFF3454
+      4DFF698F83FF8AA79FFF475750FF405650FF507063FF537D77FF6F9296FF779A
+      9AFF416762FF29423FFF29423FFFFBF9F9FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FAFAFAFFE1E1E1FFDFDFDFFFDEDE
+      DEFFE4E4E4FFE6E6E7FFE5E5E6FFDBDBDCFFD8D8D9FFDCDDDEFFDEDFE0FFDFE1
+      E1FFE0E1E1FFDCDAD8FFD8D4D2FFFFFFFFFFFBF9F9FF29423FFF29423FFF4167
+      62FF779A9AFF6F9296FF537D77FF507063FF405650FF475750FF8AA79FFF698F
+      83FF34544DFF41524EFF34544DFFFBF9F9FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FBFBFBFFCFD0D0FFCFCFD0FFCFCE
+      D0FFCFCCD0FFD4D2D6FFE0DFE1FFECEBECFFEEEEEEFF543732FF3B0D00FF3C27
+      1CFF320E00FF47200CFF531F00FFFFFFFFFFFBF9F9FF845F55FF845F55FF543E
+      37FF271A1EFF311B11FF50363EFF727585FF4F464CFF352130FF2B2233FF664F
+      73FF3E3039FF5C4C61FF3E3039FFFBF9F9FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FDFDFDFFCCCCC9FFCBCBC9FFC9C9
+      C9FFC7C7C9FFCECED0FFDFDFE0FFF0F0F0FFF3F3F3FFB6A195FF936F5BFF7E65
+      5AFF8B614AFFA98263FFBC987CFFFFFFFFFFFBF9F9FFFFEFC3FFFFEFC3FFFFF1
+      BEFF9392A6FF5F6480FF554F4DFF2A373FFF000000FF201601FF6E665DFF524D
+      72FF575889FF3F446AFF575889FFFBF9F9FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FEFEFEFFE1E1E1FFE0E0E0FFDEDE
+      DEFFDCDCDCFFDFE0E0FFE7E8E8FFEFF0F0FFF1F2F2FFE8D5B6FFE5CBACFFB592
+      7BFFAB7E5EFFCDAC8EFFD2B8A5FFFFFFFFFFFBF9F9FFFEC593FFFEC593FFFFD7
+      9DFFFFE0A3FF6F7095FF7387BBFF886462FFFFD995FFFFF6BCFFFFFBB9FFFFD6
+      99FFB69A75FF4B4339FFB69A75FFFBF9F9FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFFFFD0D1D1FFCFD0D0FFCCCB
+      CCFFC8C6C8FFCECCCEFFDDDCDDFFECECECFFEFEFEFFFF8E0B8FFF8E0B6FFF6E5
+      CAFFF8DEB5FFF9E0B7FFF9E1B9FFFFFFFFFFFBF9F9FFF8BA84FFF8BA84FFF8BB
+      87FFFFCA87FFF6C091FF46527CFFE0A070FFFFE3A2FFFFC28DFFFDBE8CFFFFCD
+      95FFFFE09FFFFFDE98FFFFE09FFFFBF9F9FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFFFFE9E9E9FFE7E7E7FFE7E7
+      E7FFF1F1F1FFF3F3F1FFF2F0EDFFF6F3EEFFF7F4EFFFF7F4EFFFF7F4F1FFF7F5
+      F2FFF7F5F2FFF9F8F6FFFCFBF9FFFFFFFFFFFBF9F9FFF0AC72FFF0AC72FFF0B2
+      78FFF0B077FFFFBA78FFFFBD7AFFFFBD81FFF1AF77FFF2B37CFFEFB47DFFF2B4
+      7DFFF3B47EFFF6B279FFF3B47EFFFBF9F9FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFFFFD1CECEFFCDCBC9FFC8C8
+      C4FFC7C6C7FFD3D2D5FFE7E7E8FFE8E8E9FFE9E9EAFFEBEBEBFFEEEEEEFFF1F1
+      F1FFF4F4F4FFF2F2F2FFF1F1F1FFFFFFFFFFFBF9F9FFE79E66FFE79E66FFEAA4
+      6AFFEAA46CFFE9A36BFFF0A86DFFEAA46CFFEAA46EFFEAA66CFFECA970FFECA7
+      71FFEDAB70FFECA56AFFEDAB70FFFBF9F9FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFFFFEAEAEAFFE8E8E8FFE7E7
+      E7FFE9E9E9FFEDEDEDFFF0F0F0FFEEEEEEFFEDEDEDFFEDEDEDFFEFEFEFFFF1F1
+      F1FFF4F4F4FFEFEFEFFFEBEBEBFFFFFFFFFFFBF9F9FFDD925CFFDD925CFFE097
+      63FFE19761FFDF9763FFDF9762FFDF9764FFDF9965FFE09864FFE19966FFE29A
+      65FFE49D67FFE09561FFE49D67FFFBF9F9FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFFFFDAE0DEFFD9DAD9FFD6D1
+      D1FFC4C5C4FFC9CBCAFFDDDCDCFFCFCFD0FFC5C7C8FFC0C5C3FFC7C8C9FFD0CE
+      D0FFDBD9D8FFC4C6C5FFB0B4B4FFFFFFFFFFFBF9F9FFDD925CFFDD925CFFE097
+      63FFE19761FFDF9763FFDF9762FFDF9764FFDF9965FFE09864FFE19966FFE29A
+      65FFE49D67FFE09561FFE49D67FFFBF9F9FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBF9F9FFFBF9F9FFFBF9F9FFFBF9
+      F9FFFBF9F9FFFBF9F9FFFBF9F9FFFBF9F9FFFBF9F9FFFBF9F9FFFBF9F9FFFBF9
+      F9FFFBF9F9FFFBF9F9FFFBF9F9FFFBF9F9FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000424D3E000000000000003E000000
+      2800000040000000100000000100010000000000800000000000000000000000
+      000000000000000000000000FFFFFF0000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000}
+  end
+  object ActionList1: TActionList
+    Left = 227
+    Top = 67
+    object ActionShowInExplorer: TAction
+      Category = 'File'
+      Caption = 'Show in Explorer'
+      OnExecute = ActionShowInExplorerExecute
+    end
+    object ActionWindowsProperties: TAction
+      Category = 'File'
+      Caption = 'Windows properties'
+      OnExecute = ActionWindowsPropertiesExecute
+    end
+    object ActionResetRating: TAction
+      Category = 'File'
+      Caption = 'Reset rating and play counter'
+      OnExecute = ActionResetRatingExecute
+    end
+    object ActionSynchronizeRating: TAction
+      Category = 'File'
+      Caption = 'Synchronize rating'
+      OnExecute = ActionSynchronizeRatingExecute
+    end
+    object ActionRefreshFile: TAction
+      Category = 'File'
+      Caption = 'Refresh'
+      OnExecute = ActionRefreshFileExecute
+    end
+    object ActionTagAdd: TAction
+      Category = 'ExtendedTags'
+      Caption = 'Add tag'
+      OnExecute = ActionTagAddExecute
+    end
+    object ActionTagRename: TAction
+      Category = 'ExtendedTags'
+      Caption = 'Edit tag'
+      OnExecute = ActionTagRenameExecute
+    end
+    object ActionTagRemove: TAction
+      Category = 'ExtendedTags'
+      Caption = 'Remove tag'
+      OnExecute = ActionTagRemoveExecute
+    end
+    object ActionTagGetLastFM: TAction
+      Category = 'ExtendedTags'
+      Caption = 'Get extended tags from last.fm'
+      OnExecute = ActionTagGetLastFMExecute
+    end
+    object ActionTagOpenCloudEditor: TAction
+      Category = 'ExtendedTags'
+      Caption = 'Open cloud editor'
+      OnExecute = ActionTagOpenCloudEditorExecute
+    end
+    object ActionCoverNewMetaData: TAction
+      Category = 'Cover'
+      Caption = 'Add cover to metadata'
+      OnExecute = ActionCoverNewMetaDataExecute
+    end
+    object ActionCoverDeleteMetaData: TAction
+      Category = 'Cover'
+      Caption = 'Delete selected cover from metadata'
+      OnExecute = ActionCoverDeleteMetaDataExecute
+    end
+    object ActionCoverMetaDataSaveToFile: TAction
+      Category = 'Cover'
+      Caption = 'Save selected cover to file'
+      OnExecute = ActionCoverMetaDataSaveToFileExecute
+    end
+    object ActionCoverMetaDataOpenFile: TAction
+      Category = 'Cover'
+      Caption = 'Open selected image file'
+      OnExecute = ActionCoverMetaDataOpenFileExecute
+    end
+    object ActionCoverLoadLibrary: TAction
+      Category = 'Cover'
+      Caption = 'Load cover for Media library'
+      OnExecute = ActionCoverLoadLibraryExecute
+    end
+    object ActionCoverUseCurrentSelectionForMediaLibrary: TAction
+      Category = 'Cover'
+      Caption = 'Use selected cover for Media library'
+      OnExecute = ActionCoverUseCurrentSelectionForMediaLibraryExecute
+    end
+    object ActionCoverResetMediaLibrary: TAction
+      Category = 'Cover'
+      Caption = 'Reset cover in Media library'
+      OnExecute = ActionCoverResetMediaLibraryExecute
+    end
+    object ActionMetaNewFrame: TAction
+      Category = 'MetaData Structure'
+      Caption = 'New data frame'
+      OnExecute = ActionMetaNewFrameExecute
+    end
+    object ActionMetaCopyFromID3v1: TAction
+      Category = 'MetaData Structure'
+      Caption = 'Copy ID3v2/APE from ID3v1'
+      OnExecute = ActionMetaCopyFromID3v1Execute
+    end
+    object ActionMetaCopyFromID3v2: TAction
+      Category = 'MetaData Structure'
+      Caption = 'Copy ID3v1 from ID3v2/APE'
+      OnExecute = ActionMetaCopyFromID3v2Execute
+    end
+  end
+  object PM_CoverArt: TPopupMenu
+    OnPopup = PM_CoverArtPopup
+    Left = 47
+    Top = 257
+    object Addcovertometadata1: TMenuItem
+      Action = ActionCoverNewMetaData
+    end
+    object Deleteselectedcoverfrommetadata1: TMenuItem
+      Action = ActionCoverDeleteMetaData
+    end
+    object Saveselectedcovertofile1: TMenuItem
+      Action = ActionCoverMetaDataSaveToFile
+    end
+    object Openselectedimagefile1: TMenuItem
+      Action = ActionCoverMetaDataOpenFile
+    end
+    object N4: TMenuItem
+      Caption = '-'
+    end
+    object LoadcoverforMedialibrary1: TMenuItem
+      Action = ActionCoverLoadLibrary
+    end
+    object UseselectedcoverforMedialibrary1: TMenuItem
+      Action = ActionCoverUseCurrentSelectionForMediaLibrary
+    end
+    object ResetcoverinMedialibrary1: TMenuItem
+      Action = ActionCoverResetMediaLibrary
+    end
+  end
+  object PM_TagStructure: TPopupMenu
+    Left = 47
+    Top = 115
+    object Newdataframe1: TMenuItem
+      Action = ActionMetaNewFrame
+    end
+    object CopyID3v2APEfromID3v11: TMenuItem
+      Action = ActionMetaCopyFromID3v1
+    end
+    object CopyID3v1fromID3v2APE1: TMenuItem
+      Action = ActionMetaCopyFromID3v2
+    end
+  end
+  object PM_FileOverview: TPopupMenu
+    Left = 49
+    Top = 67
+    object ShowinExplorer1: TMenuItem
+      Action = ActionShowInExplorer
+    end
+    object Windowsproperties1: TMenuItem
+      Action = ActionWindowsProperties
+    end
+    object Resetratingandplaycounter1: TMenuItem
+      Action = ActionResetRating
+    end
+    object Synchronizerating1: TMenuItem
+      Action = ActionSynchronizeRating
+    end
+    object Refresh1: TMenuItem
+      Action = ActionRefreshFile
+    end
   end
 end

@@ -56,7 +56,6 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     procedure HandleNewConnectedDrive;
 
     procedure FillTreeView(MP3Liste: TAudioFileList; AudioFile:TAudioFile);
-    procedure FillTreeViewQueryTooShort;
     procedure RefreshPlaylistVSTHeader;
 
     function GetDropWindowSection(aControl: TWinControl): TWindowSection;
@@ -88,8 +87,8 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     function HandleIgnoreRule(aTag: String): Boolean;
     function HandleMergeRule(aTag: String; out newTag: String): Boolean;
     // Select all files with the same path as MedienBib.CurrentAudioFile
-    function GetListOfAudioFileCopies(Original: TAudioFile; Target: TAudioFileList): Boolean;
-    procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile; CheckTrees: Boolean=False);
+    function GetListOfAudioFileCopies(Original: TAudioFile; Target: TAudioFileList; NotifyDetailForm: Boolean = True): Boolean;
+    procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile; IncludeDetailForm: Boolean = True);
     procedure SyncAudioFilesWith(aAudioFile: TAudioFile);
     procedure DoSyncStuffAfterTagEdit(aAudioFile: TAudiofile; backupTag: UTF8String);
 
@@ -316,13 +315,8 @@ begin
             VST.Header.SortColumn := GetColumnIDfromContent(VST, MedienBib.Sortparams[0].Tag);
 
 
-        if (MP3Liste.Count = 0) then
-        begin
-            // just add a Dummyfile showing "No results"
-            VST.AddChild(Nil, MedienBib.BibSearcher.DummyAudioFile);
-            ShowVSTDetails(Nil);
-        end else
-        begin
+        VST.EmptyListMessage := MedienBib.BibSearcher.EmptyListMessage;
+
             for i := 0 to MP3Liste.Count-1 do
                 VST.AddChild(Nil, MP3Liste.Items[i]);
 
@@ -364,23 +358,8 @@ begin
                 // no file in view
                 ShowVSTDetails(Nil);
             end;
-        end;
 
         VST.EndUpdate;
-    end;
-end;
-
-
-procedure FillTreeViewQueryTooShort;
-begin
-    with Nemp_MainForm do
-    begin
-        MedienBib.BibSearcher.DummyAudioFile.Titel := MainForm_SearchQueryTooShort;
-        VST.BeginUpdate;
-        VST.Clear;
-        VST.AddChild(Nil, MedienBib.BibSearcher.DummyAudioFile);
-        VST.EndUpdate;
-        ShowVSTDetails(Nil);
     end;
 end;
 
@@ -881,11 +860,19 @@ begin
         if LanguageCode = 'de' then
           Application.HelpFile := ExtractFilePath(Paramstr(0)) + 'nemp_de.chm'
         else
-          Application.HelpFile := ExtractFilePath(Paramstr(0)) + 'nemp_de.chm';
+          Application.HelpFile := ExtractFilePath(Paramstr(0)) + 'nemp_en.chm';
+
+        if not FileExists(Application.HelpFile) then
+          Application.HelpFile := ExtractFilePath(Paramstr(0)) + 'nemp_en.chm';
+
+        if not FileExists(Application.HelpFile) then
+          Application.HelpFile := '';
 
         //c := Nemp_MainForm.CBHeadSetControlInsertMode.ItemIndex;
         //BackupComboboxes(Nemp_MainForm);
         ReTranslateComponent (Nemp_MainForm);
+        RefreshVSTDetailsTimer.Enabled := False;
+        RefreshVSTDetailsTimer.Enabled := True;
         //RestoreComboboxes(Nemp_MainForm);
 
         //Nemp_MainForm.CBHeadSetControlInsertMode.ItemIndex := c;
@@ -893,6 +880,11 @@ begin
         DisplayPlayerMainTitleInformation(True);
         DisplayHeadsetTitleInformation(True);
         ShowVSTDetails(NempPlayer.CurrentFile, SD_PLAYER);
+
+        LblEmptyLibraryHint.Caption := MainForm_LibraryIsEmpty;
+        VST.EmptyListMessage := MedienBib.BibSearcher.EmptyListMessage;
+        VST.Invalidate;
+                                        //        EmptyListMessage  dummaudiofile
 
         // refresh Hints und sonstige Anzeigen
         case NempPlaylist.WiedergabeMode of
@@ -1351,7 +1343,7 @@ end;
      - Medienbib.status <= 1  (searching for new files or GetTags should be ok)
        and MedienBib.CurrentThreadFilename
 }
-function GetListOfAudioFileCopies(Original: TAudioFile; Target: TAudioFileList): Boolean;
+function GetListOfAudioFileCopies(Original: TAudioFile; Target: TAudioFileList; NotifyDetailForm: Boolean = True): Boolean;
 var bibFile: TAudioFile;
     originalPath: String;
 
@@ -1371,8 +1363,10 @@ begin
         Target.Add(NempPlayer.MainAudioFile);
 
     // 3. The Detailform-File
-    if assigned(fDetails) and NeededFile(fDetails.CurrentAudioFile) then
-        Target.Add(fDetails.CurrentAudioFile);
+    // This is a special case: The DetailForm should only be notified when there was a change
+    if assigned(fDetails) and NotifyDetailForm then //and NeededFile(fDetails.CurrentAudioFile) then
+      fDetails.AudioFileEdited(Original);
+      // Target.Add(fDetails.CurrentAudioFile);
 
     // 4. The "currentfile" from the library (this is the one displayed in the VST-Details)
     if NeededFile(Medienbib.CurrentAudioFile) then
@@ -1413,7 +1407,6 @@ end;
 
 procedure DoSyncStuffAfterTagEdit(aAudioFile: TAudiofile; backupTag: UTF8String);
 var aErr: TNempAudioError;
-    BibFile: TAudioFile;
     newTags: UTF8String;
 begin
     newTags := aAudioFile.RawTagLastFM;
@@ -1427,20 +1420,10 @@ begin
         aAudioFile.ID3TagNeedsUpdate := False;
         SyncAudioFilesWith(aAudioFile);
         // Correct GUI (player, Details, Detailform, VSTs))
-        CorrectVCLAfterAudioFileEdit(aAudioFile, True);
+        CorrectVCLAfterAudioFileEdit(aAudioFile);
 
         if MedienBib.CollectionsAreDirty(ccTagCloud) then
           SetBrowseTabWarning(True);
-
-
-        {
-          Tags im TagCloud-Modus werden "dirty" (aber auch NUR DORT)
-          QuickSearch-Strings sind nicht betroffen
-        }
-        // Update the TagCloud
-        // BibFile := MedienBib.GetAudioFileWithFilename(aAudioFile.Pfad);
-        //if assigned(BibFile) then
-        //    MedienBib.TagCloud.UpdateAudioFile(BibFile);
     end else
     begin
         aAudioFile.RawTagLastFM := backupTag;
@@ -1459,9 +1442,8 @@ end;
         PlaylistVST
         Detailform
 }
-procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile; CheckTrees: Boolean=False);
+procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile; IncludeDetailForm: Boolean = True);
 var OriginalPath: String;
-    bibFile: TAudioFile;
 
       function SameFile(af: TAudioFile): boolean;
       begin
@@ -1489,14 +1471,8 @@ begin
         Nemp_MainForm.ShowVSTDetails(MedienBib.CurrentAudioFile, -1);  // -1: Do not change Source (playlist/medienbib)) of audiofile
 
     // ... Detail-Form
-    if assigned(fDetails)
-        and Nemp_MainForm.AutoShowDetailsTMP
-        and SameFile(fDetails.CurrentAudioFile)
-    then
-        // Note: a call of AktualisiereDetailForm(af, SD_MEDIENBIB)
-        //       will produce some strange AVs here - so we do it quick&dirty with a timer
-        //       (Probably some issues with VST.Edited and stuff. Don't know.)
-        FDetails.ReloadTimer.Enabled := True;
+    if assigned(fDetails) and IncludeDetailForm then
+      fDetails.AudioFileEdited(aFile);
 end;
 
 procedure RepositionABRepeatButtons;
@@ -2014,8 +1990,6 @@ begin
 end;
 
 procedure CollectionDblClick(ac: TAudioCollection; Node: PVirtualNode);
-var
-  rc: TRootCollection;
 begin
   case ac.CollectionClass of
     ccFiles: begin

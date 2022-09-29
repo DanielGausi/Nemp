@@ -254,7 +254,6 @@ begin
         // if there are more Columns than defined in the Inifile (due to a new version): Set Default values
         for i := ContentList.Count to Spaltenzahl-1 do
         begin
-          contentID := i;
           aVST.Header.Columns[i].Tag := i;
           aVST.Header.Columns[i].Text := _(DefaultSpalten[i].Bezeichnung);
           aVST.Header.Columns[i].Width := DefaultSpalten[i].width;

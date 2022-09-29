@@ -44,24 +44,24 @@ uses Windows, Contnrs, Sysutils,  Classes, dialogs, Messages, StrUtils, System.N
   type
       TLyrics = class
           private
-              fInterpret: String;  // the current artist we are searching for
-              fTitle: String;      // the current title we are searching for
-              fCurrentLyrics: String;
+              // fInterpret: String;  // the current artist we are searching for
+              // fTitle: String;      // the current title we are searching for
+              // fCurrentLyrics: String;
 
-              fExceptionOccured: Boolean;
-              fExceptionMessage: String;
+              // fExceptionOccured: Boolean;
+              // fExceptionMessage: String;
 
               // Get the HTML-Code and parse it
-              function GetLyrics_Chartlyrics(aInterpret, aTitle: String): Boolean;
+              //function GetLyrics_Chartlyrics(aInterpret, aTitle: String): Boolean;
               // main method of the class
               // everything else is done in the subroutines
-              function GetLyrics(aInterpret, aTitle: String): String;
+              //function GetLyrics(aInterpret, aTitle: String): String;
 
           public
               constructor Create;
               destructor Destroy; override;
-              property ExceptionOccured: Boolean read fExceptionOccured;
-              property ExceptionMessage: String read fExceptionMessage;
+              // property ExceptionOccured: Boolean read fExceptionOccured;
+              // property ExceptionMessage: String read fExceptionMessage;
 
               class procedure GetLyricSources(dest: TStrings);
               class function GetLyricsURL(SourceIndex: Integer; aInterpret, aTitle: String): String;
@@ -188,7 +188,7 @@ end;
     (removed)
     --------------------------------------------------------
 }
-
+(*
 function TLyrics.GetLyrics(aInterpret, aTitle: String): String;
 var Success: Boolean;
 begin
@@ -208,7 +208,7 @@ begin
         result := fCurrentLyrics
     else
         result := '';
-end;
+end;*)
 
 
 {
@@ -216,6 +216,7 @@ end;
     GetLyrics_Chartlyrics
     --------------------------------------------------------
 }
+(*
 function TLyrics.GetLyrics_Chartlyrics(aInterpret, aTitle: String): Boolean;
 var code, rawLyrics, aURL: String;
     lStart, LEnd: Integer;
@@ -262,5 +263,6 @@ begin
         end;
     end;
 end;
+*)
 
 end.

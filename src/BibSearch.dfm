@@ -11,14 +11,12 @@ object FormBibSearch: TFormBibSearch
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
     595
     449)
-  PixelsPerInch = 96
   TextHeight = 13
   object Btn_ExtendedSearch: TButton
     AlignWithMargins = True

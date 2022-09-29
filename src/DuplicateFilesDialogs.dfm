@@ -11,13 +11,11 @@ object DuplicateFilesDialog: TDuplicateFilesDialog
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   DesignSize = (
     382
     232)
-  PixelsPerInch = 96
   TextHeight = 13
   object rgQuery: TRadioGroup
     AlignWithMargins = True
@@ -34,9 +32,6 @@ object DuplicateFilesDialog: TDuplicateFilesDialog
       'Overwrite existing file'
       'Cancel copying')
     TabOrder = 0
-    ExplicitLeft = 8
-    ExplicitTop = 151
-    ExplicitWidth = 608
   end
   object cbForAll: TCheckBox
     AlignWithMargins = True
@@ -81,7 +76,6 @@ object DuplicateFilesDialog: TDuplicateFilesDialog
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 4
-    ExplicitWidth = 633
     DesignSize = (
       376
       46)

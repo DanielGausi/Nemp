@@ -37,7 +37,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, CheckLst, ContNrs, NempAudioFiles, DeleteHelper,
-  DriveRepairTools, ExtCtrls, ImgList, GnuGetText, System.UITypes,
+  DriveRepairTools, ExtCtrls, ImgList, GnuGetText, System.UITypes, NempHelp,
   System.ImageList, Generics.Collections, VirtualTrees, PNGImage,CommCtrl ;
 
 
@@ -67,6 +67,7 @@ type
     HintImage: TImage;
     VSTDrives: TVirtualStringTree;
     checkImages: TImageList;
+    ImgHelp: TImage;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
     procedure BtnHelpClick(Sender: TObject);
@@ -108,6 +109,7 @@ procedure TDeleteSelection.FormCreate(Sender: TObject);
 var filename: String;
 begin
     TranslateComponent (self);
+    HelpContext := HELP_CleanupLibrary;
 
     VSTPlaylistFiles.NodeDataSize  := SizeOf(TLibraryPlaylist);
     VSTFiles.NodeDataSize  := SizeOf(TAudioFile);
@@ -347,7 +349,7 @@ end;
 
 procedure TDeleteSelection.BtnHelpClick(Sender: TObject);
 begin
-    MessageDlg(DeleteHelper_Readme, mtInformation, [mbOK], 0);
+  Application.HelpContext(HELP_CleanupLibrary);
 end;
 
 procedure TDeleteSelection.FillTreeViews(currentData: TDeleteData);

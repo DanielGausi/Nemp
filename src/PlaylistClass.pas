@@ -6,7 +6,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2019, Daniel Gaussmann
+    Copyright (C) 2005-2022, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -1128,18 +1128,20 @@ procedure TNempPlaylist.Search(aString: String; SearchNext: Boolean = False);
 var Keywords: TStringList;
     i: Integer;
 begin
-    Keywords := ExplodeWithQuoteMarks(' ', aString);
-
+  Keywords := TStringList.Create;
+  try
+    ExplodeWithQuoteMarks(' ', aString, Keywords);
     for i := 0 to Playlist.Count - 1 do
-        Playlist[i].IsSearchResult := AudioFileMatchesKeywordsPlaylist(Playlist[i], Keywords);
-
+      Playlist[i].IsSearchResult := AudioFileMatchesKeywordsPlaylist(Playlist[i], Keywords);
+  finally
     Keywords.Free;
+  end;
 
-    if assigned(fOnFilePropertiesChanged) then
-        fOnFilePropertiesChanged(Self);
+  if assigned(fOnFilePropertiesChanged) then
+    fOnFilePropertiesChanged(Self);
 
-    if assigned(fOnSearchResultsChanged) then
-        fOnSearchResultsChanged(Self);
+  if assigned(fOnSearchResultsChanged) then
+    fOnSearchResultsChanged(Self);
 end;
 
 

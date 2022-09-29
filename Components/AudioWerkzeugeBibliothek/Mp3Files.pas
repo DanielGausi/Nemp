@@ -126,6 +126,7 @@ type
 
             procedure fSetTitle           (aValue: UnicodeString); override;
             procedure fSetArtist          (aValue: UnicodeString); override;
+            procedure fSetAlbumArtist     (aValue: UnicodeString); override;
             procedure fSetAlbum           (aValue: UnicodeString); override;
             procedure fSetYear            (aValue: UnicodeString); override;
             procedure fSetTrack           (aValue: UnicodeString); override;
@@ -134,6 +135,7 @@ type
 
             function fGetTitle            : UnicodeString; override;
             function fGetArtist           : UnicodeString; override;
+            function fGetAlbumArtist      : UnicodeString; override;
             function fGetAlbum            : UnicodeString; override;
             function fGetYear             : UnicodeString; override;
             function fGetTrack            : UnicodeString; override;
@@ -364,6 +366,13 @@ begin
     if result = '' then
         result := fApeTag.Album;
 end;
+function TMP3File.fGetAlbumArtist: UnicodeString;
+begin
+  result := fID3v2Tag.AlbumArtist;
+  if result = '' then
+    result := fApeTag.AlbumArtist;
+end;
+
 function TMP3File.fGetArtist: UnicodeString;
 begin
     result := fID3v2Tag.Artist;
@@ -413,6 +422,14 @@ begin
   fID3v1Tag.Album := aValue;
   fID3v2Tag.Album := aValue;
   fApeTag.Album := aValue;
+end;
+
+procedure TMP3File.fSetAlbumArtist(aValue: UnicodeString);
+begin
+  inherited;
+  EnforceSecondaryTagsAreProcessed;
+  fID3v2Tag.AlbumArtist := aValue;
+  fApeTag.AlbumArtist := aValue;
 end;
 
 procedure TMP3File.fSetArtist(aValue: UnicodeString);

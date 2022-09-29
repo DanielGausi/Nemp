@@ -1,3 +1,34 @@
+{
+
+    Unit NewMetaFrame
+
+    - Dialog to add a new Frame to the MetaData of a File
+
+    ---------------------------------------------------------------
+    Nemp - Noch ein Mp3-Player
+    Copyright (C) 2005-2022, Daniel Gaussmann
+    http://www.gausi.de
+    mail@gausi.de
+    ---------------------------------------------------------------
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+
+    See license.txt for more information
+
+    ---------------------------------------------------------------
+}
+
 unit NewMetaFrame;
 
 interface
@@ -17,10 +48,14 @@ type
     edt_FrameValue: TEdit;
     BtnOK: TButton;
     BtnCancel: TButton;
+    cbTagTypeSelection: TComboBox;
+    lblNoMoreFrames: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure BtnOKClick(Sender: TObject);
     procedure BtnCancelClick(Sender: TObject);
+
+    procedure cbTagTypeSelectionChange(Sender: TObject);
   private
     { Private declarations }
 
@@ -32,17 +67,25 @@ type
     ///  For Oggg/Flac/Ape this is not neccessary, as we store the "FrameKey" directly in the Combobox,
     ///  as OggVorbis-Keas are more descriptive from the beginning ...
     fFrameTypList: TList;
+    fTagType: TTagType;
+    fCurrentTagObject: TBaseAudioFile;
+
     procedure PrepareID3FramesSelection(ID3v2Tag: TID3v2Tag);
     procedure PrepareAPEFramesSelection(ApeTag: TApeTag);
 
+    function PrepareFrameSelection: Integer;
+
+    procedure SetAllowedTags(Tags: TTagTypeSet);
+    procedure SetCurrentTagObject(Value: TBaseAudioFile);
+
+    property AllowedTags: TTagTypeSet write SetAllowedTags;
+
   public
     { Public declarations }
-    TagType: TTagType;
 
     // The Tag-Object currently displayed in FormDetails
-    CurrentTagObject: TBaseAudioFile;
-
-    function PrepareFrameSelection: Integer;
+    property CurrentTagObject: TBaseAudioFile read fCurrentTagObject write SetCurrentTagObject;
+    property SelectedTagType: TTagType read fTagType;
 
   end;
 
@@ -51,9 +94,72 @@ var
 
 implementation
 
-uses gnugettext;
+uses gnugettext, Nemp_RessourceStrings;
 
 {$R *.dfm}
+
+procedure TNewMetaFrameForm.FormCreate(Sender: TObject);
+begin
+  fFrameTypList := TList.Create;
+  //BackupComboboxes(self);
+  TranslateComponent (self);
+  //RestoreComboboxes(self);
+end;
+
+procedure TNewMetaFrameForm.FormDestroy(Sender: TObject);
+begin
+    fFrameTypList.Free;
+end;
+
+procedure TNewMetaFrameForm.SetCurrentTagObject(Value: TBaseAudioFile);
+begin
+  fCurrentTagObject := Value;
+
+  case fCurrentTagObject.FileType of
+    at_Invalid: ;
+    at_Mp3: begin
+        if TMp3File(fCurrentTagObject).ApeTag.ContainsData then
+          AllowedTags := [TT_ID3v2, TT_APE]
+        else
+          AllowedTags := [TT_ID3v2];
+    end;
+    at_Ogg: AllowedTags := [TT_OggVorbis];
+    at_Flac: AllowedTags := [TT_Flac];
+    at_M4A: AllowedTags := [TT_M4A];
+    at_Monkey,
+    at_WavPack,
+    at_MusePack,
+    at_OptimFrog,
+    at_TrueAudio: AllowedTags := [TT_Ape];
+    at_Wma: ;
+    at_Wav: ;
+    at_AbstractApe: ;
+  end;
+end;
+
+procedure TNewMetaFrameForm.SetAllowedTags(Tags: TTagTypeSet);
+var
+  iTag: TTagType;
+begin
+  cbTagTypeSelection.Clear;
+
+  for iTag in Tags do
+    cbTagTypeSelection.Items.AddObject(TagTypeDescriptions[iTag], TObject(iTag));
+
+  cbTagTypeSelection.ItemIndex := 0;
+  fTagType := TTagType(cbTagTypeSelection.Items.Objects[0]);
+  cbTagTypeSelection.Enabled := cbTagTypeSelection.Items.Count > 1;
+
+  PrepareFrameSelection;
+end;
+
+
+
+procedure TNewMetaFrameForm.cbTagTypeSelectionChange(Sender: TObject);
+begin
+  fTagType := TTagType(cbTagTypeSelection.Items.Objects[cbTagTypeSelection.ItemIndex]);
+  PrepareFrameSelection;
+end;
 
 procedure TNewMetaFrameForm.PrepareID3FramesSelection(ID3v2Tag: TID3v2Tag);
 var TextList, URLList: TList;
@@ -123,6 +229,7 @@ begin
     end;
 end;
 
+
 procedure TNewMetaFrameForm.PrepareAPEFramesSelection(ApeTag: TApeTag);
 var CommentList: TStringList;
 begin
@@ -175,7 +282,7 @@ begin
     fFrameTypList.Clear;
     cbFrameType.clear;
 
-    case TagType of
+    case fTagType of
         TT_ID3v2:  begin
               PrepareID3FramesSelection(TMP3File(CurrentTagObject).ID3v2Tag);
         end;
@@ -185,7 +292,7 @@ begin
               CommentList := TStringList.Create;
               try
                   CommentList.CaseSensitive := False;
-                  if TagType = TT_OggVorbis then
+                  if fTagType = TT_OggVorbis then
                       TOggVorbisFile(CurrentTagObject).GetAllFields(CommentList)
                   else
                       TFlacFile(CurrentTagObject).GetAllFields(CommentList);
@@ -303,6 +410,10 @@ begin
     edt_FrameValue.Text := '';
 
     result := cbFrameType.Items.Count;
+    lblNoMoreFrames.Visible := result = 0;
+    lblNoMoreFrames.Caption := DetailForm_NoNewFramesPossible;
+
+    BtnOK.Enabled := result > 0;
 end;
 
 
@@ -317,7 +428,7 @@ begin
     if Trim(edt_FrameValue.Text) = '' then
         exit;
 
-    case TagType of
+    case fTagType of
         TT_ID3v2:  begin
 
             NewFrame := TMP3File(CurrentTagObject).Id3v2Tag.AddFrame(
@@ -386,18 +497,5 @@ begin
     end;
 end;
 
-procedure TNewMetaFrameForm.FormCreate(Sender: TObject);
-begin
-    fFrameTypList := TList.Create;
-
-    //BackupComboboxes(self);
-    TranslateComponent (self);
-    //RestoreComboboxes(self);
-end;
-
-procedure TNewMetaFrameForm.FormDestroy(Sender: TObject);
-begin
-    fFrameTypList.Free;
-end;
 
 end.

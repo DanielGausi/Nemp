@@ -79,10 +79,6 @@ function LoadSettings: Boolean;
 var i: Integer;
     aMenuItem: TMenuItem;
     tmpwstr, g15path: UnicodeString;
-    // defaultAdvanced: Boolean;
-    {$IFDEF USESTYLES}
-    WinVersionInfo: TWindowsVersionInfo;
-    {$ENDIF}
 
 begin
     UpdateSplashScreen(SplashScreen_LoadingPreferences);
@@ -128,9 +124,6 @@ begin
         //Playlist-Einstellungen laden
         NempPlaylist.LoadSettings;
         // MedienBib-Einstellungen laden
-
-        // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        //  MedienBib.NewCoverFlow.InitList(MedienBib.CoverViewList, MedienBib.CoverCount);
         MedienBib.LoadSettings;
         NempLayout.BrowseMode := MedienBib.BrowseMode;
 
@@ -173,6 +166,7 @@ begin
         MM_O_Skin_UseAdvanced.Checked := NempOptions.GlobalUseAdvancedSkin;
         PM_P_Skin_UseAdvancedSkin.Checked := NempOptions.GlobalUseAdvancedSkin;
         // Skin-MenuItems setzen
+        (*
         if (FindFirst(GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\Skins\'+'*',faDirectory,SR)=0) then
         repeat
           if (SR.Name<>'.') and (SR.Name<>'..') and ((SR.Attr AND faDirectory)= faDirectory) then
@@ -198,12 +192,14 @@ begin
           end;
         until FindNext(SR)<>0;
         FindClose(SR);
+        *)
 
         if (FindFirst(ExtractFilePath(Paramstr(0)) + 'Skins\' +'*',faDirectory,SR)=0) then
         repeat
           if (SR.Name<>'.') and (SR.Name<>'..') and ((SR.Attr AND faDirectory)= faDirectory) then
           begin
-              tmpstr :=  StringReplace('<public> ' + Sr.Name,'&','&&',[rfReplaceAll]);
+              //tmpstr :=  StringReplace('<public> ' + Sr.Name,'&','&&',[rfReplaceAll]);
+              tmpstr :=  StringReplace(Sr.Name, '&', '&&', [rfReplaceAll]);
 
               aMenuItem := TMenuItem.Create(Nemp_MainForm);
               aMenuItem.AutoHotkeys := maManual;
@@ -376,7 +372,6 @@ begin
 
         // Optionen verarbeiten, Variablen entsprechend setzen
         actToggleStayOnTop.Checked := NempOptions.MiniNempStayOnTop;
-        AutoShowDetailsTMP := False; /// NempOptions.AutoShowDetails;
 
         if NempOptions.FullRowSelect then
             VST.TreeOptions.SelectionOptions := VST.TreeOptions.SelectionOptions + [toFullRowSelect]
@@ -470,10 +465,12 @@ begin
         if NempOptions.Useskin then
         begin
             SetSkinRadioBox(NempOptions.SkinName);
-            tmpstr := StringReplace(NempOptions.SkinName,
+            {tmpstr := StringReplace(NempOptions.SkinName,
                     '<public> ', ExtractFilePath(Paramstr(0)) + 'Skins\', []);
             tmpstr := StringReplace(tmpstr,
                     '<private> ', GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\Skins\',[]);
+            }
+            tmpstr := GetSkinDirFromSkinName(NempOptions.SkinName);
             Nempskin.LoadFromDir(tmpstr);
             NempSkin.ActivateSkin(False);
             RandomBtn.GlyphLine := NempPlaylist.WiedergabeMode;

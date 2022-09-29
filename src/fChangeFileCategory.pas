@@ -1,3 +1,33 @@
+{
+
+    Unit fChangeFileCategory
+
+    - Form Dialog for moving/copying files into other categories
+
+    ---------------------------------------------------------------
+    Nemp - Noch ein Mp3-Player
+    Copyright (C) 2005-2022, Daniel Gaussmann
+    http://www.gausi.de
+    mail@gausi.de
+    ---------------------------------------------------------------
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+
+    See license.txt for more information
+
+    ---------------------------------------------------------------
+}
 unit fChangeFileCategory;
 
 interface
@@ -5,9 +35,9 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Winapi.ActiveX,
-  Nemp_RessourceStrings, gnugetText, math,
+  Nemp_RessourceStrings, gnugetText, math, NempHelp,
   NempAudioFiles, LibraryOrganizer.Base, LibraryOrganizer.Files,
-  AudioDisplayUtils;
+  AudioDisplayUtils, Vcl.Imaging.pngimage;
 
 type
   TFormChangeCategory = class(TForm)
@@ -25,7 +55,9 @@ type
     pnlCurrent: TPanel;
     lblCurrentCategory: TLabel;
     lblHeadline: TLabel;
+    ImgHelp: TImage;
     procedure FormCreate(Sender: TObject);
+    procedure ImgHelpClick(Sender: TObject);
   private
     { Private declarations }
 
@@ -61,6 +93,7 @@ begin
   BackupComboboxes(self);
   TranslateComponent(self);
   RestoreComboboxes(self);
+  HelpContext := HELP_ChangeCategories;
 end;
 
 function TFormChangeCategory.GetEffect: teCategoryAction;
@@ -74,6 +107,11 @@ end;
 function TFormChangeCategory.GetNewCategory: TLibraryFileCategory;
 begin
   result := TLibraryFileCategory(cbCategorySelection.Items.Objects[cbCategorySelection.ItemIndex]);
+end;
+
+procedure TFormChangeCategory.ImgHelpClick(Sender: TObject);
+begin
+  Application.HelpContext(HELP_ChangeCategories);
 end;
 
 procedure TFormChangeCategory.SetCategories(Source: TLibraryCategoryList;

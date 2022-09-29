@@ -11,7 +11,6 @@ object AboutForm: TAboutForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   OnHide = FormHide
@@ -19,7 +18,6 @@ object AboutForm: TAboutForm
   DesignSize = (
     371
     394)
-  PixelsPerInch = 96
   TextHeight = 13
   object NempCredits: TACredits
     AlignWithMargins = True
@@ -34,7 +32,7 @@ object AboutForm: TAboutForm
       ''
       '[b]Nemp - Noch ein Mp3-Player[/b]'
       ''
-      'Copyright '#169' 2005-2021 Daniel '#39'Gausi'#39' Gaussmann'
+      'Copyright '#169' 2005-2022 Daniel '#39'Gausi'#39' Gaussmann'
       ' '
       'Website: [url="https://www.gausi.de"]https://www.gausi.de[/url]'
       'e-Mail: [url="mailto:mail@gausi.de"]mail@gausi.de[/url]'
@@ -64,7 +62,7 @@ object AboutForm: TAboutForm
       '[row="200"]'
       ''
       ''
-      'Programmed with CodeGear Delphi 2009 / XE2 / XE3 / 10.x'
+      'Programmed with CodeGear Delphi 2009 / XE2 / XE3 / 10.x / 11.1'
       ''
       ''
       '[b]Used components/units[/b]'
@@ -75,7 +73,9 @@ object AboutForm: TAboutForm
         '[url="https://gausi.de/awb.html"]Audio Werkzeuge Bibliothek[/url' +
         ']'
       ''
-      '[url="http://www.soft-gems.net/"]Virtual Treeview[/url]'
+      
+        '[url="https://www.jam-software.de/virtual-treeview"]Virtual Tree' +
+        'view[/url]'
       ''
       
         '[url="http://sourceforge.net/projects/flyingcow/"]Flying Cow[/ur' +
@@ -100,14 +100,6 @@ object AboutForm: TAboutForm
         'sionsinfo+kompo+zur+windowserkennung.html"]TWindowsVersionInfo[/' +
         'url] by MagicAndre1981'
       ''
-      
-        '[url="http://angusj.com/delphi/"]Drag&Drop-Component[/url] (modi' +
-        'fied) by Angus Johnson'
-      ''
-      
-        '[url="http://delphi.fsprolabs.com/"]FSPro Windows 7 Taskbar Comp' +
-        'onents[/url]'
-      ''
       '[url="https://www.last.fm/api/intro"]The LastFM API[/url]'
       ''
       '[url="http://www.madshi.net/"]MadExcept[/url] by Mathias Rauen'
@@ -118,7 +110,7 @@ object AboutForm: TAboutForm
       ''
       '[b]Icons and Graphics[/b]'
       ''
-      '[url="http://everaldo.com/crystal"]Chrystal Project Icons[/url]'
+      'Chrystal Project Icons by Everaldo Coelho'
       ''
       
         'Silk Icon Set by [url="http://www.famfamfam.com/lab/icons/silk"]' +

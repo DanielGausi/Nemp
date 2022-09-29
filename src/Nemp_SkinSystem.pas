@@ -42,7 +42,7 @@ iniFiles, jpeg, NempPanel, Classes, oneinst, SkinButtons, PNGImage, ProgressShap
 
 Nemp_ConstantsAndTypes, PartyModeClass{$IFDEF USESTYLES}, vcl.themes, vcl.styles, Vcl.CheckLst {$ENDIF};
 
-const MAX_MENUIMAGE_INDEX = 43;
+const MAX_MENUIMAGE_INDEX = 42;
       MAX_PLAYLIST_IMAGE_INDEX = 24;
 
 type
@@ -439,18 +439,20 @@ const CustomColorNames : Array [0..15] of string = ('ColorA','ColorB','ColorC','
 implementation
 
 
-uses NempMainUnit, Details, OptionsComplete, Hilfsfunktionen, spectrum_vis,
+uses NempMainUnit, Details, OptionsComplete, Hilfsfunktionen, spectrum_vis, System.StrUtils,
     SplitForm_Hilfsfunktionen, PlaylistUnit, AuswahlUnit, MedienlisteUnit, ExtendedControlsUnit,
     VSTEditControls, MedienBibliothekClass, TagClouds, Systemhelper, DeleteSelect;
 
 function GetSkinDirFromSkinName(aName: String): String;
 begin
-    result := StringReplace(aName,
+  result := ExtractFilePath(ParamStr(0)) + 'Skins\' + aName;
+
+    {result := StringReplace(aName,
               '<public> ', ExtractFilePath(ParamStr(0)) + 'Skins\', []);
 
     result := StringReplace(result,
               '<private> ', GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\Skins\',[]);
-
+    }
 end;
 
 constructor TNempSkin.create;

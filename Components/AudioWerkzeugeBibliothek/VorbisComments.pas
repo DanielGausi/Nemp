@@ -74,6 +74,7 @@ const
     VORBIS_TITLE        = 'TITLE'        ;
     VORBIS_TRACKNUMBER  = 'TRACKNUMBER'  ;
     VORBIS_VERSION      = 'VERSION'      ;
+    VORBIS_ALBUMARTIST  = 'ALBUMARTIST'  ;
 
 type
 
@@ -149,6 +150,7 @@ type
             function fGetLocation    : UnicodeString;
             function fGetContact     : UnicodeString;
             function fGetISRC        : UnicodeString;
+            function fGetAlbumArtist : UnicodeString;
 
             procedure fSetPropertyByFieldname(aField: String; aValue: UnicodeString);
             procedure fSetTitle       (value: UnicodeString);
@@ -166,7 +168,7 @@ type
             procedure fSetLocation    (value: UnicodeString);
             procedure fSetContact     (value: UnicodeString);
             procedure fSetISRC        (value: UnicodeString);
-
+            procedure fSetAlbumArtist (value: UnicodeString);
 
         public
             property ValidComment: Boolean read fValidComment;
@@ -186,6 +188,7 @@ type
             property Location    : UnicodeString read fGetLocation     write fSetLocation    ;
             property Contact     : UnicodeString read fGetContact      write fSetContact     ;
             property ISRC        : UnicodeString read fGetISRC         write fSetISRC        ;
+            property AlbumArtist : UnicodeString read fGetAlbumArtist  write fSetAlbumArtist ;
 
             //property CommentVectorList: TObjectList read fCommentVectorList;
 
@@ -320,6 +323,11 @@ begin
     result := fGetPropertyByFieldname(VORBIS_ALBUM);
 end;
 
+function TVorbisComments.fGetAlbumArtist: UnicodeString;
+begin
+  result := fGetPropertyByFieldName(VORBIS_ALBUMARTIST);
+end;
+
 function TVorbisComments.fGetArtist: UnicodeString;
 begin
     result := fGetPropertyByFieldname(VORBIS_ARTIST);
@@ -434,6 +442,11 @@ end;
 procedure TVorbisComments.fSetAlbum(value: UnicodeString);
 begin
     fSetPropertyByFieldname(VORBIS_ALBUM, Value);
+end;
+
+procedure TVorbisComments.fSetAlbumArtist(value: UnicodeString);
+begin
+  fSetPropertyByFieldName(VORBIS_ALBUMARTIST, value);
 end;
 
 procedure TVorbisComments.fSetArtist(value: UnicodeString);

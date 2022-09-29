@@ -638,10 +638,7 @@ begin
     end;
 
     if assigned(FDetails) and FDetails.visible then
-    begin
-        FDetails.Close;
-        Nemp_MainForm.AutoShowDetailsTMP := False;
-    end;
+      FDetails.Close;
 
     if assigned(OptionsCompleteForm) and OptionsCompleteForm.visible then
         OptionsCompleteForm.Close;

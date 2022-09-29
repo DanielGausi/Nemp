@@ -13,12 +13,10 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
-  OldCreateOrder = False
   ShowHint = True
   OnCreate = FormCreate
   OnMouseDown = TrackBarMouseDown
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 13
   object GRPBOXEqualizer: TGroupBox
     AlignWithMargins = True

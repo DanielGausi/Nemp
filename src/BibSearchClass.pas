@@ -14,7 +14,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2019, Daniel Gaussmann
+    Copyright (C) 2005-2022, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -114,6 +114,7 @@ type
     // so, here is a highly complex TUTF8StringList. ;-)
     TUTF8StringList = Array of UTF8String;
 
+    teEmptyListMessages = (elmLibrary, elmCategory, elmSearch, elmShortSearch, elmFavorite, elmPlaylist, elmTitle);
 
     TBibSearcher = class
       private
@@ -124,9 +125,7 @@ type
         // Used for "Better search"
         CurrentList: TAudioFileList;
 
-        // Dummy-Audiofiles
-        fDummyAudioFile: TAudioFile;
-
+        fEmptyListMessageIdx: teEmptyListMessages;
         fIPCSearchIsRunning: Boolean;
 
         // Some Flags for the search
@@ -138,6 +137,9 @@ type
         fAccelerateSearchIncludePath: LongBool;
         fAccelerateSearchIncludeComment: LongBool;
         fAccelerateSearchIncludeGenre: LongBool;
+        fAccelerateSearchIncludeComposer: LongBool;
+        fAccelerateSearchIncludeAlbumArtist: LongBool;
+
 
         fTotalStringLengthSetting   : Integer;  // The length of the total string, according to the curent settings
         fTotalStringLengthMinimized : Integer;  //  The length of the total string, without filenames and without comments
@@ -169,8 +171,14 @@ type
         function GetAccelerateSearchIncludeComment: LongBool;
         procedure SetAccelerateSearchIncludeGenre(Value: LongBool);
         function GetAccelerateSearchIncludeGenre: LongBool;
+        procedure SetAccelerateSearchIncludeComposer(Value: LongBool);
+        function GetAccelerateSearchIncludeComposer: LongBool;
+        procedure SetAccelerateSearchIncludeAlbumArtist(Value: LongBool);
+        function GetAccelerateSearchIncludeAlbumArtist: LongBool;
         function GetAccelerateLyricSearch: LongBool;
         procedure SetAccelerateLyricSearch(Value: LongBool);
+
+        function GetEmptyListMessage: String;
 
         procedure CalculateTotalStringLengths(FileList: TAudioFileList);
         procedure CalculateLyricStringLengths(FileList: TAudioFileList);
@@ -187,10 +195,9 @@ type
 
         function AudioFileMatchesCompleteKeywords(aAudioFile: TAudioFile; Keywords: TSearchKeywords): Boolean;
         function AudioFileMatchesCompleteKeywordsApprox(aAudioFile: TAudioFile; Keywords: TUTF8SearchKeywords): Boolean;
-
         function AudioFileMatchesCompleteKeywordsNoSubStrings(aAudioFile: TAudioFile; Keywords: TSearchKeywords): Boolean;
 
-        function GenerateKeywordList(aKeyword: UnicodeString): TStringList;
+        procedure GenerateKeywordList(aKeyword: UnicodeString; KeywordList: TStringList);
 
         function fGetMostrecentQuickSearch: String;
 
@@ -221,16 +228,18 @@ type
         property AccelerateSearchIncludePath: LongBool read GetAccelerateSearchIncludePath write SetAccelerateSearchIncludePath;
         property AccelerateSearchIncludeComment: LongBool read GetAccelerateSearchIncludeComment write SetAccelerateSearchIncludeComment;
         property AccelerateSearchIncludeGenre: LongBool read GetAccelerateSearchIncludeGenre write SetAccelerateSearchIncludeGenre;
+        property AccelerateSearchIncludeComposer: LongBool read GetAccelerateSearchIncludeComposer write SetAccelerateSearchIncludeComposer;
+        property AccelerateSearchIncludeAlbumArtist: LongBool read GetAccelerateSearchIncludeAlbumArtist write SetAccelerateSearchIncludeAlbumArtist;
+
         property AccelerateLyricSearch: LongBool read GetAccelerateLyricSearch write SetAccelerateLyricSearch;
-
-        property DummyAudioFile: TAudioFile read fDummyAudioFile;
-
+        property EmptyListMessage: string read GetEmptyListMessage;
         property IPCSearchIsRunning: Boolean read fIPCSearchIsRunning;
-
         property MostRecentQuickSearch: String read fGetMostrecentQuickSearch;
 
         constructor Create(aWnd: DWord);
         destructor Destroy; override;
+
+        function GetNewEmptyListMessage(msgIdx: teEmptyListMessages): String;
 
         procedure Clear;
         // Deletes an AudioFile from the ObjectLists
@@ -327,6 +336,8 @@ begin
             or (AnsiContainsText(aAudioFile.Titel     , Keywords[i]))
             or (AnsiContainsText(aAudioFile.Comment   , Keywords[i]))
             or (AnsiContainsText(aAudioFile.Genre     , Keywords[i]))
+            or (AnsiContainsText(aAudioFile.AlbumArtist, Keywords[i]))
+            or (AnsiContainsText(aAudioFile.Composer   , Keywords[i]))
      then  // nothing. Audiofile is valid (til here)
      else
      begin
@@ -350,6 +361,8 @@ begin
           or (SearchDP(UTF8Encode(AnsiLowerCase(aAudioFile.Album)),  Keywords[i],  length(Keywords[i]) Div 4) > 0)
           or (SearchDP(UTF8Encode(AnsiLowerCase(aAudioFile.Comment)),Keywords[i],  length(Keywords[i]) Div 4) > 0)
           or (SearchDP(UTF8Encode(AnsiLowerCase(aAudioFile.Genre  )),Keywords[i],  length(Keywords[i]) Div 4) > 0)
+          or (SearchDP(UTF8Encode(AnsiLowerCase(aAudioFile.AlbumArtist  )),Keywords[i],  length(Keywords[i]) Div 4) > 0)
+          or (SearchDP(UTF8Encode(AnsiLowerCase(aAudioFile.Composer  )),Keywords[i],  length(Keywords[i]) Div 4) > 0)
       then // nothing. Audiofile is valid (til here)
       else
       begin
@@ -377,8 +390,6 @@ begin
     QuickSearchHistory := TStringList.Create;
     for i := 1 to 10 do
         SearchResultLists[i] := TAudioFileList.Create(False);
-
-    fDummyAudioFile := TAudioFile.Create;
 end;
 
 destructor TBibSearcher.Destroy;
@@ -387,7 +398,6 @@ begin
     IPCSearchResults.Free;
     QuickSearchResults.Free;
     QuickSearchHistory.Free;
-    fDummyAudioFile.Free;
     for i := 1 to 10 do
         SearchResultLists[i].Free;
     inherited destroy;
@@ -421,6 +431,27 @@ begin
         RemoveAudioFileFromLists(aList[i]);
 end;
 
+function TBibSearcher.GetEmptyListMessage: String;
+begin
+  case fEmptyListMessageIdx of
+    elmLibrary: result := MainForm_LibraryIsEmpty;
+    elmCategory: result := MainForm_EmptyCategory;
+    elmSearch: result := MainForm_NoSearchresults;
+    elmShortSearch: result := MainForm_SearchQueryTooShort;
+    elmFavorite: result := MainForm_NoFavorites;
+    elmPlaylist: result := MainForm_EmptyBibPlaylist;
+    elmTitle: result := MainForm_NoTitleInformationAvailable;
+  else
+    result := MainForm_LibraryIsEmpty;
+  end;
+end;
+
+function TBibSearcher.GetNewEmptyListMessage(msgIdx: teEmptyListMessages): String;
+begin
+  fEmptyListMessageIdx := msgIdx;
+  result := GetEmptyListMessage;
+end;
+
 {
     --------------------------------------------------------
     LoadFromIni
@@ -435,6 +466,8 @@ begin
     AccelerateSearchIncludePath    := Ini.ReadBool('MedienBib', 'AccelerateSearchIncludePath', True);
     AccelerateSearchIncludeComment := Ini.ReadBool('MedienBib', 'AccelerateSearchIncludeComment', False);
     AccelerateSearchIncludeGenre   := Ini.ReadBool('MedienBib', 'AccelerateSearchIncludeGenre', True);
+    AccelerateSearchIncludeComposer   := Ini.ReadBool('MedienBib', 'AccelerateSearchIncludeComposer', True);
+    AccelerateSearchIncludeAlbumArtist := Ini.ReadBool('MedienBib', 'AccelerateSearchIncludeAlbumArtist', True);
     AccelerateLyricSearch          := Ini.ReadBool('MedienBib', 'AccelerateLyricSearch', False);
 
     QuickSearchOptions.WhileYouType       := Ini.ReadBool('MedienBib', 'QSWhileYouType', True);
@@ -448,6 +481,8 @@ begin
     Ini.WriteBool('MedienBib', 'AccelerateSearchIncludePath', AccelerateSearchIncludePath);
     Ini.WriteBool('MedienBib', 'AccelerateSearchIncludeComment', AccelerateSearchIncludeComment);
     Ini.WriteBool('MedienBib', 'AccelerateSearchIncludeGenre', AccelerateSearchIncludeGenre);
+    Ini.WriteBool('MedienBib', 'AccelerateSearchIncludeComposer', AccelerateSearchIncludeComposer);
+    Ini.WriteBool('MedienBib', 'AccelerateSearchIncludeAlbumArtist', AccelerateSearchIncludeAlbumArtist);
     Ini.WriteBool('MedienBib', 'AccelerateLyricSearch', AccelerateLyricSearch);
 
     Ini.WriteBool('MedienBib', 'QSWhileYouType', QuickSearchOptions.WhileYouType);
@@ -504,6 +539,22 @@ procedure TBibSearcher.SetAccelerateLyricSearch(Value: LongBool);
 begin
   InterLockedExchange(Integer(fAccelerateLyricSearch), Integer(Value));
 end;
+procedure TBibSearcher.SetAccelerateSearchIncludeComposer(Value: LongBool);
+begin
+  InterLockedExchange(Integer(fAccelerateSearchIncludeComposer), Integer(Value));
+end;
+function TBibSearcher.GetAccelerateSearchIncludeComposer: LongBool;
+begin
+  InterLockedExchange(Integer(Result), Integer(fAccelerateSearchIncludeComposer));
+end;
+procedure TBibSearcher.SetAccelerateSearchIncludeAlbumArtist(Value: LongBool);
+begin
+  InterLockedExchange(Integer(fAccelerateSearchIncludeAlbumArtist), Integer(Value));
+end;
+function TBibSearcher.GetAccelerateSearchIncludeAlbumArtist: LongBool;
+begin
+  InterLockedExchange(Integer(Result), Integer(fAccelerateSearchIncludeAlbumArtist));
+end;
 
 {
     --------------------------------------------------------
@@ -542,6 +593,14 @@ begin
             if AccelerateSearchIncludeGenre then
                 aLengthAdditional := 1 + aLengthAdditional
                                        + length({#1 + }Utf8Encode(AnsiLowerCase(aAudioFile.Genre)));
+
+            if AccelerateSearchIncludeComposer and  (aAudioFile.Composer <> '')  and (aAudioFile.Composer <> aAudioFile.Artist) then
+                aLengthAdditional := 1 + aLengthAdditional
+                                       + length({#1 + }Utf8Encode(AnsiLowerCase(aAudioFile.Composer)));
+
+            if AccelerateSearchIncludeAlbumArtist and  (aAudioFile.AlbumArtist <> '')  and (aAudioFile.AlbumArtist <> aAudioFile.Artist) then
+                aLengthAdditional := 1 + aLengthAdditional
+                                       + length({#1 + }Utf8Encode(AnsiLowerCase(aAudioFile.AlbumArtist)));
 
             fTotalStringLengthSetting   := fTotalStringLengthSetting + aLengthMinimal + aLengthAdditional;
             fTotalStringLengthMinimized := fTotalStringLengthMinimized + aLengthMinimal;
@@ -634,6 +693,13 @@ begin
                 if AccelerateSearchIncludeGenre and BuildSettings then
                     currentAudioString := currentAudioString + #1
                                 + Utf8Encode(AnsiLowerCase(aAudioFile.Genre));
+                if AccelerateSearchIncludeComposer and  (aAudioFile.Composer <> '')  and (aAudioFile.Composer <> aAudioFile.Artist) then
+                    currentAudioString := currentAudioString + #1
+                                + Utf8Encode(AnsiLowerCase(aAudioFile.Composer));
+                if AccelerateSearchIncludeAlbumArtist and  (aAudioFile.AlbumArtist <> '')  and (aAudioFile.AlbumArtist <> aAudioFile.Artist) then
+                    currentAudioString := currentAudioString + #1
+                                + Utf8Encode(AnsiLowerCase(aAudioFile.AlbumArtist));
+
                 currentAudioString := currentAudioString + #13#10;
 
                 if currentPos + length(currentAudioString) <= maxLength then
@@ -815,7 +881,7 @@ end;
 }
 function TBibSearcher.AudioFileMatchesCompleteKeywords(aAudioFile: TAudioFile; Keywords: TSearchKeywords): Boolean;
 begin
-  result := IsOk(Keywords.Artist, aAudioFile.Artist)
+  result := (IsOk(Keywords.Artist, aAudioFile.Artist) or IsOk(Keywords.Artist, aAudioFile.AlbumArtist) or IsOk(Keywords.Artist, aAudioFile.Composer))
           AND IsOk(Keywords.Titel, aAudioFile.Titel)
           AND IsOk(Keywords.Album, aAudioFile.Album)
           AND IsOk(Keywords.Pfad, aAudioFile.Pfad)
@@ -831,6 +897,8 @@ begin
                (trim(Keywords.General) = '')
             or (AnsiContainsText(aAudioFile.Pfad      , Keywords.General))
             or (AnsiContainsText(aAudioFile.Artist    , Keywords.General))
+            or (AnsiContainsText(aAudioFile.AlbumArtist , Keywords.General))
+            or (AnsiContainsText(aAudioFile.Composer   , Keywords.General))
             or (AnsiContainsText(aAudioFile.Album     , Keywords.General))
             or (AnsiContainsText(aAudioFile.Titel     , Keywords.General))
             or (AnsiContainsText(aAudioFile.Comment   , Keywords.General))
@@ -841,7 +909,7 @@ end;
 
 function TBibSearcher.AudioFileMatchesCompleteKeywordsNoSubStrings(aAudioFile: TAudioFile; Keywords: TSearchKeywords): Boolean;
 begin
-    result := IsOKNoSubStrings(Keywords.Artist, aAudioFile.Artist)
+    result := (IsOKNoSubStrings(Keywords.Artist, aAudioFile.Artist) or IsOKNoSubStrings(Keywords.Artist, aAudioFile.AlbumArtist) or IsOKNoSubStrings(Keywords.Artist, aAudioFile.Composer))
           AND IsOKNoSubStrings(Keywords.Titel, aAudioFile.Titel)
           AND IsOKNoSubStrings(Keywords.Album, aAudioFile.Album)
           AND IsOKNoSubStrings(Keywords.Pfad, aAudioFile.Pfad)
@@ -855,7 +923,7 @@ end;
 
 function TBibSearcher.AudioFileMatchesCompleteKeywordsApprox(aAudioFile: TAudioFile; Keywords: TUTF8SearchKeywords): Boolean;
 begin
-    result := IsOKApprox(Keywords.Artist, aAudioFile.Artist)
+    result := (IsOKApprox(Keywords.Artist, aAudioFile.Artist) or IsOKApprox(Keywords.Artist, aAudioFile.AlbumArtist) or IsOKApprox(Keywords.Artist, aAudioFile.Composer))
           AND IsOKApprox(Keywords.Titel,  aAudioFile.Titel )
           AND IsOKApprox(Keywords.Album,  aAudioFile.Album )
           AND IsOKApprox(Keywords.Kommentar, aAudioFile.Comment)
@@ -872,6 +940,8 @@ begin
                (trim(String(Keywords.General)) = '')
             or (SearchDP(UTF8Encode(AnsiLowerCase(aAudioFile.Pfad)),   Keywords.General,  length(Keywords.General) Div 4) > 0)
             or (SearchDP(UTF8Encode(AnsiLowerCase(aAudioFile.Artist)), Keywords.General,  length(Keywords.General) Div 4) > 0)
+            or (SearchDP(UTF8Encode(AnsiLowerCase(aAudioFile.AlbumArtist)), Keywords.General,  length(Keywords.General) Div 4) > 0)
+            or (SearchDP(UTF8Encode(AnsiLowerCase(aAudioFile.Composer)), Keywords.General,  length(Keywords.General) Div 4) > 0)
             or (SearchDP(UTF8Encode(AnsiLowerCase(aAudioFile.Titel)),  Keywords.General,  length(Keywords.General) Div 4) > 0)
             or (SearchDP(UTF8Encode(AnsiLowerCase(aAudioFile.Album)),  Keywords.General,  length(Keywords.General) Div 4) > 0)
             or (SearchDP(UTF8Encode(AnsiLowerCase(aAudioFile.Comment)),Keywords.General,  length(Keywords.General) Div 4) > 0)
@@ -926,7 +996,7 @@ end;
 }
 procedure TBibSearcher.ShowSearchResults(aIndex: Integer);
 begin
-    fDummyAudioFile.Titel := MainForm_NoSearchresults;
+    fEmptyListMessageIdx := elmSearch;
     if (aIndex >=1) and (aIndex <= 10) then
     begin
         CurrentList := SearchResultLists[aIndex];
@@ -947,9 +1017,9 @@ end;
     Used only by QuickSearch atm
     --------------------------------------------------------
 }
-function TBibSearcher.GenerateKeywordList(aKeyword: UnicodeString): TStringList;
+procedure TBibSearcher.GenerateKeywordList(aKeyword: UnicodeString; KeywordList: TStringList);
 begin
-  result := ExplodeWithQuoteMarks(' ', aKeyword);
+  ExplodeWithQuoteMarks(' ', aKeyword, KeywordList);
 end;
 
 {
@@ -995,7 +1065,7 @@ begin
 
     CurrentList := SearchResultLists[1];
     // Show empty CurrentList in MainForm
-    fDummyAudioFile.Titel := MainForm_NoSearchresults; // ???
+    fEmptyListMessageIdx := elmSearch;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(CurrentList));
 end;
 
@@ -1042,116 +1112,121 @@ begin
   // Escape "\*", as we use "*" for a search for all files now (11.2018)
   keyword := StringReplace(keyword, '\*', '*', [rfreplaceAll]);
 
-  Keywords := GenerateKeywordList(keyword);
-  OnlyOneWord := Keywords.Count = 1;
-  searchL := 0;
-  searchR := length(TotalStringIndizes) - 1;
+  Keywords := TStringList.Create;
+  try
+    GenerateKeywordList(keyword, Keywords);
+    OnlyOneWord := Keywords.Count = 1;
+    searchL := 0;
+    searchR := length(TotalStringIndizes) - 1;
 
-  SetLength(KeywordsUTF8, Keywords.Count);
-  for i := 0 to Keywords.Count - 1 do
-      KeywordsUTF8[i] := UTF8Encode(AnsiLowerCase(Keywords[i]));
+    SetLength(KeywordsUTF8, Keywords.Count);
+    for i := 0 to Keywords.Count - 1 do
+        KeywordsUTF8[i] := UTF8Encode(AnsiLowerCase(Keywords[i]));
 
-  // Get the longest keyword
-  // Note: Boyer-Moore-Horspool is (much) faster on (much) longer search-patterns.
-  //       Dynamic-programming is slower on longer searchpatterns, but shorter
-  //       ones will cause many false positives
-  UTF8Keyword := GetLongestUTF8String(Keywords);
-  lmax := length(UTF8Keyword);
+    // Get the longest keyword
+    // Note: Boyer-Moore-Horspool is (much) faster on (much) longer search-patterns.
+    //       Dynamic-programming is slower on longer searchpatterns, but shorter
+    //       ones will cause many false positives
+    UTF8Keyword := GetLongestUTF8String(Keywords);
+    lmax := length(UTF8Keyword);
 
-  QuickSearchResults.Clear;
+    QuickSearchResults.Clear;
 
-  if lmax > 0 then
-  begin
-      if AllowErr then
-      begin
-            tmpList  := TAudioFileList.Create(False);
-            if AccelerateSearch then
-            begin
-                k := 0;
-                // Preprocessing for dynamic programming
-                A := PreProcess_FilterCount(UTF8Keyword);
+    if lmax > 0 then
+    begin
+        if AllowErr then
+        begin
+              tmpList  := TAudioFileList.Create(False);
+              if AccelerateSearch then
+              begin
+                  k := 0;
+                  // Preprocessing for dynamic programming
+                  A := PreProcess_FilterCount(UTF8Keyword);
 
-                while k + lmax < Length(TotalString) do
-                begin
-                    k := SearchFilterCountDP(TotalString, UTF8Keyword, (lmax Div 4), k, A);
-                    if k = 0 then break;
+                  while k + lmax < Length(TotalString) do
+                  begin
+                      k := SearchFilterCountDP(TotalString, UTF8Keyword, (lmax Div 4), k, A);
+                      if k = 0 then break;
 
-                    NewIdx := BinIntSearch(TotalStringIndizes, k, searchL, searchR);
-                    // Probably binary search will NOT find k in the indizes-array
-                    // it will return randomly the next smaller or bigger index.
-                    // we need always the smaller one.
-                    if TotalStringIndizes[NewIdx] > k then
-                        if NewIdx > 0 then dec(NewIdx);
+                      NewIdx := BinIntSearch(TotalStringIndizes, k, searchL, searchR);
+                      // Probably binary search will NOT find k in the indizes-array
+                      // it will return randomly the next smaller or bigger index.
+                      // we need always the smaller one.
+                      if TotalStringIndizes[NewIdx] > k then
+                          if NewIdx > 0 then dec(NewIdx);
 
-                    // Check whether audiofile really matches the keywords
-                    if AudioFileMatchesKeywords(MainList[NewIdx], Keywords) then
-                        QuickSearchResults.Add(MainList[NewIdx])
-                    else
-                        if AudioFileMatchesKeywordsApprox(MainList[NewIdx], KeywordsUTF8) then
-                            tmpList.Add(MainList[NewIdx]);
+                      // Check whether audiofile really matches the keywords
+                      if AudioFileMatchesKeywords(MainList[NewIdx], Keywords) then
+                          QuickSearchResults.Add(MainList[NewIdx])
+                      else
+                          if AudioFileMatchesKeywordsApprox(MainList[NewIdx], KeywordsUTF8) then
+                              tmpList.Add(MainList[NewIdx]);
 
-                    // continue with next audiofile
-                    if NewIdx < length(TotalStringIndizes) - 1 then
-                        k := TotalStringIndizes[NewIdx + 1]
-                    else
-                        k := length(TotalString) + 1;
-                end;
-            end else
-            begin
-                // No acceleration. :(
-                // Check every single object
-                for i := 0 to MainList.Count - 1 do
-                begin
-                    // Add File to first List
-                    if AudioFileMatchesKeywords(MainList[i], Keywords) then
-                        QuickSearchResults.Add(MainList[i])
-                    else
-                        if AudioFileMatchesKeywordsApprox(MainList[i], KeywordsUTF8) then
-                            tmpList.Add(MainList[i]);
-                end;
-            end;
-            // Exact matchings first, matchings with errors afterwards.
-            for i := 0 to tmpList.Count - 1 do
-                QuickSearchResults.Add(tmpList[i]);
+                      // continue with next audiofile
+                      if NewIdx < length(TotalStringIndizes) - 1 then
+                          k := TotalStringIndizes[NewIdx + 1]
+                      else
+                          k := length(TotalString) + 1;
+                  end;
+              end else
+              begin
+                  // No acceleration. :(
+                  // Check every single object
+                  for i := 0 to MainList.Count - 1 do
+                  begin
+                      // Add File to first List
+                      if AudioFileMatchesKeywords(MainList[i], Keywords) then
+                          QuickSearchResults.Add(MainList[i])
+                      else
+                          if AudioFileMatchesKeywordsApprox(MainList[i], KeywordsUTF8) then
+                              tmpList.Add(MainList[i]);
+                  end;
+              end;
+              // Exact matchings first, matchings with errors afterwards.
+              for i := 0 to tmpList.Count - 1 do
+                  QuickSearchResults.Add(tmpList[i]);
 
-            tmpList.Free;
-      end else
-      begin
-            // no errors allowed, exact matching
-            if AccelerateSearch then
-            begin
-                k := 0;
-                // preprocessing for Boyer-Moore-Horspool
-                BC := PreProcess_BMH_BC(UTF8Keyword);
+              tmpList.Free;
+        end else
+        begin
+              // no errors allowed, exact matching
+              if AccelerateSearch then
+              begin
+                  k := 0;
+                  // preprocessing for Boyer-Moore-Horspool
+                  BC := PreProcess_BMH_BC(UTF8Keyword);
 
-                while k + lmax < Length(TotalString) do
-                begin
-                    k := BoyerMooreHorspoolEx(TotalString, UTF8Keyword, k, BC);
-                    if k = 0 then break;
-                    // ... just the same idea as in the first part
-                    NewIdx := BinIntSearch(TotalStringIndizes, k, searchL, searchR);
-                    if TotalStringIndizes[NewIdx] > k then
-                        if NewIdx > 0 then dec(NewIdx);
+                  while k + lmax < Length(TotalString) do
+                  begin
+                      k := BoyerMooreHorspoolEx(TotalString, UTF8Keyword, k, BC);
+                      if k = 0 then break;
+                      // ... just the same idea as in the first part
+                      NewIdx := BinIntSearch(TotalStringIndizes, k, searchL, searchR);
+                      if TotalStringIndizes[NewIdx] > k then
+                          if NewIdx > 0 then dec(NewIdx);
 
-                    if OnlyOneWord or (AudioFileMatchesKeywords(MainList[NewIdx], Keywords)) then
-                        QuickSearchResults.Add(MainList[NewIdx]);
+                      if OnlyOneWord or (AudioFileMatchesKeywords(MainList[NewIdx], Keywords)) then
+                          QuickSearchResults.Add(MainList[NewIdx]);
 
-                    if NewIdx < length(TotalStringIndizes) - 1 then
-                        k := TotalStringIndizes[NewIdx + 1]
-                    else
-                        k := length(TotalString) + 1;
-                end;
-            end else
-            begin
-                for i := 0 to MainList.Count - 1 do
-                    if (AudioFileMatchesKeywords(MainList[i], Keywords)) then
-                        QuickSearchResults.Add(MainList[i]);
-            end;
-      end;
+                      if NewIdx < length(TotalStringIndizes) - 1 then
+                          k := TotalStringIndizes[NewIdx + 1]
+                      else
+                          k := length(TotalString) + 1;
+                  end;
+              end else
+              begin
+                  for i := 0 to MainList.Count - 1 do
+                      if (AudioFileMatchesKeywords(MainList[i], Keywords)) then
+                          QuickSearchResults.Add(MainList[i]);
+              end;
+        end;
+    end;
+  finally
+    Keywords.Free;
   end;
-  fDummyAudioFile.Titel := MainForm_NoSearchresults;
+  fEmptyListMessageIdx := elmSearch;
   SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowQuickSearchResults, lParam(QuickSearchResults));
-  Keywords.Free;
+
 end;
 
 procedure TBibSearcher.GlobalQuickTagSearch(KeyTag: UnicodeString);
@@ -1180,7 +1255,7 @@ begin
     end;
 
     // show search results
-    fDummyAudioFile.Titel := MainForm_NoSearchresults;
+    fEmptyListMessageIdx := elmSearch;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(QuickSearchResults));
 end;
 
@@ -1191,7 +1266,7 @@ begin
     for i := 0 to MainList.Count - 1 do
         QuickSearchResults.Add(Mainlist[i]);
 
-    fDummyAudioFile.Titel := MainForm_NoSearchresults;
+    fEmptyListMessageIdx := elmSearch;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowQuickSearchResults, lParam(QuickSearchResults));
 end;
 
@@ -1228,76 +1303,79 @@ var i, lmax: integer;
 begin
   fIPCSearchIsRunning := True;
 
-  Keywords := GenerateKeywordList(keyword);
-  //OnlyOneWord := Keywords.Count = 1;
-  searchL := 0;
-  searchR := length(TotalStringIndizes) - 1;
+  Keywords := TStringList.Create;
+  try
+    GenerateKeywordList(keyword, Keywords);
+    //OnlyOneWord := Keywords.Count = 1;
+    searchL := 0;
+    searchR := length(TotalStringIndizes) - 1;
 
-  SetLength(KeywordsUTF8, Keywords.Count);
-  for i := 0 to Keywords.Count - 1 do
-      KeywordsUTF8[i] := UTF8Encode(AnsiLowerCase(Keywords[i]));
+    SetLength(KeywordsUTF8, Keywords.Count);
+    for i := 0 to Keywords.Count - 1 do
+        KeywordsUTF8[i] := UTF8Encode(AnsiLowerCase(Keywords[i]));
 
-  // Get the longest keyword
-  // Note: Boyer-Moore-Horspool is (much) faster on (much) longer search-patterns.
-  //       Dynamic-programming is slower on longer searchpatterns, but shorter
-  //       ones will cause many false positives
-  UTF8Keyword := GetLongestUTF8String(Keywords);
-  lmax := length(UTF8Keyword);
+    // Get the longest keyword
+    // Note: Boyer-Moore-Horspool is (much) faster on (much) longer search-patterns.
+    //       Dynamic-programming is slower on longer searchpatterns, but shorter
+    //       ones will cause many false positives
+    UTF8Keyword := GetLongestUTF8String(Keywords);
+    lmax := length(UTF8Keyword);
+    IPCSearchResults.clear;
+    if lmax > 0 then
+    begin
+              tmpList  := TAudioFileList.Create(False);
+              if AccelerateSearch then
+              begin
+                  k := 0;
+                  // Preprocessing for dynamic programming
+                  A := PreProcess_FilterCount(UTF8Keyword);
 
-  IPCSearchResults.clear;
+                  while k + lmax < Length(TotalString) do
+                  begin
+                      k := SearchFilterCountDP(TotalString, UTF8Keyword, (lmax Div 4), k, A);
+                      if k = 0 then break;
 
-  if lmax > 0 then
-  begin
-            tmpList  := TAudioFileList.Create(False);
-            if AccelerateSearch then
-            begin
-                k := 0;
-                // Preprocessing for dynamic programming
-                A := PreProcess_FilterCount(UTF8Keyword);
+                      NewIdx := BinIntSearch(TotalStringIndizes, k, searchL, searchR);
+                      // Probably binary search will NOT find k in the indizes-array
+                      // it will return randomly the next smaller or bigger index.
+                      // we need always the smaller one.
+                      if TotalStringIndizes[NewIdx] > k then
+                          if NewIdx > 0 then dec(NewIdx);
 
-                while k + lmax < Length(TotalString) do
-                begin
-                    k := SearchFilterCountDP(TotalString, UTF8Keyword, (lmax Div 4), k, A);
-                    if k = 0 then break;
+                      // Check whether audiofile really matches the keywords
+                      if AudioFileMatchesKeywords(MainList[NewIdx], Keywords) then
+                          IPCSearchResults.Add(MainList[NewIdx])
+                      else
+                          if AudioFileMatchesKeywordsApprox(MainList[NewIdx], KeywordsUTF8) then
+                              tmpList.Add(MainList[NewIdx]);
 
-                    NewIdx := BinIntSearch(TotalStringIndizes, k, searchL, searchR);
-                    // Probably binary search will NOT find k in the indizes-array
-                    // it will return randomly the next smaller or bigger index.
-                    // we need always the smaller one.
-                    if TotalStringIndizes[NewIdx] > k then
-                        if NewIdx > 0 then dec(NewIdx);
+                      // continue with next audiofile
+                      if NewIdx < length(TotalStringIndizes) - 1 then
+                          k := TotalStringIndizes[NewIdx + 1]
+                      else
+                          k := length(TotalString) + 1;
+                  end;
+              end else
+              begin
+                  // No acceleration. :(
+                  // Check every single object
+                  for i := 0 to MainList.Count - 1 do
+                  begin
+                      if AudioFileMatchesKeywords(MainList[i], Keywords) then
+                          IPCSearchResults.Add(MainList[i])
+                      else
+                          if AudioFileMatchesKeywordsApprox(MainList[i], KeywordsUTF8) then
+                              tmpList.Add(MainList[i]);
+                  end;
+              end;
+              // Exact matchings first, matchings with errors afterwards.
+              for i := 0 to tmpList.Count - 1 do
+                  IPCSearchResults.Add(tmpList[i]);
 
-                    // Check whether audiofile really matches the keywords
-                    if AudioFileMatchesKeywords(MainList[NewIdx], Keywords) then
-                        IPCSearchResults.Add(MainList[NewIdx])
-                    else
-                        if AudioFileMatchesKeywordsApprox(MainList[NewIdx], KeywordsUTF8) then
-                            tmpList.Add(MainList[NewIdx]);
-
-                    // continue with next audiofile
-                    if NewIdx < length(TotalStringIndizes) - 1 then
-                        k := TotalStringIndizes[NewIdx + 1]
-                    else
-                        k := length(TotalString) + 1;
-                end;
-            end else
-            begin
-                // No acceleration. :(
-                // Check every single object
-                for i := 0 to MainList.Count - 1 do
-                begin
-                    if AudioFileMatchesKeywords(MainList[i], Keywords) then
-                        IPCSearchResults.Add(MainList[i])
-                    else
-                        if AudioFileMatchesKeywordsApprox(MainList[i], KeywordsUTF8) then
-                            tmpList.Add(MainList[i]);
-                end;
-            end;
-            // Exact matchings first, matchings with errors afterwards.
-            for i := 0 to tmpList.Count - 1 do
-                IPCSearchResults.Add(tmpList[i]);
-
-            tmpList.Free;
+              tmpList.Free;
+    end;
+  finally
+    Keywords.Free;
   end;
 
   // Copy SearchResults to VCL-Lists
@@ -1306,7 +1384,6 @@ begin
   // Show search results.
   //SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowQuickSearchResults, lParam(fDummyAudioFile));
 
-  Keywords.Free;
   fIPCSearchIsRunning := False;
 end;
 
@@ -1526,7 +1603,7 @@ begin
         SearchExact(SearchMode, UTF8LongestKeyword, KeyWords, UTF8SearchKeywords);
 
     // show search results
-    fDummyAudioFile.Titel := MainForm_NoSearchresults;
+    fEmptyListMessageIdx := elmSearch;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(CurrentList));
 end;
 
@@ -1542,7 +1619,7 @@ begin
             QuickSearchResults.Add(MainList[i]);
 
     // show search results
-    fDummyAudioFile.Titel := MainForm_NoSearchresults;
+    fEmptyListMessageIdx := elmSearch;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(QuickSearchResults));
 end;
 
@@ -1592,7 +1669,7 @@ begin
             end;
         end;
 
-        fDummyAudioFile.Titel := MainForm_NoSearchresults;
+        fEmptyListMessageIdx := elmSearch;
         SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(tmpList));
     finally
         tmpList.Free;
@@ -1633,7 +1710,7 @@ begin
             end;
         end;
 
-        fDummyAudioFile.Titel := MainForm_NoFavorites;
+        fEmptyListMessageIdx := elmFavorite;
         SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowFavorites, lParam(tmpList));
     finally
         tmpList.Free;

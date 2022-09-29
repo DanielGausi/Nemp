@@ -47,7 +47,8 @@ uses
   Dialogs, StdCtrls, ExtCtrls, ComCtrls, IniFiles, MyDialogs, System.Contnrs,
   System.StrUtils,
   gnuGettext, Nemp_RessourceStrings, DriveRepairTools,
-  SystemHelper, fldBrows, NempAudioFiles, Hilfsfunktionen, AudioDisplayUtils;
+  SystemHelper, fldBrows, NempAudioFiles, Hilfsfunktionen, AudioDisplayUtils,
+  Vcl.Mask;
 
 type
   TPlaylistCopyForm = class(TForm)

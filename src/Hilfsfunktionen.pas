@@ -63,15 +63,16 @@ function GetStreamExtension(aStream: DWord): String;
 function ReplaceForbiddenFilenameChars(aString: UnicodeString): UnicodeString;
 
 procedure Explode(const Separator, S: String; aStrings: TStrings);  overload;
-function Explode(const Separator, S: String): TStringList;  overload; Deprecated;
-function ExplodeWithQuoteMarks(const Separator, S: String): TStringList;  Deprecated;
+//function Explode(const Separator, S: String): TStringList;  overload; Deprecated;
+procedure ExplodeWithQuoteMarks(const Separator, S: String; aStrings: TStrings); //: TStringList;  // Deprecated;
 
 procedure Delay(dwMillSec: DWord);
 
-
+function IntToStrEmptyZero(Value: Integer): String;
 function SekIntToMinStr(sek:integer; OnlyMinutes: Boolean = False):string;
 function SekToZeitString(dauer:int64; OnlyMinutes: Boolean = False):string;
 function SecToStr(Value: Double):String;
+function GetFileSize(const FileName: string): Int64;
 function SizeToString(Value: Int64): String;
 function SizeToString2(Value: Int64): String;
 function SecondsUntil(aTime: TTime): Integer;
@@ -215,10 +216,14 @@ begin
     begin
       if PLugInfo.formats[i].ctype = Channelinfo.ctype then
       begin
-                tmpext := Explode(';', String(PLugInfo.Formats[i].exts));
-                if tmpext.Count > 0 then
-                  result := StringReplace(tmpext.Strings[0],'*', '',[]);
-                FreeAndNil(tmpext);// im Explode wirds erzeugt
+          tmpext := TStringList.Create;
+          try
+            Explode(';', String(PlugInfo.Formats[i].exts), tmpext);
+            if tmpext.Count > 0 then
+              result := StringReplace(tmpext.Strings[0],'*', '',[]);
+          finally
+            tmpext.Free;
+          end;
       end;
     end;
   end;
@@ -282,7 +287,7 @@ begin
 
 end;
 
-function Explode(const Separator, S: String): TStringList;
+(*function Explode(const Separator, S: String): TStringList;
 var
   SepLen: Integer;
   F, P: PChar;
@@ -306,21 +311,21 @@ begin
     Result.Add(tmpstr);
     if P^ <> #0 then Inc(P, SepLen);
   end;
-end;
+end;*)
 
-function ExplodeWithQuoteMarks(const Separator, S: String): TStringList;
+//function ExplodeWithQuoteMarks(const Separator, S: String): TStringList;
+procedure ExplodeWithQuoteMarks(const Separator, S: String; aStrings: TStrings);
 var
   SepLen: Integer;
   F, P: PChar;
   tmpstr, quote:String;
 
 begin
-  result := TStringList.Create;
   if (S = '') then Exit;
   quote := '"';
   if Separator = '' then
   begin
-    Result.Add(S);
+    aStrings.Add(S);
     Exit;
   end;
   SepLen := Length(Separator);
@@ -341,14 +346,14 @@ begin
             if (P = nil) then P := StrEnd(F);
             SetString(tmpstr, F, P - F);
             if trim(tmpstr) <> '' then
-              Result.Add(tmpstr);
+              aStrings.Add(tmpstr);
             if P^ <> #0 then Inc(P, SepLen);
         end
         else
         begin
             SetString(tmpstr, F+1, P - F-1);
             if trim(tmpstr) <> '' then
-              Result.Add(tmpstr);
+              aStrings.Add(tmpstr);
             if P^ <> #0 then Inc(P, Length(quote));
         end;
     end else
@@ -357,7 +362,7 @@ begin
         if (P = nil) then P := StrEnd(F);
         SetString(tmpstr, F, P - F);
         if trim(tmpstr) <> '' then
-          Result.Add(tmpstr);
+          aStrings.Add(tmpstr);
         if P^ <> #0 then Inc(P, SepLen);
     end;
   end;
@@ -456,6 +461,13 @@ begin
   end;
 end;
 
+function IntToStrEmptyZero(Value: Integer): String;
+begin
+  if Value = 0 then
+    result := ''
+  else
+    result := IntToStr(Value)
+end;
 
 function SekIntToMinStr(sek:integer; OnlyMinutes: Boolean = False):string;
 begin
@@ -569,6 +581,21 @@ Begin
   // In String verwandeln
   Result:=MakeTime(M,S);
 End;
+
+
+function GetFileSize(const FileName: string): Int64;
+var
+  FileInfo: TWin32FileAttributeData;
+begin
+  FillChar(FileInfo, SizeOf(FileInfo), 0);
+  if GetFileAttributesEx(PChar(FileName), GetFileExInfoStandard, @FileInfo) then
+  begin
+    Int64Rec(Result).Hi := FileInfo.nFileSizeHigh;
+    Int64Rec(Result).Lo := FileInfo.nFileSizeLow;
+  end
+  else
+    Result := 0; // -1 wäre ein besserer Wert, da es Dateien gibt die Größe 0 haben
+end;
 
 function SizeToString(Value: Int64): String;
 begin

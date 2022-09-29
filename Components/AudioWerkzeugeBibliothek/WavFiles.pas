@@ -80,6 +80,7 @@ type
             procedure fSetYear            (aValue: UnicodeString); override;
             procedure fSetTrack           (aValue: UnicodeString); override;
             procedure fSetGenre           (aValue: UnicodeString); override;
+            procedure fSetAlbumArtist (value: UnicodeString); override;
 
             function fGetTitle            : UnicodeString; override;
             function fGetArtist           : UnicodeString; override;
@@ -89,6 +90,7 @@ type
             function fGetGenre            : UnicodeString; override;
             function fGetFileType            : TAudioFileType; override;
             function fGetFileTypeDescription : String;         override;
+            function fGetAlbumArtist : UnicodeString; override;
 
         public
             { Public declarations }
@@ -134,6 +136,12 @@ begin
   // nothing. This Unit is read-Only
 end;
 
+procedure Twavfile.fSetAlbumArtist(value: UnicodeString);
+begin
+  inherited;
+  // nothing. This Unit is read-Only
+end;
+
 procedure TWavfile.fSetArtist(aValue: UnicodeString);
 begin
   inherited;
@@ -169,6 +177,11 @@ end;
 function TWavfile.fGetAlbum: UnicodeString;
 begin
     result := '';
+end;
+
+function Twavfile.fGetAlbumArtist: UnicodeString;
+begin
+  result := '';
 end;
 
 function TWavfile.fGetArtist: UnicodeString;

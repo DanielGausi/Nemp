@@ -37,7 +37,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, StdCtrls, NempAudioFiles, StrUtils,
+  Dialogs, ExtCtrls, StdCtrls, NempAudioFiles, StrUtils, NempHelp,
 
   Nemp_ConstantsAndTypes, gnuGettext, Nemp_RessourceStrings;
 
@@ -156,6 +156,7 @@ end;
 procedure TShutDownForm.FormCreate(Sender: TObject);
 begin
   TranslateComponent (self);
+  HelpContext := HELP_SleepTimer;
 end;
 
 end.

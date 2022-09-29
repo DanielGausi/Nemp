@@ -901,21 +901,27 @@ var count: LongWord;
     var Info: PBass_PluginInfo;
         a, j: Integer;
         tmpext: TStringList;
+        newExt: String;
     begin
-        Info := BASS_PluginGetInfo(aPlug); // get plugin info to add to the file selector filter...
-        for a := 0 to Info.formatc - 1 do
-        begin
-            // Set The OpenDialog additional, to the supported PlugIn Formats
-            Filter := Filter
-              + '|' + String(Info.Formats[a].name) + ' ' + '(' +
-              String(Info.Formats[a].exts) + ')' { , ' + fd.cFileName} + '|' + String(Info.Formats[a].exts);
-
-            //ValidExtensions
-            tmpext := Explode(';', String(Info.Formats[a].exts));
-            for j := 0 to tmpext.Count - 1 do
-                ValidExtensions.Add(StringReplace(tmpext.Strings[j],'*', '',[]));
-            FreeAndNil(tmpext);// im Explode wirds erzeugt
+      Info := BASS_PluginGetInfo(aPlug); // get plugin info to add to the file selector filter...
+      tmpext := TStringList.Create;
+      try
+        for a := 0 to Info.formatc - 1 do begin
+          // Set The OpenDialog additional, to the supported PlugIn Formats
+          Filter := Filter
+            + '|' + String(Info.Formats[a].name) + ' ' + '(' +
+            String(Info.Formats[a].exts) + ')' { , ' + fd.cFileName} + '|' + String(Info.Formats[a].exts);
+          //ValidExtensions
+          Explode(';', String(Info.Formats[a].exts), tmpext  );
+          for j := 0 to tmpext.Count - 1 do begin
+            newExt := StringReplace(tmpext.Strings[j],'*', '',[]);
+            if ValidExtensions.IndexOf(newExt) = -1 then
+              ValidExtensions.Add(newExt);
+          end;
         end;
+      finally
+        tmpext.Free;
+      end;
     end;
 
 begin

@@ -120,17 +120,17 @@ DetailForm_OnlyOneM4ACover = '(only one cover supported)';
 DetailForm_SaveChanges = 'Do you want to save the changes in the current file?';
 DetailForm_HighPlayCounter = 'This file was played %d times. This information will be irretrievably deleted if you reset the rating.';
 
-DetailForm_LibraryTagChanged = 'You have changed some properties of the audiofile, but these changes have not been saved yet.'
-          + 'If you make changes on this page as well, this may result in inconsistencies or unexpected behavior upon saving.'
-          + #13#10 + #13#10
-          + 'Would you like to save your changes now before you continue?';
+//DetailForm_LibraryTagChanged = 'You have changed some properties of the audiofile, but these changes have not been saved yet.'
+//          + 'If you make changes on this page as well, this may result in inconsistencies or unexpected behavior upon saving.'
+//          + #13#10 + #13#10
+//          + 'Would you like to save your changes now before you continue?';
 
-DetailForm_NoNewFramesPossible = 'All supported meta frames are already set. There''s nothing Nemp could add to the file here.';
+DetailForm_NoNewFramesPossible = 'All supported meta frames are already set.';
 DetailForm_CurrentLibraryCover = 'Current cover art';
 DetailForm_CoverflowNotActive = 'The Coverflow will update automatically when you activate it';
 DetailForm_NoPictureInOggMetaDataSuppotred = 'Not supported';
-DetailForm_CopyFromID3v2 = 'Copy from ID3 v2';
-DetailForm_CopyFromAPE = 'Copy from APE';
+// DetailForm_CopyFromID3v2 = 'Copy from ID3 v2';
+// DetailForm_CopyFromAPE = 'Copy from APE';
 
 
 Warning_FileNotFound = 'File not found';
@@ -246,6 +246,19 @@ FloatingPointChannels_Off = 'Current status: Off';
     OptionsForm_InvalidTime = 'Invalid time. Try something between 00:00 and 23:59.';
 
     OptionsForm_UnratedFilesHint = '* Including %d unrated files.';
+
+
+    OptionsForm_UnSavedChangesQuery = 'Some settings have been changed, but they have not been applied yet.'
+          +#13#10 + #13#10 + 'Do you want to save the changes before closing this window?'
+
+    ;
+    OptionsForm_UnSavedChangesCaption = 'Confirmation';
+    OptionsForm_UnSavedChangesTitle = 'Confirm closing';
+    OptionsForm_UnSavedChangesText = 'Some settings have not been applied yet.';
+    OptionsForm_UnSavedChangesKeep = 'Apply';
+    OptionsForm_UnSavedChangesKeepHint = 'Apply the changes and close the settings window.';
+    OptionsForm_UnSavedChangesDiscard = 'Discard';
+    OptionsForm_UnSavedChangesDiscardHint = 'Discard the changes and close the settings window.';
 
     Warning_NoSkinFound = 'No skins found';
     AdvancedSkinActivateHint = 'Note: The current skin does not support advanced skinning.';
@@ -457,6 +470,7 @@ MainForm_GlobalQuickSearch    = 'Quicksearch (library)';
 /// MainForm_MoreSearchresults  = 'Additional results (not limited to current preselection)';
 MainForm_NoSearchresults    = 'Nothing found. Try another search.';
 MainForm_EmptyCategory      = 'There are no files in the current category.';
+MainForm_EmptyBibPlaylist      = 'The playlist contains no files.';
 MainForm_SearchQueryTooShort = 'Search query too short. Please enter at least 2 characters.';
 MainForm_NoFavorites = 'No files flagged with this marker.';
 // DummyFile for browsing Playlists/Webradio
@@ -979,7 +993,6 @@ CopyToUSB_ERROR_ACCESS_DENIED = 'Access denied. Choose OK to continue with next 
 CopyToUSB_ERROR_NOT_ENOUGH_MEMORY  = 'Not enough memory. Choose OK to continue with next file, or cancel the copying process.';
 
 WizardCancel = 'You cancelled the Nemp Wizard. Some features may be disabled.';
-
 Wizard_NewSkin = 'Nemp 4.6 comes with a new default skin. Do you want to use the new one?';
 
 StartG15ToolQuestion = 'If you have a Logitech G15 keyboard, Nemp can display the current title (and some other stuff) on it.'
@@ -1013,12 +1026,11 @@ DeleteHelper_DoWithDriveMissing   = 'You should keep files in the library, conne
 DeleteHelper_DoWithNetworkPresent = 'You should remove the missing files from the library.';
 DeleteHelper_DoWithNetworkMissing = 'You should keep the files in the library, check your network settings and try again later.';
 
-DeleteHelper_Readme = 'Sometimes it is not appropriate to remove every missing file from the library. '
-    + 'E.g.: If you store large parts of your music files on an external harddrive which is currently not connected to your PC.'
-    + #13#10 + #13#10
-    + 'In this dialog you can choose what to do with the missing files on the specified drives.' + #13#10
-    + 'Missing files from the checked drives will be removed from the library, the others will not be removed.'
-    ;
+//DeleteHelper_Readme = 'Sometimes it is not appropriate to remove every missing file from the library. '
+//    + 'E.g.: If you store large parts of your music files on an external harddrive which is currently not connected to your PC.'
+//    + #13#10 + #13#10
+//    + 'In this dialog you can choose what to do with the missing files on the specified drives.' + #13#10
+//    + 'Missing files from the checked drives will be removed from the library, the others will not be removed.' ;
 
 DeleteHelper_Explanation = 'Nemp has detected several files in your library that are currently missing.'
               +#13#10#13#10
@@ -1166,6 +1178,29 @@ WriteAccessNotPossiblePortable = 'Nemp can''t write into the current directory a
   + #13#10
   + #13#10 + 'Please refer to the documentation for further details.';
 
+LibConfigHint_Root = 'Root layer: %s';
+LibConfigHint_LayerMain = 'Layer %s';
+LibConfigHint_LayerSorting = 'Sorted by: ';
+LibConfigText_LayerSortedBy = '%s (by %s)';
+
+//function MainVSTEmptyMessage(state: Integer): String;
+
 implementation
+
+(*
+function MainVSTEmptyMessage(state: Integer): String;
+begin
+  case state of
+    0: result := ;
+    1: result := ;
+    2: result := ;
+    3: result := ;
+    4: result := ;
+    5: result := ;
+
+
+  end;
+
+end*)
 
 end.

@@ -114,12 +114,14 @@ type
             // Setter/Getter for basic Metadata
             function fGetTitle     : UnicodeString;  virtual; abstract;
             function fGetArtist    : UnicodeString;  virtual; abstract;
+            function fGetAlbumArtist : UnicodeString;  virtual; abstract;
             function fGetAlbum     : UnicodeString;  virtual; abstract;
             function fGetYear      : UnicodeString;  virtual; abstract;
             function fGetTrack     : UnicodeString;  virtual; abstract;
             function fGetGenre     : UnicodeString;  virtual; abstract;
             procedure fSetTitle    (aValue: UnicodeString);  virtual; abstract;
             procedure fSetArtist   (aValue: UnicodeString);  virtual; abstract;
+            procedure fSetAlbumArtist   (aValue: UnicodeString);  virtual; abstract;
             procedure fSetAlbum    (aValue: UnicodeString);  virtual; abstract;
             procedure fSetYear     (aValue: UnicodeString);  virtual; abstract;
             procedure fSetTrack    (aValue: UnicodeString);  virtual; abstract;
@@ -144,6 +146,7 @@ type
             // Basic Meta data from Tags
             property Title   : UnicodeString read fGetTitle  write fSetTitle ;
             property Artist  : UnicodeString read fGetArtist write fSetArtist;
+            property AlbumArtist  : UnicodeString read fGetAlbumArtist write fSetAlbumArtist;
             property Album   : UnicodeString read fGetAlbum  write fSetAlbum ;
             property Year    : UnicodeString read fGetYear   write fSetYear  ;
             property Track   : UnicodeString read fGetTrack  write fSetTrack ;

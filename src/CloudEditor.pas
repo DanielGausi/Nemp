@@ -35,7 +35,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, VirtualTrees, contnrs, StrUtils, gnugettext, MyDialogs,
+  Dialogs, VirtualTrees, contnrs, StrUtils, gnugettext, MyDialogs, NempHelp,
   NempAudioFiles, TagClouds, StdCtrls, Spin, TagHelper, ComCtrls, Vcl.Menus,
   System.UITypes, LibraryOrganizer.Base, LibraryOrganizer.Files;
 
@@ -69,6 +69,7 @@ type
     pm_JustRemoveTags: TMenuItem;
     pm_DeleteRenameRule: TMenuItem;
     pm_DeleteIgnoreRule: TMenuItem;
+    BtnHelp: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -99,6 +100,7 @@ type
     procedure MergeTagVSTHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
     procedure BtnDeleteIgnoreRuleClick(Sender: TObject);
     procedure BtnDeleteRenameRuleClick(Sender: TObject);
+    procedure BtnHelpClick(Sender: TObject);
   private
     { Private-Deklarationen }
     OldSelectionPrefix : String;
@@ -144,6 +146,7 @@ uses NempMainUnit, MedienBibliothekClass, Nemp_RessourceStrings, Math, MainFormH
 procedure TCloudEditorForm.FormCreate(Sender: TObject);
 begin
     TranslateComponent (self);
+    HelpContext := HELP_TagCloudEditor;
 
     TagRoot := TRootCollection.Create(Nil);
     TagRoot.AddSubCollectionType(ccTagCloud, csCount, sd_Descending);
@@ -923,6 +926,11 @@ begin
     end;
     MergeTagVST.DeleteSelectedNodes;
     MergeTagVST.EndUpdate;
+end;
+
+procedure TCloudEditorForm.BtnHelpClick(Sender: TObject);
+begin
+  Application.HelpContext(HELP_TagCloudEditor);
 end;
 
 procedure TCloudEditorForm.BtnUpdateID3TagsClick(Sender: TObject);

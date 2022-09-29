@@ -323,8 +323,9 @@ var sl: TStringList;
     aDateTime: TDateTime;
 begin
     // explode the String, fill fields
-    sl := Explode(LOG_SEPARATOR , aLogString);
+    sl := TStringList.Create;
     try
+        Explode(LOG_SEPARATOR , aLogString, sl);
         if sl.Count >= 4 then
         begin
             if TryStrToDateTime(sl[0], aDateTime) then
