@@ -247,18 +247,8 @@ FloatingPointChannels_Off = 'Current status: Off';
 
     OptionsForm_UnratedFilesHint = '* Including %d unrated files.';
 
-
     OptionsForm_UnSavedChangesQuery = 'Some settings have been changed, but they have not been applied yet.'
-          +#13#10 + #13#10 + 'Do you want to save the changes before closing this window?'
-
-    ;
-    OptionsForm_UnSavedChangesCaption = 'Confirmation';
-    OptionsForm_UnSavedChangesTitle = 'Confirm closing';
-    OptionsForm_UnSavedChangesText = 'Some settings have not been applied yet.';
-    OptionsForm_UnSavedChangesKeep = 'Apply';
-    OptionsForm_UnSavedChangesKeepHint = 'Apply the changes and close the settings window.';
-    OptionsForm_UnSavedChangesDiscard = 'Discard';
-    OptionsForm_UnSavedChangesDiscardHint = 'Discard the changes and close the settings window.';
+          +#13#10 + #13#10 + 'Do you want to save the changes before closing this window?';
 
     Warning_NoSkinFound = 'No skins found';
     AdvancedSkinActivateHint = 'Note: The current skin does not support advanced skinning.';
@@ -652,6 +642,7 @@ MainForm_MenuCaptionsSearchForEmptyAlbum  = 'Show all files where "Album" is mis
 
 MainForm_LibraryIsEmpty = 'You music library is empty. Drop some files here to start.';
 MainForm_LibraryIsLoading = 'Loading library. Please wait...';
+MainForm_PlaylistIsEmpty = 'Empty playlist. Drop some files here to play.';
 
 // MainForm_MainMenu_Messages = 'Messages (%d)';
 MainForm_MainMenu_NoMessages = 'Messages';

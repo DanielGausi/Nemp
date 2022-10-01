@@ -46,10 +46,6 @@ function Handle_UpdaterMessage(Var aMsg: TMessage): Boolean;
 function Handle_ScrobblerMessage(Var aMsg: TMessage): Boolean;
 function Handle_WndProc(var Message: TMessage): Boolean;
 
-//function Handle_DropFilesForPlaylist(Var aMsg: TMessage; UseDefaultInsertMode: Boolean): Boolean; overload;
-//function Handle_DropFilesForLibrary(Var aMsg: TMessage): Boolean; overload;
-//function Handle_DropFilesForHeadPhone(Var aMsg: TMessage): Boolean; overload;
-
 // new Drag&Drop-Handling
 function Handle_DropFilesForPlaylist(FileList: TStringList; UseDefaultInsertMode: Boolean; TargetNode: PVirtualNode; Mode: TDropMode; ForcePlay: Boolean): Boolean;
 function Handle_DropFilesForLibrary(FileList: TStringList; TargetCategory: TLibraryCategory; AllowCategoryChange: Boolean = False): Boolean;
@@ -2033,7 +2029,7 @@ begin
                     MedienBib.PlaylistUpdateList.Add(newPlaylist);
                 end;
             end else
-
+            begin
                 BibFile := MedienBib.GetAudioFileWithFilename(NewFile);
                 if not assigned(BibFile) then begin
                   AudioFile := TAudioFile.Create;
@@ -2053,22 +2049,7 @@ begin
                   if MedienBib.AudioFileCategoryShouldChange(BibFile) then
                     MedienBib.CategoryChangeList.Add(BibFile);
                 end;
-
-                {// bisheriger Code
-                if Not MedienBib.AudioFileExists(NewFile) then
-                begin
-                    AudioFile:=TAudioFile.Create;
-                    if MedienBib.UseNewFileScanMethod then
-                        AudioFile.Pfad := NewFile
-                    else begin
-                        aErr := AudioFile.GetAudioData(NewFile, GAD_Rating or MedienBib.IgnoreLyricsFlag);
-                        AudioFile.Category := MedienBib.NewCategoryMask;
-                        HandleError(afa_NewFile, AudioFile, aErr);
-                        MedienBib.CoverArtSearcher.InitCover(AudioFile, tm_VCL, INIT_COVER_DEFAULT);
-                    end;
-                    // add it to the UpdateListe anyway
-                    MedienBib.UpdateList.Add(AudioFile);
-                end;}
+            end;
         end else
         begin
             // Datei nur in die Playlist übernehmen

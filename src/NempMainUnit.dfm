@@ -1810,97 +1810,128 @@ object Nemp_MainForm: TNemp_MainForm
           Columns = <
             item
               Position = 0
+              Text = 'Artist'
               Width = 10
             end
             item
               Position = 1
+              Text = 'Title'
             end
             item
               Position = 2
+              Text = 'Album'
             end
             item
               Position = 3
+              Text = 'Track'
             end
             item
               Position = 4
+              Text = 'CD'
             end
             item
               Position = 5
+              Text = 'Year'
             end
             item
               Position = 6
+              Text = 'Album-Artist'
             end
             item
               Position = 7
+              Text = 'Composer'
             end
             item
               Position = 8
+              Text = 'Duration'
             end
             item
               Position = 9
+              Text = 'Genre'
             end
             item
               Position = 10
+              Text = 'Comment'
             end
             item
               Position = 11
+              Text = 'Bitrate'
             end
             item
               Position = 12
+              Text = 'cbr/vbr'
             end
             item
               Position = 13
+              Text = 'Channelmode'
             end
             item
               Position = 14
+              Text = 'Samplerate'
             end
             item
               Position = 15
+              Text = 'Type'
             end
             item
               Position = 16
+              Text = 'Filename'
             end
             item
               Position = 17
+              Text = 'Directory'
             end
             item
               Position = 18
+              Text = 'Path'
             end
             item
               Position = 19
+              Text = 'Filesize'
             end
             item
               Position = 20
+              Text = 'File created'
             end
             item
               Position = 21
+              Text = 'Rating'
             end
             item
               Position = 22
+              Text = 'Play counter'
             end
             item
               Position = 23
+              Text = 'Track gain'
             end
             item
               Position = 24
+              Text = 'Album gain'
             end
             item
               Position = 25
+              Text = 'Track peak'
             end
             item
               Position = 26
+              Text = 'Album peak'
             end
             item
               Position = 27
+              Text = 'BPM'
             end
             item
               Position = 28
+              Text = 'Lyrics'
             end
             item
               Position = 29
+              Text = 'Tags'
             end
             item
               Position = 30
+              Text = 'Marker'
             end>
         end
       end
@@ -3189,7 +3220,7 @@ object Nemp_MainForm: TNemp_MainForm
         OnClick = MM_H_AboutClick
       end
       object MM_H_Help: TMenuItem
-        Caption = 'Documentation and user guide'
+        Caption = 'Help'
         ImageIndex = 4
         OnClick = ToolButton7Click
       end
@@ -5533,25 +5564,25 @@ object Nemp_MainForm: TNemp_MainForm
         GroupIndex = 1
       end
       object PM_ML_SortFilename: TMenuItem
-        Tag = 12
+        Tag = 16
         Caption = 'Filename'
         GroupIndex = 1
         OnClick = AnzeigeSortMENUClick
       end
       object PM_ML_SortPathFilename: TMenuItem
-        Tag = 10
+        Tag = 18
         Caption = 'Path && Filename'
         GroupIndex = 1
         OnClick = AnzeigeSortMENUClick
       end
       object PM_ML_SortLyricsexists: TMenuItem
-        Tag = 15
+        Tag = 28
         Caption = 'Lyrics exists'
         GroupIndex = 1
         OnClick = AnzeigeSortMENUClick
       end
       object PM_ML_SortGenre: TMenuItem
-        Tag = 14
+        Tag = 9
         Caption = 'Genre'
         GroupIndex = 1
         OnClick = AnzeigeSortMENUClick
@@ -5561,19 +5592,19 @@ object Nemp_MainForm: TNemp_MainForm
         GroupIndex = 1
       end
       object PM_ML_SortDuration: TMenuItem
-        Tag = 3
+        Tag = 8
         Caption = 'Duration'
         GroupIndex = 1
         OnClick = AnzeigeSortMENUClick
       end
       object PM_ML_SortFilesize: TMenuItem
-        Tag = 9
+        Tag = 19
         Caption = 'Filesize'
         GroupIndex = 1
         OnClick = AnzeigeSortMENUClick
       end
       object PM_ML_bpm: TMenuItem
-        Tag = 28
+        Tag = 27
         Caption = 'BPM (Beats per minute)'
         GroupIndex = 1
         OnClick = AnzeigeSortMENUClick
@@ -6396,7 +6427,7 @@ object Nemp_MainForm: TNemp_MainForm
         OnClick = MM_H_CheckForUpdatesClick
       end
       object PM_P_Help: TMenuItem
-        Caption = 'Documentation and user guide'
+        Caption = 'Help'
         ImageIndex = 4
         OnClick = ToolButton7Click
       end

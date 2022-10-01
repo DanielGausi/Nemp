@@ -141,6 +141,11 @@ object AboutForm: TAboutForm
         ' '
       ''
       ''
+      '[b]Special thanks to[/b]'
+      ''
+      'J'#252'rgen W. for a lively exchange of ideas during development'
+      ''
+      ''
       '[row="200"]')
     LinkFont.Charset = DEFAULT_CHARSET
     LinkFont.Color = clGray

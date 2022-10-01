@@ -76,7 +76,7 @@ begin
 end;
 
 function LoadSettings: Boolean;
-var i: Integer;
+var colIdx: Integer;
     aMenuItem: TMenuItem;
     tmpwstr, g15path: UnicodeString;
 
@@ -129,15 +129,17 @@ begin
 
         VSTColumns_LoadSettings(VST);
 
-        for i:=0 to Spaltenzahl-1 do
-        begin
-            aMenuItem := TMenuItem.Create(Nemp_MainForm);
-            aMenuItem.AutoHotkeys := maManual;
-            aMenuItem.AutoCheck := True;
-            aMenuItem.Tag := i;
-            aMenuItem.OnClick := VST_ColumnPopupOnClick;
-            aMenuItem.Caption := VST.Header.Columns[i].Text; // _(DefaultSpalten[s].Bezeichnung);
-            VST_ColumnPopup.Items.Insert(i, aMenuItem);
+        colIdx := VST.Header.Columns.GetFirstColumn;
+        while colIdx >= 0 do begin
+          aMenuItem := TMenuItem.Create(Nemp_MainForm);
+          aMenuItem.AutoHotkeys := maManual;
+          aMenuItem.AutoCheck := True;
+          aMenuItem.Tag := colIdx;
+          aMenuItem.OnClick := VST_ColumnPopupOnClick;
+          aMenuItem.Caption := VST.Header.Columns[colIdx].Text; // _(DefaultSpalten[s].Bezeichnung);
+          VST_ColumnPopup.Items.Insert(VST.Header.Columns[colIdx].Position, aMenuItem);
+
+          colIdx := VST.Header.Columns.GetNextColumn(colIdx);
         end;
 
         NempUpdater.LoadSettings;
@@ -166,39 +168,10 @@ begin
         MM_O_Skin_UseAdvanced.Checked := NempOptions.GlobalUseAdvancedSkin;
         PM_P_Skin_UseAdvancedSkin.Checked := NempOptions.GlobalUseAdvancedSkin;
         // Skin-MenuItems setzen
-        (*
-        if (FindFirst(GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\Skins\'+'*',faDirectory,SR)=0) then
-        repeat
-          if (SR.Name<>'.') and (SR.Name<>'..') and ((SR.Attr AND faDirectory)= faDirectory) then
-          begin
-              tmpstr :=  StringReplace('<private> ' + Sr.Name,'&','&&',[rfReplaceAll]);
-              aMenuItem := TMenuItem.Create(Nemp_MainForm);
-              aMenuItem.AutoHotkeys := maManual;
-              aMenuItem.OnClick := SkinAn1Click;
-              aMenuItem.RadioItem := True;
-              aMenuItem.AutoCheck := True;
-              aMenuItem.GroupIndex := 3;
-              aMenuItem.Caption := tmpstr; //'<private> ' + Sr.Name;
-              PM_P_Skins.Add(aMenuItem);
-
-              aMenuItem := TMenuItem.Create(Nemp_MainForm);
-              aMenuItem.AutoHotkeys := maManual;
-              aMenuItem.OnClick := SkinAn1Click;
-              aMenuItem.RadioItem := True;
-              aMenuItem.AutoCheck := True;
-              aMenuItem.GroupIndex := 3;
-              aMenuItem.Caption := tmpstr; //'<private> ' + Sr.Name;
-              MM_O_Skins.Add(aMenuItem);
-          end;
-        until FindNext(SR)<>0;
-        FindClose(SR);
-        *)
-
         if (FindFirst(ExtractFilePath(Paramstr(0)) + 'Skins\' +'*',faDirectory,SR)=0) then
         repeat
           if (SR.Name<>'.') and (SR.Name<>'..') and ((SR.Attr AND faDirectory)= faDirectory) then
           begin
-              //tmpstr :=  StringReplace('<public> ' + Sr.Name,'&','&&',[rfReplaceAll]);
               tmpstr :=  StringReplace(Sr.Name, '&', '&&', [rfReplaceAll]);
 
               aMenuItem := TMenuItem.Create(Nemp_MainForm);
@@ -207,7 +180,7 @@ begin
               aMenuItem.RadioItem := True;
               aMenuItem.AutoCheck := True;
               aMenuItem.GroupIndex := 3;
-              aMenuItem.Caption := tmpstr; ///'<public> ' + Sr.Name;
+              aMenuItem.Caption := tmpstr;
               PM_P_Skins.Add(aMenuItem);
 
               aMenuItem := TMenuItem.Create(Nemp_MainForm);
@@ -216,7 +189,7 @@ begin
               aMenuItem.RadioItem := True;
               aMenuItem.AutoCheck := True;
               aMenuItem.GroupIndex := 3;
-              aMenuItem.Caption := tmpstr; ///'<public> ' + Sr.Name;
+              aMenuItem.Caption := tmpstr;
               MM_O_Skins.Add(aMenuItem);
           end;
         until FindNext(SR)<>0;
@@ -407,7 +380,7 @@ begin
             NempOptions.FontNameVBR := VST.Font.Name;
         if Screen.Fonts.IndexOf(NempOptions.FontNameCBR) = -1 then
             NempOptions.FontNameCBR := VST.Font.Name;
-        VST.Header.SortColumn := GetColumnIDfromContent(VST, MedienBib.Sortparams[0].Tag);
+        VST.Header.SortColumn := MedienBib.Sortparams[0].Tag;
 
         case NempPlaylist.WiedergabeMode of
             0: RandomBtn.Hint := (MainForm_RepeatBtnHint_RepeatAll);
@@ -440,38 +413,17 @@ begin
 end;
 
 procedure ApplyLayout;
-var tmpStr: String;
 begin
     NempLayout.BuildMainForm(nil);
     with Nemp_MainForm do
     begin
         // Ggf. Tray-Icon erzeugen und das erzeugen in TrayIconAdded merken
         NempTrayIcon.Visible := NempOptions.ShowTrayIcon;
-        //if NempOptions.NempWindowView in [NEMPWINDOW_TRAYONLY, NEMPWINDOW_BOTH, NEMPWINDOW_BOTH_MIN_TRAY] then
-        //  NempTrayIcon.Visible := True
-        //else
-        //  NempTrayIcon.Visible := False;
-
-        // NempWindowDefault := GetWindowLong(Application.Handle, GWL_EXSTYLE);
-        {if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
-        begin
-            ShowWindow( Application.Handle, SW_HIDE );
-            SetWindowLong( Application.Handle, GWL_EXSTYLE,
-                     GetWindowLong(Application.Handle, GWL_EXSTYLE)
-                     or WS_EX_TOOLWINDOW
-                     and (not WS_EX_APPWINDOW));
-        end;}
 
         if NempOptions.Useskin then
         begin
             SetSkinRadioBox(NempOptions.SkinName);
-            {tmpstr := StringReplace(NempOptions.SkinName,
-                    '<public> ', ExtractFilePath(Paramstr(0)) + 'Skins\', []);
-            tmpstr := StringReplace(tmpstr,
-                    '<private> ', GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\Skins\',[]);
-            }
-            tmpstr := GetSkinDirFromSkinName(NempOptions.SkinName);
-            Nempskin.LoadFromDir(tmpstr);
+            Nempskin.LoadFromDir(GetSkinDirFromSkinName(NempOptions.SkinName));
             NempSkin.ActivateSkin(False);
             RandomBtn.GlyphLine := NempPlaylist.WiedergabeMode;
         end else
@@ -514,15 +466,6 @@ begin
                     ProcessCommandline(paramstr(1), True, True);
             end;
         end;
-
-       { case
-    RegisterDragDrop(_ControlPanel.Handle, fDropManager as IDropTarget) of
-      DRAGDROP_E_INVALIDHWND : ShowMessage('invalid');
-      DRAGDROP_E_ALREADYREGISTERED : ShowMessage('already reg');
-      E_OUTOFMEMORY : ShowMessage('outofmem');
-       S_OK: ShowMessage('ok');
-    end;  }
-
     end;
 end;
 

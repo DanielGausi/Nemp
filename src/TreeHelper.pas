@@ -49,9 +49,6 @@ uses Windows, Graphics, SysUtils, VirtualTrees, Forms, Controls, NempAudioFiles,
   procedure VSTColumns_SaveSettings(aVST: TVirtualStringTree);
   procedure VSTColumns_LoadSettings(aVST: TVirtualStringTree);
 
-  function GetColumnIDfromPosition(aVST:TVirtualStringTree; position:LongWord):integer;
-  function GetColumnIDfromContent(aVST:TVirtualStringTree; content:integer):integer;
-
   function GetOldNode(ac: TAudioCollection; aTree: TVirtualStringTree): PVirtualNode; overload;
   function GetOldNode(lc: TLibraryCategory; aTree: TVirtualStringTree): PVirtualNode; overload;
 
@@ -62,74 +59,13 @@ uses Windows, Graphics, SysUtils, VirtualTrees, Forms, Controls, NempAudioFiles,
   function GetNodeWithCueFile(aTree: TVirtualStringTree; aRootNode: PVirtualNode; aAudioFile: TAudioFile): PVirtualNode;
   function GetNodeWithIndex(aTree: TVirtualStringTree; aIndex: Cardinal; StartNode: PVirtualNode): PVirtualNode;
 
-  // function AutoDecideExternalDrag: Boolean;
-  //function LimitFileCount(actualCount, maxCount: Integer): Integer;
   procedure PrepareDragImage(DragDrop: TNempDragManager; aFile: TAudioFile);
-  //procedure InitiateDragDrop(SourceTree: TVirtualStringTree; Dest: TStringList; DragDrop: TDragFilesSrc; maxFiles: Integer); overload;
-  // procedure InitiateDragDrop(Source, Dest: TAudioFileList; DragDrop: TDragFilesSrc; maxFiles: Integer); overload;
-
   procedure InitiateDragDrop(SourceTree: TVirtualStringTree; DragDrop: TNempDragManager; DoExecute: Boolean; SourceIsPlayer: Boolean); overload;
   procedure InitiateDragDrop(Source: TAudioFileList; SourceControl: TControl; DragDrop: TNempDragManager; DoExecute: Boolean; SourceIsPlayer: Boolean); overload;
 
   function ValidPlaylistDropNode(Source: TVirtualStringTree; Node: PVirtualNode): Boolean;
 
   function InitiateFocussedPlay(aTree: TVirtualStringTree): Boolean;
-
-  // function ObjContainsFiles(const DataObj: IDataObject): Boolean;
-  // procedure GetFileListFromObj(const DataObj: IDataObject; FileList: TStringList);
-  // procedure SetDragHint(DataObject: IDataObject; const szMessage, szInsert: string; Effect: Integer);
-
-type
-
-  TNempDragOverEvent = procedure(Shift: TShiftState; State: TDragState;
-    Pt: TPoint; var Effect: Integer; var Accept: Boolean) of object;
-
-     (*
-  TNempDropManager = class(TInterfacedObject, IDropTarget)
-  private
-    FOwner: TComponent;                            // The tree which is responsible for drag management.
-    // FDragSource: TBaseVirtualTree;     // Reference to the source tree if the source was a VT, might be different than
-                                       // the owner tree.
-    // FIsDropTarget: Boolean;            // True if the owner is currently the drop target.
-    // FDataObject: IDataObject;          // A reference to the data object passed in by DragEnter (only used when the owner
-                                       // tree is the current drop target).
-    FDropTargetHelper: IDropTargetHelper; // Win2k > Drag image support
-    FFullDragging: BOOL;               // True, if full dragging is currently enabled in the system.
-
-    fValidSource: Boolean;
-    FDataObject: IDataObject;
-
-    fOnDragOver: TNempDragOverEvent;
-
-    function DoDragOver(KeyState: Integer; Pt: TPoint; State: TDragState; var Effect: LongInt): HResult;
-
-    // function GetDataObject: IDataObject; stdcall;
-    // function GetDragSource: TBaseVirtualTree; stdcall;
-    // function GetDropTargetHelperSupported: Boolean; stdcall;
-    // function GetIsDropTarget: Boolean; stdcall;
-  public
-    property OnDragOver: TNempDragOverEvent read fOnDragOver write fOnDragOver;
-    property DataObject: IDataObject read FDataObject;
-
-    constructor Create(AOwner: TComponent); virtual;
-    destructor Destroy; override;
-
-    function DragEnter(const DataObject: IDataObject; KeyState: Integer; Pt: TPoint;
-      var Effect: Longint): HResult; stdcall;
-    function DragLeave: HResult; stdcall;
-    function DragOver(KeyState: Integer; Pt: TPoint; var Effect: LongInt): HResult; stdcall;
-    function Drop(const DataObject: IDataObject; KeyState: Integer; Pt: TPoint; var Effect: Integer): HResult; stdcall;
-    // procedure ForceDragLeave; stdcall;
-    // function GiveFeedback(Effect: Integer): HResult; stdcall;
-    // function QueryContinueDrag(EscapePressed: BOOL; KeyState: Integer): HResult; stdcall;
-
-
-
-    //function _AddRef: Integer; stdcall;
-    //function _Release: Integer; stdcall;
-  end;
-  *)
-
 
 implementation
 
@@ -187,130 +123,81 @@ end;
 
 procedure VSTColumns_SaveSettings(aVST: TVirtualStringTree);
 var
-  i, contentID: Integer;
-  rawVisible, rawContent, rawWidth: String;
-
+  i: Integer;
+  rawVisible, rawPos, rawWidth: String;
 begin
-  contentID := GetColumnIDfromPosition(aVST, 0);
+  rawPos := IntToStr(aVST.Header.Columns[0].Position);
+  rawWidth :=   IntToStr(aVST.Header.Columns[0].Width);
+  rawVisible := BoolToStr(coVisible in aVST.Header.Columns[0].Options);
 
-  rawContent := IntToStr(aVST.Header.Columns[contentID].Tag);
-  rawWidth :=   IntToStr(aVST.Header.Columns[contentID].Width);
-  if (coVisible in aVST.Header.Columns[contentID].Options) then
-    rawVisible := '1'
-  else
-    rawVisible := '0';
-
-  for i := 1 to Spaltenzahl-1 do begin
-    contentID := GetColumnIDfromPosition(aVST, i);
-
-    rawContent := rawContent + ';' + IntToStr(aVST.Header.Columns[contentID].Tag);
-    rawWidth   := rawWidth   + ';' + IntToStr(aVST.Header.Columns[contentID].Width);
-    if (coVisible in aVST.Header.Columns[contentID].Options) then
-      rawVisible := rawVisible + ';1'
-    else
-      rawVisible := rawVisible + ';0';
+  for i := 1 to cLibraryColumnCount - 1 do begin
+    rawPos := rawPos + ';' + IntToStr(aVST.Header.Columns[i].Position);
+    rawWidth   := rawWidth   + ';' + IntToStr(aVST.Header.Columns[i].Width);
+    rawVisible := rawVisible + ';' + BoolToStr(coVisible in aVST.Header.Columns[i].Options);
   end;
-  NempSettingsManager.WriteString('Columns', 'Content', rawContent);
-  NempSettingsManager.WriteString('Columns', 'Width', rawWidth);
-  NempSettingsManager.WriteString('Columns', 'Visible', rawVisible);
+
+  NempSettingsManager.WriteString('MediaListColumns', 'Position', rawPos);
+  NempSettingsManager.WriteString('MediaListColumns', 'Width', rawWidth);
+  NempSettingsManager.WriteString('MediaListColumns', 'Visible', rawVisible);
 
   // remove depecated ini section
+  NempSettingsManager.EraseSection('Columns');
   NempSettingsManager.EraseSection('Spalten');
 end;
 
 procedure VSTColumns_LoadSettings(aVST: TVirtualStringTree);
 var
-  i, s, contentID: Integer;
-  rawVisible, rawContent, rawWidth: String;
-  VisibleList, ContentList, WidthList: TStringList;
+  i: Integer;
+  VisibleList, PosList, WidthList: TStringList;
 begin
-  if NempSettingsManager.SectionExists('Columns') then
-  begin
-    // load newer configuration style
-    rawContent := NempSettingsManager.ReadString('Columns', 'Content', '');
-    rawWidth := NempSettingsManager.ReadString('Columns', 'Width', '');
-    rawVisible := NempSettingsManager.ReadString('Columns', 'Visible', '');
-    ContentList := TStringList.Create;
+    NempSettingsManager.ReadString('MediaListColumns', 'Position', '');
+    NempSettingsManager.ReadString('MediaListColumns', 'Width', '');
+    NempSettingsManager.ReadString('MediaListColumns', 'Visible', '');
+    PosList := TStringList.Create;
     WidthList := TStringList.Create;
     VisibleList := TStringList.Create;
     try
-      Explode(';', rawContent, ContentList);
-      Explode(';', rawWidth, WidthList);
-      Explode(';', rawVisible, VisibleList);
-      if (ContentList.Count <= Spaltenzahl) and (ContentList.Count = WidthList.Count) and (WidthList.Count = VisibleList.Count) then
+       PosList.Delimiter := ';';
+       WidthList.Delimiter := ';';
+       VisibleList.Delimiter := ';';
+       PosList.DelimitedText     := NempSettingsManager.ReadString('MediaListColumns', 'Position', '');
+       WidthList.DelimitedText   := NempSettingsManager.ReadString('MediaListColumns', 'Width', '');
+       VisibleList.DelimitedText := NempSettingsManager.ReadString('MediaListColumns', 'Visible', '');
+
+      if (PosList.Count <= cLibraryColumnCount) and (PosList.Count = WidthList.Count) and (WidthList.Count = VisibleList.Count) then
       begin
-        for i := 0 to ContentList.Count - 1 do
+        for i := 0 to PosList.Count - 1 do
         begin
-          contentID := StrToIntDef(ContentList[i], DefaultSpalten[i].Inhalt);
-          aVST.Header.Columns[i].Tag := contentID ;
-          aVST.Header.Columns[i].Text := _(DefaultSpalten[contentID].Bezeichnung);
-          aVST.Header.Columns[i].Width := StrToIntDef(WidthList[i], DefaultSpalten[i].width);
-          if VisibleList[i] = '1' then
-            aVST.Header.Columns[i].Options := aVST.Header.Columns[i].Options + [coVisible]
-          else
-            aVST.Header.Columns[i].Options := aVST.Header.Columns[i].Options - [coVisible];
+          aVST.Header.Columns[i].Position := StrToIntDef(PosList[i], DefaultColumns[i].Position);
+          aVST.Header.Columns[i].Width := StrToIntDef(WidthList[i], DefaultColumns[i].width);
+          if not StrToBool(VisibleList[i]) then
+            aVST.Header.Columns[i].Options := aVST.Header.Columns[i].Options - [coVisible]
         end;
 
         // if there are more Columns than defined in the Inifile (due to a new version): Set Default values
-        for i := ContentList.Count to Spaltenzahl-1 do
+        for i := PosList.Count to cLibraryColumnCount - 1 do
         begin
-          aVST.Header.Columns[i].Tag := i;
-          aVST.Header.Columns[i].Text := _(DefaultSpalten[i].Bezeichnung);
-          aVST.Header.Columns[i].Width := DefaultSpalten[i].width;
-          aVST.Header.Columns[i].Options := aVST.Header.Columns[i].Options + [coVisible]
+          aVST.Header.Columns[i].Position := DefaultColumns[i].Position;
+          aVST.Header.Columns[i].Width := DefaultColumns[i].width;
+          if not DefaultColumns[i].Visible then
+            aVST.Header.Columns[i].Options := aVST.Header.Columns[i].Options - [coVisible]
         end;
       end else
       begin
         // set default values for all columns
-        for i := 0 to Spaltenzahl-1 do
+        for i := 0 to cLibraryColumnCount-1 do
         begin
-          contentID := DefaultSpalten[i].Inhalt;
-          aVST.Header.Columns[i].Tag := contentID;
-          aVST.Header.Columns[i].Text := _(DefaultSpalten[contentID].Bezeichnung);
-          aVST.Header.Columns[i].Width := DefaultSpalten[i].width;
-          aVST.Header.Columns[i].Options := aVST.Header.Columns[i].Options + [coVisible]
+          aVST.Header.Columns[i].Position := DefaultColumns[i].Position;
+          aVST.Header.Columns[i].Width := DefaultColumns[i].width;
+          if not DefaultColumns[i].Visible then
+            aVST.Header.Columns[i].Options := aVST.Header.Columns[i].Options - [coVisible]
         end;
       end;
     finally
-      ContentList.Free;
+      PosList.Free;
       WidthList.Free;
       VisibleList.Free;
     end;
-  end else
-  begin
-    // load old configuration style
-    for i:=0 to Spaltenzahl-1 do
-    begin
-      s := NempSettingsManager.ReadInteger('Spalten','Inhalt' + IntToStr(i), DefaultSpalten[i].Inhalt);
-      aVST.Header.Columns[i].Text := _(DefaultSpalten[s].Bezeichnung);
-      aVST.Header.Columns[i].Tag := s;
-
-      if NempSettingsManager.readbool('Spalten','visible' + IntToStr(i), DefaultSpalten[i].visible) then
-        aVST.Header.Columns[i].Options := aVST.Header.Columns[i].Options + [coVisible]
-      else
-        aVST.Header.Columns[i].Options := aVST.Header.Columns[i].Options - [coVisible];
-
-      aVST.Header.Columns[i].Width := NempSettingsManager.ReadInteger('Spalten','Breite' + IntToStr(i), DefaultSpalten[i].width);
-    end;
-  end;
-end;
-
-function GetColumnIDfromPosition(aVST:TVirtualStringTree; position:LongWord):integer;
-var i:integer;
-begin
-  result := 0;
-  for i:=0 to aVST.Header.Columns.Count-1 do
-    if aVST.Header.Columns[i].Position = position then
-      result := i;
-end;
-
-function GetColumnIDfromContent(aVST:TVirtualStringTree; content:integer):integer;
-var i:integer;
-begin
-  result := 0;
-  for i:=0 to aVST.Header.Columns.Count-1 do
-    if aVST.Header.Columns[i].Tag = content then
-      result := i;
 end;
 
 
@@ -505,30 +392,11 @@ begin
     DragDrop.SetDragGraphic(Nil);
 end;
 
-
-(*function LimitFileCount(actualCount, maxCount: Integer): Integer;
-begin
-  result := min(maxCount, actualCount);
-  if actualCount > maxCount then
-    AddErrorLog(Format(Warning_TooManyFiles, [maxCount]));
-end; *)
-
-function AutoDecideExternalDrag: Boolean;
-var
-  State: TKeyboardState;
-begin
-  GetKeyboardState(State);
-  // Allow dragging to the explorer, when Ctrl is pressed or Right MouseButton
-  result := ((State[VK_CONTROL] and 128) <> 0)
-         or ((State[VK_RButton] and 128) <> 0);
-end;
-
 function ValidPlaylistDropNode(Source: TVirtualStringTree; Node: PVirtualNode): Boolean;
 begin
   result := (assigned(Node) and (Source.GetNodeLevel(Node) = 0))
               or (not assigned(Node));
 end;
-
 
 procedure InitiateDragDrop(SourceTree: TVirtualStringTree; DragDrop: TNempDragManager;
   DoExecute: Boolean; SourceIsPlayer: Boolean);
@@ -564,75 +432,5 @@ begin
       DragDrop.Execute;
     end;
 end;
-
-
-(*
-procedure SetDragHint(DataObject: IDataObject; const szMessage, szInsert: string; Effect: Integer);
-var
-  FormatEtc: TFormatEtc;
-  Medium: TStgMedium;
-  Data: Pointer;
-  Descr: DROPDESCRIPTION;
-  s: WideString;
-  maxL: Integer;
-begin
-  ZeroMemory(@Descr, SizeOf(DROPDESCRIPTION));
-  {Do not set Descr.&type to DROPIMAGE_INVALID - this value ignore any custom hint}
-  {use same image as dropeffect type}
-  Descr.&type := DROPIMAGE_LABEL;
-  case Effect of
-    DROPEFFECT_NONE:
-      Descr.&type := DROPIMAGE_NONE;
-    DROPEFFECT_COPY:
-      Descr.&type := DROPIMAGE_COPY;
-    DROPEFFECT_MOVE:
-      Descr.&type := DROPIMAGE_MOVE;
-    DROPEFFECT_LINK:
-      Descr.&type := DROPIMAGE_LINK;
-  end;
-  {format message for system}
-
-  maxL := min(Length(szMessage), MAX_PATH-1);
-  s := Copy(szMessage, 1, maxL);
-  Move(s[1], Descr.szMessage[0], maxL * SizeOf(WideChar));
-
-  maxL := min(Length(szInsert), MAX_PATH-1);
-  s := Copy(szInsert, 1, maxL);
-  Move(s[1], Descr.szInsert[0], maxL * SizeOf(WideChar));
-  {
-  if Length(szMessage) <= MAX_PATH then
-  begin
-    s := szMessage + '%1 dumdii';
-    Move(s[1], Descr.szMessage[0], Length(s) * SizeOf(WideChar));
-
-    s := 'wuppdi';
-    Move(s[1], Descr.szInsert[0], Length(s) * SizeOf(WideChar));
-    //Descr.szInsert := 'wuppdi';
-  end
-  else
-  begin
-    s := Copy(szMessage, 1, MAX_PATH - 2) + '%1';
-    Move(s[1], Descr.szMessage[0], Length(s) * SizeOf(WideChar));
-
-    s := Copy(szMessage, MAX_PATH - 1, MAX_PATH);
-    Move(s[1], Descr.szInsert[0], Length(s) * SizeOf(WideChar));
-  end;
-  }
-  {prepare structures to set DROPDESCRIPTION data}
-  FormatEtc.cfFormat := FDragDescriptionFormat; {registered clipboard format}
-  FormatEtc.ptd := nil;
-  FormatEtc.dwAspect := DVASPECT_CONTENT;
-  FormatEtc.lindex := -1;
-  FormatEtc.tymed := TYMED_HGLOBAL;
-
-  ZeroMemory(@Medium, SizeOf(TStgMedium));
-  Medium.tymed := TYMED_HGLOBAL;
-  Medium.HGlobal := GlobalAlloc(GHND or GMEM_SHARE, SizeOf(DROPDESCRIPTION));
-  Data := GlobalLock(Medium.HGlobal);
-  Move(Descr, Data^, SizeOf(DROPDESCRIPTION));
-  GlobalUnlock(Medium.HGlobal);
-
-  DataObject.SetData(FormatEtc, Medium, True);
-end; *)
 
 end.

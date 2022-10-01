@@ -855,7 +855,7 @@ begin
         begin
             SortParams[i].Comparefunction := AFComparePath;
             SortParams[i].Direction := sd_Ascending;
-            SortParams[i].Tag := CON_PFAD;
+            SortParams[i].Tag := colIdx_Path;
         end;
 
   NewCoverFlow := TNempCoverFlow.Create;// (CFHandle, aWnd);
@@ -1219,7 +1219,7 @@ begin
 
         for i := SORT_MAX downto 0 do
         begin
-            so := NempSettingsManager.ReadInteger('MedienBib', 'Sortorder' + IntToStr(i), CON_PFAD);
+            so := NempSettingsManager.ReadInteger('MedienBib', 'Sortorder' + IntToStr(i), colIdx_Path);
             self.AddSorter(so, False);
             sd := NempSettingsManager.ReadInteger('MedienBib', 'SortMode' + IntToStr(i), Integer(sd_Ascending));
             if sd = Integer(sd_Ascending) then
@@ -3455,11 +3455,11 @@ begin
     fSearchStringIsDirty := False
   else begin
     fSearchStringIsDirty := fSearchStringIsDirty
-      or (EditedColumn in [CON_ARTIST, CON_TITEL, CON_ALBUM])
-      or (BibSearcher.AccelerateSearchIncludeComment and (EditedColumn = CON_STANDARDCOMMENT))
-      or (BibSearcher.AccelerateSearchIncludeGenre and (EditedColumn = CON_GENRE))
-      or (BibSearcher.AccelerateSearchIncludeComposer and (EditedColumn = CON_COMPOSER))
-      or (BibSearcher.AccelerateSearchIncludeAlbumArtist and (EditedColumn = CON_ALBUMARTIST))
+      or (EditedColumn in [colIdx_ARTIST, colIdx_TITLE, colIdx_ALBUM])
+      or (BibSearcher.AccelerateSearchIncludeComment and (EditedColumn = colIdx_COMMENT))
+      or (BibSearcher.AccelerateSearchIncludeGenre and (EditedColumn = colIdx_GENRE))
+      or (BibSearcher.AccelerateSearchIncludeComposer and (EditedColumn = colIdx_COMPOSER))
+      or (BibSearcher.AccelerateSearchIncludeAlbumArtist and (EditedColumn = colIdx_ALBUMARTIST))
   end;
 
   result := fSearchStringIsDirty;
@@ -3487,11 +3487,11 @@ var
   editedContent: teCollectionContent;
 begin
   case EditedColumn of
-    CON_ARTIST : editedContent := ccArtist;
-    CON_ALBUMARTIST : editedContent := ccArtist;
-    CON_ALBUM  : editedContent := ccAlbum;
-    CON_YEAR   : editedContent := ccYear;
-    CON_GENRE  : editedContent := ccGenre;
+    colIdx_ARTIST : editedContent := ccArtist;
+    colIdx_ALBUMARTIST : editedContent := ccArtist;
+    colIdx_ALBUM  : editedContent := ccAlbum;
+    colIdx_YEAR   : editedContent := ccYear;
+    colIdx_GENRE  : editedContent := ccGenre;
   else
     editedContent := ccNone; // i.e. edited property isn't relevant for the structure of the Collection
   end;
@@ -3990,37 +3990,37 @@ var NewSortMethod: TAudioFileCompare;
     i: Integer;
 begin
     case TreeHeaderColumnTag of
-        CON_ARTIST              : NewSortMethod := AFCompareArtist;
-        CON_ALBUMARTIST         : NewSortMethod := AFCompareAlbumArtist;
-        CON_COMPOSER            : NewSortMethod := AFCompareComposer;
-        CON_TITEL               : NewSortMethod := AFCompareTitle;
-        CON_ALBUM               : NewSortMethod := AFCompareAlbum;
-        CON_DAUER               : NewSortMethod := AFCompareDuration;
-        CON_BITRATE             : NewSortMethod := AFCompareBitrate;
-        CON_CBR                 : NewSortMethod := AFCompareCBR;
-        CON_MODE                : NewSortMethod := AFCompareChannelMode;
-        CON_SAMPLERATE          : NewSortMethod := AFCompareSamplerate;
-        CON_STANDARDCOMMENT     : NewSortMethod := AFCompareComment;
-        CON_FILESIZE            : NewSortMethod := AFCompareFilesize;
-        CON_FILEAGE             : NewSortMethod := AFCompareFileAge;
-        CON_PFAD                : NewSortMethod := AFComparePath;
-        CON_ORDNER              : NewSortMethod := AFCompareDirectory;
-        CON_DATEINAME           : NewSortMethod := AFCompareFilename;
-        CON_EXTENSION           : NewSortMethod := AFCompareExtension;
-        CON_YEAR                : NewSortMethod := AFCompareYear;
-        CON_GENRE               : NewSortMethod := AFCompareGenre;
-        CON_LYRICSEXISTING      : NewSortMethod := AFCompareLyricsExists;
-        CON_TRACKNR             : NewSortMethod := AFCompareTrackNr;
-        CON_RATING              : NewSortMethod := AFCompareRating;
-        CON_PLAYCOUNTER         : NewSortMethod := AFComparePlayCounter;
-        CON_LASTFMTAGS          : NewSortMethod := AFCompareLastFMTagsExists;
-        CON_CD                  : NewSortMethod := AFCompareCD;
-        CON_FAVORITE            : NewSortMethod := AFCompareFavorite;
-        CON_TRACKGAIN           : NewSortMethod := AFCompareTrackGain;
-        CON_ALBUMGAIN           : NewSortMethod := AFCompareAlbumGain;
-        CON_TRACKPEAK           : NewSortMethod := AFCompareTrackPeak;
-        CON_ALBUMPEAK           : NewSortMethod := AFCompareAlbumPeak;
-        CON_BPM                 : NewSortMethod := AFCompareBPM;
+        colIdx_ARTIST              : NewSortMethod := AFCompareArtist;
+        colIdx_ALBUMARTIST         : NewSortMethod := AFCompareAlbumArtist;
+        colIdx_COMPOSER            : NewSortMethod := AFCompareComposer;
+        colIdx_TITLE               : NewSortMethod := AFCompareTitle;
+        colIdx_ALBUM               : NewSortMethod := AFCompareAlbum;
+        colIdx_DURATION            : NewSortMethod := AFCompareDuration;
+        colIdx_BITRATE             : NewSortMethod := AFCompareBitrate;
+        colIdx_CBRVBR              : NewSortMethod := AFCompareCBR;
+        colIdx_ChannelMode         : NewSortMethod := AFCompareChannelMode;
+        colIdx_SAMPLERATE          : NewSortMethod := AFCompareSamplerate;
+        colIdx_COMMENT             : NewSortMethod := AFCompareComment;
+        colIdx_FILESIZE            : NewSortMethod := AFCompareFilesize;
+        colIdx_FILEAGE             : NewSortMethod := AFCompareFileAge;
+        colIdx_Path                : NewSortMethod := AFComparePath;
+        colIdx_Directory           : NewSortMethod := AFCompareDirectory;
+        colIdx_Filename            : NewSortMethod := AFCompareFilename;
+        colIdx_Extension           : NewSortMethod := AFCompareExtension;
+        colIdx_YEAR                : NewSortMethod := AFCompareYear;
+        colIdx_GENRE               : NewSortMethod := AFCompareGenre;
+        colIdx_Lyrics              : NewSortMethod := AFCompareLyricsExists;
+        colIdx_TRACK               : NewSortMethod := AFCompareTrackNr;
+        colIdx_RATING              : NewSortMethod := AFCompareRating;
+        colIdx_PLAYCOUNTER         : NewSortMethod := AFComparePlayCounter;
+        colIdx_LastFMTags          : NewSortMethod := AFCompareLastFMTagsExists;
+        colIdx_CD                  : NewSortMethod := AFCompareCD;
+        colIdx_Marker              : NewSortMethod := AFCompareFavorite;
+        colIdx_TRACKGAIN           : NewSortMethod := AFCompareTrackGain;
+        colIdx_ALBUMGAIN           : NewSortMethod := AFCompareAlbumGain;
+        colIdx_TRACKPEAK           : NewSortMethod := AFCompareTrackPeak;
+        colIdx_ALBUMPEAK           : NewSortMethod := AFCompareAlbumPeak;
+        colIdx_BPM                 : NewSortMethod := AFCompareBPM;
     else
         NewSortMethod := AFComparePath;
     end;

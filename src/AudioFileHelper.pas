@@ -120,8 +120,6 @@ implementation
 
 uses NempMainUnit, CoverHelper, MedienbibliothekClass;
 // MainUnit is needed because
-//    - Sortieren_String1String2Titel_asc and
-//    - Sortieren_String1String2Titel_desc
 //    - some of the binary searches
 // need some properties from the MedienBib, from where
 // the sort-method is called
@@ -604,11 +602,7 @@ begin
                 aAudioFile.FileIsPresent := True;
                 aAudioFile.Pfad := newFilename;
                 newTitel := ini.ReadString('playlist','Title'+ IntToStr(i),'');
-                //if newTitel <> '' then
-                    aAudioFile.Description :=  NewTitel
-                //else
-                //    aAudioFile.Description := aAudioFile.Pfad;
-                // aAudioFile.Titel := aAudioFile.Description;
+                aAudioFile.Description :=  NewTitel
             end;
 
             at_CDDA: begin

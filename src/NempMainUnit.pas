@@ -1601,7 +1601,7 @@ uses   Splash, About, OptionsComplete, StreamVerwaltung,
    PlaylistUnit,  AuswahlUnit,  MedienlisteUnit, ShutDown, Details,
   BirthdayShow, RandomPlaylist, BasicSettingsWizard,
   NewPicture, ShutDownEdit, NewStation, BibSearch, BassHelper,
-  ExtendedControlsUnit, CloudEditor,
+  ExtendedControlsUnit, CloudEditor, NempHelp,
   TagHelper, PartymodePassword, CreateHelper, PlaylistToUSB, ErrorForm,
   CDOpenDialogs, WebServerLog, Lowbattery, ProgressUnit, EffectsAndEqualizer,
   MainFormBuilderForm, ReplayGainProgress, NempReplayGainCalculation,
@@ -1982,6 +1982,7 @@ begin
     PlaylistVST.NodeDataSize := SizeOf(TAudioFile);
 
     VST.EmptyListMessage := MainForm_LibraryIsEmpty;
+    PlaylistVST.EmptyListMessage := MainForm_PlaylistIsEmpty;
 
     ErrorLog := TStringList.Create;
     ErrorLogCount := 0;
@@ -3331,50 +3332,50 @@ begin
   VST.Enabled := False;
 
   case (Sender as TMenuItem).Tag of
-      CON_ARTIST: begin
-          MedienBib.AddSorter(CON_TITEL, False);
-          MedienBib.AddSorter(CON_ARTIST);
+      colIdx_ARTIST: begin
+          MedienBib.AddSorter(colIdx_TITLE, False);
+          MedienBib.AddSorter(colIdx_ARTIST);
       end;
-      CON_EX_ARTISTALBUMTITEL: begin
-          MedienBib.AddSorter(CON_TITEL, False);
-          MedienBib.AddSorter(CON_ALBUM);
-          MedienBib.AddSorter(CON_ARTIST);
+      colIdx_EX_ARTISTALBUMTITEL: begin
+          MedienBib.AddSorter(colIdx_TITLE, False);
+          MedienBib.AddSorter(colIdx_ALBUM);
+          MedienBib.AddSorter(colIdx_ARTIST);
       end;
-      CON_TITEL: begin
-          MedienBib.AddSorter(CON_ARTIST, False);
-          MedienBib.AddSorter(CON_TITEL);
+      colIdx_TITLE: begin
+          MedienBib.AddSorter(colIdx_ARTIST, False);
+          MedienBib.AddSorter(colIdx_TITLE);
       end;
-      CON_ALBUM: begin
-          MedienBib.AddSorter(CON_ALBUM, False);
-          MedienBib.AddSorter(CON_ARTIST);
-          MedienBib.AddSorter(CON_TITEL);
+      colIdx_ALBUM: begin
+          MedienBib.AddSorter(colIdx_ALBUM, False);
+          MedienBib.AddSorter(colIdx_ARTIST);
+          MedienBib.AddSorter(colIdx_TITLE);
       end;
-      CON_EX_ALBUMTITELARTIST: begin
-          MedienBib.AddSorter(CON_ARTIST, False);
-          MedienBib.AddSorter(CON_TITEL);
-          MedienBib.AddSorter(CON_ALBUM);
+      colIdx_EX_ALBUMTITELARTIST: begin
+          MedienBib.AddSorter(colIdx_ARTIST, False);
+          MedienBib.AddSorter(colIdx_TITLE);
+          MedienBib.AddSorter(colIdx_ALBUM);
       end;
-      CON_EX_ALBUMTRACK: begin
-          MedienBib.AddSorter(CON_TRACKNR, False);
-          MedienBib.AddSorter(CON_ALBUM);
+      colIdx_EX_ALBUMTRACK: begin
+          MedienBib.AddSorter(colIdx_TRACK, False);
+          MedienBib.AddSorter(colIdx_ALBUM);
       end;
-      CON_DATEINAME: MedienBib.AddSorter(CON_DATEINAME, False);
-      CON_PFAD: MedienBib.AddSorter(CON_PFAD, False);
-      CON_LYRICSEXISTING: MedienBib.AddSorter(CON_LYRICSEXISTING, False);
-      CON_EXTENSION : MedienBib.AddSorter(CON_EXTENSION, False);
-      CON_GENRE: MedienBib.AddSorter(CON_GENRE, False);
-      CON_DAUER: MedienBib.AddSorter(CON_DAUER, False);
-      CON_FILESIZE: MedienBib.AddSorter(CON_FILESIZE, False);
-      CON_LASTFMTAGS: MedienBib.AddSorter(CON_LASTFMTAGS, False);
-      CON_TRACKGAIN: MedienBib.AddSorter(CON_TRACKGAIN, False);
-      CON_ALBUMGAIN: MedienBib.AddSorter(CON_ALBUMGAIN, False);
-      CON_BPM: MedienBib.AddSorter(CON_BPM, False);
+      colIdx_Filename: MedienBib.AddSorter(colIdx_Filename, False);
+      colIdx_Path: MedienBib.AddSorter(colIdx_Path, False);
+      colIdx_Lyrics: MedienBib.AddSorter(colIdx_Lyrics, False);
+      colIdx_EXTENSION : MedienBib.AddSorter(colIdx_EXTENSION, False);
+      colIdx_GENRE: MedienBib.AddSorter(colIdx_GENRE, False);
+      colIdx_Duration: MedienBib.AddSorter(colIdx_Duration, False);
+      colIdx_FILESIZE: MedienBib.AddSorter(colIdx_FILESIZE, False);
+      colIdx_LastFMTags: MedienBib.AddSorter(colIdx_LastFMTags, False);
+      colIdx_TRACKGAIN: MedienBib.AddSorter(colIdx_TRACKGAIN, False);
+      colIdx_ALBUMGAIN: MedienBib.AddSorter(colIdx_ALBUMGAIN, False);
+      colIdx_BPM: MedienBib.AddSorter(colIdx_BPM, False);
   end;
 
   MedienBib.SortAnzeigeListe;
 
   // Anzeige im VST aktualisieren
-  VST.Header.SortColumn := GetColumnIDfromContent(VST, MedienBib.Sortparams[0].Tag);
+  VST.Header.SortColumn := MedienBib.Sortparams[0].Tag;
   case MedienBib.Sortparams[0].Direction of
       sd_Ascending  : VST.Header.SortDirection := sdAscending  ;
       sd_Descending : VST.Header.SortDirection := sdDescending ;
@@ -4397,19 +4398,19 @@ begin
     PM_ML_ShowInExplorer.Enabled :=  assigned(VST.FocusedNode);
     PM_ML_Properties    .Enabled :=  assigned(VST.FocusedNode) AND (NOT NempSkin.NempPartyMode.DoBlockDetailWindow);
 
-    PM_ML_SortArtistTitle.Checked := (MedienBib.Sortparams[0].Tag = CON_ARTIST) and (MedienBib.Sortparams[1].Tag = CON_TITEL) ;
-    PM_ML_SortArtistAlbumTitle.Checked := (MedienBib.Sortparams[0].Tag = CON_ARTIST) and (MedienBib.Sortparams[1].Tag = CON_ALBUM) and (MedienBib.Sortparams[2].Tag = CON_TITEL);
-    PM_ML_SortTitleArtist.Checked := (MedienBib.Sortparams[0].Tag = CON_TITEL) and (MedienBib.Sortparams[1].Tag = CON_ARTIST);
-    PM_ML_SortAlbumArtistTitle.Checked := (MedienBib.Sortparams[0].Tag = CON_ALBUM) and (MedienBib.Sortparams[1].Tag = CON_ARTIST) and (MedienBib.Sortparams[2].Tag = CON_TITEL);
-    PM_ML_SortAlbumTitleArtist.Checked := (MedienBib.Sortparams[0].Tag = CON_ALBUM) and (MedienBib.Sortparams[1].Tag = CON_TITEL) and (MedienBib.Sortparams[2].Tag = CON_ARTIST);
-    PM_ML_SortAlbumTracknr.Checked := (MedienBib.Sortparams[0].Tag = CON_ALBUM) and (MedienBib.Sortparams[1].Tag = CON_TRACKNR);
-    PM_ML_SortFilename.Checked := (MedienBib.Sortparams[0].Tag = CON_DATEINAME);
-    PM_ML_SortPathFilename.Checked := (MedienBib.Sortparams[0].Tag = CON_PFAD);
-    PM_ML_SortLyricsexists.Checked := (MedienBib.Sortparams[0].Tag = CON_LYRICSEXISTING);
-    PM_ML_SortGenre.Checked := (MedienBib.Sortparams[0].Tag = CON_GENRE);
-    PM_ML_SortDuration.Checked := (MedienBib.Sortparams[0].Tag = CON_DAUER);
-    PM_ML_SortFilesize.Checked := (MedienBib.Sortparams[0].Tag = CON_FILESIZE);
-    PM_ML_bpm.Checked := (MedienBib.Sortparams[0].Tag = CON_BPM);
+    PM_ML_SortArtistTitle.Checked := (MedienBib.Sortparams[0].Tag = colIdx_ARTIST) and (MedienBib.Sortparams[1].Tag = colIdx_TITLE) ;
+    PM_ML_SortArtistAlbumTitle.Checked := (MedienBib.Sortparams[0].Tag = colIdx_ARTIST) and (MedienBib.Sortparams[1].Tag = colIdx_ALBUM) and (MedienBib.Sortparams[2].Tag = colIdx_TITLE);
+    PM_ML_SortTitleArtist.Checked := (MedienBib.Sortparams[0].Tag = colIdx_TITLE) and (MedienBib.Sortparams[1].Tag = colIdx_ARTIST);
+    PM_ML_SortAlbumArtistTitle.Checked := (MedienBib.Sortparams[0].Tag = colIdx_ALBUM) and (MedienBib.Sortparams[1].Tag = colIdx_ARTIST) and (MedienBib.Sortparams[2].Tag = colIdx_TITLE);
+    PM_ML_SortAlbumTitleArtist.Checked := (MedienBib.Sortparams[0].Tag = colIdx_ALBUM) and (MedienBib.Sortparams[1].Tag = colIdx_TITLE) and (MedienBib.Sortparams[2].Tag = colIdx_ARTIST);
+    PM_ML_SortAlbumTracknr.Checked := (MedienBib.Sortparams[0].Tag = colIdx_ALBUM) and (MedienBib.Sortparams[1].Tag = colIdx_TRACK);
+    PM_ML_SortFilename.Checked := (MedienBib.Sortparams[0].Tag = colIdx_Filename);
+    PM_ML_SortPathFilename.Checked := (MedienBib.Sortparams[0].Tag = colIdx_Path);
+    PM_ML_SortLyricsexists.Checked := (MedienBib.Sortparams[0].Tag = colIdx_Lyrics);
+    PM_ML_SortGenre.Checked := (MedienBib.Sortparams[0].Tag = colIdx_GENRE);
+    PM_ML_SortDuration.Checked := (MedienBib.Sortparams[0].Tag = colIdx_Duration);
+    PM_ML_SortFilesize.Checked := (MedienBib.Sortparams[0].Tag = colIdx_FILESIZE);
+    PM_ML_bpm.Checked := (MedienBib.Sortparams[0].Tag = colIdx_BPM);
     //-
     PM_ML_SortAscending.Checked := MedienBib.Sortparams[0].Direction = sd_Ascending;
     PM_ML_SortDescending.Checked := MedienBib.Sortparams[0].Direction = sd_Descending;
@@ -4716,6 +4717,9 @@ end;
 procedure TNemp_MainForm.ShowHelp;
 var ProperHelpFile: String;
 begin
+  Application.HelpContext(HELP_Nemp_Main);
+  exit;
+
     //if (NempOptions.Language = 'de') then
     if (LeftStr(NempOptions.Language,2) = 'de') then
     begin
@@ -4822,49 +4826,47 @@ var af: TAudioFile;
 begin
         af := Sender.GetNodeData<TAudioFile>(Node);
 
-        case VST.Header.Columns[column].Tag of
-          CON_ARTIST    : CellText := NempDisplay.TreeArtist(af);// af.GetArtistForVST(NempOptions.ReplaceNAArtistBy);
-          CON_ALBUMARTIST : CellText := af.AlbumArtist;
-          CON_COMPOSER  : CellText := af.Composer;
-          CON_TITEL     : CellText := NempDisplay.TreeTitle(af); // af.GetTitleForVST(NempOptions.ReplaceNATitleBy);
-          CON_ALBUM     : CellText := NempDisplay.TreeAlbum(af); // af.GetAlbumForVST(NempOptions.ReplaceNAAlbumBy);
-          CON_DAUER     : CellText := NempDisplay.TreeDuration(af); //  af.GetDurationForVST;
-          CON_BITRATE   : CellText := NempDisplay.TreeBitrate(af); //  af.GetBitrateForVST;
-          CON_CBR       : if af.vbr then CellText := 'vbr'
+        case Column of
+          colIdx_ARTIST    : CellText := NempDisplay.TreeArtist(af);// af.GetArtistForVST(NempOptions.ReplaceNAArtistBy);
+          colIdx_ALBUMARTIST : CellText := af.AlbumArtist;
+          colIdx_COMPOSER  : CellText := af.Composer;
+          colIdx_TITLE     : CellText := NempDisplay.TreeTitle(af); // af.GetTitleForVST(NempOptions.ReplaceNATitleBy);
+          colIdx_ALBUM     : CellText := NempDisplay.TreeAlbum(af); // af.GetAlbumForVST(NempOptions.ReplaceNAAlbumBy);
+          colIdx_Duration  : CellText := NempDisplay.TreeDuration(af); //  af.GetDurationForVST;
+          colIdx_BITRATE   : CellText := NempDisplay.TreeBitrate(af); //  af.GetBitrateForVST;
+          colIdx_CBRVBR   : if af.vbr then CellText := 'vbr'
                           else CellText := 'cbr';
-          CON_MODE            : CellText := NempDisplay.TreeChannelmode(af);
-          CON_SAMPLERATE      : CellText := NempDisplay.TreeSamplerate(af);
-          CON_STANDARDCOMMENT : CellText := af.Comment;
-          CON_FILESIZE  : CellText :=  NempDisplay.TreeFileSize(af);
-          CON_FILEAGE   : Celltext := af.FileAgeString;
-          CON_PFAD      : CellText := af.Pfad;
-          CON_ORDNER    : CellText := af.Ordner;
-          CON_DATEINAME : CellText := af.Dateiname;
-          CON_YEAR      : CellText := af.Year;
-          CON_GENRE     : CellText := af.genre;
-          CON_LYRICSEXISTING : CellText := ' ';
-          CON_EXTENSION : CellText := af.Extension;
-          CON_TRACKNR   : CellText := IntToStr(af.Track);
-          CON_CD        : CellText := af.CD;
-          CON_RATING    : CellText := '     ';
-          CON_PLAYCOUNTER : CellText := IntToStr(af.PlayCounter);
+          colIdx_ChannelMODE  : CellText := NempDisplay.TreeChannelmode(af);
+          colIdx_SAMPLERATE   : CellText := NempDisplay.TreeSamplerate(af);
+          colIdx_COMMENT   : CellText := af.Comment;
+          colIdx_FILESIZE  : CellText :=  NempDisplay.TreeFileSize(af);
+          colIdx_FILEAGE   : Celltext := af.FileAgeString;
+          colIdx_Path      : CellText := af.Pfad;
+          colIdx_Directory : CellText := af.Ordner;
+          colIdx_Filename  : CellText := af.Dateiname;
+          colIdx_YEAR      : CellText := af.Year;
+          colIdx_GENRE     : CellText := af.genre;
+          colIdx_Lyrics    : CellText := ' ';
+          colIdx_EXTENSION : CellText := af.Extension;
+          colIdx_TRACK     : CellText := IntToStr(af.Track);
+          colIdx_CD        : CellText := af.CD;
+          colIdx_RATING    : CellText := '     ';
+          colIdx_PLAYCOUNTER : CellText := IntToStr(af.PlayCounter);
 
-          CON_FAVORITE  : CellText := ' '; // noFav
-          CON_LASTFMTAGS: CellText := ' ';
+          colIdx_Marker  : CellText := ' '; // noFav
+          colIdx_LastFMTags: CellText := ' ';
 
-          CON_TRACKGAIN : Celltext := GainValueToString(af.TrackGain);
-          CON_ALBUMGAIN : Celltext := GainValueToString(af.AlbumGain);
-
-          CON_TRACKPEAK : Celltext := PeakValueToString(af.TrackPeak);
-          CON_ALBUMPEAK : Celltext := PeakValueToString(af.AlbumPeak);
-          CON_BPM : Celltext := af.BPM;
+          colIdx_TRACKGAIN : Celltext := GainValueToString(af.TrackGain);
+          colIdx_ALBUMGAIN : Celltext := GainValueToString(af.AlbumGain);
+          colIdx_TRACKPEAK : Celltext := PeakValueToString(af.TrackPeak);
+          colIdx_ALBUMPEAK : Celltext := PeakValueToString(af.AlbumPeak);
+          colIdx_BPM : Celltext := af.BPM;
 
         else
           CellText := ' ';
         end;
         // Correct CellText for toAutoSpan to a non-empty-string
         if CellText = '' then Celltext := ' ';
-
 
 end;
 
@@ -4876,8 +4878,8 @@ var af: TAudioFile;
 begin
   af := Sender.GetNodeData<TAudioFile>(Node);
 
-  case VST.Header.Columns[column].Tag of
-     CON_RATING: begin
+  case Column of
+     colIdx_RATING: begin
             TargetCanvas.Brush.Style := bsClear;
             if af.Rating = 0 then
                 st := 127
@@ -4898,8 +4900,8 @@ var aFile: TAudioFile;
     FileIsInLibrary: Boolean;
 begin
 
-    case VST.Header.Columns[column].Tag of
-      CON_FAVORITE: begin
+    case Column of
+      colIdx_Marker: begin
           aFile := GetFocussedAudioFile;
           if assigned(aFile) then
           begin
@@ -4949,7 +4951,7 @@ end;
 procedure TNemp_MainForm.VSTAfterGetMaxColumnWidth(Sender: TVTHeader;
   Column: TColumnIndex; var MaxWidth: Integer);
 begin
-if VST.Header.Columns[column].Tag = CON_RATING then
+  if Column = colIdx_RATING then
     MaxWidth := 80;
 end;
 
@@ -4964,7 +4966,7 @@ begin
           oldAudioFile := GetFocussedAudioFile;
           VST.Enabled := False;
 
-          MedienBib.AddSorter(VST.Header.Columns[HitInfo.Column].Tag);
+          MedienBib.AddSorter(HitInfo.Column); //   (VST.Header.Columns[HitInfo.Column].Tag);
           VST.Header.SortColumn := HitInfo.Column;
           if MedienBib.SortParams[0].Direction = sd_Ascending then
               VST.Header.SortDirection := sdAscending
@@ -5082,10 +5084,10 @@ begin
                 Font.Style := Font.Style + [fsStrikeOut]
             else
             begin
-                case VST.Header.Columns[column].Tag of
-                    CON_RATING,
-                    CON_LASTFMTAGS,
-                    CON_LYRICSEXISTING: ; // nothing
+                case Column of
+                    colIdx_RATING,
+                    colIdx_LastFMTags,
+                    colIdx_Lyrics: ; // nothing
                 else
                     // strike out
                     Font.Style := Font.Style + [fsStrikeOut];
@@ -5126,15 +5128,15 @@ begin
     aAudioFile := Sender.GetNodeData<TAudioFile>(Node);
 
     case VST.Header.Columns[VST.FocusedColumn].Tag of
-        CON_ARTIST:   aString := aAudioFile.Artist;
-        CON_ALBUMARTIST: aString := aAudioFile.AlbumArtist;
-        CON_COMPOSER: aString := aAudioFile.Composer;
-        CON_TITEL:    aString := aAudioFile.Titel;
-        CON_ALBUM:    aString := aAudioFile.Album;
-        CON_PFAD,
-        CON_ORDNER:   aString := aAudioFile.Ordner;
-        CON_DATEINAME:aString := aAudioFile.Dateiname;
-        CON_EXTENSION:aString := aAudioFile.Extension;
+        colIdx_ARTIST:   aString := aAudioFile.Artist;
+        colIdx_ALBUMARTIST: aString := aAudioFile.AlbumArtist;
+        colIdx_COMPOSER: aString := aAudioFile.Composer;
+        colIdx_TITLE:    aString := aAudioFile.Titel;
+        colIdx_ALBUM:    aString := aAudioFile.Album;
+        colIdx_Path,
+        colIdx_Directory: aString := aAudioFile.Ordner;
+        colIdx_Filename:  aString := aAudioFile.Dateiname;
+        colIdx_EXTENSION: aString := aAudioFile.Extension;
     else
         aString := aAudioFile.Artist;
     end;
@@ -5162,15 +5164,15 @@ var Node,ScrollNode: PVirtualNode;
             AudioFile := aVST.GetNodeData<TAudioFile>(nextNode);
 
             case FocussedAttribut of
-                CON_ARTIST    : aString := AudioFile.Artist;
-                CON_ALBUMARTIST: aString := AudioFile.AlbumArtist;
-                CON_COMPOSER  : aString := AudioFile.Composer;
-                CON_TITEL     : aString := AudioFile.Titel;
-                CON_ALBUM     : aString := AudioFile.Album;
-                CON_PFAD,
-                CON_ORDNER    : aString := AudioFile.Ordner;
-                CON_DATEINAME : aString := AudioFile.Dateiname;
-                CON_EXTENSION : aString := AudioFile.Extension;
+                colIdx_ARTIST    : aString := AudioFile.Artist;
+                colIdx_ALBUMARTIST: aString := AudioFile.AlbumArtist;
+                colIdx_COMPOSER  : aString := AudioFile.Composer;
+                colIdx_TITLE     : aString := AudioFile.Titel;
+                colIdx_ALBUM     : aString := AudioFile.Album;
+                colIdx_Path,
+                colIdx_Directory : aString := AudioFile.Ordner;
+                colIdx_Filename  : aString := AudioFile.Dateiname;
+                colIdx_EXTENSION : aString := AudioFile.Extension;
             else
                 aString := AudioFile.Artist;
             end;
@@ -9179,21 +9181,21 @@ begin
     ikNormal, ikSelected:
       begin
           af := Sender.GetNodeData<TAudioFile>(Node);
-          case VST.Header.Columns[column].Tag of
-              CON_LYRICSEXISTING :
+          case Column of
+              colIdx_Lyrics :
                   if af.LyricsExisting then ImageIndex := 6
                   else ImageIndex := 7;
 
-              CON_LASTFMTAGS :
+              colIdx_LastFMTags:
                       if Length(af.RawTagLastFM) > 0 then ImageIndex := 11;
                   //else imageIndex := 15;
                   // Con_Titel: imageIndex := 10;
 
-              CON_Favorite: ImageIndex := 12 + (af.Favorite mod 4);
+              colIdx_Marker: ImageIndex := 12 + (af.Favorite mod 4);
 
-              CON_ARTIST: if (trim(af.Artist) = '') and (NempDisplay.ArtistSubstitute <> svEmpty) then ImageIndex := 24;
-              CON_TITEL: if (trim(af.Titel) = '') and (NempDisplay.TitleSubstitute <> svEmpty) then ImageIndex := 24;
-              CON_ALBUM: if (trim(af.Album) = '') and (NempDisplay.AlbumSubstitute <> svEmpty) then ImageIndex := 24;
+              colIdx_ARTIST: if (trim(af.Artist) = '') and (NempDisplay.ArtistSubstitute <> svEmpty) then ImageIndex := 24;
+              colIdx_TITLE: if (trim(af.Titel) = '') and (NempDisplay.TitleSubstitute <> svEmpty) then ImageIndex := 24;
+              colIdx_ALBUM: if (trim(af.Album) = '') and (NempDisplay.AlbumSubstitute <> svEmpty) then ImageIndex := 24;
           end;
       end;
   end;
@@ -11152,18 +11154,18 @@ begin
             else
             begin
                 // Set the Delete-Shortcut to 0, otherwise the DEL-Key wont work in Edit
-                case VST.Header.Columns[column].Tag of
-                    CON_ARTIST,
-                    CON_ALBUMARTIST,
-                    CON_COMPOSER,
-                    CON_TITEL,
-                    CON_ALBUM,
-                    CON_STANDARDCOMMENT,
-                    CON_YEAR,
-                    CON_GENRE,
-                    CON_TRACKNR,
-                    CON_BPM,
-                    CON_CD: begin
+                case Column of
+                    colIdx_ARTIST,
+                    colIdx_ALBUMARTIST,
+                    colIdx_COMPOSER,
+                    colIdx_TITLE,
+                    colIdx_ALBUM,
+                    colIdx_COMMENT,
+                    colIdx_YEAR,
+                    colIdx_GENRE,
+                    colIdx_Track,
+                    colIdx_BPM,
+                    colIdx_CD: begin
                         if af.HasSupportedTagFormat then
                         begin
                             ClearShortCuts;
@@ -11171,14 +11173,14 @@ begin
                         end else
                             allowed := False;
                     end;
-                    CON_RATING: begin
+                    colIdx_RATING: begin
                             ClearShortCuts;
                             allowed := True; // always allow edit of ratings
                             //allowed := NempOptions.AllowQuickAccessToMetadata;
                     end;
                 else
                     {CON_DAUER, CON_BITRATE, CON_CBR, CON_MODE, CON_SAMPLERATE, CON_FILESIZE,
-                    CON_PFAD, CON_ORDNER, CON_DATEINAME, CON_LYRICSEXISTING, CON_EXTENSION }
+                    CON_PFAD, CON_ORDNER, CON_DATEINAME, colIdx_Lyrics, CON_EXTENSION }
                     allowed := False;
                 end;
             end;
@@ -11193,8 +11195,8 @@ procedure TNemp_MainForm.VSTCreateEditor(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; out EditLink: IVTEditLink);
 var aRect: TRect;
 begin
-    case VST.Header.Columns[column].Tag of
-        CON_RATING: begin
+    case Column of
+        colIdx_RATING: begin
               aRect := VST.GetDisplayRect(Node, Column, False, False);
               RatingGraphics.SetBackGround(VST.Canvas, aRect);
               EditLink := TRatingEditLink.Create;
@@ -11233,7 +11235,7 @@ begin
         and (MedienBib.CurrentThreadFilename <> af.Pfad)
     then
     begin
-        if (VST.Header.Columns[column].Tag = CON_RATING) then
+        if Column = colIdx_RATING then
         begin
             // Bugfix 4.13.2 // 4.14:
             // Only handle Rating here. Text information ist written in OnNewText
@@ -11285,18 +11287,18 @@ begin
     af.GetAudioData(af.Pfad); // not needed any more .... ?
 
     WriteNewStringData := True;
-    case VST.Header.Columns[column].Tag of
-        CON_ARTIST : af.Artist := NewText;
-        CON_ALBUMARTIST: af.AlbumArtist := NewText;
-        CON_COMPOSER: af.Composer := NewText;
-        CON_TITEL  : af.Titel := NewText;
-        CON_ALBUM  : af.Album := NewText;
-        CON_STANDARDCOMMENT : af.Comment := NewText;
-        CON_YEAR : af.Year := NewText;
-        CON_GENRE: af.Genre := NewText;
-        CON_TRACKNR: af.Track := StrToIntDef(NewText, 0);
-        CON_CD: af.CD := NewText;
-        CON_BPM: af.BPM := NewText;
+    case Column of
+        colIdx_ARTIST : af.Artist := NewText;
+        colIdx_ALBUMARTIST: af.AlbumArtist := NewText;
+        colIdx_COMPOSER: af.Composer := NewText;
+        colIdx_TITLE  : af.Titel := NewText;
+        colIdx_ALBUM  : af.Album := NewText;
+        colIdx_COMMENT : af.Comment := NewText;
+        colIdx_YEAR : af.Year := NewText;
+        colIdx_GENRE: af.Genre := NewText;
+        colIdx_TRACK : af.Track := StrToIntDef(NewText, 0);
+        colIdx_CD: af.CD := NewText;
+        colIdx_BPM: af.BPM := NewText;
     else
         {CON_DAUER, CON_BITRATE, CON_CBR, CON_MODE, CON_SAMPLERATE, CON_FILESIZE,
         CON_PFAD, CON_ORDNER, CON_DATEINAME, CON_LYRICSEXISTING, CON_EXTENSION, ... }
@@ -11306,7 +11308,7 @@ begin
 
     if WriteNewStringData then
     begin
-        aErr := af.WriteStringToMetaData(NewText, VST.Header.Columns[column].Tag, NempOptions.AllowQuickAccessToMetadata );
+        aErr := af.WriteStringToMetaData(NewText, Column, NempOptions.AllowQuickAccessToMetadata );
         if (aErr = AUDIOERR_None) then
         begin
             SyncAudioFilesWith(af);
@@ -11314,8 +11316,8 @@ begin
             CorrectVCLAfterAudioFileEdit(af);
 
             // using variables, as we need to perform *both* checks, even if the first one is already TRUE
-            SearchDirty := MedienBib.SearchStringIsDirty(VST.Header.Columns[column].Tag);
-            CollectionDirty := MedienBib.CollectionsAreDirty(VST.Header.Columns[column].Tag);
+            SearchDirty := MedienBib.SearchStringIsDirty(Column);
+            CollectionDirty := MedienBib.CollectionsAreDirty(Column);
 
             if SearchDirty or CollectionDirty then
               SetBrowseTabWarning(True);
@@ -11334,21 +11336,14 @@ end;
 
 procedure TNemp_MainForm.RepairZOrder;
 begin
-  ///02.2017
-
   if (NempOptions.MiniNempStayOnTop) AND (NempOptions.AnzeigeMode = 1) then
   begin
     // Fenster in den Vordergrund setzen.
     SetWindowPos(Nemp_MainForm.Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
-
-    // ggf. das Detailfenster nach oben holen
-//    if assigned(FDetails) and FDetails.CB_StayOnTop.Checked then
-//      SetWindowPos(FDetails.Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
-  end
-  else
+  end else
   begin
     // Jetzt die Hautform NICHT in den Vordergrund setzen
-    /// ??? 2022    SetWindowPos(Nemp_MainForm.Handle,HWND_NOTOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
+    SetWindowPos(Nemp_MainForm.Handle,HWND_NOTOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
   end;
 
   if assigned(PlaylistForm) and PlaylistForm.Visible then
@@ -11357,6 +11352,9 @@ begin
     SetForeGroundWindow(MedienlisteForm.Handle);
   if assigned(AuswahlForm) and AuswahlForm.Visible then
     SetForeGroundWindow(AuswahlForm.Handle);
+  if assigned(ExtendedControlForm) and ExtendedControlForm.Visible then
+    SetForeGroundWindow(ExtendedControlForm.Handle);
+
   SetForeGroundWindow(Handle);
 end;
 

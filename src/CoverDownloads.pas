@@ -52,16 +52,9 @@ const
 
 type
 
-
-
     TPicType = (ptNone, ptJPG, ptPNG);
-
     TQueryType = (qtCoverFlow, qtPlayer, qtTreeView);
     TSubQueryType = (sqtFile, sqtCDDA);
-
-
-
-
 
     TCoverDownloadItem = class
         ArchiveID: Integer;
@@ -69,8 +62,6 @@ type
         Artist: String;
         Album: String;
         Directory: String;
-        //nö. CoverDestination: String; // Destination for the downloaded Coverfile.
-                                  // = Directory for files, /Cover/ for CDDA
         QueryType: TQueryType;
         SubQueryType: TSubQueryType; // used for qtPlayer (file/cdda)
         FileType: String;       // On files: used to collect artist-album-data from other files
@@ -94,8 +85,6 @@ type
         private
             { Private-Deklarationen }
             fHttpClient: THttpClient;
-
-            //fSemaphore: THandle;
             fEvent: TEvent;
 
             // Thread-Copy for the Item that is currently processed
@@ -300,7 +289,6 @@ begin
     fDataStream := TMemoryStream.Create;
     fCurrentDownloadItem := TCoverDownloadItem.Create;
 
-    //fSemaphore := CreateSemaphore(Nil, 0, maxInt, Nil);
     fEvent := TEvent.Create(Nil, True, False, '');
     FreeOnTerminate := False;
 
@@ -347,7 +335,6 @@ begin
     try
         While Not Terminated do
         begin
-            //if (WaitforSingleObject(fSemaphore, 1000) = WAIT_OBJECT_0) then
             if fEvent.WaitFor(1000) = wrSignaled then
             begin
                 if not Terminated then
@@ -1117,7 +1104,6 @@ end;
 
 procedure TCoverDownloadWorkerThread.StartWorking;
 begin
-    //ReleaseSemaphore(fSemaphore, 1, Nil);
     fEvent.SetEvent;
 end;
 

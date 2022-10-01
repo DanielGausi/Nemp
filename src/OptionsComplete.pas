@@ -789,7 +789,6 @@ type
 
   private
     { Private-Deklarationen }
-    // OldFontSize: integer;
     DetailRatingHelper: TRatingHelper;
 
     FileCategories: TLibraryCategoryList;
@@ -829,6 +828,7 @@ type
     procedure ApplyFontsAndPartyMode;
     procedure ShowFileSearchSettings;
     procedure ApplyFileSearchSettings;
+    procedure SynchMediaListColumns;
     procedure ShowListViewSettings;
     procedure ApplyListViewSettings;
     procedure ShowWebRadioSettings;
@@ -939,9 +939,9 @@ const
     HELP_SettingsGeneral, // General
     HELP_SettingsControls, // Controls
     HELP_SettingsListView, // View
-    HELP_SettingsFonts, // Fonts and PartyM
-    HELP_SettingsFileManagement, // FileMan
-    Help_Categories, // MediaLib Configurat
+    HELP_SettingsFonts, // Fonts and PartyMode
+    HELP_SettingsFileManagement, // FileManagement
+    Help_Categories, // MediaLib Configuration
     HELP_SettingsMetadata, // MetaData
     HELP_SettingsSearch, // Search
     HELP_SettingsPlayback, // Player
@@ -1014,75 +1014,13 @@ begin
           mrNo    : CanClose := True;
           mrAbort : CanClose := False;
         end;
-
-
-
-     (*
-    with TTaskDialog.Create(self) do
-    begin
-      try
-        Caption := OptionsForm_UnSavedChangesCaption;
-        Title := OptionsForm_UnSavedChangesTitle;
-        Text := OptionsForm_UnSavedChangesText;
-
-        CommonButtons := [tcbCancel];
-        with TTaskDialogButtonItem(Buttons.Add) do
-        begin
-          Caption := OptionsForm_UnSavedChangesKeep;
-          CommandLinkHint := OptionsForm_UnSavedChangesKeepHint;
-          ModalResult := mrYes;
-        end;
-        with TTaskDialogButtonItem(Buttons.Add) do
-        begin
-          Caption := OptionsForm_UnSavedChangesDiscard;
-          CommandLinkHint := OptionsForm_UnSavedChangesDiscardHint;
-          ModalResult := mrNo;
-        end;
-        MainIcon := tdiInformation;
-        Flags := [tfUseCommandLinks];
-        if Execute then
-          case ModalResult of
-            mrYes: begin
-                BTNApplyClick(nil);
-                CanClose := True
-            end;
-            mrNo: begin
-                CanClose := True
-            end;
-          else
-            CanClose := False;
-          end;
-      finally
-        Free;
-      end
-    end;   *)
-
   end;
-
-  {
-    OptionsForm_UnSavedChangesKeep = 'Apply';
-    OptionsForm_UnSavedChangesKeepHint = 'Apply the changes and close the settings window.';
-    OptionsForm_UnSavedChangesDiscard = 'Discard';
-    OptionsForm_UnSavedChangesDiscardHint = 'Discard the changes and close the settings window.';
-
-  }
-
-
-
 end;
 
 procedure TOptionsCompleteForm.FormCreate(Sender: TObject);
-var i, s, count: integer;
+var i, count: integer;
   BassInfo: BASS_DEVICEINFO;
 begin
-
-  //optionsVST.StyleElements := [];
-  //optionsVST.TreeOptions.PaintOptions
-  //Header.Options := optionsVST.Header.Options + [hoOwnerDraw];
-  //optionsVST.Color := clWhite;
-  //optionsVST.Font.Color := clred;
-  //BtnOK.StyleElements := [];
-  //UnSkinForm(self);
   fCoverFlowGUIUpdating := False;
 
   BackUpComboBoxes(self);
@@ -1092,7 +1030,6 @@ begin
   HelpContext := HELP_Einstellungen;
   for i := 0 to 16 do
     PageControl1.Pages[i].HelpContext := HelpContexts[i];
-
 
   DetailRatingHelper := TRatingHelper.Create;
   LoadStarGraphics(DetailRatingHelper);
@@ -1116,10 +1053,6 @@ begin
     cbIncludeFiles.Checked[i] := True;
   end;
 
-  //for i := 0 to CBPlaylistTypes.Count - 1 do
-  //  CBPlaylistTypes.Checked[i] := True;
-
-
   for i := 0 to PageControl1.PageCount - 1 do
     PageControl1.Pages[i].TabVisible := False;
 
@@ -1127,9 +1060,7 @@ begin
   OptionsVST.NodeDataSize := SizeOf(TTabSheet);
   FillMainTreeView;
 
-  //----------------------------------
   count := 1;
-
   while (Bass_GetDeviceInfo(count, BassInfo)) do
   begin
     MainDeviceCB.Items.Add(String(BassInfo.Name));
@@ -1154,18 +1085,12 @@ begin
         LblConst_Headphones.Enabled := False;
     end;
 
-  //-----------------------------------------------
   CBFontNameCBR.Items := Screen.Fonts;
   CBFontNameVBR.Items := Screen.Fonts;
 
-  // Spalten-Checkboxen erzeugen
-  // SetLength(CBSpalten, Spaltenzahl);
-  for i := 0 to  Spaltenzahl - 1 do // Length(CBSpalten)-1 do
-  begin
-    s := GetColumnIDfromPosition(Nemp_MainForm.VST, i);
-    clbViewMainColumns.Items.Add(Nemp_MainForm.VST.Header.Columns[s].Text);
-    clbViewMainColumns.Checked[i] := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
-  end;
+  for i := 0 to cLibraryColumnCount - 1 do
+    clbViewMainColumns.Items.Add('');
+  SynchMediaListColumns;
 
   OpenDlg_DefaultCover.Filter :=  //FileFormatList.GetGraphicFilter([ftRaster], fstBoth, [foCompact, foIncludeAll,foIncludeExtension], Nil);
       'All images|*.bmp; *.dib; *.gif; *.jfif; *.jpe; *.jpeg; *.jpg; *.png; *.rle|'
@@ -1188,7 +1113,7 @@ end;
 procedure TOptionsCompleteForm.FormShow(Sender: TObject);
 begin
   // Beta-Option
-  //cb_BetaDontUseThreadedUpdate.Checked := MedienBib.BetaDontUseThreadedUpdate;
+  // cb_BetaDontUseThreadedUpdate.Checked := MedienBib.BetaDontUseThreadedUpdate;
   // cbFixCoverFlowOnStart.Checked := NempOptions.FixCoverFlowOnStart;
   ShowNempSettings;
   ShowControlsSettings;
@@ -1419,13 +1344,11 @@ begin
   EdtPassword.Text      := NempWebServer.PasswordU;
   EdtUsernameAdmin.Text := NempWebServer.UsernameA;
   EdtPasswordAdmin.Text := NempWebServer.PasswordA;
-
   seWebServer_Port.Value := NempWebServer.Port;
   cbPermitLibraryAccess.Checked    := NempWebServer.AllowLibraryAccess;
   cbPermitPlaylistDownload.Checked := NempWebServer.AllowFileDownload;
   cbAllowRemoteControl.Checked     := NempWebServer.AllowRemoteControl;
   cbPermitVote.Checked             := NempWebServer.AllowVotes;
-
   getIPs(cbLANIPs.Items);
   if cbLANIPs.Items.Count > 0 then
     cbLANIPs.ItemIndex := 0;
@@ -1440,9 +1363,7 @@ begin
     BtnServerActivate.Caption := WebServer_DeActivateServer
   else
     BtnServerActivate.Caption := WebServer_ActivateServer;
-
   CBAutoStartWebServer.Checked := MedienBib.AutoActivateWebServer;
-
   ChangeWebserverLinks(Nil);
 end;
 
@@ -1469,7 +1390,6 @@ begin
 end;
 
 
-
 procedure TOptionsCompleteForm.ShowBirthdaySettings;
 begin
   CBStartCountDown.Checked := NempPlayer.NempBirthdayTimer.UseCountDown;
@@ -1489,7 +1409,6 @@ end;
 
 procedure TOptionsCompleteForm.ShowFontsAndPartyMode;
 begin
-  // OldFontSize := NempOptions.DefaultFontSize;
   // Font settings
   SEFontSize.Value := NempOptions.DefaultFontSize;
   SERowHeight.Value := NempOptions.RowHeight;
@@ -1546,16 +1465,21 @@ begin
   CB_CoverSearch_LastFM.Checked := MedienBib.CoverSearchLastFM;
 end;
 
-procedure TOptionsCompleteForm.ShowListViewSettings;
+procedure TOptionsCompleteForm.SynchMediaListColumns;
 var
-  i, s: Integer;
+  i, colIdx: Integer;
+begin
+  for i := 0 to cLibraryColumnCount - 1 do begin
+    colIdx := Nemp_MainForm.VST.Header.Columns.ColumnFromPosition(i);
+    clbViewMainColumns.Items[i] := Nemp_MainForm.VST.Header.Columns[colIdx].Text;
+    clbViewMainColumns.Checked[i] := coVisible in Nemp_MainForm.VST.Header.Columns[colIdx].Options;
+  end;
+end;
+
+procedure TOptionsCompleteForm.ShowListViewSettings;
 begin
   // Visible Columns in media list (main VST)
-  for i := 0 to SpaltenZahl - 1 do begin
-    s := GetColumnIDfromPosition(Nemp_MainForm.VST, i);
-    clbViewMainColumns.Items[i] := Nemp_MainForm.VST.Header.Columns[s].Text;
-    clbViewMainColumns.Checked[i] := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
-  end;
+  SynchMediaListColumns;
   // not available meta data
   cbReplaceArtistBy.ItemIndex := Integer(NempDisplay.ArtistSubstitute);
   cbReplaceTitleBy .ItemIndex := Integer(NempDisplay.TitleSubstitute) ;
@@ -1966,16 +1890,10 @@ begin
                   = mrYes) then
               begin
                   // ok, accept settings later
-
-                  //MedienBib.IgnoreLyrics := cb_IgnoreLyrics.Checked;
-                  //MedienBib.RemoveAllLyrics;
-                  //CB_AccelerateLyricSearch.Checked := False;
-                  //MedienBib.Changed := True;
-
               end else
               begin
                   // cancel, reset checkbox
-                  cb_IgnoreLyrics.Checked := False; //MedienBib.IgnoreLyrics;
+                  cb_IgnoreLyrics.Checked := False;
               end;
           end else
           ;
@@ -2057,17 +1975,13 @@ procedure TOptionsCompleteForm.BtnRefreshDevicesClick(Sender: TObject);
 var count: Integer;
     BassInfo: BASS_DEVICEINFO;
 begin
-    //showmessage(inttostr(NempPlayer.MainDevice) + ' - ' + inttostr(NempPlayer.HeadsetDevice));
-
     NempPlaylist.RepairBassEngine(True);
-
     MainDeviceCB.Items.Clear;
     HeadPhonesDeviceCB.Items.Clear;
 
     count := 1;
     while (Bass_GetDeviceInfo(count, BassInfo)) do
     begin
-        // BASS_Init(count, 44100, 0, Nemp_MainForm.Handle, nil);
         MainDeviceCB.Items.Add(String(BassInfo.Name));
         HeadPhonesDeviceCB.Items.Add(String(BassInfo.Name));
         inc(count);
@@ -2078,7 +1992,6 @@ begin
     else
       if Count >= 1 then
           MainDeviceCB.ItemIndex := 0;
-
 
     if (HeadPhonesDeviceCB.Items.Count > Integer(NempPlayer.HeadsetDevice)) then
         HeadPhonesDeviceCB.ItemIndex := NempPlayer.HeadsetDevice //- 1
@@ -2101,12 +2014,8 @@ begin
 
   // Einzelne Endungen registrieren
   for i := 0 to NempPlayer.ValidExtensions.Count - 1 do
-      if CBFileTypes.Checked[i] then
-      begin
-          // ftr.DeleteUserChoice(NempPlayer.ValidExtensions[i]);
-          ftr.RegisterType(NempPlayer.ValidExtensions[i], 'Nemp.AudioFile', 'Nemp Audiofile', Paramstr(0), 0);
-          // ftr.DeleteSpecialSetting(NempPlayer.ValidExtensions[i]);
-      end;
+    if CBFileTypes.Checked[i] then
+      ftr.RegisterType(NempPlayer.ValidExtensions[i], 'Nemp.AudioFile', 'Nemp Audiofile', Paramstr(0), 0);
 
   // Operationen für Nemp.AudioFile hinzufügen
   ftr.AddHandler('open','"' +  Paramstr(0) + '" "%1"');
@@ -2120,10 +2029,7 @@ begin
   // Playlisten-Typen hinzufügen
   for i := 0 to CBPlaylistTypes.Count - 1 do
     if CBPlaylistTypes.Checked[i] then
-    begin
-        ftr.RegisterType(CBPlaylistTypes.Items[i], 'Nemp.Playlist', 'Nemp Playlist', Paramstr(0), 1);
-        // ftr.DeleteSpecialSetting(CBPlaylistTypes.Items[i]);
-    end;
+      ftr.RegisterType(CBPlaylistTypes.Items[i], 'Nemp.Playlist', 'Nemp Playlist', Paramstr(0), 1);
 
   ftr.AddHandler('open','"' +  Paramstr(0) + '" "%1"');
   ftr.AddHandler('enqueue','"' +  Paramstr(0) + '" /enqueue "%1"', (FiletypeRegistration_PlaylistEnqueue));
@@ -2200,18 +2106,8 @@ end;
 
 
 procedure TOptionsCompleteForm.FormActivate(Sender: TObject);
-var i, s: Integer;
 begin
-  // Checkboxen der Spalten ggf. aktualisieren
-  // Nötig, weil wir wegen dem Geburtstag Kein Modales Show machen
-  for i := 0 to Spaltenzahl - 1 do
-  begin
-    s := GetColumnIDfromPosition(Nemp_MainForm.VST, i);
-    clbViewMainColumns.Items[i] := Nemp_MainForm.VST.Header.Columns[s].Text;
-    clbViewMainColumns.Checked[i] := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
-    // CBSpalten[i].Caption := Nemp_MainForm.VST.Header.Columns[s].Text;
-    // CBSpalten[i].Checked := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
- end;
+  SynchMediaListColumns;
 end;
 
 // GeburtstagsOptionen
@@ -2278,7 +2174,6 @@ begin
         lblCount40.Caption := '(' + IntToStr(RatingCounts[8]) + ')';
         lblCount45.Caption := '(' + IntToStr(RatingCounts[9]) + ')';
         lblCount50.Caption := '(' + IntToStr(RatingCounts[10]) + ')';
-
 
         lblCount00.Visible := RatingCounts[0] > 0;
         lblCount05.Visible := True;
@@ -2561,16 +2456,17 @@ end;
 
 procedure TOptionsCompleteForm.ApplyListViewSettings;
 var
-  i, s: Integer;
+  i, colIdx: Integer;
 begin
   // visible columns
-  for i := 0 to Spaltenzahl-1 do begin
-    s := GetColumnIDfromPosition(Nemp_MainForm.VST, i);
+  for i := 0 to cLibraryColumnCount - 1 do begin
+    colIdx := Nemp_MainForm.VST.Header.Columns.ColumnFromPosition(i);
     if clbViewMainColumns.Checked[i] then
-      Nemp_MainForm.VST.Header.Columns[s].Options := Nemp_MainForm.VST.Header.Columns[s].Options + [coVisible]
+      Nemp_MainForm.VST.Header.Columns[colIdx].Options := Nemp_MainForm.VST.Header.Columns[colIdx].Options + [coVisible]
     else
-      Nemp_MainForm.VST.Header.Columns[s].Options := Nemp_MainForm.VST.Header.Columns[s].Options - [coVisible];
+      Nemp_MainForm.VST.Header.Columns[colIdx].Options := Nemp_MainForm.VST.Header.Columns[colIdx].Options - [coVisible];
   end;
+
   // missing metadata
   NempDisplay.ArtistSubstitute := TESubstituteValue(cbReplaceArtistBy.ItemIndex);
   NempDisplay.TitleSubstitute  := TESubstituteValue(cbReplaceTitleBy .ItemIndex);
@@ -3045,19 +2941,10 @@ end;
 
 procedure TOptionsCompleteForm.RefreshQRCode(aURL: String);
 var QR: TRedeemerQR;
-    //s: String;
     QRBitmap: TBitmap;
 begin
     QR := TRedeemerQR.Create();
     try
-        {s := 'http://' + cbURLs.Text;
-
-        if sePort.Value <> 80 then
-            s := s + ':' + IntToStr(sePort.Value);
-
-        if cbAdmin.Checked then
-            s := s + '/admin';
-        }
         QR.LoadFromString(AnsiString(aURL), ecHigh);
         QRBitmap := TBitmap.Create;
         try
@@ -3068,7 +2955,6 @@ begin
         finally
             QRBitmap.Free;
         end;
-
     finally
         QR.Free();
     end;
@@ -3663,8 +3549,6 @@ begin
   EdtGlobalIP.Text := WebServer_GettingIP;
   try
       aText := GetURLAsString('https://www.gausi.de/deine_ip.php');
-      // String(IDHttpWebServerGetIP.get('http://www.gausi.de/deine_ip.php'));
-
       a := pos('<body>', aText);
       b := pos('</body>', aText);
       if (a > 0) and (b > 0) then begin
@@ -3674,7 +3558,6 @@ begin
       else
           EdtGlobalIP.Text := WebServer_GetIPFailedShort;
   except
-      //MessageDlg((WebServer_GetIPFailes), mtWarning, [mbOK], 0);
       EdtGlobalIP.Text := WebServer_GetIPFailedShort;
   end;
 end;
@@ -3686,29 +3569,6 @@ begin
     Application.HelpContext(HelpContexts[PageControl1.ActivePageIndex])
   else
     Application.HelpContext(HELP_Einstellungen);
-
-{  case PageControl1.ActivePageIndex of
-    0: Application.HelpContext(HELP_SettingsGeneral); // General
-    1: Application.HelpContext(HELP_SettingsControls); // Controls
-    2: Application.HelpContext(HELP_SettingsListView); // View
-    3: Application.HelpContext(HELP_SettingsFonts); // Fonts and PartyMode
-    4: Application.HelpContext(HELP_SettingsFileManagement); // FileManagement
-    5: Application.HelpContext(Help_Categories); // MediaLib Configuration      // => HELP_SettingsConfigLibrary ?
-    6: Application.HelpContext(HELP_SettingsMetadata); // MetaData
-    7: Application.HelpContext(HELP_SettingsSearch); // Search
-    8: Application.HelpContext(HELP_SettingsPlayback); // Player
-    9: Application.HelpContext(HELP_SettingsPlaylist); // Playlist
-    10: Application.HelpContext(HELP_SettingsWebradio); // Webradio
-    11: Application.HelpContext(Help_EqualizerAndEffects); // Effects  // => HELP_SettingsEffects
-    12: Application.HelpContext(HELP_SettingsBirthday); // Birthday
-    13: Application.HelpContext(HELP_SettingsLastFM); // LastFM
-    14: Application.HelpContext(HELP_SettingsWebserver); // Webserver
-    15: Application.HelpContext(HELP_SettingsCoverflow); // Coverflow
-    16: Application.HelpContext(HELP_WindowsRegistry); // Filetypes
-  else
-    Application.HelpContext(HELP_Einstellungen);
-  end;}
-
 end;
 
 {$REGION 'Customizable Coverflow'}
@@ -3766,7 +3626,6 @@ begin
   MedienBib.NewCoverFlow.Settings.AngleMain     := tbCoverAngleMain     .Position;
   // View
   MedienBib.NewCoverFlow.Settings.ViewPosX := tbCoverViewPosition.Position  ;
-  // MedienBib.NewCoverFlow.Settings.ViewDirX := tbCoverViewDirection.Position ;
   // Reflexion
   MedienBib.NewCoverFlow.Settings.UseReflection        := cbCoverFlowUseReflection .Checked;
 	MedienBib.NewCoverFlow.Settings.ReflexionBlendFaktor := tbCoverReflexionIntensity.Position;
@@ -3984,15 +3843,6 @@ begin
   (NempUpdater.NotifyOnBetas <> CB_AutoCheckNotifyOnBetas.Checked) or
   (NempPlayer.ReInitAfterSuspend <> cbReInitAfterSuspend.Checked) or
   (NempPlayer.PauseOnSuspend <> cbPauseOnSuspend.Checked);
-  {case CBBOX_UpdateInterval.ItemIndex  of
-    0: NempUpdater.CheckInterval := 0;
-    1: NempUpdater.CheckInterval := 1;
-    2: NempUpdater.CheckInterval := 7;
-    3: NempUpdater.CheckInterval := 14;
-    4: NempUpdater.CheckInterval := 30;
-  else
-    NempUpdater.CheckInterval := 7;
-  end;}
 end;
 
 function TOptionsCompleteForm.ControlsChanged: Boolean;
@@ -4005,16 +3855,6 @@ begin
   (NempOptions.RegisterHotKeys <> CBRegisterHotKeys.Checked) or
   (NempOptions.TabStopAtPlayerControls <> CB_TabStopAtPlayerControls.Checked) or
   (NempOptions.TabStopAtTabs <> CB_TabStopAtTabs.Checked);
-
-  {NempOptions.DefineHotKey(hkPlay,         CB_Activate_Play.Checked, IndexToMod(CB_Mod_Play.ItemIndex), IndexToKey(CB_Key_Play.ItemIndex));
-  NempOptions.DefineHotKey(hkStop,         CB_Activate_Stop.Checked, IndexToMod(CB_Mod_Stop.ItemIndex), IndexToKey(CB_Key_Stop.ItemIndex));
-  NempOptions.DefineHotKey(hkNext,         CB_Activate_Next.Checked, IndexToMod(CB_Mod_Next.ItemIndex), IndexToKey(CB_Key_Next.ItemIndex));
-  NempOptions.DefineHotKey(hkPrev,         CB_Activate_Prev.Checked, IndexToMod(CB_Mod_Prev.ItemIndex), IndexToKey(CB_Key_Prev.ItemIndex));
-  NempOptions.DefineHotKey(hkSlideForward, CB_Activate_JumpForward.Checked, IndexToMod(CB_Mod_JumpForward.ItemIndex), IndexToKey(CB_Key_JumpForward.ItemIndex));
-  NempOptions.DefineHotKey(hkSlideBack,    CB_Activate_JumpBack.Checked, IndexToMod(CB_Mod_JumpBack.ItemIndex), IndexToKey(CB_Key_JumpBack.ItemIndex));
-  NempOptions.DefineHotKey(hkIncVol,       CB_Activate_IncVol.Checked, IndexToMod(CB_Mod_IncVol.ItemIndex), IndexToKey(CB_Key_IncVol.ItemIndex));
-  NempOptions.DefineHotKey(hkDecVol,       CB_Activate_DecVol.Checked, IndexToMod(CB_Mod_DecVol.ItemIndex), IndexToKey(CB_Key_DecVol.ItemIndex));
-  NempOptions.DefineHotKey(hkMute,         CB_Activate_Mute.Checked, IndexToMod(CB_Mod_Mute.ItemIndex), IndexToKey(CB_Key_Mute.ItemIndex));}
 end;
 
 function TOptionsCompleteForm.PlayerSettingsChanged: Boolean;
@@ -4143,26 +3983,12 @@ function TOptionsCompleteForm.FileSearchSettingsChanged: Boolean;
 begin
   result :=
   (MedienBib.AutoScanDirs <> CBAutoScan.Checked) or
-  //for i := 0 to LBAutoScan.Items.Count - 1 do
-  //  MedienBib.AutoScanDirList.Add(LBAutoScan.Items[i]);
   (MedienBib.AskForAutoAddNewDirs <> CBAskForAutoAddNewDirs.Checked) or
   (MedienBib.AutoAddNewDirs <> CBAutoAddNewDirs.Checked) or
   (MedienBib.AutoDeleteFiles <> cb_AutoDeleteFiles.checked) or
   (MedienBib.AutoDeleteFilesShowInfo <> cb_AutoDeleteFilesShowInfo.checked) or
   (MedienBib.AutoScanPlaylistFilesOnView <> CBAutoScanPlaylistFilesOnView.Checked) or
   (MedienBib.IncludeAll <> cbIncludeAll.Checked) or
-  {if not MedienBib.IncludeAll then begin
-    MedienBib.IncludeFilter := '';
-    for i := 0 to CBIncludeFiles.Count - 1 do begin
-      if CBIncludeFiles.Checked[i] then
-        MedienBib.IncludeFilter := MedienBib.IncludeFilter + ';*' + CBIncludeFiles.Items[i];
-    end;
-    // delete first ';'
-    if (MedienBib.IncludeFilter <> '') AND (MedienBib.IncludeFilter[1] = ';') then
-      MedienBib.IncludeFilter := copy(MedienBib.IncludeFilter, 2, length(MedienBib.IncludeFilter));
-    if MedienBib.IncludeFilter = '' then
-      MedienBib.IncludeFilter := '*.mp3'
-  end;}
   (TCoverArtSearcher.UseDir       <> CB_CoverSearch_inDir.Checked) or
   (TCoverArtSearcher.UseParentDir <> CB_CoverSearch_inParentDir.Checked) or
   (TCoverArtSearcher.UseSubDir    <> CB_CoverSearch_inSubDir.Checked) or
@@ -4175,15 +4001,6 @@ end;
 function TOptionsCompleteForm.ListViewSettingsChanged: Boolean;
 begin
   result :=
-  // visible columns
-  {for i := 0 to Spaltenzahl-1 do begin
-    s := GetColumnIDfromPosition(Nemp_MainForm.VST, i);
-    if clbViewMainColumns.Checked[i] then
-      Nemp_MainForm.VST.Header.Columns[s].Options := Nemp_MainForm.VST.Header.Columns[s].Options + [coVisible]
-    else
-      Nemp_MainForm.VST.Header.Columns[s].Options := Nemp_MainForm.VST.Header.Columns[s].Options - [coVisible];
-  end;}
-  // missing metadata
   (NempDisplay.ArtistSubstitute <> TESubstituteValue(cbReplaceArtistBy.ItemIndex)) or
   (NempDisplay.TitleSubstitute  <> TESubstituteValue(cbReplaceTitleBy .ItemIndex)) or
   (NempDisplay.AlbumSubstitute  <> TESubstituteValue(cbReplaceAlbumBy .ItemIndex)) or

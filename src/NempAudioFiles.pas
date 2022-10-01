@@ -2165,12 +2165,12 @@ begin
             begin
                 case ColumnIndex of
 
-                    CON_ARTIST : MainFile.Artist := aValue;
-                    CON_ALBUMARTIST : MainFile.AlbumArtist := aValue;
-                    CON_TITEL  : MainFile.Title  := aValue ;
-                    CON_ALBUM  : MainFile.Album  := aValue ;
-                    CON_YEAR   : MainFile.Year := aValue;
-                    CON_GENRE  : begin
+                    colIdx_ARTIST : MainFile.Artist := aValue;
+                    colIdx_ALBUMARTIST : MainFile.AlbumArtist := aValue;
+                    colIdx_TITLE  : MainFile.Title  := aValue ;
+                    colIdx_ALBUM  : MainFile.Album  := aValue ;
+                    colIdx_YEAR   : MainFile.Year := aValue;
+                    colIdx_GENRE  : begin
                         // for non-standard genres, we need the ID3v2Tag
                         if MainFile.FileType = at_Mp3 then
                         begin
@@ -2180,10 +2180,10 @@ begin
                         MainFile.Genre := aValue;
                     end;
 
-                    CON_TRACKNR: begin
+                    colIdx_TRACK: begin
                           MainFile.Track := aValue;  //StrToIntDef(aValue, 0);
                     end;
-                    CON_STANDARDCOMMENT: begin
+                    colIdx_COMMENT: begin
                         case MainFile.FileType of
                             at_Mp3: TMp3File(MainFile).Comment := aValue;
                             at_Ogg: TOggVorbisFile(MainFile).SetPropertyByFieldname(VORBIS_COMMENT, aValue);
@@ -2198,7 +2198,7 @@ begin
                         end;
                     end;
 
-                    CON_CD: begin
+                    colIdx_CD: begin
                         case MainFile.FileType of
                             at_Mp3: begin
                                 EnsureID3v2Exists(TMp3File(MainFile));
@@ -2216,7 +2216,7 @@ begin
                         end;
                     end;
 
-                    CON_BPM: begin
+                    colIdx_BPM: begin
                         case MainFile.FileType of
                           at_Mp3: begin
                             EnsureID3v2Exists(TMp3File(MainFile));

@@ -312,7 +312,7 @@ begin
         if (Not MedienBib.AnzeigeListIsCurrentlySorted) then
             VST.Header.SortColumn := -1
         else
-            VST.Header.SortColumn := GetColumnIDfromContent(VST, MedienBib.Sortparams[0].Tag);
+            VST.Header.SortColumn := MedienBib.Sortparams[0].Tag;
 
 
         VST.EmptyListMessage := MedienBib.BibSearcher.EmptyListMessage;
@@ -851,7 +851,6 @@ begin
 end;
 
 procedure ReTranslateNemp(LanguageCode: String);
-var i: Integer;
 begin
     with Nemp_MainForm do
     begin
@@ -884,6 +883,10 @@ begin
         LblEmptyLibraryHint.Caption := MainForm_LibraryIsEmpty;
         VST.EmptyListMessage := MedienBib.BibSearcher.EmptyListMessage;
         VST.Invalidate;
+
+        PlaylistVST.EmptyListMessage := MainForm_PlaylistIsEmpty;
+        PlaylistVST.Invalidate;
+
                                         //        EmptyListMessage  dummaudiofile
 
         // refresh Hints und sonstige Anzeigen
@@ -969,7 +972,6 @@ begin
             RestoreComboboxes(FormStreamVerwaltung);
         end;
         if assigned(ShutDownForm         ) then ReTranslateComponent(ShutDownForm        );
-        //if assigned(HeadsetControlForm   ) then ReTranslateComponent(HeadsetControlForm  );
         if assigned(BirthdayForm         ) then ReTranslateComponent(BirthdayForm        );
         if assigned(RandomPlaylistForm   ) then
         begin
@@ -1028,18 +1030,10 @@ begin
             RestoreComboboxes(FormChangeCategory);
         end;
 
-         // Todo:
-        // - Alle Comboboxen auf ihren alten Itemindex zurücksetzen (also die, die schon zu Beginn gefüllt sind)
-        // - Einige Comboboxen ggf. neu füllen ("Alte suchergebnisse")
-
-        for i := 0 to Spaltenzahl - 1 do
-           VST.Header.Columns[i].Text := _(DefaultSpalten[VST.Header.Columns[i].Tag].Bezeichnung);
-        VST.Invalidate;
-
         // Categories
         ArtistsVST.Header.Columns[0].Text := TreeHeader_Categories;
-        ArtistsVST.Invalidate; // to translate Captions of Playlist- and Webradio-Category
-        AlbenVST.Invalidate; // Translate RootColelction-Captions
+        ArtistsVST.Invalidate; // Translate Captions of Playlist- and Webradio-Category
+        AlbenVST.Invalidate; // Translate RootCollection-Captions
         // Collections
         RefreshCollectionTreeHeader(MedienBib.CurrentCategory);
 
@@ -1047,10 +1041,7 @@ begin
         PlaylistPropertiesChanged(NempPlaylist);
 
         if Medienbib.BrowseMode = 1 then
-            CoverScrollbarChange(Nil); // trigger redraw of label
-
-        //if Medienbib.BrowseMode = 2 then
-        //    MedienBib.TagCloud.Paint(MedienBib.TagCloud.CurrentTagList);
+          CoverScrollbarChange(Nil); // trigger redraw of label
 
     end;
 end;

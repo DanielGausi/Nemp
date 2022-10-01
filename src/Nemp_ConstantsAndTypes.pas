@@ -70,19 +70,19 @@ type
 
     TEDefaultCoverType = (dcFile, dcWebRadio, dcCDDA, dcNoCover_deprecated, dcError);
 
-    TSpalte = record
+    (*TSpalte = record
       Bezeichnung: string;
       Inhalt: integer;
       visible: boolean;
       width: integer;
       sortAscending: boolean;
-    end;
+    end;*)
 
-    TLibraryColumn = record
+    TLibraryColumn = record   // formerly known as TSpalte
       Position: Integer;
       Width: Integer;
       Visible: Boolean;
-      sortAsc: Boolean;
+      // sortAsc: Boolean;
       Name: String;
     end;
 
@@ -560,10 +560,11 @@ const
 
     // WM_TRAYMSG = WM_USER + 10; // not needed any more (tTrayIcon)
 
-    Spaltenzahl = 31;
-    cLibraryColumns = 31;
+    // Spaltenzahl = 31;
+    cLibraryColumnCount = 31; // formerly known as Spaltenzahl
+
     // Nicht Ändern! Das sind auch die Tags in den Menu-Einträgen zum Sortieren!!
-    CON_ARTIST    = 0 ;
+    (*CON_ARTIST    = 0 ;
     CON_TITEL     = 1 ;
     CON_ALBUM     = 2 ;
     CON_DAUER     = 3 ;
@@ -581,7 +582,7 @@ const
     CON_GENRE     = 14;
     CON_LYRICSEXISTING = 15;
     CON_TRACKNR   = 16;
-          CON_CD        = 22;
+        CON_CD        = 22;
     CON_RATING    = 17;
     CON_PLAYCOUNTER = 18;
     CON_LASTFMTAGS = 19;
@@ -595,11 +596,9 @@ const
     CON_BPM = 28;
     CON_ALBUMARTIST = 29;
     CON_COMPOSER = 30;
+    *)
 
-    //-----
-    CON_EX_ARTISTALBUMTITEL = 117;
-    CON_EX_ALBUMTITELARTIST = 118;
-    CON_EX_ALBUMTRACK = 119;
+
 
     {NEMPWINDOW_ONLYTASKBAR = 0;
     NEMPWINDOW_TASKBAR_MIN_TRAY = 1;
@@ -613,15 +612,15 @@ const
     SHUTDOWNMODE_Hibernate = 3;
     SHUTDOWNMODE_Shutdown = 4;
 
-    MODE_ARTIST_TITEL = 0;
-    MODE_PATH         = 1;
-    MODE_INFO         = 2;
-    MODE_LYRICS       = 3;
-    MODE_MAX          = 4;
+    // MODE_ARTIST_TITEL = 0;
+    // MODE_PATH         = 1;
+    // MODE_INFO         = 2;
+    // MODE_LYRICS       = 3;
+    // MODE_MAX          = 4;
 
-      SEARCH_ARTIST = 0;
-      SEARCH_ALBUM  = 1;
-      SEARCH_COVERID = 2;
+      // SEARCH_ARTIST = 0;
+      // SEARCH_ALBUM  = 1;
+      // SEARCH_COVERID = 2;
 
       // Anzeige der Details: AudioFile aus der Playlist oder der MedienBib?
       SD_PLAYLIST = 0;
@@ -719,49 +718,116 @@ const
          'Techno'
          );
 
-      {DefaultColumns: array[0..cLibraryColumns-1] of TLibraryColumn =
+      colIdx_Artist       = 0;
+      colIdx_Title        = 1;
+      colIdx_Album        = 2;
+      colIdx_Track        = 3;
+      colIdx_CD           = 4;
+      colIdx_Year         = 5;
+      colIdx_AlbumArtist  = 6;
+      colIdx_Composer     = 7;
+      colIdx_Duration     = 8;
+      colIdx_Genre        = 9;
+      colIdx_Comment      = 10;
+      colIdx_Bitrate      = 11;
+      colIdx_cbrvbr       = 12;
+      colIdx_Channelmode  = 13;
+      colIdx_Samplerate   = 14;
+      colIdx_Extension    = 15;
+      colIdx_Filename     = 16;
+      colIdx_Directory    = 17;
+      colIdx_Path         = 18;
+      colIdx_Filesize     = 19;
+      colIdx_Fileage      = 20;
+      colIdx_Rating       = 21;
+      colIdx_PlayCounter  = 22;
+      colIdx_TrackGain    = 23;
+      colIdx_AlbumGain    = 24;
+      colIdx_TrackPeak    = 25;
+      colIdx_AlbumPeak    = 26;
+      colIdx_BPM          = 27;
+      colIdx_Lyrics       = 28;
+      colIdx_LastFMTags   = 29;
+      colIdx_Marker       = 30;
+
+      //-----
+      colIdx_EX_ARTISTALBUMTITEL = 117;
+      colIdx_EX_ALBUMTITELARTIST = 118;
+      colIdx_EX_ALBUMTRACK = 119;
+
+      DefaultColumns: array[0..cLibraryColumnCount-1] of TLibraryColumn =
       (
-        (Position: 0; Width: 120; Visible: True; SortAsc: True; Name: 'Artist'),
+        (Position: 0; Width: 120; Visible: True; Name: 'Artist'),
+        (Position: 1; Width: 120; Visible: True; Name: 'Title'),
+        (Position: 2; Width: 120; Visible: True; Name: 'Album'),
+        (Position: 3; Width:  50; Visible: True; Name: 'Track'),
+        (Position: 4; Width:  50; Visible: False; Name: 'CD'),
+        (Position: 5; Width:  50; Visible: True; Name: 'Year'),
+        (Position: 6; Width: 120; Visible: True; Name: 'Album-Artist'),
+        (Position: 7; Width: 120; Visible: False; Name: 'Composer'),
+        (Position: 8; Width:  50; Visible: True; Name: 'Duration'),
+        (Position: 9; Width: 120; Visible: False; Name: 'Genre'),
+        (Position:10; Width: 120; Visible: False; Name: 'Comment'),
+        (Position:11; Width:  50; Visible: False; Name: 'Bitrate'),
+        (Position:12; Width:  50; Visible: False; Name: 'cbr/vbr'),
+        (Position:13; Width:  50; Visible: False; Name: 'Channelmode'),
+        (Position:14; Width:  50; Visible: False; Name: 'Samplerate'),
+        (Position:15; Width:  50; Visible: False; Name: 'Type'),
+        (Position:16; Width: 120; Visible: False; Name: 'Filename'),
+        (Position:17; Width: 120; Visible: False; Name: 'Directory'),
+        (Position:18; Width: 120; Visible: False; Name: 'Path'),
+        (Position:19; Width:  50; Visible: False; Name: 'Filesize'),
+        (Position:20; Width:  50; Visible: False; Name: 'Fileage'),
+        (Position:21; Width: 100; Visible: True; Name: 'Rating'),
+        (Position:22; Width:  50; Visible: False; Name: 'Play counter'),
+        (Position:23; Width:  50; Visible: False; Name: 'Track gain'),
+        (Position:24; Width:  50; Visible: False; Name: 'Album gain'),
+        (Position:25; Width:  50; Visible: False; Name: 'Track peak'),
+        (Position:26; Width:  50; Visible: False; Name: 'Album peak'),
+        (Position:27; Width:  50; Visible: False; Name: 'BPM'),
+        (Position:28; Width:  50; Visible: False; Name: 'Lyrics'),
+        (Position:29; Width:  50; Visible: False; Name: 'Tags'),
+        (Position:30; Width:  50; Visible: False; Name: 'Marker')
+      );
 
-      );}
-
+      (*
       DefaultSpalten : array[0..30] of TSpalte =
       (
-        (Bezeichnung: 'Artist' ;Inhalt: CON_ARTIST        ;visible: True  ;width: 120 ;sortAscending: True),
-        (Bezeichnung: 'Title' ;Inhalt: CON_TITEL          ;visible: True  ;width: 190 ;sortAscending: True),
-        (Bezeichnung: 'Album' ;Inhalt: CON_ALBUM          ;visible: True  ;width: 130 ;sortAscending: True),
-        (Bezeichnung: 'Duration' ;Inhalt: CON_DAUER       ;visible: True  ;width: 44  ;sortAscending: True),
-        (Bezeichnung: 'Bitrate' ;Inhalt: CON_BITRATE      ;visible: False  ;width: 44  ;sortAscending: True),
-        (Bezeichnung: 'cbr/vbr' ;Inhalt: CON_CBR          ;visible: False  ;width: 51  ;sortAscending: True),
-        (Bezeichnung: 'Channelmode' ;Inhalt: CON_MODE     ;visible: False  ;width: 53  ;sortAscending: True),
-        (Bezeichnung: 'Samplerate' ;Inhalt: CON_SAMPLERATE ;visible: False  ;width: 40  ;sortAscending: True),
-        (Bezeichnung: 'Comment' ;Inhalt: CON_STANDARDCOMMENT;visible: False ;width: 50  ;sortAscending: True),
-        (Bezeichnung: 'Filesize' ;Inhalt: CON_FILESIZE    ;visible: False ;width: 50  ;sortAscending: True),
-        (Bezeichnung: 'Path' ;Inhalt: CON_PFAD            ;visible: False ;width: 50  ;sortAscending: True),
-        (Bezeichnung: 'Directory' ;Inhalt: CON_ORDNER     ;visible: False ;width: 50  ;sortAscending: True),
-        (Bezeichnung: 'Filename' ;Inhalt: CON_DATEINAME   ;visible: False ;width: 50  ;sortAscending: True),
-        //        (Bezeichnung: 'Kategorie'  ;Inhalt: CON_KATEGORIE  ;visible: False ;width: 50  ;sortAscending: True),
-        (Bezeichnung: 'Year' ;Inhalt: CON_YEAR             ;visible: True  ;width: 50  ;sortAscending: True),
-        (Bezeichnung: 'Genre' ;Inhalt: CON_GENRE           ;visible: True  ;width: 100 ;sortAscending: True),
-        (Bezeichnung: 'Lyrics' ;Inhalt: CON_LYRICSEXISTING ;visible: False  ;width: 50 ;sortAscending: True),
-        (Bezeichnung: 'Track' ;Inhalt: CON_TRACKNR         ;visible: true  ;width: 50 ;sortAscending: True),
-        (Bezeichnung: 'Rating' ;Inhalt: CON_RATING         ;visible: true  ;width: 100 ;sortAscending: True),
-        (Bezeichnung: 'Play counter' ;Inhalt: CON_PLAYCOUNTER;visible: false  ;width: 44;sortAscending: True),
-        (Bezeichnung: 'Tags' ;Inhalt: CON_LASTFMTAGS       ;visible: false  ;width: 44;sortAscending: True),
-        (Bezeichnung: 'Type' ;Inhalt: CON_EXTENSION        ;visible: false  ;width: 50;sortAscending: True),
-        (Bezeichnung: 'Fileage' ;Inhalt: CON_FILEAGE       ;visible: false  ;width: 80;sortAscending: True),
-        (Bezeichnung: 'CD' ;Inhalt: CON_CD                 ;visible: false  ;width: 50 ;sortAscending: True),
-        (Bezeichnung: 'Marker' ;Inhalt: CON_FAVORITE       ;visible: true   ;width: 44 ;sortAscending: True),
-        // new in Nemp 4.13
-        (Bezeichnung: 'Track gain' ;Inhalt: CON_TRACKGAIN       ;visible: false   ;width: 70 ;sortAscending: True),
-        (Bezeichnung: 'Album gain' ;Inhalt: CON_ALBUMGAIN       ;visible: false   ;width: 70 ;sortAscending: True),
-        (Bezeichnung: 'Track peak' ;Inhalt: CON_TRACKPEAK       ;visible: false   ;width: 70 ;sortAscending: True),
-        (Bezeichnung: 'Album peak' ;Inhalt: CON_ALBUMPEAK       ;visible: false   ;width: 70 ;sortAscending: True),
-        // new in Nemp 5
-        (Bezeichnung: 'BPM'        ;Inhalt: CON_BPM             ;visible: false   ;width: 70 ;sortAscending: True),
-        (Bezeichnung: 'Album-Artist';Inhalt: CON_ALBUMARTIST     ;visible: false   ;width: 120;sortAscending: True),
-        (Bezeichnung: 'Composer';Inhalt: CON_COMPOSER     ;visible: false   ;width: 120;sortAscending: True)
+            (Bezeichnung: 'Artist' ;Inhalt: CON_ARTIST        ;visible: True  ;width: 120 ;sortAscending: True),
+            (Bezeichnung: 'Title' ;Inhalt: CON_TITEL          ;visible: True  ;width: 190 ;sortAscending: True),
+            (Bezeichnung: 'Album' ;Inhalt: CON_ALBUM          ;visible: True  ;width: 130 ;sortAscending: True),
+            (Bezeichnung: 'Duration' ;Inhalt: CON_DAUER       ;visible: True  ;width: 44  ;sortAscending: True),
+            (Bezeichnung: 'Bitrate' ;Inhalt: CON_BITRATE      ;visible: False  ;width: 44  ;sortAscending: True),
+            (Bezeichnung: 'cbr/vbr' ;Inhalt: CON_CBR          ;visible: False  ;width: 51  ;sortAscending: True),
+            (Bezeichnung: 'Channelmode' ;Inhalt: CON_MODE     ;visible: False  ;width: 53  ;sortAscending: True),
+            (Bezeichnung: 'Samplerate' ;Inhalt: CON_SAMPLERATE ;visible: False  ;width: 40  ;sortAscending: True),
+            (Bezeichnung: 'Comment' ;Inhalt: CON_STANDARDCOMMENT;visible: False ;width: 50  ;sortAscending: True),
+            (Bezeichnung: 'Filesize' ;Inhalt: CON_FILESIZE    ;visible: False ;width: 50  ;sortAscending: True),
+            (Bezeichnung: 'Path' ;Inhalt: CON_PFAD            ;visible: False ;width: 50  ;sortAscending: True),
+            (Bezeichnung: 'Directory' ;Inhalt: CON_ORDNER     ;visible: False ;width: 50  ;sortAscending: True),
+            (Bezeichnung: 'Filename' ;Inhalt: CON_DATEINAME   ;visible: False ;width: 50  ;sortAscending: True),
+            (Bezeichnung: 'Year' ;Inhalt: CON_YEAR             ;visible: True  ;width: 50  ;sortAscending: True),
+            (Bezeichnung: 'Genre' ;Inhalt: CON_GENRE           ;visible: True  ;width: 100 ;sortAscending: True),
+            (Bezeichnung: 'Lyrics' ;Inhalt: CON_LYRICSEXISTING ;visible: False  ;width: 50 ;sortAscending: True),
+            (Bezeichnung: 'Track' ;Inhalt: CON_TRACKNR         ;visible: true  ;width: 50 ;sortAscending: True),
+            (Bezeichnung: 'Rating' ;Inhalt: CON_RATING         ;visible: true  ;width: 100 ;sortAscending: True),
+            (Bezeichnung: 'Play counter' ;Inhalt: CON_PLAYCOUNTER;visible: false  ;width: 44;sortAscending: True),
+            (Bezeichnung: 'Tags' ;Inhalt: CON_LASTFMTAGS       ;visible: false  ;width: 44;sortAscending: True),
+            (Bezeichnung: 'Type' ;Inhalt: CON_EXTENSION        ;visible: false  ;width: 50;sortAscending: True),
+            (Bezeichnung: 'Fileage' ;Inhalt: CON_FILEAGE       ;visible: false  ;width: 80;sortAscending: True),
+            (Bezeichnung: 'CD' ;Inhalt: CON_CD                 ;visible: false  ;width: 50 ;sortAscending: True),
+            (Bezeichnung: 'Marker' ;Inhalt: CON_FAVORITE       ;visible: true   ;width: 44 ;sortAscending: True),
+            // new in Nemp 4.13
+            (Bezeichnung: 'Track gain' ;Inhalt: CON_TRACKGAIN       ;visible: false   ;width: 70 ;sortAscending: True),
+            (Bezeichnung: 'Album gain' ;Inhalt: CON_ALBUMGAIN       ;visible: false   ;width: 70 ;sortAscending: True),
+            (Bezeichnung: 'Track peak' ;Inhalt: CON_TRACKPEAK       ;visible: false   ;width: 70 ;sortAscending: True),
+            (Bezeichnung: 'Album peak' ;Inhalt: CON_ALBUMPEAK       ;visible: false   ;width: 70 ;sortAscending: True),
+            // new in Nemp 5
+            (Bezeichnung: 'BPM'        ;Inhalt: CON_BPM             ;visible: false   ;width: 70 ;sortAscending: True),
+            (Bezeichnung: 'Album-Artist';Inhalt: CON_ALBUMARTIST     ;visible: false   ;width: 120;sortAscending: True),
+            (Bezeichnung: 'Composer';Inhalt: CON_COMPOSER     ;visible: false   ;width: 120;sortAscending: True)
       );
+      *)
 
       //AUDIOFILE_STRINGS : Array[0..4] of string =
       //  ('artist', 'album', 'directory', 'genre', 'year');

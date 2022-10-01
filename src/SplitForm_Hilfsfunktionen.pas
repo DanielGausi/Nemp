@@ -1009,17 +1009,6 @@ begin
 
       // reactivate it again
       PanelCoverBrowse.OnResize := PanelCoverBrowseResize;
-      //CoverScrollbar.WindowProc := bckup;
-      //SendMessage( CoverScrollbar.Handle, WM_SETREDRAW, 1, 0);
-
-
-      // 5. Constraints setzen
-      {
-      Constraints.MinHeight := NempOptions.NempFormAufteilung[AnzeigeMode].FormMinHeight;
-      Constraints.MaxHeight := NempOptions.NempFormAufteilung[AnzeigeMode].FormMaxHeight;
-      Constraints.MinWidth  := NempOptions.NempFormAufteilung[AnzeigeMode].FormMinWidth;
-      Constraints.MaxWidth  := NempOptions.NempFormAufteilung[AnzeigeMode].FormMaxWidth;
-      }
 
       if NempOptions.AnzeigeMode = 0 then
       begin
@@ -1068,7 +1057,6 @@ begin
           ReInitRelativePositions;
       end;
 
-      //02.2017 // MAXIMIZED-OVer TAskleiste????
       if (NempOptions.AnzeigeMode = 0) AND NempOptions.MainFormMaximized then
           WindowState := wsMaximized;
 
@@ -1076,9 +1064,6 @@ begin
           NempSkin.FitSkinToNewWindow;
 
       RepairZOrder;
-      // evtl. Form neu zeichnen. Stichwort "Schwarze Ecken"
-
-      // teilweise auskommentiert für Windows 7
       if (NempOptions.AnzeigeMode = 0) AND (Tag in [0,1]) then
       begin
           SetWindowRgn( handle, 0, Not _IsThemeActive );
@@ -1110,25 +1095,14 @@ end;
 
 procedure ReAcceptDragFiles;
 begin
-      DragAcceptFiles (PlaylistForm.Handle, True);
-      DragAcceptFiles (AuswahlForm.Handle, True);
-      DragAcceptFiles (MedienlisteForm.Handle, True);
-      DragAcceptFiles (ExtendedControlForm.Handle, True);
-      //DragAcceptFiles (Nemp_MainForm.Handle, True);
-      //DragAcceptFiles(Nemp_MainForm._ControlPanel.Handle, True);
-      RegisterDragDrop(Nemp_MainForm._ControlPanel.Handle, Nemp_MainForm.fDropManager as IDropTarget);
-      //RegisterDragDrop(Nemp_MainForm.PanelCoverBrowse.Handle, Nemp_MainForm.fDropManager as IDropTarget);
-      RegisterDragDrop(Nemp_MainForm.TreePanel.Handle, Nemp_MainForm.fDropManager as IDropTarget);
-      RegisterDragDrop(Nemp_MainForm.CloudPanel.Handle, Nemp_MainForm.fDropManager as IDropTarget);
-      RegisterDragDrop(Nemp_MainForm.CoverflowPanel.Handle, Nemp_MainForm.fDropManager as IDropTarget);
-
-      {case RegisterDragDrop(Nemp_MainForm._ControlPanel.Handle, Nemp_MainForm.fDropManager as IDropTarget) of
-      DRAGDROP_E_INVALIDHWND : ShowMessage('invalid');
-      DRAGDROP_E_ALREADYREGISTERED : ShowMessage('already reg');
-      E_OUTOFMEMORY : ShowMessage('outofmem');
-       S_OK: ShowMessage('ok');
-    end;}
-
+  DragAcceptFiles (PlaylistForm.Handle, True);
+  DragAcceptFiles (AuswahlForm.Handle, True);
+  DragAcceptFiles (MedienlisteForm.Handle, True);
+  DragAcceptFiles (ExtendedControlForm.Handle, True);
+  RegisterDragDrop(Nemp_MainForm._ControlPanel.Handle, Nemp_MainForm.fDropManager as IDropTarget);
+  RegisterDragDrop(Nemp_MainForm.TreePanel.Handle, Nemp_MainForm.fDropManager as IDropTarget);
+  RegisterDragDrop(Nemp_MainForm.CloudPanel.Handle, Nemp_MainForm.fDropManager as IDropTarget);
+  RegisterDragDrop(Nemp_MainForm.CoverflowPanel.Handle, Nemp_MainForm.fDropManager as IDropTarget);
 end;
 
 procedure PositionCloseImage(CloseBtn: TSkinButton; ParentPanel: TPanel);

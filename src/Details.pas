@@ -712,13 +712,17 @@ end;
     --------------------------------------------------------
 }
 procedure TFDetails.ReloadTimerTimer(Sender: TObject);
+var
+  oldChanged: Boolean;
 begin
     ReloadTimer.Enabled := False;
+    oldChanged := self.fDataChanged;
 
     if ApplyExternalChanges then begin
       ApplyEditFileToEditTag;
       ShowMainProperties;
       ShowMetaDataFrames;
+      fDataChanged := oldChanged;
     end
     else begin
       // reload the file data, discard all changes made here
@@ -1835,26 +1839,26 @@ begin
   then
     // Artist, Title and Album are handled the same for Searchstrings, so one test for all is enough
     // (they are all included, or Search is not accelerated at all)
-    SearchDirty := SearchDirty or MedienBib.SearchStringIsDirty(CON_ARTIST);
+    SearchDirty := SearchDirty or MedienBib.SearchStringIsDirty(colIdx_ARTIST);
   // other properties may be included or not
   if (BackupFile.Comment  <> fEditFile.Comment) then
-    SearchDirty := SearchDirty or MedienBib.SearchStringIsDirty(CON_STANDARDCOMMENT);
+    SearchDirty := SearchDirty or MedienBib.SearchStringIsDirty(colIdx_COMMENT);
   if (BackupFile.Genre  <> fEditFile.Genre) then
-    SearchDirty := SearchDirty or MedienBib.SearchStringIsDirty(CON_GENRE);
+    SearchDirty := SearchDirty or MedienBib.SearchStringIsDirty(colIdx_GENRE);
   if (BackupFile.AlbumArtist  <> fEditFile.AlbumArtist) then
-    SearchDirty := SearchDirty or MedienBib.SearchStringIsDirty(CON_ALBUMARTIST);
+    SearchDirty := SearchDirty or MedienBib.SearchStringIsDirty(colIdx_ALBUMARTIST);
   if (BackupFile.Composer  <> fEditFile.Composer) then
-    SearchDirty := SearchDirty or MedienBib.SearchStringIsDirty(CON_COMPOSER);
+    SearchDirty := SearchDirty or MedienBib.SearchStringIsDirty(colIdx_COMPOSER);
 
   // Check for relevant changes for the collections
   if (BackupFile.Artist <> fEditFile.Artist) or (BackupFile.AlbumArtist <> fEditFile.AlbumArtist) then
-    CollectionDirty := CollectionDirty or MedienBib.CollectionsAreDirty(CON_ARTIST);
+    CollectionDirty := CollectionDirty or MedienBib.CollectionsAreDirty(colIdx_ARTIST);
   if (BackupFile.Album <> fEditFile.Album) then
-    CollectionDirty := CollectionDirty or MedienBib.CollectionsAreDirty(CON_ALBUM);
+    CollectionDirty := CollectionDirty or MedienBib.CollectionsAreDirty(colIdx_ALBUM);
   if (BackupFile.Year <> fEditFile.Year) then
-    CollectionDirty := CollectionDirty or MedienBib.CollectionsAreDirty(CON_YEAR);
+    CollectionDirty := CollectionDirty or MedienBib.CollectionsAreDirty(colIdx_YEAR);
   if (BackupFile.Genre <> fEditFile.Genre) then
-    CollectionDirty := CollectionDirty or MedienBib.CollectionsAreDirty(CON_GENRE);
+    CollectionDirty := CollectionDirty or MedienBib.CollectionsAreDirty(colIdx_GENRE);
   if (BackupFile.RawTagLastFM <> fEditFile.RawTagLastFM) then
     CollectionDirty := CollectionDirty or MedienBib.CollectionsAreDirty(ccTagCloud);
 
