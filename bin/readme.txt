@@ -6,10 +6,10 @@
       von Daniel 'Gausi' Gauﬂmann, 
       eMail: mail@gausi.de
 
-      Programmiert mit CodeGear / Embarcadero Delphi 2009 bis 10.3
-      Januar 2005 - April 2021
+      Programmiert mit CodeGear / Embarcadero Delphi 2009 bis 11.1
+      Januar 2005 - Oktober 2022
 
-      Version: 4.15
+      Version: 5.0
 
 
    -----------------------------------------------------------
