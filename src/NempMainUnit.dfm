@@ -7580,7 +7580,7 @@ object Nemp_MainForm: TNemp_MainForm
       OnExecute = actFileOverviewSideBySideExecute
     end
     object actShowControlCover: TAction
-      Caption = 'Show cover in conrtol panel'
+      Caption = 'Show cover in control panel'
       OnExecute = actShowControlCoverExecute
     end
   end
