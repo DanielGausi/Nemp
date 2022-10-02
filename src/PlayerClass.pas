@@ -1209,7 +1209,7 @@ begin
   // hidden feature: user agent
   fNemp_BassUserAgent := NempSettingsManager.ReadString('Player', 'UserAgent', NEMP_BASS_DEFAULT_USERAGENT);
 
-  NempBirthdayTimer.UseCountDown := NempSettingsManager.ReadBool('Event', 'UseCountDown', True);
+  NempBirthdayTimer.UseCountDown := NempSettingsManager.ReadBool('Event', 'UseCountDown', False);
   NempBirthdayTimer.StartTime := NempSettingsManager.ReadTime('Event', 'StartTime', 0 );
   // NempBirthdayTimer.StartCountDownTime := Ini.ReadTime('Event', 'StartCountDownTime',0);
   NempBirthdayTimer.BirthdaySongFilename := (NempSettingsManager.ReadString('Event', 'BirthdaySongFilename', ''));

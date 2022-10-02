@@ -37,7 +37,7 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     NempAudioFiles, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, dialogs, CoverHelper,
     MyDialogs, System.UITypes, math, Vcl.ExtCtrls, Vcl.Graphics, RatingCtrls, SkinButtons,
     LibraryOrganizer.Base, LibraryOrganizer.Files, LibraryOrganizer.Playlists, LibraryOrganizer.Webradio,
-    MainFormLayout;
+    MainFormLayout, System.StrUtils;
 
 type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
 
@@ -856,7 +856,7 @@ begin
     begin
         Uselanguage(LanguageCode);
 
-        if LanguageCode = 'de' then
+        if AnsiStartsText('de', LanguageCode) then
           Application.HelpFile := ExtractFilePath(Paramstr(0)) + 'nemp_de.chm'
         else
           Application.HelpFile := ExtractFilePath(Paramstr(0)) + 'nemp_en.chm';

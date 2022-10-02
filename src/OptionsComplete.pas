@@ -3948,12 +3948,11 @@ begin
 end;
 function TOptionsCompleteForm.BirthdaySettingsChanged: Boolean;
 begin
-  result :=
-  (NempPlayer.NempBirthdayTimer.CountDownFileName <> EditCountdownSong.Text) or
-  (NempPlayer.NempBirthdayTimer.BirthdaySongFilename <> EditBirthdaySong.Text) or
-  (NempPlayer.NempBirthdayTimer.StartTime <> StrToTime(mskEdt_BirthdayTime.Text)) or
-  (NempPlayer.NempBirthdayTimer.UseCountDown <> CBStartCountDown.Checked) or
-  (NempPlayer.NempBirthdayTimer.ContinueAfter <> CBContinueAfter.Checked);
+  result := (NempPlayer.NempBirthdayTimer.CountDownFileName <> EditCountdownSong.Text)
+      or (NempPlayer.NempBirthdayTimer.BirthdaySongFilename <> EditBirthdaySong.Text)
+      or (NempPlayer.NempBirthdayTimer.StartTime <> StrToTime(mskEdt_BirthdayTime.Text))
+      or (NempPlayer.NempBirthdayTimer.UseCountDown <> CBStartCountDown.Checked)
+      or (NempPlayer.NempBirthdayTimer.ContinueAfter <> CBContinueAfter.Checked);
 end;
 function TOptionsCompleteForm.FontsAndPartyModeChanged: Boolean;
 begin

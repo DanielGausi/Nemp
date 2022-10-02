@@ -6,16 +6,16 @@ object UpdateForm: TUpdateForm
   ClientHeight = 296
   ClientWidth = 500
   Color = clBtnFace
+  Constraints.MinHeight = 250
+  Constraints.MinWidth = 450
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poMainFormCenter
   OnCreate = FormCreate
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 13
   object RichEdit1: TRichEdit
     AlignWithMargins = True
@@ -34,7 +34,6 @@ object UpdateForm: TUpdateForm
     ScrollBars = ssVertical
     TabOrder = 0
     StyleElements = [seBorder]
-    Zoom = 100
   end
   object Panel1: TPanel
     Left = 0
