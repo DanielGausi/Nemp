@@ -102,12 +102,12 @@ type
 
   const
       cDefaultWindowData: TFormDataArray = (
-        (Key: 'Main'; Top: 0; Left: 0; Width: 1200; Height: 750; Docked: False; Visible: True),
-        (Key: 'MiniMain'; Top: 410; Left: 180; Width: 800; Height: 100; Docked: False; Visible: True), //height: ignored here
-        (Key: 'Playlist'; Top: 0; Left: 780; Width: 400; Height: 390; Docked: False; Visible: True),
-        (Key: 'MediaList'; Top: 530; Left: 0; Width: 840; Height: 330; Docked: False; Visible: True),
-        (Key: 'BrowseList'; Top: 0; Left: 0; Width: 760; Height: 390; Docked: False; Visible: True),
-        (Key: 'Extended'; Top: 530; Left: 860; Width: 330; Height: 330; Docked: False; Visible: True)
+        (Key: 'Main'; Top: -1; Left: -1; Width: 1200; Height: 750; Docked: False; Visible: True),
+        (Key: 'MiniMain'; Top: 460; Left: 180; Width: 800; Height: 100; Docked: False; Visible: True), //height: ignored here
+        (Key: 'Playlist'; Top: 50; Left: 830; Width: 400; Height: 390; Docked: False; Visible: True),
+        (Key: 'MediaList'; Top: 580; Left: 50; Width: 840; Height: 330; Docked: False; Visible: True),
+        (Key: 'BrowseList'; Top: 50; Left: 50; Width: 760; Height: 390; Docked: False; Visible: True),
+        (Key: 'Extended'; Top: 580; Left: 910; Width: 330; Height: 330; Docked: False; Visible: True)
       );
 
   type
@@ -121,6 +121,8 @@ type
         fHeight  : Integer;
         fDocked: Boolean;
         fVisible: Boolean;
+
+        procedure CenterForm;
 
       public
         property Top    : Integer read fTop     write fTop    ;
@@ -1409,6 +1411,22 @@ begin
   fNempForm := aNempForm;
 end;
 
+procedure TNempFormData.CenterForm;
+begin
+  fTop := (Screen.PrimaryMonitor.Height - fHeight) Div 2;
+  if fTop < 0 then begin
+    fTop := 50;
+    fHeight := Screen.PrimaryMonitor.Height - 50;
+  end;
+
+  fLeft := (Screen.PrimaryMonitor.Width - fWidth) Div 2;
+  if fLeft < 0 then begin
+    fLeft := 50;
+    fWidth := Screen.PrimaryMonitor.Width - 50;
+  end;
+
+end;
+
 procedure TNempFormData.GetDataFromString(aString: String);
 var
   WindowDataStrings: TStringList;
@@ -1433,6 +1451,10 @@ begin
       fDocked  := cDefaultWindowData[fNempForm].Docked;
       fVisible := cDefaultWindowData[fNempForm].Visible;
     end;
+
+    if (fTop = -1) and (fLeft = -1) then
+      CenterForm;
+
   finally
     WindowDataStrings.Free;
   end;

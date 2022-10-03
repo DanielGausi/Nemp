@@ -45,12 +45,10 @@ Nemp_ConstantsAndTypes ;
       public
         procedure SaveWindowPosition(aMode: Integer);
         procedure LoadWindowPosition;
-        procedure LoadWindowPositionLegacy;
     end;
 
     TNempSubForm = class(TNempForm)
       private
-        procedure LoadWindowPositionLegacy;
 
       protected
         fNempFormID: TENempFormIDs;
@@ -74,20 +72,6 @@ Nemp_ConstantsAndTypes ;
 implementation
 
 uses gnuGettext;
-
-function GetIniPrefix(aID: TENempFormIDs): String;
-begin
-  case aID of
-    nfMain:     result := 'Main';
-    nfMainMini: result := 'Mini';
-    nfPlaylist: result := 'Playlist';
-    nfMediaLibrary: result := 'Medienliste';
-    nfBrowse:       result := 'AuswahlSuche';
-    nfExtendedControls: result := 'ExtendedControls';
-  else
-    result := '';
-  end;
-end;
 
 { TNempSubForm }
 
@@ -134,39 +118,8 @@ end;
 procedure TNempSubForm.LoadWindowPosition;
 var rawIniString: String;
 begin
-  if NempSettingsManager.SectionExists('NempForms') then
-  begin
-    rawIniString := NempSettingsManager.ReadString('NempForms', cDefaultWindowData[fNempFormID].Key, '');
-    NempOptions.FormPositions[fNempFormID].GetDataFromString(rawIniString);
-  end else
-    LoadWindowPositionLegacy;
-end;
-
-procedure TNempSubForm.LoadWindowPositionLegacy;
-var
-  iniPrefix: String;
-begin
-  iniPrefix := GetIniPrefix(fNempFormID);
-
-  NempOptions.FormPositions[fNempFormID].Top :=
-    NempSettingsManager.ReadInteger('Windows', iniPrefix+'Top', cDefaultWindowData[fNempFormID].Top);
-
-  NempOptions.FormPositions[fNempFormID].Left :=
-    NempSettingsManager.ReadInteger('Windows', iniPrefix+'Left', cDefaultWindowData[fNempFormID].Left);
-
-  NempOptions.FormPositions[fNempFormID].Width :=
-    NempSettingsManager.ReadInteger('Windows', iniPrefix+'Width', cDefaultWindowData[fNempFormID].Width);
-
-  NempOptions.FormPositions[fNempFormID].Height :=
-    NempSettingsManager.ReadInteger('Windows', iniPrefix+'Height', cDefaultWindowData[fNempFormID].Height);
-
-  // some of these setting may not be loaded correctly, but I'll ignore that here
-  // (inconsistent IniKeys in previous Versions)
-  //NempOptions.FormPositions[fNempFormID].Visible :=
-  //  NempSettingsManager.ReadBool('Windows', iniPrefix+'Visible', cDefaultWindowData[fNempFormID].Visible);
-
-  NempOptions.FormPositions[fNempFormID].Docked :=
-    NempSettingsManager.ReadBool('Windows', iniPrefix+'Docked', cDefaultWindowData[fNempFormID].Docked);
+  rawIniString := NempSettingsManager.ReadString('NempForms', cDefaultWindowData[fNempFormID].Key, '');
+  NempOptions.FormPositions[fNempFormID].GetDataFromString(rawIniString);
 end;
 
 procedure TNempSubForm.SaveWindowPosition;
@@ -187,40 +140,11 @@ end;
 procedure TNempCustomMainForm.LoadWindowPosition;
 var rawIniString: String;
 begin
-  if NempSettingsManager.SectionExists('NempForms') then
-  begin
     rawIniString := NempSettingsManager.ReadString('NempForms', cDefaultWindowData[nfMain].Key, '');
     NempOptions.FormPositions[nfMain].GetDataFromString(rawIniString);
-
     rawIniString := NempSettingsManager.ReadString('NempForms', cDefaultWindowData[nfMainMini].Key, '');
     NempOptions.FormPositions[nfMainMini].GetDataFromString(rawIniString);
-
     NempOptions.MainFormMaximized := NempSettingsManager.ReadBool('NempForms', 'MainFormMaximized' , False);
-  end else
-    LoadWindowPositionLegacy
-end;
-
-procedure TNempCustomMainForm.LoadWindowPositionLegacy;
-
-    procedure ReadPart(aID: TENempFormIDs);
-    var iniPrefix: string;
-    begin
-      iniPrefix := GetIniPrefix(aID);
-      NempOptions.FormPositions[aID].Top :=
-        NempSettingsManager.ReadInteger('Windows', iniPrefix+'Top', cDefaultWindowData[aID].Top);
-      NempOptions.FormPositions[aID].Left :=
-        NempSettingsManager.ReadInteger('Windows', iniPrefix+'Left', cDefaultWindowData[aID].Left);
-      NempOptions.FormPositions[aID].Width :=
-        NempSettingsManager.ReadInteger('Windows', iniPrefix+'Width', cDefaultWindowData[aID].Width);
-      NempOptions.FormPositions[aID].Height :=
-        NempSettingsManager.ReadInteger('Windows', iniPrefix+'Height', cDefaultWindowData[aID].Height);
-    end;
-
-begin
-  ReadPart(nfMain);
-  ReadPart(nfMainMini);
-  NempOptions.FormPositions[nfMainMini].Height := 560;
-  NempOptions.MainFormMaximized := NempSettingsManager.ReadBool('Windows', 'maximiert_0' ,False);
 end;
 
 procedure TNempCustomMainForm.SaveWindowPosition(aMode: Integer);
