@@ -1318,6 +1318,8 @@ object Nemp_MainForm: TNemp_MainForm
           Ratio = 0
           OnPaint = NewPanelPaint
           OwnerDraw = False
+          ExplicitLeft = 131
+          ExplicitTop = -3
           DesignSize = (
             219
             221)
@@ -1661,7 +1663,7 @@ object Nemp_MainForm: TNemp_MainForm
           OwnerDraw = False
           object EDITFastSearch: TEdit
             Left = 58
-            Top = 4
+            Top = 3
             Width = 172
             Height = 21
             AutoSize = False

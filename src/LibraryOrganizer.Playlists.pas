@@ -76,6 +76,8 @@ type
       function ComparePrefix(aPrefix: String): Integer; override;
       function IndexOf(aCollection: TAudioCollection): Integer; override;
 
+      function PerformSearch(aKeyword: String; ParentAreadyMatches: Boolean): Boolean; override;
+
       procedure Analyse(recursiv, ForceAnalysise: Boolean); override; // empty
       procedure Sort(doRecursive: Boolean = True); override; // empty
       procedure ReSort(newSorting: teCollectionSorting; newDirection: teSortDirection); override; // empty
@@ -194,6 +196,12 @@ end;
 function TAudioPlaylistCollection.MatchPrefix(aPrefix: String): Boolean;
 begin
   result := AnsiContainsText(fKey, aPrefix); // or: only fFileName?
+end;
+
+function TAudioPlaylistCollection.PerformSearch(aKeyword: String;
+  ParentAreadyMatches: Boolean): Boolean;
+begin
+  result := AnsiContainsText(fKey, aKeyword);
 end;
 
 function TAudioPlaylistCollection.ComparePrefix(aPrefix: String): Integer;

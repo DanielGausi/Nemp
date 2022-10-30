@@ -1496,12 +1496,10 @@ begin
     if assigned(FormEffectsAndEqualizer) then
     begin
         // maybe to do, for later: Disbale Effect-Controls when Headset-Controls are enabled
-        //(* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!
         FormEffectsAndEqualizer.grpBoxABRepeat   .Enabled := EnableControls;
         FormEffectsAndEqualizer.BtnABRepeatUnSet .Enabled := NempPlayer.ABRepeatActive and EnableControls;
         FormEffectsAndEqualizer.BtnABRepeatSetA  .Enabled := EnableControls;
         FormEffectsAndEqualizer.BtnABRepeatSetB  .Enabled := EnableControls;
-        //*)
     end;
 end;
 

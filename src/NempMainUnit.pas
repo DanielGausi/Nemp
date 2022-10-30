@@ -1512,10 +1512,10 @@ type
     procedure ReFillCategoryMenu;
     procedure ReFillCategoryTree(RemarkOldNodes: LongBool);
     procedure RefreshCollectionTreeHeader(Source: TLibraryCategory);
-    procedure FillCollectionTree(Source: TLibraryCategory; RemarkOldNodes: LongBool);
+    procedure FillCollectionTree(Source: TLibraryCategory; RemarkOldNodes: LongBool; OnlySearchResults: Boolean = False);
     procedure FillCollectionCoverflow(Source: TLibraryCategory; RemarkOldNodes: LongBool);
     procedure FillCollectionTagCloud(Source: TLibraryCategory; RemarkOldNodes: LongBool);
-    procedure AddCollection(aCollection: TAudioCollection; aNode: PVirtualNode);
+    procedure AddCollection(aCollection: TAudioCollection; aNode: PVirtualNode; OnlySearchResults: Boolean = False);
     //procedure CorrectSkinRegions;
     //procedure ResetVolSteps;
     procedure ReSizeBrowseTrees;
@@ -5991,7 +5991,8 @@ end;
 procedure TNemp_MainForm.ImgDetailCoverDblClick(Sender: TObject);
 begin
     if assigned(MedienBib.CurrentAudioFile) then
-      ShowDetailForm(MedienBib.CurrentAudioFile, True);
+      MedienBib.GenerateAlbumAnzeigeListe(MedienBib.CurrentAudioFile);
+      //ShowDetailForm(MedienBib.CurrentAudioFile, True);
 end;
 
 procedure TNemp_MainForm.ImgDetailCoverMouseDown(Sender: TObject;
@@ -6003,7 +6004,9 @@ end;
 
 procedure TNemp_MainForm.ImgDetailCoverMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
-var af: TAudioFile;
+var
+  af: TAudioFile;
+  DateiListe: TAudioFileList;
 begin
     if ssleft in shift then
     begin
@@ -6024,11 +6027,18 @@ begin
 
           if Assigned(af) then
           begin
-              // Add selected file to DropManager
-              fDropManager.InitDrag(ImgDetailCover, True);
-              fDropManager.AddFile(af, True);
-              PrepareDragImage(fDropManager, af);
-              fDropManager.Execute;
+            Dateiliste := TAudioFileList.Create(False);
+            try
+              if ssShift in shift then
+                MedienBib.GetAlbumTitelListFromAudioFile(Dateiliste, af) // get all files for this "Album"
+              else
+                Dateiliste.Add(af); // add just the current file
+
+              InitiateDragDrop(DateiListe, ImgDetailCover, fDropManager, True, False);
+            finally
+              FreeAndNil(Dateiliste);
+            end;
+
           end;
       end;
     end
@@ -6342,7 +6352,7 @@ end;
 
 
 procedure TNemp_MainForm.AddCollection(aCollection: TAudioCollection;
-  aNode: PVirtualNode);
+  aNode: PVirtualNode; OnlySearchResults: Boolean = False);
 var
   i: Integer;
   subCollectionNode: PVirtualNode;
@@ -6351,8 +6361,10 @@ begin
   for i := 0 to aCollection.CollectionCount - 1 do
   begin
     subCollection := aCollection.Collection[i];
-    subCollectionNode := AlbenVST.AddChild(aNode, subCollection);
-    AddCollection(subCollection, subCollectionNode)
+    if (not OnlySearchResults) or subCollection.MatchesCurrentSearch  then begin
+      subCollectionNode := AlbenVST.AddChild(aNode, subCollection);
+      AddCollection(subCollection, subCollectionNode, OnlySearchResults)
+    end;
   end;
 end;
 
@@ -6571,7 +6583,7 @@ begin
   end;
 end;
 
-procedure TNemp_MainForm.FillCollectionTree(Source: TLibraryCategory; RemarkOldNodes: LongBool);
+procedure TNemp_MainForm.FillCollectionTree(Source: TLibraryCategory; RemarkOldNodes: LongBool; OnlySearchResults: Boolean = False);
 var
   rootNode, oldNode: PVirtualNode;
   i: Integer;
@@ -6596,7 +6608,7 @@ begin
     AlbenVST.Clear;
     for i := 0 to Source.CollectionCount - 1 do begin
       rootNode := AlbenVST.AddChild(Nil, Source.Collections[i]);
-      AddCollection(Source.Collections[i], rootNode);
+      AddCollection(Source.Collections[i], rootNode, OnlySearchResults);
     end;
     VST.EndUpdate;
     AlbenVST.EndUpdate;
@@ -6655,21 +6667,37 @@ end;
 
 
 procedure TNemp_MainForm.RefreshCoverFlowTimerTimer(Sender: TObject);
+var
+  i: Integer;
 begin
     RefreshCoverFlowTimer.Enabled := False;
     if Not MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow then
         exit;
 
-    MedienBib.GenerateCoverCategoryFromSearchresult(MedienBib.AnzeigeListe);
-    MedienBib.NewCoverFlow.ClearTextures;
-    MedienBib.NewCoverFlow.SetNewList(MedienBib.CoverSearchCategory);
-    MedienBib.CoverArtSearcher.PrepareMainCover(MedienBib.CoverSearchCategory);
-    CoverScrollbar.OnChange := Nil;
-    SetCoverFlowScrollbarRange(MedienBib.NewCoverFlow.CoverCount);
-    CoverScrollbar.Position := MedienBib.NewCoverFlow.GetCollectionIndex(MedienBib.CoverSearchCategory.FindLastCollectionAgain);
-    CoverScrollbar.OnChange := CoverScrollbarChange;
-    CoverScrollbarChange(Nil);
-    MedienBib.NewCoverFlow.Paint(1);
+    case MedienBib.BrowseMode of
+      {0: begin
+        for i := 0 to MedienBib.CurrentCategory.CollectionCount - 1 do
+          MedienBib.CurrentCategory.Collections[i].PerformSearch(EDITFastSearch.Text, False);
+
+        FillCollectionTree(MedienBib.CurrentCategory, True, True);
+
+      end;}
+      1: begin
+        MedienBib.GenerateCoverCategoryFromSearchresult(MedienBib.AnzeigeListe);
+        MedienBib.NewCoverFlow.ClearTextures;
+        MedienBib.NewCoverFlow.SetNewList(MedienBib.CoverSearchCategory);
+        MedienBib.CoverArtSearcher.PrepareMainCover(MedienBib.CoverSearchCategory);
+        CoverScrollbar.OnChange := Nil;
+        SetCoverFlowScrollbarRange(MedienBib.NewCoverFlow.CoverCount);
+        CoverScrollbar.Position := MedienBib.NewCoverFlow.GetCollectionIndex(MedienBib.CoverSearchCategory.FindLastCollectionAgain);
+        CoverScrollbar.OnChange := CoverScrollbarChange;
+        CoverScrollbarChange(Nil);
+        MedienBib.NewCoverFlow.Paint(1);
+      end;
+      {2: begin
+        CloudViewer.PaintCloud(EDITFastSearch.Text);
+      end;}
+    end;
 end;
 
 procedure TNemp_MainForm.ArtistsVSTPaintText(Sender: TBaseVirtualTree;
@@ -6786,6 +6814,7 @@ begin
     exit;
 
   ac := AlbenVST.GetNodeData<TAudioCollection>(Node);
+
   if assigned(ac) and (ac.CoverID <> '') then begin
       aGraphic := CoverManager.GetCachedCover(ac.CoverID, success).Graphic;
       if (not success) and PreviewGraphicShouldExist(ac.CoverID) then
@@ -9805,7 +9834,7 @@ begin
     begin
         // Restart Timer
         if MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow
-            AND (MedienBib.BrowseMode = 1)
+            // AND (MedienBib.BrowseMode = 1)
         then
             RefreshCoverFlowTimer.Enabled := True;
     end;
@@ -9937,7 +9966,7 @@ begin
                     DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter);
                 // Restart Timer
                 if MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow
-                    AND (MedienBib.BrowseMode = 1)
+                    // AND (MedienBib.BrowseMode = 1)
                 then
                     RefreshCoverFlowTimer.Enabled := True;
             end;
@@ -9949,7 +9978,13 @@ begin
               EDITFastSearch.Text := '';
               //MedienBib.ShowQuickSearchList;
               MedienBib.RestoreAnzeigeListeAfterQuicksearch;
-              RestoreCoverFlowAfterSearch;
+
+              case MedienBib.BrowseMode of
+                0: FillCollectionTree(MedienBib.CurrentCategory, True, False);
+                1: RestoreCoverFlowAfterSearch;
+                2: CloudViewer.PaintCloud('');
+              end;
+
           end
   end;
 end;
@@ -10007,7 +10042,7 @@ begin
               begin
                   // Restart Timer
                   if MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow
-                      AND (MedienBib.BrowseMode = 1)
+                      // AND (MedienBib.BrowseMode = 1)
                   then
                       RefreshCoverFlowTimer.Enabled := True;
               end;

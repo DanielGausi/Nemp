@@ -70,19 +70,10 @@ type
 
     TEDefaultCoverType = (dcFile, dcWebRadio, dcCDDA, dcNoCover_deprecated, dcError);
 
-    (*TSpalte = record
-      Bezeichnung: string;
-      Inhalt: integer;
-      visible: boolean;
-      width: integer;
-      sortAscending: boolean;
-    end;*)
-
     TLibraryColumn = record   // formerly known as TSpalte
       Position: Integer;
       Width: Integer;
       Visible: Boolean;
-      // sortAsc: Boolean;
       Name: String;
     end;
 
@@ -292,22 +283,8 @@ type
         DefaultFontStyles: TFontStyles;
         ArtistAlbenFontStyles: TFontStyles;
 
-        /// MOVED WriteAccessPossible: Boolean;
         AllowQuickAccessToMetadata: Boolean;
         // UseCDDB: Boolean;
-
-        // Steuerung des Deskbands:
-        //Folgende Nachrichten werden registriert und an ein Deskband gesendet:
-        //NEMP_DESKBAND_ACTIVATE:   array [0..MAX_PATH] of Char = 'NEMP - Deskband Activate'#0;
-        //NEMP_DESKBAND_DEACTIVATE: array [0..MAX_PATH] of Char = 'NEMP - Deskband Deactivate'#0;
-        // Ein Deskband wird so gesucht und gefunden:
-        //       wnd :=  FindWindow('Shell_TrayWnd', nil);
-        //       wnd :=  FindWindowEx(wnd, 0, 'ReBarWindow32', nil);
-        //       wnd :=  FindWindowEx(wnd, 0, 'TNempDeskBand', Nil);
-        // ShowDeskbandOnMinimize: Boolean;
-        // ShowDeskbandOnStart   : Boolean;
-        // HideDeskbandOnRestore : Boolean;
-        // HideDeskbandOnClose   : Boolean;
 
         AnzeigeMode: Integer;
         UseSkin: Boolean;
@@ -792,48 +769,6 @@ const
         (Position:30; Width:  50; Visible: False; Name: 'Marker')
       );
 
-      (*
-      DefaultSpalten : array[0..30] of TSpalte =
-      (
-            (Bezeichnung: 'Artist' ;Inhalt: CON_ARTIST        ;visible: True  ;width: 120 ;sortAscending: True),
-            (Bezeichnung: 'Title' ;Inhalt: CON_TITEL          ;visible: True  ;width: 190 ;sortAscending: True),
-            (Bezeichnung: 'Album' ;Inhalt: CON_ALBUM          ;visible: True  ;width: 130 ;sortAscending: True),
-            (Bezeichnung: 'Duration' ;Inhalt: CON_DAUER       ;visible: True  ;width: 44  ;sortAscending: True),
-            (Bezeichnung: 'Bitrate' ;Inhalt: CON_BITRATE      ;visible: False  ;width: 44  ;sortAscending: True),
-            (Bezeichnung: 'cbr/vbr' ;Inhalt: CON_CBR          ;visible: False  ;width: 51  ;sortAscending: True),
-            (Bezeichnung: 'Channelmode' ;Inhalt: CON_MODE     ;visible: False  ;width: 53  ;sortAscending: True),
-            (Bezeichnung: 'Samplerate' ;Inhalt: CON_SAMPLERATE ;visible: False  ;width: 40  ;sortAscending: True),
-            (Bezeichnung: 'Comment' ;Inhalt: CON_STANDARDCOMMENT;visible: False ;width: 50  ;sortAscending: True),
-            (Bezeichnung: 'Filesize' ;Inhalt: CON_FILESIZE    ;visible: False ;width: 50  ;sortAscending: True),
-            (Bezeichnung: 'Path' ;Inhalt: CON_PFAD            ;visible: False ;width: 50  ;sortAscending: True),
-            (Bezeichnung: 'Directory' ;Inhalt: CON_ORDNER     ;visible: False ;width: 50  ;sortAscending: True),
-            (Bezeichnung: 'Filename' ;Inhalt: CON_DATEINAME   ;visible: False ;width: 50  ;sortAscending: True),
-            (Bezeichnung: 'Year' ;Inhalt: CON_YEAR             ;visible: True  ;width: 50  ;sortAscending: True),
-            (Bezeichnung: 'Genre' ;Inhalt: CON_GENRE           ;visible: True  ;width: 100 ;sortAscending: True),
-            (Bezeichnung: 'Lyrics' ;Inhalt: CON_LYRICSEXISTING ;visible: False  ;width: 50 ;sortAscending: True),
-            (Bezeichnung: 'Track' ;Inhalt: CON_TRACKNR         ;visible: true  ;width: 50 ;sortAscending: True),
-            (Bezeichnung: 'Rating' ;Inhalt: CON_RATING         ;visible: true  ;width: 100 ;sortAscending: True),
-            (Bezeichnung: 'Play counter' ;Inhalt: CON_PLAYCOUNTER;visible: false  ;width: 44;sortAscending: True),
-            (Bezeichnung: 'Tags' ;Inhalt: CON_LASTFMTAGS       ;visible: false  ;width: 44;sortAscending: True),
-            (Bezeichnung: 'Type' ;Inhalt: CON_EXTENSION        ;visible: false  ;width: 50;sortAscending: True),
-            (Bezeichnung: 'Fileage' ;Inhalt: CON_FILEAGE       ;visible: false  ;width: 80;sortAscending: True),
-            (Bezeichnung: 'CD' ;Inhalt: CON_CD                 ;visible: false  ;width: 50 ;sortAscending: True),
-            (Bezeichnung: 'Marker' ;Inhalt: CON_FAVORITE       ;visible: true   ;width: 44 ;sortAscending: True),
-            // new in Nemp 4.13
-            (Bezeichnung: 'Track gain' ;Inhalt: CON_TRACKGAIN       ;visible: false   ;width: 70 ;sortAscending: True),
-            (Bezeichnung: 'Album gain' ;Inhalt: CON_ALBUMGAIN       ;visible: false   ;width: 70 ;sortAscending: True),
-            (Bezeichnung: 'Track peak' ;Inhalt: CON_TRACKPEAK       ;visible: false   ;width: 70 ;sortAscending: True),
-            (Bezeichnung: 'Album peak' ;Inhalt: CON_ALBUMPEAK       ;visible: false   ;width: 70 ;sortAscending: True),
-            // new in Nemp 5
-            (Bezeichnung: 'BPM'        ;Inhalt: CON_BPM             ;visible: false   ;width: 70 ;sortAscending: True),
-            (Bezeichnung: 'Album-Artist';Inhalt: CON_ALBUMARTIST     ;visible: false   ;width: 120;sortAscending: True),
-            (Bezeichnung: 'Composer';Inhalt: CON_COMPOSER     ;visible: false   ;width: 120;sortAscending: True)
-      );
-      *)
-
-      //AUDIOFILE_STRINGS : Array[0..4] of string =
-      //  ('artist', 'album', 'directory', 'genre', 'year');
-
       // für die Prozedur ActualizeEQ:
       // Je nach Modus den übergebenen Gain-Wert als Position des Buttons oder als echten Wert (z.B. aus der Ini) interpretieren
       SETFX_MODE_VCL = 0;
@@ -853,18 +788,9 @@ const
       IPC_MODE_CHANNELS = 2;
 
       cmNoStretch = 1;
-      // Note: These 3 Flags has been used in Nemp3
-      // They are still used in the Code, but has no effect after all
-      //cmUseBibDefaults = 2;
-      //cmUseDefaultCover = 4;
-      //cmCustomizeMainCover= 8;
 
       // For starting VST
       WM_STARTEDITING = WM_User + 778;
-
-      //NEMP_DESKBAND_ACTIVATE: array [0..MAX_PATH] of Char = 'NEMP - Deskband Activate'#0;
-      //NEMP_DESKBAND_DEACTIVATE: array [0..MAX_PATH] of Char = 'NEMP - Deskband Deactivate'#0;
-      //NEMP_DESKBAND_UPDATE: array [0..MAX_PATH] of Char = 'NEMP - Deskband Update'#0;
 
       VORBIS_COMMENT = 'COMMENT';
       VORBIS_LYRICS = 'UNSYNCEDLYRICS';
@@ -874,7 +800,6 @@ const
       VORBIS_DISCNUMBER = 'DISCNUMBER';
       VORBIS_USERCOVERID = 'NEMP_COVER_ID';
       VORBIS_COMPOSER = 'COMPOSER';
-      //VORBIS_FAVORITE = 'FAVORITE';
 
       APE_COMMENT = 'COMMENT';
       APE_LYRICS = 'UNSYNCEDLYRICS';
@@ -883,7 +808,6 @@ const
       APE_CATEGORIES = 'CATEGORIES';
       APE_DISCNUMBER = 'DISCNUMBER';
       APE_USERCOVERID = 'NEMP_COVER_ID';
-      //APE_FAVORITE = 'FAVORITE';
 
       TRACK_BPM = 'BPM';
 
@@ -1154,11 +1078,9 @@ begin
   UseDisplayApp := NempSettingsManager.ReadBool('Allgemein', 'UseDisplayApp', false);
 
   AllowQuickAccessToMetadata := NempSettingsManager.ReadBool('Allgemein', 'AllowQuickAccessToMetadata', False);
-  // UseCDDB                    := NempSettingsManager.ReadBool('Allgemein', 'UseCDDB', False);
 
   MiniNempStayOnTop := NempSettingsManager.ReadBool('Allgemein', 'MiniNempStayOnTop', False);
   QuickRefreshDetails := NempSettingsManager.ReadBool('Allgemein', 'QuickRefreshDetails', True);
-  // FixCoverFlowOnStart := NempSettingsManager.ReadBool('Allgemein', 'FixCoverFlowOnStart', False);
 
   ShutDownModeIniIdx     := NempSettingsManager.ReadInteger('Allgemein',  'ShutDownModeIniIdx'    , 4);
   ShutDownTimeIniIdx     := NempSettingsManager.ReadInteger('Allgemein',  'ShutDownTimeIniIdx'    , 3);
@@ -1176,13 +1098,7 @@ begin
   if PreferredLyricSearch < 0 then
     PreferredLyricSearch := 0;
 
-  // NempWindowView          := NempSettingsManager.ReadInteger('Fenster', 'NempWindowView', NEMPWINDOW_ONLYTASKBAR);
   ShowTrayIcon            := NempSettingsManager.ReadBool('Fenster', 'ShowTrayIcon', False);
-  //ShowDeskbandOnMinimize  := NempSettingsManager.ReadBool('Fenster', 'ShowDeskbandOnMinimize', False);
-  //ShowDeskbandOnStart     := NempSettingsManager.ReadBool('Fenster', 'ShowDeskbandOnStart', True);
-  //HideDeskbandOnRestore   := NempSettingsManager.ReadBool('Fenster', 'HideDeskbandOnRestore', False);
-  //HideDeskbandOnClose     := NempSettingsManager.ReadBool('Fenster', 'HideDeskbandOnClose', True);
-
   FullRowSelect := NempSettingsManager.ReadBool('Fenster', 'FullRowSelect', True);
 
   ArtistAlbenFontSize  := NempSettingsManager.ReadInteger('Font','ArtistAlbenFontSize', 8);
@@ -1252,8 +1168,6 @@ begin
   // Note: The Display-App-String is written by the G15-App only
 
   NempSettingsManager.WriteBool('Allgemein', 'AllowQuickAccessToMetadata', AllowQuickAccessToMetadata);
-  // NempSettingsManager.WriteBool('Allgemein', 'UseCDDB', UseCDDB);
-
   NempSettingsManager.WriteBool('Allgemein', 'MiniNempStayOnTop', MiniNempStayOnTop);
   NempSettingsManager.WriteBool('Allgemein', 'QuickRefreshDetails', QuickRefreshDetails);
 
@@ -1270,13 +1184,7 @@ begin
   NempSettingsManager.WriteBool('Fenster', 'UseSkin', UseSkin);
   NempSettingsManager.WriteString('Fenster','SkinName', SkinName);
   NempSettingsManager.WriteBool('Fenster', 'UseAdvancedSkin', GlobalUseAdvancedSkin);
-
-  // NempSettingsManager.WriteInteger('Fenster', 'NempWindowView', NempWindowView);
   NempSettingsManager.WriteBool('Fenster', 'ShowTrayIcon', ShowTrayIcon);
-  //NempSettingsManager.WriteBool('Fenster', 'ShowDeskbandOnMinimize', ShowDeskbandOnMinimize);
-  //NempSettingsManager.WriteBool('Fenster', 'ShowDeskbandOnStart', ShowDeskbandOnStart);
-  //NempSettingsManager.WriteBool('Fenster', 'HideDeskbandOnRestore', HideDeskbandOnRestore);
-  //NempSettingsManager.WriteBool('Fenster', 'HideDeskbandOnClose', HideDeskbandOnClose);
   NempSettingsManager.WriteBool('Fenster', 'FullRowSelect', FullRowSelect);
 
   NempSettingsManager.WriteInteger('Font','ArtistAlbenFontSize',ArtistAlbenFontSize);

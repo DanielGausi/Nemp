@@ -1045,6 +1045,8 @@ begin
   DetailRatingHelper.DrawRatingInStarsOnBitmap(4*51 + 1, RatingImage45.Picture.Bitmap, RatingImage45.Width, RatingImage45.Height);
   DetailRatingHelper.DrawRatingInStarsOnBitmap(4*51+26 + 1, RatingImage50.Picture.Bitmap, RatingImage50.Width, RatingImage50.Height);
 
+  cbIncludeFiles.Items.BeginUpdate;
+  CBFileTypes.Items.BeginUpdate;
   for i := 0 to NempPlayer.ValidExtensions.Count - 1 do
   begin
     CBFileTypes.Items.Add(NempPlayer.ValidExtensions[i]);
@@ -1052,6 +1054,8 @@ begin
     cbIncludeFiles.Items.Add(NempPlayer.ValidExtensions[i]);
     cbIncludeFiles.Checked[i] := True;
   end;
+  cbIncludeFiles.Items.EndUpdate;
+  CBFileTypes.Items.BeginUpdate;
 
   for i := 0 to PageControl1.PageCount - 1 do
     PageControl1.Pages[i].TabVisible := False;
@@ -1088,9 +1092,11 @@ begin
   CBFontNameCBR.Items := Screen.Fonts;
   CBFontNameVBR.Items := Screen.Fonts;
 
+  clbViewMainColumns.Items.BeginUpdate;
   for i := 0 to cLibraryColumnCount - 1 do
     clbViewMainColumns.Items.Add('');
   SynchMediaListColumns;
+  clbViewMainColumns.Items.EndUpdate;
 
   OpenDlg_DefaultCover.Filter :=  //FileFormatList.GetGraphicFilter([ftRaster], fstBoth, [foCompact, foIncludeAll,foIncludeExtension], Nil);
       'All images|*.bmp; *.dib; *.gif; *.jfif; *.jpe; *.jpeg; *.jpg; *.png; *.rle|'
@@ -1438,9 +1444,11 @@ var
 begin
   // Scan Directories
   CBAutoScan.Checked := MedienBib.AutoScanDirs;
+  LBAutoScan.Items.BeginUpdate;
   LBAutoScan.Items.Clear;
   for i := 0 to MedienBib.AutoScanDirList.Count - 1 do
     LBAutoScan.Items.Add(MedienBib.AutoScanDirList[i]);
+  LBAutoScan.Items.EndUpdate;
   CBAutoAddNewDirs.Checked       := MedienBib.AutoAddNewDirs;
   CBAskForAutoAddNewDirs.Checked := MedienBib.AskForAutoAddNewDirs;
   cb_AutoDeleteFiles        .checked := MedienBib.AutoDeleteFiles;
@@ -1449,8 +1457,10 @@ begin
   EnableDirectoryScanControls;
   // File types for the media library
   cbIncludeAll.Checked := MedienBib.IncludeAll;
+  cbIncludeFiles.Items.BeginUpdate;
   for i := 0 to CBIncludeFiles.Count - 1 do
     CBIncludeFiles.Checked[i] := Pos('*' + CBIncludeFiles.Items[i], MedienBib.IncludeFilter) > 0;
+  cbIncludeFiles.Items.EndUpdate;
   EnableMediaLibraryFileTypeControls;
   // Search for Cover art
   CB_CoverSearch_inDir.Checked       := TCoverArtSearcher.UseDir;

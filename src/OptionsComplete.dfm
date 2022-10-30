@@ -2529,7 +2529,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object editCDNames: TLabeledEdit
               Left = 16
               Top = 123
-              Width = 171
+              Width = 154
               Height = 21
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False

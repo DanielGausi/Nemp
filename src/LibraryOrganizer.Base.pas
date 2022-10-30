@@ -309,6 +309,7 @@ type
       fArchiveID: Integer;
       fCount: Integer;
       fKey: String;
+      fMatchesCurrentSearch: Boolean;
       function GetCaption: String; virtual; abstract;
       function GetSimpleCaption: String; virtual; abstract;
 
@@ -325,6 +326,7 @@ type
       property Caption: String read GetCaption;
       property SimpleCaption: String read GetSimpleCaption;
       property CoverID: String read GetCoverID;
+      property MatchesCurrentSearch: Boolean read fMatchesCurrentSearch;
 
       property CollectionClass: teCollectionClass read fCollectionClass;
 
@@ -347,6 +349,10 @@ type
 
       function MatchPrefix(aPrefix: String): Boolean; virtual; abstract;
       function ComparePrefix(aPrefix: String): Integer; virtual; abstract;
+
+      // PerformSearch will search the Keyword(s) in the Collection (including SubCollections),
+      // and set the field fMatchesCurrentSearch accordingly
+      function PerformSearch(aKeyword: String; ParentAreadyMatches: Boolean): Boolean; virtual; abstract;
 
       function IndexOf(aCollection: TAudioCollection): Integer; virtual; abstract;
 

@@ -116,15 +116,7 @@ type
       fValidArtist: Boolean;
       fValidAlbum: Boolean;
 
-      function GenerateDirectoryAlbumKey(aAudioFile: TAudioFile): String;
-      function GenerateArtistKey(aAudioFile: TAudioFile): String;
-      //function AdjustedAlbum(aAudioFile: TAudioFile): String;
-      function GenerateAlbumKey(aAudioFile: TAudioFile): String;
-      function GenerateGenreKey(aAudioFile: TAudioFile): String;
-      function GenerateDecadeKey(aAudioFile: TAudioFile; out IntYear: Integer): String;
-      function GenerateYearKey(aAudioFile: TAudioFile; out IntYear: Integer): String;
-      function GenerateFileAgeYearKey(aAudioFile: TAudioFile): String;
-      function GenerateFileAgeMonthKey(aAudioFile: TAudioFile): String;
+      function isCloud: Boolean;
 
       function TryGetCollection(aKey: String; out Value: TAudioFileCollection): Boolean;
       function InitNewCollection(aKey: String; CollectionMode: teFileCollectionMode = cmDefault): TAudioFileCollection;
@@ -141,7 +133,6 @@ type
       procedure AddForTagCloud(aAudioFile: TAudioFile);
       procedure AddByPath(aAudioFile: TAudioFile);
       procedure AddByCoverID(aAudioFile: TAudioFile);
-      function GetAlbumArtistOrArtist(af: TAudioFile): String;
 
       function SearchAudioFileByKey (aKey: String; aAudioFile: TAudioFile; CheckExist: Boolean): TAudioFileCollection;
       function SearchAudioFileByPath (aAudioFile: TAudioFile; CheckExist: Boolean): TAudioFileCollection;
@@ -252,6 +243,8 @@ type
       function ComparePrefix(aPrefix: String): Integer; override;
       function IndexOf(aCollection: TAudioCollection): Integer; override;
 
+      function PerformSearch(aKeyword: String; ParentAreadyMatches: Boolean): Boolean; override;
+
       procedure Analyse(recursive, ForceAnalysis: Boolean); override;
       // After inserting all Files into a collection, we may want to analyze these files and collect further data
       // for example, when sorting by Album, we may want addtional common information like "year", "genre", "artist"
@@ -353,6 +346,17 @@ type
   function CompareCollection_FileAge(const item1,item2: TAudioFileCollection): Integer;
   function CompareCollection_Genre(const item1,item2: TAudioFileCollection): Integer;
   function CompareCollection_Directory(const item1,item2: TAudioFileCollection): Integer;
+
+
+  function GetAlbumArtistOrArtist(af: TAudioFile): String;
+  function GenerateDirectoryAlbumKey(aAudioFile: TAudioFile): String;
+  function GenerateArtistKey(aAudioFile: TAudioFile): String;
+  function GenerateAlbumKey(aAudioFile: TAudioFile): String;
+  function GenerateGenreKey(aAudioFile: TAudioFile): String;
+  function GenerateDecadeKey(aAudioFile: TAudioFile; out IntYear: Integer): String;
+  function GenerateYearKey(aAudioFile: TAudioFile; out IntYear: Integer): String;
+  function GenerateFileAgeYearKey(aAudioFile: TAudioFile): String;
+  function GenerateFileAgeMonthKey(aAudioFile: TAudioFile): String;
 
 implementation
 
@@ -468,6 +472,124 @@ begin
           result := 0;
 end;
 
+function GetAlbumArtistOrArtist(af: TAudioFile): String;
+begin
+  if NempOrganizerSettings.PreferAlbumArtist then begin
+    result := af.AlbumArtist;
+    if (result = '')
+      or (NempOrganizerSettings.IgnoreVariousAlbumArtists and (AnsiSameText(result, 'Various Artists')))
+    then
+      result := af.Artist;
+  end else
+    result := af.Artist;
+end;
+
+function GenerateArtistKey(aAudioFile: TAudioFile): String;
+begin
+  result := AnsiLowerCase(GetAlbumArtistOrArtist(aAudioFile));
+end;
+
+function GenerateDirectoryAlbumKey(aAudioFile: TAudioFile): String;
+var
+  PathStructure: TStringlist;
+  lastDirectory: String;
+  i, startIdx, endIdx: Integer;
+begin
+  if (not NempOrganizerSettings.TrimCDFromDirectory) or (NempOrganizerSettings.CDNames.Count = 0) then
+    result := aAudioFile.Ordner
+  else
+  begin
+    // result should be the path, but something like "\CD 2\" as last directory should be ignored
+    if KeyCache.RawDirectory = aAudioFile.Ordner  then
+      result := KeyCache.ProcessedDirectory
+    else begin
+        PathStructure := TStringlist.create;
+        try
+          Explode('\', aAudioFile.Pfad, PathStructure);
+
+          if (PathStructure.Count >= 3)
+            and (PathStructure[0] = '')
+            and (PathStructure[1] = '')
+          then begin
+            PathStructure[2] := '\\' + PathStructure[2];
+            startIdx := 2;
+          end else
+            startIdx := 0;
+
+          endIdx := PathStructure.Count - 2;
+
+          // note: startIdx+2 because a folder like "CD 1" is the root folder, it should NOT be skipped
+          // so, there must be (2) Directory-Levels + (1) the filename in the PathStructure when we want to skip the last dir
+          if PathStructure.Count > startIdx + 2 then begin
+            // analyse the last directory
+            lastDirectory := PathStructure[PathStructure.Count - 2];
+            for i := 0 to NempOrganizerSettings.CDNames.Count - 1 do
+              lastDirectory  := StringReplace(lastDirectory, NempOrganizerSettings.CDNames[i], ' ', [rfIgnoreCase, rfReplaceAll]);
+            lastDirectory := trim(lastDirectory);
+            if (lastDirectory <> PathStructure[PathStructure.Count - 2]) and
+                           ((lastDirectory <> '') and (StrToIntDef(lastDirectory, 10) < 10))
+            then
+              // skip the last directory for Key calculation
+              endIdx := PathStructure.Count - 3
+            else
+              endIdx := PathStructure.Count - 2;
+          end;
+
+          result := '';
+          for i := startIdx to endIdx do
+            result := result + PathStructure[i] + '\';
+
+          // Set the cache
+          KeyCache.RawDirectory := aAudioFile.Ordner;
+          KeyCache.ProcessedDirectory := result;
+        finally
+          PathStructure.Free;
+        end;
+    end;
+  end;
+end;
+
+
+function GenerateAlbumKey(aAudioFile: TAudioFile): String;
+begin
+  // todo: different key depending on settings (e.g. include Artist and/or Directory, the latter stripped by stuff like "CD 1")
+  case NempOrganizerSettings.AlbumKeyMode of
+    akAlbumOnly: result := AnsiLowerCase(aAudioFile.Album);
+    akAlbumArtist: result := Format('%s||%s', [AnsiLowerCase(aAudioFile.Album), GenerateArtistKey(aAudioFile)]); //  AnsiLowerCase(aAudioFile.Artist)]
+    akAlbumDirectory: result := Format('%s||%s', [AnsiLowerCase(aAudioFile.Album), GenerateDirectoryAlbumKey(aAudioFile)]);
+    akDirectoryOnly: result := GenerateDirectoryAlbumKey(aAudioFile);
+    akCoverID: result := aAudioFile.CoverID;
+  end;
+end;
+
+function GenerateGenreKey(aAudioFile: TAudioFile): String;
+begin
+  result := trim(AnsiLowerCase(aAudioFile.Genre));
+  // for later maybe: defining synonyms?
+end;
+
+function GenerateDecadeKey(aAudioFile: TAudioFile; out IntYear: Integer): String;
+begin
+  IntYear := StrToIntDef(aAudioFile.Year, -1);
+  result := YearToDecadeString(IntYear);
+end;
+
+function GenerateYearKey(aAudioFile: TAudioFile; out IntYear: Integer): String;
+begin
+  IntYear := StrToIntDef(aAudioFile.Year, -1);
+  result := AddLeadingZeroes(IntYear, 4);
+end;
+
+function GenerateFileAgeYearKey(aAudioFile: TAudioFile): String;
+begin
+  result := FormatDateTime('yyyy', aAudioFile.FileAge, fLibraryFormatSettings);
+end;
+
+function GenerateFileAgeMonthKey(aAudioFile: TAudioFile): String;
+begin
+  result := FormatDateTime('yyyy-mm', aAudioFile.FileAge, fLibraryFormatSettings);
+end;
+
 
 { TAudioFileCollection }
 
@@ -531,17 +653,16 @@ begin
     fFileList[i].CoverID := newID;
 end;
 
+function TAudioFileCollection.isCloud: Boolean;
+begin
+  result := (Content = ccTagCloud)
+      or ((Content = ccRoot) and (ChildContent = ccTagCloud))
+end;
+
 procedure TAudioFileCollection.DoGetFiles(dest: TAudioFileList;
   recursive: Boolean);
 var
   i: Integer;
-
-  function isCloud: Boolean;
-  begin
-    result := (Content = ccTagCloud)
-        or ((Content = ccRoot) and (ChildContent = ccTagCloud))
-  end;
-
 begin
   for i := 0 to fFileList.Count - 1 do
     dest.Add(fFileList[i]);
@@ -989,159 +1110,6 @@ begin
   fNeedAnalysis := False;
 end;
 
-function TAudioFileCollection.GetAlbumArtistOrArtist(af: TAudioFile): String;
-begin
-  if NempOrganizerSettings.PreferAlbumArtist then begin
-    result := af.AlbumArtist;
-    if (result = '')
-      or (NempOrganizerSettings.IgnoreVariousAlbumArtists and (AnsiSameText(result, 'Various Artists')))
-    then
-      result := af.Artist;
-  end else
-    result := af.Artist;
-end;
-
-function TAudioFileCollection.GenerateArtistKey(aAudioFile: TAudioFile): String;
-begin
-  result := AnsiLowerCase(GetAlbumArtistOrArtist(aAudioFile));
-end;
-
-function TAudioFileCollection.GenerateDirectoryAlbumKey(aAudioFile: TAudioFile): String;
-var
-  PathStructure: TStringlist;
-  lastDirectory: String;
-  i, startIdx, endIdx: Integer;
-begin
-  if (not NempOrganizerSettings.TrimCDFromDirectory) or (NempOrganizerSettings.CDNames.Count = 0) then
-    result := aAudioFile.Ordner
-  else
-  begin
-    // result should be the path, but something like "\CD 2\" as last directory should be ignored
-    if KeyCache.RawDirectory = aAudioFile.Ordner  then
-      result := KeyCache.ProcessedDirectory
-    else begin
-        PathStructure := TStringlist.create;
-        try
-          Explode('\', aAudioFile.Pfad, PathStructure);
-
-          if (PathStructure.Count >= 3)
-            and (PathStructure[0] = '')
-            and (PathStructure[1] = '')
-          then begin
-            PathStructure[2] := '\\' + PathStructure[2];
-            startIdx := 2;
-          end else
-            startIdx := 0;
-
-          endIdx := PathStructure.Count - 2;
-
-          // note: startIdx+2 because a folder like "CD 1" is the root folder, it should NOT be skipped
-          // so, there must be (2) Directory-Levels + (1) the filename in the PathStructure when we want to skip the last dir
-          if PathStructure.Count > startIdx + 2 then begin
-            // analyse the last directory
-            lastDirectory := PathStructure[PathStructure.Count - 2];
-            for i := 0 to NempOrganizerSettings.CDNames.Count - 1 do
-              lastDirectory  := StringReplace(lastDirectory, NempOrganizerSettings.CDNames[i], ' ', [rfIgnoreCase, rfReplaceAll]);
-            lastDirectory := trim(lastDirectory);
-            if (lastDirectory <> PathStructure[PathStructure.Count - 2]) and
-                           ((lastDirectory <> '') and (StrToIntDef(lastDirectory, 10) < 10))
-            then
-              // skip the last directory for Key calculation
-              endIdx := PathStructure.Count - 3
-            else
-              endIdx := PathStructure.Count - 2;
-          end;
-
-          result := '';
-          for i := startIdx to endIdx do
-            result := result + PathStructure[i] + '\';
-
-          // Set the cache
-          KeyCache.RawDirectory := aAudioFile.Ordner;
-          KeyCache.ProcessedDirectory := result;
-        finally
-          PathStructure.Free;
-        end;
-    end;
-  end;
-end;
-
-(*
-This method works for Directories like "\CD 2\", but not for complete strings like "Some Album (CD 2)"
-skip it for now, maybe later ...
-function TAudioFileCollection.AdjustedAlbum(aAudioFile: TAudioFile): String;
-var
-  processedAlbum: String;
-  i: Integer;
-begin
-  if (not NempOrganizerSettings.TrimCDFromDirectory) or (NempOrganizerSettings.CDNames.Count = 0) then
-    result := aAudioFile.Album
-  else
-  begin
-    // result should be the path, but something like "\CD 2\" as last directory should be ignored
-    if KeyCache.RawAlbum = aAudioFile.Album  then
-      result := KeyCache.ProcessedAlbum
-    else begin
-      // Remove thing like "CD 2" from the album information
-      processedAlbum := aAudioFile.Album;
-      for i := 0 to NempOrganizerSettings.CDNames.Count - 1 do
-        processedAlbum  := StringReplace(processedAlbum, NempOrganizerSettings.CDNames[i], ' ', [rfIgnoreCase, rfReplaceAll]);
-      processedAlbum := trim(processedAlbum);
-      if (processedAlbum <> aAudioFile.Album)
-        and ((processedAlbum <> '')
-        and (StrToIntDef(processedAlbum, 10) < 10))
-      then
-        result := processedAlbum
-      else
-        result := aAudioFile.Album;
-      // Set the cache to the new data
-      KeyCache.RawAlbum := aAudioFile.Album;
-      KeyCache.ProcessedAlbum := result;
-    end;
-  end;
-end;
-*)
-
-function TAudioFileCollection.GenerateAlbumKey(aAudioFile: TAudioFile): String;
-begin
-  // todo: different key depending on settings (e.g. include Artist and/or Directory, the latter stripped by stuff like "CD 1")
-  case NempOrganizerSettings.AlbumKeyMode of
-    akAlbumOnly: result := AnsiLowerCase(aAudioFile.Album);
-    akAlbumArtist: result := Format('%s||%s', [AnsiLowerCase(aAudioFile.Album), GenerateArtistKey(aAudioFile)]); //  AnsiLowerCase(aAudioFile.Artist)]
-    akAlbumDirectory: result := Format('%s||%s', [AnsiLowerCase(aAudioFile.Album), GenerateDirectoryAlbumKey(aAudioFile)]);
-    akDirectoryOnly: result := GenerateDirectoryAlbumKey(aAudioFile);
-    akCoverID: result := aAudioFile.CoverID;
-  end;
-end;
-
-function TAudioFileCollection.GenerateGenreKey(aAudioFile: TAudioFile): String;
-begin
-  result := trim(AnsiLowerCase(aAudioFile.Genre));
-  // for later maybe: defining synonyms?
-  //result := AnsiLowerCase(Trim(aAudioFile.Genre));
-end;
-
-function TAudioFileCollection.GenerateDecadeKey(aAudioFile: TAudioFile; out IntYear: Integer): String;
-begin
-  IntYear := StrToIntDef(aAudioFile.Year, -1);
-  result := YearToDecadeString(IntYear);
-end;
-
-function TAudioFileCollection.GenerateYearKey(aAudioFile: TAudioFile; out IntYear: Integer): String;
-begin
-  IntYear := StrToIntDef(aAudioFile.Year, -1);
-  result := AddLeadingZeroes(IntYear, 4);
-end;
-
-function TAudioFileCollection.GenerateFileAgeYearKey(aAudioFile: TAudioFile): String;
-begin
-  result := FormatDateTime('yyyy', aAudioFile.FileAge, fLibraryFormatSettings);
-end;
-
-function TAudioFileCollection.GenerateFileAgeMonthKey(aAudioFile: TAudioFile): String;
-begin
-  result := FormatDateTime('yyyy-mm', aAudioFile.FileAge, fLibraryFormatSettings);
-end;
 
 function TAudioFileCollection.TryGetCollection(aKey: String; out Value: TAudioFileCollection): Boolean;
 var
@@ -1221,6 +1189,45 @@ begin
   else
     result := AnsiStartsText(aPrefix, fKey);
   end;
+end;
+
+
+{
+ Not in use yet ...
+}
+function TAudioFileCollection.PerformSearch(aKeyword: String; ParentAreadyMatches: Boolean): Boolean;
+var
+  tmpMatch, childMatch: Boolean;
+  i: Integer;
+begin
+
+  fMatchesCurrentSearch := ParentAreadyMatches;
+
+  if not fMatchesCurrentSearch then begin
+      case self.Content of
+        ccArtist: fMatchesCurrentSearch := AnsiContainsText(fArtist, aKeyword);
+        ccAlbum: fMatchesCurrentSearch := AnsiContainsText(fArtist, aKeyword) or AnsiContainsText(fAlbum, aKeyword);
+        ccDirectory: fMatchesCurrentSearch := AnsiContainsText(fKey, aKeyword);
+        ccGenre: fMatchesCurrentSearch := AnsiContainsText(fGenre, aKeyword);
+        ccDecade: fMatchesCurrentSearch := AnsiContainsText(IntToStr(fYear), aKeyword);
+        ccYear: fMatchesCurrentSearch := AnsiContainsText(IntToStr(fYear), aKeyword);
+        ccFileAgeYear: fMatchesCurrentSearch := AnsiContainsText(FormatDateTime('yyyy', fFileAge, fLibraryFormatSettings), aKeyword);
+        ccFileAgeMonth: fMatchesCurrentSearch := AnsiContainsText(FormatDateTime('mmmm yy', fFileAge, fLibraryFormatSettings), aKeyword);
+      else
+        fMatchesCurrentSearch := AnsiContainsText(fKey, aKeyword);
+      end;
+  end;
+
+  if (not isCloud) and assigned(fCollectionList) then begin
+    tmpMatch := False;
+    for i := 0 to fCollectionList.Count - 1 do begin
+      childMatch := fCollectionList[i].PerformSearch(aKeyword, fMatchesCurrentSearch);
+      tmpMatch := tmpMatch or childMatch;
+    end;
+  end;
+
+  fMatchesCurrentSearch := fMatchesCurrentSearch or tmpMatch;
+  result := fMatchesCurrentSearch;
 end;
 
 function TAudioFileCollection.ComparePrefix(aPrefix: String): Integer;

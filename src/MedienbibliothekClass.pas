@@ -649,6 +649,8 @@ type
         function AnzeigeShowsPlaylistFiles: Boolean;
         procedure GenerateAnzeigeListe(aCollection: TAudioCollection);
         procedure GenerateReverseAnzeigeListe(aCollection: TAudioCollection);
+        procedure GenerateAlbumAnzeigeListe(aAudioFile: TAudioFile);
+        procedure GetAlbumTitelListFromAudioFile(Target: TAudioFileList; aAudioFile: TAudioFile);
 
         procedure GetTitelListFromCoverIDUnsorted(Target: TAudioFileList; aCoverID: String);
         procedure GetTitelListFromDirectoryUnsorted(Target: TAudioFileList; aDirectory: String);
@@ -3814,6 +3816,31 @@ begin
 
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList, 0);
   end;
+end;
+
+procedure TMedienBibliothek.GenerateAlbumAnzeigeListe(aAudioFile: TAudioFile);
+begin
+  LastBrowseResultList.Clear;
+  AnzeigeListe := LastBrowseResultList;
+  SetBaseMarkerList(LastBrowseResultList);
+  GetAlbumTitelListFromAudioFile(AnzeigeListe, aAudioFile);
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList, 0);
+end;
+
+procedure TMedienBibliothek.GetAlbumTitelListFromAudioFile(Target: TAudioFileList; aAudioFile: TAudioFile);
+var
+  SourceAlbumKey: String;
+begin
+  if not assigned(aAudioFile) then
+    exit;
+
+  SourceAlbumKey := GenerateAlbumKey(aAudioFile);
+  for var i: Integer := 0 to Mp3ListePfadSort.Count - 1 do begin
+    if GenerateAlbumKey(Mp3ListePfadSort[i]) = SourceAlbumKey then
+      Target.Add(Mp3ListePfadSort[i]);
+  end;
+
+  Target.Sort(Sort_AlbumTrack_asc);
 end;
 
 {

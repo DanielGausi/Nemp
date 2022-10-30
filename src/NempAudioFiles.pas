@@ -303,9 +303,6 @@ type
         function GetPath: UnicodeString;
         procedure SetPath(const Value: UnicodeString);
 
-        // function fGetNonEmptyTitle: UnicodeString;
-        // function fGetProperFilename: UnicodeString;
-
         function fGetIsFile: Boolean;
         function fGetIsStream: Boolean;
         function fGetIsCDDA: Boolean;
@@ -587,11 +584,6 @@ const
       RG_ClearAlbum = 8;
       RG_ClearBoth = 12; // = RG_ClearTrack OR RG_ClearAlbum
 
-      // SAD_xxx Flags for SetAudioData-Methods
-      //SAD_None     = 0;   // Do not Update Informatin in the file
-      //SAD_Existing = 1;  // Update only existing Tag (note: v2 Tag has to be created!)
-      //SAD_Both     = 2;  // Update both (v1 an v2)-Tags
-
       // property-IDs for saving/loading
       // general format in the gmp/npl-files
       // 1Byte ID
@@ -619,30 +611,17 @@ const
       MP3DB_LYRICS      = 24;
       MP3DB_ID3KOMMENTAR = 25;
       MP3DB_COVERID = 27;
-
-      //MP3DB_DUMMY_Byte1  = 28;
       MP3DB_RATING = 28;
 
       MP3DB_CUEPRESENT   = 30;
-
       MP3DB_FAVORITE  = 29;
       MP3DB_CATEGORY = 39;
-
-      //MP3DB_DUMMY_Int1   = 30;
-      // MP3DB_DUMMY_Int2   = 31;
       MP3DB_PLAYCOUNTER  = 31;
-      // MP3DB_DUMMY_Int3   = 32;
       MP3DB_DRIVE_ID   = 32; // new in 4.13: The ID of the drive, needed for changing the drive letter properly
-
-      //MP3DB_DUMMY_Text1  = 33;
       MP3DB_LASTFM_TAGS  = 33;
-      //MP3DB_DUMMY_Text2  = 34;
       MP3DB_CD = 34;    // new in 4.5 (Part of aSet)
-
-      //MP3DB_DUMMY_Text3  = 35;
       MP3DB_ALBUMGAIN = 35;
       MP3DB_TRACKGAIN = 36;
-
       MP3DB_ALBUMPEAK = 37;
       MP3DB_TRACKPEAK = 38;
       MP3DB_BPM = 14;
@@ -727,7 +706,6 @@ begin
 
         ApeErr_InvalidApeFile       : result := AUDIO_ApeErr_InvalidApeFile;
         ApeErr_InvalidTag           : result := AUDIO_ApeErr_InvalidApeTag;
-        //ApeErr_NoTag                : result := AUDIOERR_None;   // Nemp does not handle this as "Error"
 
         WmaErr_WritingNotSupported  : result := AUDIOERR_UnsupportedMediaFile; // Nemp does not permit this
         WavErr_WritingNotSupported  : result := AUDIOERR_UnsupportedMediaFile; // Nemp does not permit this
@@ -1254,12 +1232,8 @@ begin
                   fFileAge := GetFileCreationDateTime(filename);
                   MainFile := AudioFileFactory.CreateAudioFile(filename, True);
                   try
-                      //MainFile.ReadFromFile(filename);
-                      //result := AudioToNempAudioError(MainFile.LastError);
                       result := AudioToNempAudioError(MainFile.ReadFromFile(filename));
-
                       GetAudioData(MainFile, Flags);
-
                   finally
                       MainFile.Free;
                   end;
@@ -1474,9 +1448,6 @@ begin
     CD      := aM4AFile.Disc;
     Comment := aM4AFile.Comment;
     Lyrics  := UTF8String(aM4AFile.Lyrics);
-    // Playcounter/Rating: Maybe incompatible with other Taggers
-    // PlayCounter := StrToIntDef(aFlacFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT), 0);
-    // Rating :=  StrToIntDef(aFlacFile.GetPropertyByFieldname(VORBIS_RATING), 0);
     // LastFM-Tags/CATEGORIES: Probably Nemp-Only
     RawTagLastFM := UTF8String(aM4AFile.Keywords);
     fVBR := False;
@@ -1487,7 +1458,7 @@ begin
     else
         fChannelModeIDX := 4; // unknown
     end;
-
+    // Playcounter/Rating: Maybe incompatible with other Taggers
     PlayCounter := StrToIntDef(aM4AFile.GetSpecialData(DEFAULT_MEAN, M4APlayCounter),0);
     Rating      := StrToIntDef(aM4AFile.GetSpecialData(DEFAULT_MEAN, M4ARating), 0);
 
@@ -2194,7 +2165,6 @@ begin
                             at_MusePack,
                             at_OptimFrog,
                             at_TrueAudio: TBaseApeFile(MainFile).Apetag.SetValueByKey(APE_COMMENT, aValue);
-                            //  at_Invalid: ; at_Wma: ; at_Wav: ;
                         end;
                     end;
 
@@ -2212,7 +2182,6 @@ begin
                             at_MusePack,
                             at_OptimFrog,
                             at_TrueAudio: TBaseApeFile(MainFile).ApeTag.SetValueByKey(APE_DISCNUMBER, aValue);
-                            //  at_Invalid: ; at_Wma: ; at_Wav: ;
                         end;
                     end;
 
@@ -2223,7 +2192,6 @@ begin
                             TMp3File(MainFile).ID3v2Tag.BPM := AValue;
                             if TMp3File(MainFile).ApeTag.Exists then
                               TMp3File(MainFile).ApeTag.SetValueByKey(TRACK_BPM, aValue);
-
                           end;
                           at_Ogg: TOggVorbisFile(MainFile).SetPropertyByFieldname(TRACK_BPM, aValue);
                           at_Flac: TFlacFile(MainFile).SetPropertyByFieldname(TRACK_BPM, aValue);
@@ -2233,12 +2201,9 @@ begin
                           at_MusePack,
                           at_OptimFrog,
                           at_TrueAudio: TBaseApeFile(MainFile).ApeTag.SetValueByKey(TRACK_BPM, aValue);
-
-                          //at_Invalid, at_Wma, at_Wav, at_AbstractApe: ;
                         end;
                     end;
                 end;
-
                 result := AudioToNempAudioError(MainFile.UpdateFile);
             end;
         finally
@@ -2258,7 +2223,6 @@ begin
                 result := AUDIOERR_UnsupportedMediaFile
             else
             begin
-                // bei mp3-Dateien war hier noch ne Abfrage "if Lyrics <> '' " dabei .... warum? Checken?
                         case MainFile.FileType of
                             at_Mp3: begin
                                 EnsureID3v2Exists(TMp3File(MainFile));
@@ -2272,7 +2236,6 @@ begin
                             at_MusePack,
                             at_OptimFrog,
                             at_TrueAudio: TBaseApeFile(MainFile).ApeTag.SetValueByKey(APE_LYRICS, String(aValue));
-                            //  at_Invalid: ; at_Wma: ; at_Wav: ;
                         end;
                 result := AudioToNempAudioError(MainFile.UpdateFile);
             end;
@@ -2318,7 +2281,6 @@ begin
                             at_MusePack,
                             at_OptimFrog,
                             at_TrueAudio: TBaseApeFile(MainFile).ApeTag.SetValueByKey(APE_CATEGORIES , String(aValue));
-                            //  at_Invalid: ; at_Wma: ; at_Wav: ;
                         end;
 
                 result := AudioToNempAudioError(MainFile.UpdateFile);
@@ -2359,9 +2321,7 @@ begin
                   at_MusePack,
                   at_OptimFrog,
                   at_TrueAudio: TBaseApeFile(MainFile).ApeTag.SetValueByKey(APE_RATING, StrRating );
-                  //at_Wma: ; at_Invalid: ; at_Wav: ;
                 end;
-
                 result := AudioToNempAudioError(MainFile.UpdateFile);
             end;
         finally
@@ -2399,9 +2359,7 @@ begin
                         at_MusePack,
                         at_OptimFrog,
                         at_TrueAudio:  TBaseApeFile(MainFile).ApeTag.SetValueByKey(APE_PLAYCOUNT  , StrCounter);
-                        //at_Wma: ; at_Invalid: ; at_Wav: ;
                       end;
-
                 result := AudioToNempAudioError(MainFile.UpdateFile);
             end;
         finally
@@ -2513,9 +2471,7 @@ begin
                                     TBaseApeFile(MainFile).ApeTag.SetValueByKey(REPLAYGAIN_ALBUM_PEAK, strAlbumPeak);
                                 end;
                           end;
-                          // at_Invalid: ;at_Wma: ; at_Wav: ;
                       end;
-
                 result := AudioToNempAudioError(MainFile.UpdateFile);
             end;
         finally
@@ -2563,9 +2519,7 @@ begin
                     at_MusePack,
                     at_OptimFrog,
                     at_TrueAudio:  TBaseApeFile(MainFile).ApeTag.SetValueByKey(APE_USERCOVERID  , String(aValue));
-                    //at_Wma: ; at_Invalid: ; at_Wav: ;
                 end;
-
                 result := AudioToNempAudioError(MainFile.UpdateFile);
             end;
         finally
@@ -3002,15 +2956,10 @@ var GenreIDX:byte;
     katold:byte;
     tmp: UnicodeString;
     Id, byteTrack: Byte;
-    // dummy: Integer;
     Wyear: word;
     DummyInt: Integer;
     Dummystr: UnicodeString;
 begin
-    // Note: Dummy was used for the size of the Audiofile data
-    // not used for some time,
-    // in 2018 relocated in seperate function, as the Medialibrary.Load method needs to check the size field for buffering reasons
-    //  aStream.Read(dummy, SizeOf(dummy));
     c := 0;
     repeat
         aStream.Read(id, sizeof(ID));
@@ -3061,19 +3010,13 @@ begin
             MP3DB_LYRICS: Lyrics := UTF8String(Trim(  ReadTextFromStream_DEPRECATED(aStream)));
             MP3DB_ID3KOMMENTAR: Comment := ReadTextFromStream_DEPRECATED(aStream);
             MP3DB_COVERID: CoverID := ReadTextFromStream_DEPRECATED(aStream);
-
             MP3DB_RATING : aStream.Read(fRating, sizeOf(fRating));
             MP3DB_CUEPRESENT  : aStream.Read(DummyInt, sizeOf(DummyInt));
-
             MP3DB_FAVORITE : aStream.Read(fFavorite, sizeOf(fFavorite));
             MP3DB_PLAYCOUNTER  : aStream.Read(fPlayCounter, sizeOf(fPlayCounter));
-            MP3DB_DRIVE_ID{MP3DB_DUMMY_Int3}  : aStream.Read(DummyInt, sizeOf(DummyInt));
-
+            MP3DB_DRIVE_ID  : aStream.Read(DummyInt, sizeOf(DummyInt));
             MP3DB_LASTFM_TAGS : RawTagLastFM := UTF8String(ReadTextFromStream_DEPRECATED(aStream));
-            //MP3DB_DUMMY_Text1 : DummyStr := ReadTextFromStream(aStream);
-            //MP3DB_DUMMY_Text2 : DummyStr := ReadTextFromStream(aStream);
             MP3DB_ALBUMGAIN : DummyStr := ReadTextFromStream_DEPRECATED(aStream);
-
             else begin
               // Something is wrong. Stop reading.
                c := MP3DB_MAXID;
@@ -3165,16 +3108,11 @@ begin
                                     aStream.Read(cuePresent, sizeOf(cuePresent));
                                     GetCueList;
                                 end;
-            //MP3DB_DUMMY_Byte2 : aStream.Read(DummyByte, sizeOf(DummyByte));
             MP3DB_FAVORITE : aStream.Read(fFavorite, sizeOf(fFavorite));
-            //MP3DB_DUMMY_Int1  : aStream.Read(DummyInt, sizeOf(DummyInt));
             MP3DB_PLAYCOUNTER  : aStream.Read(fPlayCounter, sizeOf(fPlayCounter));
-            MP3DB_DRIVE_ID{MP3DB_DUMMY_Int3}  : aStream.Read(DummyInt, sizeOf(DummyInt));
-            //MP3DB_DUMMY_Text1 : DummyStr := ReadTextFromStream(aStream);
+            MP3DB_DRIVE_ID  : aStream.Read(DummyInt, sizeOf(DummyInt));
             MP3DB_LASTFM_TAGS : RawTagLastFM := UTF8String(ReadTextFromStream_DEPRECATED(aStream));
-            // MP3DB_DUMMY_Text2 : DummyStr := ReadTextFromStream(aStream);
             MP3DB_ALBUMGAIN : DummyStr := ReadTextFromStream_DEPRECATED(aStream);
-
             else begin
               c := MP3DB_MAXID;
             end;

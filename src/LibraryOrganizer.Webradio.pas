@@ -73,6 +73,7 @@ type
       function MatchPrefix(aPrefix: String): Boolean; override;
       function ComparePrefix(aPrefix: String): Integer; override;
       function IndexOf(aCollection: TAudioCollection): Integer; override;
+      function PerformSearch(aKeyword: String; ParentAreadyMatches: Boolean): Boolean; override;
 
       procedure Analyse(recursive, ForceAnalysis: Boolean); override; // empty
       procedure Sort(doRecursive: Boolean = True); override; // empty
@@ -200,6 +201,13 @@ function TAudioWebradioCollection.MatchPrefix(aPrefix: String): Boolean;
 begin
   result := AnsiContainsText(fKey, aPrefix)
     or AnsiContainsText(fName, aPrefix);
+end;
+
+function TAudioWebradioCollection.PerformSearch(aKeyword: String;
+  ParentAreadyMatches: Boolean): Boolean;
+begin
+  result := AnsiContainsText(fKey, aKeyword)
+    or AnsiContainsText(fName, aKeyword);
 end;
 
 function TAudioWebradioCollection.ComparePrefix(aPrefix: String): Integer;
