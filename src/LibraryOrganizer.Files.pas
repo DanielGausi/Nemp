@@ -1218,8 +1218,8 @@ begin
       end;
   end;
 
+  tmpMatch := False;
   if (not isCloud) and assigned(fCollectionList) then begin
-    tmpMatch := False;
     for i := 0 to fCollectionList.Count - 1 do begin
       childMatch := fCollectionList[i].PerformSearch(aKeyword, fMatchesCurrentSearch);
       tmpMatch := tmpMatch or childMatch;

@@ -1318,8 +1318,6 @@ object Nemp_MainForm: TNemp_MainForm
           Ratio = 0
           OnPaint = NewPanelPaint
           OwnerDraw = False
-          ExplicitLeft = 131
-          ExplicitTop = -3
           DesignSize = (
             219
             221)
@@ -5960,7 +5958,6 @@ object Nemp_MainForm: TNemp_MainForm
     end
     object PM_PL_ClearPlaylist: TMenuItem
       Caption = 'Clear'
-      Visible = False
       OnClick = PM_PL_ClearPlaylistClick
     end
     object PM_PL_DeleteSelected: TMenuItem

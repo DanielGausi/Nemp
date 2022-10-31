@@ -11397,7 +11397,7 @@ end;
 
 procedure TNemp_MainForm.PM_PL_ClearPlaylistClick(Sender: TObject);
 begin
-    NempPlaylist.ClearPlaylist(False);
+    NempPlaylist.ClearPlaylist(True);
 end;
 
 procedure TNemp_MainForm.PM_PL_CopyPlaylistToUSBClick(Sender: TObject);

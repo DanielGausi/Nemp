@@ -1172,6 +1172,8 @@ end;
 }
 function TAudioFile.GetAudioData(aFile: TBaseAudioFile; Flags: Integer = 0): TNempAudioError;
 begin
+  result := AUDIOERR_None;
+
   // get detailed information (format-specific)
   case aFile.FileType of
       at_Invalid: SetUnknown;
