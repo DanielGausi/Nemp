@@ -62,8 +62,8 @@ uses NempMainUnit, Splash, gnugettext, PlaylistClass, PlayerClass,
     SplitForm_Hilfsfunktionen, DriveRepairTools, NempCoverFlowClass,
 
     MedienListeUnit, AuswahlUnit, ExtendedControlsUnit, PlaylistUnit,
-    WindowsVersionInfo, AudioDisplayUtils,
-    Cover.ViewCache;
+    WindowsVersionInfo, AudioDisplayUtils, MyDialogs, NempHelp,
+    Cover.ViewCache, fConfigErrorDlg;
 
 
 procedure UpdateSplashScreen(status: String);
@@ -473,7 +473,7 @@ procedure CheckWriteAccess;
 var
   cfgIni: TMemIniFile;
 begin
-  if NempSettingsManager.WriteAccessPossible then
+    if NempSettingsManager.WriteAccessPossible then
     exit;
 
   // write access is not possible: Nemp will not function as intended
@@ -488,8 +488,13 @@ begin
     //   For that case, he can edit the UseLocalData.cfg to "ShowWarning=0"
     cfgIni := TMemIniFile.Create(ExtractFilePath(Paramstr(0)) + 'UseLocalData.cfg');
     try
-      if cfgIni.ReadBool('Settings', 'ShowWarning', True) then
-        AddErrorLog(WriteAccessNotPossiblePortable);
+      if cfgIni.ReadBool('Settings', 'ShowWarning', True) then begin
+        // AddErrorLog(WriteAccessNotPossiblePortable);
+        // TranslateMessageDlg(WriteAccessNotPossiblePortable, mtWarning, [mbOK, mbHelp], HELP_Install);
+        if not assigned(ConfigErrorDlg) then
+          Application.CreateForm(TConfigErrorDlg, ConfigErrorDlg);
+        ConfigErrorDlg.ShowModal;
+      end;
     finally
       cfgIni.Free;
     end;

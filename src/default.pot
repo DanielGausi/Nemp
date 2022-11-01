@@ -7,8 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2022-10-30 15:18\n"
-"PO-Revision-Date: 2022-10-30 15:18\n"
+"POT-Creation-Date: 2022-11-01 10:41\n"
+"PO-Revision-Date: 2022-11-01 10:41\n"
 "Last-Translator: Somebody <your.email@address.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,7 +20,7 @@ msgstr ""
 #. Nemp_MainForm..Player_PopupMenu..Help1..PM_P_About..Caption
 #: NempMainUnit_-_Kopie.dfm:6106
 #. Nemp_MainForm..Player_PopupMenu..Help1..PM_P_About..Caption
-#: NempMainUnit.dfm:6422
+#: NempMainUnit.dfm:6419
 msgid "About Nemp"
 msgstr ""
 
@@ -267,27 +267,27 @@ msgstr ""
 #. Nemp_MainForm..__MainContainerPanel..PlaylistPanel..PlayerHeaderPanel..PlaylistControlPanel..EditPlaylistSearch..Font.Name
 #: NempMainUnit.dfm:1210
 #. Nemp_MainForm..__MainContainerPanel..MedienBibDetailPanel..ContainerPanelMedienBibDetails..DetailID3TagPanel..LblBibArtist..Font.Name
-#: NempMainUnit.dfm:1359
+#: NempMainUnit.dfm:1357
 #. Nemp_MainForm..__MainContainerPanel..MedienBibDetailPanel..ContainerPanelMedienBibDetails..DetailID3TagPanel..LblBibTitle..Font.Name
-#: NempMainUnit.dfm:1418
+#: NempMainUnit.dfm:1416
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..MedienBibHeaderPanel..MedienListeControlPanel..EDITFastSearch..Font.Name
-#: NempMainUnit.dfm:1673
+#: NempMainUnit.dfm:1671
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST..Font.Name
-#: NempMainUnit.dfm:1760
+#: NempMainUnit.dfm:1758
 #. Nemp_MainForm..__MainContainerPanel..TreePanel..AuswahlHeaderPanel0..AuswahlFillPanel0..AuswahlStatusLBL0..Font.Name
-#: NempMainUnit.dfm:2000
+#: NempMainUnit.dfm:1998
 #. Nemp_MainForm..__MainContainerPanel..TreePanel..PanelStandardBrowse..ArtistsVST..Font.Name
-#: NempMainUnit.dfm:2150
+#: NempMainUnit.dfm:2148
 #. Nemp_MainForm..__MainContainerPanel..TreePanel..PanelStandardBrowse..AlbenVST..Font.Name
-#: NempMainUnit.dfm:2206
+#: NempMainUnit.dfm:2204
 #. Nemp_MainForm..__MainContainerPanel..CoverflowPanel..AuswahlHeaderPanel1..AuswahlFillPanel1..AuswahlStatusLBL1..Font.Name
-#: NempMainUnit.dfm:2316
+#: NempMainUnit.dfm:2314
 #. Nemp_MainForm..__MainContainerPanel..CoverflowPanel..PanelCoverBrowse..Pnl_CoverFlowLabel..Font.Name
-#: NempMainUnit.dfm:2500
+#: NempMainUnit.dfm:2498
 #. Nemp_MainForm..__MainContainerPanel..CloudPanel..AuswahlHeaderPanel2..AuswahlFillPanel2..AuswahlStatusLBL2..Font.Name
-#: NempMainUnit.dfm:2609
+#: NempMainUnit.dfm:2607
 #. Nemp_MainForm..__MainContainerPanel..EmptyLibraryPanel..LblEmptyLibraryHint..Font.Name
-#: NempMainUnit.dfm:2788
+#: NempMainUnit.dfm:2786
 #. NewFavoritePlaylistForm..Font.Name
 #: NewFavoritePlaylist.dfm:12
 #. NewMetaFrameForm..Font.Name
@@ -689,6 +689,8 @@ msgstr ""
 #: ErrorForm.dfm:47
 #. FormChangeCategory..pnlButtons..BtnOK..Caption
 #: fChangeFileCategory.dfm:130
+#. ConfigErrorDlg..pnlButtons..btnOK..Caption
+#: fConfigErrorDlg.dfm:81
 #. FormLowBattery..BtnOk..Caption
 #: Lowbattery.dfm:62
 #. NewFavoritePlaylistForm..BtnOK..Caption
@@ -944,9 +946,9 @@ msgstr ""
 #. Nemp_MainForm..Player_PopupMenu..Help1..PM_P_CheckForUpdates..Caption
 #: NempMainUnit_-_Kopie.dfm:6111
 #. Nemp_MainForm..Nemp_MainMenu..MM_Help..MM_H_CheckForUpdates..Caption
-#: NempMainUnit.dfm:3230
+#: NempMainUnit.dfm:3228
 #. Nemp_MainForm..Player_PopupMenu..Help1..PM_P_CheckForUpdates..Caption
-#: NempMainUnit.dfm:6427
+#: NempMainUnit.dfm:6424
 msgid "Check for updates"
 msgstr ""
 
@@ -1188,7 +1190,7 @@ msgstr ""
 #. Nemp_MainForm..__MainContainerPanel..PlaylistPanel..PlayerHeaderPanel..PlaylistControlPanel..EditPlaylistSearch..TextHint
 #: NempMainUnit.dfm:1214
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_Search..Caption
-#: NempMainUnit.dfm:2831
+#: NempMainUnit.dfm:2829
 #. OptionsCompleteForm..Panel1..PageControl1..tabSearch..Caption
 #: OptionsComplete.dfm:2943
 #. Programmer's name for it: MainForm_PlaylistSearch
@@ -1210,9 +1212,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..PM_PL_SortByArtist..Caption
 #: NempMainUnit_-_Kopie.dfm:5610
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1815
+#: NempMainUnit.dfm:1813
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..PM_PL_SortByArtist..Caption
-#: NempMainUnit.dfm:5898
+#: NempMainUnit.dfm:5896
 #. OptionsCompleteForm..Panel1..PageControl1..TabView4..GrpBox_ViewExt_NoMetadata..LblReplaceArtistBy..Caption
 #: OptionsComplete_-_Kopie.dfm:2411
 #. OptionsCompleteForm..Panel1..PageControl1..tabViewingSettings..cpgViewingSettings..cpMissingMetaData..LblReplaceArtistBy..Caption
@@ -1237,9 +1239,9 @@ msgstr ""
 #. Nemp_MainForm..__MainContainerPanel..PlaylistPanel..GRPBOXPlaylist..PlaylistVST......Text
 #: NempMainUnit.dfm:1091
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1820
+#: NempMainUnit.dfm:1818
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..PM_PL_SortByTitle..Caption
-#: NempMainUnit.dfm:5903
+#: NempMainUnit.dfm:5901
 #. OptionsCompleteForm..Panel1..PageControl1..TabView4..GrpBox_ViewExt_NoMetadata..LblReplaceTitletBy..Caption
 #: OptionsComplete_-_Kopie.dfm:2419
 #. OptionsCompleteForm..Panel1..PageControl1..tabViewingSettings..cpgViewingSettings..cpMissingMetaData..LblReplaceTitletBy..Caption
@@ -1266,9 +1268,9 @@ msgstr ""
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_SortLayerBy..PM_ML_SortLayerByAlbum..Caption
 #: NempMainUnit_-_Kopie.dfm:6868
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1824
+#: NempMainUnit.dfm:1822
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortLayerBy..PM_ML_SortLayerByAlbum..Caption
-#: NempMainUnit.dfm:7177
+#: NempMainUnit.dfm:7174
 #. OptionsCompleteForm..Panel1..PageControl1..TabView4..GrpBox_ViewExt_NoMetadata..LblReplaceAlbumBy..Caption
 #: OptionsComplete_-_Kopie.dfm:2427
 #. OptionsCompleteForm..Panel1..PageControl1..tabViewingSettings..cpgViewingSettings..cpMissingMetaData..LblReplaceAlbumBy..Caption
@@ -1285,7 +1287,7 @@ msgstr ""
 #. FDetails..MainPageControl..Tab_MetaData..Pnl_ID3v1_MPEG..GrpBox_ID3v1..LblConst_ID3v1Comment..Caption
 #: Details.dfm:1105
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1856
+#: NempMainUnit.dfm:1854
 #. Programmer's name for it: AudioFileProperty_Comment
 #: Nemp_RessourceStrings.pas:836
 msgid "Comment"
@@ -1296,9 +1298,9 @@ msgstr ""
 #. FDetails..MainPageControl..Tab_General..GrpBox_File..LlblConst_Path..Caption
 #: Details.dfm:115
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1888
+#: NempMainUnit.dfm:1886
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortPlaylistsBy..PM_ML_SortPlaylistsByPath..Caption
-#: NempMainUnit.dfm:7245
+#: NempMainUnit.dfm:7242
 #. Programmer's name for it: DetailForm_InfoLblPath
 #: Nemp_RessourceStrings.pas:109
 #. Programmer's name for it: AudioFileProperty_Path
@@ -1320,7 +1322,7 @@ msgstr ""
 #. FDetails..MainMenu1..mmLyrics..Caption
 #: Details.dfm:1646
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1928
+#: NempMainUnit.dfm:1926
 #. Programmer's name for it: AudioFileProperty_Lyrics
 #: Nemp_RessourceStrings.pas:840
 msgid "Lyrics"
@@ -1339,11 +1341,11 @@ msgstr ""
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_SortLayerBy..PM_ML_SortLayerByGenre..Caption
 #: NempMainUnit_-_Kopie.dfm:6898
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1852
+#: NempMainUnit.dfm:1850
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortGenre..Caption
-#: NempMainUnit.dfm:5588
+#: NempMainUnit.dfm:5586
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortLayerBy..PM_ML_SortLayerByGenre..Caption
-#: NempMainUnit.dfm:7207
+#: NempMainUnit.dfm:7204
 #. NewStationForm..GrpBox_NewStation..LblConst_Genre..Caption
 #: NewStation.dfm:66
 #. FormStreamVerwaltung..pnlMain..VST_Favorites......Text
@@ -1403,7 +1405,7 @@ msgstr ""
 #. FDetails..MainPageControl..Tab_MetaData..Pnl_ID3v1_MPEG..GrpBox_ID3v1..LblConst_ID3v1Year..Caption
 #: Details.dfm:1071
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1836
+#: NempMainUnit.dfm:1834
 #. Programmer's name for it: AudioFileProperty_Year
 #: Nemp_RessourceStrings.pas:838
 msgid "Year"
@@ -1476,7 +1478,7 @@ msgstr ""
 #. Nemp_MainForm..TNAMenu..PM_TNA_Close..Caption
 #: NempMainUnit_-_Kopie.dfm:5911
 #. Nemp_MainForm..TNAMenu..PM_TNA_Close..Caption
-#: NempMainUnit.dfm:6199
+#: NempMainUnit.dfm:6196
 #. PlayerLogForm..BtnClose..Caption
 #: PlayerLog.dfm:27
 #. PlaylistCopyForm..BtnClose..Caption
@@ -1489,7 +1491,7 @@ msgstr ""
 #. Nemp_MainForm..PopupPlayPause..PM_PlayCDAudio..Caption
 #: NempMainUnit_-_Kopie.dfm:6139
 #. Nemp_MainForm..PopupPlayPause..PM_PlayCDAudio..Caption
-#: NempMainUnit.dfm:6455
+#: NempMainUnit.dfm:6452
 msgid "Play CD-Audio"
 msgstr ""
 
@@ -1633,7 +1635,7 @@ msgstr ""
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_SortLayerBy..PM_ML_SortLayerByCount..Caption
 #: NempMainUnit_-_Kopie.dfm:6880
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortLayerBy..PM_ML_SortLayerByCount..Caption
-#: NempMainUnit.dfm:7192
+#: NempMainUnit.dfm:7189
 msgid "Count"
 msgstr ""
 
@@ -1728,16 +1730,18 @@ msgstr ""
 #: CloudEditor.dfm:307
 #. DeleteSelection..BtnHelp..Caption
 #: DeleteSelect.dfm:167
+#. ConfigErrorDlg..btnHelp..Caption
+#: fConfigErrorDlg.dfm:104
 #. MainFormBuilder..pnlButtons..BtnHelp..Caption
 #: MainFormBuilderForm.dfm:154
 #. Nemp_MainForm..Player_PopupMenu..Help1..Caption
 #: NempMainUnit_-_Kopie.dfm:6103
 #. Nemp_MainForm..Nemp_MainMenu..MM_Help..MM_H_Help..Caption
-#: NempMainUnit.dfm:3225
+#: NempMainUnit.dfm:3223
 #. Nemp_MainForm..Player_PopupMenu..Help1..Caption
-#: NempMainUnit.dfm:6419
+#: NempMainUnit.dfm:6416
 #. Nemp_MainForm..Player_PopupMenu..Help1..PM_P_Help..Caption
-#: NempMainUnit.dfm:6432
+#: NempMainUnit.dfm:6429
 #. OptionsCompleteForm..Panel2..BtnHelp..Caption
 #: OptionsComplete.dfm:6146
 msgid "Help"
@@ -1818,9 +1822,9 @@ msgstr ""
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortFilesize..Caption
 #: NempMainUnit_-_Kopie.dfm:5318
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1892
+#: NempMainUnit.dfm:1890
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortFilesize..Caption
-#: NempMainUnit.dfm:5604
+#: NempMainUnit.dfm:5602
 #. Programmer's name for it: DetailForm_InfoLblFileSize
 #: Nemp_RessourceStrings.pas:111
 #. Programmer's name for it: AudioFileProperty_Filesize
@@ -1835,13 +1839,13 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..PM_PL_SortByFilename..Caption
 #: NempMainUnit_-_Kopie.dfm:5605
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1880
+#: NempMainUnit.dfm:1878
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortFilename..Caption
-#: NempMainUnit.dfm:5570
+#: NempMainUnit.dfm:5568
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..PM_PL_SortByFilename..Caption
-#: NempMainUnit.dfm:5893
+#: NempMainUnit.dfm:5891
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortPlaylistsBy..PM_ML_SortPlaylistsByFilename..Caption
-#: NempMainUnit.dfm:7235
+#: NempMainUnit.dfm:7232
 #. NewFavoritePlaylistForm..edit_PlaylistFilename..EditLabel.Caption
 #: NewFavoritePlaylist.dfm:56
 #. OptionsCompleteForm..Panel1..PageControl1..TabView4..GrpBox_ViewExt_NoMetadata..cbReplaceArtistBy..Text
@@ -1886,7 +1890,7 @@ msgstr ""
 #. FDetails..MainPageControl..Tab_MetaData..Pnl_ID3v1_MPEG..GrpBox_Mpeg..LblConst_MpegSamplerate..Caption
 #: Details.dfm:1239
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1872
+#: NempMainUnit.dfm:1870
 #. Programmer's name for it: Infostring_Samplerate
 #: Nemp_RessourceStrings.pas:307
 #. Programmer's name for it: AudioFileProperty_Samplerate
@@ -1899,7 +1903,7 @@ msgstr ""
 #. FDetails..MainPageControl..Tab_MetaData..Pnl_ID3v1_MPEG..GrpBox_Mpeg..LblConst_MpegBitrate..Caption
 #: Details.dfm:1222
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1860
+#: NempMainUnit.dfm:1858
 #. NewStationForm..GrpBox_NewStation..LblConst_Bitrate..Caption
 #: NewStation.dfm:59
 #. Programmer's name for it: Infostring_Bitrate
@@ -1925,9 +1929,9 @@ msgstr ""
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortDuration..Caption
 #: NempMainUnit_-_Kopie.dfm:5312
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1848
+#: NempMainUnit.dfm:1846
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortDuration..Caption
-#: NempMainUnit.dfm:5598
+#: NempMainUnit.dfm:5596
 #. PlaylistEditorForm..PnlPlaylistFiles..PlaylistFilesVST......Text
 #: PlaylistEditor.dfm:169
 #. RandomPlaylistForm..GrpBox_Duration..Caption
@@ -1954,7 +1958,7 @@ msgstr ""
 #. FDetails..MainPageControl..Tab_General..PnlLibraryMetadata..GrpBox_MetaDataLibrary..pnlMetadataOverview..lblAlbumArtist..Caption
 #: Details.dfm:424
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1840
+#: NempMainUnit.dfm:1838
 #. OptionsCompleteForm..Panel1..PageControl1..tabCategories..cpgCategories..cpCategorySettings..lblAlbumArtist..Caption
 #: OptionsComplete.dfm:2450
 msgid "Album-Artist"
@@ -1963,21 +1967,21 @@ msgstr ""
 #. FDetails..MainPageControl..Tab_General..PnlLibraryMetadata..GrpBox_MetaDataLibrary..pnlMetadataOverview..lblComposer..Caption
 #: Details.dfm:441
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1844
+#: NempMainUnit.dfm:1842
 msgid "Composer"
 msgstr ""
 
 #. FDetails..MainPageControl..Tab_General..PnlLibraryMetadata..GrpBox_MetaDataLibrary..pnlMetadataOverview..LblConst_CD..Caption
 #: Details.dfm:491
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1832
+#: NempMainUnit.dfm:1830
 msgid "CD"
 msgstr ""
 
 #. FDetails..MainPageControl..Tab_General..PnlLibraryMetadata..GrpBox_MetaDataLibrary..pnlMetadataOverview..LblConst_Rating..Caption
 #: Details.dfm:534
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1900
+#: NempMainUnit.dfm:1898
 #. RandomPlaylistForm..GrpBox_Rating..Caption
 #: RandomPlaylist.dfm:300
 msgid "Rating"
@@ -1988,7 +1992,7 @@ msgstr ""
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_ReplayGain..Caption
 #: NempMainUnit_-_Kopie.dfm:5489
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_ReplayGain..Caption
-#: NempMainUnit.dfm:5777
+#: NempMainUnit.dfm:5775
 #. OptionsCompleteForm..Panel1..PageControl1..TabPlayer0..GrpBox_TabAudio2_ReplayGain..Caption
 #: OptionsComplete_-_Kopie.dfm:3795
 #. OptionsCompleteForm..Panel1..PageControl1..tabEffects..cpgEffects..cpReplayGain..Caption
@@ -2001,7 +2005,7 @@ msgstr ""
 #. FDetails..MainPageControl..Tab_MetaData..Pnl_ID3v1_MPEG..GrpBox_ID3v1..LblConst_ID3v1Track..Caption
 #: Details.dfm:1122
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1828
+#: NempMainUnit.dfm:1826
 #. Programmer's name for it: AudioFileProperty_Track
 #: Nemp_RessourceStrings.pas:841
 msgid "Track"
@@ -2072,7 +2076,7 @@ msgstr ""
 #. FDetails..MainPageControl..Tab_MetaData..GrpBox_TextFrames..VST_MetaData......Text
 #: Details.dfm:975
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1876
+#: NempMainUnit.dfm:1874
 #. OptionsCompleteForm..Panel1..VST_MetaData......WideText
 #: OptionsComplete_-_Kopie.dfm:5496
 msgid "Type"
@@ -2301,127 +2305,127 @@ msgstr ""
 #. Nemp_MainForm..PlaylistManagerPopup..N10..Caption
 #: NempMainUnit_-_Kopie.dfm:7089
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..N22..Caption
-#: NempMainUnit.dfm:2828
+#: NempMainUnit.dfm:2826
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..N23..Caption
-#: NempMainUnit.dfm:2837
+#: NempMainUnit.dfm:2835
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..N71..Caption
-#: NempMainUnit.dfm:2860
+#: NempMainUnit.dfm:2858
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..N21..Caption
-#: NempMainUnit.dfm:2879
+#: NempMainUnit.dfm:2877
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SortBy..N6..Caption
-#: NempMainUnit.dfm:2927
+#: NempMainUnit.dfm:2925
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..N69..Caption
-#: NempMainUnit.dfm:2939
+#: NempMainUnit.dfm:2937
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..N18..Caption
-#: NempMainUnit.dfm:2969
+#: NempMainUnit.dfm:2967
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..N26..Caption
-#: NempMainUnit.dfm:2986
+#: NempMainUnit.dfm:2984
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..N33..Caption
-#: NempMainUnit.dfm:3024
+#: NempMainUnit.dfm:3022
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_View..N29..Caption
-#: NempMainUnit.dfm:3041
+#: NempMainUnit.dfm:3039
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_View..N40..Caption
-#: NempMainUnit.dfm:3063
+#: NempMainUnit.dfm:3061
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_View..MM_O_Overview..N39..Caption
-#: NempMainUnit.dfm:3092
+#: NempMainUnit.dfm:3090
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_Skins..N38..Caption
-#: NempMainUnit.dfm:3116
+#: NempMainUnit.dfm:3114
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..N32..Caption
-#: NempMainUnit.dfm:3121
+#: NempMainUnit.dfm:3119
 #. Nemp_MainForm..Medialist_View_PopupMenu..N14..Caption
-#: NempMainUnit.dfm:5520
+#: NempMainUnit.dfm:5518
 #. Nemp_MainForm..Medialist_View_PopupMenu..N2..Caption
-#: NempMainUnit.dfm:5529
+#: NempMainUnit.dfm:5527
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..N8..Caption
-#: NempMainUnit.dfm:5565
+#: NempMainUnit.dfm:5563
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..N7..Caption
-#: NempMainUnit.dfm:5593
+#: NempMainUnit.dfm:5591
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..N4..Caption
-#: NempMainUnit.dfm:5615
+#: NempMainUnit.dfm:5613
 #. Nemp_MainForm..Medialist_View_PopupMenu..N5..Caption
-#: NempMainUnit.dfm:5632
+#: NempMainUnit.dfm:5630
 #. Nemp_MainForm..Medialist_View_PopupMenu..N72..Caption
-#: NempMainUnit.dfm:5654
+#: NempMainUnit.dfm:5652
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SetRatingsOfSelectedFilesCHOOSE..N73..Caption
-#: NempMainUnit.dfm:5718
+#: NempMainUnit.dfm:5716
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_MarkFile..N81..Caption
-#: NempMainUnit.dfm:5754
+#: NempMainUnit.dfm:5752
 #. Nemp_MainForm..Medialist_View_PopupMenu..N3..Caption
-#: NempMainUnit.dfm:5800
+#: NempMainUnit.dfm:5798
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Extended..N15..Caption
-#: NempMainUnit.dfm:5827
+#: NempMainUnit.dfm:5825
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Extended..N76..Caption
-#: NempMainUnit.dfm:5845
+#: NempMainUnit.dfm:5843
 #. Nemp_MainForm..Medialist_View_PopupMenu..N55..Caption
-#: NempMainUnit.dfm:5853
+#: NempMainUnit.dfm:5851
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..N9..Caption
-#: NempMainUnit.dfm:5912
+#: NempMainUnit.dfm:5910
 #. Nemp_MainForm..PlayListPOPUP..N25..Caption
-#: NempMainUnit.dfm:5928
+#: NempMainUnit.dfm:5926
 #. Nemp_MainForm..PlayListPOPUP..N12..Caption
-#: NempMainUnit.dfm:5959
+#: NempMainUnit.dfm:5957
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..N75..Caption
-#: NempMainUnit.dfm:6041
+#: NempMainUnit.dfm:6038
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MarkFiles..N86..Caption
-#: NempMainUnit.dfm:6074
+#: NempMainUnit.dfm:6071
 #. Nemp_MainForm..PlayListPOPUP..N48..Caption
-#: NempMainUnit.dfm:6107
+#: NempMainUnit.dfm:6104
 #. Nemp_MainForm..PlayListPOPUP..N13..Caption
-#: NempMainUnit.dfm:6116
+#: NempMainUnit.dfm:6113
 #. Nemp_MainForm..PlayListPOPUP..N24..Caption
-#: NempMainUnit.dfm:6141
+#: NempMainUnit.dfm:6138
 #. Nemp_MainForm..TNAMenu..N20..Caption
-#: NempMainUnit.dfm:6192
+#: NempMainUnit.dfm:6189
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..N31..Caption
-#: NempMainUnit.dfm:6230
+#: NempMainUnit.dfm:6227
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..N34..Caption
-#: NempMainUnit.dfm:6252
+#: NempMainUnit.dfm:6249
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..PM_P_FileOverview..Onlydetails2..Caption
-#: NempMainUnit.dfm:6281
+#: NempMainUnit.dfm:6278
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Skins..N30..Caption
-#: NempMainUnit.dfm:6308
+#: NempMainUnit.dfm:6305
 #. Nemp_MainForm..Player_PopupMenu..N35..Caption
-#: NempMainUnit.dfm:6321
+#: NempMainUnit.dfm:6318
 #. Nemp_MainForm..Player_PopupMenu..N36..Caption
-#: NempMainUnit.dfm:6328
+#: NempMainUnit.dfm:6325
 #. Nemp_MainForm..Player_PopupMenu..N17..Caption
-#: NempMainUnit.dfm:6416
+#: NempMainUnit.dfm:6413
 #. Nemp_MainForm..PopupRepeat..N70..Caption
-#: NempMainUnit.dfm:6500
+#: NempMainUnit.dfm:6497
 #. Nemp_MainForm..Win7TaskBarPopup..N67..Caption
-#: NempMainUnit.dfm:6934
+#: NempMainUnit.dfm:6931
 #. Nemp_MainForm..PopupRepeatAB..N78..Caption
-#: NempMainUnit.dfm:6966
+#: NempMainUnit.dfm:6963
 #. Nemp_MainForm..PopupEditExtendedTags..N1..Caption
-#: NempMainUnit.dfm:7008
+#: NempMainUnit.dfm:7005
 #. Nemp_MainForm..PopupEditExtendedTags..N79..Caption
-#: NempMainUnit.dfm:7024
+#: NempMainUnit.dfm:7021
 #. Nemp_MainForm..PopupEditExtendedTags..N37..Caption
-#: NempMainUnit.dfm:7031
+#: NempMainUnit.dfm:7028
 #. Nemp_MainForm..PopupEditExtendedTags..pm_FO_FileOverview..N41..Caption
-#: NempMainUnit.dfm:7045
+#: NempMainUnit.dfm:7042
 #. Nemp_MainForm..QuickSearchHistory_PopupMenu..N80..Caption
-#: NempMainUnit.dfm:7064
+#: NempMainUnit.dfm:7061
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..N27..Caption
-#: NempMainUnit.dfm:7146
+#: NempMainUnit.dfm:7143
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_FavPlaylistSeparator..Caption
-#: NempMainUnit.dfm:7158
+#: NempMainUnit.dfm:7155
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortLayerBy..N11..Caption
-#: NempMainUnit.dfm:7217
+#: NempMainUnit.dfm:7214
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortPlaylistsBy..N28..Caption
-#: NempMainUnit.dfm:7250
+#: NempMainUnit.dfm:7247
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..N16..Caption
-#: NempMainUnit.dfm:7281
+#: NempMainUnit.dfm:7278
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_Medialibrary..N82..Caption
-#: NempMainUnit.dfm:7316
+#: NempMainUnit.dfm:7313
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_ResetTagCloudSeparator..Caption
-#: NempMainUnit.dfm:7346
+#: NempMainUnit.dfm:7343
 #. Nemp_MainForm..PlaylistManagerPopup..N19..Caption
-#: NempMainUnit.dfm:7452
+#: NempMainUnit.dfm:7449
 #. Nemp_MainForm..PlaylistManagerPopup..N10..Caption
-#: NempMainUnit.dfm:7466
+#: NempMainUnit.dfm:7463
 #. Nemp_MainForm..Medialist_Category_PopupMenu..N42..Caption
-#: NempMainUnit.dfm:7617
+#: NempMainUnit.dfm:7614
 #. OptionsCompleteForm..Panel1..PageControl1..TabSystem1..GrpBox_Hotkeys..CB_Key_Play....Items.Strings
 #: OptionsComplete_-_Kopie.dfm:458
 #. OptionsCompleteForm..Panel1..PageControl1..TabSystem1..GrpBox_Hotkeys..CB_Key_Stop....Items.Strings
@@ -2805,7 +2809,7 @@ msgstr ""
 #. Nemp_MainForm..PopupRepeat..PM_ABRepeat..Caption
 #: NempMainUnit_-_Kopie.dfm:6187
 #. Nemp_MainForm..PopupRepeat..PM_ABRepeat..Caption
-#: NempMainUnit.dfm:6503
+#: NempMainUnit.dfm:6500
 msgid "A-B repeat"
 msgstr ""
 
@@ -2834,7 +2838,7 @@ msgstr ""
 #. Nemp_MainForm..PopupRepeatAB..PM_StopABrepeat..Caption
 #: NempMainUnit_-_Kopie.dfm:6653
 #. Nemp_MainForm..PopupRepeatAB..PM_StopABrepeat..Caption
-#: NempMainUnit.dfm:6969
+#: NempMainUnit.dfm:6966
 msgid "Disable A-B repeat"
 msgstr ""
 
@@ -2935,6 +2939,77 @@ msgstr ""
 msgid "Move/Copy files into another category"
 msgstr ""
 
+#. ConfigErrorDlg..Caption
+#: fConfigErrorDlg.dfm:5
+msgid "Nemp: Faulty installation"
+msgstr ""
+
+#. ConfigErrorDlg..Font.Name
+#: fConfigErrorDlg.dfm:12
+#. ConfigErrorDlg..lblCaption..Font.Name
+#: fConfigErrorDlg.dfm:35
+#. ConfigErrorDlg..lblMessage..Font.Name
+#: fConfigErrorDlg.dfm:54
+#. OptionsCompleteForm..Panel1..PageControl1..tabGeneral..cpgMainOptions..HeaderFont.Name
+#: OptionsComplete.dfm:103
+#. OptionsCompleteForm..Panel1..PageControl1..tabControl..cpgControlSettings..HeaderFont.Name
+#: OptionsComplete.dfm:447
+#. OptionsCompleteForm..Panel1..PageControl1..tabViewingSettings..cpgViewingSettings..HeaderFont.Name
+#: OptionsComplete.dfm:1317
+#. OptionsCompleteForm..Panel1..PageControl1..tabFontSizes..cpgDisplaySettings..HeaderFont.Name
+#: OptionsComplete.dfm:1738
+#. OptionsCompleteForm..Panel1..PageControl1..tabFileManagement..cpgFileManagement..HeaderFont.Name
+#: OptionsComplete.dfm:2057
+#. OptionsCompleteForm..Panel1..PageControl1..tabCategories..cpgCategories..HeaderFont.Name
+#: OptionsComplete.dfm:2360
+#. OptionsCompleteForm..Panel1..PageControl1..tabMetadata..cpgMetadata..HeaderFont.Name
+#: OptionsComplete.dfm:2761
+#. OptionsCompleteForm..Panel1..PageControl1..tabSearch..cpgSearchSettings..HeaderFont.Name
+#: OptionsComplete.dfm:2955
+#. OptionsCompleteForm..Panel1..PageControl1..tabPlayer..cpgPlayerMain..HeaderFont.Name
+#: OptionsComplete.dfm:3111
+#. OptionsCompleteForm..Panel1..PageControl1..tabPlaylist..cpgPlaylistSettings..HeaderFont.Name
+#: OptionsComplete.dfm:3538
+#. OptionsCompleteForm..Panel1..PageControl1..tabWebradio..cpgWebstreams..HeaderFont.Name
+#: OptionsComplete.dfm:4109
+#. OptionsCompleteForm..Panel1..PageControl1..tabEffects..cpgEffects..HeaderFont.Name
+#: OptionsComplete.dfm:4320
+#. OptionsCompleteForm..Panel1..PageControl1..tabBirthday..cpgBirthday..HeaderFont.Name
+#: OptionsComplete.dfm:4557
+#. OptionsCompleteForm..Panel1..PageControl1..tabLastfm..cpgScrobble..HeaderFont.Name
+#: OptionsComplete.dfm:4753
+#. OptionsCompleteForm..Panel1..PageControl1..tabWebserver..cpgWebserverConfiguration..HeaderFont.Name
+#: OptionsComplete.dfm:5111
+#. OptionsCompleteForm..Panel1..PageControl1..tabCoverflow..cpgCoverFlowView..HeaderFont.Name
+#: OptionsComplete.dfm:5476
+#. OptionsCompleteForm..Panel1..PageControl1..tabFiletypes..cpgFileTypesRegistration..HeaderFont.Name
+#: OptionsComplete.dfm:5877
+msgid "Segoe UI"
+msgstr ""
+
+#. ConfigErrorDlg..lblCaption..Caption
+#: fConfigErrorDlg.dfm:31
+msgid "The installation of Nemp is faulty"
+msgstr ""
+
+#. ConfigErrorDlg..lblMessage....Caption
+#: fConfigErrorDlg.dfm:50
+msgid "Nemp has no write permissions in the configured data directory. "
+"Therefore the playlist and the media library can not be saved. For "
+"instructions on how to fix this problem, click on "
+"\"Help\"."
+msgstr ""
+
+#. ConfigErrorDlg..BtnProgramDir..Caption
+#: fConfigErrorDlg.dfm:92
+msgid "Open install directory"
+msgstr ""
+
+#. ConfigErrorDlg..btnOpenDataDir..Caption
+#: fConfigErrorDlg.dfm:116
+msgid "Open data directory"
+msgstr ""
+
 #. FormNewLayer..Caption
 #: LibraryOrganizer.Configuration.NewLayer.dfm:5
 msgid "Nemp: New category layer"
@@ -2957,7 +3032,7 @@ msgstr ""
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_SortLayerBy..Caption
 #: NempMainUnit_-_Kopie.dfm:6860
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortLayerBy..Caption
-#: NempMainUnit.dfm:7169
+#: NempMainUnit.dfm:7166
 msgid "Sort layer by"
 msgstr ""
 
@@ -2981,11 +3056,11 @@ msgstr ""
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortAscending..Caption
 #: NempMainUnit_-_Kopie.dfm:5333
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortAscending..Caption
-#: NempMainUnit.dfm:5619
+#: NempMainUnit.dfm:5617
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortLayerBy..PM_ML_SortLayerAscending..Caption
-#: NempMainUnit.dfm:7221
+#: NempMainUnit.dfm:7218
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortPlaylistsBy..PM_ML_SortPlaylistsAscending..Caption
-#: NempMainUnit.dfm:7254
+#: NempMainUnit.dfm:7251
 #. OptionsCompleteForm..Panel1..PageControl1..tabCategories..cpgCategories..cpCategoryPlaylists..cbPlaylistSortDirection..Text
 #: OptionsComplete.dfm:2407
 #. OptionsCompleteForm..Panel1..PageControl1..tabCategories..cpgCategories..cpCategoryPlaylists..cbPlaylistSortDirection....Items.Strings
@@ -3002,11 +3077,11 @@ msgstr ""
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortDescending..Caption
 #: NempMainUnit_-_Kopie.dfm:5327
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortDescending..Caption
-#: NempMainUnit.dfm:5626
+#: NempMainUnit.dfm:5624
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortLayerBy..PM_ML_SortLayerDescending..Caption
-#: NempMainUnit.dfm:7227
+#: NempMainUnit.dfm:7224
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortPlaylistsBy..PM_ML_SortPlaylistsDescending..Caption
-#: NempMainUnit.dfm:7259
+#: NempMainUnit.dfm:7256
 #. OptionsCompleteForm..Panel1..PageControl1..tabCategories..cpgCategories..cpCategoryPlaylists..cbPlaylistSortDirection....Items.Strings
 #: OptionsComplete.dfm:2410
 msgid "Descending"
@@ -3079,11 +3154,11 @@ msgstr ""
 #. Nemp_MainForm..__MainContainerPanel.._TopMainPanel..AuswahlPanel..AuswahlHeaderPanel..AuswahlControlPanel..TabBtn_TagCloud..Hint
 #: NempMainUnit_-_Kopie.dfm:546
 #. Nemp_MainForm..__MainContainerPanel..TreePanel..AuswahlHeaderPanel0..AuswahlControlPanel0..TabBtn_TagCloud0..Hint
-#: NempMainUnit.dfm:2089
+#: NempMainUnit.dfm:2087
 #. Nemp_MainForm..__MainContainerPanel..CoverflowPanel..AuswahlHeaderPanel1..AuswahlControlPanel1..TabBtn_TagCloud1..Hint
-#: NempMainUnit.dfm:2405
+#: NempMainUnit.dfm:2403
 #. Nemp_MainForm..__MainContainerPanel..CloudPanel..AuswahlHeaderPanel2..AuswahlControlPanel2..TabBtn_TagCloud2..Hint
-#: NempMainUnit.dfm:2709
+#: NempMainUnit.dfm:2707
 msgid "Tag cloud"
 msgstr ""
 
@@ -3135,11 +3210,11 @@ msgstr ""
 #. Nemp_MainForm..__MainContainerPanel.._TopMainPanel..AuswahlPanel..AuswahlHeaderPanel..AuswahlControlPanel..TabBtn_CoverFlow..Hint
 #: NempMainUnit_-_Kopie.dfm:504
 #. Nemp_MainForm..__MainContainerPanel..TreePanel..AuswahlHeaderPanel0..AuswahlControlPanel0..TabBtn_CoverFlow0..Hint
-#: NempMainUnit.dfm:2047
+#: NempMainUnit.dfm:2045
 #. Nemp_MainForm..__MainContainerPanel..CoverflowPanel..AuswahlHeaderPanel1..AuswahlControlPanel1..TabBtn_CoverFlow1..Hint
-#: NempMainUnit.dfm:2363
+#: NempMainUnit.dfm:2361
 #. Nemp_MainForm..__MainContainerPanel..CloudPanel..AuswahlHeaderPanel2..AuswahlControlPanel2..TabBtn_CoverFlow2..Hint
-#: NempMainUnit.dfm:2667
+#: NempMainUnit.dfm:2665
 #. OptionsCompleteForm..Panel1..PageControl1..TabView4..GrpBox_ViewVis_CoverFlow..Caption
 #: OptionsComplete_-_Kopie.dfm:2527
 msgid "Coverflow"
@@ -3152,13 +3227,13 @@ msgstr ""
 #. Nemp_MainForm..__MainContainerPanel.._VSTPanel..MedienBibDetailPanel..MedienBibDetailHeaderPanel..MedienBibDetailFillPanel..MedienBibDetailStatusLbl..Caption
 #: NempMainUnit_-_Kopie.dfm:1412
 #. Nemp_MainForm..__MainContainerPanel..MedienBibDetailPanel..MedienBibDetailHeaderPanel..MedienBibDetailFillPanel..MedienBibDetailStatusLbl..Caption
-#: NempMainUnit.dfm:1530
+#: NempMainUnit.dfm:1528
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_View..MM_O_Overview..Caption
-#: NempMainUnit.dfm:3081
+#: NempMainUnit.dfm:3079
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..PM_P_FileOverview..Caption
-#: NempMainUnit.dfm:6270
+#: NempMainUnit.dfm:6267
 #. Nemp_MainForm..PopupEditExtendedTags..pm_FO_FileOverview..Caption
-#: NempMainUnit.dfm:7034
+#: NempMainUnit.dfm:7031
 msgid "File overview"
 msgstr ""
 
@@ -3174,7 +3249,7 @@ msgstr ""
 #. Nemp_MainForm..TNAMenu..PM_TNA_Playlist..Caption
 #: NempMainUnit_-_Kopie.dfm:5900
 #. Nemp_MainForm..TNAMenu..PM_TNA_Playlist..Caption
-#: NempMainUnit.dfm:6188
+#: NempMainUnit.dfm:6185
 #. OptionsCompleteForm..Panel1..PageControl1..tabPlaylist..Caption
 #: OptionsComplete.dfm:3526
 #. Programmer's name for it: OptionsTree_Playlist
@@ -3250,9 +3325,9 @@ msgstr ""
 #. MainFormBuilder..pnlConstruction..pnlSettings..grpBoxAdditionalConfig..cbFileOverviewOrientation....Items.Strings
 #: MainFormBuilderForm.dfm:689
 #. Nemp_MainForm..ActionListLayout..actTreeViewSideBySide..Caption
-#: NempMainUnit.dfm:7557
+#: NempMainUnit.dfm:7554
 #. Nemp_MainForm..ActionListLayout..actFileOverviewSideBySide..Caption
-#: NempMainUnit.dfm:7581
+#: NempMainUnit.dfm:7578
 msgid "Side by side"
 msgstr ""
 
@@ -3261,9 +3336,9 @@ msgstr ""
 #. MainFormBuilder..pnlConstruction..pnlSettings..grpBoxAdditionalConfig..cbFileOverviewOrientation....Items.Strings
 #: MainFormBuilderForm.dfm:690
 #. Nemp_MainForm..ActionListLayout..actTreeviewStacked..Caption
-#: NempMainUnit.dfm:7553
+#: NempMainUnit.dfm:7550
 #. Nemp_MainForm..ActionListLayout..actFileOverviewStacked..Caption
-#: NempMainUnit.dfm:7577
+#: NempMainUnit.dfm:7574
 msgid "Stacked"
 msgstr ""
 
@@ -3299,7 +3374,7 @@ msgstr ""
 #. MainFormBuilder..pnlConstruction..pnlSettings..grpBoxAdditionalConfig..cbShowCategorySelection..Caption
 #: MainFormBuilderForm.dfm:716
 #. Nemp_MainForm..ActionListLayout..actToggleShowCategorySelection..Caption
-#: NempMainUnit.dfm:7561
+#: NempMainUnit.dfm:7558
 msgid "Show category selection"
 msgstr ""
 
@@ -3358,47 +3433,47 @@ msgstr ""
 #. Nemp_MainForm..__MainContainerPanel.._TopMainPanel..AuswahlPanel..GRPBOXArtistsAlben..LblEmptyLibraryHint..Caption
 #: NempMainUnit_-_Kopie.dfm:120
 #. Nemp_MainForm..__MainContainerPanel..EmptyLibraryPanel..LblEmptyLibraryHint..Caption
-#: NempMainUnit.dfm:2784
+#: NempMainUnit.dfm:2782
 msgid "Library is empty"
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel.._TopMainPanel..AuswahlPanel..GRPBOXArtistsAlben..PanelCoverBrowse..Pnl_CoverFlowLabel..Caption
 #: NempMainUnit_-_Kopie.dfm:201
 #. Nemp_MainForm..__MainContainerPanel..CoverflowPanel..PanelCoverBrowse..Pnl_CoverFlowLabel..Caption
-#: NempMainUnit.dfm:2496
+#: NempMainUnit.dfm:2494
 msgid "Pnl_CoverFlowLabel"
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel.._TopMainPanel..AuswahlPanel..GRPBOXArtistsAlben..PanelCoverBrowse..Pnl_CoverFlowLabel..TabBtnCoverCategory..Hint
 #: NempMainUnit_-_Kopie.dfm:235
 #. Nemp_MainForm..__MainContainerPanel..CoverflowPanel..PanelCoverBrowse..Pnl_CoverFlowLabel..TabBtnCoverCategory..Hint
-#: NempMainUnit.dfm:2532
+#: NempMainUnit.dfm:2530
 #. Nemp_MainForm..__MainContainerPanel..CloudPanel..PanelTagCloudBrowse..TabBtnTagCloudCategory..Hint
-#: NempMainUnit.dfm:2748
+#: NempMainUnit.dfm:2746
 msgid "Select category"
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel.._TopMainPanel..AuswahlPanel..AuswahlHeaderPanel..AuswahlControlPanel..edtCloudSearch..TextHint
 #: NempMainUnit_-_Kopie.dfm:474
 #. Nemp_MainForm..__MainContainerPanel..CloudPanel..AuswahlHeaderPanel2..AuswahlControlPanel2..edtCloudSearch..TextHint
-#: NempMainUnit.dfm:2637
+#: NempMainUnit.dfm:2635
 msgid "Search (Tags)"
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel.._TopMainPanel..AuswahlPanel..AuswahlHeaderPanel..AuswahlControlPanel..TabBtn_Browse..Hint
 #: NempMainUnit_-_Kopie.dfm:483
 #. Nemp_MainForm..__MainContainerPanel..TreePanel..AuswahlHeaderPanel0..AuswahlControlPanel0..TabBtn_Browse0..Hint
-#: NempMainUnit.dfm:2026
+#: NempMainUnit.dfm:2024
 #. Nemp_MainForm..__MainContainerPanel..CoverflowPanel..AuswahlHeaderPanel1..AuswahlControlPanel1..TabBtn_Browse1..Hint
-#: NempMainUnit.dfm:2342
+#: NempMainUnit.dfm:2340
 #. Nemp_MainForm..__MainContainerPanel..CloudPanel..AuswahlHeaderPanel2..AuswahlControlPanel2..TabBtn_Browse2..Hint
-#: NempMainUnit.dfm:2646
+#: NempMainUnit.dfm:2644
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_View..MM_O_Treeview..Caption
-#: NempMainUnit.dfm:3072
+#: NempMainUnit.dfm:3070
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..PM_P_TreeView..Caption
-#: NempMainUnit.dfm:6261
+#: NempMainUnit.dfm:6258
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_Treeview..Caption
-#: NempMainUnit.dfm:7272
+#: NempMainUnit.dfm:7269
 msgid "Treeview"
 msgstr ""
 
@@ -3411,13 +3486,13 @@ msgstr ""
 #. Nemp_MainForm..__MainContainerPanel..PlaylistPanel..PlayerHeaderPanel..PlaylistControlPanel..TabBtn_Playlist..Hint
 #: NempMainUnit.dfm:1170
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..MedienBibHeaderPanel..MedienListeControlPanel..TabBtn_Medialib..Hint
-#: NempMainUnit.dfm:1709
+#: NempMainUnit.dfm:1707
 #. Nemp_MainForm..__MainContainerPanel..TreePanel..AuswahlHeaderPanel0..AuswahlControlPanel0..TabBtn_Preselection0..Hint
-#: NempMainUnit.dfm:2068
+#: NempMainUnit.dfm:2066
 #. Nemp_MainForm..__MainContainerPanel..CoverflowPanel..AuswahlHeaderPanel1..AuswahlControlPanel1..TabBtn_Preselection1..Hint
-#: NempMainUnit.dfm:2384
+#: NempMainUnit.dfm:2382
 #. Nemp_MainForm..__MainContainerPanel..CloudPanel..AuswahlHeaderPanel2..AuswahlControlPanel2..TabBtn_Preselection2..Hint
-#: NempMainUnit.dfm:2688
+#: NempMainUnit.dfm:2686
 msgid "Show context menu"
 msgstr ""
 
@@ -3455,14 +3530,14 @@ msgstr ""
 #. Nemp_MainForm..__MainContainerPanel.._VSTPanel..MedialistPanel..MedienBibHeaderPanel..MedienListeControlPanel..EDITFastSearch..TextHint
 #: NempMainUnit_-_Kopie.dfm:897
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..MedienBibHeaderPanel..MedienListeControlPanel..EDITFastSearch..TextHint
-#: NempMainUnit.dfm:1678
+#: NempMainUnit.dfm:1676
 msgid "Search (Library)"
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel.._VSTPanel..MedienBibDetailPanel..ContainerPanelMedienBibDetails..DetailID3TagPanel..ImgBibRating..Hint
 #: NempMainUnit_-_Kopie.dfm:1217
 #. Nemp_MainForm..__MainContainerPanel..MedienBibDetailPanel..ContainerPanelMedienBibDetails..DetailID3TagPanel..ImgBibRating..Hint
-#: NempMainUnit.dfm:1331
+#: NempMainUnit.dfm:1329
 #. FormPlaylistDuplicates..PnlDetails..grpBoxDetailsPlaylist..ImgRatingPlaylist..Hint
 #: PlaylistDuplicates.dfm:258
 #. FormPlaylistDuplicates..PnlDetails..grpBoxDetailsDuplicate..ImgRatingDuplicate..Hint
@@ -3496,26 +3571,26 @@ msgstr ""
 #. Nemp_MainForm..__MainContainerPanel.._VSTPanel..MedienBibDetailPanel..ContainerPanelMedienBibDetails..DetailID3TagPanel..lblBibFilename..Caption
 #: NempMainUnit_-_Kopie.dfm:1346
 #. Nemp_MainForm..__MainContainerPanel..MedienBibDetailPanel..ContainerPanelMedienBibDetails..DetailID3TagPanel..LblBibGenre..Caption
-#: NempMainUnit.dfm:1383
+#: NempMainUnit.dfm:1381
 #. Nemp_MainForm..__MainContainerPanel..MedienBibDetailPanel..ContainerPanelMedienBibDetails..DetailID3TagPanel..LblBibPlayCounter..Caption
-#: NempMainUnit.dfm:1395
+#: NempMainUnit.dfm:1393
 #. Nemp_MainForm..__MainContainerPanel..MedienBibDetailPanel..ContainerPanelMedienBibDetails..DetailID3TagPanel..LblBibQuality..Caption
-#: NempMainUnit.dfm:1404
+#: NempMainUnit.dfm:1402
 #. Nemp_MainForm..__MainContainerPanel..MedienBibDetailPanel..ContainerPanelMedienBibDetails..DetailID3TagPanel..LblBibTitle..Caption
-#: NempMainUnit.dfm:1414
+#: NempMainUnit.dfm:1412
 #. Nemp_MainForm..__MainContainerPanel..MedienBibDetailPanel..ContainerPanelMedienBibDetails..DetailID3TagPanel..LblBibYear..Caption
-#: NempMainUnit.dfm:1430
+#: NempMainUnit.dfm:1428
 #. Nemp_MainForm..__MainContainerPanel..MedienBibDetailPanel..ContainerPanelMedienBibDetails..DetailID3TagPanel..LblBibReplayGain..Caption
-#: NempMainUnit.dfm:1452
+#: NempMainUnit.dfm:1450
 #. Nemp_MainForm..__MainContainerPanel..MedienBibDetailPanel..ContainerPanelMedienBibDetails..DetailID3TagPanel..lblBibFilename..Caption
-#: NempMainUnit.dfm:1461
+#: NempMainUnit.dfm:1459
 msgid "                  "
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel.._VSTPanel..MedienBibDetailPanel..ContainerPanelMedienBibDetails..DetailID3TagPanel..LblBibReplayGain..Hint
 #: NempMainUnit_-_Kopie.dfm:1336
 #. Nemp_MainForm..__MainContainerPanel..MedienBibDetailPanel..ContainerPanelMedienBibDetails..DetailID3TagPanel..LblBibReplayGain..Hint
-#: NempMainUnit.dfm:1451
+#: NempMainUnit.dfm:1449
 #. FormPlaylistDuplicates..PnlDetails..grpBoxDetailsPlaylist..LblReplayGainPlaylist..Hint
 #: PlaylistDuplicates.dfm:340
 #. FormPlaylistDuplicates..PnlDetails..grpBoxDetailsDuplicate..LblReplayGainDuplicate..Hint
@@ -3526,14 +3601,14 @@ msgstr ""
 #. Nemp_MainForm..__MainContainerPanel.._VSTPanel..MedienBibDetailPanel..MedienBibDetailHeaderPanel..MedienBibDetailControlPanel..TabBtn_Cover..Hint
 #: NempMainUnit_-_Kopie.dfm:1432
 #. Nemp_MainForm..__MainContainerPanel..MedienBibDetailPanel..MedienBibDetailHeaderPanel..MedienBibDetailControlPanel..TabBtn_Cover..Hint
-#: NempMainUnit.dfm:1552
+#: NempMainUnit.dfm:1550
 msgid "Toggle Cover/Lyrics"
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel.._VSTPanel..MedienBibDetailPanel..MedienBibDetailHeaderPanel..MedienBibDetailControlPanel..TabBtn_SummaryLock..Hint
 #: NempMainUnit_-_Kopie.dfm:1454
 #. Nemp_MainForm..__MainContainerPanel..MedienBibDetailPanel..MedienBibDetailHeaderPanel..MedienBibDetailControlPanel..TabBtn_SummaryLock..Hint
-#: NempMainUnit.dfm:1574
+#: NempMainUnit.dfm:1572
 msgid "Toggle File Overview (player only vs. selected "
 "file)"
 msgstr ""
@@ -3581,7 +3656,7 @@ msgstr ""
 #. Nemp_MainForm..__MainContainerPanel.._ControlPanel..ControlContainer2..NewPlayerPanel..BtnClose..Hint
 #: NempMainUnit.dfm:303
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_CloseNemp..Caption
-#: NempMainUnit.dfm:2882
+#: NempMainUnit.dfm:2880
 #. ShutDownEditForm..grpBoxSettings..cbIntendedAction....Items.Strings
 #: ShutDownEdit.dfm:130
 #. Programmer's name for it: NempShutDown_ClosePopupBlank
@@ -3699,9 +3774,9 @@ msgstr ""
 #. Nemp_MainForm..__MainContainerPanel.._ControlPanel..ControlContainer1..PlayerControlPanel..StopBTN..Hint
 #: NempMainUnit.dfm:892
 #. Nemp_MainForm..TNAMenu..PM_TNA_Stop..Caption
-#: NempMainUnit.dfm:6172
+#: NempMainUnit.dfm:6169
 #. Nemp_MainForm..PopupStop..PM_StopNow..Caption
-#: NempMainUnit.dfm:6464
+#: NempMainUnit.dfm:6461
 #. OptionsCompleteForm..Panel1..PageControl1..TabSystem1..GrpBox_Hotkeys..CB_Activate_Stop..Caption
 #: OptionsComplete_-_Kopie.dfm:302
 #. OptionsCompleteForm..Panel1..PageControl1..tabControl..cpgControlSettings..cpHotkeys..CB_Activate_Stop..Caption
@@ -3736,7 +3811,7 @@ msgstr ""
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..Caption
 #: NempMainUnit_-_Kopie.dfm:2420
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..Caption
-#: NempMainUnit.dfm:2810
+#: NempMainUnit.dfm:2808
 msgid "&Media library"
 msgstr ""
 
@@ -3750,9 +3825,9 @@ msgstr ""
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_Webradio..Caption
 #: NempMainUnit_-_Kopie.dfm:6967
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_Webradio..Caption
-#: NempMainUnit.dfm:2823
+#: NempMainUnit.dfm:2821
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_Webradio..Caption
-#: NempMainUnit.dfm:7336
+#: NempMainUnit.dfm:7333
 msgid "Manage webradio stations"
 msgstr ""
 
@@ -3761,28 +3836,28 @@ msgstr ""
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_ConfigureMedialibrary..Caption
 #: NempMainUnit_-_Kopie.dfm:6910
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_ML_ConfigureMediaLibrary..Caption
-#: NempMainUnit.dfm:3006
+#: NempMainUnit.dfm:3004
 msgid "Configure Media library"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_Load..Caption
 #: NempMainUnit_-_Kopie.dfm:2451
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_Load..Caption
-#: NempMainUnit.dfm:2840
+#: NempMainUnit.dfm:2838
 msgid "&Load"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_Save..Caption
 #: NempMainUnit_-_Kopie.dfm:2456
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_Save..Caption
-#: NempMainUnit.dfm:2845
+#: NempMainUnit.dfm:2843
 msgid "Sa&ve"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_ExportAsCSV..Caption
 #: NempMainUnit_-_Kopie.dfm:2461
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_ExportAsCSV..Caption
-#: NempMainUnit.dfm:2850
+#: NempMainUnit.dfm:2848
 msgid "&Export as csv"
 msgstr ""
 
@@ -3791,23 +3866,23 @@ msgstr ""
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_Medialibrary..PM_ML_MedialibraryDelete..Caption
 #: NempMainUnit_-_Kopie.dfm:6941
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_Delete..Caption
-#: NempMainUnit.dfm:2855
+#: NempMainUnit.dfm:2853
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_Medialibrary..PM_ML_MedialibraryDelete..Caption
-#: NempMainUnit.dfm:7311
+#: NempMainUnit.dfm:7308
 msgid "&Delete"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_RefreshAll..Caption
 #: NempMainUnit_-_Kopie.dfm:2474
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_RefreshAll..Caption
-#: NempMainUnit.dfm:2863
+#: NempMainUnit.dfm:2861
 msgid "&Refresh (rescan all files)"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_DeleteMissingFiles..Caption
 #: NempMainUnit_-_Kopie.dfm:2480
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_DeleteMissingFiles..Caption
-#: NempMainUnit.dfm:2869
+#: NempMainUnit.dfm:2867
 msgid "Cleanup (remove &missing files)"
 msgstr ""
 
@@ -3816,128 +3891,128 @@ msgstr ""
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_Medialibrary..PM_ML_CloudEditor..Caption
 #: NempMainUnit_-_Kopie.dfm:6960
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_T_CloudEditor..Caption
-#: NempMainUnit.dfm:2874
+#: NempMainUnit.dfm:2872
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_Medialibrary..PM_ML_CloudEditor..Caption
-#: NempMainUnit.dfm:7330
+#: NempMainUnit.dfm:7327
 msgid "Tag cloud editor"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..Caption
 #: NempMainUnit_-_Kopie.dfm:2500
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..Caption
-#: NempMainUnit.dfm:2888
+#: NempMainUnit.dfm:2886
 msgid "&Playlist"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_Files..Caption
 #: NempMainUnit_-_Kopie.dfm:2503
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_Files..Caption
-#: NempMainUnit.dfm:2891
+#: NempMainUnit.dfm:2889
 msgid "Add &files"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_Directory..Caption
 #: NempMainUnit_-_Kopie.dfm:2507
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_Directory..Caption
-#: NempMainUnit.dfm:2895
+#: NempMainUnit.dfm:2893
 msgid "Add &directory"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_WebStream..Caption
 #: NempMainUnit_-_Kopie.dfm:2511
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_WebStream..Caption
-#: NempMainUnit.dfm:2899
+#: NempMainUnit.dfm:2897
 msgid "Add &webradio"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SortBy..Caption
 #: NempMainUnit_-_Kopie.dfm:2516
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SortBy..Caption
-#: NempMainUnit.dfm:2904
+#: NempMainUnit.dfm:2902
 msgid "Sort &by"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SortBy..MM_PL_SortByFilename..Caption
 #: NempMainUnit_-_Kopie.dfm:2520
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SortBy..MM_PL_SortByFilename..Caption
-#: NempMainUnit.dfm:2908
+#: NempMainUnit.dfm:2906
 msgid "&Filename"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SortBy..MM_PL_SortByArtist..Caption
 #: NempMainUnit_-_Kopie.dfm:2525
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SortBy..MM_PL_SortByArtist..Caption
-#: NempMainUnit.dfm:2913
+#: NempMainUnit.dfm:2911
 msgid "&Artist"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SortBy..MM_PL_SortByTitle..Caption
 #: NempMainUnit_-_Kopie.dfm:2530
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SortBy..MM_PL_SortByTitle..Caption
-#: NempMainUnit.dfm:2918
+#: NempMainUnit.dfm:2916
 msgid "&Title"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SortBy..MM_PL_SortByAlbumTrack..Caption
 #: NempMainUnit_-_Kopie.dfm:2535
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SortBy..MM_PL_SortByAlbumTrack..Caption
-#: NempMainUnit.dfm:2923
+#: NempMainUnit.dfm:2921
 msgid "A&lbum, Tracknr."
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SortBy..MM_PL_SortByInverse..Caption
 #: NempMainUnit_-_Kopie.dfm:2542
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SortBy..MM_PL_SortByInverse..Caption
-#: NempMainUnit.dfm:2930
+#: NempMainUnit.dfm:2928
 msgid "&Inverse"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SortBy..MM_PL_SortByMix..Caption
 #: NempMainUnit_-_Kopie.dfm:2546
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SortBy..MM_PL_SortByMix..Caption
-#: NempMainUnit.dfm:2934
+#: NempMainUnit.dfm:2932
 msgid "&Mix"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_GenerateRandomPlaylist..Caption
 #: NempMainUnit_-_Kopie.dfm:2554
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_GenerateRandomPlaylist..Caption
-#: NempMainUnit.dfm:2942
+#: NempMainUnit.dfm:2940
 msgid "&Generate random playlist"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_Load..Caption
 #: NempMainUnit_-_Kopie.dfm:2558
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_Load..Caption
-#: NempMainUnit.dfm:2946
+#: NempMainUnit.dfm:2944
 msgid "&Load (and clear current list)"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_AddPlaylist..Caption
 #: NempMainUnit_-_Kopie.dfm:2564
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_AddPlaylist..Caption
-#: NempMainUnit.dfm:2952
+#: NempMainUnit.dfm:2950
 msgid "L&oad (add files to current list)"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_RecentPlaylists..Caption
 #: NempMainUnit_-_Kopie.dfm:2568
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_RecentPlaylists..Caption
-#: NempMainUnit.dfm:2956
+#: NempMainUnit.dfm:2954
 msgid "&Recent playlists"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_Save..Caption
 #: NempMainUnit_-_Kopie.dfm:2571
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_Save..Caption
-#: NempMainUnit.dfm:2959
+#: NempMainUnit.dfm:2957
 msgid "&Save"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SaveAsPlaylist..Caption
 #: NempMainUnit_-_Kopie.dfm:2577
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SaveAsPlaylist..Caption
-#: NempMainUnit.dfm:2965
+#: NempMainUnit.dfm:2963
 msgid "Save As"
 msgstr ""
 
@@ -3946,9 +4021,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ExtendedScanFiles..Caption
 #: NempMainUnit_-_Kopie.dfm:5856
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_ExtendedScanFiles..Caption
-#: NempMainUnit.dfm:2972
+#: NempMainUnit.dfm:2970
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ExtendedScanFiles..Caption
-#: NempMainUnit.dfm:6144
+#: NempMainUnit.dfm:6141
 msgid "Refresh files"
 msgstr ""
 
@@ -3959,11 +4034,11 @@ msgstr ""
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_Medialibrary..PM_ML_MedialibraryDeleteNotExisting..Caption
 #: NempMainUnit_-_Kopie.dfm:6955
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_DeleteMissingFiles..Caption
-#: NempMainUnit.dfm:2977
+#: NempMainUnit.dfm:2975
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_DeleteMissingFiles..Caption
-#: NempMainUnit.dfm:5972
+#: NempMainUnit.dfm:5969
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_Medialibrary..PM_ML_MedialibraryDeleteNotExisting..Caption
-#: NempMainUnit.dfm:7325
+#: NempMainUnit.dfm:7322
 msgid "Cleanup (remove missing files)"
 msgstr ""
 
@@ -3972,9 +4047,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ClearPlaylist..Caption
 #: NempMainUnit_-_Kopie.dfm:5674
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_ClearPlaylist..Caption
-#: NempMainUnit.dfm:2982
+#: NempMainUnit.dfm:2980
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ClearPlaylist..Caption
-#: NempMainUnit.dfm:5962
+#: NempMainUnit.dfm:5960
 msgid "Clear"
 msgstr ""
 
@@ -3983,9 +4058,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ExtendedAddToMedialibrary..Caption
 #: NempMainUnit_-_Kopie.dfm:5831
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_ExtendedAddToMedialibrary..Caption
-#: NempMainUnit.dfm:2989
+#: NempMainUnit.dfm:2987
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ExtendedAddToMedialibrary..Caption
-#: NempMainUnit.dfm:6119
+#: NempMainUnit.dfm:6116
 msgid "Add all files to the media library"
 msgstr ""
 
@@ -3994,9 +4069,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_CopyPlaylistToUSB..Caption
 #: NempMainUnit_-_Kopie.dfm:5849
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_CopyPlaylistToUSB..Caption
-#: NempMainUnit.dfm:2993
+#: NempMainUnit.dfm:2991
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_CopyPlaylistToUSB..Caption
-#: NempMainUnit.dfm:6137
+#: NempMainUnit.dfm:6134
 #. PlaylistCopyForm..BtnCopyFiles..Caption
 #: PlaylistToUSB.dfm:31
 #. Programmer's name for it: CopyToUSB_Copy
@@ -4007,14 +4082,14 @@ msgstr ""
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..Caption
 #: NempMainUnit_-_Kopie.dfm:2610
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..Caption
-#: NempMainUnit.dfm:2998
+#: NempMainUnit.dfm:2996
 msgid "&Settings"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_Preferences..Caption
 #: NempMainUnit_-_Kopie.dfm:2613
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_Preferences..Caption
-#: NempMainUnit.dfm:3001
+#: NempMainUnit.dfm:2999
 msgid "&Preferences"
 msgstr ""
 
@@ -4023,16 +4098,16 @@ msgstr ""
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Wizard..Caption
 #: NempMainUnit_-_Kopie.dfm:5927
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_Wizard..Caption
-#: NempMainUnit.dfm:3011
+#: NempMainUnit.dfm:3009
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Wizard..Caption
-#: NempMainUnit.dfm:6215
+#: NempMainUnit.dfm:6212
 msgid "Wizard"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_View..Caption
 #: NempMainUnit_-_Kopie.dfm:2623
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_View..Caption
-#: NempMainUnit.dfm:3031
+#: NempMainUnit.dfm:3029
 msgid "&View"
 msgstr ""
 
@@ -4087,23 +4162,23 @@ msgstr ""
 #. Nemp_MainForm..Player_PopupMenu..PM_P_FormBuilder..Caption
 #: NempMainUnit_-_Kopie.dfm:5980
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_FormBuilder..Caption
-#: NempMainUnit.dfm:3027
+#: NempMainUnit.dfm:3025
 #. Nemp_MainForm..Player_PopupMenu..PM_P_FormBuilder..Caption
-#: NempMainUnit.dfm:6292
+#: NempMainUnit.dfm:6289
 msgid "Form designer"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_Skins..Caption
 #: NempMainUnit_-_Kopie.dfm:2675
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_Skins..Caption
-#: NempMainUnit.dfm:3103
+#: NempMainUnit.dfm:3101
 msgid "&Skins"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_Skins..MM_O_Skins_WindowsStandard..Caption
 #: NempMainUnit_-_Kopie.dfm:2678
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_Skins..MM_O_Skins_WindowsStandard..Caption
-#: NempMainUnit.dfm:3106
+#: NempMainUnit.dfm:3104
 msgid "Windows default"
 msgstr ""
 
@@ -4112,9 +4187,9 @@ msgstr ""
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Skins..PM_P_Skin_UseAdvancedSkin..Caption
 #: NempMainUnit_-_Kopie.dfm:5992
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_Skins..MM_O_Skin_UseAdvanced..Caption
-#: NempMainUnit.dfm:3111
+#: NempMainUnit.dfm:3109
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Skins..PM_P_Skin_UseAdvancedSkin..Caption
-#: NempMainUnit.dfm:6304
+#: NempMainUnit.dfm:6301
 msgid "Use advanced skinning"
 msgstr ""
 
@@ -4123,9 +4198,9 @@ msgstr ""
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Languages..Caption
 #: NempMainUnit_-_Kopie.dfm:6001
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_Languages..Caption
-#: NempMainUnit.dfm:3016
+#: NempMainUnit.dfm:3014
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Languages..Caption
-#: NempMainUnit.dfm:6313
+#: NempMainUnit.dfm:6310
 msgid "Languages"
 msgstr ""
 
@@ -4134,9 +4209,9 @@ msgstr ""
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Languages..PM_P_Defaultlanguage..Caption
 #: NempMainUnit_-_Kopie.dfm:6004
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_Languages..MM_O_Defaultlanguage..Caption
-#: NempMainUnit.dfm:3019
+#: NempMainUnit.dfm:3017
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Languages..PM_P_Defaultlanguage..Caption
-#: NempMainUnit.dfm:6316
+#: NempMainUnit.dfm:6313
 msgid "English"
 msgstr ""
 
@@ -4145,9 +4220,9 @@ msgstr ""
 #. Nemp_MainForm..Player_PopupMenu..PM_P_PartyMode..Caption
 #: NempMainUnit_-_Kopie.dfm:6012
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_PartyMode..Caption
-#: NempMainUnit.dfm:3124
+#: NempMainUnit.dfm:3122
 #. Nemp_MainForm..Player_PopupMenu..PM_P_PartyMode..Caption
-#: NempMainUnit.dfm:6324
+#: NempMainUnit.dfm:6321
 #. OptionsCompleteForm..Panel1..PageControl1..tabFontSizes..cpgDisplaySettings..cpPartyMode..Caption
 #: OptionsComplete.dfm:1745
 msgid "Party mode"
@@ -4156,21 +4231,21 @@ msgstr ""
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..Caption
 #: NempMainUnit_-_Kopie.dfm:2709
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..Caption
-#: NempMainUnit.dfm:3129
+#: NempMainUnit.dfm:3127
 msgid "&Tools"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Shutdown..Caption
 #: NempMainUnit_-_Kopie.dfm:2712
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Shutdown..Caption
-#: NempMainUnit.dfm:3132
+#: NempMainUnit.dfm:3130
 msgid "&Shutdown"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Shutdown..MM_T_ShutdownOff..Caption
 #: NempMainUnit_-_Kopie.dfm:2715
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Shutdown..MM_T_ShutdownOff..Caption
-#: NempMainUnit.dfm:3135
+#: NempMainUnit.dfm:3133
 msgid "&Disable"
 msgstr ""
 
@@ -4199,29 +4274,29 @@ msgstr ""
 #. Nemp_MainForm..PopupTools..PM_T_Scrobbler..PM_T_ScrobblerOptions..Caption
 #: NempMainUnit_-_Kopie.dfm:7035
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Shutdown..MM_T_ShutdownSettings..Caption
-#: NempMainUnit.dfm:3139
+#: NempMainUnit.dfm:3137
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Birthday..MM_T_BirthdayOptions..Caption
-#: NempMainUnit.dfm:3155
+#: NempMainUnit.dfm:3153
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_RemoteNemp..MM_T_WebServerOptions..Caption
-#: NempMainUnit.dfm:3167
+#: NempMainUnit.dfm:3165
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Scrobbler..MM_T_ScrobblerOptions..Caption
-#: NempMainUnit.dfm:3183
+#: NempMainUnit.dfm:3181
 #. Nemp_MainForm..Player_PopupMenu..PM_P_ShutDown..PM_P_ShutDownSettings..Caption
-#: NempMainUnit.dfm:6338
+#: NempMainUnit.dfm:6335
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Birthday..PM_P_BirthdayOptions..Caption
-#: NempMainUnit.dfm:6354
+#: NempMainUnit.dfm:6351
 #. Nemp_MainForm..Player_PopupMenu..PM_P_RemoteNemp..PM_P_WebServerOptions..Caption
-#: NempMainUnit.dfm:6366
+#: NempMainUnit.dfm:6363
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Scrobbler..PM_P_ScrobblerOptions..Caption
-#: NempMainUnit.dfm:6382
+#: NempMainUnit.dfm:6379
 #. Nemp_MainForm..PopupTools..PM_T_ShutDown..PM_T_ShutDownSettings..Caption
-#: NempMainUnit.dfm:7368
+#: NempMainUnit.dfm:7365
 #. Nemp_MainForm..PopupTools..PM_T_Birthday..PM_T_BirthdayOptions..Caption
-#: NempMainUnit.dfm:7384
+#: NempMainUnit.dfm:7381
 #. Nemp_MainForm..PopupTools..PM_T_WebServer..PM_T_WebServerOptions..Caption
-#: NempMainUnit.dfm:7396
+#: NempMainUnit.dfm:7393
 #. Nemp_MainForm..PopupTools..PM_T_Scrobbler..PM_T_ScrobblerOptions..Caption
-#: NempMainUnit.dfm:7412
+#: NempMainUnit.dfm:7409
 #. PlayerLogForm..BtnSettings..Caption
 #: PlayerLog.dfm:37
 #. PlaylistCopyForm..GrpboxSettings..Caption
@@ -4238,18 +4313,18 @@ msgstr ""
 #. Nemp_MainForm..PopupTools..PM_T_ShutDown..PM_T_ShutdownInfo..Caption
 #: NempMainUnit_-_Kopie.dfm:6995
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Shutdown..MM_T_ShutdownInfo..Caption
-#: NempMainUnit.dfm:3143
+#: NempMainUnit.dfm:3141
 #. Nemp_MainForm..Player_PopupMenu..PM_P_ShutDown..PM_P_ShutdownInfo..Caption
-#: NempMainUnit.dfm:6342
+#: NempMainUnit.dfm:6339
 #. Nemp_MainForm..PopupTools..PM_T_ShutDown..PM_T_ShutdownInfo..Caption
-#: NempMainUnit.dfm:7372
+#: NempMainUnit.dfm:7369
 msgid "(not active)"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Birthday..Caption
 #: NempMainUnit_-_Kopie.dfm:2728
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Birthday..Caption
-#: NempMainUnit.dfm:3148
+#: NempMainUnit.dfm:3146
 msgid "&Birthday mode"
 msgstr ""
 
@@ -4276,27 +4351,27 @@ msgstr ""
 #. Nemp_MainForm..PopupTools..PM_T_Scrobbler..PM_T_ScrobblerActivate..Caption
 #: NempMainUnit_-_Kopie.dfm:7031
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Birthday..MM_T_BirthdayActivate..Caption
-#: NempMainUnit.dfm:3151
+#: NempMainUnit.dfm:3149
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_RemoteNemp..MM_T_WebServerActivate..Caption
-#: NempMainUnit.dfm:3163
+#: NempMainUnit.dfm:3161
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Scrobbler..MM_T_ScrobblerActivate..Caption
-#: NempMainUnit.dfm:3179
+#: NempMainUnit.dfm:3177
 #. Nemp_MainForm..Player_PopupMenu..PM_P_ShutDown..PM_P_ShutDownOff..Caption
-#: NempMainUnit.dfm:6334
+#: NempMainUnit.dfm:6331
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Birthday..PM_P_BirthdayActivate..Caption
-#: NempMainUnit.dfm:6350
+#: NempMainUnit.dfm:6347
 #. Nemp_MainForm..Player_PopupMenu..PM_P_RemoteNemp..PM_P_WebServerActivate..Caption
-#: NempMainUnit.dfm:6362
+#: NempMainUnit.dfm:6359
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Scrobbler..PM_P_ScrobblerActivate..Caption
-#: NempMainUnit.dfm:6378
+#: NempMainUnit.dfm:6375
 #. Nemp_MainForm..PopupTools..PM_T_ShutDown..PM_T_ShutDownActivate..Caption
-#: NempMainUnit.dfm:7364
+#: NempMainUnit.dfm:7361
 #. Nemp_MainForm..PopupTools..PM_T_Birthday..PM_T_BirthdayActivate..Caption
-#: NempMainUnit.dfm:7380
+#: NempMainUnit.dfm:7377
 #. Nemp_MainForm..PopupTools..PM_T_WebServer..PM_T_WebServerActivate..Caption
-#: NempMainUnit.dfm:7392
+#: NempMainUnit.dfm:7389
 #. Nemp_MainForm..PopupTools..PM_T_Scrobbler..PM_T_ScrobblerActivate..Caption
-#: NempMainUnit.dfm:7408
+#: NempMainUnit.dfm:7405
 #. OptionsCompleteForm..Panel1..PageControl1..TabPlayer6..BtnActivateBirthdayMode..Caption
 #: OptionsComplete_-_Kopie.dfm:4814
 #. OptionsCompleteForm..Panel1..PageControl1..tabBirthday..cpgBirthday..cpBirthdayMain..BtnActivateBirthdayMode..Caption
@@ -4313,11 +4388,11 @@ msgstr ""
 #. Nemp_MainForm..PopupTools..PM_T_WebServer..Caption
 #: NempMainUnit_-_Kopie.dfm:7012
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_RemoteNemp..Caption
-#: NempMainUnit.dfm:3160
+#: NempMainUnit.dfm:3158
 #. Nemp_MainForm..Player_PopupMenu..PM_P_RemoteNemp..Caption
-#: NempMainUnit.dfm:6359
+#: NempMainUnit.dfm:6356
 #. Nemp_MainForm..PopupTools..PM_T_WebServer..Caption
-#: NempMainUnit.dfm:7389
+#: NempMainUnit.dfm:7386
 msgid "Nemp &Webserver"
 msgstr ""
 
@@ -4328,18 +4403,18 @@ msgstr ""
 #. Nemp_MainForm..PopupTools..PM_T_WebServer..PM_T_WebServerShowLog..Caption
 #: NempMainUnit_-_Kopie.dfm:7023
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_RemoteNemp..MM_T_WebServerShowLog..Caption
-#: NempMainUnit.dfm:3171
+#: NempMainUnit.dfm:3169
 #. Nemp_MainForm..Player_PopupMenu..PM_P_RemoteNemp..PM_P_WebServerShowLog..Caption
-#: NempMainUnit.dfm:6370
+#: NempMainUnit.dfm:6367
 #. Nemp_MainForm..PopupTools..PM_T_WebServer..PM_T_WebServerShowLog..Caption
-#: NempMainUnit.dfm:7400
+#: NempMainUnit.dfm:7397
 msgid "Show log"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Scrobbler..Caption
 #: NempMainUnit_-_Kopie.dfm:2756
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Scrobbler..Caption
-#: NempMainUnit.dfm:3176
+#: NempMainUnit.dfm:3174
 msgid "Scro&bbler"
 msgstr ""
 
@@ -4348,9 +4423,9 @@ msgstr ""
 #. Nemp_MainForm..Player_PopupMenu..PM_P_KeyboardDisplay..Caption
 #: NempMainUnit_-_Kopie.dfm:6080
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_KeyboardDisplay..Caption
-#: NempMainUnit.dfm:3188
+#: NempMainUnit.dfm:3186
 #. Nemp_MainForm..Player_PopupMenu..PM_P_KeyboardDisplay..Caption
-#: NempMainUnit.dfm:6392
+#: NempMainUnit.dfm:6389
 msgid "Keyboard display"
 msgstr ""
 
@@ -4359,30 +4434,30 @@ msgstr ""
 #. Nemp_MainForm..Player_PopupMenu..PM_P_EqualizerEffects..Caption
 #: NempMainUnit_-_Kopie.dfm:6075
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_EqualizerEffects..Caption
-#: NempMainUnit.dfm:3193
+#: NempMainUnit.dfm:3191
 #. Nemp_MainForm..Player_PopupMenu..PM_P_EqualizerEffects..Caption
-#: NempMainUnit.dfm:6387
+#: NempMainUnit.dfm:6384
 msgid "Equalizer && Effects"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Directories..Caption
 #: NempMainUnit_-_Kopie.dfm:2778
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Directories..Caption
-#: NempMainUnit.dfm:3198
+#: NempMainUnit.dfm:3196
 msgid "&Directories"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Directories..MM_T_DirectoriesRecordings..Caption
 #: NempMainUnit_-_Kopie.dfm:2780
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Directories..MM_T_DirectoriesRecordings..Caption
-#: NempMainUnit.dfm:3200
+#: NempMainUnit.dfm:3198
 msgid "&Recordings (webradio)"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Directories..MM_T_DirectoriesData..Caption
 #: NempMainUnit_-_Kopie.dfm:2784
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Directories..MM_T_DirectoriesData..Caption
-#: NempMainUnit.dfm:3204
+#: NempMainUnit.dfm:3202
 msgid "&Data (cover, preferences, ...)"
 msgstr ""
 
@@ -4391,9 +4466,9 @@ msgstr ""
 #. Nemp_MainForm..Player_PopupMenu..PM_P_PlaylistLog..Caption
 #: NempMainUnit_-_Kopie.dfm:6096
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_PlaylistLog..Caption
-#: NempMainUnit.dfm:3213
+#: NempMainUnit.dfm:3211
 #. Nemp_MainForm..Player_PopupMenu..PM_P_PlaylistLog..Caption
-#: NempMainUnit.dfm:6412
+#: NempMainUnit.dfm:6409
 #. OptionsCompleteForm..Panel1..PageControl1..tabPlaylist..cpgPlaylistSettings..cpPlaylistLog..Caption
 #: OptionsComplete.dfm:3545
 msgid "Playlist log"
@@ -4402,7 +4477,7 @@ msgstr ""
 #. Nemp_MainForm..Nemp_MainMenu..MM_Help..Caption
 #: NempMainUnit_-_Kopie.dfm:2794
 #. Nemp_MainForm..Nemp_MainMenu..MM_Help..Caption
-#: NempMainUnit.dfm:3218
+#: NempMainUnit.dfm:3216
 #. Programmer's name for it: XcmbHelp
 #: Nemp_RessourceStrings.pas:45
 msgid "&Help"
@@ -4411,7 +4486,7 @@ msgstr ""
 #. Nemp_MainForm..Nemp_MainMenu..MM_Help..MM_H_About..Caption
 #: NempMainUnit_-_Kopie.dfm:2796
 #. Nemp_MainForm..Nemp_MainMenu..MM_Help..MM_H_About..Caption
-#: NempMainUnit.dfm:3220
+#: NempMainUnit.dfm:3218
 msgid "&About Nemp"
 msgstr ""
 
@@ -4425,7 +4500,7 @@ msgstr ""
 #. Nemp_MainForm..Nemp_MainMenu..MM_H_ErrorLog..Caption
 #: NempMainUnit_-_Kopie.dfm:2812
 #. Nemp_MainForm..Nemp_MainMenu..MM_H_ErrorLog..Caption
-#: NempMainUnit.dfm:3236
+#: NempMainUnit.dfm:3234
 #. MainForm_MainMenu_Messages = 'Messages (%d)';
 #. Programmer's name for it: MainForm_MainMenu_NoMessages
 #: Nemp_RessourceStrings.pas:648
@@ -4435,14 +4510,14 @@ msgstr ""
 #. Nemp_MainForm..Nemp_MainMenu..MM_Warning_ID3Tags..Caption
 #: NempMainUnit_-_Kopie.dfm:2818
 #. Nemp_MainForm..Nemp_MainMenu..MM_Warning_ID3Tags..Caption
-#: NempMainUnit.dfm:3242
+#: NempMainUnit.dfm:3240
 msgid "Warning"
 msgstr ""
 
 #. Nemp_MainForm..PlayListOpenDialog....Filter
 #: NempMainUnit_-_Kopie.dfm:5175
 #. Nemp_MainForm..PlayListOpenDialog....Filter
-#: NempMainUnit.dfm:5461
+#: NempMainUnit.dfm:5459
 #. PlaylistEditorForm..PlayListOpenDialog....Filter
 #: PlaylistEditor.dfm:214
 msgid "All supported files|*.m3u;*.m3u8;*.pls;*.npl;*.asx;*.wax|m3u-lists|*.m"
@@ -4455,9 +4530,9 @@ msgstr ""
 #. Nemp_MainForm..SaveDialog1..DefaultExt
 #: NempMainUnit_-_Kopie.dfm:5203
 #. Nemp_MainForm..OpenDialog1..DefaultExt
-#: NempMainUnit.dfm:5471
+#: NempMainUnit.dfm:5469
 #. Nemp_MainForm..SaveDialog1..DefaultExt
-#: NempMainUnit.dfm:5489
+#: NempMainUnit.dfm:5487
 msgid "gmp"
 msgstr ""
 
@@ -4466,23 +4541,23 @@ msgstr ""
 #. Nemp_MainForm..SaveDialog1..Filter
 #: NempMainUnit_-_Kopie.dfm:5204
 #. Nemp_MainForm..OpenDialog1..Filter
-#: NempMainUnit.dfm:5472
+#: NempMainUnit.dfm:5470
 #. Nemp_MainForm..SaveDialog1..Filter
-#: NempMainUnit.dfm:5490
+#: NempMainUnit.dfm:5488
 msgid "Nemp medialibrary (*.gmp)|*.gmp"
 msgstr ""
 
 #. Nemp_MainForm..PlayListSaveDialog..DefaultExt
 #: NempMainUnit_-_Kopie.dfm:5192
 #. Nemp_MainForm..PlayListSaveDialog..DefaultExt
-#: NempMainUnit.dfm:5478
+#: NempMainUnit.dfm:5476
 msgid "m3u8"
 msgstr ""
 
 #. Nemp_MainForm..PlayListSaveDialog....Filter
 #: NempMainUnit_-_Kopie.dfm:5195
 #. Nemp_MainForm..PlayListSaveDialog....Filter
-#: NempMainUnit.dfm:5481
+#: NempMainUnit.dfm:5479
 msgid "m3u-list|*.m3u|m3u8-list (unicode-capable)|*.m3u8|pls-list|*.pls|Nemp "
 "playlists|*.npl"
 msgstr ""
@@ -4494,11 +4569,11 @@ msgstr ""
 #. Nemp_MainForm..PopupHeadset..PM_H_EnqueueEndOfPlaylist..Caption
 #: NempMainUnit_-_Kopie.dfm:7044
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Enqueue..Caption
-#: NempMainUnit.dfm:5501
+#: NempMainUnit.dfm:5499
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_EnqueueBrowse..Caption
-#: NempMainUnit.dfm:7132
+#: NempMainUnit.dfm:7129
 #. Nemp_MainForm..PopupHeadset..PM_H_EnqueueEndOfPlaylist..Caption
-#: NempMainUnit.dfm:7421
+#: NempMainUnit.dfm:7418
 #. RandomPlaylistForm..CBInsertMode....Items.Strings
 #: RandomPlaylist.dfm:291
 #. Programmer's name for it: MainForm_MenuCaptionsEnqueue
@@ -4515,11 +4590,11 @@ msgstr ""
 #. Nemp_MainForm..PopupHeadset..PM_H_PlayAndClearPlaylist..Caption
 #: NempMainUnit_-_Kopie.dfm:7049
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Play..Caption
-#: NempMainUnit.dfm:5506
+#: NempMainUnit.dfm:5504
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_PlayBrowse..Caption
-#: NempMainUnit.dfm:7137
+#: NempMainUnit.dfm:7134
 #. Nemp_MainForm..PopupHeadset..PM_H_PlayAndClearPlaylist..Caption
-#: NempMainUnit.dfm:7426
+#: NempMainUnit.dfm:7423
 #. OptionsCompleteForm..Panel1..PageControl1..TabPlayer2..GrpBox_HeadsetBehaviour..GrpBox_DefaultAction....Items.Strings
 #: OptionsComplete_-_Kopie.dfm:4187
 #. OptionsCompleteForm..Panel1..PageControl1..TabPlayer2..GrpBox_HeadsetBehaviour..GrpBox_HeadsetDefaultAction....Items.Strings
@@ -4546,11 +4621,11 @@ msgstr ""
 #. Nemp_MainForm..PopupHeadset..PM_H_EnqueueAfterCurrentTitle..Caption
 #: NempMainUnit_-_Kopie.dfm:7054
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_PlayNext..Caption
-#: NempMainUnit.dfm:5511
+#: NempMainUnit.dfm:5509
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_PlayNextBrowse..Caption
-#: NempMainUnit.dfm:7142
+#: NempMainUnit.dfm:7139
 #. Nemp_MainForm..PopupHeadset..PM_H_EnqueueAfterCurrentTitle..Caption
-#: NempMainUnit.dfm:7431
+#: NempMainUnit.dfm:7428
 #. 'Enqueue (at the end of the prebook-list)';
 #. Programmer's name for it: MainForm_MenuCaptionsPlayNext
 #: Nemp_RessourceStrings.pas:587
@@ -4562,7 +4637,7 @@ msgstr ""
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_PlayNow..Caption
 #: NempMainUnit_-_Kopie.dfm:5230
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_PlayNow..Caption
-#: NempMainUnit.dfm:5516
+#: NempMainUnit.dfm:5514
 msgid "Just play focussed file (don't change the "
 "playlist)"
 msgstr ""
@@ -4572,9 +4647,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_PlayInHeadset..Caption
 #: NempMainUnit_-_Kopie.dfm:5822
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_PlayHeadset..Caption
-#: NempMainUnit.dfm:5523
+#: NempMainUnit.dfm:5521
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_PlayInHeadset..Caption
-#: NempMainUnit.dfm:6110
+#: NempMainUnit.dfm:6107
 msgid "Play in headset"
 msgstr ""
 
@@ -4583,9 +4658,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..Caption
 #: NempMainUnit_-_Kopie.dfm:5601
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..Caption
-#: NempMainUnit.dfm:5532
+#: NempMainUnit.dfm:5530
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..Caption
-#: NempMainUnit.dfm:5889
+#: NempMainUnit.dfm:5887
 #. OptionsCompleteForm..Panel1..PageControl1..tabCategories..cpgCategories..cpCategoryPlaylists..lblPlaylistSortMode..Caption
 #: OptionsComplete.dfm:2381
 msgid "Sort by"
@@ -4594,35 +4669,35 @@ msgstr ""
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortArtistTitle..Caption
 #: NempMainUnit_-_Kopie.dfm:5249
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortArtistTitle..Caption
-#: NempMainUnit.dfm:5535
+#: NempMainUnit.dfm:5533
 msgid "Artist, Title"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortArtistAlbumTitle..Caption
 #: NempMainUnit_-_Kopie.dfm:5254
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortArtistAlbumTitle..Caption
-#: NempMainUnit.dfm:5540
+#: NempMainUnit.dfm:5538
 msgid "Artist, Album, Title"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortTitleArtist..Caption
 #: NempMainUnit_-_Kopie.dfm:5259
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortTitleArtist..Caption
-#: NempMainUnit.dfm:5545
+#: NempMainUnit.dfm:5543
 msgid "Title, Artist"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortAlbumArtistTitle..Caption
 #: NempMainUnit_-_Kopie.dfm:5264
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortAlbumArtistTitle..Caption
-#: NempMainUnit.dfm:5550
+#: NempMainUnit.dfm:5548
 msgid "Album, Artist, Title"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortAlbumTitleArtist..Caption
 #: NempMainUnit_-_Kopie.dfm:5269
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortAlbumTitleArtist..Caption
-#: NempMainUnit.dfm:5555
+#: NempMainUnit.dfm:5553
 msgid "Album, Title, Artist"
 msgstr ""
 
@@ -4631,44 +4706,44 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..PM_PL_SortByAlbumTrack..Caption
 #: NempMainUnit_-_Kopie.dfm:5620
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortAlbumTracknr..Caption
-#: NempMainUnit.dfm:5560
+#: NempMainUnit.dfm:5558
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..PM_PL_SortByAlbumTrack..Caption
-#: NempMainUnit.dfm:5908
+#: NempMainUnit.dfm:5906
 msgid "Album, Tracknr."
 msgstr ""
 
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortPathFilename..Caption
 #: NempMainUnit_-_Kopie.dfm:5290
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortPathFilename..Caption
-#: NempMainUnit.dfm:5576
+#: NempMainUnit.dfm:5574
 msgid "Path && Filename"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortLyricsexists..Caption
 #: NempMainUnit_-_Kopie.dfm:5296
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_SortLyricsexists..Caption
-#: NempMainUnit.dfm:5582
+#: NempMainUnit.dfm:5580
 msgid "Lyrics exists"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_HideSelected..Caption
 #: NempMainUnit_-_Kopie.dfm:5344
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_HideSelected..Caption
-#: NempMainUnit.dfm:5635
+#: NempMainUnit.dfm:5633
 msgid "Hide selected files"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_DeleteSelected..Caption
 #: NempMainUnit_-_Kopie.dfm:5349
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_DeleteSelected..Caption
-#: NempMainUnit.dfm:5640
+#: NempMainUnit.dfm:5638
 msgid "Remove selected files"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_MLView_ChangeCategory..Caption
 #: NempMainUnit_-_Kopie.dfm:5355
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_MLView_ChangeCategory..Caption
-#: NempMainUnit.dfm:5646
+#: NempMainUnit.dfm:5644
 msgid "Change category of selected files"
 msgstr ""
 
@@ -4677,9 +4752,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..Caption
 #: NempMainUnit_-_Kopie.dfm:5693
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SetRatingsOfSelectedFilesCHOOSE..Caption
-#: NempMainUnit.dfm:5657
+#: NempMainUnit.dfm:5655
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..Caption
-#: NempMainUnit.dfm:5981
+#: NempMainUnit.dfm:5978
 msgid "Set rating of selected files to"
 msgstr ""
 
@@ -4688,9 +4763,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles1..Caption
 #: NempMainUnit_-_Kopie.dfm:5696
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SetRatingsOfSelectedFilesCHOOSE..PM_ML_SetRatingsOfSelectedFiles1..Caption
-#: NempMainUnit.dfm:5661
+#: NempMainUnit.dfm:5659
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles1..Caption
-#: NempMainUnit.dfm:5984
+#: NempMainUnit.dfm:5981
 msgid "0.5 stars"
 msgstr ""
 
@@ -4699,9 +4774,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles2..Caption
 #: NempMainUnit_-_Kopie.dfm:5702
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SetRatingsOfSelectedFilesCHOOSE..PM_ML_SetRatingsOfSelectedFiles2..Caption
-#: NempMainUnit.dfm:5667
+#: NempMainUnit.dfm:5665
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles2..Caption
-#: NempMainUnit.dfm:5990
+#: NempMainUnit.dfm:5987
 msgid "1 star"
 msgstr ""
 
@@ -4710,9 +4785,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles3..Caption
 #: NempMainUnit_-_Kopie.dfm:5708
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SetRatingsOfSelectedFilesCHOOSE..PM_ML_SetRatingsOfSelectedFiles3..Caption
-#: NempMainUnit.dfm:5673
+#: NempMainUnit.dfm:5671
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles3..Caption
-#: NempMainUnit.dfm:5996
+#: NempMainUnit.dfm:5993
 msgid "1.5 stars"
 msgstr ""
 
@@ -4721,9 +4796,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles4..Caption
 #: NempMainUnit_-_Kopie.dfm:5713
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SetRatingsOfSelectedFilesCHOOSE..PM_ML_SetRatingsOfSelectedFiles4..Caption
-#: NempMainUnit.dfm:5678
+#: NempMainUnit.dfm:5676
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles4..Caption
-#: NempMainUnit.dfm:6001
+#: NempMainUnit.dfm:5998
 msgid "2 stars"
 msgstr ""
 
@@ -4732,9 +4807,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles5..Caption
 #: NempMainUnit_-_Kopie.dfm:5719
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SetRatingsOfSelectedFilesCHOOSE..PM_ML_SetRatingsOfSelectedFiles5..Caption
-#: NempMainUnit.dfm:5684
+#: NempMainUnit.dfm:5682
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles5..Caption
-#: NempMainUnit.dfm:6007
+#: NempMainUnit.dfm:6004
 msgid "2.5 stars"
 msgstr ""
 
@@ -4743,9 +4818,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles6..Caption
 #: NempMainUnit_-_Kopie.dfm:5725
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SetRatingsOfSelectedFilesCHOOSE..PM_ML_SetRatingsOfSelectedFiles6..Caption
-#: NempMainUnit.dfm:5690
+#: NempMainUnit.dfm:5688
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles6..Caption
-#: NempMainUnit.dfm:6013
+#: NempMainUnit.dfm:6010
 msgid "3 stars"
 msgstr ""
 
@@ -4754,9 +4829,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles7..Caption
 #: NempMainUnit_-_Kopie.dfm:5731
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SetRatingsOfSelectedFilesCHOOSE..PM_ML_SetRatingsOfSelectedFiles7..Caption
-#: NempMainUnit.dfm:5696
+#: NempMainUnit.dfm:5694
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles7..Caption
-#: NempMainUnit.dfm:6019
+#: NempMainUnit.dfm:6016
 msgid "3.5 stars"
 msgstr ""
 
@@ -4765,9 +4840,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles8..Caption
 #: NempMainUnit_-_Kopie.dfm:5736
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SetRatingsOfSelectedFilesCHOOSE..PM_ML_SetRatingsOfSelectedFiles8..Caption
-#: NempMainUnit.dfm:5701
+#: NempMainUnit.dfm:5699
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles8..Caption
-#: NempMainUnit.dfm:6024
+#: NempMainUnit.dfm:6021
 msgid "4 stars"
 msgstr ""
 
@@ -4776,9 +4851,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles9..Caption
 #: NempMainUnit_-_Kopie.dfm:5742
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SetRatingsOfSelectedFilesCHOOSE..PM_ML_SetRatingsOfSelectedFiles9..Caption
-#: NempMainUnit.dfm:5707
+#: NempMainUnit.dfm:5705
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles9..Caption
-#: NempMainUnit.dfm:6030
+#: NempMainUnit.dfm:6027
 msgid "4.5 stars"
 msgstr ""
 
@@ -4787,9 +4862,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles10..Caption
 #: NempMainUnit_-_Kopie.dfm:5747
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SetRatingsOfSelectedFilesCHOOSE..PM_ML_SetRatingsOfSelectedFiles10..Caption
-#: NempMainUnit.dfm:5712
+#: NempMainUnit.dfm:5710
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles10..Caption
-#: NempMainUnit.dfm:6035
+#: NempMainUnit.dfm:6032
 msgid "5 stars"
 msgstr ""
 
@@ -4798,9 +4873,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_ResetRating..Caption
 #: NempMainUnit_-_Kopie.dfm:5757
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SetRatingsOfSelectedFilesCHOOSE..PM_ML_ResetRating..Caption
-#: NempMainUnit.dfm:5722
+#: NempMainUnit.dfm:5720
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_ResetRating..Caption
-#: NempMainUnit.dfm:6045
+#: NempMainUnit.dfm:6042
 msgid "Reset rating/playcounter"
 msgstr ""
 
@@ -4809,9 +4884,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MarkFiles..Caption
 #: NempMainUnit_-_Kopie.dfm:5765
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_MarkFile..Caption
-#: NempMainUnit.dfm:5730
+#: NempMainUnit.dfm:5728
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MarkFiles..Caption
-#: NempMainUnit.dfm:6053
+#: NempMainUnit.dfm:6050
 msgid "Flag selected files with"
 msgstr ""
 
@@ -4820,9 +4895,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MarkFiles..PM_PL_Mark1..Caption
 #: NempMainUnit_-_Kopie.dfm:5769
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_MarkFile..PM_ML_Mark1..Caption
-#: NempMainUnit.dfm:5734
+#: NempMainUnit.dfm:5732
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MarkFiles..PM_PL_Mark1..Caption
-#: NempMainUnit.dfm:6057
+#: NempMainUnit.dfm:6054
 msgid "Mark 1"
 msgstr ""
 
@@ -4831,9 +4906,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MarkFiles..PM_PL_Mark2..Caption
 #: NempMainUnit_-_Kopie.dfm:5775
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_MarkFile..PM_ML_Mark2..Caption
-#: NempMainUnit.dfm:5741
+#: NempMainUnit.dfm:5739
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MarkFiles..PM_PL_Mark2..Caption
-#: NempMainUnit.dfm:6063
+#: NempMainUnit.dfm:6060
 msgid "Mark 2"
 msgstr ""
 
@@ -4842,9 +4917,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MarkFiles..PM_PL_Mark3..Caption
 #: NempMainUnit_-_Kopie.dfm:5781
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_MarkFile..PM_ML_Mark3..Caption
-#: NempMainUnit.dfm:5748
+#: NempMainUnit.dfm:5746
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MarkFiles..PM_PL_Mark3..Caption
-#: NempMainUnit.dfm:6069
+#: NempMainUnit.dfm:6066
 msgid "Mark 3"
 msgstr ""
 
@@ -4853,9 +4928,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MarkFiles..PM_PL_Mark0..Caption
 #: NempMainUnit_-_Kopie.dfm:5789
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_MarkFile..PM_ML_Mark0..Caption
-#: NempMainUnit.dfm:5758
+#: NempMainUnit.dfm:5756
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MarkFiles..PM_PL_Mark0..Caption
-#: NempMainUnit.dfm:6077
+#: NempMainUnit.dfm:6074
 msgid "Unmarked"
 msgstr ""
 
@@ -4867,14 +4942,14 @@ msgstr ""
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_GetTags..Caption
 #: NempMainUnit_-_Kopie.dfm:5477
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_GetTags..Caption
-#: NempMainUnit.dfm:5765
+#: NempMainUnit.dfm:5763
 msgid "Get additional tags for selected files"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_RefreshSelected..Caption
 #: NempMainUnit_-_Kopie.dfm:5483
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_RefreshSelected..Caption
-#: NempMainUnit.dfm:5771
+#: NempMainUnit.dfm:5769
 msgid "Refresh selected"
 msgstr ""
 
@@ -4883,9 +4958,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ReplayGain..PM_PL_ReplayGain_SingleTracks..Caption
 #: NempMainUnit_-_Kopie.dfm:5799
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_ReplayGain..PM_ML_ReplayGain_SingleTracks..Caption
-#: NempMainUnit.dfm:5780
+#: NempMainUnit.dfm:5778
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ReplayGain..PM_PL_ReplayGain_SingleTracks..Caption
-#: NempMainUnit.dfm:6087
+#: NempMainUnit.dfm:6084
 msgid "Single tracks"
 msgstr ""
 
@@ -4894,9 +4969,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ReplayGain..PM_PL_ReplayGain_OneAlbum..Caption
 #: NempMainUnit_-_Kopie.dfm:5804
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_ReplayGain..PM_ML_ReplayGain_OneAlbum..Caption
-#: NempMainUnit.dfm:5785
+#: NempMainUnit.dfm:5783
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ReplayGain..PM_PL_ReplayGain_OneAlbum..Caption
-#: NempMainUnit.dfm:6092
+#: NempMainUnit.dfm:6089
 msgid "As one album"
 msgstr ""
 
@@ -4905,9 +4980,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ReplayGain..PM_PL_ReplayGain_MultiAlbums..Caption
 #: NempMainUnit_-_Kopie.dfm:5809
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_ReplayGain..PM_ML_ReplayGain_MultiAlbum..Caption
-#: NempMainUnit.dfm:5790
+#: NempMainUnit.dfm:5788
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ReplayGain..PM_PL_ReplayGain_MultiAlbums..Caption
-#: NempMainUnit.dfm:6097
+#: NempMainUnit.dfm:6094
 msgid "Multiple albums (by tags)"
 msgstr ""
 
@@ -4916,23 +4991,23 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ReplayGain..PM_PL_ReplayGain_Clear..Caption
 #: NempMainUnit_-_Kopie.dfm:5814
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_ReplayGain..PM_ML_ReplayGain_Clear..Caption
-#: NempMainUnit.dfm:5795
+#: NempMainUnit.dfm:5793
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ReplayGain..PM_PL_ReplayGain_Clear..Caption
-#: NempMainUnit.dfm:6102
+#: NempMainUnit.dfm:6099
 msgid "Clear ReplayGain"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_CopyToClipboard..Caption
 #: NempMainUnit_-_Kopie.dfm:5515
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_CopyToClipboard..Caption
-#: NempMainUnit.dfm:5803
+#: NempMainUnit.dfm:5801
 msgid "Copy to clipboard"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_MagicCopyToClipboard..Caption
 #: NempMainUnit_-_Kopie.dfm:5520
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_MagicCopyToClipboard..Caption
-#: NempMainUnit.dfm:5808
+#: NempMainUnit.dfm:5806
 msgid "... and include a proper playlist-file"
 msgstr ""
 
@@ -4941,37 +5016,37 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ExtendedPasteFromClipboard..Caption
 #: NempMainUnit_-_Kopie.dfm:5844
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_PasteFromClipboard..Caption
-#: NempMainUnit.dfm:5812
+#: NempMainUnit.dfm:5810
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ExtendedPasteFromClipboard..Caption
-#: NempMainUnit.dfm:6132
+#: NempMainUnit.dfm:6129
 msgid "Paste from clipboard"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Extended..Caption
 #: NempMainUnit_-_Kopie.dfm:5529
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Extended..Caption
-#: NempMainUnit.dfm:5817
+#: NempMainUnit.dfm:5815
 msgid "Extended"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Extended..PM_ML_ExtendedShowAllFilesInDir..Caption
 #: NempMainUnit_-_Kopie.dfm:5531
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Extended..PM_ML_ExtendedShowAllFilesInDir..Caption
-#: NempMainUnit.dfm:5819
+#: NempMainUnit.dfm:5817
 msgid "Show all files within this directory"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Extended..PM_ML_ExtendedAddAllFilesInDir..Caption
 #: NempMainUnit_-_Kopie.dfm:5535
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Extended..PM_ML_ExtendedAddAllFilesInDir..Caption
-#: NempMainUnit.dfm:5823
+#: NempMainUnit.dfm:5821
 msgid "Add all files within this directory"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Extended..PM_ML_ExtendedSearchTitle..Caption
 #: NempMainUnit_-_Kopie.dfm:5543
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Extended..PM_ML_ExtendedSearchTitle..Caption
-#: NempMainUnit.dfm:5831
+#: NempMainUnit.dfm:5829
 #. Programmer's name for it: MainForm_MenuCaptionsSearchForTitle
 #: Nemp_RessourceStrings.pas:635
 msgid "Search for this title"
@@ -4980,7 +5055,7 @@ msgstr ""
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Extended..PM_ML_ExtendedSearchArtist..Caption
 #: NempMainUnit_-_Kopie.dfm:5548
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Extended..PM_ML_ExtendedSearchArtist..Caption
-#: NempMainUnit.dfm:5836
+#: NempMainUnit.dfm:5834
 #. Programmer's name for it: MainForm_MenuCaptionsSearchForArtist
 #: Nemp_RessourceStrings.pas:636
 msgid "Search for this artist"
@@ -4989,7 +5064,7 @@ msgstr ""
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Extended..PM_ML_ExtendedSearchAlbum..Caption
 #: NempMainUnit_-_Kopie.dfm:5553
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Extended..PM_ML_ExtendedSearchAlbum..Caption
-#: NempMainUnit.dfm:5841
+#: NempMainUnit.dfm:5839
 #. Programmer's name for it: MainForm_MenuCaptionsSearchForAlbum
 #: Nemp_RessourceStrings.pas:637
 msgid "Search for this album"
@@ -4998,7 +5073,7 @@ msgstr ""
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Extended..PM_ML_ShowAllIncompleteTaggedFiles..Caption
 #: NempMainUnit_-_Kopie.dfm:5560
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Extended..PM_ML_ShowAllIncompleteTaggedFiles..Caption
-#: NempMainUnit.dfm:5848
+#: NempMainUnit.dfm:5846
 msgid "Show all files where Artist/Title/Album is "
 "missing"
 msgstr ""
@@ -5008,9 +5083,9 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ShowInExplorer..Caption
 #: NempMainUnit_-_Kopie.dfm:5862
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_ShowInExplorer..Caption
-#: NempMainUnit.dfm:5856
+#: NempMainUnit.dfm:5854
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ShowInExplorer..Caption
-#: NempMainUnit.dfm:6150
+#: NempMainUnit.dfm:6147
 #. PlaylistEditorForm..PopUpPlaylist..PM_PL_ShowinExplorer..Caption
 #: PlaylistEditor.dfm:241
 msgid "Show in Windows Explorer"
@@ -5023,18 +5098,18 @@ msgstr ""
 #. Nemp_MainForm..PopupEditExtendedTags..pm_TagDetails..Caption
 #: NempMainUnit_-_Kopie.dfm:6711
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_Properties..Caption
-#: NempMainUnit.dfm:5860
+#: NempMainUnit.dfm:5858
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_Properties..Caption
-#: NempMainUnit.dfm:6154
+#: NempMainUnit.dfm:6151
 #. Nemp_MainForm..PopupEditExtendedTags..pm_TagDetails..Caption
-#: NempMainUnit.dfm:7027
+#: NempMainUnit.dfm:7024
 msgid "Properties"
 msgstr ""
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_AddFiles..Caption
 #: NempMainUnit_-_Kopie.dfm:5584
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_AddFiles..Caption
-#: NempMainUnit.dfm:5872
+#: NempMainUnit.dfm:5870
 #. PlaylistEditorForm..PopUpPlaylist..PM_PL_AddFiles..Caption
 #: PlaylistEditor.dfm:223
 msgid "Add files"
@@ -5043,46 +5118,46 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_AddDirectories..Caption
 #: NempMainUnit_-_Kopie.dfm:5588
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_SearchDirectory..Caption
-#: NempMainUnit.dfm:2813
+#: NempMainUnit.dfm:2811
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_AddDirectories..Caption
-#: NempMainUnit.dfm:5876
+#: NempMainUnit.dfm:5874
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SearchDirectory..Caption
-#: NempMainUnit.dfm:7284
+#: NempMainUnit.dfm:7281
 msgid "Add directory"
 msgstr ""
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_AddCDAudio..Caption
 #: NempMainUnit_-_Kopie.dfm:5592
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_AddCDAudio..Caption
-#: NempMainUnit.dfm:5880
+#: NempMainUnit.dfm:5878
 msgid "Add CD-Audio"
 msgstr ""
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_AddWebstream..Caption
 #: NempMainUnit_-_Kopie.dfm:5596
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_AddWebstream..Caption
-#: NempMainUnit.dfm:5884
+#: NempMainUnit.dfm:5882
 msgid "Add webradio"
 msgstr ""
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..PM_PL_SortByInverse..Caption
 #: NempMainUnit_-_Kopie.dfm:5627
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..PM_PL_SortByInverse..Caption
-#: NempMainUnit.dfm:5915
+#: NempMainUnit.dfm:5913
 msgid "Inverse"
 msgstr ""
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..PM_PL_SortByMix..Caption
 #: NempMainUnit_-_Kopie.dfm:5631
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..PM_PL_SortByMix..Caption
-#: NempMainUnit.dfm:5919
+#: NempMainUnit.dfm:5917
 msgid "Mix"
 msgstr ""
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_StopAfterCurrentTitle..Caption
 #: NempMainUnit_-_Kopie.dfm:5636
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_StopAfterCurrentTitle..Caption
-#: NempMainUnit.dfm:5924
+#: NempMainUnit.dfm:5922
 #. Programmer's name for it: MainForm_PlaylistMenu_StopAfterTitle
 #: Nemp_RessourceStrings.pas:568
 msgid "Stop after current title"
@@ -5091,21 +5166,21 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_GeneraterandomPlaylist..Caption
 #: NempMainUnit_-_Kopie.dfm:5643
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_GeneraterandomPlaylist..Caption
-#: NempMainUnit.dfm:5931
+#: NempMainUnit.dfm:5929
 msgid "Generate random playlist"
 msgstr ""
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_LoadPlaylist..Caption
 #: NempMainUnit_-_Kopie.dfm:5647
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_LoadPlaylist..Caption
-#: NempMainUnit.dfm:5935
+#: NempMainUnit.dfm:5933
 msgid "Load (and clear current list)"
 msgstr ""
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_AddPlaylist..Caption
 #: NempMainUnit_-_Kopie.dfm:5653
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_AddPlaylist..Caption
-#: NempMainUnit.dfm:5941
+#: NempMainUnit.dfm:5939
 msgid "Load (add files to current list)"
 msgstr ""
 
@@ -5114,9 +5189,9 @@ msgstr ""
 #. Nemp_MainForm..PlaylistManagerPopup..PM_PLM_RecentPlaylists..Caption
 #: NempMainUnit_-_Kopie.dfm:7093
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_RecentPlaylists..Caption
-#: NempMainUnit.dfm:5945
+#: NempMainUnit.dfm:5943
 #. Nemp_MainForm..PlaylistManagerPopup..PM_PLM_RecentPlaylists..Caption
-#: NempMainUnit.dfm:7470
+#: NempMainUnit.dfm:7467
 msgid "Recent playlists"
 msgstr ""
 
@@ -5125,9 +5200,9 @@ msgstr ""
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_Medialibrary..PM_ML_MedialibrarySave..Caption
 #: NempMainUnit_-_Kopie.dfm:6931
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SavePlaylist..Caption
-#: NempMainUnit.dfm:5948
+#: NempMainUnit.dfm:5946
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_Medialibrary..PM_ML_MedialibrarySave..Caption
-#: NempMainUnit.dfm:7301
+#: NempMainUnit.dfm:7298
 #. PlaylistEditorForm..PnlPlaylistFiles..BtnSave..Caption
 #: PlaylistEditor.dfm:181
 #. PlaylistEditorForm..PopUpPlaylist..PM_PL_Save..Caption
@@ -5142,14 +5217,14 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SaveAsPlaylist..Caption
 #: NempMainUnit_-_Kopie.dfm:5666
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SaveAsPlaylist..Caption
-#: NempMainUnit.dfm:5954
+#: NempMainUnit.dfm:5952
 msgid "Save as"
 msgstr ""
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_DeleteSelected..Caption
 #: NempMainUnit_-_Kopie.dfm:5679
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_DeleteSelected..Caption
-#: NempMainUnit.dfm:5967
+#: NempMainUnit.dfm:5964
 #. PlaylistEditorForm..PopUpPlaylist..PM_PL_Delete..Caption
 #: PlaylistEditor.dfm:231
 msgid "Remove selected"
@@ -5158,35 +5233,35 @@ msgstr ""
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ScanForDuplicates..Caption
 #: NempMainUnit_-_Kopie.dfm:5689
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ScanForDuplicates..Caption
-#: NempMainUnit.dfm:5977
+#: NempMainUnit.dfm:5974
 msgid "Scan for duplicates"
 msgstr ""
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ReplayGain..Caption
 #: NempMainUnit_-_Kopie.dfm:5795
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ReplayGain..Caption
-#: NempMainUnit.dfm:6083
+#: NempMainUnit.dfm:6080
 msgid "ReplayGain (selected files)"
 msgstr ""
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ExtendedCopyToClipboard..Caption
 #: NempMainUnit_-_Kopie.dfm:5835
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ExtendedCopyToClipboard..Caption
-#: NempMainUnit.dfm:6123
+#: NempMainUnit.dfm:6120
 msgid "Copy selected files to clipboard"
 msgstr ""
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MagicCopyToClipboard..Caption
 #: NempMainUnit_-_Kopie.dfm:5840
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MagicCopyToClipboard..Caption
-#: NempMainUnit.dfm:6128
+#: NempMainUnit.dfm:6125
 msgid "... and include a proper playlist file"
 msgstr ""
 
 #. Nemp_MainForm..TNAMenu..PM_TNA_PlayPause..Caption
 #: NempMainUnit_-_Kopie.dfm:5879
 #. Nemp_MainForm..TNAMenu..PM_TNA_PlayPause..Caption
-#: NempMainUnit.dfm:6167
+#: NempMainUnit.dfm:6164
 #. Programmer's name for it: PlayerBtn_Pause
 #: Nemp_RessourceStrings.pas:962
 msgid "Pause"
@@ -5195,28 +5270,28 @@ msgstr ""
 #. Nemp_MainForm..TNAMenu..PM_TNA_Next..Caption
 #: NempMainUnit_-_Kopie.dfm:5889
 #. Nemp_MainForm..TNAMenu..PM_TNA_Next..Caption
-#: NempMainUnit.dfm:6177
+#: NempMainUnit.dfm:6174
 msgid "Next track"
 msgstr ""
 
 #. Nemp_MainForm..TNAMenu..PM_TNA_Previous..Caption
 #: NempMainUnit_-_Kopie.dfm:5894
 #. Nemp_MainForm..TNAMenu..PM_TNA_Previous..Caption
-#: NempMainUnit.dfm:6182
+#: NempMainUnit.dfm:6179
 msgid "Previous track"
 msgstr ""
 
 #. Nemp_MainForm..TNAMenu..PM_TNA_Restore..Caption
 #: NempMainUnit_-_Kopie.dfm:5907
 #. Nemp_MainForm..TNAMenu..PM_TNA_Restore..Caption
-#: NempMainUnit.dfm:6195
+#: NempMainUnit.dfm:6192
 msgid "Restore"
 msgstr ""
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Preferences..Caption
 #: NempMainUnit_-_Kopie.dfm:5922
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Preferences..Caption
-#: NempMainUnit.dfm:6210
+#: NempMainUnit.dfm:6207
 #. OptionsCompleteForm..Caption
 #: OptionsComplete_-_Kopie.dfm:5
 #. OptionsCompleteForm..Caption
@@ -5227,7 +5302,7 @@ msgstr ""
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..Caption
 #: NempMainUnit_-_Kopie.dfm:5932
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..Caption
-#: NempMainUnit.dfm:6220
+#: NempMainUnit.dfm:6217
 #. OptionsCompleteForm..Panel1..PageControl1..TabView1..GrpBox_ViewPartymode_Amplification..Caption
 #: OptionsComplete_-_Kopie.dfm:2059
 #. OptionsCompleteForm..Panel1..PageControl1..tabViewingSettings..Caption
@@ -5243,7 +5318,7 @@ msgstr ""
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..PM_P_ViewSeparateWindows_Playlist..Caption
 #: NempMainUnit_-_Kopie.dfm:5956
 #. Nemp_MainForm..ActionListLayout..actTogglePlaylist..Caption
-#: NempMainUnit.dfm:7544
+#: NempMainUnit.dfm:7541
 msgid "Show playlist"
 msgstr ""
 
@@ -5260,21 +5335,21 @@ msgstr ""
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..PM_P_ViewStayOnTop..Caption
 #: NempMainUnit_-_Kopie.dfm:5974
 #. Nemp_MainForm..ActionListLayout..actToggleStayOnTop..Caption
-#: NempMainUnit.dfm:7548
+#: NempMainUnit.dfm:7545
 msgid "Stay on top"
 msgstr ""
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Skins..Caption
 #: NempMainUnit_-_Kopie.dfm:5984
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Skins..Caption
-#: NempMainUnit.dfm:6296
+#: NempMainUnit.dfm:6293
 msgid "Skins"
 msgstr ""
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Skins..PM_P_Skins_WindowsStandard..Caption
 #: NempMainUnit_-_Kopie.dfm:5987
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Skins..PM_P_Skins_WindowsStandard..Caption
-#: NempMainUnit.dfm:6299
+#: NempMainUnit.dfm:6296
 msgid "Windows standard"
 msgstr ""
 
@@ -5283,9 +5358,9 @@ msgstr ""
 #. Nemp_MainForm..PopupTools..PM_T_ShutDown..Caption
 #: NempMainUnit_-_Kopie.dfm:6984
 #. Nemp_MainForm..Player_PopupMenu..PM_P_ShutDown..Caption
-#: NempMainUnit.dfm:6331
+#: NempMainUnit.dfm:6328
 #. Nemp_MainForm..PopupTools..PM_T_ShutDown..Caption
-#: NempMainUnit.dfm:7361
+#: NempMainUnit.dfm:7358
 msgid "Shutdown"
 msgstr ""
 
@@ -5294,9 +5369,9 @@ msgstr ""
 #. Nemp_MainForm..PopupTools..PM_T_Birthday..Caption
 #: NempMainUnit_-_Kopie.dfm:7000
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Birthday..Caption
-#: NempMainUnit.dfm:6347
+#: NempMainUnit.dfm:6344
 #. Nemp_MainForm..PopupTools..PM_T_Birthday..Caption
-#: NempMainUnit.dfm:7377
+#: NempMainUnit.dfm:7374
 msgid "Birthday mode"
 msgstr ""
 
@@ -5305,16 +5380,16 @@ msgstr ""
 #. Nemp_MainForm..PopupTools..PM_T_Scrobbler..Caption
 #: NempMainUnit_-_Kopie.dfm:7028
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Scrobbler..Caption
-#: NempMainUnit.dfm:6375
+#: NempMainUnit.dfm:6372
 #. Nemp_MainForm..PopupTools..PM_T_Scrobbler..Caption
-#: NempMainUnit.dfm:7405
+#: NempMainUnit.dfm:7402
 msgid "Scrobbler"
 msgstr ""
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Directories..Caption
 #: NempMainUnit_-_Kopie.dfm:6085
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Directories..Caption
-#: NempMainUnit.dfm:6397
+#: NempMainUnit.dfm:6394
 #. OptionsCompleteForm..Panel1..PageControl1..TabView0..GrpBox_ViewMain_BrowseClassic..CBSortArray1....Items.Strings
 #: OptionsComplete_-_Kopie.dfm:1910
 #. OptionsCompleteForm..Panel1..PageControl1..TabView0..GrpBox_ViewMain_BrowseClassic..CBSortArray2....Items.Strings
@@ -5331,42 +5406,42 @@ msgstr ""
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Directories..PM_P_DirectoriesRecordings..Caption
 #: NempMainUnit_-_Kopie.dfm:6087
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Directories..PM_P_DirectoriesRecordings..Caption
-#: NempMainUnit.dfm:6399
+#: NempMainUnit.dfm:6396
 msgid "Recordings (webradio)"
 msgstr ""
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Directories..PM_P_DirectoriesData..Caption
 #: NempMainUnit_-_Kopie.dfm:6091
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Directories..PM_P_DirectoriesData..Caption
-#: NempMainUnit.dfm:6403
+#: NempMainUnit.dfm:6400
 msgid "Data (cover, preferences, ...)"
 msgstr ""
 
 #. Nemp_MainForm..PopupPlayPause..PM_PlayFiles..Caption
 #: NempMainUnit_-_Kopie.dfm:6131
 #. Nemp_MainForm..PopupPlayPause..PM_PlayFiles..Caption
-#: NempMainUnit.dfm:6447
+#: NempMainUnit.dfm:6444
 msgid "Play files"
 msgstr ""
 
 #. Nemp_MainForm..PopupPlayPause..PM_PlayWebstream..Caption
 #: NempMainUnit_-_Kopie.dfm:6135
 #. Nemp_MainForm..PopupPlayPause..PM_PlayWebstream..Caption
-#: NempMainUnit.dfm:6451
+#: NempMainUnit.dfm:6448
 msgid "Play webstream"
 msgstr ""
 
 #. Nemp_MainForm..PopupStop..PM_StopAfterTitle..Caption
 #: NempMainUnit_-_Kopie.dfm:6152
 #. Nemp_MainForm..PopupStop..PM_StopAfterTitle..Caption
-#: NempMainUnit.dfm:6468
+#: NempMainUnit.dfm:6465
 msgid "Stop after title (Shift+Click)"
 msgstr ""
 
 #. Nemp_MainForm..PopupRepeat..PM_RepeatAll..Caption
 #: NempMainUnit_-_Kopie.dfm:6161
 #. Nemp_MainForm..PopupRepeat..PM_RepeatAll..Caption
-#: NempMainUnit.dfm:6477
+#: NempMainUnit.dfm:6474
 #. Programmer's name for it: MainForm_RepeatBtnHint_RepeatAll
 #: Nemp_RessourceStrings.pas:557
 msgid "Repeat all"
@@ -5375,7 +5450,7 @@ msgstr ""
 #. Nemp_MainForm..PopupRepeat..PM_RepeatTitle..Caption
 #: NempMainUnit_-_Kopie.dfm:6167
 #. Nemp_MainForm..PopupRepeat..PM_RepeatTitle..Caption
-#: NempMainUnit.dfm:6483
+#: NempMainUnit.dfm:6480
 #. Programmer's name for it: MainForm_RepeatBtnHint_RepeatTitle
 #: Nemp_RessourceStrings.pas:558
 msgid "Repeat title"
@@ -5384,7 +5459,7 @@ msgstr ""
 #. Nemp_MainForm..PopupRepeat..PM_RandomMode..Caption
 #: NempMainUnit_-_Kopie.dfm:6173
 #. Nemp_MainForm..PopupRepeat..PM_RandomMode..Caption
-#: NempMainUnit.dfm:6489
+#: NempMainUnit.dfm:6486
 #. Programmer's name for it: MainForm_RepeatBtnHint_RandomMode
 #: Nemp_RessourceStrings.pas:559
 msgid "Random mode"
@@ -5393,7 +5468,7 @@ msgstr ""
 #. Nemp_MainForm..PopupRepeat..PM_RepeatOff..Caption
 #: NempMainUnit_-_Kopie.dfm:6179
 #. Nemp_MainForm..PopupRepeat..PM_RepeatOff..Caption
-#: NempMainUnit.dfm:6495
+#: NempMainUnit.dfm:6492
 #. Programmer's name for it: MainForm_RepeatBtnHint_NoRepeat
 #: Nemp_RessourceStrings.pas:560
 msgid "Repeat off"
@@ -5404,9 +5479,9 @@ msgstr ""
 #. Nemp_MainForm..PopupRepeatAB..PM_SetA..Caption
 #: NempMainUnit_-_Kopie.dfm:6642
 #. Nemp_MainForm..PopupRepeat..PM_ABRepeatSetA..Caption
-#: NempMainUnit.dfm:6507
+#: NempMainUnit.dfm:6504
 #. Nemp_MainForm..PopupRepeatAB..PM_SetA..Caption
-#: NempMainUnit.dfm:6958
+#: NempMainUnit.dfm:6955
 msgid "Set start point (A)"
 msgstr ""
 
@@ -5415,65 +5490,65 @@ msgstr ""
 #. Nemp_MainForm..PopupRepeatAB..PM_SetB..Caption
 #: NempMainUnit_-_Kopie.dfm:6646
 #. Nemp_MainForm..PopupRepeat..PM_ABRepeatSetB..Caption
-#: NempMainUnit.dfm:6511
+#: NempMainUnit.dfm:6508
 #. Nemp_MainForm..PopupRepeatAB..PM_SetB..Caption
-#: NempMainUnit.dfm:6962
+#: NempMainUnit.dfm:6959
 msgid "Set end point (B)"
 msgstr ""
 
 #. Nemp_MainForm..NempTrayIcon..Hint
 #: NempMainUnit_-_Kopie.dfm:6200
 #. Nemp_MainForm..NempTrayIcon..Hint
-#: NempMainUnit.dfm:6516
+#: NempMainUnit.dfm:6513
 msgid "Nemp - Noch ein mp3-Player"
 msgstr ""
 
 #. Nemp_MainForm..Win7TaskBarPopup..test1..Caption
 #: NempMainUnit_-_Kopie.dfm:6621
 #. Nemp_MainForm..Win7TaskBarPopup..test1..Caption
-#: NempMainUnit.dfm:6937
+#: NempMainUnit.dfm:6934
 msgid "Close this menu"
 msgstr ""
 
 #. Nemp_MainForm..PopupEditExtendedTags..PM_TagAudiofile..Caption
 #: NempMainUnit_-_Kopie.dfm:6675
 #. Nemp_MainForm..PopupEditExtendedTags..PM_TagAudiofile..Caption
-#: NempMainUnit.dfm:6991
+#: NempMainUnit.dfm:6988
 msgid "This audio file"
 msgstr ""
 
 #. Nemp_MainForm..PopupEditExtendedTags..PM_AddTagThisFile..Caption
 #: NempMainUnit_-_Kopie.dfm:6680
 #. Nemp_MainForm..PopupEditExtendedTags..PM_AddTagThisFile..Caption
-#: NempMainUnit.dfm:6996
+#: NempMainUnit.dfm:6993
 msgid "Add new tag to this file"
 msgstr ""
 
 #. Nemp_MainForm..PopupEditExtendedTags..PM_RenameTagThisFile..Caption
 #: NempMainUnit_-_Kopie.dfm:6684
 #. Nemp_MainForm..PopupEditExtendedTags..PM_RenameTagThisFile..Caption
-#: NempMainUnit.dfm:7000
+#: NempMainUnit.dfm:6997
 msgid "Rename tag in this file"
 msgstr ""
 
 #. Nemp_MainForm..PopupEditExtendedTags..PM_RemoveTagThisFile..Caption
 #: NempMainUnit_-_Kopie.dfm:6688
 #. Nemp_MainForm..PopupEditExtendedTags..PM_RemoveTagThisFile..Caption
-#: NempMainUnit.dfm:7004
+#: NempMainUnit.dfm:7001
 msgid "Remove tag from this file"
 msgstr ""
 
 #. Nemp_MainForm..PopupEditExtendedTags..PM_TagTagCloud..Caption
 #: NempMainUnit_-_Kopie.dfm:6695
 #. Nemp_MainForm..PopupEditExtendedTags..PM_TagTagCloud..Caption
-#: NempMainUnit.dfm:7011
+#: NempMainUnit.dfm:7008
 msgid "Nemp Tagcloud (Ignore/Rename rules)"
 msgstr ""
 
 #. Nemp_MainForm..PopupEditExtendedTags..PM_TagIgnoreList..Caption
 #: NempMainUnit_-_Kopie.dfm:6700
 #. Nemp_MainForm..PopupEditExtendedTags..PM_TagIgnoreList..Caption
-#: NempMainUnit.dfm:7016
+#: NempMainUnit.dfm:7013
 msgid "Add \"Ignore rule\" and remove this tag from all "
 "files"
 msgstr ""
@@ -5481,7 +5556,7 @@ msgstr ""
 #. Nemp_MainForm..PopupEditExtendedTags..PM_TagMergeList..Caption
 #: NempMainUnit_-_Kopie.dfm:6704
 #. Nemp_MainForm..PopupEditExtendedTags..PM_TagMergeList..Caption
-#: NempMainUnit.dfm:7020
+#: NempMainUnit.dfm:7017
 msgid "Add \"Rename rule\" and rename this tag in all "
 "files"
 msgstr ""
@@ -5489,7 +5564,7 @@ msgstr ""
 #. Nemp_MainForm..QuickSearchHistory_PopupMenu..pmRecentSearches..Caption
 #: NempMainUnit_-_Kopie.dfm:6720
 #. Nemp_MainForm..QuickSearchHistory_PopupMenu..pmRecentSearches..Caption
-#: NempMainUnit.dfm:7060
+#: NempMainUnit.dfm:7057
 #. Programmer's name for it: MainForm_RecentQuickSearchresults
 #: Nemp_RessourceStrings.pas:535
 msgid "Recent searches"
@@ -5516,25 +5591,25 @@ msgstr ""
 #. Nemp_MainForm..QuickSearchHistory_PopupMenu..pmQuickSeachHistory9..Caption
 #: NempMainUnit_-_Kopie.dfm:6782
 #. Nemp_MainForm..QuickSearchHistory_PopupMenu..pmQuickSeachHistory0..Caption
-#: NempMainUnit.dfm:7068
+#: NempMainUnit.dfm:7065
 #. Nemp_MainForm..QuickSearchHistory_PopupMenu..pmQuickSeachHistory1..Caption
-#: NempMainUnit.dfm:7074
+#: NempMainUnit.dfm:7071
 #. Nemp_MainForm..QuickSearchHistory_PopupMenu..pmQuickSeachHistory2..Caption
-#: NempMainUnit.dfm:7080
+#: NempMainUnit.dfm:7077
 #. Nemp_MainForm..QuickSearchHistory_PopupMenu..pmQuickSeachHistory3..Caption
-#: NempMainUnit.dfm:7086
+#: NempMainUnit.dfm:7083
 #. Nemp_MainForm..QuickSearchHistory_PopupMenu..pmQuickSeachHistory4..Caption
-#: NempMainUnit.dfm:7092
+#: NempMainUnit.dfm:7089
 #. Nemp_MainForm..QuickSearchHistory_PopupMenu..pmQuickSeachHistory5..Caption
-#: NempMainUnit.dfm:7098
+#: NempMainUnit.dfm:7095
 #. Nemp_MainForm..QuickSearchHistory_PopupMenu..pmQuickSeachHistory6..Caption
-#: NempMainUnit.dfm:7104
+#: NempMainUnit.dfm:7101
 #. Nemp_MainForm..QuickSearchHistory_PopupMenu..pmQuickSeachHistory7..Caption
-#: NempMainUnit.dfm:7110
+#: NempMainUnit.dfm:7107
 #. Nemp_MainForm..QuickSearchHistory_PopupMenu..pmQuickSeachHistory8..Caption
-#: NempMainUnit.dfm:7116
+#: NempMainUnit.dfm:7113
 #. Nemp_MainForm..QuickSearchHistory_PopupMenu..pmQuickSeachHistory9..Caption
-#: NempMainUnit.dfm:7122
+#: NempMainUnit.dfm:7119
 msgid "."
 msgstr ""
 
@@ -5553,7 +5628,7 @@ msgstr ""
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_SortLayerBy..PM_ML_SortLayerByName..Caption
 #: NempMainUnit_-_Kopie.dfm:6862
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortLayerBy..PM_ML_SortLayerByName..Caption
-#: NempMainUnit.dfm:7172
+#: NempMainUnit.dfm:7169
 #. FormStreamVerwaltung..pnlMain..VST_Favorites......Text
 #: StreamVerwaltung.dfm:75
 #. Programmer's name for it: AudioFileProperty_Name
@@ -5573,7 +5648,7 @@ msgstr ""
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_SortLayerBy..PM_ML_SortLayerByReleaseYear..Caption
 #: NempMainUnit_-_Kopie.dfm:6886
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortLayerBy..PM_ML_SortLayerByReleaseYear..Caption
-#: NempMainUnit.dfm:7197
+#: NempMainUnit.dfm:7194
 msgid "Release Year"
 msgstr ""
 
@@ -5582,7 +5657,7 @@ msgstr ""
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_SortLayerBy..PM_ML_SortLayerByFileAge..Caption
 #: NempMainUnit_-_Kopie.dfm:6892
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortLayerBy..PM_ML_SortLayerByFileAge..Caption
-#: NempMainUnit.dfm:7202
+#: NempMainUnit.dfm:7199
 #. OptionsCompleteForm..Panel1..PageControl1..TabView0..GrpBox_ViewMain_BrowseClassic..CBSortArray1....Items.Strings
 #: OptionsComplete_-_Kopie.dfm:1913
 #. OptionsCompleteForm..Panel1..PageControl1..TabView0..GrpBox_ViewMain_BrowseClassic..CBSortArray2....Items.Strings
@@ -5597,9 +5672,9 @@ msgstr ""
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_SortLayerBy..PM_ML_SortLayerByDirectory..Caption
 #: NempMainUnit_-_Kopie.dfm:6904
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1884
+#: NempMainUnit.dfm:1882
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortLayerBy..PM_ML_SortLayerByDirectory..Caption
-#: NempMainUnit.dfm:7212
+#: NempMainUnit.dfm:7209
 #. OptionsCompleteForm..Panel1..PageControl1..TabView4..GrpBox_ViewExt_NoMetadata..cbReplaceArtistBy....Items.Strings
 #: OptionsComplete_-_Kopie.dfm:2443
 #. OptionsCompleteForm..Panel1..PageControl1..TabView4..GrpBox_ViewExt_NoMetadata..cbReplaceTitleBy....Items.Strings
@@ -5627,7 +5702,7 @@ msgstr ""
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_Medialibrary..Caption
 #: NempMainUnit_-_Kopie.dfm:6924
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_Medialibrary..Caption
-#: NempMainUnit.dfm:7294
+#: NempMainUnit.dfm:7291
 #. OptionsCompleteForm..Panel1..PageControl1..tabGeneral..cpgMainOptions..cpStarting..lblNempStartLibrary..Caption
 #: OptionsComplete.dfm:303
 #. RandomPlaylistForm..GrpBox_General..CBWholeBib..Text
@@ -5640,35 +5715,35 @@ msgstr ""
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_Medialibrary..PM_ML_MedialibraryLoad..Caption
 #: NempMainUnit_-_Kopie.dfm:6926
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_Medialibrary..PM_ML_MedialibraryLoad..Caption
-#: NempMainUnit.dfm:7296
+#: NempMainUnit.dfm:7293
 msgid "Load"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_Medialibrary..PM_ML_MedialibraryExport..Caption
 #: NempMainUnit_-_Kopie.dfm:6936
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_Medialibrary..PM_ML_MedialibraryExport..Caption
-#: NempMainUnit.dfm:7306
+#: NempMainUnit.dfm:7303
 msgid "Export as csv"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_Medialibrary..PM_ML_MedialibraryRefresh..Caption
 #: NempMainUnit_-_Kopie.dfm:6949
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_Medialibrary..PM_ML_MedialibraryRefresh..Caption
-#: NempMainUnit.dfm:7319
+#: NempMainUnit.dfm:7316
 msgid "Refresh (rescan all files)"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_Browse_PopupMenu..PM_ML_RemoveSelectedPlaylists..Caption
 #: NempMainUnit_-_Kopie.dfm:6972
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_RemoveSelectedPlaylists..Caption
-#: NempMainUnit.dfm:7341
+#: NempMainUnit.dfm:7338
 msgid "Remove selected playlist"
 msgstr ""
 
 #. Nemp_MainForm..PopupHeadset..PM_H_JustPlay..Caption
 #: NempMainUnit_-_Kopie.dfm:7059
 #. Nemp_MainForm..PopupHeadset..PM_H_JustPlay..Caption
-#: NempMainUnit.dfm:7436
+#: NempMainUnit.dfm:7433
 msgid "Just play the track (don't change the "
 "playlist)"
 msgstr ""
@@ -5676,174 +5751,174 @@ msgstr ""
 #. Nemp_MainForm..PlaylistManagerPopup..PM_PLM_Default..Caption
 #: NempMainUnit_-_Kopie.dfm:7069
 #. Nemp_MainForm..PlaylistManagerPopup..PM_PLM_Default..Caption
-#: NempMainUnit.dfm:7446
+#: NempMainUnit.dfm:7443
 msgid "Default playlist"
 msgstr ""
 
 #. Nemp_MainForm..PlaylistManagerPopup..PM_PLM_SaveAsExistingFavorite..Caption
 #: NempMainUnit_-_Kopie.dfm:7079
 #. Nemp_MainForm..PlaylistManagerPopup..PM_PLM_SaveAsExistingFavorite..Caption
-#: NempMainUnit.dfm:7456
+#: NempMainUnit.dfm:7453
 msgid "Save playlist \"\""
 msgstr ""
 
 #. Nemp_MainForm..PlaylistManagerPopup..PM_PLM_SaveAsNewFavorite..Caption
 #: NempMainUnit_-_Kopie.dfm:7084
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SaveAsNewFavorite..Caption
-#: NempMainUnit.dfm:7149
+#: NempMainUnit.dfm:7146
 #. Nemp_MainForm..PlaylistManagerPopup..PM_PLM_SaveAsNewFavorite..Caption
-#: NempMainUnit.dfm:7461
+#: NempMainUnit.dfm:7458
 msgid "Save current playlist as new favorite"
 msgstr ""
 
 #. Nemp_MainForm..PlaylistManagerPopup..PM_PLM_EditFavourites..Caption
 #: NempMainUnit_-_Kopie.dfm:7097
 #. Nemp_MainForm..PlaylistManagerPopup..PM_PLM_EditFavourites..Caption
-#: NempMainUnit.dfm:7474
+#: NempMainUnit.dfm:7471
 msgid "Edit favorites"
 msgstr ""
 
 #. Nemp_MainForm..PlaylistVST_HeaderPopup..pmShowColumnIndex..Caption
 #: NempMainUnit_-_Kopie.dfm:7128
 #. Nemp_MainForm..PlaylistVST_HeaderPopup..pmShowColumnIndex..Caption
-#: NempMainUnit.dfm:7505
+#: NempMainUnit.dfm:7502
 #. OptionsCompleteForm..Panel1..PageControl1..tabViewingSettings..cpgViewingSettings..cpPlaylistFormatting..cb_ShowIndexInTreeview..Caption
 #: OptionsComplete.dfm:1432
 msgid "Show column \"Index\""
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel..MedienBibDetailPanel..ContainerPanelMedienBibDetails..DetailID3TagPanel..LblBibAlbum..Caption
-#: NempMainUnit.dfm:1343
+#: NempMainUnit.dfm:1341
 #. Nemp_MainForm..__MainContainerPanel..MedienBibDetailPanel..ContainerPanelMedienBibDetails..DetailID3TagPanel..LblBibArtist..Caption
-#: NempMainUnit.dfm:1355
+#: NempMainUnit.dfm:1353
 #. Nemp_MainForm..__MainContainerPanel..MedienBibDetailPanel..ContainerPanelMedienBibDetails..DetailID3TagPanel..LblBibDuration..Caption
-#: NempMainUnit.dfm:1373
+#: NempMainUnit.dfm:1371
 #. Nemp_MainForm..__MainContainerPanel..MedienBibDetailPanel..ContainerPanelMedienBibDetails..DetailID3TagPanel..lblBibDirectory..Caption
-#: NempMainUnit.dfm:1471
+#: NempMainUnit.dfm:1469
 msgid "               "
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1864
+#: NempMainUnit.dfm:1862
 #. Programmer's name for it: AudioFileProperty_CbrVbr
 #: Nemp_RessourceStrings.pas:833
 msgid "cbr/vbr"
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1868
+#: NempMainUnit.dfm:1866
 #. Programmer's name for it: AudioFileProperty_ChannelMode
 #: Nemp_RessourceStrings.pas:834
 msgid "Channelmode"
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1896
+#: NempMainUnit.dfm:1894
 msgid "File created"
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1904
+#: NempMainUnit.dfm:1902
 #. Programmer's name for it: TreeHeader_PlayCounter
 #: Nemp_RessourceStrings.pas:85
 msgid "Play counter"
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1908
+#: NempMainUnit.dfm:1906
 msgid "Track gain"
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1912
+#: NempMainUnit.dfm:1910
 msgid "Album gain"
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1916
+#: NempMainUnit.dfm:1914
 msgid "Track peak"
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1920
+#: NempMainUnit.dfm:1918
 msgid "Album peak"
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1924
+#: NempMainUnit.dfm:1922
 msgid "BPM"
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1932
+#: NempMainUnit.dfm:1930
 #. RandomPlaylistForm..GrpBox_Tags..Caption
 #: RandomPlaylist.dfm:91
 msgid "Tags"
 msgstr ""
 
 #. Nemp_MainForm..__MainContainerPanel..MedialistPanel..GRPBOXVST..VST......Text
-#: NempMainUnit.dfm:1936
+#: NempMainUnit.dfm:1934
 #. Programmer's name for it: TreeHeader_Marker
 #: Nemp_RessourceStrings.pas:89
 msgid "Marker"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_SearchDirectoryCurrentCategory..Caption
-#: NempMainUnit.dfm:2819
+#: NempMainUnit.dfm:2817
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SearchDirectoryCurrentCategory..Caption
-#: NempMainUnit.dfm:7290
+#: NempMainUnit.dfm:7287
 msgid "Add directory to the current category"
 msgstr ""
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_Directories..MM_T_DirectoriesProgram..Caption
-#: NempMainUnit.dfm:3208
+#: NempMainUnit.dfm:3206
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Directories..PM_P_DirectoriesProgram..Caption
-#: NempMainUnit.dfm:6407
+#: NempMainUnit.dfm:6404
 msgid "Program directory"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_ML_SortBy..PM_ML_bpm..Caption
-#: NempMainUnit.dfm:5610
+#: NempMainUnit.dfm:5608
 msgid "BPM (Beats per minute)"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_View_PopupMenu..PM_MLView_RemoveFromCategory..Caption
-#: NempMainUnit.dfm:5650
+#: NempMainUnit.dfm:5648
 msgid "Remove selected files from current category"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_EditFavorites..Caption
-#: NempMainUnit.dfm:7154
+#: NempMainUnit.dfm:7151
 msgid "Edit favorite playlists"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_ChangeCategory..Caption
-#: NempMainUnit.dfm:7161
+#: NempMainUnit.dfm:7158
 msgid "Change category"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_RemoveFromCategory..Caption
-#: NempMainUnit.dfm:7165
+#: NempMainUnit.dfm:7162
 msgid "Remove from category"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortLayerBy..PM_ML_SortLayerByArtistAlbum..Caption
-#: NempMainUnit.dfm:7182
+#: NempMainUnit.dfm:7179
 msgid "Artist, Album"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortLayerBy..PM_ML_SortLayerByArtistReleaseYear..Caption
-#: NempMainUnit.dfm:7187
+#: NempMainUnit.dfm:7184
 msgid "Artist, Release Year"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortPlaylistsBy..Caption
-#: NempMainUnit.dfm:7232
+#: NempMainUnit.dfm:7229
 msgid "Sort playlists by"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_SortPlaylistsBy..PM_ML_SortPlaylistsByFolder..Caption
-#: NempMainUnit.dfm:7240
+#: NempMainUnit.dfm:7237
 #. OptionsCompleteForm..Panel1..PageControl1..tabCategories..cpgCategories..cpCategoryPlaylists..cbPlaylistCaptionMode....Items.Strings
 #: OptionsComplete.dfm:2394
 #. OptionsCompleteForm..Panel1..PageControl1..tabCategories..cpgCategories..cpCategoryPlaylists..cbPlaylistSortMode....Items.Strings
@@ -5852,78 +5927,78 @@ msgid "Folder"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_ConfigureMedialibrary..Caption
-#: NempMainUnit.dfm:7264
+#: NempMainUnit.dfm:7261
 #. Nemp_MainForm..Medialist_Category_PopupMenu..PM_ML_ConfigureMediaLibraryCat..Caption
-#: NempMainUnit.dfm:7607
+#: NempMainUnit.dfm:7604
 msgid "Configure media library"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_Collection_PopupMenu..PM_ML_ResetTagCloud..Caption
-#: NempMainUnit.dfm:7349
+#: NempMainUnit.dfm:7346
 msgid "Reset tag cloud"
 msgstr ""
 
 #. Nemp_MainForm..ActionListLayout..actJoinWindows..Caption
-#: NempMainUnit.dfm:7523
+#: NempMainUnit.dfm:7520
 msgid "Join windows"
 msgstr ""
 
 #. Nemp_MainForm..ActionListLayout..actSplitWindows..Caption
-#: NempMainUnit.dfm:7528
+#: NempMainUnit.dfm:7525
 msgid "Split windows"
 msgstr ""
 
 #. Nemp_MainForm..ActionListLayout..actToggleFileOverview..Caption
-#: NempMainUnit.dfm:7532
+#: NempMainUnit.dfm:7529
 msgid "Show file overview"
 msgstr ""
 
 #. Nemp_MainForm..ActionListLayout..actToggleTitleList..Caption
-#: NempMainUnit.dfm:7536
+#: NempMainUnit.dfm:7533
 msgid "Show title list"
 msgstr ""
 
 #. Nemp_MainForm..ActionListLayout..actToggleBrowseList..Caption
-#: NempMainUnit.dfm:7540
+#: NempMainUnit.dfm:7537
 msgid "Show treeview/coverflow/tagcloud"
 msgstr ""
 
 #. Nemp_MainForm..ActionListLayout..actFileOverviewBoth..Caption
-#: NempMainUnit.dfm:7565
+#: NempMainUnit.dfm:7562
 msgid "Cover/lyrics and details"
 msgstr ""
 
 #. Nemp_MainForm..ActionListLayout..actFileOverviewOnlyCover..Caption
-#: NempMainUnit.dfm:7569
+#: NempMainUnit.dfm:7566
 msgid "Only cover/lyrics"
 msgstr ""
 
 #. Nemp_MainForm..ActionListLayout..actFileOverviewOnlyDetails..Caption
-#: NempMainUnit.dfm:7573
+#: NempMainUnit.dfm:7570
 msgid "Only details"
 msgstr ""
 
 #. Nemp_MainForm..ActionListLayout..actShowControlCover..Caption
-#: NempMainUnit.dfm:7585
+#: NempMainUnit.dfm:7582
 msgid "Show cover in control panel"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_Category_PopupMenu..PM_ML_ClearCategory..Caption
-#: NempMainUnit.dfm:7612
+#: NempMainUnit.dfm:7609
 #. Programmer's name for it: MainForm_MenuCaptionsClearCollectionBlanko
 #: Nemp_RessourceStrings.pas:595
 msgid "Clear category"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_Category_PopupMenu..PM_ML_ShowPlaylistCategories..Caption
-#: NempMainUnit.dfm:7620
+#: NempMainUnit.dfm:7617
 #. OptionsCompleteForm..Panel1..PageControl1..tabCategories..cpgCategories..cpCategories..cbLibConfigShowPlaylistCategories..Caption
 #: OptionsComplete.dfm:2733
 msgid "Show playlist categories"
 msgstr ""
 
 #. Nemp_MainForm..Medialist_Category_PopupMenu..PM_ML_ShowWebradioCategory..Caption
-#: NempMainUnit.dfm:7624
+#: NempMainUnit.dfm:7621
 msgid "Show webradio category"
 msgstr ""
 
@@ -11820,43 +11895,6 @@ msgstr ""
 msgid "General"
 msgstr ""
 
-#. OptionsCompleteForm..Panel1..PageControl1..tabGeneral..cpgMainOptions..HeaderFont.Name
-#: OptionsComplete.dfm:103
-#. OptionsCompleteForm..Panel1..PageControl1..tabControl..cpgControlSettings..HeaderFont.Name
-#: OptionsComplete.dfm:447
-#. OptionsCompleteForm..Panel1..PageControl1..tabViewingSettings..cpgViewingSettings..HeaderFont.Name
-#: OptionsComplete.dfm:1317
-#. OptionsCompleteForm..Panel1..PageControl1..tabFontSizes..cpgDisplaySettings..HeaderFont.Name
-#: OptionsComplete.dfm:1738
-#. OptionsCompleteForm..Panel1..PageControl1..tabFileManagement..cpgFileManagement..HeaderFont.Name
-#: OptionsComplete.dfm:2057
-#. OptionsCompleteForm..Panel1..PageControl1..tabCategories..cpgCategories..HeaderFont.Name
-#: OptionsComplete.dfm:2360
-#. OptionsCompleteForm..Panel1..PageControl1..tabMetadata..cpgMetadata..HeaderFont.Name
-#: OptionsComplete.dfm:2761
-#. OptionsCompleteForm..Panel1..PageControl1..tabSearch..cpgSearchSettings..HeaderFont.Name
-#: OptionsComplete.dfm:2955
-#. OptionsCompleteForm..Panel1..PageControl1..tabPlayer..cpgPlayerMain..HeaderFont.Name
-#: OptionsComplete.dfm:3111
-#. OptionsCompleteForm..Panel1..PageControl1..tabPlaylist..cpgPlaylistSettings..HeaderFont.Name
-#: OptionsComplete.dfm:3538
-#. OptionsCompleteForm..Panel1..PageControl1..tabWebradio..cpgWebstreams..HeaderFont.Name
-#: OptionsComplete.dfm:4109
-#. OptionsCompleteForm..Panel1..PageControl1..tabEffects..cpgEffects..HeaderFont.Name
-#: OptionsComplete.dfm:4320
-#. OptionsCompleteForm..Panel1..PageControl1..tabBirthday..cpgBirthday..HeaderFont.Name
-#: OptionsComplete.dfm:4557
-#. OptionsCompleteForm..Panel1..PageControl1..tabLastfm..cpgScrobble..HeaderFont.Name
-#: OptionsComplete.dfm:4753
-#. OptionsCompleteForm..Panel1..PageControl1..tabWebserver..cpgWebserverConfiguration..HeaderFont.Name
-#: OptionsComplete.dfm:5111
-#. OptionsCompleteForm..Panel1..PageControl1..tabCoverflow..cpgCoverFlowView..HeaderFont.Name
-#: OptionsComplete.dfm:5476
-#. OptionsCompleteForm..Panel1..PageControl1..tabFiletypes..cpgFileTypesRegistration..HeaderFont.Name
-#: OptionsComplete.dfm:5877
-msgid "Segoe UI"
-msgstr ""
-
 #. OptionsCompleteForm..Panel1..PageControl1..tabGeneral..cpgMainOptions..cpUpdateThread_FAILSAFE..Caption
 #: OptionsComplete.dfm:110
 msgid "Failsafe"
@@ -17057,19 +17095,6 @@ msgid "Nemp can't write into the Users appdata path and therefore can't save "
 "any data (including settings, playlist and the media library). This "
 "is quite unusual. \n"
 "\nYou may try Nemp using in \"portable mode\".\n\n"
-"Please refer to the documentation for further "
-"details."
-msgstr ""
-
-#. Programmer's name for it: WriteAccessNotPossiblePortable
-#: Nemp_RessourceStrings.pas:1170
-msgid "Nemp can't write into the current directory and therefore can't save "
-"any data (including settings, playlist and the media library). \n"
-"\n"
-"You may try Nemp using in \"installed mode\" by deleting the file "
-"\"UseLocalData.cfg\". Otherwise, you should move Nemp into your "
-"\"portable apps\" directory.\n"
-"\n"
 "Please refer to the documentation for further "
 "details."
 msgstr ""
