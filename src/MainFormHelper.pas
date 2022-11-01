@@ -134,7 +134,7 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     PlayerLog, progressUnit, Hilfsfunktionen, EffectsAndEqualizer, MainFormBuilderForm,
     ReplayGainProgress, NewMetaFrame, WebQRCodes, PlaylistEditor, NewFavoritePlaylist,
     AudioDisplayUtils, PlaylistDuplicates, LibraryOrganizer.Configuration.NewLayer,
-    fChangeFileCategory;
+    fChangeFileCategory, fConfigErrorDlg;
 
 procedure CorrectVolButton;
 begin
@@ -916,6 +916,8 @@ begin
         ReTranslateComponent (MedienlisteForm );
         ReTranslateComponent (ProgressFormLibrary    );
         ReTranslateComponent (ProgressFormPlaylist   );
+
+        if assigned(ConfigErrorDlg) then ReTranslateComponent(ConfigErrorDlg);
 
         if assigned(FNewPicture          ) then ReTranslateComponent(FNewPicture         );
         if assigned(FSplash              ) then ReTranslateComponent(FSplash             );
