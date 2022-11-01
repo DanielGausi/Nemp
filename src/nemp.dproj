@@ -356,6 +356,10 @@
         <DCCReference Include="3rd Party Units\ReplayGain.pas"/>
         <DCCReference Include="MainFormLayout.pas"/>
         <DCCReference Include="NempHelp.pas"/>
+        <DCCReference Include="fConfigErrorDlg.pas">
+            <Form>ConfigErrorDlg</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

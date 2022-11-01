@@ -138,7 +138,8 @@ uses
   RedeemerInheritablePNG in '3rd Party Units\RedeemerInheritablePNG.pas',
   ReplayGain in '3rd Party Units\ReplayGain.pas',
   MainFormLayout in 'MainFormLayout.pas',
-  NempHelp in 'NempHelp.pas';
+  NempHelp in 'NempHelp.pas',
+  fConfigErrorDlg in 'fConfigErrorDlg.pas' {ConfigErrorDlg};
 
 {$R *.res}
 
