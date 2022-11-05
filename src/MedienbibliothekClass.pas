@@ -3326,6 +3326,7 @@ begin
       Mp3ListePfadSort.Extract(aAudioFile);
       BibSearcher.RemoveAudioFileFromLists(aAudioFile);
       // remove it from all Categories
+      CoverSearchCategory.RemoveAudioFile(aAudioFile);
       for i := 0 to FileCategories.Count - 1 do
         TLibraryFileCategory(FileCategories[i]).RemoveAudioFile(aAudioFile);
       FreeAndNil(aAudioFile);
