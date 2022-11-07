@@ -5127,7 +5127,7 @@ begin
 
     aAudioFile := Sender.GetNodeData<TAudioFile>(Node);
 
-    case VST.Header.Columns[VST.FocusedColumn].Tag of
+    case VST.FocusedColumn of
         colIdx_ARTIST:   aString := aAudioFile.Artist;
         colIdx_ALBUMARTIST: aString := aAudioFile.AlbumArtist;
         colIdx_COMPOSER: aString := aAudioFile.Composer;
@@ -5210,9 +5210,9 @@ begin
       if not Assigned(VST.FocusedNode) then Exit;
       // nächstes Vorkommen des Prefixes suchen, dazu: beim nächsten Knoten beginnen
       if VST.GetNext(VST.FocusedNode) <> NIL then
-        ScrollNode := GetNodeWithPrefix(VST, VST.GetNext(VST.FocusedNode), VST.Header.Columns[VST.FocusedColumn].Tag, OldSelectionPrefix,erfolg)
+        ScrollNode := GetNodeWithPrefix(VST, VST.GetNext(VST.FocusedNode), VST.FocusedColumn, OldSelectionPrefix,erfolg)
       else
-        ScrollNode := GetNodeWithPrefix(VST, VST.GetFirst, VST.Header.Columns[VST.FocusedColumn].Tag, OldSelectionPrefix,erfolg);
+        ScrollNode := GetNodeWithPrefix(VST, VST.GetFirst, VST.FocusedColumn, OldSelectionPrefix,erfolg);
       if erfolg then
       begin
         // den alten deselektieren, und zum neuen hinscrollen, Focus setzen und selektieren
