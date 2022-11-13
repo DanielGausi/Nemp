@@ -31,7 +31,7 @@ Nemp has a lot (and I mean a lot!) of settings. Some are very useful, others may
 * Activate fading between tracks and skip silence at the end of tracks
 * Choose a default action when the user double-click a file in the Windows Explorer, like "play" or "enqueue"
 * Automatically scan your music folder for new files when Nemp starts
-* Use a fuzzy search (do you know ho many R, S and T are in "Alanis Morissette"?)
+* Use a fuzzy search (do you know how many R, S and T are in "Alanis Morissette"?)
 * and many, many more!
 
 ![Nemp Settings](/Screenshots/Settings.jpg)
@@ -51,7 +51,7 @@ Nemp does not change anything in your music files without your permission. It wi
 * Nemp can shut down the computer after some time. This includes lowering the output volume during the last 30 seconds, so you won't wake up again due to a sudden change in the volume
 * Nemp can play a birthday song at midnight automatically 
 * You can customize the look of Nemp by the integrated skin system
-* You can create random playlist based on genres and other tags
+* You can create random playlists based on genres and other tags
 * Fun stuff: If Nemp runs on a device with low battery, it may happen that the playback wobbles a little bit - just as it did on these old portable cassette players ...
 
 ## Nemp API
