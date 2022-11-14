@@ -107,8 +107,8 @@ resourcestring
   rsFormatReplayGainAlbum_WithPeak = 'Album: %.2f dB, Peak: %.6f';
 
 const
-  cCSVHeader = 'Artist;Title;Album;Genre;Year;Track;CD;Directory;Filename;Type;Filesize;Duration;Bitrate;vbr;Channelmode;Samplerate;Rating;Playcounter;Lyrics;TrackGain;AlbumGain;TrackPeak;AlbumPeak';
-  cCSVFormat = '%s;%s;%s;%s;%s;%d;%s;%s;%s;%s;%d;%d;%d;%s;%s;%s;%d;%d;%s;%s;%s;%s;%s;';
+  cCSVHeader = 'Artist;Title;Album;Album-Artist;Composer;Genre;Year;Track;CD;Directory;Filename;Type;Filesize;Duration;Bitrate;vbr;Channelmode;Samplerate;Rating;Playcounter;Lyrics;BPM;TrackGain;AlbumGain;TrackPeak;AlbumPeak';
+  cCSVFormat = '%s;%s;%s;%s;%s;%s;%s;%d;%s;%s;%s;%s;%d;%d;%d;%s;%s;%s;%d;%d;%s;%s;%s;%s;%s;%s;';
   phArtist   =   '<artist>';
   phAlbum    =    '<album>';
   phTitle    =    '<title>';
@@ -1107,6 +1107,8 @@ begin
         [ EscapeStr(af.Artist),
           EscapeStr(af.Titel),
           EscapeStr(af.Album),
+          EscapeStr(af.AlbumArtist),
+          EscapeStr(af.Composer),
           EscapeStr(af.Genre),
           EscapeStr(af.Year),
           af.Track,
@@ -1123,6 +1125,7 @@ begin
           af.Rating,
           af.PlayCounter,
           LyricsStr,
+          EscapeStr(af.BPM),
           GainValueToString(af.TrackGain),
           GainValueToString(af.AlbumGain),
           PeakValueToString(af.TrackPeak),
