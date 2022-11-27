@@ -1,0 +1,47 @@
+﻿%<META>%
+%EXTENSION%=html
+%ENCODING%=UTF8
+%ESCAPE%=& &amp;
+%ESCAPE%=< &lt;
+%ESCAPE%=> &gt;
+%ESCAPE%=" &quot;
+%ESCAPE%=' &#39;
+%</META>%
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="generator" content="Nemp - https://www.gausi.de">	
+	<title>Nemp - File overview</title>	
+</head>
+<body>
+	<h1>Nemp - File overview</h1>
+	<p>
+		Number of Files: <TotalCount> <br>
+		Duration: <TotalSeconds> Seconds<br>
+		Size: <TotalBytes> Bytes	
+	</p>
+	<table>
+		<tr>
+			<th class="title">Title</th>
+			<th class="artist">Artist</th>
+			<th class="album">Album</th>
+			<th class="track">Track</th>
+			<th class="year">Year</th>
+			<th class="genre">Genre</th>
+			<th class="filename">Filename</th>
+		</tr>
+%<FILES>%
+		<tr>
+			<td class="title"><title></td>
+			<td class="artist"><artist></td>
+			<td class="album"><album></td>
+			<td class="track"><track></td>
+			<td class="year"><year></td>
+			<td class="genre"><genre></td>
+			<td class="filename"><filename></td>
+		</tr>
+%</FILES>%
+	</table>
+</body>
+</html>

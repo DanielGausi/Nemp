@@ -1,2 +1,4 @@
-Icon_2 Icon "New Icons\\NempFile.ico"
-Icon_1 Icon "New Icons\\NempMainIcon.ico"
+nxpCSV RCDATA "ressources\\csv.nxp"
+nxpHTML RCDATA "ressources\\html.nxp"
+nxpEmpty RCDATA "ressources\\empty.nxp"
+nxpJson RCDATA "ressources\\json.nxp"

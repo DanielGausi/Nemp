@@ -122,12 +122,40 @@ const
   phSubDir   =   '<subdir>';
   phDir      =      '<dir>';
   phFullPath = '<fullpath>';
+  phAlbumArtist  = '<AlbumArtist>';
+  phComposer     = '<Composer>';
+  phCD           = '<CD>';
+  phType         = '<Type>';     // type = extension
+  phFilesize     = '<Filesize>';
+  phDuration     = '<Duration>';
+  phBitrate      = '<Bitrate>';
+  phVBR          = '<VBR>';
+  phChannelmode  = '<Channelmode>';
+  phSamplerate   = '<Samplerate>';
+  phRating       = '<Rating>';
+  phPlaycounter  = '<Playcounter>';
+  phLyrics       = '<Lyrics>';
+  phLyricsExist  = '<LyricsExist>';
+  phBPM          = '<BPM>';
+  phTrackGain    = '<TrackGain>';
+  phAlbumGain    = '<AlbumGain>';
+  phTrackPeak    = '<TrackPeak>';
+  phAlbumPeak    = '<AlbumPeak>';
+  phCoverID      = '<CoverID>';
+  // For export summary only
+  phTotalCount = '<TotalCount>';
+  phTotalBytes = '<TotalBytes>';
+  phTotalSeconds = '<TotalSeconds>';
+
+  // combined placeholders, default values
   cFormatArtistTitle = '<artist> - <title>';
   cFormatArtistAlbum = '<artist> - <album>';
   cFormatWebradio = '<station>: <title>';
 
-  Mp3db_Samplerates: Array[0..9] of String
-      = (' 8.0','11.0','12.0','16.0','22.0','24.0','32.0','44.1','48.0','N/A ');
+  Mp3db_Samplerates: Array[0..10] of String
+      = (' 8.0','11.0','12.0','16.0','22.0','24.0','32.0','44.1','48.0', '96.0','N/A ');
+  Mp3db_SampleratesInt: Array[0..10] of Integer
+      = (8000, 11000, 12000, 16000, 22000, 24000, 32000, 44100, 48000, 96000, 0);
 
   Mp3db_Modes:  Array[0..5] of String
       = ('S ','JS','DC','M ','--', 'X');
@@ -153,17 +181,21 @@ type
 
   TESubstituteValue = (svEmpty, svNA, svFileName, svSubDirectory, svDirectory, svFullPath, svFileNameWithExtension);
 
-  // ??? Das nutzen? TAudioFileStringIndex = (siArtist, siAlbum, siOrdner, siGenre, siJahr, siFileAge, siDateiname);
-
   TEAudioProperty = (cpArtist, cpTitle, cpAlbum, cpTrack, cpYear, cpGenre,
-      cpFileName, cpFileNameExt, cpExtension, cpSubDir, cpDir, cpFullPath, cpStation );
+      cpFileName, cpFileNameExt, cpExtension, cpSubDir, cpDir, cpFullPath, cpStation,
+      cpAlbumArtist, cpComposer, cpCD, cpType,
+      cpFilesize, cpDuration, cpBitrate, cpVBR, cpChannelmode, cpSamplerate, cpRating, cpPlaycounter, cpLyrics, cpLyricsExist,
+      cpBPM, cpTrackGain, cpAlbumGain, cpTrackPeak, cpAlbumPeak, cpCoverID);
 
   TSetOfAudioProperties = set of TEAudioProperty;
 
 const
   PlaceHolders: Array[TEAudioProperty] of String = (
         phArtist, phTitle, phAlbum, phTrack, phYear, phGenre,
-        phFileName, phFileNameExt, phExtension, phSubDir, phDir, phFullPath, phStation);
+        phFileName, phFileNameExt, phExtension, phSubDir, phDir, phFullPath, phStation,
+        phAlbumArtist, phComposer, phCD, phType,
+        phFilesize, phDuration, phBitrate, phVBR, phChannelmode, phSamplerate, phRating, phPlaycounter, phLyrics, phLyricsExist,
+        phBPM, phTrackGain, phAlbumGain, phTrackPeak, phAlbumPeak, phCoverID);
 
 type
 
@@ -309,6 +341,8 @@ type
 
 function NempDisplay: TAudioDisplay;
 
+function GetAudioProperty(aAudioFile: TAudioFile; aProp: TEAudioProperty): string;
+
 
 implementation
 
@@ -326,6 +360,56 @@ begin
 
   result := flocalNempDisplay;
 end;
+
+
+function GetAudioProperty(aAudioFile: TAudioFile; aProp: TEAudioProperty): string;
+  begin
+    case aProp of
+      cpArtist  : result := aAudioFile.Artist;
+      cpTitle   : result := aAudioFile.Titel;
+      cpAlbum   : result := aAudioFile.Album;
+      cpTrack   : result := IntToStr(aAudioFile.Track);
+      cpYear    : result := aAudioFile.Year;
+      cpGenre   : result := aAudioFile.Genre;
+      cpFileName: result := ChangeFileExt(aAudioFile.Dateiname, '');
+      cpFileNameExt: result := aAudioFile.Dateiname;
+      cpExtension: result := aAudioFile.Extension;
+      cpSubDir  : result := ExtractFileName(ExcludeTrailingPathDelimiter(aAudioFile.Ordner));
+      cpDir     : result := aAudioFile.Ordner;
+      cpFullPath: result := aAudioFile.Pfad;
+      cpStation : if aAudioFile.Description = '' then
+                  result := aAudioFile.Ordner
+                else
+                  result := aAudioFile.Description;
+
+      cpAlbumArtist : result := aAudioFile.AlbumArtist;
+      cpComposer : result := aAudioFile.Composer;
+      cpCD : result := aAudioFile.CD;
+      cpType : result := aAudioFile.Extension;
+      cpFilesize : result := aAudioFile.Size.ToString;
+      cpDuration : result := aAudioFile.Duration.ToString;
+      cpBitrate : result := aAudioFile.Bitrate.ToString;
+      cpVBR : if aAudioFile.vbr then result := 'vbr' else result := 'cbr';
+      cpChannelmode : result := Mp3DB_ChannelModes[aAudioFile.ChannelModeIdx];
+      cpSamplerate : result := Mp3db_SampleratesInt[aAudioFile.SampleRateIdx].ToString;
+      cpRating : result := aAudioFile.Rating.ToString;
+      cpPlaycounter : result := aAudioFile.PlayCounter.ToString;
+      cpLyrics : result := aAudioFile.Lyrics;
+      cpLyricsExist : if aAudioFile.LyricsExisting then result := '1' else result := '0';
+      cpBPM : result := aAudioFile.BPM;
+      cpTrackGain : result := PeakValueToString(aAudioFile.TrackGain);
+      cpAlbumGain : result := PeakValueToString(aAudioFile.AlbumGain);
+      cpTrackPeak : result := PeakValueToString(aAudioFile.TrackPeak);
+      cpAlbumPeak : result := PeakValueToString(aAudioFile.AlbumPeak);
+      cpCoverID : result := aAudioFile.CoverID;
+    else
+      result := '';
+    end;
+    // note: Trim is needed, especially for property "year" in PlaylistToUSB
+    // otherwise there may be some "#0" in the string, which will lead to invalid filenames and
+    // erroneous behaviour
+    result := trim(result);
+  end;
 
 
 { TAudioFormatString }
@@ -366,38 +450,11 @@ end;
 function TAudioFormatString.ParsedTitle(aAudioFile: TAudioFile): String;
 var tmp: String;
   i: TEAudioProperty;
-
-  function GetAudioProperty(aProp: TEAudioProperty): string;
-  begin
-    case aProp of
-      cpArtist  : result := aAudioFile.Artist;
-      cpTitle   : result := aAudioFile.Titel;
-      cpAlbum   : result := aAudioFile.Album;
-      cpTrack   : result := IntToStr(aAudioFile.Track);
-      cpYear    : result := aAudioFile.Year;
-      cpGenre   : result := aAudioFile.Genre;
-      cpFileName: result := ChangeFileExt(aAudioFile.Dateiname, '');
-      cpFileNameExt: result := aAudioFile.Dateiname;
-      cpExtension: result := aAudioFile.Extension;
-      cpSubDir  : result := ExtractFileName(ExcludeTrailingPathDelimiter(aAudioFile.Ordner));
-      cpDir     : result := aAudioFile.Ordner;
-      cpFullPath: result := aAudioFile.Pfad;
-      cpStation : if aAudioFile.Description = '' then
-                  result := aAudioFile.Ordner
-                else
-                  result := aAudioFile.Description;
-    end;
-    // note: Trim is needed, especially for property "year" in PlaylistToUSB
-    // otherwise there may be some "#0" in the string, which will lead to invalid filenames and
-    // erroneous behaviour
-    result := trim(result);
-  end;
-
 begin
   tmp := fParseString;
 
   for i in fContainedProperties do
-    tmp := StringReplace(tmp, PlaceHolders[i], GetAudioProperty(i), [rfIgnoreCase,rfReplaceAll]);
+    tmp := StringReplace(tmp, PlaceHolders[i], GetAudioProperty(aAudioFile, i), [rfIgnoreCase,rfReplaceAll]);
   result := tmp;
 end;
 
@@ -749,7 +806,7 @@ end;
 
 function TAudioDisplay.TreeAudioFileIndex(af: TAudioFile; aIndex: Integer): String;
 begin
-  if af.AudioType = at_CUE then
+   if af.AudioType = at_CUE then
     result := Format(rsFormatTreeCueIndex, [aIndex])
   else
     result := IntToStr(aIndex);

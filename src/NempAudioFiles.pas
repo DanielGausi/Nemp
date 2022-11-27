@@ -1118,8 +1118,9 @@ begin
         32000: fSamplerateIDX := 6;
         44100: fSamplerateIDX := 7;
         48000: fSamplerateIDX := 8;
+        96000: fSamplerateIDX := 9;
     else
-        fSamplerateIDX := 9;
+        fSamplerateIDX := 10;
     end;
 end;
 {

@@ -1606,7 +1606,7 @@ uses   Splash, About, OptionsComplete, StreamVerwaltung,
   CDOpenDialogs, WebServerLog, Lowbattery, ProgressUnit, EffectsAndEqualizer,
   MainFormBuilderForm, ReplayGainProgress, NempReplayGainCalculation,
   NewFavoritePlaylist, PlaylistManagement, PlaylistEditor, AudioDisplayUtils ,
-  fChangeFileCategory;
+  fChangeFileCategory, fExport;
 
 
 {$R *.dfm}
@@ -4718,8 +4718,7 @@ procedure TNemp_MainForm.ShowHelp;
 var ProperHelpFile: String;
 begin
   Application.HelpContext(HELP_Nemp_Main);
-  exit;
-
+  (*
     //if (NempOptions.Language = 'de') then
     if (LeftStr(NempOptions.Language,2) = 'de') then
     begin
@@ -4737,6 +4736,7 @@ begin
         TranslateMessageDLG((Error_HelpFileNotFound), mtError, [mbOK], 0)
     else
         ShellExecute(Handle, 'open', PChar(ProperHelpFile), nil, nil, SW_SHOWNORMAl);
+    *)
 end;
 
 procedure TNemp_MainForm.ToolButton7Click(Sender: TObject);
@@ -6667,8 +6667,8 @@ end;
 
 
 procedure TNemp_MainForm.RefreshCoverFlowTimerTimer(Sender: TObject);
-var
-  i: Integer;
+//var
+//  i: Integer;
 begin
     RefreshCoverFlowTimer.Enabled := False;
     if Not MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow then
@@ -9681,21 +9681,44 @@ end;
 
 
 procedure TNemp_MainForm.PM_ML_MedialibraryExportClick(Sender: TObject);
+var
+  ExportSuccess: Boolean;
 begin
   if NempSkin.NempPartyMode.DoBlockBibOperations then
       exit;
 
-  if MedienBib.StatusBibUpdate >= 2 then
+  if MedienBib.StatusBibUpdate <> 0 then
   begin
       TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
       exit;
   end;
 
-//deleted Oktober, 9, 2008  SaveDialog1.InitialDir := myFolder;
+  MedienBib.PrepareExport;
+  if FormExport.ShowModal = mrOK then begin
+    if FormExport.ExportMode = 3 then
+      ExportSuccess := MedienBib.DoPlaylistExport(NempPlaylist.Playlist, FormExport.ExportFilename)
+    else
+      ExportSuccess := MedienBib.DoExport(FormExport.ExportMode, FormExport.ExportFilename);
+
+    if ExportSuccess then begin
+      if TranslateMessageDLG((ExportSucceeded), mtInformation, [MBYes, MBNo], 0) = mrYes then
+        ShellExecute(Handle, 'open', PChar(FormExport.ExportFilename), nil, nil, SW_SHOWNORMAl);
+    end else begin
+      if FormExport.ExportMode = 1 then // export CurrentCategory
+        TranslateMessageDLG((ExportFailed_CurrentCategory), mtWarning, [MBOK], 0)
+      else
+        TranslateMessageDLG((ExportFailed_Unknown), mtWarning, [MBOK], 0)
+    end;
+
+    MedienBib.FinishExport(True);
+  end else
+    MedienBib.FinishExport(False);
+ (*
   SaveDialog1.Filter := (MediaLibrary_CSVFilter) + ' (*.csv)|*.csv';
   if SaveDialog1.Execute then
       if not MedienBib.SaveAsCSV(SaveDialog1.FileName) then
         TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+  *)
 end;
 
 procedure TNemp_MainForm.PM_P_CloseClick(Sender: TObject);

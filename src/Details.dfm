@@ -1,9 +1,6 @@
 object FDetails: TFDetails
   Left = 220
   Top = 125
-  Hint = 
-    'Refresh this form whenever you select another file in the main w' +
-    'indow.'
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'File properties'
@@ -29,7 +26,7 @@ object FDetails: TFDetails
     Top = 3
     Width = 615
     Height = 503
-    ActivePage = Tab_General
+    ActivePage = Tab_MetaData
     Align = alClient
     MultiLine = True
     TabOrder = 0
@@ -361,7 +358,7 @@ object FDetails: TFDetails
             Height = 313
             Align = alClient
             BevelOuter = bvNone
-            TabOrder = 0
+            TabOrder = 1
             DesignSize = (
               196
               313)
@@ -384,7 +381,7 @@ object FDetails: TFDetails
             object lb_Tags: TListBox
               AlignWithMargins = True
               Left = 6
-              Top = 24
+              Top = 27
               Width = 179
               Height = 273
               Anchors = [akLeft, akTop, akRight, akBottom]
@@ -401,7 +398,7 @@ object FDetails: TFDetails
             Height = 313
             Align = alLeft
             BevelOuter = bvNone
-            TabOrder = 1
+            TabOrder = 0
             object IMG_LibraryRating: TImage
               Left = 96
               Top = 222
@@ -645,7 +642,7 @@ object FDetails: TFDetails
               Height = 21
               AutoComplete = False
               Sorted = True
-              TabOrder = 0
+              TabOrder = 6
               OnChange = EditLibraryChange
               OnExit = Edit_LibraryExit
             end
@@ -654,7 +651,7 @@ object FDetails: TFDetails
               Top = 72
               Width = 300
               Height = 21
-              TabOrder = 1
+              TabOrder = 2
               OnChange = EditLibraryChange
               OnExit = Edit_LibraryExit
             end
@@ -663,7 +660,7 @@ object FDetails: TFDetails
               Top = 24
               Width = 300
               Height = 21
-              TabOrder = 2
+              TabOrder = 0
               OnChange = EditLibraryChange
               OnExit = Edit_LibraryExit
             end
@@ -672,7 +669,7 @@ object FDetails: TFDetails
               Top = 192
               Width = 51
               Height = 21
-              TabOrder = 3
+              TabOrder = 9
               OnChange = Edit_LibraryYearChange
               OnExit = Edit_LibraryExit
             end
@@ -681,7 +678,7 @@ object FDetails: TFDetails
               Top = 96
               Width = 300
               Height = 21
-              TabOrder = 4
+              TabOrder = 3
               OnChange = EditLibraryChange
               OnExit = Edit_LibraryExit
             end
@@ -690,7 +687,7 @@ object FDetails: TFDetails
               Top = 48
               Width = 300
               Height = 21
-              TabOrder = 5
+              TabOrder = 1
               OnChange = EditLibraryChange
               OnExit = Edit_LibraryExit
             end
@@ -699,7 +696,7 @@ object FDetails: TFDetails
               Top = 192
               Width = 51
               Height = 21
-              TabOrder = 6
+              TabOrder = 8
               OnChange = Edit_LibraryTrackChange
               OnExit = Edit_LibraryExit
             end
@@ -718,7 +715,7 @@ object FDetails: TFDetails
               Top = 120
               Width = 300
               Height = 21
-              TabOrder = 8
+              TabOrder = 4
               OnChange = EditLibraryChange
               OnExit = Edit_LibraryExit
             end
@@ -727,7 +724,7 @@ object FDetails: TFDetails
               Top = 144
               Width = 300
               Height = 21
-              TabOrder = 9
+              TabOrder = 5
               OnChange = EditLibraryChange
               OnExit = Edit_LibraryExit
             end
@@ -1532,7 +1529,7 @@ object FDetails: TFDetails
     end
     object cbQuickRefresh: TCheckBox
       Left = 12
-      Top = 4
+      Top = 0
       Width = 179
       Height = 17
       Hint = 

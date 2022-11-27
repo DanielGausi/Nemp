@@ -1,0 +1,46 @@
+%<META>%
+%EXTENSION%=json
+%ENCODING%=UTF8
+%ESCAPE%=\ \\
+%ESCAPE%=" \"
+%ESCAPE%=/ \/
+%</META>%
+{
+"summary": {
+	"files":<TotalCount>,
+	"duration":<TotalSeconds>,
+	"size":<TotalBytes>
+},
+"files":[
+%<FILES>%
+	{
+		"Artist":"<artist>",
+		"Title":"<title>",
+		"Album":"<album>",
+		"AlbumArtist":"<AlbumArtist>",
+		"Composer":"<Composer>",
+		"Genre":"<genre>",
+		"Year":"<year>",
+		"Track":"<track>",
+		"CD":"<CD>",
+		"Directory":"<dir>",
+		"Filename":"<filename>",
+		"Ext":"<ext>",
+		"Filesize":<Filesize>,
+		"Duration":<Duration>,
+		"Bitrate":<Bitrate>,
+		"VBR":"<VBR>",
+		"Channelmode":"<Channelmode>",
+		"Samplerate":<Samplerate>,
+		"Rating":<Rating>,
+		"Playcounter":<Playcounter>,
+		"BPM":"<BPM>",
+		"TrackGain":<TrackGain>,
+		"AlbumGain":<AlbumGain>,
+		"TrackPeak":<TrackPeak>,
+		"AlbumPeak":<AlbumPeak>
+	},
+%</FILES>%
+	{}
+]
+}

@@ -1,0 +1,19 @@
+﻿%<META>%
+%EXTENSION%=txt
+%ENCODING%=UTF8
+%ESCAPE%=< &lt;
+%ESCAPE%=> &gt;
+%</META>%
+
+Within %<META>% ... %</META>% the meta data of the template is defined.
+Use %EXTENSION% to define the default extension of the saved file.
+With %ENCODING% you can specify the encoding. Possible values are "ansi", "utf8" and "utf16".
+Use %ESCAPE% to define a list of escape sequences. For example, in html every "<" should be replaced by "&lt;".
+
+Before and after the actual list of files you can use placeholders <TotalCount>, <TotalSeconds> and <TotalBytes> to add a summary of the exported files.
+
+%<FILES>%
+The lines between %<FILES>% and %</FILES>% are added for every file. Here you can use the placeholders like <artist>, <title> or <album>.
+%</FILES>%
+
+After the list of files you can add some more text.

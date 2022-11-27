@@ -96,6 +96,8 @@ function AnsiCompareText_Nemp(const S1, S2: string): Integer;
 function AnsiCompareText_NempIgnoreCase(const S1, S2: string): Integer;
 function AnsiStartsText_Nemp(const ASubText, AText: string): Boolean;
 
+function UniqueFilename(aExistingFilename: String): String;
+
 
 procedure Wuppdi(i: Integer = 0);
 
@@ -810,6 +812,23 @@ begin
   else
     Result := CompareString(LOCALE_USER_DEFAULT, SORT_STRINGSORT or SORT_DIGITSASNUMBERS,
       PChar(AText), L, PChar(ASubText), L) = 2;
+end;
+
+function UniqueFilename(aExistingFilename: String): String;
+var
+  aPath, aExt, aFileName, newName: String;
+  i: Integer;
+begin
+  aExt := ExtractFileExt(aExistingFilename);
+  aPath := ExtractFilePath(aExistingFilename);
+  aFileName := ChangeFileExt(ExtractFilename(aExistingFilename), '');
+  i := 0;
+  repeat
+    inc(i);
+    newName := aPath + aFileName + '('+ IntToStr(i)+ ')' + aExt;
+  until not FileExists(newName);
+
+  result := newName;
 end;
 
 

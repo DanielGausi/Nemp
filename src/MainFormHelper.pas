@@ -134,7 +134,7 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     PlayerLog, progressUnit, Hilfsfunktionen, EffectsAndEqualizer, MainFormBuilderForm,
     ReplayGainProgress, NewMetaFrame, WebQRCodes, PlaylistEditor, NewFavoritePlaylist,
     AudioDisplayUtils, PlaylistDuplicates, LibraryOrganizer.Configuration.NewLayer,
-    fChangeFileCategory, fConfigErrorDlg;
+    fChangeFileCategory, fConfigErrorDlg, fExport;
 
 procedure CorrectVolButton;
 begin
@@ -1031,6 +1031,8 @@ begin
             ReTranslateComponent(FormChangeCategory);
             RestoreComboboxes(FormChangeCategory);
         end;
+        if assigned(FormExport) then
+          ReTranslateComponent(FormExport);
 
         // Categories
         ArtistsVST.Header.Columns[0].Text := TreeHeader_Categories;

@@ -795,6 +795,8 @@ Medialibrary_DriveRepairError = 'An Error occured while updating drivelist. Plea
 Medialibrary_DialogFilter            = 'Nemp media library';
 Medialibrary_AddingPlaylist          = 'Adding the playlist to the media library...';
 MediaLibrary_CSVFilter               = 'CSV files';
+MediaLibrary_HTMLFilter              = 'HTML files';
+MediaLibrary_AnyFileFilter           = 'files';
 
 MediaLibrary_OutOfMemoryAccelerateSearchReduced       = 'Not enough memory. The settings for the accelerated search have been reduced to a minimum.';
 MediaLibrary_OutOfMemoryAccelerateSearchDisabled      = 'Not enough memory. Accelerated search has been disabled.';
@@ -1174,24 +1176,16 @@ LibConfigHint_LayerMain = 'Layer %s';
 LibConfigHint_LayerSorting = 'Sorted by: ';
 LibConfigText_LayerSortedBy = '%s (by %s)';
 
-//function MainVSTEmptyMessage(state: Integer): String;
+ExportFailed_CurrentCategory = 'The current category doesn''t contain audio files, but Playlists or Webradio. Export is not possible.';
+ExportFailed_Unknown = 'The export failed for an unexpected reason.';
+ExportSucceeded = 'Export complete. Do you want to open the file now?';
+ExportNewTemplateCaption = 'Export: New template';
+ExportNewTemplatePrompt = 'Please enter a name for the new template';
+ExportDeleteTemplateConfirmation = 'Do you really want to delete the template "%s"?';
+ExportDeleteTemplateFailed = 'The template could not be deleted.';
+
 
 implementation
 
-(*
-function MainVSTEmptyMessage(state: Integer): String;
-begin
-  case state of
-    0: result := ;
-    1: result := ;
-    2: result := ;
-    3: result := ;
-    4: result := ;
-    5: result := ;
-
-
-  end;
-
-end*)
 
 end.

@@ -54,7 +54,7 @@ uses Windows, Contnrs, Sysutils,  Classes, Inifiles, RTLConsts,
      Nemp_RessourceStrings, DriveRepairTools, ShoutcastUtils, BibSearchClass,
      NempCoverFlowClass, TagClouds, ScrobblerUtils, CustomizedScrobbler,
      LibraryOrganizer.Base, LibraryOrganizer.Files, LibraryOrganizer.Playlists, LibraryOrganizer.Webradio,
-     PlaylistManagement,
+     PlaylistManagement, AudioExportUtils,
      DeleteHelper, TagHelper, Generics.Collections, unFastFileStream, System.Types, System.UITypes,
      {Winapi.Wincodec, Winapi.ActiveX,} System.Generics.Defaults;
 
@@ -215,6 +215,8 @@ type
         fAutoScanPlaylistFilesOnView: Boolean;
 
         fJobList: TJobList;
+
+        fAudioExport: TAudioExport;
 
         function IsAutoSortWanted: Boolean;
         // Getter and Setter for some properties.
@@ -439,22 +441,14 @@ type
         AutoActivateWebServer: Boolean;
 
         CoverSearchLastFM: Boolean;
-        // HideNACover: Boolean;
         MissingCoverMode: teMissingCoverPreSorting; //Integer;
 
-        // Einstellungen für Standard-Cover
-        // Eines für alle. Ist eins nicht da: Fallback auf Default
-        //UseNempDefaultCover: Boolean;
-        //PersonalizeMainCover: Boolean;
-
-        // zur Laufzeit - weitere Sortiereigenschaften
-        //Sortparam: Integer; // Eine der CON_ // CON_EX_- Konstanten
-        //SortAscending: Boolean;
-
         SortParams: Array[0..SORT_MAX] of TCompareRecord;
-          { TODO :
-            SortParams im Create initialisieren
-            SortParams in Ini Speichern/Laden }
+
+        ExportTemplate: String;
+        ExportMode: integer;
+        ExportDirectory: String;
+        ExportFilename: String;
 
         // this is used to synchronize access to single mediafiles
         // Some threads are running and modifying the files: GetLyrics and the Player.PostProcessor
@@ -531,10 +525,11 @@ type
         property DefaultFileCategory: TLibraryFileCategory read GetDefaultFileCategory write SetDefaultFileCategory;
         property NewFilesCategory: TLibraryFileCategory read GetNewFilesCategory write SetNewFilesCategory;
 
-
         property DefaultPlaylistCategory: TLibraryPlaylistCategory read GetDefaultPlaylistCategory;
         property FavoritePlaylistCategory: TLibraryPlaylistCategory read GetFavoritePlaylistCategory;
         property AutoScanPlaylistFilesOnView: Boolean read fAutoScanPlaylistFilesOnView write SetAutoScanPlaylistFilesOnView;
+
+        property AudioExport: TAudioExport read fAudioExport;
 
         // Basic Operations. Create, Destroy, Clear, Copy
         constructor Create(aWnd: DWord; CFHandle: DWord);
@@ -713,6 +708,10 @@ type
 
         // Saving/Loading
         // a. Export as CSV, to get the library to Excel or whatever.
+        procedure PrepareExport;
+        function DoExport(Mode: Integer; TargetFilename: String): Boolean;
+        function DoPlaylistExport(Playlist: TAudioFileList; TargetFilename: String): Boolean;
+        procedure FinishExport(Finished: Boolean);
         function SaveAsCSV(aFilename: UnicodeString): Boolean;
         // b. Loading/Saving the *.gmp-File
         // will call several private methods
@@ -731,6 +730,8 @@ type
 
         function GetLyricsUsage: TLibraryLyricsUsage;
         procedure RemoveAllLyrics;
+
+
 
   end;
 
@@ -760,7 +761,7 @@ type
 
 implementation
 
-uses System.Win.TaskbarCore, AudioDisplayUtils, Math;
+uses System.Win.TaskbarCore, AudioDisplayUtils, Math, fExport, VCL.Forms;
 
 function GetProperMenuString(aIdx: Integer): UnicodeString;
 begin
@@ -868,7 +869,9 @@ begin
 
   fJobList := TJobList.Create;
   fJobList.OwnsObjects := True;
+  fAudioExport := Nil;
   fChangeCategory := Nil;
+  CurrentAudioFile := Nil;
 end;
 
 destructor TMedienBibliothek.Destroy;
@@ -923,6 +926,9 @@ begin
   ST_Ordnerlist.Free;
   BibSearcher.Free;
 
+  if assigned(fAudioExport) then
+    fAudioExport.Free;
+
   inherited Destroy;
 end;
 
@@ -936,6 +942,7 @@ end;
 procedure TMedienBibliothek.Clear;
 var i: Integer;
 begin
+  CurrentAudioFile := Nil;
   fJobList.Clear;
   for i := 0 to Mp3ListePfadSort.Count - 1 do
       Mp3ListePfadSort[i].Free;
@@ -948,6 +955,10 @@ begin
   PlaylistCategories.Clear;
   CoverSearchCategory.Clear;
   WebRadioCategory.Clear;
+  CurrentCategory := Nil;
+  fNewFilesCategory := Nil;
+  fDefaultFileCategory := Nil;
+  fChangeCategory := Nil;
   InitFileCategories; // create Default-Lists
 
   UpdateList.Clear;
@@ -1318,6 +1329,11 @@ begin
 
         AutoActivateWebServer := NempSettingsManager.ReadBool('MedienBib', 'AutoActivateWebServer', False);
 
+        ExportTemplate := NempSettingsManager.ReadString('MedienBib', 'ExportTemplate', 'csv');
+        ExportMode  := NempSettingsManager.ReadInteger('MedienBib', 'ExportMode', 0);
+        ExportDirectory := NempSettingsManager.ReadString('MedienBib', 'ExportDirectory', '');
+        ExportFilename := NempSettingsManager.ReadString('MedienBib', 'ExportFilename', '');
+
         NewCoverFlow.LoadSettings;
         BibSearcher.LoadFromIni(NempSettingsManager);
         fCurrentCategoryIdx := NempSettingsManager.ReadInteger('LibraryOrganizerSelection', 'CollectionIndex', 0);
@@ -1376,6 +1392,11 @@ begin
         NempSettingsManager.WriteBool('MedienBib', 'AskForAutoAddNewDirs', AskForAutoAddNewDirs);
         NempSettingsManager.WriteBool('MedienBib', 'AutoAddNewDirs', AutoAddNewDirs);
         NempSettingsManager.WriteBool('MedienBib', 'AutoActivateWebServer', AutoActivateWebServer);
+
+        NempSettingsManager.WriteString('MedienBib', 'ExportTemplate', ExportTemplate);
+        NempSettingsManager.WriteInteger('MedienBib', 'ExportMode', ExportMode);
+        NempSettingsManager.WriteString('MedienBib', 'ExportDirectory', ExportDirectory);
+        NempSettingsManager.WriteString('MedienBib', 'ExportFilename', ExportFilename);
 
         NempSettingsManager.WriteBool('MedienBib', 'ShowAutoResolveInconsistenciesHints', ShowAutoResolveInconsistenciesHints);
         NempSettingsManager.WriteBool('MedienBib', 'AskForAutoResolveInconsistencies', AskForAutoResolveInconsistencies);
@@ -4521,6 +4542,98 @@ end;
        No Webradio stations
     --------------------------------------------------------
 }
+procedure TMedienBibliothek.PrepareExport;
+begin
+  if not assigned(fAudioExport) then
+    fAudioExport := TAudioExport.Create(SavePath);
+
+  if not assigned(FormExport) then
+    Application.CreateForm(TFormExport, FormExport);
+
+  FormExport.AudioExport := AudioExport; // Set this first before anything else !
+  FormExport.SearchTemplates;
+  FormExport.ExportMode := ExportMode;
+  FormExport.DefaultTemplate := ExportTemplate;
+  FormExport.ExportDirectory := ExportDirectory;
+  FormExport.ExportFilename := ExportFilename;
+end;
+
+function TMedienBibliothek.DoExport(Mode: Integer; TargetFilename: String): Boolean;
+var
+  tmpList: TAudioFileList;
+begin
+  if StatusBibUpdate >= 2 then begin
+    result := False;
+    exit;
+  end;
+
+  ExportMode := Mode;
+  ExportDirectory := ExtractFilePath(TargetFilename);
+  ExportFilename := TargetFilename;
+  ExportTemplate := fAudioExport.TemplateFilename;
+
+  EnterCriticalSection(CSUpdate);
+  try
+    try
+      case ExportMode of
+        0: result := fAudioExport.ExportFiles(Mp3ListePfadSort, ExportFilename);
+        1: begin
+          if (CurrentCategory is TLibraryFileCategory) then begin
+            tmpList := TAudioFileList.Create(False);
+            try
+              CurrentCategory.Collections[0].GetFiles(tmpList, True, False);
+              result := fAudioExport.ExportFiles(tmpList, ExportFilename);
+            finally
+              tmpList.Free;
+            end;
+          end else
+            result := False;
+        end;
+        2: result := fAudioExport.ExportFiles(AnzeigeListe, ExportFilename);
+      else
+        result := False;
+      end;
+
+    except
+      on E: Exception do begin
+        MessageDLG(E.Message, mtError, [mbOK], 0);
+        result := False;
+      end;
+    end;
+  finally
+    LeaveCriticalSection(CSUpdate);
+  end;
+end;
+
+function TMedienBibliothek.DoPlaylistExport(Playlist: TAudioFileList; TargetFilename: String): Boolean;
+begin
+  ExportMode := 3;
+  ExportDirectory := ExtractFilePath(TargetFilename);
+  ExportFilename := TargetFilename;
+  ExportTemplate := fAudioExport.TemplateFilename;
+  try
+    result := fAudioExport.ExportFiles(Playlist, TargetFilename);
+  except
+    on E: Exception do begin
+      MessageDLG(E.Message, mtError, [mbOK], 0);
+      result := False;
+    end;
+  end;
+end;
+
+procedure TMedienBibliothek.FinishExport(Finished: Boolean);
+begin
+  (*if Finished then begin
+    ExportMode := FormExport.ExportMode;
+    ExportTemplate := FormExport.DefaultTemplate;
+    ExportDirectory := FormExport.ExportDirectory;
+    ExportFilename := FormExport.ExportFilename;
+  end;
+  *)
+  FreeAndNil(fAudioExport);
+end;
+
+
 function TMedienBibliothek.SaveAsCSV(aFilename: UnicodeString): boolean;
 var i: integer;
   tmpStrList : TStringList;
@@ -5591,7 +5704,7 @@ var
   i: Integer;
   curIdx, targetIdx: Byte;
 begin
-  if Action = caNone then
+  if Action = LibraryOrganizer.Base.caNone then
     exit;
 
   // remove Files from the current Category
