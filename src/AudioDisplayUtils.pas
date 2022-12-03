@@ -397,8 +397,8 @@ function GetAudioProperty(aAudioFile: TAudioFile; aProp: TEAudioProperty): strin
       cpLyrics : result := aAudioFile.Lyrics;
       cpLyricsExist : if aAudioFile.LyricsExisting then result := '1' else result := '0';
       cpBPM : result := aAudioFile.BPM;
-      cpTrackGain : result := PeakValueToString(aAudioFile.TrackGain);
-      cpAlbumGain : result := PeakValueToString(aAudioFile.AlbumGain);
+      cpTrackGain : result := GainValueToNumberString(aAudioFile.TrackGain);
+      cpAlbumGain : result := GainValueToNumberString(aAudioFile.AlbumGain);
       cpTrackPeak : result := PeakValueToString(aAudioFile.TrackPeak);
       cpAlbumPeak : result := PeakValueToString(aAudioFile.AlbumPeak);
       cpCoverID : result := aAudioFile.CoverID;
