@@ -720,6 +720,7 @@ type
     actShowControlCover: TAction;
     Showcoverinconrtolpanel1: TMenuItem;
     Showcoverinconrtolpanel2: TMenuItem;
+    MM_H_HelpOnline: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1378,6 +1379,7 @@ type
     procedure PM_ML_ShowWebradioCategoryClick(Sender: TObject);
     procedure PM_ML_ClearCategoryClick(Sender: TObject);
     procedure actShowControlCoverExecute(Sender: TObject);
+    procedure MM_H_HelpOnlineClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -4715,7 +4717,7 @@ end;
 
 
 procedure TNemp_MainForm.ShowHelp;
-var ProperHelpFile: String;
+//var ProperHelpFile: String;
 begin
   Application.HelpContext(HELP_Nemp_Main);
   (*
@@ -4744,6 +4746,13 @@ begin
     ShowHelp;
 end;
 
+procedure TNemp_MainForm.MM_H_HelpOnlineClick(Sender: TObject);
+begin
+  if AnsiStartsText('de', NempOptions.Language) then
+    ShellExecute(Handle, 'open', PChar(NEMP_ONLINE_HELP_DE), nil, nil, SW_SHOW)
+  else
+    ShellExecute(Handle, 'open', PChar(NEMP_ONLINE_HELP_EN), nil, nil, SW_SHOW)
+end;
 
 procedure TNemp_MainForm.MM_ML_RefreshAllClick(Sender: TObject);
 begin

@@ -358,7 +358,7 @@ var
     IsPlaceHolder := Template[offset] = '<';
     start := Offset;
     inc(offset);
-    while (offset <= Length(Template)) do begin // and (Template[offset] <> '>') and (Template[offset] <> '<') do begin
+    while (offset <= Length(Template)) do begin
       if IsPlaceHolder then begin
           // segment is (or at least could be) a placeholder
           if Template[offset] = '<' then begin
@@ -389,7 +389,7 @@ begin
     CurrentSegment := GetNextSegment;
     if IsPlaceHolder then begin
       // check, whether it is actually a valid Placeholder
-      result := result + EscapedAudioProperty(AudioFile, CurrentSegment); // + GetAudioFileProperty(CurrentSegment)
+      result := result + EscapedAudioProperty(AudioFile, CurrentSegment);
     end else begin
       result := result + CurrentSegment;
     end;

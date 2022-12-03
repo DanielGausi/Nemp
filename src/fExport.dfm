@@ -11,6 +11,7 @@ object FormExport: TFormExport
   Font.Name = 'Segoe UI'
   Font.Style = []
   Menu = MainMenuExport
+  Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
@@ -64,7 +65,6 @@ object FormExport: TFormExport
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 4
-    ExplicitTop = 215
     DesignSize = (
       495
       38)
@@ -192,10 +192,6 @@ object FormExport: TFormExport
       TabOrder = 0
       OnClick = lbTemplatesClick
       OnDblClick = ActionEditTemplateExecute
-      ExplicitLeft = 21
-      ExplicitTop = 0
-      ExplicitWidth = 145
-      ExplicitHeight = 129
     end
   end
   object saveDlgExport: TSaveDialog
@@ -234,6 +230,7 @@ object FormExport: TFormExport
     end
   end
   object MainMenuExport: TMainMenu
+    AutoHotkeys = maManual
     Left = 320
     object mmItemFile: TMenuItem
       Caption = 'File'

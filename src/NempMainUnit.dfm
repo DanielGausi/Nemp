@@ -2845,7 +2845,7 @@ object Nemp_MainForm: TNemp_MainForm
         OnClick = MM_ML_SaveClick
       end
       object MM_ML_ExportAsCSV: TMenuItem
-        Caption = '&Export as csv'
+        Caption = '&Export'
         ShortCut = 16453
         OnClick = PM_ML_MedialibraryExportClick
       end
@@ -3223,6 +3223,10 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = 'Help'
         ImageIndex = 4
         OnClick = ToolButton7Click
+      end
+      object MM_H_HelpOnline: TMenuItem
+        Caption = 'Online help'
+        OnClick = MM_H_HelpOnlineClick
       end
       object MM_H_CheckForUpdates: TMenuItem
         Caption = 'Check for updates'
