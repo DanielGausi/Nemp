@@ -90,7 +90,7 @@ function GainStringToSingle(aGainString: String): Single;
 function PeakStringToSingle(aPeakString: String): Single;
 
 function GainValueToString(aGainValue: Single): String;
-function GainValueToNumberString(aGainValue: Single): String;
+function ReplayGainValueToNumberString(aGainValue: Single): String;
 function PeakValueToString(aPeakValue: Single): String;
 
 function AnsiCompareText_Nemp(const S1, S2: string): Integer;
@@ -764,19 +764,19 @@ begin
     end;
 end;
 
-function GainValueToNumberString(aGainValue: Single): String;
+function ReplayGainValueToNumberString(aGainValue: Single): String;
 var formatSettings: TFormatSettings;
 begin
     if isZero(aGainValue) then
-        result := ''
+        result := '0'
+    else
+    if SameValue(aGainValue, 1) then
+        result := '1'
     else
     begin
         formatSettings := TFormatSettings.Create(GetThreadLocale);
         formatSettings.DecimalSeparator := '.';
-        if aGainValue > 0 then
-            result := Format('+%.6f', [aGainValue], formatSettings)
-        else
-            result := Format('%.6f', [aGainValue], formatSettings);
+        result := Format('%.6f', [aGainValue], formatSettings);
     end;
 end;
 
