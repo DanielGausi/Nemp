@@ -23,7 +23,7 @@ type
     { Public-Deklarationen }
     SelectedEntry: Integer;
 
-    procedure FillView(aCDDBResponse: AnsiString);
+    procedure FillView(aCDDBResponse: UTF8String);
   end;
 
 var
@@ -55,7 +55,7 @@ begin
     modalresult := mrOk;
 end;
 
-procedure TFormCDDBSelect.FillView(aCDDBResponse: AnsiString);
+procedure TFormCDDBSelect.FillView(aCDDBResponse: UTF8String);
 var sl: tStringList;
     i: Integer;
 begin

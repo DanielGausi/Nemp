@@ -1,19 +1,18 @@
 object FormCDDBSelect: TFormCDDBSelect
   Left = 0
   Top = 0
+  BorderStyle = bsDialog
   Caption = 'Select CD'
-  ClientHeight = 142
-  ClientWidth = 425
+  ClientHeight = 141
+  ClientWidth = 423
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
-  Position = poScreenCenter
+  Position = poOwnerFormCenter
   OnCreate = FormCreate
-  PixelsPerInch = 96
   TextHeight = 13
   object BtnOK: TButton
     Left = 248

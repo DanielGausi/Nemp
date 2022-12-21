@@ -35,7 +35,7 @@ interface
 uses windows, classes, SysUtils, StrUtils, IniFiles, NempAudioFiles;
 
 resourcestring
-  rsFormatNonEmptyTitleCDDA       = 'CD-Audio, Track &d';
+  rsFormatNonEmptyTitleCDDA       = 'CD-Audio, Track %d';
   rsFormatDefaultPlaylistTitle    = '%s - %s';
   rsFormatPlaylistStream          = 'Webradio: %s';
   rsFormatPlaylistStreamWithTitle = '%s: %s';

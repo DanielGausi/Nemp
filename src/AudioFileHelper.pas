@@ -881,7 +881,7 @@ begin
         begin
             aAudioFile := SourceList[i];
             case aAudioFile.AudioType of
-                at_File: begin
+                at_File, at_CDDA: begin
 
                       // if the AudioFile is located on the same Drive as the Playlist: Save relative Path
                       if (aAudioFile.Ordner[1] = PlaylistSaveDriveChar) and TDrivemanager.EnableCloudMode then
@@ -916,9 +916,9 @@ begin
                 at_Stream: begin
                     aAudioFile.SaveToStream(tmpStream, aAudioFile.Pfad)
                 end;
-                at_CDDA: begin
-                    aAudioFile.SaveToStream(tmpStream, aAudioFile.Pfad)
-                end;
+                //at_CDDA: begin // we need to get a "DriveID" here just as for regular files
+                //    aAudioFile.SaveToStream(tmpStream, aAudioFile.Pfad)
+                //end;
             end;
         end;
         try

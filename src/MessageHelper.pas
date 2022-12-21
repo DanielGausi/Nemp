@@ -68,7 +68,7 @@ uses NempMainUnit, Nemp_ConstantsAndTypes, NempAPI, Details,
     SearchTool, MMSystem, BibHelper, CloudEditor, SplitForm_Hilfsfunktionen,
     DeleteSelect, GnuGetText, MedienbibliothekClass, PlayerLog,
     PostProcessorUtils, ProgressUnit, EffectsAndEqualizer,
-    AudioDisplayUtils, System.Win.TaskbarCore;
+    AudioDisplayUtils, System.Win.TaskbarCore, cddaUtils;
 
 var NEMP_API_InfoString: Array[0..500] of AnsiChar;
     NEMP_API_InfoStringW: Array[0..500] of WideChar;
@@ -1798,6 +1798,7 @@ Var
   PlayIdx: Integer;
 Begin
     result := True;
+    MarkCDDBCacheAsDeprecated;
 
     // Größe der Playlist und Status des Players merken
     // abspielen := NempPlaylist.Count = 0;

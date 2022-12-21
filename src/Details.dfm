@@ -26,7 +26,7 @@ object FDetails: TFDetails
     Top = 3
     Width = 615
     Height = 503
-    ActivePage = Tab_MetaData
+    ActivePage = Tab_General
     Align = alClient
     MultiLine = True
     TabOrder = 0

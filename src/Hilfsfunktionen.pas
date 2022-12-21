@@ -43,8 +43,6 @@ uses
   math, contNrs, consts, OneInst, DateUtils,
   gnugettext, Nemp_RessourceStrings;
 
-
-
 //type TMyhelp = array[0..0] of TRGBQuad;
 //   TRGBArray = array[0..0] of TRGBTriple;
 //   pRGBArray = ^TRGBArray;
@@ -98,7 +96,6 @@ function AnsiCompareText_NempIgnoreCase(const S1, S2: string): Integer;
 function AnsiStartsText_Nemp(const ASubText, AText: string): Boolean;
 
 function UniqueFilename(aExistingFilename: String): String;
-
 
 procedure Wuppdi(i: Integer = 0);
 

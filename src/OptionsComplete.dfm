@@ -83,7 +83,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 0
       Width = 469
       Height = 632
-      ActivePage = tabFiletypes
+      ActivePage = tabMetadata
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -2523,7 +2523,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object editCDNames: TLabeledEdit
               Left = 16
               Top = 123
-              Width = 120
+              Width = 103
               Height = 21
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -2746,6 +2746,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 461
           Height = 568
+          VertScrollBar.Position = 84
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -2756,7 +2757,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpMetaData: TCategoryPanel
-            Top = 0
+            Top = -84
             Height = 445
             Caption = 'Meta data (e.g. ID3-Tags)'
             TabOrder = 0
@@ -2928,6 +2929,64 @@ object OptionsCompleteForm: TOptionsCompleteForm
                 'les with "unicode-filenames".'
               Caption = 'Auto-detect (probably) used character sets'
               TabOrder = 10
+            end
+          end
+          object cpCDDB: TCategoryPanel
+            Top = 361
+            Height = 203
+            Caption = 'CDDB settings'
+            TabOrder = 1
+            object lblInvalidCDDBMail: TLabel
+              Left = 16
+              Top = 142
+              Width = 65
+              Height = 11
+              Caption = 'E-mail is invalid'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -9
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+            end
+            object cbUseCDDB: TCheckBox
+              Left = 16
+              Top = 16
+              Width = 393
+              Height = 17
+              Caption = 'Use online CDDB to get audio CD information'
+              TabOrder = 0
+            end
+            object cbPreferCDDB: TCheckBox
+              Left = 16
+              Top = 39
+              Width = 401
+              Height = 17
+              Caption = 'Prefer CDDB information over CD-Text'
+              TabOrder = 1
+            end
+            object edtCDDBServer: TLabeledEdit
+              Left = 16
+              Top = 80
+              Width = 393
+              Height = 21
+              EditLabel.Width = 197
+              EditLabel.Height = 13
+              EditLabel.Caption = 'CDDB server (default: gnudb.gnudb.org)'
+              TabOrder = 2
+              Text = ''
+            end
+            object edtCDDBEMail: TLabeledEdit
+              Left = 16
+              Top = 120
+              Width = 393
+              Height = 21
+              EditLabel.Width = 53
+              EditLabel.Height = 13
+              EditLabel.Caption = 'Your e-mail'
+              TabOrder = 3
+              Text = ''
+              OnExit = edtCDDBEMailExit
             end
           end
         end
@@ -4241,7 +4300,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object cbFilenameFormat: TComboBox
               Left = 16
-              Top = 95
+              Top = 99
               Width = 393
               Height = 21
               TabOrder = 3

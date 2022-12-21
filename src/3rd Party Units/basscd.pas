@@ -1,6 +1,6 @@
 {
   BASSCD 2.4 Delphi unit
-  Copyright (c) 2003-2014 Un4seen Developments Ltd.
+  Copyright (c) 2003-2019 Un4seen Developments Ltd.
 
   See the BASSCD.CHM file for more detailed documentation
 }
@@ -26,9 +26,12 @@ const
   BASS_CONFIG_CD_RETRY          = $10201;
   BASS_CONFIG_CD_AUTOSPEED      = $10202;
   BASS_CONFIG_CD_SKIPERROR      = $10203;
+  BASS_CONFIG_CD_READ           = $10205;
+  BASS_CONFIG_CD_TIMEOUT        = $10206;
 
   // additional BASS_SetConfigPtr options
   BASS_CONFIG_CD_CDDB_SERVER    = $10204;
+  BASS_CONFIG_CD_CDDB_HELLO	    = $10207;
 
   // BASS_CD_SetInterface options
   BASS_CD_IF_AUTO               = 0;

@@ -2429,7 +2429,6 @@ object Nemp_MainForm: TNemp_MainForm
         PopupMenu = Medialist_Collection_PopupMenu
         TabOrder = 1
         OnDblClick = PanelCoverBrowseDblClick
-        OnEndDrag = PanelCoverBrowseEndDrag
         OnMouseDown = PanelCoverBrowseMouseDown
         OnMouseMove = IMGMedienBibCoverMouseMove
         OnMouseUp = IMGMedienBibCoverMouseUp

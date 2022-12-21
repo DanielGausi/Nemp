@@ -1182,57 +1182,76 @@ end;
 
 procedure TFDetails.ShowMainProperties;
 begin
-        // Fill Edits with properties of the AudioFile
-        if fEditFile.IsFile then
-        begin
-            Edit_LibraryArtist   .Text := fEditFile.Artist ;
-            Edit_LibraryTitle    .Text := fEditFile.Titel ;
-            Edit_LibraryAlbum    .Text := fEditFile.Album ;
-            Edit_LibraryYear     .Text := fEditFile.Year ;
-            Edit_LibraryComment  .Text := fEditFile.Comment ;
-            Edit_LibraryAlbumArtist.Text := fEditFile.AlbumArtist;
-            Edit_LibraryComposer .Text := fEditFile.Composer;
-            Edit_LibraryTrack    .Text := IntToStr(fEditFile.Track);
-            Edit_LibraryCD       .Text := fEditFile.CD ;
-            // Genre
-            CB_LibraryGenre      .Text := fEditFile.Genre;
-            // Rating and PlayCounter
-            UpdateRatingGUI;
+  // Fill Edits with properties of the AudioFile
+  case fEditFile.AudioType of
+    at_File: begin
+        Edit_LibraryArtist   .Text := fEditFile.Artist ;
+        Edit_LibraryTitle    .Text := fEditFile.Titel ;
+        Edit_LibraryAlbum    .Text := fEditFile.Album ;
+        Edit_LibraryYear     .Text := fEditFile.Year ;
+        Edit_LibraryComment  .Text := fEditFile.Comment ;
+        Edit_LibraryAlbumArtist.Text := fEditFile.AlbumArtist;
+        Edit_LibraryComposer .Text := fEditFile.Composer;
+        Edit_LibraryTrack    .Text := IntToStr(fEditFile.Track);
+        Edit_LibraryCD       .Text := fEditFile.CD ;
+        // Genre
+        CB_LibraryGenre      .Text := fEditFile.Genre;
+        // Rating and PlayCounter
+        UpdateRatingGUI;
+        // Additional Tags for TagCloud
+        lb_Tags.Items.Text := String(fEditFile.RawTagLastFM);
+        // replayGain Values
+        if fEditFile.TrackGain = 0 then
+            LblReplayGainTitle.Caption := 'N/A'
+        else
+            LblReplayGainTitle.Caption := Format((rsFormatReplayGainTrack_WithPeak), [fEditFile.TrackGain, fEditFile.TrackPeak]);
+        if fEditFile.AlbumGain = 0 then
+            LblReplayGainAlbum.Caption := 'N/A'
+        else
+            LblReplayGainAlbum.Caption := Format((rsFormatReplayGainAlbum_WithPeak), [fEditFile.AlbumGain, fEditFile.AlbumPeak]);
+    end;
+    at_CDDA: begin
+          Edit_LibraryArtist   .Text := fEditFile.Artist ;
+          Edit_LibraryTitle    .Text := fEditFile.Titel ;
+          Edit_LibraryAlbum    .Text := fEditFile.Album ;
+          Edit_LibraryYear     .Text := fEditFile.Year ;
+          Edit_LibraryComment  .Text := ''; // fEditFile.Comment;
+          Edit_LibraryAlbumArtist.Text := '';
+          Edit_LibraryComposer .Text := '';
+          Edit_LibraryTrack    .Text := IntToStr(fEditFile.Track);
+          Edit_LibraryCD       .Text := '';
+          CB_LibraryGenre      .Text := fEditFile.Genre;
+          lb_Tags.Items.Text := '';
+          // Rating and PlayCounter
+          LblPlayCounter.Caption := '';
+          DetailRatingHelper.DrawRatingInStarsOnBitmap(0, IMG_LibraryRating.Picture.Bitmap, IMG_LibraryRating.Width, IMG_LibraryRating.Height);
+          // ReplayGain
+          LblReplayGainTitle  .Caption := 'N/A';
+          LblReplayGainAlbum  .Caption := 'N/A';
+    end;
+  else
+    begin
+        Edit_LibraryArtist   .Text := '';
+        Edit_LibraryTitle    .Text := '';
+        Edit_LibraryAlbum    .Text := '';
+        Edit_LibraryYear     .Text := '';
+        Edit_LibraryComment  .Text := '';
+        Edit_LibraryAlbumArtist.Text := '';
+        Edit_LibraryComposer .Text := '';
+        Edit_LibraryTrack    .Text := '';
+        Edit_LibraryCD       .Text := '';
 
-            // Additional Tags for TagCloud
-            lb_Tags.Items.Text := String(fEditFile.RawTagLastFM);
-
-            // replayGain Values
-            if fEditFile.TrackGain = 0 then
-                LblReplayGainTitle.Caption := 'N/A'
-            else
-                LblReplayGainTitle.Caption := Format((rsFormatReplayGainTrack_WithPeak), [fEditFile.TrackGain, fEditFile.TrackPeak]);
-            if fEditFile.AlbumGain = 0 then
-                LblReplayGainAlbum.Caption := 'N/A'
-            else
-                LblReplayGainAlbum.Caption := Format((rsFormatReplayGainAlbum_WithPeak), [fEditFile.AlbumGain, fEditFile.AlbumPeak]);
-        end else
-        begin
-            Edit_LibraryArtist   .Text := '';
-            Edit_LibraryTitle    .Text := '';
-            Edit_LibraryAlbum    .Text := '';
-            Edit_LibraryYear     .Text := '';
-            Edit_LibraryComment  .Text := '';
-            Edit_LibraryAlbumArtist.Text := '';
-            Edit_LibraryComposer .Text := '';
-            Edit_LibraryTrack    .Text := '';
-            Edit_LibraryCD       .Text := '';
-
-            lb_Tags.Items.Text := '';
-            // Genre
-            CB_LibraryGenre      .Text := '';
-            // Rating and PlayCounter
-            LblPlayCounter.Caption := '';
-            DetailRatingHelper.DrawRatingInStarsOnBitmap(0, IMG_LibraryRating.Picture.Bitmap, IMG_LibraryRating.Width, IMG_LibraryRating.Height);
-            // ReplayGain
-            LblReplayGainTitle  .Caption := 'N/A';
-            LblReplayGainAlbum  .Caption := 'N/A';
-        end;
+        lb_Tags.Items.Text := '';
+        // Genre
+        CB_LibraryGenre      .Text := '';
+        // Rating and PlayCounter
+        LblPlayCounter.Caption := '';
+        DetailRatingHelper.DrawRatingInStarsOnBitmap(0, IMG_LibraryRating.Picture.Bitmap, IMG_LibraryRating.Width, IMG_LibraryRating.Height);
+        // ReplayGain
+        LblReplayGainTitle  .Caption := 'N/A';
+        LblReplayGainAlbum  .Caption := 'N/A';
+    end;
+  end;
 end;
 
 procedure TFDetails.ShowLyrics;
@@ -1951,7 +1970,10 @@ begin
         fEditTag := AudioFileFactory.CreateAudioFile(fEditFile.Pfad, True);
         aErr := fEditTag.ReadFromFile(fEditFile.Pfad);
 
-        PnlWarnung.Visible := (not assigned(fEditTag)) or (not fEditTag.Valid);
+        if not fOriginalFileCopy.isCDDA then
+          PnlWarnung.Visible := (not assigned(fEditTag)) or (not fEditTag.Valid)
+        else
+          PnlWarnung.Visible := False;
 
         if assigned(fEditTag) and fEditTag.Valid then
         begin
@@ -3200,10 +3222,10 @@ begin
             end;
 
             at_CDDA: begin
-                ClearCDDBCache;
-                // if NempOptions.UseCDDB then
-                //     CurrentAudioFile.GetAudioData(CurrentAudioFile.Pfad, gad_CDDB)
-                // else
+                // ClearCDDBCache;
+                 if NempOptions.UseCDDB then
+                     fEditFile.GetAudioData(fEditFile.Pfad, gad_CDDB)
+                 else
                     fEditFile.GetAudioData(fEditFile.Pfad, 0);
             end;
         end;

@@ -284,7 +284,10 @@ type
         ArtistAlbenFontStyles: TFontStyles;
 
         AllowQuickAccessToMetadata: Boolean;
-        // UseCDDB: Boolean;
+        UseCDDB: Boolean;
+        PreferCDDB: Boolean;
+        CDDBServer: String;
+        CDDBEMail: String;
 
         AnzeigeMode: Integer;
         UseSkin: Boolean;
@@ -886,7 +889,6 @@ begin
 
   for idxForm := Low(TENempFormIDs) to High(TENempFormIDs) do
     FormPositions[idxForm] := TNempFormData.create(idxForm);
-
 end;
 
 destructor TNempOptions.Destroy;
@@ -1100,6 +1102,11 @@ begin
   if PreferredLyricSearch < 0 then
     PreferredLyricSearch := 0;
 
+  UseCDDB := NempSettingsManager.ReadBool('Allgemein', 'UseCDDB', False);
+  PreferCDDB := NempSettingsManager.ReadBool('Allgemein', 'PreferCDDB', False);
+  CDDBServer := NempSettingsmanager.ReadString('Allgemein', 'CDDBServer', '');
+  CDDBEMail := NempSettingsmanager.ReadString('Allgemein', 'CDDBEMail', '');
+
   ShowTrayIcon            := NempSettingsManager.ReadBool('Fenster', 'ShowTrayIcon', False);
   FullRowSelect := NempSettingsManager.ReadBool('Fenster', 'FullRowSelect', True);
 
@@ -1181,6 +1188,11 @@ begin
   NempSettingsManager.WriteString('Allgemein', 'Language', Language);
   NempSettingsManager.WriteInteger('Allgemein', 'maxDragFileCount', maxDragFileCount);
   NempSettingsManager.WriteInteger('Allgemein', 'PreferredLyricSearchIdx', PreferredLyricSearch);
+
+  NempSettingsManager.WriteBool('Allgemein', 'UseCDDB', UseCDDB);
+  NempSettingsManager.WriteBool('Allgemein', 'PreferCDDB', PreferCDDB);
+  NempSettingsmanager.WriteString('Allgemein', 'CDDBServer', CDDBServer);
+  NempSettingsmanager.WriteString('Allgemein', 'CDDBEMail', CDDBEMail);
 
   NempSettingsManager.WriteInteger('Fenster', 'Anzeigemode', AnzeigeMode);
   NempSettingsManager.WriteBool('Fenster', 'UseSkin', UseSkin);

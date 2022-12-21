@@ -41,7 +41,7 @@ uses Windows, Forms, Contnrs, SysUtils,  VirtualTrees, IniFiles, Classes,
     gnuGettext, Nemp_RessourceStrings, System.UITypes, System.Types,
     System.Generics.Defaults,
 
-    MainFormHelper, CoverHelper, DriveRepairTools;
+    MainFormHelper, CoverHelper, DriveRepairTools, cddaUtils;
 
 type
   DWORD = cardinal;
@@ -369,6 +369,8 @@ type
 
       // new in 4.14: just as in the media library
       procedure ReSynchronizeDrives;
+
+      procedure SynchFilesWithCDDrive(CDDADrive: TCDDADrive);
   end;
 
 implementation
@@ -1235,9 +1237,9 @@ begin
             // todo
             if ReloadDataFromFile then
             begin
-                //if NempOptions.UseCDDB then
-                //    AudioFile.GetAudioData(AudioFile.Pfad, GAD_CDDB)
-                //else
+                if NempOptions.UseCDDB then
+                    AudioFile.GetAudioData(AudioFile.Pfad, GAD_CDDB)
+                else
                     AudioFile.GetAudioData(AudioFile.Pfad, 0);
             end;
         end;
@@ -1367,8 +1369,13 @@ begin
     NewFile.Pfad := aAudiofileName;
     // ... GetAudioData for this file ...
     case NewFile.AudioType of
-        at_File: SynchNewFileWithBib(newFile);
-        at_CDDA: NewFile.GetAudioData(aAudioFileName, 0);
+        at_File: SynchNewFileWithBib(NewFile);
+        at_CDDA: begin
+                  if NempOptions.UseCDDB then
+                    NewFile.GetAudioData(NewFile.Pfad, GAD_CDDB)
+                  else
+                    NewFile.GetAudioData(NewFile.Pfad, 0);
+        end;
     end;
     // ... and add it to the playlist
     AddFileToPlaylist(NewFile, aCueName);
@@ -1409,7 +1416,12 @@ begin
 
   case NewFile.AudioType of
       at_File: SynchNewFileWithBib(NewFile);
-      at_CDDA: NewFile.GetAudioData(aAudioFileName, 0);
+      at_CDDA: begin
+                  if NempOptions.UseCDDB then
+                    NewFile.GetAudioData(NewFile.Pfad, GAD_CDDB)
+                  else
+                    NewFile.GetAudioData(NewFile.Pfad, 0);
+        end;
   end;
   InsertFileToPlayList(NewFile, aCueName);
 
@@ -2297,6 +2309,19 @@ begin
                 Playlist[i].FileIsPresent := FileExists(Playlist[i].Pfad);
         end;
     end;
+end;
+
+procedure TNempPlaylist.SynchFilesWithCDDrive(CDDADrive: TCDDADrive);
+var
+  i: Integer;
+  TrackData: TCDTrackData;
+begin
+  for i := 0 to Playlist.Count - 1 do begin
+    if (length(Playlist[i].Pfad) > 0) and (Playlist[i].Pfad[1] = CDDADrive.Letter) then begin
+      CDDADrive.GetTrackData(Playlist[i].Pfad, TrackData);
+      Playlist[i].AssignCDTrackData(TrackData);
+    end;
+  end;
 end;
 
 {

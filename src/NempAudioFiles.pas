@@ -455,6 +455,8 @@ type
         //   Lyrics are not used in webserver but needs much place
         procedure AssignLight(aAudioFile: TAudioFile);
 
+        procedure AssignCDTrackData(TrackData: TCDTrackData);
+
         // Change the Driveletter from a file
         procedure SetNewDriveChar(aChar: Char);
 
@@ -522,9 +524,9 @@ type
 
         procedure GetAllTags(AutoTags, LastFMTags: TStringList);
 
-        procedure SetFlag(aFlag: Integer);
-        procedure UnSetFlag(aFlag: Integer);
-        function FlaggedWith(aFlag: Integer): Boolean;
+        procedure SetFlag(aFlag: Cardinal);
+        procedure UnSetFlag(aFlag: Cardinal);
+        function FlaggedWith(aFlag: Cardinal): Boolean;
 
         // creates a copy of the Audiofile and adds the copy to the list
         procedure AddCopyToList(aList: TAudioFileList);
@@ -903,6 +905,30 @@ begin
     AlbumGain          := aAudioFile.AlbumGain           ;
     TrackPeak          := aAudioFile.TrackPeak           ;
     AlbumPeak          := aAudioFile.AlbumPeak           ;
+end;
+
+procedure TAudioFile.AssignCDTrackData(TrackData: TCDTrackData);
+begin
+  if TrackData.Track = -1 then begin
+    Track := -1;
+    Artist := '';
+    AlbumArtist := '';
+    Titel := 'Invalid Track';
+    Album := '';
+    Duration := 0;
+    Genre := '';
+    Year := '';
+    Comment := TrackData.CddbID;
+  end else begin
+    Titel := TrackData.Title;
+    Artist := TrackData.Artist;
+    Album := TrackData.Album;
+    Duration := TrackData.Duration;
+    Track := TrackData.Track;
+    Year := TrackData.Year;
+    Genre := TrackData.Genre;
+    Comment := TrackData.CddbID;
+  end;
 end;
 
 {
@@ -1552,46 +1578,33 @@ end;
 
 function TAudioFile.GetCDDAInfo(Filename: UnicodeString;
   Flags: Integer): TCDDAError;
-var cdFile: TCDDAFile;
-
+var
+  checkCDDB, preferCDDB: Boolean;
+  DriveNo: Integer;
+  CDDrive: TCDDADrive;
+  TrackData: TCDTrackData;
 begin
+  result := cddaErr_None;
 
-//result := cddaErr_None;
-//exit;
+  checkCDDB := ((Flags and GAD_CDDB) = GAD_CDDB) and NempOptions.UseCDDB;
+  preferCDDB := checkCDDB and NempOptions.PreferCDDB;
 
-    SetCDDADefaultInformation(self);
-    cdFile := TCDDAFile.Create;
-    try
-        result := cdFile.GetData(Filename, (Flags and GAD_CDDB) = GAD_CDDB);
-
-        if result = cddaErr_None then
-        begin
-            fTrack := cdFile.Track;
-            Artist := cdFile.Artist;
-            AlbumArtist := '';
-            Titel := cdFile.Title;
-            Album := cdFile.Album;
-            fDuration := cdFile.Duration;
-            Genre := cdFile.Genre;
-            Year := cdFile.Year;
-            Comment := cdFile.CddbID;
-        end else
-        begin
-            fTrack := 0;
-            Artist := '';
-            AlbumArtist := '';
-            Titel := 'Invalid Track';
-            Album := '';
-            fDuration := 0;
-            Genre := '';
-            Year := '';
-            Comment := '';
-            // Pfad := 'cdda:\\';     // do not do this!!!
-        end;
-
-    finally
-        cdFile.Free;
+  SetCDDADefaultInformation(self);
+  DriveNo := TCDDADrive.GetDriveNumber(Filename);
+  if DriveNo < 0 then begin
+    result := cddaErr_invalidPath;
+    TrackData.Track := -1;
+  end
+  else begin
+    CDDrive := CDDriveList[DriveNo];
+    if CDDrive.OutOfDate then begin
+      CDDrive.ClearDiscInformation;
+      CDDrive.GetDiscInformation(checkCDDB, preferCDDB);
     end;
+    CDDrive.GetTrackData(Filename, TrackData);
+  end;
+
+  AssignCDTrackData(TrackData);
 end;
 
 
@@ -2581,15 +2594,15 @@ begin
         fFlags := fFlags AND (NOT FLAG_SEARCHRESULT);
 end;
 
-procedure TAudioFile.SetFlag(aFlag: Integer);
+procedure TAudioFile.SetFlag(aFlag: Cardinal);
 begin
   fFlags := fFlags OR aFlag
 end;
-procedure TAudioFile.UnSetFlag(aFlag: Integer);
+procedure TAudioFile.UnSetFlag(aFlag: Cardinal);
 begin
   fFlags := fFlags AND (NOT aFlag);
 end;
-function TAudioFile.FlaggedWith(aFlag: Integer): Boolean;
+function TAudioFile.FlaggedWith(aFlag: Cardinal): Boolean;
 begin
   result := (fFlags AND aFlag) = aFlag;
 end;

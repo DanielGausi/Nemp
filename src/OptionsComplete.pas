@@ -626,6 +626,12 @@ type
     ImgHelp: TImage;
     CB_AccelerateSearchIncludeAlbumArtist: TCheckBox;
     CB_AccelerateSearchIncludeComposer: TCheckBox;
+    cpCDDB: TCategoryPanel;
+    cbUseCDDB: TCheckBox;
+    cbPreferCDDB: TCheckBox;
+    edtCDDBServer: TLabeledEdit;
+    edtCDDBEMail: TLabeledEdit;
+    lblInvalidCDDBMail: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -786,6 +792,7 @@ type
       var HintText: string);
     procedure cbPreferAlbumArtistClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure edtCDDBEMailExit(Sender: TObject);
 
   private
     { Private-Deklarationen }
@@ -927,7 +934,7 @@ implementation
 
 uses NempMainUnit, Details, SplitForm_Hilfsfunktionen, WindowsVersionInfo,
   WebServerLog, MedienBibliothekClass, DriveRepairTools, WebQRCodes,
-  AudioDisplayUtils, unitFlyingCow, RedeemerQR, NempHelp;
+  AudioDisplayUtils, unitFlyingCow, RedeemerQR, NempHelp, cddaUtils;
 
 {$R *.dfm}
 
@@ -1556,6 +1563,12 @@ begin
   cb_ShowAutoResolveInconsistenciesHints.checked := MedienBib.ShowAutoResolveInconsistenciesHints;
   // Char code detection
   CBAutoDetectCharCode.Checked := NempCharCodeOptions.AutoDetectCodePage;
+  // CDDB-Settings
+  cbUseCDDB.Checked := NempOptions.UseCDDB;
+  cbPreferCDDB.checked := NempOptions.PreferCDDB;
+  edtCDDBServer.Text := NempOptions.CDDBServer;
+  edtCDDBEMail.Text := NempOptions.CDDBEMail;
+  lblInvalidCDDBMail.Visible := not ValidEmail(NempOptions.CDDBEMail);
 end;
 
 procedure TOptionsCompleteForm.ShowLastFMSettings;
@@ -2766,6 +2779,12 @@ begin
   MedienBib.ShowAutoResolveInconsistenciesHints := cb_ShowAutoResolveInconsistenciesHints.checked;
   // Heuristics for charcode detections
   NempCharCodeOptions.AutoDetectCodePage := CBAutoDetectCharCode.Checked;
+  // CDDB-Settings
+  NempOptions.UseCDDB := cbUseCDDB.Checked;
+  NempOptions.PreferCDDB := cbPreferCDDB.checked;
+  NempOptions.CDDBServer := trim(edtCDDBServer.Text);
+  NempOptions.CDDBEMail := trim(edtCDDBEMail.Text);
+  BASS_ApplyCDDBSettings(NempOptions.CDDBServer, NempOptions.CDDBEMail);
 end;
 
 function TOptionsCompleteForm.ApplySearchSettings: Boolean;
@@ -2838,6 +2857,11 @@ end;
 procedure TOptionsCompleteForm.EditCountdownSongChange(Sender: TObject);
 begin
   LBlCountDownWarning.Visible := NOT FileExists(EditCountdownSong.Text);
+end;
+
+procedure TOptionsCompleteForm.edtCDDBEMailExit(Sender: TObject);
+begin
+  lblInvalidCDDBMail.Visible := not ValidEmail(trim(edtCDDBEMail.Text));
 end;
 
 procedure TOptionsCompleteForm.EditBirthdaySongChange(Sender: TObject);

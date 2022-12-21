@@ -1331,7 +1331,6 @@ type
     procedure TreesRenderOLEData(Sender: TBaseVirtualTree;
       const FormatEtcIn: tagFORMATETC; out Medium: tagSTGMEDIUM;
       ForClipboard: Boolean; var Result: HRESULT);
-    procedure PanelCoverBrowseEndDrag(Sender, Target: TObject; X, Y: Integer);
     procedure LibraryVSTEndDrag(Sender, Target: TObject; X, Y: Integer);
     procedure VSTDragAllowed(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; var Allowed: Boolean);
@@ -1437,6 +1436,8 @@ type
         detailedInternalDrop: Boolean; var Effect: Integer; var Accept: Boolean; var HintStr: String);
 
     procedure SearchDirectoryForNewFiles(TargetCategory: TLibraryCategory);
+
+    procedure CDDBConsistencyCheck(af: TAudioFile);
 
   public
     { Public declarations }
@@ -5893,6 +5894,28 @@ begin
   end;
 end;
 
+procedure TNemp_MainForm.CDDBConsistencyCheck(af: TAudioFile);
+var
+  cddbID: UTF8String;
+  DriveNo: Integer;
+begin
+  cddbID := TCDDADrive.GetDriveCDDBID(af.Pfad);
+  if (cddbID = '') or (String(cddbID) <> af.Comment) then begin
+    DriveNo := TCDDADrive.GetDriveNumber(af.Pfad);
+    if DriveNo = -1 then begin
+      // todo: Invalid Drive, probably an disconnected external CDDrive. What to do in this case?
+      // ....
+    end
+    else begin
+      // Drive exists
+      CDDriveList[DriveNo].ClearDiscInformation;
+      CDDriveList[DriveNo].GetDiscInformation(NempOptions.UseCDDB, NempOptions.PreferCDDB);
+      NempPlaylist.SynchFilesWithCDDrive(CDDriveList[DriveNo]);
+    end;
+    PlaylistVST.Invalidate;
+  end;
+end;
+
 procedure TNemp_MainForm.ShowVSTDetails(aAudioFile: TAudioFile; Source: Integer = SD_MEDIENBIB);
 var DoShowDetails, SameFile: Boolean;
     MainFile: TAudioFile;
@@ -5935,15 +5958,12 @@ begin
 
   ImgBibRating  .Visible :=  assigned(aAudioFile);
 
+  // check, whether the current cd is valid for the AudioFile-Object
+  // this is VERY important for the cover-downloading:
+  // if album-Artist-data does not match the cddb-id, a wrong cover will be downloaded
+  // and displayed permanently
   if assigned(MainFile) and (MainFile.isCDDA) then
-  begin
-      // check, whether the current cd is valid for the AudioFile-Object
-      // this is VERY important for the cover-downloading:
-      // if album-Artist-data does not match the cddb-id, a wrong cover will be downloaded
-      // and displayed permanently
-      if (CddbIDFromCDDA(MainFile.Pfad) <> MainFile.Comment) then
-          MainFile.GetAudioData(MainFile.Pfad, 0);
-  end;
+    CDDBConsistencyCheck(MainFile);
 
   FillBibDetailLabels(aAudioFile);
   CreateTagLabels(MainFile);
@@ -7390,6 +7410,7 @@ end;
 
 procedure TNemp_MainForm.PM_PlayCDAudioClick(Sender: TObject);
 var CurrentIdx, i: Integer;
+  newFile: TAudioFile;
 begin
     CurrentIdx := NempPlaylist.Count; // CurrentIdx ist der erwartete Index des ersten neu eingefügten Files
 
@@ -7398,8 +7419,11 @@ begin
 
     if CDOpenDialog.ShowModal = mrOK then
     begin
-        for i := 0 to CDOpenDialog.Files.Count - 1 do
-            NempPlaylist.AddFileToPlaylist(CDOpenDialog.Files[i]);
+        for i := 0 to CDOpenDialog.SelectedFiles.Count - 1 do begin
+          newFile := TAudioFile.Create;
+          newFile.Assign(CDOpenDialog.SelectedFiles[i]);
+          NempPlaylist.AddFileToPlaylist(newFile);
+        end;
         if (NempPlaylist.Count > CurrentIdx) then
         begin
             NempPlayer.LastUserWish := USER_WANT_PLAY;
@@ -8430,6 +8454,9 @@ begin
             CoverImage.Refresh;
             if assigned(af) then
             begin
+                if af.isCDDA then
+                  CDDBConsistencyCheck(af);
+
                 PlayerArtistLabel.Caption := NempDisplay.PlayerLine1(af, cueFile); //'TODO Line1' ;//NempPlayer.PlayerLine1;
                 PlayerTitleLabel.Caption  := NempDisplay.PlayerLine2(af, cueFile); //'TODO Line2' ;// NempPlayer.PlayerLine2;
 
@@ -8725,7 +8752,7 @@ begin
       begin
           newdir := fb.SelectedItem;
           NempPlaylist.InitialDialogFolder := fb.SelectedItem;
-
+          MarkCDDBCacheAsDeprecated;
           //NempPlaylist.InsertNode := Nil;
           NempPlaylist.ResetInsertIndex;
           ST_Playlist.Mask := GeneratePlaylistSTFilter;
@@ -8755,6 +8782,7 @@ end;
 procedure TNemp_MainForm.PM_PL_AddCDAudioClick(Sender: TObject);
 var i: integer;
   Abspielen: Boolean;
+  newFile: TAudioFile;
 begin
     // Playlistlänge merken
     Abspielen := NempPlaylist.Count = 0;
@@ -8766,8 +8794,11 @@ begin
 
     if CDOpenDialog.ShowModal = mrOK then
     begin
-        for i := 0 to CDOpenDialog.Files.Count - 1 do
-            NempPlaylist.AddFileToPlaylist(CDOpenDialog.Files[i]);
+        for i := 0 to CDOpenDialog.SelectedFiles.Count - 1 do begin
+          newFile := TAudioFile.Create;
+          newFile.Assign(CDOpenDialog.SelectedFiles[i]);
+          NempPlaylist.AddFileToPlaylist(newFile);
+        end;
     end;
 
     // ggf. abspielen
@@ -8788,9 +8819,11 @@ begin
   Abspielen := NempPlaylist.Count = 0;
 
   // einfügen
-  if PlaylistDateienOpenDialog.Execute then
+  if PlaylistDateienOpenDialog.Execute then begin
+    MarkCDDBCacheAsDeprecated;
     for i := 0 to PlaylistDateienOpenDialog.Files.Count - 1 do
       NempPlaylist.AddFileToPlaylist(PlaylistDateienOpenDialog.Files[i]);
+  end;
 
   // ggf. abspielen
   if abspielen AND (NempPlaylist.Count > 0) then
@@ -9247,11 +9280,16 @@ begin
   ///  Application.ProcessMessages involved.
   ///  However, This method is probably very rarely used, and in most cases the
   ///  playlist contains <1000 files or so, which should be scanned quite fast.
+
   ClearCDDBCache;
 
   NempPlayer.CoverArtSearcher.StartNewSearch;
-  for i := 0 to NempPlaylist.Playlist.Count - 1 do
+  for i := 0 to NempPlaylist.Playlist.Count - 1 do begin
+    if (NempPlaylist.Playlist[i].isCDDA) then
+      CDDBConsistencyCheck(NempPlaylist.Playlist[i])
+    else
       NempPlaylist.RefreshAudioFile(i, True);
+  end;
 end;
 
 procedure TNemp_MainForm.LyricsMemoKeyDown(Sender: TObject; var Key: Word;
@@ -11936,12 +11974,6 @@ begin
   end;
 end;
 
-
-procedure TNemp_MainForm.PanelCoverBrowseEndDrag(Sender, Target: TObject; X,
-  Y: Integer);
-begin
-showmessage('sdsdsdsd');
-end;
 
 procedure TNemp_MainForm.PanelCoverBrowseMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);

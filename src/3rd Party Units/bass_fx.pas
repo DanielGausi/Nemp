@@ -1,10 +1,10 @@
 {=============================================================================
-  BASS_FX 2.4 - Copyright (c) 2002-2014 (: JOBnik! :) [Arthur Aminov, ISRAEL]
+  BASS_FX 2.4 - Copyright (c) 2002-2018 (: JOBnik! :) [Arthur Aminov, ISRAEL]
                                                       [http://www.jobnik.org]
 
          bugs/suggestions/questions:
            forum  : http://www.un4seen.com/forum/?board=1
-                    http://www.jobnik.org/smforum
+                    http://www.jobnik.org/forums
            e-mail : bass_fx@jobnik.org
         --------------------------------------------------
 
@@ -12,7 +12,7 @@
   ------------------------------------------
   (c) 2002 Roger Johansson. w1dg3r@yahoo.com
 
-  NOTE: This unit will work only with BASS_FX version 2.4.11.1
+  NOTE: This unit will work only with BASS_FX version 2.4.12
         Check www.un4seen.com or www.jobnik.org for any later versions.
 
   * Requires BASS 2.4 (available at http://www.un4seen.com)
@@ -366,7 +366,7 @@ const
 	// tempo attributes options
 	BASS_ATTRIB_TEMPO_OPTION_USE_AA_FILTER    = $10010;    // TRUE (default) / FALSE (default for multi-channel on mobile devices for lower CPU usage)
 	BASS_ATTRIB_TEMPO_OPTION_AA_FILTER_LENGTH = $10011;    // 32 default (8 .. 128 taps)
-	BASS_ATTRIB_TEMPO_OPTION_USE_QUICKALGO    = $10012;    // TRUE (default on mobile devices for loswer CPU usage) / FALSE (default)
+	BASS_ATTRIB_TEMPO_OPTION_USE_QUICKALGO    = $10012;    // TRUE (default on mobile devices for lower CPU usage) / FALSE (default)
 	BASS_ATTRIB_TEMPO_OPTION_SEQUENCE_MS      = $10013;    // 82 default, 0 = automatic
 	BASS_ATTRIB_TEMPO_OPTION_SEEKWINDOW_MS    = $10014;    // 28 default, 0 = automatic
 	BASS_ATTRIB_TEMPO_OPTION_OVERLAP_MS       = $10015;    // 8  default

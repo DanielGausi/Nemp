@@ -297,7 +297,7 @@ type
         PlayBufferSize: DWORD;
 
         UseVisualization: Boolean;
-        VisualizationInterval: Integer;
+        VisualizationInterval: Cardinal;
 
         TimeMode: Byte;
         ScrollTaskbarTitel: Boolean;
@@ -872,16 +872,19 @@ end;
 
 procedure TNempPlayer.SetSoundFont(aFilename: String);
 var NewSoundfont  : BASS_MIDI_FONT;
+  PNewSoundfont  : PBASS_MIDI_FONT;
 begin
+
     NewSoundfont.font := BASS_MIDI_FontInit(PChar(aFilename), BASS_UNICODE);  // open new soundfont
     if (NewSoundfont.font <> 0) and (NewSoundfont.font <> fSoundfont) then
     begin
         NewSoundfont.preset := -1;                                  // use all presets
         NewSoundfont.bank   := 0;                                   // use default bank(s)
+        PNewSoundfont := @NewSoundfont;
         BASS_MIDI_FontFree(fSoundfont);                             // free old soundfont
-        BASS_MIDI_StreamSetFonts(0, NewSoundfont, 1);               // set default soundfont
-        BASS_MIDI_StreamSetFonts(MainStream, NewSoundfont, 1);      // set for current stream too
-        BASS_MIDI_StreamSetFonts(SlideStream, NewSoundfont, 1);
+        BASS_MIDI_StreamSetFonts(0, PNewSoundfont, 1);               // set default soundfont
+        BASS_MIDI_StreamSetFonts(MainStream, PNewSoundfont, 1);      // set for current stream too
+        BASS_MIDI_StreamSetFonts(SlideStream, PNewSoundfont, 1);
         fSoundfont := NewSoundfont.font;
         fSoundfontFilename := aFilename;
     end;
@@ -896,6 +899,7 @@ var count: LongWord;
     tmpfilter: String;
     BassInfo: BASS_DEVICEINFO;
     sf  : BASS_MIDI_FONT;
+    psf  : PBASS_MIDI_FONT;
 
     procedure ProcessPLugin(aPlug: Dword);
     var Info: PBass_PluginInfo;
@@ -965,7 +969,8 @@ begin
         HeadsetDevice := MainDevice;
 
     // Init SoundFonts for MIDI
-    if (BASS_MIDI_StreamGetFonts(0, sf, 1) >= 1) then
+    psf := @sf;
+    if (BASS_MIDI_StreamGetFonts(0, psf, 1) >= 1) then
         fSoundfont  := sf.font
     else
     begin
@@ -981,6 +986,7 @@ begin
 
     BASS_SetConfigPtr(BASS_CONFIG_NET_AGENT or BASS_UNICODE, PChar(Nemp_BassUserAgent));
     BASS_SetConfig(BASS_CONFIG_BUFFER, PlayBufferSize);
+    BASS_ApplyCDDBSettings(NempOptions.CDDBServer, NempOptions.CDDBEMail);
 
     // more stable Webradio? (2019) ---
     BASS_SetConfig(BASS_CONFIG_NET_BUFFER, 10000);
@@ -1396,7 +1402,7 @@ begin
       end;
 
       at_CDDA: begin
-          result := BASS_CD_StreamCreate(AudioDriveNumber(localPath), aFile.Track - 1, DecodeFlag or flags );
+          result := BASS_CD_StreamCreate(TCDDADrive.GetDriveNumber(localPath), aFile.Track - 1, DecodeFlag or flags );
           // Decodier-Stream nachbehandeln
           if aReverse AND (result <> 0) then
           begin
@@ -1520,6 +1526,7 @@ begin
           end;
       end;
 
+      (*
       if MainAudioFile.isCDDA then
       begin
           // check, whether the current cd is valid for the AudioFile-Object
@@ -1529,6 +1536,7 @@ begin
           if (CddbIDFromCDDA(MainAudioFile.Pfad) <> MainAudioFile.Comment ) then
               MainAudioFile.GetAudioData(MainAudioFile.Pfad, 0);
       end;
+      *)
 
       //CDChangeSuccess := True;
       //if JustCDChange then
