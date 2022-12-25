@@ -286,6 +286,7 @@ type
         AllowQuickAccessToMetadata: Boolean;
         UseCDDB: Boolean;
         PreferCDDB: Boolean;
+        AutoScanNewCDs: Boolean;
         CDDBServer: String;
         CDDBEMail: String;
 
@@ -338,6 +339,10 @@ const
     NEMP_NAME_TASK = '[Nemp]';
     NEMP_VERSION_SPLASH = 'version 5.0';// 'v3.3';
     NEMP_BASS_DEFAULT_USERAGENT = 'Nemp/5.0';
+    CDDB_DEFAULT_SERVER = 'gnudb.gnudb.org';
+    CDDB_DEFAULT_EMAIL = 'nemp@gausi.de';
+    CDDB_APPNAME = 'nemp+5.0';
+
     NEMP_ONLINE_HELP_DE = 'https://nemp-help.gausi.de/de/';
     NEMP_ONLINE_HELP_EN = 'https://nemp-help.gausi.de/en/';
 
@@ -1106,6 +1111,7 @@ begin
   PreferCDDB := NempSettingsManager.ReadBool('Allgemein', 'PreferCDDB', False);
   CDDBServer := NempSettingsmanager.ReadString('Allgemein', 'CDDBServer', '');
   CDDBEMail := NempSettingsmanager.ReadString('Allgemein', 'CDDBEMail', '');
+  AutoScanNewCDs := NempSettingsManager.ReadBool('Allgemein', 'AutoScanNewCDs', True);
 
   ShowTrayIcon            := NempSettingsManager.ReadBool('Fenster', 'ShowTrayIcon', False);
   FullRowSelect := NempSettingsManager.ReadBool('Fenster', 'FullRowSelect', True);
@@ -1193,6 +1199,7 @@ begin
   NempSettingsManager.WriteBool('Allgemein', 'PreferCDDB', PreferCDDB);
   NempSettingsmanager.WriteString('Allgemein', 'CDDBServer', CDDBServer);
   NempSettingsmanager.WriteString('Allgemein', 'CDDBEMail', CDDBEMail);
+  NempSettingsManager.WriteBool('Allgemein', 'AutoScanNewCDs', AutoScanNewCDs);
 
   NempSettingsManager.WriteInteger('Fenster', 'Anzeigemode', AnzeigeMode);
   NempSettingsManager.WriteBool('Fenster', 'UseSkin', UseSkin);

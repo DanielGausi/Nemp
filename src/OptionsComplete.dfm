@@ -2043,6 +2043,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 461
           Height = 568
+          VertScrollBar.Position = 182
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -2053,7 +2054,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpLibraryCoverArt: TCategoryPanel
-            Top = 495
+            Top = 313
             Height = 280
             Caption = 'Cover art'
             TabOrder = 2
@@ -2173,7 +2174,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpLibraryFileTypes: TCategoryPanel
-            Top = 260
+            Top = 78
             Height = 235
             Caption = 'File types for the media library'
             TabOrder = 1
@@ -2221,7 +2222,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpScanDirectories: TCategoryPanel
-            Top = 0
+            Top = -182
             Height = 260
             Caption = 'Directories'
             TabOrder = 0
@@ -2523,7 +2524,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object editCDNames: TLabeledEdit
               Left = 16
               Top = 123
-              Width = 103
+              Width = 52
               Height = 21
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -2746,7 +2747,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 461
           Height = 568
-          VertScrollBar.Position = 84
+          VertScrollBar.Position = 171
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -2757,7 +2758,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpMetaData: TCategoryPanel
-            Top = -84
+            Top = -171
             Height = 445
             Caption = 'Meta data (e.g. ID3-Tags)'
             TabOrder = 0
@@ -2932,13 +2933,13 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpCDDB: TCategoryPanel
-            Top = 361
-            Height = 203
+            Top = 274
+            Height = 290
             Caption = 'CDDB settings'
             TabOrder = 1
             object lblInvalidCDDBMail: TLabel
               Left = 16
-              Top = 142
+              Top = 167
               Width = 65
               Height = 11
               Caption = 'E-mail is invalid'
@@ -2949,44 +2950,74 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Font.Style = []
               ParentFont = False
             end
+            object lblLocalCDDBCache: TLabel
+              Left = 16
+              Top = 194
+              Width = 181
+              Height = 14
+              Caption = 'Local cache for CDDB information'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+            end
             object cbUseCDDB: TCheckBox
               Left = 16
-              Top = 16
+              Top = 39
               Width = 393
               Height = 17
               Caption = 'Use online CDDB to get audio CD information'
-              TabOrder = 0
+              TabOrder = 1
             end
             object cbPreferCDDB: TCheckBox
               Left = 16
-              Top = 39
+              Top = 62
               Width = 401
               Height = 17
               Caption = 'Prefer CDDB information over CD-Text'
-              TabOrder = 1
+              TabOrder = 2
             end
             object edtCDDBServer: TLabeledEdit
               Left = 16
-              Top = 80
+              Top = 104
               Width = 393
               Height = 21
               EditLabel.Width = 197
               EditLabel.Height = 13
               EditLabel.Caption = 'CDDB server (default: gnudb.gnudb.org)'
-              TabOrder = 2
+              TabOrder = 3
               Text = ''
             end
             object edtCDDBEMail: TLabeledEdit
               Left = 16
-              Top = 120
+              Top = 144
               Width = 393
               Height = 21
               EditLabel.Width = 53
               EditLabel.Height = 13
               EditLabel.Caption = 'Your e-mail'
-              TabOrder = 3
+              TabOrder = 4
               Text = ''
               OnExit = edtCDDBEMailExit
+            end
+            object cbAutoCheckNewCDs: TCheckBox
+              Left = 16
+              Top = 16
+              Width = 401
+              Height = 17
+              Caption = 'Automatically scan new CDs'
+              TabOrder = 0
+            end
+            object btnClearCDDBCache: TButton
+              Left = 16
+              Top = 214
+              Width = 99
+              Height = 25
+              Caption = 'Clear cache'
+              TabOrder = 5
+              OnClick = btnClearCDDBCacheClick
             end
           end
         end

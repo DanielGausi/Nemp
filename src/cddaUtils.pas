@@ -1,3 +1,37 @@
+{
+
+    Unit cddaUtils
+
+    - manage meta data for Audio CDs
+      Read CD Text
+      Use online CDDB
+      Cache data from online CDDB in a local file
+
+    ---------------------------------------------------------------
+    Nemp - Noch ein Mp3-Player
+    Copyright (C) 2005-2023, Daniel Gaussmann
+    http://www.gausi.de
+    mail@gausi.de
+    ---------------------------------------------------------------
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+
+    See license.txt for more information
+
+    ---------------------------------------------------------------
+}
+
 unit cddaUtils;
 
 interface
@@ -8,10 +42,6 @@ uses  Windows, Forms, Messages, SysUtils, Variants, ContNrs, Classes, StrUtils,
 
 const
   MAXDRIVES = 10;  // maximum number auf CDDA-Drives
-
-  CDDB_DEFAULT_SERVER = 'gnudb.gnudb.org';
-  CDDB_DEFAULT_EMAIL = 'nemp@gausi.de';
-  CDDB_APPNAME = 'nemp+5.0';
 
   REGEX_EMAIL =  '^((?>[a-zA-Z\d!#$%&''*+\-/=?^_`{|}~]+\x20*|"((?=[\x01-\x7f])'
            +'[^"\\]|\\[\x01-\x7f])*"\x20*)*(?<angle><))?((?!\.)'
@@ -47,9 +77,7 @@ type
 
     TCDDADrive = class
       private
-        fCachedCDTextData: AnsiString;
-        fCachedCddbData: UTF8String;
-        fCachedCddbID  : UTF8String;
+        fCddbID  : UTF8String;
         fIndex         : Integer;
         fIsCompilation : Boolean;
         fDelimter      : Char;
@@ -63,11 +91,11 @@ type
         fOutOfDate: Boolean;
 
         function GetCDTextInformation: TCddaError;
-        function GetCDDBInformation: TCddaError; //AnsiString;
-        procedure ConvertCDTextData(Data: PAnsiChar);
-        procedure ConvertCDDBData;
+        function GetCDDBInformation: TCddaError;
+        function GetLocalCDDBInformation: Boolean;
         function GetTrackDataCDText(TrackNumber: Integer; var TrackData: TCDTrackData): Boolean;
         function GetTrackDataCDDB(TrackNumber: Integer; var TrackData: TCDTrackData): Boolean;
+        procedure CheckForCompilation;
       public
         property Vendor   : AnsiString read fVendor;
         property Product  : AnsiString read fProduct;
@@ -77,11 +105,8 @@ type
 
         constructor Create;
         destructor Destroy; override;
-
-        procedure Assign(aDrive: TCDDADrive);
         procedure ClearDiscInformation;
         function GetDiscInformation(CheckOnline, PreferOnline: Boolean): TCddaError;
-        procedure CheckForCompilation(aData: UTF8String);
         class function GetTrackNumber(aPath: String): Integer;
         class function GetDriveNumber(aPath: String): Integer;
         class function GetDriveCDDBID(aPath: String): UTF8String;
@@ -89,9 +114,16 @@ type
         function GetTrackData(Path: String; var TrackData: TCDTrackData): Boolean; overload;
     end;
 
-    TCDDADriveList = class (TObjectList<TCDDADrive>);
+    TCDDADriveList = class(TObjectList<TCDDADrive>);
+    TCDDBCacheDict = class(TObjectDictionary<string, TStringList>);
 
     function CDDriveList: TCDDADriveList;
+    function LocalCDDBData: TCDDBCacheDict;
+
+    procedure AddLocalCDDBData(cdID: String; cdData: TStringList);
+    procedure RemoveLocalCDDBData(aDrive: TCDDADrive);//   (cdID: String);
+    procedure ClearAllLocalCDDBData;
+
     procedure UpdateDriveList;
 
     function BassErrorToCDError(aError: Integer): TCddaError;
@@ -99,11 +131,11 @@ type
     function CoverFilenameFromCDDA(aPath: String): String;
     function CddbIDFromCDDA(aPath: String): String;
 
-    procedure ClearCDDBCache;
+    procedure ClearCDDriveData;
     // When adding some file to the Playlist (by Drag&Drop, Copy&Paste), the DiskInformation should be refreshed.
-    // But only once per "Action", not per every file. Therefore, the CDDB-Cache should be marked as Deprecated. If
+    // But only once per "Action", not per every file. Therefore, the CDDB-Data should be marked as deprecated. If
     // a file on a deprecated CD-Drive is found, it will refresh it's Disk-Information, and remove the mark.
-    procedure MarkCDDBCacheAsDeprecated;
+    procedure MarkCDDriveDataAsDeprecated;
 
     function ValidEMail(aMail: String): Boolean;
     function GenerateCDDBHello(Mail: String): String;
@@ -113,10 +145,11 @@ type
 implementation
 
 uses
-  System.RegularExpressions;
+  System.RegularExpressions, Nemp_ConstantsAndTypes;
 
 var
   fCDDriveList: TCDDADriveList;
+  fLocalCDDBData: TCDDBCacheDict;
 
 procedure FillDriveList;
 var cdi : BASS_CD_INFO ;
@@ -136,14 +169,108 @@ begin
   end;
 end;
 
+procedure LoadCachedCDDBData;
+var
+  allData, cdData: TStringList;
+  cdID: String;
+  iLine: Integer;
+begin
+  if FileExists(NempSettingsManager.SavePath + 'CDDBCache.ncd') then begin
+    allData := TStringList.Create;
+    try
+      iLine := 0;
+      allData.LoadFromFile(NempSettingsManager.SavePath + 'CDDBCache.ncd', TEnCoding.UTF8);
+      while iLine < allData.Count do begin
+        if trim(allData[iLine]) = '<CDDBEntry>' then begin
+          inc(iLine);
+          // the next line contains the ID of this CD entry
+          cdID := allData[iLine];
+          inc(iLine);
+          // the following lines contains the CD Data
+          cdData := TStringList.Create;
+          while trim(allData[iLine]) <> '</CDDBEntry>' do begin
+            cdData.Add(allData[iLine]);
+            inc(iLine);
+          end;
+          fLocalCDDBData.AddOrSetValue(cdID, cdData);
+          inc(iLine); // should be the next '<CDDBEntry>'
+        end;
+      end;
+    finally
+      allData.Free;
+    end;
+  end;
+end;
+
+procedure SaveCachedCDDBData;
+var
+  allData: TStringList;
+  iCD: String;
+begin
+  allData := TStringList.Create;
+  try
+    for iCD in fLocalCDDBData.Keys do begin
+      allData.Add('<CDDBEntry>');
+      allData.Add(iCD);
+      allData.AddStrings(fLocalCDDBData[iCD]);
+      allData.Add('</CDDBEntry>');
+    end;
+    allData.SaveToFile(NempSettingsManager.SavePath + 'CDDBCache.ncd', TEnCoding.UTF8);
+  finally
+    allData.Free;
+  end;
+end;
+
+procedure AddLocalCDDBData(cdID: String; cdData: TStringList);
+var
+  DataCopy: TStringList;
+  i: Integer;
+begin
+  DataCopy := TStringList.Create;
+  // remove the comment section from the original data
+  for i := 0 to cdData.Count - 1 do
+    if (cdData[i] <> '') and (cdData[i][1] <> '#')  then
+      DataCopy.Add(cdData[i]);
+
+  LocalCDDBData.AddOrSetValue(cdID, DataCopy);
+  SaveCachedCDDBData;
+end;
+
+procedure RemoveLocalCDDBData(aDrive: TCDDADrive);
+begin
+  if LocalCDDBData.ContainsKey(aDrive.fCddbID) then
+    LocalCDDBData.Remove(aDrive.fCddbID)
+end;
+
+procedure ClearAllLocalCDDBData;
+begin
+  LocalCDDBData.Clear;
+  SaveCachedCDDBData;
+end;
+
 function CDDriveList: TCDDADriveList;
 begin
   if not assigned(fCDDriveList) then begin
     fCDDriveList := TCDDADriveList.Create(True);
     // Get list of available drives
     FillDriveList;
+    // Initialize local Cache
+    if not assigned(fLocalCDDBData) then begin
+      fLocalCDDBData := TCDDBCacheDict.Create([doOwnsValues]);
+      LoadCachedCDDBData;
+    end;
   end;
   result := fCDDriveList;
+end;
+
+
+function LocalCDDBData: TCDDBCacheDict;
+begin
+  if not assigned(fLocalCDDBData) then begin
+    fLocalCDDBData := TCDDBCacheDict.Create([doOwnsValues]);
+    LoadCachedCDDBData;
+  end;
+  result := fLocalCDDBData;
 end;
 
 
@@ -178,7 +305,7 @@ var
 begin
   aDrive := TCDDADrive.GetDriveNumber(aPath);
   if aDrive >= 0 then begin
-    result := CDDriveList[aDrive].fCachedCddbID;
+    result := CDDriveList[aDrive].fCddbID;
     result := StringReplace(result, ' ', '-', [rfReplaceAll]);
     if Length(result) > 32 then
       SetLength(Result, 32);
@@ -194,7 +321,7 @@ begin
 end;
 
 
-procedure ClearCDDBCache;
+procedure ClearCDDriveData;
 var
   i: Integer;
 begin
@@ -202,7 +329,7 @@ begin
     CDDriveList[i].ClearDiscInformation;
 end;
 
-procedure MarkCDDBCacheAsDeprecated;
+procedure MarkCDDriveDataAsDeprecated;
 var
   i: Integer;
 begin
@@ -245,61 +372,6 @@ end;
 
 { TCDDADrive }
 
-procedure TCDDADrive.Assign(aDrive: TCDDADrive);
-begin
-    fCachedCDTextData := aDrive.fCachedCDTextData;
-    fCachedCddbData := aDrive.fCachedCddbData;
-    fCachedCddbID   := aDrive.fCachedCddbID  ;
-    fIndex          := aDrive.fIndex         ;
-    fIsCompilation  := aDrive.fIsCompilation ;
-    fDelimter       := aDrive.fDelimter      ;
-    fVendor          := aDrive.Vendor        ;
-    fProduct         := aDrive.Product       ;
-    fRevision        := aDrive.Revision      ;
-    fLetter          := aDrive.Letter        ;
-end;
-
-procedure TCDDADrive.CheckForCompilation(aData: UTF8String);
-var sl: TStringList;
-    i: integer;
-    cMinus, cSlash, c: Integer;
-begin
-    fIsCompilation := False;
-    cMinus := 0;
-    cSlash := 0;
-    c := 0;
-
-    sl := TStringList.Create;
-    try
-        sl.Text := String(aData);
-        for i := 0 to sl.Count - 1 do
-        begin
-            if AnsiStartstext('TTITLE', sl[i]) then
-            begin
-                c := c + 1;
-                if pos(' - ', sl[i]) > 0 then
-                    cMinus := cMinus + 1;
-                if pos(' / ', sl[i]) > 0 then
-                    cSlash := cSlash + 1;
-            end;
-        end;
-
-        if cSlash >= c-2 then
-        begin
-            fIsCompilation := True;
-            self.fDelimter := '/';
-        end else
-        if cMinus >= c-2 then
-        begin
-            fIsCompilation := True;
-            self.fDelimter := '-';
-        end;
-    finally
-        sl.Free;
-    end;
-
-end;
-
 constructor TCDDADrive.Create;
 begin
   inherited;
@@ -315,24 +387,39 @@ begin
   inherited;
 end;
 
-procedure TCDDADrive.ConvertCDTextData(Data: PAnsiChar);
+procedure TCDDADrive.CheckForCompilation;
+var
+  i: integer;
+  cMinus, cSlash, c: Integer;
 begin
-  { quote from the BASS_CD Help file:
-    When requesting CD-TEXT, a series of null-terminated strings is returned (the final string ending in a double null),
-    in the form of "tag=text". The following is a list of all the possible tags. Where <t> is shown, that represents the
-    track number, with "0" being the whole disc/album. For example, "TITLE0" is the album title, while "TITLE1" is the
-    title of the first track.
-  }
-  fCDTextTitles.Clear;
-  while (trim(String(Data)) <> '') do begin
-    fCDTextTitles.Add(String(Data));
-    Data := Data + Length(Data) + 1 ;
-  end;
-end;
+  fIsCompilation := False;
+  cMinus := 0;
+  cSlash := 0;
+  c := 0;
 
-procedure TCDDADrive.ConvertCDDBData;
-begin
-  fCDDBTitles.Text := String(fCachedCddbData);
+  for i := 0 to fCDDBTitles.Count - 1 do
+  begin
+      if AnsiStartstext('TTITLE', fCDDBTitles[i]) then
+      begin
+          c := c + 1;
+          if pos(' - ', fCDDBTitles[i]) > 0 then
+              cMinus := cMinus + 1;
+          if pos(' / ', fCDDBTitles[i]) > 0 then
+              cSlash := cSlash + 1;
+      end;
+  end;
+
+  if cSlash >= c-2 then
+  begin
+      fIsCompilation := True;
+      fDelimter := '/';
+  end else
+  if cMinus >= c-2 then
+  begin
+      fIsCompilation := True;
+      fDelimter := '-';
+  end;
+
 end;
 
 function TCDDADrive.GetCDTextInformation: TCddaError;
@@ -342,83 +429,100 @@ begin
   result := cddaErr_None;
   pData := BASS_CD_GetID(fIndex, BASS_CDID_TEXT);
   if pData <> Nil then begin
-    ConvertCDTextData(pData);
-    fCachedCDTextData := self.fCDTextTitles.Text;
+    fCDTextTitles.Clear;
+    while (trim(String(pData)) <> '') do begin
+      fCDTextTitles.Add(String(pData));
+      pData := pData + Length(pData) + 1 ;
+    end;
   end else
     result := BassErrorToCDError(BASS_ErrorGetCode)
 end;
 
-function TCDDADrive.GetCDDBInformation: TCddaError;
-var queryReply: UTF8String;
+function TCDDADrive.GetLocalCDDBInformation: Boolean;
+begin
+  if LocalCDDBData.ContainsKey(fCddbID) then begin
+    fCDDBTitles.Clear;
+    fCDDBTitles.AddStrings(LocalCDDBData[fCddbID]);
+    CheckForCompilation;
+    result := True;
+  end else
+    result := False;
+end;
 
+function TCDDADrive.GetCDDBInformation: TCddaError;
+var
+  queryReply, tmpCddbData: UTF8String;
 begin
     result := cddaErr_None;
     // the fCachedCddbID := BASS_CD_GetID(fIndex, BASS_CDID_CDDB); is needed anyway, even if we don't want to query the cddb online
     // This ID should have been calculated before calling this method.
-    if fCachedCddbID = '' then
+    if fCddbID = '' then
       exit;
 
-    // get new DATA
-    // 1. Query general Information about the Disc.
-    // Return value may be used for the next query BASS_CDID_CDDB_READ
-    queryReply := BASS_CD_GetID(fIndex, BASS_CDID_CDDB_QUERY);
-          // Example reply:
-          //    210 Found exact matches, list follows (until terminating `.')
-          //    soundtrack 9a09340d Pink Floyd / 1979 - The Wall (Disc 01)
-          //    rock 9a09340d Pink Floyd / THE WALL  (Shine On Box)  - CD 1 (1992)
-          //    .
-    if queryReply = '' then
-      result := BassErrorToCDError(BASS_ErrorGetCode)
-    else begin
-        if AnsiStartsText('200', String(queryReply)) then begin
-          // only one entry for this disc is found in the online database
-          fCachedCddbData := BASS_CD_GetID(fIndex, BASS_CDID_CDDB_READ + 0);
-          if fCachedCddbData = '' then
+    // first: Try to get Data from local Cache
+    if not GetLocalCDDBInformation then begin
+          // ID is not cached in local data yet. Search it online!
+          // 1. Query general Information about the Disc.
+          // Return value may be used for the next query BASS_CDID_CDDB_READ
+          queryReply := BASS_CD_GetID(fIndex, BASS_CDID_CDDB_QUERY);
+                // Example reply:
+                //    210 Found exact matches, list follows (until terminating `.')
+                //    soundtrack 9a09340d Pink Floyd / 1979 - The Wall (Disc 01)
+                //    rock 9a09340d Pink Floyd / THE WALL  (Shine On Box)  - CD 1 (1992)
+                //    .
+          if queryReply = '' then
             result := BassErrorToCDError(BASS_ErrorGetCode)
-          else
-            ConvertCDDBData;
-        end
-        else begin
-          if AnsiStartsText('210', String(queryReply))
-              or AnsiStartsText('211', String(queryReply))
-          then begin
-              // more than one entry for this disc is found.
-              // User selection needed
-              if not assigned(FormCDDBSelect) then
-                Application.CreateForm(TFormCDDBSelect, FormCDDBSelect);
-              FormCDDBSelect.FillView(queryReply);
-
-              if FormCDDBSelect.ShowModal = mrOK then begin
-                fCachedCddbData := BASS_CD_GetID(fIndex, BASS_CDID_CDDB_READ + FormCDDBSelect.SelectedEntry);
-                if fCachedCddbData = '' then
+          else begin
+              if AnsiStartsText('200', String(queryReply)) then begin
+                // only one entry for this disc is found in the online database
+                tmpCddbData := BASS_CD_GetID(fIndex, BASS_CDID_CDDB_READ + 0);
+                if tmpCddbData = '' then
                   result := BassErrorToCDError(BASS_ErrorGetCode)
                 else
-                  ConvertCDDBData;
+                  fCDDBTitles.Text := String(tmpCddbData);
               end
               else begin
-                // canceled by user
-                fCachedCddbData := '';
-                result := cddaErr_Cancelled;
+                if AnsiStartsText('210', String(queryReply))
+                    or AnsiStartsText('211', String(queryReply))
+                then begin
+                    // more than one entry for this disc is found.
+                    // User selection needed
+                    if not assigned(FormCDDBSelect) then
+                      Application.CreateForm(TFormCDDBSelect, FormCDDBSelect);
+                    FormCDDBSelect.FillView(queryReply);
+
+                    if (not FormCDDBSelect.Visible) and (FormCDDBSelect.ShowModal = mrOK) then begin
+                      tmpCddbData := BASS_CD_GetID(fIndex, BASS_CDID_CDDB_READ + FormCDDBSelect.SelectedEntry);
+                      if tmpCddbData = '' then
+                        result := BassErrorToCDError(BASS_ErrorGetCode)
+                      else
+                        fCDDBTitles.Text := String(tmpCddbData);
+                    end
+                    else begin
+                      // canceled by user
+                      fCDDBTitles.Clear;
+                      result := cddaErr_Cancelled;
+                    end;
+                end else
+                begin
+                    // some error occured
+                    fCDDBTitles.Clear;
+                    result := cddaErr_Unknown;
+                end;
               end;
-          end else
-          begin
-              // some error occured
-              fCachedCddbData := '';
-              result := cddaErr_Unknown;
+              if result = cddaErr_None then begin
+                AddLocalCDDBData(fCddbID, fCDDBTitles);
+                CheckForCompilation;
+              end;
           end;
-        end;
-        if result = cddaErr_None then
-          CheckForCompilation(fCachedCddbData);
-    end;
+    end;  // not GetLocalCDDBInformation
 end;
 
 procedure TCDDADrive.ClearDiscInformation;
 begin
   fCDTextTitles.Clear;
   fCDDBTitles.Clear;
-  fCachedCDTextData := '';
-  fCachedCddbData := '';
-  fCachedCddbID := '';
+  fCddbID := '';
   fIsCompilation := False;
   fPreferOnline := False;
   fDelimter := #0;
@@ -432,15 +536,15 @@ begin
   fOutOfDate := False;
   result := cddaErr_None;
 
-  if BASS_CD_GetID(fIndex, BASS_CDID_CDDB) = fCachedCddbID then
+  if BASS_CD_GetID(fIndex, BASS_CDID_CDDB) = fCddbID then
     exit;   // nothing has changed
 
   ClearDiscInformation;
 
   fPreferOnline := PreferOnline;
 
-  fCachedCddbID := BASS_CD_GetID(fIndex, BASS_CDID_CDDB);
-  if fCachedCddbID = '' then
+  fCddbID := BASS_CD_GetID(fIndex, BASS_CDID_CDDB);
+  if fCddbID = '' then
     result := BassErrorToCDError(BASS_ErrorGetCode);
 
   // Get MetaData for the current Disc in the Drive
@@ -448,7 +552,7 @@ begin
   if result = cddaErr_None then
     result := tmpResult;
 
-  if PreferOnline or ((fCachedCDTextData = '') and CheckOnline) then begin
+  if PreferOnline or ((fCDTextTitles.Count = 0) and CheckOnline) then begin
     tmpResult := GetCDDBInformation;
     if result = cddaErr_None then
       result := tmpResult;
@@ -479,7 +583,7 @@ var
 begin
   idx := TCDDADrive.GetDriveNumber(aPath);
   if idx >= 0 then
-    result := CDDriveList[idx].fCachedCddbID
+    result := CDDriveList[idx].fCddbID
   else
     result := '';
 end;
@@ -565,7 +669,7 @@ begin
   TrackData.Track    := -1;
   TrackData.Year     := '';
   TrackData.Genre    := '';
-  TrackData.CddbID   := fCachedCddbID;
+  TrackData.CddbID   := fCddbID;
 
   ByteLength := BASS_CD_GetTrackLength(fIndex, TrackNumber - 1); // This method wants Track=0 for the first track
   if ByteLength = High(DWord) then begin
@@ -574,7 +678,7 @@ begin
     result := True;
     TrackData.Duration := ByteLength Div 176400;
     TrackData.Track := TrackNumber;
-    TrackData.CddbID := fCachedCddbID;
+    TrackData.CddbID := fCddbID;
 
     if fPreferOnline then begin // fPreferOnline is set during GetDiscInformation()
       success := GetTrackDataCDDB(TrackNumber, TrackData);
@@ -600,10 +704,14 @@ end;
 initialization
 
   fCDDriveList := Nil;
+  fLocalCDDBData := Nil;
 
 finalization
 
   if assigned(fCDDriveList) then
     fCDDriveList.Free;
+
+  if assigned(fLocalCDDBData) then
+    fLocalCDDBData.Free;
 
 end.

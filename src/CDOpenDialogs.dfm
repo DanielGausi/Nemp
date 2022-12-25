@@ -29,15 +29,15 @@ object CDOpenDialog: TCDOpenDialog
     DesignSize = (
       390
       65)
-    object BtnRefresh: TButton
-      Left = 305
-      Top = 24
+    object BtnRefreshDrives: TButton
+      Left = 304
+      Top = 22
       Width = 75
-      Height = 21
+      Height = 25
       Anchors = [akTop, akRight]
       Caption = 'Refresh'
       TabOrder = 0
-      OnClick = BtnRefreshClick
+      OnClick = BtnRefreshDrivesClick
     end
     object cb_Drives: TComboBox
       Left = 9
@@ -74,7 +74,7 @@ object CDOpenDialog: TCDOpenDialog
       ExplicitTop = 298
       ExplicitWidth = 206
     end
-    object BtnCDDB: TButton
+    object BtnRefreshTracks: TButton
       Left = 304
       Top = 34
       Width = 75
@@ -85,7 +85,7 @@ object CDOpenDialog: TCDOpenDialog
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0
-      OnClick = BtnCDDBClick
+      OnClick = BtnRefreshTracksClick
     end
     object cbUseCDDB: TCheckBox
       Left = 16
@@ -150,6 +150,7 @@ object CDOpenDialog: TCDOpenDialog
       Width = 75
       Height = 25
       Anchors = [akTop, akRight]
+      Cancel = True
       Caption = 'Cancel'
       ModalResult = 2
       TabOrder = 0
@@ -161,6 +162,7 @@ object CDOpenDialog: TCDOpenDialog
       Height = 25
       Anchors = [akTop, akRight]
       Caption = 'Ok'
+      Default = True
       ModalResult = 1
       TabOrder = 1
       OnClick = BtnOkClick

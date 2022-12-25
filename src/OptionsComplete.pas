@@ -632,6 +632,9 @@ type
     edtCDDBServer: TLabeledEdit;
     edtCDDBEMail: TLabeledEdit;
     lblInvalidCDDBMail: TLabel;
+    cbAutoCheckNewCDs: TCheckBox;
+    lblLocalCDDBCache: TLabel;
+    btnClearCDDBCache: TButton;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -793,6 +796,7 @@ type
     procedure cbPreferAlbumArtistClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure edtCDDBEMailExit(Sender: TObject);
+    procedure btnClearCDDBCacheClick(Sender: TObject);
 
   private
     { Private-Deklarationen }
@@ -1564,6 +1568,7 @@ begin
   // Char code detection
   CBAutoDetectCharCode.Checked := NempCharCodeOptions.AutoDetectCodePage;
   // CDDB-Settings
+  cbAutoCheckNewCDs.Checked := NempOptions.AutoScanNewCDs;
   cbUseCDDB.Checked := NempOptions.UseCDDB;
   cbPreferCDDB.checked := NempOptions.PreferCDDB;
   edtCDDBServer.Text := NempOptions.CDDBServer;
@@ -2780,6 +2785,7 @@ begin
   // Heuristics for charcode detections
   NempCharCodeOptions.AutoDetectCodePage := CBAutoDetectCharCode.Checked;
   // CDDB-Settings
+  NempOptions.AutoScanNewCDs := cbAutoCheckNewCDs.Checked;
   NempOptions.UseCDDB := cbUseCDDB.Checked;
   NempOptions.PreferCDDB := cbPreferCDDB.checked;
   NempOptions.CDDBServer := trim(edtCDDBServer.Text);
@@ -3150,6 +3156,11 @@ begin
   finally
       fb.Free;
   end;
+end;
+
+procedure TOptionsCompleteForm.btnClearCDDBCacheClick(Sender: TObject);
+begin
+  ClearAllLocalCDDBData;
 end;
 
 procedure TOptionsCompleteForm.BtnClearCoverCacheClick(Sender: TObject);
@@ -4078,7 +4089,12 @@ begin
   (MedienBib.AutoResolveInconsistencies <> cb_AutoResolveInconsistencies.checked) or
   (MedienBib.AskForAutoResolveInconsistencies <> cb_AskForAutoResolveInconsistencies.checked) or
   (MedienBib.ShowAutoResolveInconsistenciesHints <> cb_ShowAutoResolveInconsistenciesHints.checked) or
-  (NempCharCodeOptions.AutoDetectCodePage <> CBAutoDetectCharCode.Checked);
+  (NempCharCodeOptions.AutoDetectCodePage <> CBAutoDetectCharCode.Checked) or
+  (NempOptions.AutoScanNewCDs <> cbAutoCheckNewCDs.Checked) or
+  (NempOptions.UseCDDB <> cbUseCDDB.Checked) or
+  (NempOptions.PreferCDDB <> cbPreferCDDB.checked) or
+  (NempOptions.CDDBServer <> edtCDDBServer.Text) or
+  (NempOptions.CDDBEMail <> edtCDDBEMail.Text);
 end;
 function TOptionsCompleteForm.SearchSettingsChanged: Boolean;
 begin

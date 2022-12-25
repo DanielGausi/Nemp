@@ -1591,7 +1591,7 @@ begin
 
   SetCDDADefaultInformation(self);
   DriveNo := TCDDADrive.GetDriveNumber(Filename);
-  if DriveNo < 0 then begin
+  if (DriveNo < 0) or (DriveNo >= CDDriveList.Count) then begin
     result := cddaErr_invalidPath;
     TrackData.Track := -1;
   end

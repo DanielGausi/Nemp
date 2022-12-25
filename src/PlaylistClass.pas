@@ -2322,6 +2322,11 @@ begin
       Playlist[i].AssignCDTrackData(TrackData);
     end;
   end;
+  fDauer := CalculateDuration;
+  if assigned(fOnFilePropertiesChanged) then
+    fOnFilePropertiesChanged(self);
+  if assigned(fOnPropertiesChanged) then
+    fOnPropertiesChanged(self);
 end;
 
 {

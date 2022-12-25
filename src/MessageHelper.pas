@@ -1502,10 +1502,25 @@ begin
   end;
 end;
 
+function GetFirstDrive(UnitMask: DWORD): Char;
+var
+  c: Char;
+begin
+  Result := #0;
+  for c := 'A' to 'Z' do begin
+    if (UnitMask and 1) = 1 then begin
+      Result := c;
+      break;
+    end;
+    UnitMask := UnitMask shr 1;
+  end;
+end;
+
 
 function Handle_WndProc(var Message: TMessage): Boolean;
-var devType: Integer;
+var DriveNo: Integer;
   Datos: PDevBroadcastHdr;
+  VolInfo: PDevBroadcastVolume;
 //  VolInfo: PDevBroadcastVolume;
 //  UnitMask: DWord;
 begin
@@ -1526,23 +1541,48 @@ begin
     end;
 
     WM_DEVICECHANGE: begin
-                      if (Message.wParam = DBT_DEVICEARRIVAL) or (Message.wParam = DBT_DEVICEREMOVECOMPLETE) then
-                      begin
-                          Datos := PDevBroadcastHdr(Message.lParam);
-                          devType := Datos^.dbch_devicetype;
+        Datos := PDevBroadcastHdr(Message.lParam);
+        case Message.wParam of
+            DBT_DeviceArrival: begin
+              if Datos^.dbch_devicetype = DBT_DevTyp_Volume then
+              begin
+                VolInfo := PDevBroadcastVolume(Message.lParam);
+                if VolInfo.dbcv_flags = DBTF_Media then begin
+                  // new Media in existing drive (= new CD/DVD. A Floppy Disk or something like that would be rather unlikely.)
+                  if NempOptions.AutoScanNewCDs then begin
+                    DriveNo := TCDDADrive.GetDriveNumber(GetFirstDrive(VolInfo.dbcv_unitmask));
+                    if (DriveNo >= 0) and (DriveNo < CDDriveList.Count)  then begin
+                      CDDriveList[DriveNo].ClearDiscInformation;
+                      CDDriveList[DriveNo].GetDiscInformation(NempOptions.UseCDDB, NempOptions.PreferCDDB);
+                      NempPlaylist.SynchFilesWithCDDrive(CDDriveList[DriveNo]);
+                    end;
+                  end;
+                end
+                else
+                  // new drive connected
+                  HandleNewConnectedDrive;
 
-                          if (devType = DBT_DEVTYP_DEVICEINTERFACE) or (devType = DBT_DEVTYP_VOLUME) then
-                          begin // USB Device
-                            if Message.wParam = DBT_DEVICEARRIVAL then
-                            begin
-                              Message.Result := 1;
-                              HandleNewConnectedDrive;
-                            end
-                            else
-                                Message.Result := 1;
-                          end;
-                      end;
+                Message.Result := 1;
+              end;
+            end;
 
+            DBT_DeviceRemoveComplete: begin
+              if Datos^.dbch_devicetype = DBT_DevTyp_Volume then
+              begin
+                VolInfo := PDevBroadcastVolume(Message.lParam);
+                if (VolInfo.dbcv_flags = DBTF_Media) and NempOptions.AutoScanNewCDs then begin
+                  // Media removed
+                  DriveNo := TCDDADrive.GetDriveNumber(GetFirstDrive(VolInfo.dbcv_unitmask));
+                  if (DriveNo >= 0) and (DriveNo < CDDriveList.Count)  then begin
+                    CDDriveList[DriveNo].ClearDiscInformation;
+                    CDDriveList[DriveNo].GetDiscInformation(NempOptions.UseCDDB, NempOptions.PreferCDDB);
+                    NempPlaylist.SynchFilesWithCDDrive(CDDriveList[DriveNo]);
+                  end;
+                end;
+                Message.Result := 1;
+              end;
+            end;
+        end;
     end;
 
 
@@ -1798,7 +1838,7 @@ Var
   PlayIdx: Integer;
 Begin
     result := True;
-    MarkCDDBCacheAsDeprecated;
+    MarkCDDriveDataAsDeprecated;
 
     // Größe der Playlist und Status des Players merken
     // abspielen := NempPlaylist.Count = 0;

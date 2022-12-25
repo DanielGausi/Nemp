@@ -40,10 +40,10 @@ type
     BtnCancel: TButton;
     BtnOk: TButton;
     GrpBoxDrives: TGroupBox;
-    BtnRefresh: TButton;
+    BtnRefreshDrives: TButton;
     cb_Drives: TComboBox;
     GrpBoxTracklist: TGroupBox;
-    BtnCDDB: TButton;
+    BtnRefreshTracks: TButton;
     cbUseCDDB: TCheckBox;
     lbTracks: TListBox;
     cbInsertMode: TComboBox;
@@ -53,12 +53,12 @@ type
     procedure FormShow(Sender: TObject);
 
     procedure cb_DrivesChange(Sender: TObject);
-    procedure BtnRefreshClick(Sender: TObject);
+    procedure BtnRefreshDrivesClick(Sender: TObject);
     procedure cbUseCDDBClick(Sender: TObject);
     procedure BtnSelectAllClick(Sender: TObject);
     procedure lbTracksKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
-    procedure BtnCDDBClick(Sender: TObject);
+    procedure BtnRefreshTracksClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure BtnOkClick(Sender: TObject);
@@ -133,9 +133,10 @@ begin
     end;
 end;
 
-procedure TCDOpenDialog.BtnCDDBClick(Sender: TObject);
+procedure TCDOpenDialog.BtnRefreshTracksClick(Sender: TObject);
 begin
-  if CDDriveList.Count > CurrentDrive  then begin
+  if CDDriveList.Count > CurrentDrive then begin
+    RemoveLocalCDDBData(CDDriveList[CurrentDrive]);
     CDDriveList[CurrentDrive].ClearDiscInformation;
     CDDriveList[CurrentDrive].GetDiscInformation(nempOptions.UseCDDB, NempOptions.PreferCDDB);
     UpdateTrackList;
@@ -143,8 +144,9 @@ begin
 end;
 
 
-procedure TCDOpenDialog.BtnRefreshClick(Sender: TObject);
+procedure TCDOpenDialog.BtnRefreshDrivesClick(Sender: TObject);
 begin
+    BASS_CD_SetInterface(BASS_CD_IF_AUTO);
     UpdateDriveList;
     UpdateDriveListView;
 end;
@@ -191,10 +193,10 @@ end;
 
 
 procedure TCDOpenDialog.UpdateTrackList;
-var l: Integer;
-    newAudioFile: TAudioFile;
-    TrackCount, i: Integer;
-    TrackData: TCDTrackData;
+var
+  newAudioFile: TAudioFile;
+  TrackCount, i: Integer;
+  TrackData: TCDTrackData;
 begin
     lbTracks.Items.Clear;
     localAudioFiles.Clear;
@@ -207,7 +209,6 @@ begin
         newAudioFile := TAudioFile.Create;
         newAudioFile.Pfad := CDDriveList[CurrentDrive].Letter + ':\Track' + AddLeadingZeroes(i+1, 2) + '.cda';
         newAudioFile.AssignCDTrackData(TrackData);
-
         localAudioFiles.Add(newAudioFile);
         lbTracks.Items.Add(IntToStr(newAudioFile.Track) + ' - ' + NempDisplay.PlaylistTitle(newAudioFile));
       end;

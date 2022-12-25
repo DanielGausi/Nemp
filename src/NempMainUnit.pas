@@ -1879,8 +1879,16 @@ procedure TNemp_MainForm.OwnMessageProc(var msg: TMessage);
 begin
     if NempIsClosing then
         msg.Result := 0
-    else
+    else begin
+      // Broadcast-Messages like WM_POWER and WM_DEVICECHANGE are sent to every window, i.e. to the MainForm as well.
+      // We should not send this message to the current MainForm-Handle again
+      case Msg.Msg of
+        WM_POWERBROADCAST,
+        WM_DEVICECHANGE: msg.Result := 0;
+      else
         msg.Result := sendmessage(self.Handle, msg.Msg, msg.WParam, msg.LParam);
+      end;
+    end;
 end;
 
 
@@ -5902,7 +5910,7 @@ begin
   cddbID := TCDDADrive.GetDriveCDDBID(af.Pfad);
   if (cddbID = '') or (String(cddbID) <> af.Comment) then begin
     DriveNo := TCDDADrive.GetDriveNumber(af.Pfad);
-    if DriveNo = -1 then begin
+    if (DriveNo < 0) or (DriveNo >= CDDriveList.Count) then begin
       // todo: Invalid Drive, probably an disconnected external CDDrive. What to do in this case?
       // ....
     end
@@ -5912,7 +5920,6 @@ begin
       CDDriveList[DriveNo].GetDiscInformation(NempOptions.UseCDDB, NempOptions.PreferCDDB);
       NempPlaylist.SynchFilesWithCDDrive(CDDriveList[DriveNo]);
     end;
-    PlaylistVST.Invalidate;
   end;
 end;
 
@@ -8752,7 +8759,7 @@ begin
       begin
           newdir := fb.SelectedItem;
           NempPlaylist.InitialDialogFolder := fb.SelectedItem;
-          MarkCDDBCacheAsDeprecated;
+          MarkCDDriveDataAsDeprecated;
           //NempPlaylist.InsertNode := Nil;
           NempPlaylist.ResetInsertIndex;
           ST_Playlist.Mask := GeneratePlaylistSTFilter;
@@ -8820,7 +8827,7 @@ begin
 
   // einfügen
   if PlaylistDateienOpenDialog.Execute then begin
-    MarkCDDBCacheAsDeprecated;
+    MarkCDDriveDataAsDeprecated;
     for i := 0 to PlaylistDateienOpenDialog.Files.Count - 1 do
       NempPlaylist.AddFileToPlaylist(PlaylistDateienOpenDialog.Files[i]);
   end;
@@ -9281,7 +9288,7 @@ begin
   ///  However, This method is probably very rarely used, and in most cases the
   ///  playlist contains <1000 files or so, which should be scanned quite fast.
 
-  ClearCDDBCache;
+  ClearCDDriveData;
 
   NempPlayer.CoverArtSearcher.StartNewSearch;
   for i := 0 to NempPlaylist.Playlist.Count - 1 do begin

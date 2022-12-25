@@ -52,6 +52,7 @@ const DriveTypeTexts: array[DRIVE_UNKNOWN..DRIVE_RAMDISK] of String =
       DBT_CONFIGCHANGED          = $0018;
 
       DBT_DEVTYP_DEVICEINTERFACE = $00000005;      // device interface class
+      DBTF_MEDIA                = $0001;
       DBT_DEVTYP_VOLUME          = $00000002;
 
       MP3DB_DriveString   = 1; // string
@@ -68,6 +69,15 @@ type
       dbch_size: DWORD;
       dbch_devicetype: DWORD;
       dbch_reserved: DWORD;
+    end;
+
+    PDevBroadcastVolume = ^DEV_BROADCAST_VOLUME;
+    DEV_BROADCAST_VOLUME = packed record
+      dbcv_size: DWORD;
+      dbcv_devicetype: DWORD;
+      dbcv_reserved: DWORD;
+      dbcv_unitmask: DWORD;
+      dbcv_flags: Word;
     end;
 
 
