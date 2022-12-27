@@ -154,7 +154,7 @@ type
       function GetCategoryCaption: String;
       function GetCoverID: String; override;
 
-      function HasUniqueValue(aCollection: TAudioFileCollection): teCollectionUniqueness;
+      class function HasUniqueValue(aCollection: TAudioFileCollection): teCollectionUniqueness;
       procedure GetCommonArtist;
       procedure GetCommonGenre;
       procedure GetCommonYear;
@@ -249,6 +249,7 @@ type
       // After inserting all Files into a collection, we may want to analyze these files and collect further data
       // for example, when sorting by Album, we may want addtional common information like "year", "genre", "artist"
 
+      class function CommonCoverID(AudioFiles: TAudioFileList): String;
   end;
 
 
@@ -917,7 +918,7 @@ begin
   end;
 end;
 
-function TAudioFileCollection.HasUniqueValue(aCollection: TAudioFileCollection): teCollectionUniqueness;
+class function TAudioFileCollection.HasUniqueValue(aCollection: TAudioFileCollection): teCollectionUniqueness;
 var
   FileCount: Integer;
 begin
@@ -941,6 +942,11 @@ begin
 end;
 
 procedure TAudioFileCollection.GetCommonCoverID;
+begin
+  fCoverID := CommonCoverID(fFileList);
+end;
+
+class function TAudioFileCollection.CommonCoverID(AudioFiles: TAudioFileList): String;
 var
   i: Integer;
   aRoot: TRootCollection;
@@ -949,14 +955,19 @@ begin
   aRoot := TRootCollection.Create(nil);
   try
     aRoot.AddSubCollectionType(ccCoverID, csCount, sd_Descending);
-    for i := 0 to fFileList.Count - 1 do
-      aRoot.AddAudioFile(fFileList[i]);
+    for i := 0 to AudioFiles.Count - 1 do
+      aRoot.AddAudioFile(AudioFiles[i]);
     aRoot.Sort(False);
-    fCoverID := TAudioFileCollection(aRoot.Collection[0]).fCoverID;
 
-    if fCoverID= '' then
-      fCoverID := IntToStr(aRoot.CollectionCount);
-
+    case HasUniqueValue(aRoot) of
+      cuUnique: Result := TAudioFileCollection(aRoot.Collection[0]).fCoverID;
+    else
+      //cuInvalid, cuSampler
+       Result := '';
+    end;
+    //fCoverID := TAudioFileCollection(aRoot.Collection[0]).fCoverID;
+    //if fCoverID= '' then
+    //  fCoverID := IntToStr(aRoot.CollectionCount); ????? Why ?????
   finally
     aRoot.Free;
   end;

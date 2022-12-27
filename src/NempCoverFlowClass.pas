@@ -193,7 +193,7 @@ begin
                 fFlyingCow := tFlyingCow.Create(window, events_Window);
 
             fFlyingCow.BeginUpdate;
-            fFlyingCow.AddItems(fCoverCount);
+            fFlyingCow.AddItems(fCoverCount, assigned(fCoverCategory) and (fCoverCategory.CategoryType = ccFiles));
             fFlyingCow.EndUpdate;
 
             Nemp_MainForm.IMGMedienBibCover.Visible := False;
@@ -526,7 +526,17 @@ procedure TNempCoverFlow.SetNewList(aCategory: TLibraryCategory; FallBackToZero:
 
     function LCItemCount: Integer;
     begin
-      case aCategory.CollectionCount of
+      if aCategory.CollectionCount = 0 then
+        result := 0
+      else begin
+        if aCategory.CategoryType = ccFiles then
+          // Files: [RootCollection] + [List of Albums]
+          result := 1 + aCategory.Collections[0].CollectionCount
+        else
+          result := aCategory.CollectionCount;
+      end;
+
+      (*case aCategory.CollectionCount of
         0: result := 0; // empty;
         1: begin
           // Files: [RootCollection] + [List of Albums]
@@ -535,7 +545,7 @@ procedure TNempCoverFlow.SetNewList(aCategory: TLibraryCategory; FallBackToZero:
       else
         // Playlists: [Lists of Playlist]
         result := aCategory.CollectionCount;
-      end;
+      end;*)
     end;
 
 begin
@@ -549,7 +559,7 @@ begin
         end;
         cm_OpenGL  : begin
               fFlyingCow.BeginUpdate;
-              fFlyingCow.AddItems(fCoverCount);
+              fFlyingCow.AddItems(fCoverCount, aCategory.CategoryType = ccFiles);
               fFlyingCow.EndUpdate;
               fFlyingCow.DoSomeDrawing(10);
         end;

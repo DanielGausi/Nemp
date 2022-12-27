@@ -460,7 +460,7 @@ MainForm_GlobalQuickSearch    = 'Quicksearch (library)';
 /// MainForm_MoreSearchresults  = 'Additional results (not limited to current preselection)';
 MainForm_NoSearchresults    = 'Nothing found. Try another search.';
 MainForm_EmptyCategory      = 'There are no files in the current category.';
-MainForm_EmptyBibPlaylist      = 'The playlist contains no files.';
+MainForm_EmptyBibPlaylist      = 'The playlist file doesn''t exist or contains no files.';
 MainForm_SearchQueryTooShort = 'Search query too short. Please enter at least 2 characters.';
 MainForm_NoFavorites = 'No files flagged with this marker.';
 // DummyFile for browsing Playlists/Webradio
@@ -693,6 +693,11 @@ MediaLibrary_RefreshingFilesCompleteFinished = 'Refreshing files complete.';
 
 MediaLibrary_ScanningFilesInDir    = 'Reading file information ... %s';
 MediaLibrary_ScanningFilesCount    = 'Scanning music files for metadata ... %d/%d';
+
+MediaLibrary_ScanningPlaylistsInDir = 'Scanning playlists ... %s';
+MediaLibrary_ScanningPlaylistsCount = 'Scanning playlists files ... %d/%d';
+
+
 //ProgressForm_ScanNewFiles    = 'Nemp is Scanning the new music files for meta data. This may take a while.';
 
 //MediaLibrary_SearchingMissingFiles   = 'Searching missing files (%d%%)';
@@ -1061,6 +1066,7 @@ ProgressForm_SearchTags     = 'Nemp is searching for some additional tags for yo
 ProgressForm_UpdateMetaData = 'Nemp is updating the meta data (ID3tags) of your music files.';
 ProgressForm_DeleteFiles    = 'Nemp is removing the selected files from your media library.';
 ProgressForm_ScanNewFiles    = 'Nemp is scanning the new music files for metadata. This may take a while.';
+ProgressForm_ScanNewPlaylistFiles = 'Nemp is scanning the new playlist files. This may take a while.';
 
 ProgressForm_WorkingCaption = 'Nemp: Work in progress ...';
 ProgressForm_CompleteCaption = 'Nemp: Process completed.';
@@ -1097,6 +1103,7 @@ PlaylistManager_ReloadPlaylist = 'The current playlist "%s" has been changed sin
 //                                 + 'Do you want to save it now and switch to the default playlist?';
 
 PlaylistManager_PlaylistNoFound = 'The playlist file could not be found.';
+PlaylistManager_BibPlaylistNoFound = 'The playlist file "%s" could not be found.';
 
 PlaylistManager_DeleteFavorite = 'This will delete the playlist "%s" from your favorites. This cannot be undone.' +#13#10 + #13#10
                                 + 'Are you sure you want to delete the list?';

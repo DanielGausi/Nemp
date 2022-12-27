@@ -776,7 +776,7 @@ end;
 // also: SORT_DIGITSASNUMBERS for a better sorting of sampler series (like "Bravo Hits 1,2,3,..,10" instead of "1,10,2,3,..")
 function AnsiCompareText_Nemp(const S1, S2: string): Integer;
 begin
-  Result := CompareString(LOCALE_USER_DEFAULT, SORT_STRINGSORT or SORT_DIGITSASNUMBERS, PChar(S1),
+  Result := CompareString(LOCALE_USER_DEFAULT, SORT_STRINGSORT or LINGUISTIC_IGNORECASE or SORT_DIGITSASNUMBERS, PChar(S1),
     Length(S1), PChar(S2), Length(S2)) - CSTR_EQUAL;
 end;
 

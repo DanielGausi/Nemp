@@ -75,6 +75,7 @@ uses WinApi.Windows, System.Classes, System.SysUtils,
                 fDriveID: Integer;
                 fCategory: Cardinal;
                 fName: String;
+                fCoverID: String;
                 function GetFilename: String;
             public
                 property Path: String read fPath write fPath ;
@@ -82,6 +83,7 @@ uses WinApi.Windows, System.Classes, System.SysUtils,
                 property DriveID: Integer read fDriveID write fDriveID ;
                 property Category: Cardinal read fCategory write fCategory;
                 property Name: String read fName write fName;
+                property CoverID: String read fCoverID write fCoverID;
 
                 constructor Create(aFilename: String = '');
                 procedure LoadFromStream(aStream: TStream);
@@ -447,6 +449,7 @@ begin
               MP3DB_PL_Path    : fPath    := ReadTextFromStream(aStream);
               MP3DB_PL_DriveID : fDriveID := ReadIntegerFromStream(aStream);
               MP3DB_PL_CATEGORY: fCategory:= ReadCardinalFromStream(aStream);
+              MP3DB_PL_COVERID : fCoverID := ReadTextFromStream(aStream);
               DATA_END_ID      : ; // Explicitly do Nothing -  because of the ELSE path ;-)
         else
             begin
@@ -460,9 +463,11 @@ end;
 
 function TLibraryPlaylist.SaveToStream(aStream: TStream): LongInt;
 begin
-    result :=          WriteIntegerToStream(aStream, MP3DB_PL_DriveID, fDriveID );
-    result := result + WriteTextToStream   (aStream, MP3DB_PL_Path   , fPath    );
+    result :=          WriteIntegerToStream(aStream, MP3DB_PL_DriveID, fDriveID);
+    result := result + WriteTextToStream(aStream, MP3DB_PL_Path, fPath);
     result := result + WriteCardinalToStream(aStream, MP3DB_PL_CATEGORY, fCategory);
+    if CoverID <> '' then
+      result := result + WriteTextToStream(aStream, MP3DB_PL_COVERID, CoverID);
     result := result + WriteDataEnd(aStream);
 end;
 

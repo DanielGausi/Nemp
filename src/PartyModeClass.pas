@@ -720,6 +720,7 @@ begin
         MM_ML_Delete                   .visible := ShowGeneralMenuItems;
         N71                            .visible := ShowGeneralMenuItems;
         MM_ML_RefreshAll               .visible := ShowGeneralMenuItems;
+        MM_ML_RefreshPlaylists         .visible := ShowGeneralMenuItems;
         MM_ML_DeleteMissingFiles       .visible := ShowGeneralMenuItems;
         MM_T_CloudEditor               .visible := ShowGeneralMenuItems;
         // Playlist

@@ -3,7 +3,7 @@ object Nemp_MainForm: TNemp_MainForm
   Top = 0
   HelpContext = 10000
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 769
+  ClientHeight = 789
   ClientWidth = 1090
   Color = clBtnFace
   Constraints.MinHeight = 300
@@ -35,7 +35,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 0
     Width = 1090
-    Height = 769
+    Height = 789
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
@@ -46,9 +46,10 @@ object Nemp_MainForm: TNemp_MainForm
     OwnerDraw = False
     HierarchyLevel = 0
     SplitterMinSize = 110
+    ExplicitHeight = 769
     object _ControlPanel: TNempPanel
       Left = 0
-      Top = 669
+      Top = 689
       Width = 1090
       Height = 100
       Align = alBottom
@@ -62,6 +63,7 @@ object Nemp_MainForm: TNemp_MainForm
       Ratio = 0
       FixedHeight = True
       OwnerDraw = False
+      ExplicitTop = 669
       object ControlContainer2: TNempPanel
         Left = 481
         Top = 0
@@ -2861,6 +2863,10 @@ object Nemp_MainForm: TNemp_MainForm
         ImageIndex = 39
         ShortCut = 16500
         OnClick = MM_ML_RefreshAllClick
+      end
+      object MM_ML_RefreshPlaylists: TMenuItem
+        Caption = 'Refresh (Playlists only)'
+        OnClick = MM_ML_RefreshPlaylistsClick
       end
       object MM_ML_DeleteMissingFiles: TMenuItem
         Caption = 'Cleanup (remove &missing files)'
@@ -7027,6 +7033,10 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Properties'
       OnClick = pm_TagDetailsClick
     end
+    object pm_TagShowInExplorer: TMenuItem
+      Caption = 'Show in Windows Explorer'
+      OnClick = pm_TagShowInExplorerClick
+    end
     object N37: TMenuItem
       Caption = '-'
     end
@@ -7141,6 +7151,10 @@ object Nemp_MainForm: TNemp_MainForm
       Tag = 2
       Caption = 'Enqueue (after the current title)'
       OnClick = PM_ML_CollectionPlayEnqueueClick
+    end
+    object PM_ML_CollectionShowPlaylistInExplorer: TMenuItem
+      Caption = 'Show playlist file in Windows Explorer'
+      OnClick = PM_ML_CollectionShowPlaylistInExplorerClick
     end
     object N27: TMenuItem
       Caption = '-'

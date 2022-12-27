@@ -9,6 +9,7 @@ program nemp;
 {$R *.dres}
 
 uses
+  // FastMM4,
   madExcept,
   madLinkDisAsm,
   madListHardware,

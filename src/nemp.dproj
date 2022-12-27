@@ -110,18 +110,18 @@
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MajorVer>5</VerInfo_MajorVer>
-        <VerInfo_Build>778</VerInfo_Build>
+        <VerInfo_Build>782</VerInfo_Build>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=5.0.1.778;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=5.0.1;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=5.0.1.782;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=5.0.1;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <DCC_MapFile>3</DCC_MapFile>
         <DCC_DebugInformation>2</DCC_DebugInformation>
         <DCC_LocalDebugSymbols>true</DCC_LocalDebugSymbols>
         <Icon_MainIcon>nemp_Icon2.ico</Icon_MainIcon>
         <DCC_ExeOutput>F:\Nemp Github\Nemp\bin\</DCC_ExeOutput>
-        <DCC_Define>madExcept;$(DCC_Define)</DCC_Define>
         <DCC_DcuOutput>F:\Nemp Github\Nemp\dcu\</DCC_DcuOutput>
         <VerInfo_Release>1</VerInfo_Release>
+        <DCC_Define>madExcept;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -359,12 +359,10 @@
         <DCCReference Include="NempHelp.pas"/>
         <DCCReference Include="fConfigErrorDlg.pas">
             <Form>ConfigErrorDlg</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="AudioExportUtils.pas"/>
         <DCCReference Include="fExport.pas">
             <Form>FormExport</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <RcItem Include="ressources\csv.nxp">
             <ContainerId>ResourceItem</ContainerId>

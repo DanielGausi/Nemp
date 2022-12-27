@@ -721,6 +721,9 @@ type
     Showcoverinconrtolpanel1: TMenuItem;
     Showcoverinconrtolpanel2: TMenuItem;
     MM_H_HelpOnline: TMenuItem;
+    MM_ML_RefreshPlaylists: TMenuItem;
+    PM_ML_CollectionShowPlaylistInExplorer: TMenuItem;
+    pm_TagShowInExplorer: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1379,6 +1382,9 @@ type
     procedure PM_ML_ClearCategoryClick(Sender: TObject);
     procedure actShowControlCoverExecute(Sender: TObject);
     procedure MM_H_HelpOnlineClick(Sender: TObject);
+    procedure MM_ML_RefreshPlaylistsClick(Sender: TObject);
+    procedure PM_ML_CollectionShowPlaylistInExplorerClick(Sender: TObject);
+    procedure pm_TagShowInExplorerClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -2403,6 +2409,8 @@ begin
         ST_Playlist.Free;
         ST_Medienliste.Free;
         TagLabelList.Clear;
+
+        FreeAndNil(NempLayout);
 
         Set8087CW(Default8087CW);
     except
@@ -3967,19 +3975,31 @@ begin
   PlayEnqueue(ac, (Sender as TMenuItem).Tag);
 end;
 
+procedure TNemp_MainForm.PM_ML_CollectionShowPlaylistInExplorerClick(
+  Sender: TObject);
+var
+  ac: TAudioCollection;
+  FilePath: String;
+begin
+  ac := GetSelectedCollectionFromMainWindow;
+  if assigned(ac) and (ac.CollectionClass = ccPlaylists) then begin
+    FilePath := TAudioPlaylistCollection(ac).LibraryPlaylist.Path;
+    if FileExists(FilePath) then
+      ShellExecute(Handle, 'open' ,'explorer.exe',
+            PChar('/e,/select,"' + FilePath+'"'), '', sw_ShowNormal)
+    else
+      TranslateMessageDLG(Format(PlaylistManager_BibPlaylistNoFound, [FilePath]), mtWarning, [MBOK], 0)
+  end;
+end;
+
 procedure TNemp_MainForm.PM_ML_ConfigureMedialibraryClick(Sender: TObject);
 begin
-//  if not assigned(FormLibraryConfiguration) then
-//    Application.CreateForm(TFormLibraryConfiguration, FormLibraryConfiguration);
-//  FormLibraryConfiguration.Show;
-
-
-    if Not Assigned(OptionsCompleteForm) then
-      Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
-    OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.CategoriesNode;
-    OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.CategoriesNode] := True;
-    OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.tabCategories;
-    OptionsCompleteForm.Show;
+  if Not Assigned(OptionsCompleteForm) then
+    Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
+  OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.CategoriesNode;
+  OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.CategoriesNode] := True;
+  OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.tabCategories;
+  OptionsCompleteForm.Show;
 end;
 
 procedure TNemp_MainForm.PM_ML_FilesPlayEnqueueClick(Sender: TObject);
@@ -4041,6 +4061,7 @@ begin
     MM_ML_Delete      .Enabled := LibraryIsIdle AND LibraryNotBlockedByPartymode;
 
     MM_ML_RefreshAll         .Enabled := LibraryIsIdle AND LibraryNotBlockedByPartymode;
+    MM_ML_RefreshPlaylists   .Enabled := LibraryIsIdle AND LibraryNotBlockedByPartymode;
     MM_ML_DeleteMissingFiles .Enabled := LibraryIsIdle AND LibraryNotBlockedByPartymode;
 
     MM_T_CloudEditor         .Enabled := LibraryIsIdle AND LibraryNotBlockedByPartymode;
@@ -4186,6 +4207,8 @@ begin
         end;
     end;
     PM_ML_EnqueueBrowse.Caption := enqueueCaption;
+
+    PM_ML_CollectionShowPlaylistInExplorer.Visible := LibraryNotBlockedByPartymode and (ac.CollectionClass = ccPlaylists);
 
     isSortable := assigned(lc) and (MedienBib.BrowseMode <> 2);
     PM_ML_SortLayerBy.Visible := isSortable and (lc.CategoryType = ccFiles);
@@ -4634,20 +4657,17 @@ end;
 
 procedure TNemp_MainForm.PM_ML_ShowInExplorerClick(Sender: TObject);
 var
-    datei_ordner: UnicodeString;
-    Node: PVirtualNode;
-    af: TAudioFile;
+  Node: PVirtualNode;
+  af: TAudioFile;
 begin
-    Node:=VST.FocusedNode;
-    if not Assigned(Node) then
-        Exit;
+  Node:=VST.FocusedNode;
+  if not Assigned(Node) then
+    Exit;
 
-    af := VST.GetNodeData<TAudioFile>(Node);
-    datei_ordner := af.Ordner;
-
-    if DirectoryExists(datei_ordner) then
-        ShellExecute(Handle, 'open' ,'explorer.exe'
-                      , PChar('/e,/select,"' + af.Pfad+'"'), '', sw_ShowNormal);
+  af := VST.GetNodeData<TAudioFile>(Node);
+  if DirectoryExists(af.Ordner) then
+    ShellExecute(Handle, 'open' ,'explorer.exe',
+          PChar('/e,/select,"' + af.Pfad+'"'), '', sw_ShowNormal);
 end;
 
 
@@ -4774,6 +4794,18 @@ begin
         exit;
     end;
     MedienBib.RefreshFiles_All;
+end;
+
+procedure TNemp_MainForm.MM_ML_RefreshPlaylistsClick(Sender: TObject);
+begin
+  if NempSkin.NempPartyMode.DoBlockBibOperations then
+    exit;
+
+  if MedienBib.StatusBibUpdate <> 0 then begin
+    TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+    exit;
+  end;
+  MedienBib.RefreshPlaylists;
 end;
 
 procedure TNemp_MainForm.PM_ML_RefreshSelectedClick(Sender: TObject);
@@ -5607,6 +5639,13 @@ begin
 end;
 
 
+procedure TNemp_MainForm.pm_TagShowInExplorerClick(Sender: TObject);
+begin
+  if assigned(MedienBib.CurrentAudioFile) and DirectoryExists(MedienBib.CurrentAudioFile.Ordner) then
+  ShellExecute(Handle, 'open' ,'explorer.exe',
+      PChar('/e,/select,"' + MedienBib.CurrentAudioFile.Pfad+'"'), '', sw_ShowNormal);
+end;
+
 {
 ----------------------------------------
 Tag Management: Navigation and stuff
@@ -5708,8 +5747,8 @@ var newLabel: TLabel;
     tmpTagList: TStringlist;
     baseLeft: Integer;
 begin
-
     TagLabelList.Clear;
+
     currentTop := LblBibDirectory.Top + LblBibDirectory.Height + 12;
       // LblBibReplayGain.Top + LblBibReplayGain.Height + 12;
 

@@ -2074,14 +2074,14 @@ begin
                 BibFile := MedienBib.GetAudioFileWithFilename(NewFile);
                 if not assigned(BibFile) then begin
                   AudioFile := TAudioFile.Create;
-                  if MedienBib.UseNewFileScanMethod then
-                    AudioFile.Pfad := NewFile
-                  else begin
+                  {if MedienBib.UseNewFileScanMethod then}
+                  AudioFile.Pfad := NewFile;
+                  {else begin
                       aErr := AudioFile.GetAudioData(NewFile, GAD_Rating or MedienBib.IgnoreLyricsFlag);
                       AudioFile.Category := MedienBib.NewCategoryMask;
                       HandleError(afa_NewFile, AudioFile, aErr);
                       MedienBib.CoverArtSearcher.InitCover(AudioFile, tm_VCL, INIT_COVER_DEFAULT);
-                  end;
+                  end;}
                   MedienBib.UpdateList.Add(AudioFile);
                 end
                 else begin
@@ -2155,16 +2155,16 @@ begin
                 else
                 begin
                     // Dateisuche fertig. Starte Updatekram
-                    if MedienBib.UseNewFileScanMethod then
-                    begin
-                        // new files has to be scanned first
-                        MedienBib.ScanNewFilesAndUpdateBib;
-                    end else
+                    {if MedienBib.UseNewFileScanMethod then
+                    begin}
+                    // new files has to be scanned first
+                    MedienBib.ScanNewFilesAndUpdateBib;
+                    {end else
                     begin
                         // old method. Files are already scanned and ready to be merged into the Media Library
                         MedienBib.NewFilesUpdateBib;
                         NempTaskbarManager.ProgressState := TTaskBarProgressState.None;
-                    end;
+                    end;}
                 end;
           end;
         end;

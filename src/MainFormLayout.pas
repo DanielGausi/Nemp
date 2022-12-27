@@ -918,7 +918,7 @@ initialization
   fNempLayout := Nil;
 
 finalization
-  if assigned(fNempLayout) then
-    fNempLayout.Free;
+  //if assigned(fNempLayout) then
+  //  fNempLayout.Free;
 
 end.

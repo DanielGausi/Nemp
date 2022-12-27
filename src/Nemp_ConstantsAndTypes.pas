@@ -66,7 +66,9 @@ type
     TAudioFileStringIndex = (siArtist, siAlbum, siOrdner, siGenre, siJahr, siFileAge, siDateiname);
 
     // pa_default is used only for putting files from the playlist into the media library
-    TEProgressActions = (pa_Default, pa_SearchFiles, pa_SearchFilesForPlaylist, pa_RefreshFiles, pa_CleanUp, {pa_Searchlyrics,} pa_SearchTags, pa_UpdateMetaData, pa_DeleteFiles, pa_ScanNewFiles);
+    TEProgressActions = (pa_Default, pa_SearchFiles, pa_SearchFilesForPlaylist, pa_RefreshFiles,
+        pa_CleanUp, {pa_Searchlyrics,} pa_SearchTags, pa_UpdateMetaData, pa_DeleteFiles, pa_ScanNewFiles,
+        pa_ScanNewPlaylistFiles, pa_RefreshPlaylistFiles);
 
     TEDefaultCoverType = (dcFile, dcWebRadio, dcCDDA, dcNoCover_deprecated, dcError);
 

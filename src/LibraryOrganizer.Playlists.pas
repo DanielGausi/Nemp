@@ -53,6 +53,7 @@ type
       fFileName: String;
       fFolder: String;
       fName: String;
+      fCoverID: String;
       fCaptionMode: tePlaylistCaptionMode;
       fLibraryPlaylist: TLibraryPlaylist;
     protected
@@ -136,9 +137,9 @@ begin
   fFileName := ExtractFilename(fKey);
   fFolder :=  ExtractFileName(ExtractFileDir(fKey));
   fName := aPlaylist.Name;
+  fCoverID := aPlaylist.CoverID;
   fLibraryPlaylist := aPlaylist;
   fCount := 1;
-
   fPlaylistFiles := TAudioFileList.Create(True);
 end;
 
@@ -184,7 +185,7 @@ end;
 
 function TAudioPlaylistCollection.GetCoverID: String;
 begin
-  result := '';
+  result := fCoverID;
 end;
 
 function TAudioPlaylistCollection.GetCollection(
@@ -219,7 +220,7 @@ end;
 
 procedure TAudioPlaylistCollection.Analyse(recursiv, ForceAnalysise: Boolean);
 begin
-  // nothing to do
+  fCoverID := fLibraryPlaylist.CoverID;
 end;
 
 procedure TAudioPlaylistCollection.DoChangeCoverIDAfterDownload(newID: String);

@@ -181,6 +181,8 @@ type
     BL_Cover,
     BL_Reflexion: Single;
 
+    fFirstItemIsCollage: LongBool;
+
     // fBlendTextureHandle: GLuint;
     Settings: TCoverFlowSettings;
 
@@ -196,9 +198,14 @@ type
 
     procedure UpdateItemCount;
 
+    function GetFirstItemIsCollage: LongBool;
+    procedure SetFirstItemIsCollage(Value: LongBool);
+
+
   protected
     procedure Execute; override;
   public
+    property FirstItemIsCollage: LongBool read GetFirstItemIsCollage write SetFirstItemIsCollage;
     constructor Create (instance : TFlyingCow; window, events_window : HWND);
     procedure PauseRender;
     procedure ResumeRender;
@@ -243,7 +250,7 @@ type
     procedure EndUpdate;
     procedure Clear;
     procedure Cleartextures;
-    procedure AddItems(ItemCount: Integer);
+    procedure AddItems(ItemCount: Integer; FirstItemIsCollage: Boolean);
 
     procedure DoSomeDrawing(value: Integer);
     procedure SetPreview (index : Integer; width, height : Integer; pixels : PByteArray);
@@ -302,7 +309,7 @@ end;
 
 procedure TFlyingCow.Clear;
 begin
-  AddItems(0);
+  AddItems(0, True);
 end;
 
 procedure TFlyingCow.Cleartextures;
@@ -316,11 +323,12 @@ begin
     fThread.ResumeRender;
 end;
 
-procedure TFlyingCow.AddItems(ItemCount: Integer);
+procedure TFlyingCow.AddItems(ItemCount: Integer; FirstItemIsCollage: Boolean);
 begin
   if not fBeginUpdate then
     fThread.PauseRender;
   fCount := ItemCount;
+  fThread.FirstItemIsCollage := FirstItemIsCollage;
   fThread.fQueryUpdateItemCount := ItemCount;
   // This will start TRenderThread.UpdateItemCount through RenderThread-MainMethod
 
@@ -769,7 +777,7 @@ begin
 
   PixelData := PixelData and  $00FFFFFF;
 
-  if PixelData < $00FFFFFF then
+  if (PixelData < $00FFFFFF) and FirstItemIsCollage then
   begin
     if ((PixelData shr 23) and 1 ) = 1 then
     begin
@@ -996,7 +1004,7 @@ begin
     If (vx >= -(rc.Right-rc.Left) div 2) And (vx < (rc.Right-rc.Left)*3 div 2) Then
     begin
         // Item preview
-        if i = 0 then
+        if (i = 0) and FirstItemIsCollage then
         begin
           // the first cover art needs a texture, filled with the matching colors
           // of the displayed sub cover art on it.
@@ -1221,6 +1229,15 @@ begin
   fQueryUpdateTexturePick := -1;
 end;
 
+function TRenderThread.GetFirstItemIsCollage: LongBool;
+begin
+  InterLockedExchange(Integer(Result), Integer(fFirstItemIsCollage));
+end;
+
+procedure TRenderThread.SetFirstItemIsCollage(Value: LongBool);
+begin
+  InterLockedExchange(Integer(fFirstItemIsCollage), Integer(Value));
+end;
 
 
 // The number of items in the coverflow has been changed

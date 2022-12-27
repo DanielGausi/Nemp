@@ -235,8 +235,16 @@ begin
           SetLabelWithHint(ProgressForm_ScanNewFiles);
       end;
 
+      pa_ScanNewPlaylistFiles: begin
+          LoadImage('scanFiles.png');
+          SetLabelWithHint(ProgressForm_ScanNewPlaylistFiles);
+      end;
 
-      // ProgressForm_ScanNewFiles
+      pa_RefreshPlaylistFiles: begin
+        LoadImage('Refresh.png');
+        SetLabelWithHint(ProgressForm_RefreshFiles);
+      end;
+
 
     end;
 
