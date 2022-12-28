@@ -635,6 +635,7 @@ type
     cbAutoCheckNewCDs: TCheckBox;
     lblLocalCDDBCache: TLabel;
     btnClearCDDBCache: TButton;
+    cbApplyDefaultActionToWholeList: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1320,6 +1321,7 @@ begin
   cb_PlaylistManagerAutoSaveUserInput.Enabled := NOT cb_PlaylistManagerAutoSave.Checked;
   // Standard-Aktionen
   GrpBox_DefaultAction.ItemIndex := NempPlaylist.DefaultAction;
+  cbApplyDefaultActionToWholeList.Checked := NempPlaylist.ApplyDefaultActionToWholeList;
   GrpBox_HeadsetDefaultAction.ItemIndex := NempPlaylist.HeadSetAction;
   cb_AutoStopHeadsetSwitchTab.Checked := NempPlaylist.AutoStopHeadsetSwitchTab;
   cb_AutoStopHeadsetAddToPlayist.Checked := NempPlaylist.AutoStopHeadsetAddToPlayist;
@@ -2689,6 +2691,7 @@ procedure TOptionsCompleteForm.ApplyPlaylistSettings;
 begin
   // default actions
   NempPlaylist.DefaultAction := GrpBox_DefaultAction.ItemIndex;
+  NempPlaylist.ApplyDefaultActionToWholeList := cbApplyDefaultActionToWholeList.Checked;
   NempPlaylist.HeadSetAction := GrpBox_HeadsetDefaultAction.ItemIndex;
   NempPlaylist.AutoStopHeadsetSwitchTab := cb_AutoStopHeadsetSwitchTab.Checked;
   NempPlaylist.AutoStopHeadsetAddToPlayist := cb_AutoStopHeadsetAddToPlayist.Checked;
@@ -3933,6 +3936,7 @@ function TOptionsCompleteForm.PlaylistSettingsChanged: Boolean;
 begin
   result :=
   (NempPlaylist.DefaultAction <> GrpBox_DefaultAction.ItemIndex) or
+  (NempPlaylist.ApplyDefaultActionToWholeList <> cbApplyDefaultActionToWholeList.Checked) or
   (NempPlaylist.HeadSetAction <> GrpBox_HeadsetDefaultAction.ItemIndex) or
   (NempPlaylist.AutoStopHeadsetSwitchTab <> cb_AutoStopHeadsetSwitchTab.Checked) or
   (NempPlaylist.AutoStopHeadsetAddToPlayist <> cb_AutoStopHeadsetAddToPlayist.Checked) or

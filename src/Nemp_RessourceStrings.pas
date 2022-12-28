@@ -817,6 +817,8 @@ MediaLibrary_OutOfMemoryBuildingLyricStringError      = 'An error occurred while
     Playlist_FileNotFound         = 'The specified file can not be found. Do you want to delete it from the list?';
     Playlist_NoRecentlists        = 'empty';
 
+    Playlist_QueryTooManyFiles = 'Do you really want to add all %d titles to the playlist? Click "No" to add only the selected titles.';
+
 
 Player_FilenameWebradioTooLong = 'The filename for this stream is to long and automatic abbreviation failed.' +#13#10
                                   + 'Please change the directory for webradio downloads.';

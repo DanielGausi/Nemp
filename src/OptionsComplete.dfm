@@ -83,7 +83,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 0
       Width = 469
       Height = 632
-      ActivePage = tabMetadata
+      ActivePage = tabPlaylist
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -3620,10 +3620,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpPlaylistLog: TCategoryPanel
-            Top = 770
+            Top = 805
             Height = 120
             Caption = 'Playlist log'
             TabOrder = 3
+            ExplicitTop = 770
             object LblLogDuration: TLabel
               Left = 36
               Top = 39
@@ -3659,10 +3660,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpRandomPlayback: TCategoryPanel
-            Top = 420
+            Top = 455
             Height = 350
             Caption = 'Random playback'
             TabOrder = 2
+            ExplicitTop = 420
             object lbl_WeightedRandom: TLabel
               Left = 34
               Top = 100
@@ -4007,10 +4009,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpPlaylistBehaviour: TCategoryPanel
-            Top = 185
+            Top = 220
             Height = 235
             Caption = 'General playlist settings'
             TabOrder = 1
+            ExplicitTop = 185
             object CB_AutoScanPlaylist: TCheckBox
               Left = 16
               Top = 16
@@ -4101,7 +4104,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object cpPlaylistDefaultActions: TCategoryPanel
             Top = 0
-            Height = 185
+            Height = 220
             Caption = 'Default actions'
             TabOrder = 0
             object LblPlaylistDefaultAction: TLabel
@@ -4114,7 +4117,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object LblHeadsetDefaultAction: TLabel
               Left = 16
-              Top = 64
+              Top = 93
               Width = 405
               Height = 13
               AutoSize = False
@@ -4122,19 +4125,19 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object cb_AutoStopHeadsetAddToPlayist: TCheckBox
               Left = 16
-              Top = 128
+              Top = 159
               Width = 405
               Height = 17
               Caption = 'Stop headset when adding headset file to playlist'
-              TabOrder = 3
+              TabOrder = 4
             end
             object cb_AutoStopHeadsetSwitchTab: TCheckBox
               Left = 16
-              Top = 108
+              Top = 139
               Width = 413
               Height = 17
               Caption = 'Stop headset when switching to another tab'
-              TabOrder = 2
+              TabOrder = 3
             end
             object GrpBox_DefaultAction: TComboBox
               Left = 16
@@ -4153,19 +4156,27 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object GrpBox_HeadsetDefaultAction: TComboBox
               Left = 16
-              Top = 81
+              Top = 112
               Width = 285
               Height = 21
               Hint = 'Insert mode for files from the headset'
               Style = csDropDownList
               ItemIndex = 0
-              TabOrder = 1
+              TabOrder = 2
               Text = 'Enqueue at the end of the playlist'
               Items.Strings = (
                 'Enqueue at the end of the playlist'
                 'Play (and clear current playlist)'
                 'Enqueue after current track'
                 'Just play (don'#39't change the playlist)')
+            end
+            object cbApplyDefaultActionToWholeList: TCheckBox
+              Left = 16
+              Top = 59
+              Width = 401
+              Height = 17
+              Caption = 'Add complete list, not only the selected title'
+              TabOrder = 1
             end
           end
         end

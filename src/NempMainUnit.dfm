@@ -2207,7 +2207,7 @@ object Nemp_MainForm: TNemp_MainForm
           Font.Style = []
           Header.AutoSizeIndex = 0
           Header.Background = clWindow
-          Header.Height = 18
+          Header.Height = 16
           Header.Options = [hoAutoResize, hoDrag, hoVisible]
           Images = DummyImageList
           IncrementalSearch = isAll
@@ -5518,13 +5518,17 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Enqueue (after the current title)'
       OnClick = PM_ML_FilesPlayEnqueueClick
     end
+    object PM_ML_ApplyDefaultActionToWholeList: TMenuItem
+      Caption = 'Add all displayed titles'
+      OnClick = PM_ML_ApplyDefaultActionToWholeListClick
+    end
+    object N14: TMenuItem
+      Caption = '-'
+    end
     object PM_ML_PlayNow: TMenuItem
       Tag = 3
       Caption = 'Just play focussed file (don'#39't change the playlist)'
       OnClick = PM_ML_FilesPlayNowClick
-    end
-    object N14: TMenuItem
-      Caption = '-'
     end
     object PM_ML_PlayHeadset: TMenuItem
       Caption = 'Play in headset'

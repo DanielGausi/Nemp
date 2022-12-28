@@ -724,6 +724,7 @@ type
     MM_ML_RefreshPlaylists: TMenuItem;
     PM_ML_CollectionShowPlaylistInExplorer: TMenuItem;
     pm_TagShowInExplorer: TMenuItem;
+    PM_ML_ApplyDefaultActionToWholeList: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -753,6 +754,7 @@ type
     function GenerateSortedListFromCoverFlow(dest: TAudioFileList; CreateFileCopies: Boolean): Boolean;
     function GenerateSortedListFromTagCloud(dest: TAudioFileList; CreateFileCopies: Boolean): Boolean;
     function GenerateSortedListFromFileView(dest: TAudioFileList; CreateFileCopies: Boolean): Boolean;
+    function CopyAudioFileList(Source, Dest: TAudioFileList): Boolean;
 
     procedure PM_ML_CollectionPlayEnqueueClick(Sender: TObject);
     function GetFocussedAudioFile:TAudioFile;
@@ -1385,6 +1387,7 @@ type
     procedure MM_ML_RefreshPlaylistsClick(Sender: TObject);
     procedure PM_ML_CollectionShowPlaylistInExplorerClick(Sender: TObject);
     procedure pm_TagShowInExplorerClick(Sender: TObject);
+    procedure PM_ML_ApplyDefaultActionToWholeListClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -1494,7 +1497,7 @@ type
     MainPlayerControlsActive: Boolean;
     AlphaBlendBMP: TBitmap;
     BibRatingHelper: TRatingHelper;
-    TagLabelList: TObjectList;
+    TagLabelList: TComponentList;
 
     // reference to AB1 and AB2, needed for assigning the correct graphics
     ABRepeatStartImg, ABRepeatEndImg: TImage;
@@ -1512,8 +1515,10 @@ type
     procedure RefreshCurrentSearchDirPlayist(Sender: TObject);
     procedure RefreshCurrentSearchDirMediaLibrary(Sender: TObject);
     procedure ReInitTaskbarManager(TryAgainOnException: Boolean);
-    procedure PlayEnqueue(aCollection: TAudioCollection; EnqueueMode: Integer); overload;
-    procedure PlayEnqueue(aList: TAudioFileList; EnqueueMode: Integer); overload;
+    procedure ConfirmPlaylistClearing(InsertCount: Integer; var EnqueueMode: Integer);
+    procedure PlayEnqueue(aCollection: TAudioCollection; EnqueueMode: Integer);
+    procedure PlayEnqueueFromView(EnqueueMode: Integer);
+    procedure DirectPlayFocusedFile;
     procedure CoverFlowCategoryMenuItemClick(Sender: TObject);
     function GetFocussedCategory: TLibraryCategory;
     function GetFocussedCollection: TAudioCollection;
@@ -1903,8 +1908,7 @@ begin
     FormReadyAndActivated := false;
 
     FOwnMessageHandler := AllocateHWND( OwnMessageProc );
-    TagLabelList := TObjectList.Create(True);
-
+    TagLabelList := TComponentList.Create(True);
 
     ABRepeatStartImg := ab1;
     ABRepeatEndImg   := ab2;
@@ -3903,11 +3907,32 @@ begin
   end;
 end;
 
+function TNemp_MainForm.CopyAudioFileList(Source, Dest: TAudioFileList): Boolean;
+var
+  i: Integer;
+begin
+  result := True;
+  for i := 0 to Source.Count - 1 do
+    Source[i].AddCopyToList(Dest)
+end;
+
 {
 Für Nemp 5.0 wird eine weitere Enqueue-Aktion benötigt:
 1x für Browse-Liste (später = mit Coverflow + TagCloud, weil alles AudioCollection sein werden)
 1x für den VST unten
 }
+
+
+procedure TNemp_MainForm.ConfirmPlaylistClearing(InsertCount: Integer; var EnqueueMode: Integer);
+begin
+  if (EnqueueMode = PLAYER_PLAY_FILES) and (NempPlaylist.Count > 20) and (InsertCount < 5) then begin
+    // Ask the user, whether the current playlist should be cleared
+    if TranslateMessageDLG(Format((Playlist_QueryReallyDelete), [NempPlaylist.Count, InsertCount]), mtWarning, [mbYes, mbNo], 0) = mrYes then
+      EnqueueMode := PLAYER_PLAY_FILES
+    else
+      EnqueueMode := PLAYER_ENQUEUE_FILES;
+  end;
+end;
 
 procedure TNemp_MainForm.PlayEnqueue(aCollection: TAudioCollection; EnqueueMode: Integer);
 var
@@ -3931,15 +3956,7 @@ begin
     else
       acCount := 0;
     end;
-
-    if (EnqueueMode = PLAYER_PLAY_FILES) and (NempPlaylist.Count > 20) and (acCount < 5) then
-    begin
-      // Ask the user, whether the current playlist should be cleared
-      if TranslateMessageDLG(Format((Playlist_QueryReallyDelete), [NempPlaylist.Count, acCount]), mtWarning, [mbYes, mbNo], 0) = mrYes then
-        EnqueueMode := PLAYER_PLAY_FILES
-      else
-        EnqueueMode := PLAYER_ENQUEUE_FILES;
-    end;
+    ConfirmPlaylistClearing(acCount, EnqueueMode);
 
     case aCollection.CollectionClass of
       ccFiles,
@@ -3954,17 +3971,47 @@ begin
   end;
 end;
 
-procedure TNemp_MainForm.PlayEnqueue(aList: TAudioFileList; EnqueueMode: Integer);
+procedure TNemp_MainForm.PlayEnqueueFromView(EnqueueMode: Integer);
+var
+  FileList: TAudioFileList;
+  Proceed: Boolean;
 begin
-  if (EnqueueMode = PLAYER_PLAY_FILES) and (NempPlaylist.Count > 20) and (aList.Count < 5) then
-  begin
-    // Ask the user, whether the current playlist should be cleared
-    if TranslateMessageDLG(Format((Playlist_QueryReallyDelete), [NempPlaylist.Count, aList.Count]), mtWarning, [mbYes, mbNo], 0) = mrYes then
-      EnqueueMode := PLAYER_PLAY_FILES
-    else
-      EnqueueMode := PLAYER_ENQUEUE_FILES;
+  FileList := TAudioFileList.Create(False);
+  try
+    Proceed := True;
+    if not NempPlaylist.ApplyDefaultActionToWholeList then
+      GenerateSortedListFromFileView(FileList, True)
+    else begin
+      if MedienBib.AnzeigeListe.Count <= 10000 then
+        CopyAudioFileList(MedienBib.AnzeigeListe, FileList)
+      else begin
+        case TranslateMessageDLG(Format((Playlist_QueryTooManyFiles), [MedienBib.AnzeigeListe.Count]), mtConfirmation, [MBYes, MBNo, MBCancel], 0) of
+          mrYes: CopyAudioFileList(MedienBib.AnzeigeListe, FileList);
+          mrNo: GenerateSortedListFromFileView(FileList, True);
+        else
+          Proceed := False; // Cancel the operation, do not add files at all to the playlist
+        end;
+      end
+    end;
+
+    if Proceed then begin
+      ConfirmPlaylistClearing(FileList.Count, EnqueueMode);
+      HandleFiles(FileList, EnqueueMode);
+    end;
+  finally
+    FileList.Free;
   end;
-  HandleFiles(aList, EnqueueMode);
+end;
+
+procedure TNemp_MainForm.DirectPlayFocusedFile;
+var
+  af: TAudioFile;
+begin
+  if assigned(VST.FocusedNode) then begin
+    af := VST.GetNodeData<TAudioFile>(VST.FocusedNode);
+    if assigned(af) and FileExists(af.Pfad) then
+      NempPlaylist.PlayBibFile(af, NempPlayer.FadingInterval);
+  end;
 end;
 
 procedure TNemp_MainForm.PM_ML_CollectionPlayEnqueueClick(Sender: TObject);
@@ -4003,29 +4050,19 @@ begin
 end;
 
 procedure TNemp_MainForm.PM_ML_FilesPlayEnqueueClick(Sender: TObject);
-var
-  FileList: TAudioFileList;
 begin
-  FileList := TAudioFileList.Create(False);
-  try
-    GenerateSortedListFromFileView(FileList, True);
-    PlayEnqueue(FileList, (Sender as TMenuItem).Tag );
-  finally
-    FileList.Free;
-  end;
+  PlayEnqueueFromView((Sender as TMenuItem).Tag);
 end;
 
 procedure TNemp_MainForm.PM_ML_FilesPlayNowClick(Sender: TObject);
-var OldNode: PVirtualNode;
-    af: TAudioFile;
 begin
-    OldNode := VST.FocusedNode;
-    if assigned(OldNode) then
-        af := VST.GetNodeData<TAudioFile>(OldNode)
-    else
-        af := NIL;
-    if assigned(af) and FileExists(af.Pfad) then
-        NempPlaylist.PlayBibFile(af, NempPlayer.FadingInterval);
+  DirectPlayFocusedFile;
+end;
+
+procedure TNemp_MainForm.PM_ML_ApplyDefaultActionToWholeListClick(
+  Sender: TObject);
+begin
+  NempPlaylist.ApplyDefaultActionToWholeList := not NempPlaylist.ApplyDefaultActionToWholeList;
 end;
 
 
@@ -4380,6 +4417,8 @@ begin
     PM_ML_Enqueue .Default := NempPlaylist.DefaultAction = 0;
     PM_ML_PlayNext.Default := NempPlaylist.DefaultAction = 2;
     PM_ML_PlayNow .Default := NempPlaylist.DefaultAction = 3;
+
+    PM_ML_ApplyDefaultActionToWholeList.Checked := NempPlaylist.ApplyDefaultActionToWholeList;
 
     // Sorting
     PM_ML_SortBy.Enabled := LibraryNotCritical;
@@ -4987,13 +5026,11 @@ end;
 procedure TNemp_MainForm.VSTColumnDblClick(Sender: TBaseVirtualTree;
   Column: TColumnIndex; Shift: TShiftState);
 begin
-  // MediaListPopupTag := 3;
-
   case NempPlaylist.DefaultAction of
-      PLAYER_ENQUEUE_FILES: PM_ML_Enqueue.Click  ;
-      PLAYER_PLAY_FILES   : PM_ML_Play.Click     ;
-      PLAYER_PLAY_NEXT    : PM_ML_PlayNext.Click ;
-      PLAYER_PLAY_NOW     : PM_ML_PlayNow.Click  ;
+    PLAYER_ENQUEUE_FILES: PlayEnqueueFromView(PM_ML_Enqueue.Tag);
+    PLAYER_PLAY_FILES   : PlayEnqueueFromView(PM_ML_Play.Tag);
+    PLAYER_PLAY_NEXT    : PlayEnqueueFromView(PM_ML_PlayNext.Tag);
+    PLAYER_PLAY_NOW     : DirectPlayFocusedFile;
   end;
 end;
 
@@ -5245,13 +5282,12 @@ begin
 
   case key of
     VK_Return: begin
-        // MediaListPopupTag := 3; // Set the value to "VST"
-        case NempPlaylist.DefaultAction of
-            PLAYER_ENQUEUE_FILES: PM_ML_Enqueue.Click  ;
-            PLAYER_PLAY_FILES   : PM_ML_Play.Click     ;
-            PLAYER_PLAY_NEXT    : PM_ML_PlayNext.Click ;
-            PLAYER_PLAY_NOW     : PM_ML_PlayNow.Click  ;
-        end;
+      case NempPlaylist.DefaultAction of
+        PLAYER_ENQUEUE_FILES: PlayEnqueueFromView(PM_ML_Enqueue.Tag);
+        PLAYER_PLAY_FILES   : PlayEnqueueFromView(PM_ML_Play.Tag);
+        PLAYER_PLAY_NEXT    : PlayEnqueueFromView(PM_ML_PlayNext.Tag);
+        PLAYER_PLAY_NOW     : DirectPlayFocusedFile;
+      end;
     end;
 
     VK_F3:
@@ -5747,14 +5783,18 @@ var newLabel: TLabel;
     tmpTagList: TStringlist;
     baseLeft: Integer;
 begin
-    TagLabelList.Clear;
+    try
+      DetailID3TagPanel.DisableAlign;
+      TagLabelList.Clear;
+      DetailID3TagPanel.EnableAlign;
+    except
+      DetailID3TagPanel.EnableAlign;
+    end;
 
     currentTop := LblBibDirectory.Top + LblBibDirectory.Height + 12;
-      // LblBibReplayGain.Top + LblBibReplayGain.Height + 12;
 
     baseLeft := 8;
     currentLeft := baseleft;
-
     if assigned(aAudioFile) then
     begin
         case aAudioFile.AudioType of
@@ -5768,7 +5808,6 @@ begin
                         TagLabelList.Add(newLabel);
 
                         newLabel.Parent := DetailID3TagPanel;
-                        //newLabel.Parent := sbFileOverview;
                         newLabel.ShowAccelChar := False;
                         newLabel.AutoSize := True;
                         newLabel.Caption := tmpTagList[i];
