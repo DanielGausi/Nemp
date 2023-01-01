@@ -101,9 +101,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitLeft = 0
-    ExplicitTop = 416
-    ExplicitWidth = 712
     DesignSize = (
       706
       38)
