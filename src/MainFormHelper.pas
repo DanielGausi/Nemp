@@ -1945,7 +1945,7 @@ begin
 end;
 
 procedure LoadStarGraphics(aRatingHelper: TRatingHelper);
-var s,h,u: TBitmap;
+var s,h,u,c: TBitmap;
     baseDir: String;
 
 begin
@@ -1953,6 +1953,8 @@ begin
   s := TBitmap.Create;
   h := TBitmap.Create;
   u := TBitmap.Create;
+  c := TBitmap.Create;
+
 
 
   if Nemp_MainForm.NempSkin.isActive
@@ -1969,16 +1971,19 @@ begin
       s.Transparent := True;
       h.Transparent := True;
       u.Transparent := True;
+      c.Transparent := True;
 
       Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(s, BaseDir + 'starset')    ;
       Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(h, BaseDir + 'starhalfset');
       Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(u, BaseDir + 'starunset')  ;
+      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(c, BaseDir + 'starcount')  ;
 
-      aRatingHelper.SetStars(s,h,u);
+      aRatingHelper.SetStars(s,h,u,c);
   finally
       s.Free;
       h.Free;
       u.Free;
+      c.Free;
   end;
 end;
 

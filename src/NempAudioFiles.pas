@@ -919,6 +919,7 @@ begin
     Genre := '';
     Year := '';
     Comment := TrackData.CddbID;
+    CoverID := CoverFilenameFromCDDA(Pfad);
   end else begin
     Titel := TrackData.Title;
     Artist := TrackData.Artist;
@@ -928,6 +929,7 @@ begin
     Year := TrackData.Year;
     Genre := TrackData.Genre;
     Comment := TrackData.CddbID;
+    CoverID := CoverFilenameFromCDDA(Pfad);
   end;
 end;
 
@@ -1605,6 +1607,7 @@ begin
   end;
 
   AssignCDTrackData(TrackData);
+  CoverID := CoverFilenameFromCDDA(Filename);
 end;
 
 
@@ -2722,12 +2725,16 @@ begin
       case GetCueID(tmplist[i]) of
         CUE_ID_TRACK: begin
                         aCue := TAudioFile.Create;
+                        aCue.Assign(self);
                         aCue.AudioType := at_CUE;
-                        aCue.Pfad := Pfad;
+                        //aCue.Pfad := Pfad;
                         // set other general information, equal to the complete audiofile
-                        aCue.Album := Album;
-                        aCue.Genre := Genre;
-                        aCue.Year := Year;
+                        //aCue.Album := Album;
+                        //aCue.Genre := Genre;
+                        //aCue.Year := Year;
+                        //aCue.Bitrate := Bitrate;
+                        //aCue.SampleRateIdx := SampleRateIdx;
+                        //aCue.ChannelModeIdx := ChannelModeIdx;
                         aCue.fParent := self;
                         CueList.Add(aCue);
                       end;

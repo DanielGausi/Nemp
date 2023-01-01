@@ -194,8 +194,8 @@ type
     cbReplaceArtistBy: TComboBox;
     cbReplaceTitleBy: TComboBox;
     cbReplaceAlbumBy: TComboBox;
-    CBShowHintsInMedialist: TCheckBox;
-    CB_ShowHintsInPlaylist: TCheckBox;
+    CBShowHintsInTitlelists: TCheckBox;
+    CB_ShowAdvancedHints: TCheckBox;
     CBFullRowSelect: TCheckBox;
     Lbl_Framerate: TLabel;
     CB_visual: TCheckBox;
@@ -889,6 +889,7 @@ type
     procedure EnableMediaLibraryFileTypeControls;
     procedure EnableAutomaticRatingControls;
     procedure EnableSearchControls;
+    procedure EnableListViewControls;
 
     procedure RefreshQRCode(aURL: String);
 
@@ -1520,9 +1521,12 @@ begin
   CBSkipSortOnLargeLists.Enabled := CBAlwaysSortAnzeigeList.Checked;
   CBSkipSortOnLargeLists.Checked := MedienBib.SkipSortOnLargeLists;
   cb_limitMarkerToCurrentFiles.Checked := MedienBib.limitMarkerToCurrentFiles;
-  CBShowHintsInMedialist.Checked := MedienBib.ShowHintsInMedialist;
-  CB_ShowHintsInPlaylist.Checked := NempPlaylist.ShowHintsInPlaylist;
+  CBShowHintsInTitlelists.Checked := MedienBib.ShowHintsInMedialist;
+  CB_ShowAdvancedHints.Checked := MedienBib.ShowAdvancedHints;
+  // CB_ShowHintsInPlaylist.Checked := NempPlaylist.ShowHintsInPlaylist;
   cbFullRowSelect.Checked := NempOptions.FullRowSelect;
+
+  EnableListViewControls;
 end;
 
 procedure TOptionsCompleteForm.ShowWebRadioSettings;
@@ -2515,11 +2519,12 @@ begin
   MedienBib.AlwaysSortAnzeigeList := cbAlwaysSortAnzeigeList.Checked;
   MedienBib.SkipSortOnLargeLists := CBSkipSortOnLargeLists.Checked;
   MedienBib.limitMarkerToCurrentFiles := cb_limitMarkerToCurrentFiles.Checked;
-  MedienBib.ShowHintsInMedialist := CBShowHintsInMedialist.Checked;
-  NempPlaylist.ShowHintsInPlaylist := CB_ShowHintsInPlaylist.Checked;
+  MedienBib.ShowHintsInMedialist := CBShowHintsInTitlelists.Checked;
+  MedienBib.ShowAdvancedHints := CB_ShowAdvancedHints.Checked;
+  // NempPlaylist.ShowHintsInPlaylist := CB_ShowHintsInPlaylist.Checked;
   NempOptions.FullRowSelect := cbFullRowSelect.Checked;
   Nemp_MainForm.VST.ShowHint := MedienBib.ShowHintsInMedialist;
-  Nemp_MainForm.PlaylistVST.ShowHint := NempPlaylist.ShowHintsInPlaylist;
+  Nemp_MainForm.PlaylistVST.ShowHint := MedienBib.ShowHintsInMedialist;
   if NempOptions.FullRowSelect then
     Nemp_MainForm.VST.TreeOptions.SelectionOptions := Nemp_MainForm.VST.TreeOptions.SelectionOptions + [toFullRowSelect]
   else
@@ -2878,9 +2883,15 @@ begin
   LblEventWarning.Visible := Not FileExists(EditBirthdaySong.Text);
 end;
 
+procedure TOptionsCompleteForm.EnableListViewControls;
+begin
+  CBSkipSortOnLargeLists.Enabled := CBAlwaysSortAnzeigeList.Checked;
+  CB_ShowAdvancedHints.Enabled := CBShowHintsInTitlelists.Checked;
+end;
+
 procedure TOptionsCompleteForm.CBAlwaysSortAnzeigeListClick(Sender: TObject);
 begin
-    CBSkipSortOnLargeLists.Enabled := CBAlwaysSortAnzeigeList.Checked;
+  EnableListViewControls;
 end;
 
 procedure TOptionsCompleteForm.EnableDirectoryScanControls;
@@ -4061,11 +4072,12 @@ begin
   (MedienBib.AlwaysSortAnzeigeList <> cbAlwaysSortAnzeigeList.Checked) or
   (MedienBib.SkipSortOnLargeLists <> CBSkipSortOnLargeLists.Checked) or
   (MedienBib.limitMarkerToCurrentFiles <> cb_limitMarkerToCurrentFiles.Checked) or
-  (MedienBib.ShowHintsInMedialist <> CBShowHintsInMedialist.Checked) or
-  (NempPlaylist.ShowHintsInPlaylist <> CB_ShowHintsInPlaylist.Checked) or
+  (MedienBib.ShowHintsInMedialist <> CBShowHintsInTitlelists.Checked) or
+  (MedienBib.ShowAdvancedHints <> CB_ShowAdvancedHints.Checked) or
+  //(NempPlaylist.ShowHintsInPlaylist <> CB_ShowHintsInPlaylist.Checked) or
   (NempOptions.FullRowSelect <> cbFullRowSelect.Checked) or
   (Nemp_MainForm.VST.ShowHint <> MedienBib.ShowHintsInMedialist) or
-  (Nemp_MainForm.PlaylistVST.ShowHint <> NempPlaylist.ShowHintsInPlaylist);
+  (Nemp_MainForm.PlaylistVST.ShowHint <> MedienBib.ShowHintsInMedialist);
 end;
 function TOptionsCompleteForm.WebRadioSettingsChanged: Boolean;
 begin

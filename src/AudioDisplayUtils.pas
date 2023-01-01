@@ -54,20 +54,37 @@ resourcestring
   rsFormatHintLineTitle         = 'Title: %s';
   rsFormatHintLineAlbum         = 'Album: %s';
   rsFormatHintLineAlbumWithTrack = 'Album: %s (Track %d)';
-  rsFormatHintLineDuration      = 'Duration: %d:%.2d min';
-  rsFormatHintLineCueDuration   = 'Duration: %d:%.2d min(start at: %d:%.2d)';
-  rsFormatHintLineBitrate       = 'Bitrate: %d kbit/s';
-  rsFormatHintLineBitrateVBR    = 'Bitrate: %d kbit/s (vbr)';
-  rsFormatHintLineFileSize      = 'FileSize: %.2f MB';
-  rsFormatHintLineDirectory     = 'Directory: %s';
-  rsFormatHintLineFilename      = 'Filename: %s';
-  rsFormatHintLineCDAudioTrack  = 'Track: %d';
+
+  // These "Classic" versions are used in the old hints (before 5.1)
+  // the new ones are "shorter"
+  rsFormatHintLineDurationClassic      = 'Duration: %d:%.2d min';
+  rsFormatHintLineCueDurationClassic   = 'Duration: %d:%.2d min (start at %d:%.2d)';
+  rsFormatHintLineBitrateClassic       = 'Bitrate: %d kbit/s';
+  rsFormatHintLineBitrateVBRClassic    = 'Bitrate: %d kbit/s (vbr)';
+  rsFormatHintLineBitrateCDDAClassic   = 'Bitrate: %d kbit/s (CD-Audio)';
+  rsFormatHintLineFileSizeClassic      = 'FileSize: %.2f MB';
+  rsFormatHintLineDirectoryClassic     = 'Directory: %s';
+  rsFormatHintLineFilenameClassic      = 'Filename: %s';
+  // shorter variants
+  rsFormatHintLineDuration      = '%d:%.2d min';
+  rsFormatHintLineCueDuration   = '%d:%.2d min (start at %d:%.2d)';
+  rsFormatHintLineBitrate       = '%d kbit/s';
+  rsFormatHintLineBitrateVBR    = '%d kbit/s (vbr)';
+  rsFormatHintLineBitrateCDDA   = '%d kbit/s (CD-Audio)';
+  rsFormatHintLineFileSize      = '%.2f MB';
+  rsFormatHintLineDurationFileSize = '%d:%.2d min, %.2f MB';
+  rsFormatHintLineDirectory     = '%s';
+  rsFormatHintLineFilename      = '%s';
+  rsFormatHintLineCDAudioTrack  = 'Track %d';
 
   rsFormatHintLineRating                = 'Rating: %.1f of 5 stars';
   rsFormatHintLineRatingWithPlayCounter = 'Rating: %.1f of 5 stars, played %d times';
+  rsFormatHintLinePlayCounter = '%dx';
   rsFormatHintLineReplayGainTrack       = 'ReplayGain: %.2f dB';
   rsFormatHintLineReplayGainTrackAlbum  = 'ReplayGain: %.2f dB (Album %.2f dB)';
   rsConstHintLineReplayGainNA           = 'ReplayGain: not available';
+  rsConstHintInvalidTrack = 'Invalid track';
+  rsConstHintInvalidTrackNA = 'N/A';
 
   rsFormatHintLineWebradioStaion = 'Webradio: %s';
   rsFormatHintLineWebradioURL = 'URL: %s';
@@ -76,6 +93,7 @@ resourcestring
   rsFormatSummaryBitrate    = '%d kbit/s';
   rsFormatSummaryQuality    = '%d kbit/s, %s kHz, %s';
   rsFormatSummaryQualityVBR = '%d kbit/s (vbr), %s kHz, %s';
+  rsFormatSummaryQualityCDDA= '%d kbit/s, %s kHz, %s (CD-Audio)';
   rsFormatSummaryDuration     = '%d:%.2d min';
   rsFormatSummarySize         = '%.2f MB';
   rsFormatSummaryDurationSize = '%d:%.2d min, %.2f MB';
@@ -245,21 +263,6 @@ type
       procedure fSetPlaylistWebradioFormat(aValue: String);
       function fGetPlaylistWebradioFormat   : String;
 
-      function HintLineArtist(af: TAudioFile): String;
-      function HintLineTitle(af: TAudioFile): String;
-      function HintLineAlbum(af: TAudioFile): String;
-      function HintLineCDAudioTrack(af: TAudioFile): String;
-      function HintLineDuration(af: TAudioFile): String;
-      function HintLineCueDuration(af: TAudioFile): String;
-      function HintLineBitrate(af: TAudioFile): String;
-      function HintLineFilename(af: TAudioFile): String;
-      function HintLineDirectory(af: TAudioFile): String;
-      function HintLineFileSize(af: TAudioFile): String;
-      function HintLineRating(af: TAudioFile): String;
-      function HintLineReplayGain(af: TAudioFile): String;
-      function HintLineWebradioStation(af: TAudioFile): String;
-      function HintLineWebRadioURL(af: TAudioFile): String;
-
       // default Playlist-Title (as in previous Nemp versions)
       function GetDefaultPlaylistTitle(af: TAudioFile): String;
 
@@ -296,6 +299,28 @@ type
       function TreeSamplerate(af: TAudioFile): String;
       function TreeChannelmode(af: TAudioFile): String;
       function HintText(af: TAudioFile): String;
+      // for a better designed Hinttext: Split into 3 sections
+      function HintText1(af: TAudioFile): String; // Artist, Title, Album
+      function HintText2(af: TAudioFile): String; // Duration, Bitrate, Size, ReplayGain
+      function HintText3(af: TAudioFile): String; // Path, Filename
+
+      function HintLineArtist(af: TAudioFile): String;
+      function HintLineTitle(af: TAudioFile): String;
+      function HintLineAlbum(af: TAudioFile): String;
+      function HintLineYear(af: TAudioFile): String;
+      function HintLineCDAudioTrack(af: TAudioFile): String;
+      function HintLineDuration(af: TAudioFile; ClassicHint: Boolean = False): String;
+      function HintLineDurationSize(af: TAudioFile): String;
+      function HintLineCueDuration(af: TAudioFile; ClassicHint: Boolean = False): String;
+      function HintLineBitrate(af: TAudioFile; ClassicHint: Boolean = False): String;
+      function HintLineFilename(af: TAudioFile; ClassicHint: Boolean = False): String;
+      function HintLineDirectory(af: TAudioFile; ClassicHint: Boolean = False): String;
+      function HintLineFileSize(af: TAudioFile; ClassicHint: Boolean = False): String;
+      function HintLineRating(af: TAudioFile): String;
+      function HintLinePlayCounter(af: TAudioFile): String;
+      function HintLineReplayGain(af: TAudioFile; FallBackToEmpty: Boolean = False): String;
+      function HintLineWebradioStation(af: TAudioFile): String;
+      function HintLineWebRadioURL(af: TAudioFile): String;
 
       function SummaryArtist(af: TAudioFile): String;
       function SummaryTitle(af: TAudioFile): String;
@@ -849,42 +874,88 @@ begin
     result := Format(rsFormatHintLineAlbum, [af.Album])
 end;
 
+function TAudioDisplay.HintLineYear(af: TAudioFile): String;
+begin
+  if (Trim(af.Year) = '') or (af.Year = '0') then
+    result := ''
+  else
+    result := af.Year;
+end;
+
 function TAudioDisplay.HintLineCDAudioTrack(af: TAudioFile): String;
 begin
   result := Format(rsFormatHintLineCDAudioTrack, [af.Track]);
 end;
 
-function TAudioDisplay.HintLineBitrate(af: TAudioFile): String;
+function TAudioDisplay.HintLineBitrate(af: TAudioFile; ClassicHint: Boolean = False): String;
 begin
-  if af.vbr then
-    result := Format(rsFormatHintLineBitrateVBR, [af.Bitrate])
+  if ClassicHint then begin
+    if af.vbr then
+      result := Format(rsFormatHintLineBitrateVBRClassic, [af.Bitrate])
+    else begin
+      if af.AudioType = at_CDDA then
+        result := Format(rsFormatHintLineBitrateCDDAClassic, [af.Bitrate])
+      else
+        result := Format(rsFormatHintLineBitrateClassic, [af.Bitrate])
+    end;
+  end else begin
+    if af.vbr then
+      result := Format(rsFormatHintLineBitrateVBR, [af.Bitrate])
+    else begin
+      if af.AudioType = at_CDDA then
+        result := Format(rsFormatHintLineBitrateCDDA, [af.Bitrate])
+      else
+        result := Format(rsFormatHintLineBitrate, [af.Bitrate])
+    end;
+  end;
+end;
+
+function TAudioDisplay.HintLineDuration(af: TAudioFile; ClassicHint: Boolean = False): String;
+begin
+  if ClassicHint then
+    result := Format(rsFormatHintLineDurationClassic, [af.Duration Div 60, af.Duration mod 60])
   else
-    result := Format(rsFormatHintLineBitrate, [af.Bitrate])
+    result := Format(rsFormatHintLineDuration, [af.Duration Div 60, af.Duration mod 60]);
 end;
 
-function TAudioDisplay.HintLineDuration(af: TAudioFile): String;
+function TAudioDisplay.HintLineDurationSize(af: TAudioFile): String;
 begin
-  result := Format(rsFormatHintLineDuration, [af.Duration Div 60, af.Duration mod 60]);
+  if (af.Bitrate = 0) then
+    result := Format(rsFormatHintLineFileSize, [af.Size / 1024 / 1024])
+  else
+    result := Format(rsFormatHintLineDurationFileSize, [af.Duration Div 60, af.Duration mod 60, af.Size / 1024 / 1024])
 end;
 
-function TAudioDisplay.HintLineCueDuration(af: TAudioFile): String;
+function TAudioDisplay.HintLineCueDuration(af: TAudioFile; ClassicHint: Boolean = False): String;
 begin
-  result := Format(rsFormatHintLineCueDuration, [af.Duration Div 60, af.Duration mod 60, Round(af.Index01) Div 60, Round(af.Index01) mod 60]);
+  if ClassicHint then
+    result := Format(rsFormatHintLineCueDurationClassic, [af.Duration Div 60, af.Duration mod 60, Round(af.Index01) Div 60, Round(af.Index01) mod 60])
+  else
+    result := Format(rsFormatHintLineCueDuration, [af.Duration Div 60, af.Duration mod 60, Round(af.Index01) Div 60, Round(af.Index01) mod 60]);
 end;
 
-function TAudioDisplay.HintLineFilename(af: TAudioFile): String;
+function TAudioDisplay.HintLineFilename(af: TAudioFile; ClassicHint: Boolean = False): String;
 begin
-  result := Format(rsFormatHintLineFilename, [af.Dateiname]);
+  if ClassicHint then
+    result := Format(rsFormatHintLineFilenameClassic, [af.Dateiname])
+  else
+    result := Format(rsFormatHintLineFilename, [af.Dateiname]);
 end;
 
-function TAudioDisplay.HintLineDirectory(af: TAudioFile): String;
+function TAudioDisplay.HintLineDirectory(af: TAudioFile; ClassicHint: Boolean = False): String;
 begin
-  result := Format(rsFormatHintLineDirectory, [af.Ordner]);
+  if ClassicHint then
+    result := IncludeTrailingPathDelimiter(Format(rsFormatHintLineDirectoryClassic, [af.Ordner]))
+  else
+    result := IncludeTrailingPathDelimiter(Format(rsFormatHintLineDirectory, [af.Ordner]));
 end;
 
-function TAudioDisplay.HintLineFileSize(af: TAudioFile): String;
+function TAudioDisplay.HintLineFileSize(af: TAudioFile; ClassicHint: Boolean = False): String;
 begin
-  result := Format(rsFormatHintLineFileSize, [af.Size / 1024 / 1024]);
+  if ClassicHint then
+    result := Format(rsFormatHintLineFileSizeClassic, [af.Size / 1024 / 1024])
+  else
+    result := Format(rsFormatHintLineFileSize, [af.Size / 1024 / 1024]);
 end;
 function TAudioDisplay.HintLineRating(af: TAudioFile): String;
 begin
@@ -894,7 +965,12 @@ begin
     result := Format(rsFormatHintLineRating, [af.RoundedRating]);
 end;
 
-function TAudioDisplay.HintLineReplayGain(af: TAudioFile): String;
+function TAudioDisplay.HintLinePlayCounter(af: TAudioFile): String;
+begin
+  result := Format(rsFormatHintLinePlayCounter, [af.PlayCounter]);
+end;
+
+function TAudioDisplay.HintLineReplayGain(af: TAudioFile; FallBackToEmpty: Boolean = False): String;
 begin
   if (Not IsZero(af.TrackGain)) and (Not isZero(af.AlbumGain)) then
     result := Format(rsFormatHintLineReplayGainTrackAlbum, [af.TrackGain, af.AlbumGain])
@@ -902,7 +978,10 @@ begin
     if (Not IsZero(af.TrackGain)) then
       result := Format(rsFormatHintLineReplayGainTrack, [af.TrackGain])
     else
-      result := rsConstHintLineReplayGainNA;
+      if FallBackToEmpty then
+        result := ''
+      else
+        result := rsConstHintLineReplayGainNA;
 end;
 
 function TAudioDisplay.HintLineWebradioStation(af: TAudioFile): String;
@@ -926,11 +1005,11 @@ begin
               HintLineArtist(af)    + #13#10 +
               HintLineTitle(af)     + #13#10 +
               HintLineAlbum(af)     + #13#10 +
-              HintLineDuration(af)  + #13#10 +
-              HintLineBitrate(af)   + #13#10 +
-              HintLineFileSize(af)  + #13#10 +
-              HintLineFilename(af)  + #13#10 +
-              HintLineDirectory(af) + #13#10 +
+              HintLineDuration(af, True)  + #13#10 +
+              HintLineBitrate(af, True)   + #13#10 +
+              HintLineFileSize(af, True)  + #13#10 +
+              HintLineDirectory(af, True) + #13#10 +
+              HintLineFilename(af, True)  + #13#10 +
               HintLineRating(af)    + #13#10 +
               HintLineReplayGain(af);
         end;
@@ -945,33 +1024,103 @@ begin
             result :=
               HintLineArtist(af)   + #13#10 +
               HintLineTitle(af)    + #13#10 +
-              HintLineCueDuration(af) + #13#10 +
-              HintLineFilename(af) + #13#10 +
-              HintLineDirectory(af);
+              HintLineAlbum(af)     + #13#10 +  // added in version 5.1
+              HintLineCueDuration(af, True) + #13#10 +
+              HintLineBitrate(af, True)   + #13#10 + // 5.1
+              HintLineFilename(af, True) + #13#10 +
+              HintLineDirectory(af, True);
         end;
 
         at_CDDA: begin
             if trim(af.Artist) = '' then
                 result :=
                   HintLineCDAudioTrack(af) + #13#10 +
-                  HintLineAlbum(af)
+                  HintLineAlbum(af) + #13#10 +
+                  HintLineDuration(af, True) + #13#10 +
+                  HintLineBitrate(af, True)
             else
                 result :=
                   HintLineArtist(af) + #13#10 +
                   HintLineTitle(af)  + #13#10 +
                   HintLineAlbum(af)  + #13#10 +
-                  HintLineDuration(af);
+                  HintLineDuration(af, True) + #13#10 +
+                  HintLineBitrate(af, True);
         end;
     end;
 end;
 
+function TAudioDisplay.HintText1(af: TAudioFile): String; // Artist, Title, Album
+begin
+  case af.AudioType of
+        at_Undef: result := '';
+        at_File, at_cue: begin
+              result := HintLineArtist(af) + #13#10 +
+                        HintLineTitle(af)  + #13#10 +
+                        HintLineAlbum(af);
+              if HintLineYear(af) <> '' then
+                result := result + #13#10 + HintLineYear(af)
+        end;
+        at_CDDA: begin
+            if af.Track <= 0 then
+              result := rsConstHintInvalidTrack
+            else begin
+              // Special case for CDDA: Shorter if no Artist/Title is available (?)
+              if trim(af.Artist) = ''  then
+                result := HintLineCDAudioTrack(af) + #13#10 +
+                          HintLineAlbum(af)
+              else
+                result := HintLineArtist(af) + #13#10 +
+                          HintLineTitle(af)  + #13#10  +
+                          HintLineAlbum(af);//  + #13#10 +
+                if HintLineYear(af) <> '' then
+                  result := result + #13#10 + HintLineYear(af);
+            end;
+        end;
+        at_Stream: begin
+            result := HintLineWebradioStation(af) + #13#10 +
+                      HintLineWebRadioURL(af);
+        end;
+    end;
+end;
 
-    {
-rsConstSummaryArtistNA
-rsConstSummaryTitleNA
-rsConstSummaryAlbumNA
-rsConstSummaryYearNA
-rsConstSummaryGenreNA    }
+function TAudioDisplay.HintText2(af: TAudioFile): String; // Duration, Bitrate, Size, ReplayGain
+begin
+  case af.AudioType of
+        at_Undef, at_Stream: result := '';
+
+        at_File: begin
+          result := HintLineDurationSize(af)  + #13#10 +
+                    SummaryQuality(af);
+          if HintLineReplayGain(af, True) <> '' then
+            result := result + #13#10 + HintLineReplayGain(af, True)
+        end;
+        at_cue: begin
+            result := HintLineCueDuration(af) + #13#10 +
+                      SummaryQuality(af);
+        end;
+        at_CDDA: begin
+            if af.Track <= 0 then
+              result := rsConstHintInvalidTrackNA
+            else
+              result := HintLineDuration(af) + #13#10 +
+                      SummaryQuality(af);
+        end;
+    end;
+end;
+
+function TAudioDisplay.HintText3(af: TAudioFile): String; // Path, Filename
+begin
+  case af.AudioType of
+        at_Undef, at_Stream: result := '';
+        at_File, at_cue: begin
+            result := HintLineDirectory(af) + #13#10 +
+                      HintLineFilename(af);
+        end;
+        at_CDDA: begin
+            result := HintLineDirectory(af) + HintLineFilename(af);
+        end;
+    end;
+end;
 
 function TAudioDisplay.SummaryArtist(af: TAudioFile): String;
 begin
@@ -1074,16 +1223,21 @@ end;
 ///        It's probably some exotic format the bass.dll can process, but not widely used for actual music
 function TAudioDisplay.SummaryQuality(af: TAudioFile): String;
 begin
-  if af.Bitrate = 0 then
-    result := rsConstSummaryQualityNA
-  else
-  begin
-    if af.vbr then
-      result :=
-        Format(rsFormatSummaryQualityVBR, [af.Bitrate, Mp3db_Samplerates[af.SamplerateIDX], Mp3DB_ChannelModes[af.ChannelModeIdx] ])
+  if af.AudioType = at_CDDA then
+    result :=
+        Format(rsFormatSummaryQualityCDDA, [af.Bitrate, Mp3db_Samplerates[af.SamplerateIDX], Mp3DB_ChannelModes[af.ChannelModeIdx] ])
+  else begin
+    if af.Bitrate = 0 then
+      result := rsConstSummaryQualityNA
     else
-      result :=
-        Format(rsFormatSummaryQuality   , [af.Bitrate, Mp3db_Samplerates[af.SamplerateIDX], Mp3DB_ChannelModes[af.ChannelModeIdx] ])
+    begin
+      if af.vbr then
+        result :=
+          Format(rsFormatSummaryQualityVBR, [af.Bitrate, Mp3db_Samplerates[af.SamplerateIDX], Mp3DB_ChannelModes[af.ChannelModeIdx] ])
+      else
+        result :=
+          Format(rsFormatSummaryQuality, [af.Bitrate, Mp3db_Samplerates[af.SamplerateIDX], Mp3DB_ChannelModes[af.ChannelModeIdx] ])
+    end;
   end;
 end;
 

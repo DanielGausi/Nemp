@@ -55,6 +55,7 @@ uses windows, classes, ExtCtrls, Graphics;
         fSetStar: TBitmap;
         fHalfStar: TBitmap;
         fUnSetStar: TBitmap;
+        fCountIcon: TBitmap;
 
         BackGroundBitmap: TBitmap;
 
@@ -64,14 +65,14 @@ uses windows, classes, ExtCtrls, Graphics;
         constructor Create;
         destructor Destroy; override;
 
-        procedure SetStars(full, half, none: TBitmap);
+        procedure SetStars(full, half, none, counter: TBitmap);
 
         // MousePosToRating: Get a proper rating from X-Position
         // should be called in OnMouseMove and OnMouseDown
         function MousePosToRating(X: Integer; ImageWidth: Integer): integer;
 
         // "Translates" a Rating into Stars using the three Bitmaps
-        procedure DrawRatingInStars(aRating: Integer; aCanvas: TCanvas; ImageHeight: Integer; Left: Integer=0);
+        procedure DrawRatingInStars(aRating: Integer; aCanvas: TCanvas; ImageHeight: Integer; Left: Integer=0; Top: Integer=0);
         procedure DrawRatingInStarsOnBitmap(aRating: Integer; aBitmap: TBitmap; ImageWidth: Integer; ImageHeight: Integer);
         procedure ReDrawRatingInStarsOnBitmap(aBitmap: TBitmap);
 
@@ -136,6 +137,7 @@ begin
     fSetStar   := TBitmap.Create;
     fHalfStar  := TBitmap.Create;
     fUnSetStar := TBitmap.Create;
+    fCountIcon := TBitmap.Create;
     BackGroundBitmap := TBitmap.Create;
     fLastWidth  := 70;
     fLastHeight := 14;
@@ -146,20 +148,22 @@ begin
     fSetStar  .Free;
     fHalfStar .Free;
     fUnSetStar.Free;
+    fCountIcon.Free;
     BackGroundBitmap.Free;
     inherited;
 end;
 
 
-procedure TRatingHelper.SetStars(full, half, none: TBitmap);
+procedure TRatingHelper.SetStars(full, half, none, counter: TBitmap);
 begin
     fSetStar.Assign(full);
     fHalfStar.Assign(half);
     fUnSetStar.Assign(none);
+    fCountIcon.Assign(counter);
 end;
 
                                           // oder nur ein canvas?
-procedure TRatingHelper.DrawRatingInStars(aRating: Integer; aCanvas: TCanvas; ImageHeight: Integer; Left: Integer=0);
+procedure TRatingHelper.DrawRatingInStars(aRating: Integer; aCanvas: TCanvas; ImageHeight: Integer; Left: Integer=0; Top: Integer=0);
 var i, p: Integer;
 begin
     // note: use the same methond in Audiofile.fGetRoundedRating
@@ -167,7 +171,7 @@ begin
     // Draw SetStars
     for i := 1 to (aRating div 51) do
         aCanvas.Draw(Left + (fSetStar.Width)*(i-1) , // left
-                          (ImageHeight) Div 2 - (fSetStar.Height Div 2),
+                          Top + (ImageHeight) Div 2 - (fSetStar.Height Div 2),
                           fSetStar);
 
     p := aRating Div 51 + 1;
@@ -176,7 +180,7 @@ begin
     if ((aRating mod 51) > 25) and (p <= 5) then
     begin
         aCanvas.Draw(Left + (fSetStar.Width)*(p-1) , // left
-                          ImageHeight Div 2 - ((fSetStar.Height Div 2)),
+                          Top + ImageHeight Div 2 - ((fSetStar.Height Div 2)),
                           fSetStar);
         inc(p);
     end;
@@ -185,7 +189,7 @@ begin
     if ((aRating mod 51) <= 25) and (p <= 5) then
     begin
         aCanvas.Draw(Left + (fHalfStar.Width)*(p-1) ,
-                          ImageHeight Div 2 - (fHalfStar.Height Div 2),
+                          Top + ImageHeight Div 2 - (fHalfStar.Height Div 2),
                           fHalfStar);
         inc(p);
     end;
@@ -193,7 +197,7 @@ begin
     // Draw UnSetStar
     for i := p to 5 do
         aCanvas.Draw(Left + (fUnSetStar.Width)*(i-1) ,
-              ImageHeight Div 2 - (fUnSetStar.Height Div 2),
+              Top + ImageHeight Div 2 - (fUnSetStar.Height Div 2),
               fUnSetStar);
 end;
 

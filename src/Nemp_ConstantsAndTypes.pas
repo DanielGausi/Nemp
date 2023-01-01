@@ -102,6 +102,7 @@ type
         (Key: 'BrowseList'; Top: 50; Left: 50; Width: 760; Height: 390; Docked: False; Visible: True),
         (Key: 'Extended'; Top: 580; Left: 910; Width: 330; Height: 330; Docked: False; Visible: True)
       );
+      cWebGenericWebRadioID = 'Webradio';
 
   type
 

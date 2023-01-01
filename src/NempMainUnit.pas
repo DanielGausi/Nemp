@@ -924,7 +924,7 @@ type
     procedure DoFastSearch(aString: UnicodeString; AllowErr: Boolean = False);
     procedure DoFastIPCSearch(aString: UnicodeString);
 
-    procedure PlaylistVSTGetHint(Sender: TBaseVirtualTree;
+    procedure TitlesVSTGetHint(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex;
       var LineBreakStyle: TVTTooltipLineBreakStyle;
       var HintText: String);
@@ -1388,6 +1388,12 @@ type
     procedure PM_ML_CollectionShowPlaylistInExplorerClick(Sender: TObject);
     procedure pm_TagShowInExplorerClick(Sender: TObject);
     procedure PM_ML_ApplyDefaultActionToWholeListClick(Sender: TObject);
+    procedure TitlesVSTDrawHint(Sender: TBaseVirtualTree; HintCanvas: TCanvas;
+      Node: PVirtualNode; R: TRect; Column: TColumnIndex);
+    procedure TitlesVSTGetHintKind(Sender: TBaseVirtualTree;
+      Node: PVirtualNode; Column: TColumnIndex; var Kind: TVTHintKind);
+    procedure TitlesVSTGetHintSize(Sender: TBaseVirtualTree;
+      Node: PVirtualNode; Column: TColumnIndex; var R: TRect);
 
   private
     { Private declarations }
@@ -5989,8 +5995,8 @@ begin
   if (cddbID = '') or (String(cddbID) <> af.Comment) then begin
     DriveNo := TCDDADrive.GetDriveNumber(af.Pfad);
     if (DriveNo < 0) or (DriveNo >= CDDriveList.Count) then begin
-      // todo: Invalid Drive, probably an disconnected external CDDrive. What to do in this case?
-      // ....
+      // Invalid Drive, probably an disconnected external CDDrive. What to do in this case?
+      // (nothing for now)
     end
     else begin
       // Drive exists
@@ -6095,7 +6101,7 @@ begin
       at_CDDA: begin
           ImgBibRating.Visible := False;
           LblBibDuration  .Caption := NempDisplay.SummaryDuration(MainFile) ;
-          LblBibQuality.Caption := 'CD-Audio';
+          LblBibQuality.Caption := NempDisplay.SummaryQuality(aAudioFile); //'CD-Audio';
           LblBibPlayCounter.Caption := '';
           LblBibReplayGain.Caption := '';
       end;
@@ -10216,7 +10222,7 @@ begin
 end;
 
 
-procedure TNemp_MainForm.PlaylistVSTGetHint(Sender: TBaseVirtualTree;
+procedure TNemp_MainForm.TitlesVSTGetHint(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex;
   var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: String);
 var af: TAudioFile;
@@ -10228,6 +10234,7 @@ begin
       //LineBreakStyle := hlbForceSingleLine;
   end;
 end;
+
 
 
 procedure TNemp_MainForm.VSTAfterItemErase(Sender: TBaseVirtualTree;
@@ -13064,6 +13071,37 @@ begin
 
     SetDragHint(Sender.DragManager.DataObject, szMessage, '', Effect);
 end;
+
+procedure TNemp_MainForm.TitlesVSTGetHintKind(Sender: TBaseVirtualTree;
+  Node: PVirtualNode; Column: TColumnIndex; var Kind: TVTHintKind);
+begin
+  if MedienBib.ShowAdvancedHints then
+    Kind := vhkOwnerDraw
+  else
+    Kind := vhkText;
+end;
+
+procedure TNemp_MainForm.TitlesVSTDrawHint(Sender: TBaseVirtualTree;
+  HintCanvas: TCanvas; Node: PVirtualNode; R: TRect; Column: TColumnIndex);
+var
+  af: TAudioFile;
+begin
+  af := Sender.GetNodeData<TAudioFile>(Node);
+  if assigned(af) then
+    VSTDrawCoverHint((Sender as TVirtualStringTree), HintCanvas, af, R, BibRatingHelper);
+end;
+
+procedure TNemp_MainForm.TitlesVSTGetHintSize(Sender: TBaseVirtualTree;
+  Node: PVirtualNode; Column: TColumnIndex; var R: TRect);
+var
+  af: TAudioFile;
+begin
+  af := Sender.GetNodeData<TAudioFile>(Node);
+  if assigned(af) then
+    VSTGetCoverHintSize((Sender as TVirtualStringTree), af, R, BibRatingHelper);
+end;
+
+
 
 ///  * Other Controls, handled by our own NempDropManager
 ///    - The Player Control

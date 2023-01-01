@@ -147,6 +147,7 @@ begin
 
         CoverManager.LoadSettings;
         DummyImageList.Width := CoverManager.CoverSize;
+        CoverManagerHint.LoadSettingsHintCover;
 
         Tag := -1;
 
@@ -357,7 +358,7 @@ begin
         //    VST.TreeOptions.MiscOptions := VST.TreeOptions.MiscOptions - [toEditOnClick];
 
         VST.ShowHint := MedienBib.ShowHintsInMedialist;
-        PlaylistVST.ShowHint := NempPlaylist.ShowHintsInPlaylist;
+        PlaylistVST.ShowHint := MedienBib.ShowHintsInMedialist; //NempPlaylist.ShowHintsInPlaylist;
         ArtistsVST.DefaultNodeHeight := NempOptions.ArtistAlbenRowHeight;
         AlbenVST.DefaultNodeHeight   := NempOptions.ArtistAlbenRowHeight;
         ArtistsVST.Font.Size         := NempOptions.ArtistAlbenFontSize;

@@ -83,7 +83,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 0
       Width = 469
       Height = 632
-      ActivePage = tabPlaylist
+      ActivePage = tabViewingSettings
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -1305,6 +1305,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 461
           Height = 568
+          VertScrollBar.Position = 516
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -1315,7 +1316,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpExtendedViewingSettings: TCategoryPanel
-            Top = 905
+            Top = 389
             Height = 175
             Caption = 'Extended viewing settings'
             TabOrder = 0
@@ -1346,13 +1347,13 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Caption = 'Skip sort on large lists (> 5000)'
               TabOrder = 1
             end
-            object CB_ShowHintsInPlaylist: TCheckBox
+            object CB_ShowAdvancedHints: TCheckBox
               Left = 16
               Top = 96
               Width = 402
               Height = 17
               Hint = 'Show hints in the playlist or not.'
-              Caption = 'Show hints in playlist'
+              Caption = 'Show advanced hints'
               TabOrder = 4
             end
             object CBFullRowSelect: TCheckBox
@@ -1364,18 +1365,19 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Caption = 'Select full row in media list'
               TabOrder = 5
             end
-            object CBShowHintsInMedialist: TCheckBox
+            object CBShowHintsInTitlelists: TCheckBox
               Left = 16
               Top = 76
               Width = 402
               Height = 17
               Hint = 'Show hints in the library or not.'
-              Caption = 'Show hints in the media list'
+              Caption = 'Show hints in the playlist and the media list'
               TabOrder = 3
+              OnClick = CBAlwaysSortAnzeigeListClick
             end
           end
           object cpPlaylistFormatting: TCategoryPanel
-            Top = 715
+            Top = 199
             Height = 190
             Caption = 'Playlist formatting'
             TabOrder = 1
@@ -1532,7 +1534,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpMissingMetaData: TCategoryPanel
-            Top = 293
+            Top = -223
             Height = 422
             Caption = 'Not available metadata'
             TabOrder = 2
@@ -1671,7 +1673,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpViewCategoriesSettings: TCategoryPanel
-            Top = 200
+            Top = -316
             Height = 93
             Caption = 'Display of Albums, Directories, ...'
             TabOrder = 3
@@ -1693,7 +1695,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpVisibleColumns: TCategoryPanel
-            Top = 0
+            Top = -516
             Caption = 'Visible columns in the medialist'
             TabOrder = 4
             object clbViewMainColumns: TCheckListBox
@@ -2043,7 +2045,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 461
           Height = 568
-          VertScrollBar.Position = 182
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -2054,7 +2055,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpLibraryCoverArt: TCategoryPanel
-            Top = 313
+            Top = 495
             Height = 280
             Caption = 'Cover art'
             TabOrder = 2
@@ -2174,7 +2175,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpLibraryFileTypes: TCategoryPanel
-            Top = 78
+            Top = 260
             Height = 235
             Caption = 'File types for the media library'
             TabOrder = 1
@@ -2222,7 +2223,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpScanDirectories: TCategoryPanel
-            Top = -182
+            Top = 0
             Height = 260
             Caption = 'Directories'
             TabOrder = 0
@@ -2524,7 +2525,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object editCDNames: TLabeledEdit
               Left = 16
               Top = 123
-              Width = 52
+              Width = 35
               Height = 21
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -2747,7 +2748,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 461
           Height = 568
-          VertScrollBar.Position = 171
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -2758,7 +2758,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpMetaData: TCategoryPanel
-            Top = -171
+            Top = 0
             Height = 445
             Caption = 'Meta data (e.g. ID3-Tags)'
             TabOrder = 0
@@ -2933,7 +2933,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpCDDB: TCategoryPanel
-            Top = 274
+            Top = 445
             Height = 290
             Caption = 'CDDB settings'
             TabOrder = 1
@@ -3624,7 +3624,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 120
             Caption = 'Playlist log'
             TabOrder = 3
-            ExplicitTop = 770
             object LblLogDuration: TLabel
               Left = 36
               Top = 39
@@ -3664,7 +3663,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 350
             Caption = 'Random playback'
             TabOrder = 2
-            ExplicitTop = 420
             object lbl_WeightedRandom: TLabel
               Left = 34
               Top = 100
@@ -4013,7 +4011,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 235
             Caption = 'General playlist settings'
             TabOrder = 1
-            ExplicitTop = 185
             object CB_AutoScanPlaylist: TCheckBox
               Left = 16
               Top = 16

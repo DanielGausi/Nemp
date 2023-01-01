@@ -425,6 +425,7 @@ type
         AnzeigeListIsCurrentlySorted: Boolean;
         //AutoScanPlaylistFilesOnView: Boolean;
         ShowHintsInMedialist: Boolean;
+        ShowAdvancedHints: Boolean;
         AutoScanDirs: Boolean;
         AutoScanDirList: TStringList;  // complete list of all Directories to scan
         AutoScanToDoList: TStringList; // the "working list"
@@ -1238,6 +1239,7 @@ begin
         SkipSortOnLargeLists  := NempSettingsManager.ReadBool('MedienBib', 'SkipSortOnLargeLists', True);
         AutoScanPlaylistFilesOnView := NempSettingsManager.ReadBool('MedienBib', 'AutoScanPlaylistFilesOnView', True);
         ShowHintsInMedialist := NempSettingsManager.ReadBool('Medienbib', 'ShowHintsInMedialist', True);
+        ShowAdvancedHints := NempSettingsManager.ReadBool('Medienbib', 'ShowAdvancedHints', True);
 
         for i := SORT_MAX downto 0 do
         begin
@@ -1359,6 +1361,7 @@ begin
 
         NempSettingsManager.WriteBool('MedienBib', 'AutoScanPlaylistFilesOnView', AutoScanPlaylistFilesOnView);
         NempSettingsManager.WriteBool('Medienbib', 'ShowHintsInMedialist', ShowHintsInMedialist);
+        NempSettingsManager.WriteBool('Medienbib', 'ShowAdvancedHints', ShowAdvancedHints);
 
         for i := SORT_MAX downto 0 do
         begin

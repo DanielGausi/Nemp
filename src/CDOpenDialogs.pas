@@ -207,6 +207,7 @@ begin
     for i := 0 to TrackCount - 1 do begin
       if CDDriveList[CurrentDrive].GetTrackData(i+1, TrackData) then begin
         newAudioFile := TAudioFile.Create;
+        SetCDDADefaultInformation(newAudioFile);
         newAudioFile.Pfad := CDDriveList[CurrentDrive].Letter + ':\Track' + AddLeadingZeroes(i+1, 2) + '.cda';
         newAudioFile.AssignCDTrackData(TrackData);
         localAudioFiles.Add(newAudioFile);

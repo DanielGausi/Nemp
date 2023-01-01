@@ -46,7 +46,6 @@ object Nemp_MainForm: TNemp_MainForm
     OwnerDraw = False
     HierarchyLevel = 0
     SplitterMinSize = 110
-    ExplicitHeight = 769
     object _ControlPanel: TNempPanel
       Left = 0
       Top = 689
@@ -63,7 +62,6 @@ object Nemp_MainForm: TNemp_MainForm
       Ratio = 0
       FixedHeight = True
       OwnerDraw = False
-      ExplicitTop = 669
       object ControlContainer2: TNempPanel
         Left = 481
         Top = 0
@@ -1065,11 +1063,14 @@ object Nemp_MainForm: TNemp_MainForm
           OnDragAllowed = PlaylistVSTDragAllowed
           OnDragOver = PlaylistVSTDragOver
           OnDragDrop = PlaylistVSTDragDrop
+          OnDrawHint = TitlesVSTDrawHint
           OnEndDrag = PlaylistVSTEndDrag
           OnGetText = PlaylistVSTGetText
           OnPaintText = VSTPaintText
+          OnGetHintKind = TitlesVSTGetHintKind
+          OnGetHintSize = TitlesVSTGetHintSize
           OnGetImageIndex = PlaylistVSTGetImageIndex
-          OnGetHint = PlaylistVSTGetHint
+          OnGetHint = TitlesVSTGetHint
           OnGetUserClipboardFormats = TreesGetUserClipboardFormats
           OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
           OnKeyDown = PlaylistVSTKeyDown
@@ -1789,14 +1790,17 @@ object Nemp_MainForm: TNemp_MainForm
           OnDragAllowed = VSTDragAllowed
           OnDragOver = LibraryCollectionTreeDragOver
           OnDragDrop = LibraryCollectionTreeDragDrop
+          OnDrawHint = TitlesVSTDrawHint
           OnEditCancelled = VSTEditCancelled
           OnEdited = VSTEdited
           OnEditing = VSTEditing
           OnEndDrag = LibraryVSTEndDrag
           OnGetText = VSTGetText
           OnPaintText = VSTPaintText
+          OnGetHintKind = TitlesVSTGetHintKind
+          OnGetHintSize = TitlesVSTGetHintSize
           OnGetImageIndex = VSTGetImageIndex
-          OnGetHint = PlaylistVSTGetHint
+          OnGetHint = TitlesVSTGetHint
           OnGetUserClipboardFormats = TreesGetUserClipboardFormats
           OnHeaderClick = VSTHeaderClick
           OnHeaderDblClick = VSTHeaderDblClick

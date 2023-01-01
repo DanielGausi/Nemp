@@ -71,7 +71,7 @@ type
       fAutoMix: Boolean;                  // Mix playlist after the last title
       fJumpToNextCueOnNextClick: Boolean; // Jump only to next cue on "Next"
       fRepeatCueOnRepeatTitle: Boolean;   // repeat the current entry in cuesheet wehn "repeat title" is selected
-      fShowHintsInPlaylist: Boolean;
+      // fShowHintsInPlaylist: Boolean;
       fPlayCounter: Integer;              // used for a "better random" selection
 
       fInsertIndex: Integer;              // The Index where files are inserted during adding files (e.g. Drag&Drop)
@@ -243,8 +243,7 @@ type
       property RepeatCueOnRepeatTitle: Boolean read fRepeatCueOnRepeatTitle write fRepeatCueOnRepeatTitle;
       property RememberInterruptedPlayPosition: Boolean read fRememberInterruptedPlayPosition write fRememberInterruptedPlayPosition;
       property ShowIndexInTreeview: Boolean read fShowIndexInTreeview write fShowIndexInTreeview;
-
-      property ShowHintsInPlaylist: Boolean read fShowHintsInPlaylist write fShowHintsInPlaylist;
+      //property ShowHintsInPlaylist: Boolean read fShowHintsInPlaylist write fShowHintsInPlaylist;
 
       property PlayCounter: Integer read fPlayCounter;
 
@@ -449,7 +448,7 @@ begin
   fJumpToNextCueOnNextClick       := NempSettingsManager.ReadBool('Playlist', 'JumpToNextCueOnNextClick', True);
   fRepeatCueOnRepeatTitle         := NempSettingsManager.ReadBool('Playlist', 'RepeatCueOnRepeatTitle', True);
   fRememberInterruptedPlayPosition:= NempSettingsManager.ReadBool('Playlist', 'RememberInterruptedPlayPosition', True);
-  fShowHintsInPlaylist  := NempSettingsManager.ReadBool('Playlist', 'ShowHintsInPlaylist', True);
+  // fShowHintsInPlaylist  := NempSettingsManager.ReadBool('Playlist', 'ShowHintsInPlaylist', True);
   RandomRepeat          := NempSettingsManager.ReadInteger('Playlist', 'RandomRepeat', 25);
   TNA_PlaylistCount     := NempSettingsManager.ReadInteger('Playlist','TNA_PlaylistCount',30);
   fStartIndex         := NempSettingsManager.ReadInteger('Playlist','IndexinList',0);
@@ -515,7 +514,7 @@ begin
   NempSettingsManager.WriteBool('Playlist', 'RepeatCueOnRepeatTitle', fRepeatCueOnRepeatTitle);
   NempSettingsManager.WriteBool('Playlist', 'RememberInterruptedPlayPosition', fRememberInterruptedPlayPosition);
 
-  NempSettingsManager.WriteBool('Playlist', 'ShowHintsInPlaylist', fShowHintsInPlaylist);
+  // NempSettingsManager.WriteBool('Playlist', 'ShowHintsInPlaylist', fShowHintsInPlaylist);
   NempSettingsManager.WriteInteger('Playlist', 'RandomRepeat', RandomRepeat);
   NempSettingsManager.WriteBool('Playlist', 'BassHandlePlaylist', BassHandlePlaylist);
   NempSettingsManager.WriteString('Playlist', 'InitialDialogFolder', InitialDialogFolder);

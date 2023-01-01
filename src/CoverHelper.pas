@@ -1140,8 +1140,13 @@ begin
             aGraphic.Free;
         end;
     end
-    else
-      result := false;
+    else begin
+      if aCoverID = cWebGenericWebRadioID then begin
+        GetDefaultCover(dcWebRadio, aCoverbmp, 0);
+        result := True;
+      end else
+        result := false;
+    end;
   except
     result := false;
   end;

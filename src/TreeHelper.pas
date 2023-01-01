@@ -36,7 +36,7 @@ uses Windows, Graphics, SysUtils, VirtualTrees, Forms, Controls, NempAudioFiles,
   Contnrs, Classes, Jpeg, PNGImage, NempDragFiles, math, WinApi.ActiveX, ShlObj, ComObj,
   ShellApi,
   Id3v2Frames, dialogs, Hilfsfunktionen, LibraryOrganizer.Base, LibraryOrganizer.Files,
-  Nemp_ConstantsAndTypes, CoverHelper, MedienbibliothekClass, BibHelper,
+  Nemp_ConstantsAndTypes, CoverHelper, MedienbibliothekClass, BibHelper, RatingCtrls,
   gnuGettext, Nemp_RessourceStrings;
 
   function LengthToSize(len:integer; def:integer):integer;
@@ -67,9 +67,15 @@ uses Windows, Graphics, SysUtils, VirtualTrees, Forms, Controls, NempAudioFiles,
 
   function InitiateFocussedPlay(aTree: TVirtualStringTree): Boolean;
 
+  // Methods for TreeView-Hint with Coverart
+  function MinHintHeight(RatingHelper: TRatingHelper): Integer;
+  procedure VSTDrawCoverHint(Sender: TVirtualStringTree; HintCanvas: TCanvas; af: TAudioFile; R: TRect; RatingHelper: TRatingHelper);
+  procedure VSTGetCoverHintSize(Sender: TVirtualStringTree; af: TAudioFile; var R: TRect; RatingHelper: TRatingHelper);
+
+
 implementation
 
-uses  NempMainUnit, PlayerClass,  MainFormHelper;
+uses  NempMainUnit, PlayerClass, MainFormHelper, AudioDisplayUtils, Cover.ViewCache, VCL.Themes, VCL.GraphUtil;
 
 
 function MaxFontSize(default: Integer): Integer;
@@ -432,5 +438,199 @@ begin
       DragDrop.Execute;
     end;
 end;
+
+function MinHintHeight(RatingHelper: TRatingHelper): Integer;
+begin
+  result :=  5 + CoverManagerHint.CoverSize + 3 * CoverManagerHint.VerticalMargin;
+end;
+
+procedure VSTGetCoverHintSize(Sender: TVirtualStringTree; af: TAudioFile; var R: TRect; RatingHelper: TRatingHelper);
+var
+  Bitmap: TBitmap;
+  TM: TTextMetric;
+  tmpR: TRect;
+  fTextHeight, minHeight: Integer;
+  HintText: String;
+  DrawFormat: Cardinal;
+begin
+  Bitmap := TBitmap.Create;
+  try
+    Bitmap.Canvas.Font := Screen.HintFont;
+    Bitmap.Canvas.Font.Height := MulDiv(Bitmap.Canvas.Font.Height, Sender.ScaledPixels(96), Screen.PixelsPerInch);
+
+    GetTextMetrics(Bitmap.Canvas.Handle, TM);
+    fTextHeight := TM.tmHeight;
+    R := Rect(0, 0, Screen.Width, fTextHeight);
+    tmpR := Rect(0, 0, Screen.Width, fTextHeight);
+    DrawFormat := DT_CALCRECT or DT_TOP or DT_NOPREFIX {or DT_WORDBREAK};
+
+    HintText := NempDisplay.HintText1(af);
+    Winapi.Windows.DrawText(Bitmap.Canvas.Handle, PWideChar(HintText), Length(HintText), R, DrawFormat);
+
+    HintText := NempDisplay.HintText2(af);
+    if HintText <> '' then begin
+      Winapi.Windows.DrawText(Bitmap.Canvas.Handle, PWideChar(HintText), Length(HintText), tmpR, DrawFormat);
+      R.Height := R.Height + fTextHeight Div 2 + tmpR.Height;
+      R.Width := max(R.Width, tmpR.Width);
+    end;
+
+    R.Width := R.Width + CoverManagerHint.CoverSize + 4 * CoverManagerHint.HorizontalMargin;
+    if R.Width > 1000 then
+      R.Width := 1000;
+
+    if R.Width < 250 then
+      R.Width := 250;
+
+    // Height for Rating and PlayCounter
+    if af.AudioType in [at_File, at_Cue] then
+      R.Height := R.Height + 2 * RatingHelper.fSetStar.Height + 1 * CoverManagerHint.VerticalMargin + TM.tmHeight Div 2;
+
+    minHeight := MinHintHeight(RatingHelper);
+    if R.Height <  minHeight then
+      R.Height := minHeight;
+
+  finally
+    Bitmap.Free;
+  end;
+end;
+
+{
+  VSTDrawCoverHint: Draw the AudioFile Information on the Canvas of the generated Hint Window.
+  Several things copied from the VST code
+}
+procedure VSTDrawCoverHint(Sender: TVirtualStringTree; HintCanvas: TCanvas; af: TAudioFile; R: TRect; RatingHelper: TRatingHelper);
+var
+  HintText: String;
+  rating: Integer;
+  success, VclStyleEnabled: Boolean;
+
+  StyleServices: TCustomStyleServices;
+
+  DrawFormat: Cardinal;
+  LColor: TColor;
+  LDetails: TThemedElementDetails;
+  LGradientStart: TColor;
+  LGradientEnd: TColor;
+  LClipRect, tmpRect, txtRect: TRect;
+
+  TM: TTextMetric;
+begin
+    HintText := NempDisplay.HintText(af);
+    VclStyleEnabled := Nemp_MainForm.NempSkin.isActive and Nemp_MainForm.NempSkin.UseAdvancedSkin and NempOptions.GlobalUseAdvancedSkin;
+    with HintCanvas do begin
+        StyleServices := Vcl.Themes.StyleServices{$if CompilerVersion >= 34}(Sender){$ifend};
+        if VclStyleEnabled then begin
+
+          InflateRect(R, -1, -1); // Fixes missing border when VCL styles are used
+          LDetails := StyleServices.GetElementDetails(thHintNormal);
+          if StyleServices.GetElementColor(LDetails, ecGradientColor1, LColor) and (LColor <> clNone) then
+            LGradientStart := LColor
+          else
+            LGradientStart := clInfoBk;
+          if StyleServices.GetElementColor(LDetails, ecGradientColor2, LColor) and (LColor <> clNone) then
+            LGradientEnd := LColor
+          else
+            LGradientEnd := clInfoBk;
+          if StyleServices.GetElementColor(LDetails, ecTextColor, LColor) and (LColor <> clNone) then
+            Font.Color := LColor
+          else
+            Font.Color := Screen.HintFont.Color;
+          GradientFillCanvas(HintCanvas, LGradientStart, LGradientEnd, R, gdVertical);
+        end
+        else
+        begin
+          // Still force tooltip back and text color.
+          Font.Color := clInfoText;
+          Pen.Color := clBlack;
+          Brush.Color := clInfoBk;
+          if IsWinVistaOrAbove and StyleServices.Enabled and ((toThemeAware in Sender.TreeOptions.PaintOptions) or
+             (toUseExplorerTheme in Sender.TreeOptions.PaintOptions)) then
+          begin
+            if toUseExplorerTheme in Sender.TreeOptions.PaintOptions then // ToolTip style
+              StyleServices.DrawElement(HintCanvas.Handle, StyleServices.GetElementDetails(tttStandardNormal), R {$IF CompilerVersion >= 34}, nil, Sender.CurrentPPI{$IFEND})
+            else
+              begin // Hint style
+                LClipRect := R;
+                InflateRect(R, 4, 4);
+                StyleServices.DrawElement(Handle, StyleServices.GetElementDetails(tttStandardNormal), R, @LClipRect{$IF CompilerVersion >= 34}, Sender.CurrentPPI{$IFEND});
+                R := LClipRect;
+                StyleServices.DrawEdge(Handle, StyleServices.GetElementDetails(twWindowRoot), R, [eeRaisedOuter], [efRect]);
+              end;
+          end
+          else
+            if VclStyleEnabled then
+              StyleServices.DrawElement(Handle, StyleServices.GetElementDetails(tttStandardNormal), R {$IF CompilerVersion >= 34}, nil, Sender.CurrentPPI{$IFEND})
+            else
+              Rectangle(R);
+        end;
+        // Determine text position and don't forget the border.
+        InflateRect(R, -1, -1);
+        DrawFormat := DT_TOP or DT_NOPREFIX or DT_WORD_ELLIPSIS;
+        SetBkMode(HintCanvas.Handle, Winapi.Windows.TRANSPARENT);
+
+        GetTextMetrics(HintCanvas.Handle, TM);
+        tmpRect := R;
+        tmpRect.Top := tmpRect.Top + 1;
+        tmpRect.Left := tmpRect.Left + CoverManagerHint.CoverSize + 2*CoverManagerHint.HorizontalMargin;
+        txtRect := tmpRect;
+        tmpRect.Height := TM.tmHeight;
+        HintCanvas.Pen.Color := HintCanvas.Font.Color;
+        HintCanvas.Pen.Width := 1;
+
+        // Draw first part of the Hint information: Artist, Title, Album, Year
+        HintText := NempDisplay.HintText1(af);
+        Winapi.Windows.DrawText(HintCanvas.Handle, PWideChar(HintText), Length(HintText), txtRect, DrawFormat);
+        Winapi.Windows.DrawText(HintCanvas.Handle, PWideChar(HintText), Length(HintText), tmpRect, DT_CALCRECT or DrawFormat);
+        txtRect.Top := txtRect.Top + tmpRect.Height;
+        tmpRect.Height := TM.tmHeight;
+
+        // Draw Cover (use Parent AudioFile for CueSheets)
+        case af.AudioType of
+          at_Undef: ;
+          at_File,
+          at_CDDA: HintCanvas.Draw(5, 5, CoverManagerHint.GetCachedCover(af.CoverID, success).Graphic);
+          at_Stream: HintCanvas.Draw(5, 5, CoverManagerHint.GetCachedCover(cWebGenericWebRadioID, success).Graphic);
+          at_CUE: begin
+              if assigned(af.Parent) then
+                HintCanvas.Draw(5, 5, CoverManagerHint.GetCachedCover(af.Parent.CoverID, success).Graphic)
+              else
+                HintCanvas.Draw(5, 5, CoverManagerHint.GetCachedCover(af.CoverID, success).Graphic)
+          end;
+        end;
+
+        // Draw Rating and Playcounter, but only for Files and Cues
+        if af.AudioType in [at_File, at_Cue] then begin
+          rating := af.Rating;
+          if rating = 0 then
+            rating := 127;
+          // Rating
+          RatingHelper.DrawRatingInStars(rating, HintCanvas, RatingHelper.fSetStar.Height,
+              txtRect.Left, txtRect.Top);
+          // Play-Icon
+          HintCanvas.Draw(txtRect.Left,
+            txtRect.Top + RatingHelper.fSetStar.Height + 1 * CoverManagerHint.VerticalMargin,
+            RatingHelper.fCountIcon);
+          // actual counter
+          HintCanvas.TextOut(
+                txtRect.Left + RatingHelper.fCountIcon.Width + 2*CoverManagerHint.VerticalMargin,
+                txtRect.Top + RatingHelper.fSetStar.Height + 1 * CoverManagerHint.VerticalMargin,
+                NempDisplay.HintLinePlayCounter(af));
+          txtRect.Top := txtRect.Top + RatingHelper.fSetStar.Height + RatingHelper.fCountIcon.Height + 2*CoverManagerHint.VerticalMargin;
+        end;
+
+        // Draw horizontal line
+        HintCanvas.MoveTo(txtRect.Left, txtRect.Top  + TM.tmHeight Div 4);
+        HintCanvas.LineTo(txtRect.Left + txtRect.Width - 10, txtRect.Top + TM.tmHeight Div 4);
+        txtRect.Top := txtRect.Top + TM.tmHeight Div 2;
+
+        // Draw second part of the Hint data: Quality, Duration, Size
+        HintText := NempDisplay.HintText2(af);
+        Winapi.Windows.DrawText(HintCanvas.Handle, PWideChar(HintText), Length(HintText), txtRect, DrawFormat);
+        Winapi.Windows.DrawText(HintCanvas.Handle, PWideChar(HintText), Length(HintText), tmpRect, DT_CALCRECT or DrawFormat);
+        // txtRect.Top := txtRect.Top + tmpRect.Height + TM.tmHeight Div 2;
+        // tmpRect.Height := TM.tmHeight;
+    end;
+end;
+
 
 end.

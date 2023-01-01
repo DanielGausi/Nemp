@@ -79,12 +79,15 @@ type
       destructor Destroy; override;
 
       procedure LoadSettings;
+      procedure LoadSettingsHintCover;
       procedure SaveSettings;
 
       function GetCachedCover(aID: String; out success: Boolean): TPicture;
   end;
 
 function CoverManager: TCoverManager;
+function CoverManagerHint: TCoverManager;
+
 
 implementation
 
@@ -93,6 +96,7 @@ uses
 
 var
   fCoverManager: TCoverManager;
+  fCoverManagerHint: TCoverManager;
 
 function CoverManager: TCoverManager;
 begin
@@ -100,6 +104,14 @@ begin
     fCoverManager := TCoverManager.Create;
 
   result := fCoverManager;
+end;
+
+function CoverManagerHint: TCoverManager;
+begin
+  if not assigned(fCoverManagerHint) then
+    fCoverManagerHint := TCoverManager.Create;
+
+  result := fCoverManagerHint;
 end;
 
 { TCachedCover }
@@ -147,10 +159,13 @@ procedure TCoverManager.LoadSettings;
 begin
   fCapacity := NempSettingsManager.ReadInteger('CoverCache', 'Capacity', 150);
   CoverSize := NempSettingsManager.ReadInteger('CoverCache', 'CoverSize', 48);
-  fDefaultCover.Bitmap.Width  := CoverSize;
-  fDefaultCover.Bitmap.Height := CoverSize;
+end;
 
-  TCoverArtSearcher.GetDefaultCover(dcFile, fDefaultCover, 0);
+procedure TCoverManager.LoadSettingsHintCover;
+begin
+  fCapacity := NempSettingsManager.ReadInteger('CoverCache', 'CapacityHint', 30);
+  CoverSize := NempSettingsManager.ReadInteger('CoverCache', 'CoverSizeHint', 96);
+  //fVerticalMargin := 5;
 end;
 
 procedure TCoverManager.SaveSettings;
@@ -161,8 +176,13 @@ end;
 
 procedure TCoverManager.SetCoverSize(aValue: Integer);
 begin
-  fCoverSize := aValue;
-  fCoverOffset := fCoverSize + fHorizontalMargin;
+  if (fCoverSize <> aValue) then begin
+    fCoverSize := aValue;
+    fCoverOffset := fCoverSize + fHorizontalMargin;
+    fDefaultCover.Bitmap.Width  := CoverSize;
+    fDefaultCover.Bitmap.Height := CoverSize;
+    TCoverArtSearcher.GetDefaultCover(dcFile, fDefaultCover, 0);
+  end;
 end;
 
 procedure TCoverManager.SetHorizontalMargin(aValue: Integer);
@@ -244,10 +264,14 @@ end;
 initialization
 
   fCoverManager := Nil;
+  fCoverManagerHint := Nil;
 
 finalization
 
   if assigned(fCoverManager) then
     fCoverManager.Free;
+
+  if assigned(fCoverManagerHint) then
+    fCoverManagerhint.Free;
 
 end.

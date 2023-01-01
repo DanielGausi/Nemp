@@ -261,6 +261,7 @@ type
         SetStarBitmap: TBitmap;
         HalfStarBitmap: TBitmap;
         UnSetStarBitmap: TBitmap;
+        CountStarBitmap: TBitmap;
         ABrepeatBitmapA: TBitmap;
         ABrepeatBitmapB: TBitmap;
 
@@ -479,6 +480,7 @@ begin
   SetStarBitmap := TBitmap.Create;
   HalfStarBitmap:= TBitmap.Create;
   UnSetStarBitmap := TBitmap.Create;
+  CountStarBitmap := TBitmap.Create;
   ABrepeatBitmapA := TBitmap.Create;
   ABrepeatBitmapB := TBitmap.Create;
 
@@ -486,6 +488,7 @@ begin
   SetStarBitmap.Transparent := True;
   HalfStarBitmap.Transparent := True;
   UnSetStarBitmap.Transparent := True;
+  CountStarBitmap.Transparent := True;
   ABrepeatBitmapA.Transparent := True;
   ABrepeatBitmapB.Transparent := True;
   SetStarBitmap.Width := 14;
@@ -497,6 +500,9 @@ begin
   HalfStarBitmap.Width := 14;
   HalfStarBitmap.Height := 14;
   HalfStarBitmap.Canvas.Rectangle(0,0,14,14);
+  CountStarBitmap.Width := 14;
+  CountStarBitmap.Height := 14;
+  CountStarBitmap.Canvas.Rectangle(0,0,14,14);
   ABrepeatBitmapA.Width := 13;
   ABrepeatBitmapA.Height := 14;
   ABrepeatBitmapA.Canvas.Rectangle(0,0,14,14);
@@ -609,6 +615,7 @@ begin
   SetStarBitmap.Free;
   HalfStarBitmap.Free;
   UnSetStarBitmap.Free;
+  CountStarBitmap.Free;
   ABRepeatBitmapA.Free;
   ABRepeatBitmapB.Free;
 
@@ -2418,11 +2425,11 @@ begin
       end else
       begin
           result := False;
-          aBmp.Width := 150;
-          aBmp.Height := 150;
+          aBmp.Width := 14;
+          aBmp.Height := 14;
           aBmp.Canvas.Brush.Style := bsSolid;
           aBmp.Canvas.Brush.Color := clWhite;
-          aBmp.Canvas.FillRect(Rect(1,1,149,149));
+          aBmp.Canvas.FillRect(Rect(1,1,13,13));
       end;
   end;
 end;
@@ -2657,12 +2664,14 @@ begin
     LoadGraphicFromBaseName(SetStarBitmap, BaseDir + 'starset');
     LoadGraphicFromBaseName(UnSetStarBitmap, BaseDir + 'starunset');
     LoadGraphicFromBaseName(HalfStarBitmap, BaseDir + 'starhalfset');
+    LoadGraphicFromBaseName(CountStarBitmap, BaseDir + 'starcount');
     SetStarBitmap.Transparent := True;
     UnSetStarBitmap.Transparent := True;
     HalfStarBitmap.Transparent := True;
-    RatingGraphics.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap);
+    CountStarBitmap.Transparent := True;
+    RatingGraphics.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap, CountStarBitmap);
 
-    Nemp_MainForm.BibRatingHelper.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap);
+    Nemp_MainForm.BibRatingHelper.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap, CountStarBitmap);
     if Assigned(MedienBib.CurrentAudioFile) then
         Nemp_MainForm.BibRatingHelper.DrawRatingInStarsOnBitmap(MedienBib.CurrentAudioFile.Rating, Nemp_MainForm.ImgBibRating.Picture.Bitmap, Nemp_MainForm.ImgBibRating.Width, Nemp_MainForm.ImgBibRating.Height)
     else
@@ -2671,11 +2680,13 @@ begin
     LoadGraphicFromBaseName(SetStarBitmap, BaseDir + 'starset', True);
     LoadGraphicFromBaseName(UnSetStarBitmap, BaseDir + 'starunset', True);
     LoadGraphicFromBaseName(HalfStarBitmap, BaseDir + 'starhalfset', True);
+    LoadGraphicFromBaseName(CountStarBitmap, BaseDir + 'starcount', True);
     SetStarBitmap.Transparent := True;
     UnSetStarBitmap.Transparent := True;
     HalfStarBitmap.Transparent := True;
+    CountStarBitmap.Transparent := True;
 
-    PlayerRatingGraphics.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap);
+    PlayerRatingGraphics.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap, CountStarBitmap);
 
     //if assigned(FDetails) then
     //    FDetails.LoadStarGraphics;
