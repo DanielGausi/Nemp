@@ -514,7 +514,7 @@ type
         function DrawPreview( DestWidth : Integer; DestHeight : Integer;
                             SkinActive : Boolean = True) : HBITMAP;
 
-        procedure DrawPreviewNew( DestWidth : Integer; DestHeight : Integer;
+        procedure DrawPreviewNew(DestHeight : Integer; DestWidth : Integer;
                             destBitmap: TBitmap; SkinActive : Boolean = True);
 
         procedure SetCueSyncs;
@@ -3389,7 +3389,7 @@ begin
     }
 end;
 
-procedure TNempPlayer.DrawPreviewNew( DestWidth : Integer; DestHeight : Integer;
+procedure TNempPlayer.DrawPreviewNew(DestHeight : Integer; DestWidth : Integer;
                             destBitmap: TBitmap; SkinActive : Boolean = True);
 var
   h,pw  : Integer;
@@ -3397,8 +3397,8 @@ var
   r: TRect;
 begin
 
-        destBitmap.Width := 200; // DestWidth; // 200;
-        destBitmap.Height := 100; // DestHeight; // 100;
+        destBitmap.Width := DestWidth; // 200;
+        destBitmap.Height := DestHeight; // 100;
 
         destBitmap.PixelFormat := pf32bit;
 
