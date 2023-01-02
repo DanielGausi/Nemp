@@ -1,6 +1,6 @@
 ﻿
    Nemp - Noch ein Mp3-Player
-   Copyright (c), 2005-2022, Daniel Gaussmann
+   Copyright (c), 2005-2023, Daniel Gaussmann
    www.gausi.de
 
  Dieses Programm ist freie Software. Sie können es unter den Bedingungen 
