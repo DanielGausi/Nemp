@@ -109,3 +109,26 @@ ShowBibSelection=0
 ShowMedialist=0
 ShowFileOverview=1
 
+[ControlsTop]
+en=Controls at top
+de=Steuerung oben
+A=vxC
+ARatio=50,50
+C=haEF
+CRatio=24,75,49
+E=vGm
+ERatio=50,50
+F=vpd
+FRatio=58,40
+G=hbc
+GRatio=50,50
+FileOverviewCoverRatio=43
+TreeViewRatio=25
+TreeviewOrientation=1
+FileOVerviewOrientation=0
+FileOverviewMode=0
+ShowControlCover=1
+ShowBibSelection=1
+ShowMedialist=1
+ShowFileOverview=1
+

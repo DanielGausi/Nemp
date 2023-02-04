@@ -1,9 +1,10 @@
-<div class="library">
+<div class="library {{ClassLibrary}}">
 {{Menu}}
-{{BrowseMenu}}
+{{MenuLibrary}}
 {{NoFilesHint}}
 <div>
-{{SearchResultItems}}
+{{Summary}}
+{{LibraryItems}}
 </div>
 {{Pagination}}
 </div>

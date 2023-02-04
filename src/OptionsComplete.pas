@@ -636,6 +636,7 @@ type
     lblLocalCDDBCache: TLabel;
     btnClearCDDBCache: TButton;
     cbApplyDefaultActionToWholeList: TCheckBox;
+    cbPermitHtmlAudio: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1366,6 +1367,7 @@ begin
   EdtPasswordAdmin.Text := NempWebServer.PasswordA;
   seWebServer_Port.Value := NempWebServer.Port;
   cbPermitLibraryAccess.Checked    := NempWebServer.AllowLibraryAccess;
+  cbPermitHtmlAudio.Checked        := NempWebServer.AllowHtmlAudio;
   cbPermitPlaylistDownload.Checked := NempWebServer.AllowFileDownload;
   cbAllowRemoteControl.Checked     := NempWebServer.AllowRemoteControl;
   cbPermitVote.Checked             := NempWebServer.AllowVotes;
@@ -2686,6 +2688,7 @@ begin
   NempWebServer.Port := seWebServer_Port.Value;
   NempWebServer.AllowLibraryAccess    := cbPermitLibraryAccess.Checked;
   NempWebServer.AllowFileDownload     := cbPermitPlaylistDownload.Checked;
+  NempWebServer.AllowHtmlAudio        := cbPermitHtmlAudio.Checked;
   NempWebServer.AllowRemoteControl    := cbAllowRemoteControl.Checked;
   MedienBib.AutoActivateWebServer     := CBAutoStartWebServer.Checked;
   NempWebServer.AllowVotes            := cbPermitVote.Checked;
@@ -3507,6 +3510,7 @@ begin
         // NempWebServer.OnlyLAN := cbOnlyLAN.Checked;
         NempWebServer.AllowLibraryAccess := cbPermitLibraryAccess.Checked;
         NempWebServer.AllowFileDownload := cbPermitPlaylistDownload.Checked;
+        NempWebServer.AllowHtmlAudio := cbPermitHtmlAudio.Checked;
         NempWebServer.AllowRemoteControl := cbAllowRemoteControl.Checked;
         NempWebServer.AllowVotes := cbPermitVote.Checked;
         // 2.) Medialib kopieren
@@ -3986,6 +3990,7 @@ begin
   (NempWebServer.Port <> seWebServer_Port.Value) or
   (NempWebServer.AllowLibraryAccess    <> cbPermitLibraryAccess.Checked) or
   (NempWebServer.AllowFileDownload     <> cbPermitPlaylistDownload.Checked) or
+  (NempWebServer.AllowHtmlAudio        <> cbPermitHtmlAudio.Checked) or
   (NempWebServer.AllowRemoteControl    <> cbAllowRemoteControl.Checked) or
   (MedienBib.AutoActivateWebServer     <> CBAutoStartWebServer.Checked) or
   (NempWebServer.AllowVotes            <> cbPermitVote.Checked);

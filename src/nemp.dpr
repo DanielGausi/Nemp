@@ -9,7 +9,6 @@ program nemp;
 {$R *.dres}
 
 uses
-  // FastMM4,
   madExcept,
   madLinkDisAsm,
   madListHardware,
@@ -144,7 +143,8 @@ uses
   NempHelp in 'NempHelp.pas',
   fConfigErrorDlg in 'fConfigErrorDlg.pas' {ConfigErrorDlg},
   AudioExportUtils in 'AudioExportUtils.pas',
-  fExport in 'fExport.pas' {FormExport};
+  fExport in 'fExport.pas' {FormExport},
+  UpdateCleaning in 'UpdateCleaning.pas';
 
 {$R *.res}
 

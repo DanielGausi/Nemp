@@ -1,1 +1,0 @@
-<a class="button btnprev" href="playercontrol?action=previous" title="Play the previous title in the playlist"><img src="images/skip-backward.png" width="32" height="32" alt="backward"></a>

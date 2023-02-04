@@ -1,3 +1,6 @@
+<script>
+	setInterval(reloadplaylist, 1500000);
+</script>
 <div class="playlist">
 {{Menu}}
 <div id="playlist">

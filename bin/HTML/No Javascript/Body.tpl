@@ -1,11 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
+<!DOCTYPE html>
+<html lang="en">
 <head>
+	<meta charset="utf-8">
 	<title>Nemp Webserver</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=8" />
-	<meta name="viewport" content="width=320" />
-	<link href="main.css" rel="stylesheet" type="text/css" />	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">		
+	<link href="nempCommon.css" rel="stylesheet" type="text/css">	
 </head>
 <body>
 {{Content}}

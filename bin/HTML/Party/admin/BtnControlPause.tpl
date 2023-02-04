@@ -1,1 +1,0 @@
-<a class="button btnplaypause" onclick="playercontrol_playpause()" title="Pause"><img src="images/pause.png" width="32" height="32" alt="pause"></a>

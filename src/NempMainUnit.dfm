@@ -1036,6 +1036,7 @@ object Nemp_MainForm: TNemp_MainForm
           Font.Style = []
           Header.AutoSizeIndex = 1
           Header.Background = clWindow
+          Header.Height = 17
           Header.MainColumn = 1
           Header.Options = [hoAutoResize, hoDrag, hoVisible]
           Header.PopupMenu = PlaylistVST_HeaderPopup

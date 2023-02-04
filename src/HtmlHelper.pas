@@ -132,6 +132,7 @@ begin
     result := StringReplace(result, '<', '&lt;', [rfReplaceAll]);
     result := StringReplace(result, '>', '&gt;', [rfReplaceAll]);
     result := StringReplace(result, '"', '&quot;', [rfReplaceAll]);
+    result := StringReplace(result, '§', '&sect;', [rfReplaceAll]);
 end;
 
 

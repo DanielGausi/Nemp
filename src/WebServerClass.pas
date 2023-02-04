@@ -52,30 +52,28 @@ unit WebServerClass;
 
 interface
 
-uses Windows, Classes, Messages, ContNrs, SysUtils,  dialogs,
+uses Windows, Classes, Messages, ContNrs, SysUtils, System.IOUtils, dialogs,
   IniFiles,  StrUtils, IdBaseComponent, IdComponent, IdCustomTCPServer,
+  System.Generics.Defaults,
   IdCustomHTTPServer, IdHTTPServer, IdContext,
   NempAudioFiles, Hilfsfunktionen, HtmlHelper,
   Playlistclass, PlayerClass, Nemp_ConstantsAndTypes,
   MedienbibliothekClass, BibSearchClass, Votings,
-  AudioDisplayUtils;
+  AudioDisplayUtils, LibraryOrganizer.Base, LibraryOrganizer.Files;
 
 const
     // Messages für WebServer:
     WM_WebServer = WM_USER + 800;
-
     WS_QueryPlayer = 10;
     WS_QueryPlayerAdmin = 110;
     WS_QueryPlayerJS = 11;
     WS_QueryPlayerJSAdmin = 111;
     WS_QueryPlaylist = 1;
     WS_QueryPlaylistAdmin = 101;
-
     WS_QueryPlaylistDetail = 2;
     WS_QueryPlaylistDetailAdmin = 102;
 
     WS_PlaylistPlayID = 3;
-
     WS_InsertNext = 4;
     WS_AddToPlaylist = 5;
 
@@ -83,12 +81,9 @@ const
     WS_PlaylistMoveUpCheck = 17;
     WS_PlaylistMoveDown = 8;
     WS_PlaylistMoveDownCheck  = 18;
-
     WS_QueryPlaylistItem = 20;
     WS_QueryPlaylistItemAdmin = 120;
-
     WS_PlaylistDelete = 9;
-
     //    WM_QueryPlaylistDownload = 5553;
     WS_PlaylistDownloadID = 6;
 
@@ -100,23 +95,18 @@ const
     WS_VoteFilename = 26;  // Vote for a given Filename (more complicated!!)
     WS_AddAndVoteThisFile = 27;
 
-
     WS_IPC_GETPROGRESS = 401;  // for webserver. Values between 0 and 100
     WS_IPC_SETPROGRESS = 402; // for webserver. Values between 0 and 100
-
     WS_IPC_GETVOLUME = 403;  // for webserver. Values between 0 and 100
     WS_IPC_SETVOLUME = 404;  // for webserver. Values between 0 and 100
-
     WS_IPC_INCVOLUME = 405;  // for webserver. Increase Volume
     WS_IPC_DECVOLUME = 406;  // for webserver. Decrease Volume
-
-
-
 
 
 type
   TWebServerSettings = record
     AllowFileDownload,  //   := True;
+    AllowHtmlAudio,
     AllowLibraryAccess, //= True;
     AllowVotes,         // := True;
     AllowRemoteControl: Boolean;//  := True;
@@ -132,6 +122,7 @@ const
   cDefaultServerSettings: TWebServerSettings =
   (
     AllowFileDownload : True;
+    AllowHtmlAudio    : True;
     AllowLibraryAccess: True;
     AllowVotes        : True;
     AllowRemoteControl: True;
@@ -149,27 +140,42 @@ type
                   qrDownloadDenied, qrLibraryAccessDenied,
                   qrFileNotFound, qrInvalidParameter, qrError);
 
-  type TCountedString = class
-      private
-          fValue: String;
-          fSecondValue: String; // used for "artist" at counted strings of type "ALBUM"
-          fCount: Integer;
-          fCoverID: String;
-          fFontSize: Integer;
-      public
-          property Value: String read fValue;
-          property SecondValue: String read fSecondValue;
-          property Count: Integer read fCount;
-          property CoverID: String read fCoverID;
-          property FontSize: Integer read fFontSize;
-          constructor Create(aValue: String; c: Integer; aCoverID: String);
-          procedure Assign(aCS: tCountedString);
-          procedure getSecondValue(SourceList: TStringList);
-  end;
-
   TDoubleString = Array[Boolean] of String;
 
+  teTemplates = (
+    tplBody, tplPageError, tplPageLibrary, tplPageLibraryDetails, tplPagePlaylist, tplPagePlaylistDetails, tplPagePlayer,
+    tplMenuMain, tplMenuLibrary,
+    tplSummaryAlbum, tplSummaryArtist, tplSummaryGenre, tplSummarySearch,
+    tplItemBrowseAlbum, tplItemBrowseArtist, tplItemBrowseGenre, tplItemFileLibrary, tplItemFileLibraryDetails,
+    tplItemFilePlaylist, tplItemFilePlaylistDetails, tplItemPlayer, tplWarningNoFiles,
+    tplPagination, //tplPaginationMainArtists, tplPaginationOtherArtists, tplPaginationNext, tplPaginationPrev,
+    // tplPlayerControls,
+    // tplBtnControlPlay, tplBtnControlPause, tplBtnControlStop, tplBtnControlNext, tplBtnControlPrev,
 
+    tplBtnFilePlaynow, tplBtnFileAdd, tplBtnFileAddNext, tplBtnFileDelete,
+    tplBtnFileMoveDown, tplBtnFileMoveUp, tplBtnFileVote, tplBtnFileDownload,
+    tplHtmlFileAudio
+  );
+
+const
+  cTemplateFilenames: Array[teTemplates] of String = (
+    'Body.tpl', 'PageError.tpl', 'PageLibrary.tpl', 'PageLibraryDetails.tpl', 'PagePlaylist.tpl', 'PagePlaylistDetails.tpl', 'PagePlayer.tpl',
+    'MenuMain.tpl', 'MenuLibrary.tpl',
+    'SummaryAlbum.tpl', 'SummaryArtist.tpl', 'SummaryGenre.tpl', 'SummarySearch.tpl',
+    'ItemBrowseAlbum.tpl', 'ItemBrowseArtist.tpl', 'ItemBrowseGenre.tpl', 'ItemFileLibrary.tpl', 'ItemFileLibraryDetails.tpl',
+    'ItemFilePlaylist.tpl', 'ItemFilePlaylistDetails.tpl', 'ItemFilePlayer.tpl', 'WarningNoFiles.tpl',
+    'Pagination.tpl', // 'PaginationMainArtists.tpl', 'PaginationOtherArtists.tpl', 'PaginationNextPage.tpl', 'PaginationPrevPage.tpl',
+    // 'PlayerControls.tpl',
+    // 'BtnControlPlay.tpl', 'BtnControlPause.tpl', 'BtnControlStop.tpl', 'BtnControlNext.tpl', 'BtnControlPrev.tpl',
+    'BtnFilePlayNow.tpl', 'BtnFileAdd.tpl', 'BtnFileAddNext.tpl', 'BtnFileDelete.tpl',
+    'BtnFileMoveDown.tpl', 'BtnFileMoveUp.tpl', 'BtnFileVote.tpl', 'BtnFileDownload.tpl',
+    'HtmlFileAudio.tpl'
+  );
+  // cCharOther: Char  = '§';
+  // cCharOtherESC: String = '&sect;';
+  cOtherLetters: String = 'other';
+
+type
   TNempWebServer = class
       private
           fMainHandle: DWord;
@@ -184,19 +190,16 @@ type
           fHTML_PlaylistView: Utf8String;
           fHTML_PlaylistDetails: UTf8String;
           fQueriedPlaylistFilename: UnicodeString;
-
           fHTML_MedienbibSearchForPlay: UTf8String;
 
           fUsernameU: String;
           fPasswordU: String;
-
           fUsernameA: String;
           fPasswordA: String;
-
           fTheme : String;
 
-          // fOnlyLAN               : Longbool;
           fAllowPlaylistDownload : Longbool;
+          fAllowHtmlAudio        : Longbool;
           fAllowLibraryAccess    : Longbool;
           fAllowRemoteControl    : Longbool;
           fAllowVotes            : LongBool;
@@ -208,65 +211,29 @@ type
           IdHTTPServer1: TIdHTTPServer;
           fLocalFormatSettings: TFormatSettings;
           fLocalDir: UnicodeString;
+          fCommonDir: UnicodeString;
+          fDefaultCoverFilename: UnicodeString;
           fLastErrorString: String;
 
-          PatternBody: TDoubleString;
-          // Buttons for Player Control
-          PatternPlayerControls: TDoubleString;
-          PatternButtonNext : TDoubleString;
-          // PatternButtonPlayPause : String;
-          PatternButtonPause : TDoubleString;
-          PatternButtonPlay : TDoubleString;
-          PatternButtonPrev : TDoubleString;
-          PatternButtonStop : TDoubleString;
-          // Buttons for Files
-          PatternButtonFileDownload : TDoubleString;
-          PatternButtonFileMoveUp   : TDoubleString;
-          PatternButtonFileMoveDown : TDoubleString;
-          PatternButtonFileDelete   : TDoubleString;
-          PatternButtonFilePlayNow  : TDoubleString;
-          PatternButtonFileAdd      : TDoubleString;
-          PatternButtonFileAddnext  : TDoubleString;
-          PatternButtonFileVote     : TDoubleString;
-
-          PatternMenu : TDoubleString;
-          PatternBrowseMenu : TDoubleString;
-          PatternPagination : TDoubleString;
-          PatternPaginationNext : TDoubleString;
-          PatternPaginationPrev : TDoubleString;
-          PatternPaginationOther: TDoubleString;
-          PatternPaginationMain: TDoubleString;
-
-
-          PatternPlayerPage: TDoubleString;
-          PatternItemPlayer: TDoubleString;   // the item on the PLAYER page
-
-          PatternPlaylistPage: TDoubleString;
-          PatternItemPlaylist: TDoubleString;  // one item on the PLAYLIST page
-
-          PatternPlaylistDetailsPage : TDoubleString;
-          PatternItemPlaylistDetails : TDoubleString; // the item on the Detail-Page
-
-          PatternSearchPage: TDoubleString;
-          //PatternSearchResultPage: TDoubleString;
-          PatternItemSearchlist: TDoubleString;  // one item on the SEARCHLIST page
-
-          PatternSearchDetailsPage : TDoubleString;
-          PatternItemBrowseArtist  : TDoubleString;
-          PatternItemBrowseAlbum   : TDoubleString;
-          PatternItemBrowseGenre   : TDoubleString;
-
-          PatternItemSearchDetails : TDoubleString; // the item on the Search-Detail-Page
-
-          PatternNoFilesHint: TDoubleString;
-          PatternErrorPage: TDoubleString;
+          // List of Templates
+          Templates: Array[teTemplates] of TDoubleString;
 
           // Lists for Browsing in the Library
-          MainArtists  : Array [0..26] of TObjectList;
-          OtherArtists : Array [0..27] of TObjectList;
-          Albums       : Array [0..27] of TObjectList;
-          Genres       : TObjectList;
+          fCollectionAlbums : TRootCollection;
+          fCollectionArtists: TRootCollection;
+          fCollectionGenres : TRootCollection;
+          // for the Subnavigation (letters)
+          // Count of the collections starting with each letter.
+          // If a value is zero, it will be left out in the navigation menu
+          fMainArtistCount,
+          fOtherArtistCount,
+          fAlbumCount, fAlbumCountByArtist: Array[0..27] of Integer;
 
+          // maximum number of files in one of the collections starting with each letter.
+          // Used to calculate a proper font size for each cllection in the list of artist and genre
+          fMaxCountMainArtist,
+          fMaxCountOtherArtist: Array[0..27] of Integer;
+          fMaxCountGenre: Integer;
 
           function fGetUsernameU: String;
           procedure fSetUsernameU(Value: String);
@@ -286,15 +253,17 @@ type
           procedure fSetAllowLibraryAccess   (Value: Longbool);
           procedure fSetAllowRemoteControl   (Value: Longbool);
           procedure fSetAllowVotes           (Value: Longbool);
+          procedure fSetAllowHtmlAudio       (Value: Longbool);
 
           //function fGetOnlyLAN              : Longbool;
           function fGetAllowPlaylistDownload: Longbool;
           function fGetAllowLibraryAccess   : Longbool;
           function fGetAllowRemoteControl   : Longbool;
           function fGetAllowVotes           : Longbool;
+          function fGetAllowHtmlAudio       : Longbool;
 
           function MainMenu(aPage: Integer; IsAdmin: Boolean): String;
-          function BrowseSubMenu(aMode: String; aLetter: Char; aValue: String; IsAdmin: Boolean): String;
+          function BrowseSubMenu(aMode, startLetter: String; aValue: String; SortAlbumsByArtist, IsAdmin: Boolean): String;
 
           function fGetCount: Integer;
 
@@ -303,7 +272,7 @@ type
           // replace InsertTags for Buttons
           function fSetFileButtons(af: TAudioFile; aPattern: String; aPage: Integer; isAdmin: Boolean; IsPlayingFile: Boolean = False): String;
 
-          function fSetControlButtons(aPattern: String; isPlaying, isAdmin: Boolean): String;
+          // function fSetControlButtons(aPattern: String; isPlaying, isAdmin: Boolean): String;
 
           // The following methods have been methods of a WebServerForm-Class
           // ---->
@@ -327,7 +296,7 @@ type
 
           function ResponseJSPlaylistControl(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 
-          function ResponseFileDownload (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
+          function ResponseFileDownload (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean; HtmlAudio: Boolean): TQueryResult;
 
           function ResponseSearchInLibrary (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
           function ResponseBrowseInLibrary (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
@@ -343,16 +312,16 @@ type
           procedure LoadTemplates(isAdmin: Boolean);
           procedure TemplateFallback;
 
-          procedure SetFontSizes(aList: TObjectList);
-          procedure ClearHelperLists;
-          procedure PrepareArtists;
-          procedure MergeArtistsIfNecessary;
+          procedure InitRootCollections;
 
-          procedure PrepareAlbums;
-          procedure PrepareGenres;
+          function NavigationIndex(s: String): Integer;
+          procedure PrepareCollections;
 
           function LoadSettingsDeprecated: Boolean;
           procedure LoadDefaultSettings;
+
+          function FilePagination(Start, maxCount: Integer; LinkPrev, LinkNext: String; isAdmin: Boolean): String;
+          function ArtistNavigation(startLetter, LinkMain, LinkOther: String; isAdmin: Boolean): String;
 
       public
           SavePath: UnicodeString;
@@ -375,6 +344,9 @@ type
           property AllowLibraryAccess    : Longbool read fGetAllowLibraryAccess    write fSetAllowLibraryAccess   ;
           property AllowRemoteControl    : Longbool read fGetAllowRemoteControl    write fSetAllowRemoteControl   ;
           property AllowVotes            : Longbool read fGetAllowVotes            write fSetAllowVotes           ;
+          property AllowHtmlAudio: LongBool read fGetAllowHtmlAudio write fSetAllowHtmlAudio;
+
+
 
           property Port : Word    read fPort write fPort;
           property Count: Integer read fGetCount;
@@ -398,21 +370,25 @@ type
 
           // Im VCL-Thread ausführen, mit CS geschützt
           // d.h. Message an Form Senden, die das dann ausführt
-
           function ValidIP(aIP, bIP: String): Boolean;
 
           procedure GenerateHTMLfromPlayer(aNempPlayer: TNempPlayer; aPart: Integer; isAdmin: Boolean);
+          // List of Files in the playlist
           procedure GenerateHTMLfromPlaylist_View(aNempPlayList: TNempPlaylist; isAdmin: Boolean);
+          // List of Files in the Playlist. If aIdx = -1, the complete Playlist is processed, otherwise only the item with Index aIdx.
+          function GenerateHTMLfromPlaylistItem(aNempPlayList: TNempPlaylist; aIdx: Integer; isAdmin: Boolean): String;
+          // File details for one file in the playlist
           procedure GenerateHTMLfromPlaylist_Details(aAudioFile: TAudioFile; aIdx: Integer; isAdmin: Boolean);
 
-          function GenerateHTMLfromPlaylistItem(aNempPlayList: TNempPlaylist; aIdx: Integer; isAdmin: Boolean): String;
-
-          // Das kann im Indy-Thread geamcht werden, daher mit Result
-          function GenerateHTMLMedienbibSearchFormular(aSearchString: UnicodeString; Start: Integer; isAdmin: Boolean): UTf8String;
-          function GenerateHTMLfromMedienbibSearch_Details(aAudioFile: TAudioFile; isAdmin: Boolean): UTf8String;
-
-          function GenerateHTMLMedienbibBrowseList(aMode: String; aChar: Char; other, isAdmin: Boolean): UTf8String;
-          function GenerateHTMLMedienbibBrowseResult(aMode: String; aValue: String; Start: Integer; isAdmin: Boolean): UTf8String;
+          // Das kann im Indy-Thread gemacht werden, daher mit Result
+          // List of Albums, Artists or Genres
+          function GenerateHTMLCollectionList(CollectionType: String; startLetter: String; SortAlbumsByArtist, other, isAdmin: Boolean): UTf8String;
+          // List of Files of an Album, an Artist or a Genre
+          function GenerateHTMLFileList(CollectionType: String; CollectionID: String; startLetter: String; Start: Integer; SortAlbumsByArtist, isAdmin: Boolean): UTf8String; overload;
+          // List of files, matching a SearchString
+          function GenerateHTMLFileList(aSearchString: UnicodeString; Start: Integer; isAdmin: Boolean): UTf8String; overload;
+          // File details for one file in the Library
+          function GenerateHTMLFileDetailsLibrary(aAudioFile: TAudioFile; isAdmin: Boolean): UTf8String;
 
           procedure Shutdown;
           procedure CopyLibrary(OriginalLib: TMedienBibliothek);
@@ -426,7 +402,6 @@ type
   end;
 
 
-
 // MIMEExtensions and function FileType2MimeType copied from
 // http://extpascal.googlecode.com/svn-history/r655/trunk/IdExtHTTPServer.pas
 // licensed as http://opensource.org/licenses/BSD-3-Clause
@@ -437,185 +412,45 @@ type
     end;
 
 const
-  MIMEExtensions: array[1..176] of TMimeExtension = (
-    (Ext: '.gif'; MimeType: 'image/gif'),
+  MIMEExtensions: array[1..31] of TMimeExtension = (
+
+    (Ext: '.png'; MimeType: 'image/x-png'),
     (Ext: '.jpg'; MimeType: 'image/jpeg'),
     (Ext: '.jpeg'; MimeType: 'image/jpeg'),
     (Ext: '.html'; MimeType: 'text/html'),
     (Ext: '.htm'; MimeType: 'text/html'),
     (Ext: '.css'; MimeType: 'text/css'),
     (Ext: '.js'; MimeType: 'text/javascript'),
-    (Ext: '.txt'; MimeType: 'text/plain'),
-    (Ext: '.xls'; MimeType: 'application/excel'),
-    (Ext: '.rtf'; MimeType: 'text/richtext'),
-    (Ext: '.wq1'; MimeType: 'application/x-lotus'),
-    (Ext: '.wk1'; MimeType: 'application/x-lotus'),
-    (Ext: '.raf'; MimeType: 'application/raf'),
-    (Ext: '.png'; MimeType: 'image/x-png'),
-    (Ext: '.c'; MimeType: 'text/plain'),
-    (Ext: '.c++'; MimeType: 'text/plain'),
-    (Ext: '.pl'; MimeType: 'text/plain'),
-    (Ext: '.cc'; MimeType: 'text/plain'),
-    (Ext: '.h'; MimeType: 'text/plain'),
-    (Ext: '.talk'; MimeType: 'text/x-speech'),
-    (Ext: '.xbm'; MimeType: 'image/x-xbitmap'),
-    (Ext: '.xpm'; MimeType: 'image/x-xpixmap'),
-    (Ext: '.ief'; MimeType: 'image/ief'),
-    (Ext: '.jpe'; MimeType: 'image/jpeg'),
-    (Ext: '.tiff'; MimeType: 'image/tiff'),
-    (Ext: '.tif'; MimeType: 'image/tiff'),
-    (Ext: '.rgb'; MimeType: 'image/rgb'),
-    (Ext: '.g3f'; MimeType: 'image/g3fax'),
-    (Ext: '.xwd'; MimeType: 'image/x-xwindowdump'),
-    (Ext: '.pict'; MimeType: 'image/x-pict'),
-    (Ext: '.ppm'; MimeType: 'image/x-portable-pixmap'),
-    (Ext: '.pgm'; MimeType: 'image/x-portable-graymap'),
-    (Ext: '.pbm'; MimeType: 'image/x-portable-bitmap'),
-    (Ext: '.pnm'; MimeType: 'image/x-portable-anymap'),
-    (Ext: '.bmp'; MimeType: 'image/x-ms-bmp'),
-    (Ext: '.ras'; MimeType: 'image/x-cmu-raster'),
-    (Ext: '.pcd'; MimeType: 'image/x-photo-cd'),
-    (Ext: '.cgm'; MimeType: 'image/cgm'),
-    (Ext: '.mil'; MimeType: 'image/x-cals'),
-    (Ext: '.cal'; MimeType: 'image/x-cals'),
-    (Ext: '.fif'; MimeType: 'image/fif'),
-    (Ext: '.dsf'; MimeType: 'image/x-mgx-dsf'),
-    (Ext: '.cmx'; MimeType: 'image/x-cmx'),
-    (Ext: '.wi'; MimeType: 'image/wavelet'),
-    (Ext: '.dwg'; MimeType: 'image/vnd.dwg'),
-    (Ext: '.dxf'; MimeType: 'image/vnd.dxf'),
-    (Ext: '.svf'; MimeType: 'image/vnd.svf'),
-    (Ext: '.au'; MimeType: 'audio/basic'),
-    (Ext: '.snd'; MimeType: 'audio/basic'),
+
+    (Ext: '.mp3'; MimeType: 'audio/mpeg'),
+    (Ext: '.mp4'; MimeType: 'audio/mp4'),
+    (Ext: '.m4a'; MimeType: 'audio/mp4'),
+    (Ext: '.ogg'; MimeType: 'audio/ogg'),
+    (Ext: '.opus'; MimeType: 'audio/opus'),
+    (Ext: '.wav'; MimeType: 'audio/wav'),
+    (Ext: '.flac'; MimeType: 'audio/flac'),
+
+    (Ext: '.mpa'; MimeType: 'audio/mpeg'),
+    (Ext: '.mp2'; MimeType: 'audio/mpeg'),
+    (Ext: '.mp2a'; MimeType: 'audio/mpeg'),
     (Ext: '.aif'; MimeType: 'audio/x-aiff'),
     (Ext: '.aiff'; MimeType: 'audio/x-aiff'),
     (Ext: '.aifc'; MimeType: 'audio/x-aiff'),
-    (Ext: '.wav'; MimeType: 'audio/x-wav'),
-    (Ext: '.mpa'; MimeType: 'audio/x-mpeg'),
-    (Ext: '.abs'; MimeType: 'audio/x-mpeg'),
-    (Ext: '.mpega'; MimeType: 'audio/x-mpeg'),
-    (Ext: '.mp2a'; MimeType: 'audio/x-mpeg-2'),
-    (Ext: '.mpa2'; MimeType: 'audio/x-mpeg-2'),
-    (Ext: '.es'; MimeType: 'audio/echospeech'),
-    (Ext: '.vox'; MimeType: 'audio/voxware'),
-    (Ext: '.lcc'; MimeType: 'application/fastman'),
-    (Ext: '.ra'; MimeType: 'application/x-pn-realaudio'),
-    (Ext: '.ram'; MimeType: 'application/x-pn-realaudio'),
-    (Ext: '.mmid'; MimeType: 'x-music/x-midi'),
-    (Ext: '.skp'; MimeType: 'application/vnd.koan'),
-    (Ext: '.talk'; MimeType: 'text/x-speech'),
-    (Ext: '.mpeg'; MimeType: 'video/mpeg'),
-    (Ext: '.mpg'; MimeType: 'video/mpeg'),
-    (Ext: '.mpe'; MimeType: 'video/mpeg'),
-    (Ext: '.mpv2'; MimeType: 'video/mpeg-2'),
-    (Ext: '.mp2v'; MimeType: 'video/mpeg-2'),
-    (Ext: '.qt'; MimeType: 'video/quicktime'),
-    (Ext: '.mov'; MimeType: 'video/quicktime'),
-    (Ext: '.avi'; MimeType: 'video/x-msvideo'),
-    (Ext: '.movie'; MimeType: 'video/x-sgi-movie'),
-    (Ext: '.vdo'; MimeType: 'video/vdo'),
-    (Ext: '.viv'; MimeType: 'video/vnd.vivo'),
-    (Ext: '.pac'; MimeType: 'application/x-ns-proxy-autoconfig'),
-    (Ext: '.ai'; MimeType: 'application/postscript'),
-    (Ext: '.eps'; MimeType: 'application/postscript'),
-    (Ext: '.ps'; MimeType: 'application/postscript'),
-    (Ext: '.rtf'; MimeType: 'application/rtf'),
-    (Ext: '.pdf'; MimeType: 'application/pdf'),
-    (Ext: '.mif'; MimeType: 'application/vnd.mif'),
-    (Ext: '.t'; MimeType: 'application/x-troff'),
-    (Ext: '.tr'; MimeType: 'application/x-troff'),
-    (Ext: '.roff'; MimeType: 'application/x-troff'),
-    (Ext: '.man'; MimeType: 'application/x-troff-man'),
-    (Ext: '.me'; MimeType: 'application/x-troff-me'),
-    (Ext: '.ms'; MimeType: 'application/x-troff-ms'),
-    (Ext: '.latex'; MimeType: 'application/x-latex'),
-    (Ext: '.tex'; MimeType: 'application/x-tex'),
-    (Ext: '.texinfo'; MimeType: 'application/x-texinfo'),
-    (Ext: '.texi'; MimeType: 'application/x-texinfo'),
-    (Ext: '.dvi'; MimeType: 'application/x-dvi'),
-    (Ext: '.doc'; MimeType: 'application/msword'),
-    (Ext: '.oda'; MimeType: 'application/oda'),
-    (Ext: '.evy'; MimeType: 'application/envoy'),
-    (Ext: '.gtar'; MimeType: 'application/x-gtar'),
-    (Ext: '.tar'; MimeType: 'application/x-tar'),
-    (Ext: '.ustar'; MimeType: 'application/x-ustar'),
-    (Ext: '.bcpio'; MimeType: 'application/x-bcpio'),
-    (Ext: '.cpio'; MimeType: 'application/x-cpio'),
-    (Ext: '.shar'; MimeType: 'application/x-shar'),
-    (Ext: '.zip'; MimeType: 'application/zip'),
-    (Ext: '.hqx'; MimeType: 'application/mac-binhex40'),
-    (Ext: '.sit'; MimeType: 'application/x-stuffit'),
-    (Ext: '.sea'; MimeType: 'application/x-stuffit'),
-    (Ext: '.fif'; MimeType: 'application/fractals'),
-    (Ext: '.bin'; MimeType: 'application/octet-stream'),
-    (Ext: '.uu'; MimeType: 'application/octet-stream'),
-    (Ext: '.exe'; MimeType: 'application/octet-stream'),
-    (Ext: '.src'; MimeType: 'application/x-wais-source'),
-    (Ext: '.wsrc'; MimeType: 'application/x-wais-source'),
-    (Ext: '.hdf'; MimeType: 'application/hdf'),
-    (Ext: '.ls'; MimeType: 'text/javascript'),
-    (Ext: '.mocha'; MimeType: 'text/javascript'),
-    (Ext: '.vbs'; MimeType: 'text/vbscript'),
-    (Ext: '.sh'; MimeType: 'application/x-sh'),
-    (Ext: '.csh'; MimeType: 'application/x-csh'),
-    (Ext: '.pl'; MimeType: 'application/x-perl'),
-    (Ext: '.tcl'; MimeType: 'application/x-tcl'),
-    (Ext: '.spl'; MimeType: 'application/futuresplash'),
-    (Ext: '.mbd'; MimeType: 'application/mbedlet'),
-    (Ext: '.swf'; MimeType: 'application/x-director'),
-    (Ext: '.pps'; MimeType: 'application/mspowerpoint'),
-    (Ext: '.asp'; MimeType: 'application/x-asap'),
-    (Ext: '.asn'; MimeType: 'application/astound'),
-    (Ext: '.axs'; MimeType: 'application/x-olescript'),
-    (Ext: '.ods'; MimeType: 'application/x-oleobject'),
-    (Ext: '.opp'; MimeType: 'x-form/x-openscape'),
-    (Ext: '.wba'; MimeType: 'application/x-webbasic'),
-    (Ext: '.frm'; MimeType: 'application/x-alpha-form'),
-    (Ext: '.wfx'; MimeType: 'x-script/x-wfxclient'),
-    (Ext: '.pcn'; MimeType: 'application/x-pcn'),
-    (Ext: '.ppt'; MimeType: 'application/vnd.ms-powerpoint'),
-    (Ext: '.svd'; MimeType: 'application/vnd.svd'),
-    (Ext: '.ins'; MimeType: 'application/x-net-install'),
-    (Ext: '.ccv'; MimeType: 'application/ccv'),
-    (Ext: '.vts'; MimeType: 'workbook/formulaone'),
-    (Ext: '.wrl'; MimeType: 'x-world/x-vrml'),
-    (Ext: '.vrml'; MimeType: 'x-world/x-vrml'),
-    (Ext: '.vrw'; MimeType: 'x-world/x-vream'),
-    (Ext: '.p3d'; MimeType: 'application/x-p3d'),
-    (Ext: '.svr'; MimeType: 'x-world/x-svr'),
-    (Ext: '.wvr'; MimeType: 'x-world/x-wvr'),
-    (Ext: '.3dmf'; MimeType: 'x-world/x-3dmf'),
-    (Ext: '.ma'; MimeType: 'application/mathematica'),
-    (Ext: '.msh'; MimeType: 'x-model/x-mesh'),
-    (Ext: '.v5d'; MimeType: 'application/vis5d'),
-    (Ext: '.igs'; MimeType: 'application/iges'),
-    (Ext: '.dwf'; MimeType: 'drawing/x-dwf'),
-    (Ext: '.showcase'; MimeType: 'application/x-showcase'),
-    (Ext: '.slides'; MimeType: 'application/x-showcase'),
-    (Ext: '.sc'; MimeType: 'application/x-showcase'),
-    (Ext: '.sho'; MimeType: 'application/x-showcase'),
-    (Ext: '.show'; MimeType: 'application/x-showcase'),
-    (Ext: '.ins'; MimeType: 'application/x-insight'),
-    (Ext: '.insight'; MimeType: 'application/x-insight'),
-    (Ext: '.ano'; MimeType: 'application/x-annotator'),
-    (Ext: '.dir'; MimeType: 'application/x-dirview'),
-    (Ext: '.lic'; MimeType: 'application/x-enterlicense'),
-    (Ext: '.faxmgr'; MimeType: 'application/x-fax-manager'),
-    (Ext: '.faxmgrjob'; MimeType: 'application/x-fax-manager-job'),
-    (Ext: '.icnbk'; MimeType: 'application/x-iconbook'),
-    (Ext: '.wb'; MimeType: 'application/x-inpview'),
-    (Ext: '.inst'; MimeType: 'application/x-install'),
-    (Ext: '.mail'; MimeType: 'application/x-mailfolder'),
-    (Ext: '.pp'; MimeType: 'application/x-ppages'),
-    (Ext: '.ppages'; MimeType: 'application/x-ppages'),
-    (Ext: '.sgi-lpr'; MimeType: 'application/x-sgi-lpr'),
-    (Ext: '.tardist'; MimeType: 'application/x-tardist'),
-    (Ext: '.ztardist'; MimeType: 'application/x-ztardist'),
-    (Ext: '.wkz'; MimeType: 'application/x-wingz'),
-    (Ext: '.xml'; MimeType: 'application/xml'),
-    (Ext: '.iv'; MimeType: 'graphics/x-inventor'));
+    (Ext: '.mid'; MimeType: 'audio/midi'),
+    (Ext: '.midi'; MimeType: 'audio/midi'),
 
-function FileType2MimeType(const AFileName: string): string;
+    (Ext: '.txt'; MimeType: 'text/plain'),
+    (Ext: '.xls'; MimeType: 'application/excel'),
+    (Ext: '.rtf'; MimeType: 'text/richtext'),
+    (Ext: '.gif'; MimeType: 'image/gif'),
+    (Ext: '.jpe'; MimeType: 'image/jpeg'),
+    (Ext: '.bmp'; MimeType: 'image/x-ms-bmp'),
+    (Ext: '.pdf'; MimeType: 'application/pdf'),
+    (Ext: '.zip'; MimeType: 'application/zip'),
+    (Ext: '.exe'; MimeType: 'application/octet-stream')
+);
+
+function FileType2MimeType(const AFileName: string; default: String = 'text/html'): string;
 
 
 var
@@ -625,6 +460,8 @@ var
     CS_Authentification: RTL_CRITICAL_SECTION;
 
 const
+    cMinCountProperArtist = 5;
+    cMinCountProperAlbum = 3;
     GoodArtist = 5;
     GoodAlbum  = 3;
     MergeArtistConst = 50;
@@ -632,14 +469,14 @@ const
 
 implementation
 
-uses Nemp_RessourceStrings, AudioFileHelper, StringHelper, CoverHelper;
+uses Nemp_RessourceStrings, AudioFileHelper, StringHelper, CoverHelper, math;
 
-function FileType2MimeType(const AFileName: string): string;
+function FileType2MimeType(const AFileName: string; default: String = 'text/html'): string;
 var
   FileExt: string;
   I: Integer;
 begin
-  Result := 'text/html';
+  Result := default; //'text/html';
   FileExt := ExtractFileExt(AFileName);
   for I := Low(MIMEExtensions) to High(MIMEExtensions) do
     if SameText(MIMEExtensions[I].Ext, FileExt) then
@@ -670,44 +507,16 @@ begin
   end;
 end;
 
-
-{ TCountedString }
-procedure TCountedString.Assign(aCS: tCountedString);
+(*function EscapedLetterParam(aLetter: Char): String;
 begin
-    fValue    := aCS.fValue;
-    fCount    := aCS.fCount;
-    fCoverID  := aCS.fCoverID;
-    fFontSize := aCS.fFontSize;
-    fSecondValue := aCS.fSecondValue;
-end;
+  if aLetter = cCharOther then
+    result := cCharOtherESC
+  else
+    result := aLetter;
+end;*)
 
-constructor TCountedString.Create(aValue: String; c: Integer; aCoverID: String);
-begin
-    if trim(aValue) = '' then
-        fValue := 'N/A'
-    else
-        fValue := aValue;
-    fCount := c;
-    if trim(aCoverID) = '' then
-        fCoverID := '1'
-    else
-        fCoverID := aCoverID;
-
-    fSecondValue := '';
-    fFontSize := 10;
-end;
-
-
-procedure TCountedString.getSecondValue(SourceList: TStringlist);
-var fehlstelle: Integer;
-begin
-    fSecondValue := GetCommonString(SourceList, 0, fehlstelle);
-    if fSecondValue = '' then
-        fSecondValue := 'Various artists';
-end;
 
 constructor TNempWebServer.Create(aHandle: DWord);
-var i: Integer;
 begin
     inherited create;
     fMainHandle := aHandle;
@@ -728,17 +537,21 @@ begin
     UsernameA := 'master';
     PasswordA := 'key';
 
+    fCommonDir := ExtractFilePath(Paramstr(0)) + 'HTML\Common\';
+    fDefaultCoverFilename := fCommonDir + 'default_cover.png';
+    if not FileExists(fDefaultCoverFilename) then
+      fDefaultCoverFilename := fCommonDir + 'default_cover.png';
+    if not FileExists(fDefaultCoverFilename) then
+      fDefaultCoverFilename := '';
+
     LogList := TStringList.Create;
     VoteMachine := TVoteMachine.Create(aHandle);
     VoteMachine.LibraryList := fWebMedienBib;
 
-    for i := 0 to 26 do
-    begin
-        MainArtists[i] := TObjectList.Create;
-        OtherArtists[i] := TObjectList.Create;
-        Albums[i] := TObjectList.Create;
-    end;
-    Genres := TObjectList.Create;
+    fCollectionAlbums := TRootCollection.Create(Nil);
+    fCollectionArtists:= TRootCollection.Create(Nil);
+    fCollectionGenres := TRootCollection.Create(Nil);
+    InitRootCollections;
 end;
 
 destructor TNempWebServer.Destroy;
@@ -746,13 +559,9 @@ var i: Integer;
 begin
     IdHTTPServer1.Active := False;
     EnterCriticalSection(CS_AccessLibrary);
-    for i := 0 to 26 do
-    begin
-        MainArtists[i].Free;
-        OtherArtists[i].Free;
-        Albums[i].Free;
-    end;
-    Genres.Free;
+    fCollectionAlbums.Free;
+    fCollectionArtists.Free;
+    fCollectionGenres.Free;
 
     for i := 0 to fWebMedienBib.Count - 1 do
         fWebMedienBib[i].Free;
@@ -763,6 +572,36 @@ begin
     VoteMachine.Free;
     LogList.Free;
     inherited;
+end;
+
+procedure TNempWebServer.InitRootCollections;
+const
+  cAlbumConfig: TCollectionConfig = (
+      Content: ccAlbum;
+      PrimarySorting: csAlbum; //csArtist;
+      SecondarySorting: csArtist; //csAlbum;
+      TertiarySorting: csDefault; SortDirection1: sd_Ascending; SortDirection2: sd_Ascending; SortDirection3: sd_Ascending );
+
+  cArtistConfig: TCollectionConfig = (
+      Content: ccArtist;
+      PrimarySorting: csArtist;
+      SecondarySorting: csDefault;
+      TertiarySorting: csDefault; SortDirection1: sd_Ascending; SortDirection2: sd_Ascending; SortDirection3: sd_Ascending );
+
+  cGenreConfig: TCollectionConfig = (
+      Content: ccGenre;
+      PrimarySorting: csGenre;
+      SecondarySorting: csDefault;
+      TertiarySorting: csDefault; SortDirection1: sd_Ascending; SortDirection2: sd_Ascending; SortDirection3: sd_Ascending );
+begin
+  fCollectionAlbums.AddSubCollectionType(cAlbumConfig);
+  fCollectionArtists.AddSubCollectionType(cArtistConfig);
+  fCollectionArtists.AddSubCollectionType(cAlbumConfig);
+  fCollectionGenres.AddSubCollectionType(cGenreConfig);
+  fCollectionGenres.AddSubCollectionType(cArtistConfig);
+
+  // später, nach dem befüllen: fCollectionAlbums.Sort(True)
+  // Das sortiert die interne CollectionList mit den ganzen Alben (bzw. Artists, Genres)
 end;
 
 function TNempWebServer.LoadSettingsDeprecated: Boolean;
@@ -811,6 +650,8 @@ begin
   if NempSettingsManager.SectionExists('Webserver') then
   begin
     AllowFileDownload   := NempSettingsManager.ReadBool('Webserver', 'AllowPlaylistDownload' , cDefaultServerSettings.AllowFileDownload );
+    AllowHtmlAudio   := NempSettingsManager.ReadBool('Webserver', 'AllowHtmlAudio' , cDefaultServerSettings.AllowHtmlAudio );
+
     AllowLibraryAccess  := NempSettingsManager.ReadBool('Webserver', 'AllowLibraryAccess'    , cDefaultServerSettings.AllowLibraryAccess);
     AllowVotes          := NempSettingsManager.ReadBool('Webserver', 'AllowVotes'            , cDefaultServerSettings.AllowVotes        );
     AllowRemoteControl  := NempSettingsManager.ReadBool('Webserver', 'AllowRemoteControl'    , cDefaultServerSettings.AllowRemoteControl);
@@ -830,6 +671,7 @@ end;
 procedure TNempWebServer.SaveSettings;
 begin
   NempSettingsManager.WriteBool('Webserver', 'AllowPlaylistDownload' , AllowFileDownload );
+  NempSettingsManager.WriteBool('Webserver', 'AllowHtmlAudio' , AllowHtmlAudio );
   NempSettingsManager.WriteBool('Webserver', 'AllowLibraryAccess'    , AllowLibraryAccess);
   NempSettingsManager.WriteBool('Webserver', 'AllowVotes'            , AllowVotes        );
   NempSettingsManager.WriteBool('Webserver', 'AllowRemoteControl'    , AllowRemoteControl);
@@ -932,6 +774,11 @@ begin
     InterLockedExchange(Integer(fAllowVotes), Integer(Value));
 end;
 
+procedure TNempWebServer.fSetAllowHtmlAudio(Value: Longbool);
+begin
+    InterLockedExchange(Integer(fAllowHtmlAudio), Integer(Value));
+end;
+
 //function TNempWebServer.fGetOnlyLAN: Longbool;
 //begin
 //  InterLockedExchange(Integer(Result), Integer(fOnlyLAN));
@@ -953,9 +800,14 @@ begin
   InterLockedExchange(Integer(Result), Integer(fAllowVotes));
 end;
 
+function TNempWebServer.fGetAllowHtmlAudio: Longbool;
+begin
+  InterLockedExchange(Integer(Result), Integer(fAllowHtmlAudio));
+end;
+
 function TNempWebServer.MainMenu(aPage: Integer; IsAdmin: Boolean): String;
 begin
-    result := PatternMenu[isAdmin];
+    result := Templates[tplMenuMain][isAdmin];
 
     if aPage = 0 then
         result := StringReplace(result, '{{PlayerClass}}', 'player active', [rfReplaceAll])
@@ -978,13 +830,13 @@ begin
         result := StringReplace(result, '{{LibraryClass}}', 'hidden', [rfReplaceAll]);
 end;
 
-function TNempWebServer.BrowseSubMenu(aMode: String; aLetter: Char; aValue: String; isAdmin: Boolean): String;
+function TNempWebServer.BrowseSubMenu(aMode, startLetter: String; aValue: String; SortAlbumsByArtist, isAdmin: Boolean): String;
 var sub: String;
     c: Char;
-    letterClass: String;
+    letterClass, sortparam: String;
     idx: Integer;
 begin
-    result := PatternBrowseMenu[isAdmin];
+    result := Templates[tplMenuLibrary][isAdmin];
 
     if aMode = 'artist' then
         result := StringReplace(result, '{{ArtistClass}}', 'artist active', [rfReplaceAll])
@@ -1001,45 +853,64 @@ begin
     else
         result := StringReplace(result, '{{GenreClass}}', 'genre', [rfReplaceAll]);
 
-    if aMode = '' then // fallback
-        sub := '';
+    //if  then // fallback
+    //    sub := '';
 
-    if (aMode = 'genre')then
-    begin
-        if aValue = '' then
-            sub := ''
-        else
-            sub := '<ul class="charselection"> <li class="genre active">' +  EscapeHTMLChars(aValue) + '</li></ul>';
-    end
+    if (aMode = '') or (aMode = 'genre')then
+      sub := ''
     else
     begin
         sub := '<ul class="charselection">';
 
-        if aLetter = '0' then
-            letterClass := 'other active'
+        if (aMode = 'album') and SortAlbumsByArtist then
+          sortParam := '&albumsortmode=artist'
         else
-            letterClass := 'other';
+          sortParam := '';
 
-        if ((aMode = 'artist') and (MainArtists[0].Count + OtherArtists[0].Count > 0))
-          or ((aMode = 'album') and (Albums[0].Count > 0))
-        then
-            sub := sub +  '<li class="' + letterClass + '"> <a href="browse?mode=' + aMode + '&l=0">0-9</a></li>'#13#10;
-
-        for c := 'A' to 'Z' do
-        begin
-            if c = aLetter then
-                letterClass := c + ' active'
-            else
-                letterClass := c;
-
-            idx := ord(c) - ord('A') + 1;
-
-            if ((aMode = 'artist') and (MainArtists[idx].Count + OtherArtists[idx].Count > 0))
-              or ((aMode = 'album') and (Albums[idx].Count > 0))
-            then
-                sub := sub + '<li class="' + letterClass +'"> <a href="browse?mode=' + aMode + '&l=' + c + '">' + c + '</a></li>'#13#10;
+        // Links to "A".."Z"
+        for c := 'A' to 'Z' do begin
+          if c = startLetter then
+            letterClass := c + ' active'
+          else
+            letterClass := c;
+          idx := ord(c) - ord('A') + 1;
+          if ((aMode = 'artist') and (fMainArtistCount[idx] + fOtherArtistCount[idx] > 0))
+            or ((aMode = 'album') and (not SortAlbumsByArtist) and (fAlbumCount[idx] > 0))
+            or ((aMode = 'album') and (SortAlbumsByArtist) and (fAlbumCountByArtist[idx] > 0))
+          then
+            sub := sub + '<li class="' + letterClass +'"> <a href="library?mode=' + aMode + sortParam + '&l=' + c + '">' + c + '</a></li>'#13#10;
         end;
 
+        // Link to "0"
+        if ((aMode = 'artist') and (fMainArtistCount[0] + fOtherArtistCount[0] > 0))
+          or ((aMode = 'album') and (not SortAlbumsByArtist) and (fAlbumCount[0] > 0))
+          or ((aMode = 'album') and (SortAlbumsByArtist) and (fAlbumCountByArtist[0] > 0))
+        then begin
+          if startLetter = '0' then
+            letterClass := 'number active'
+          else
+            letterClass := 'number';
+          sub := sub +  '<li class="' + letterClass + '"> <a href="library?mode=' + aMode + sortParam + '&l=0">0-9</a></li>'#13#10;
+        end;
+
+        // Link to "other"
+        if ((aMode = 'artist') and (fMainArtistCount[27] + fOtherArtistCount[27] > 0))
+          or ((aMode = 'album') and (not SortAlbumsByArtist) and (fAlbumCount[27] > 0))
+          or ((aMode = 'album') and (SortAlbumsByArtist) and (fAlbumCountByArtist[27] > 0))
+        then begin
+          if startLetter = cOtherLetters then
+            letterClass := cOtherLetters + ' active'
+          else
+            letterClass := cOtherLetters;
+          sub := sub +  '<li class="' + letterClass + '"> <a href="library?mode=' + aMode + sortParam + '&l=' + EscapeHTMLChars(cOtherLetters) + '">other</a></li>'#13#10;
+        end;
+        // Sort-Link for Albums (by Album name or by Artist name)
+        if (aMode = 'album') and (aValue = '') then begin
+          if SortAlbumsByArtist then
+            sub := sub +  '<li class="sortmode"> <a href="library?mode=' + aMode + '&l=' + EscapeHTMLChars(startLetter) + '">Sort by album name</a></li>'#13#10
+          else
+            sub := sub +  '<li class="sortmode"> <a href="library?albumsortmode=artist&mode=' + aMode + '&l=' + EscapeHTMLChars(startLetter) + '">Sort by artist name</a></li>'#13#10
+        end;
         sub := sub + '</ul>'
     end;
 
@@ -1053,12 +924,19 @@ begin
     Result := '';
     for i := 1 to Length(ASrc) do
     begin
-        if CharInSet(ASrc[i], ['&', '*','#','%','<','>',' ','[',']'])   //(ASrc[i] in ['&', '*','#','%','<','>',' ','[',']'])
+      case ASrc[i] of
+        ' ': Result := Result + '%20';
+      else
+        Result := Result + '&#' + IntToStr(Ord(ASrc[i])) + ';';
+       // '&', '*','#','%','<','>','[',']':
+        //#33..#128: Result := Result + ASrc[i];
+      end;
+       (* if CharInSet(ASrc[i], ['&', '*','#','%','<','>',' ','[',']'])   //(ASrc[i] in ['&', '*','#','%','<','>',' ','[',']'])
           or (not CharInSet(ASrc[i], [#33..#128]) )                     //or (not (ASrc[i] in [#33..#128]))
         then
             Result := Result + '&#' + IntToStr(Ord(ASrc[i])) + ';'
         else
-            Result := Result + ASrc[i];
+            Result := Result + ASrc[i];*)
     end;
 end;
 
@@ -1093,10 +971,75 @@ begin
 end;
 
 
+function TNempWebServer.FilePagination(Start, maxCount: Integer; LinkPrev, LinkNext: String; isAdmin: Boolean): String;
+var
+  pagination: String;
+  StartNext: Integer;
+const
+  LinkClass: Array[Boolean] of String = ('navigate', 'hidden');
+
+begin
+  pagination := Templates[tplPagination][isAdmin];
+  pagination := StringReplace(pagination, '{{ClassFiles}}', 'files', [rfReplaceAll]);
+
+  StartNext := Start + MaxCountPerPage;
+  if StartNext >= maxCount then
+    StartNext := maxCount;
+
+  pagination := StringReplace(pagination, '{{LinkPrev}}', LinkPrev, [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{ClassPrev}}', LinkClass[linkPrev = ''], [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{LinkNext}}', LinkNext, [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{ClassNext}}', LinkClass[LinkNext = ''], [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{Start}}' , IntToStr(Start+1), [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{End}}'   , IntToStr(StartNext), [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{Count}}' , IntToStr(maxCount), [rfReplaceAll]);
+
+  // hide Artist-Navigation
+  pagination := StringReplace(pagination, '{{ClassArtists}}', 'hidden', [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{ClassMain}}', 'hidden', [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{ClassOther}}', 'hidden', [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{LinkMain}}', '', [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{LinkOther}}', '', [rfReplaceAll]);
+
+  result := pagination;
+end;
+
+function TNempWebServer.ArtistNavigation(startLetter, LinkMain, LinkOther: String; isAdmin: Boolean): String;
+var
+  pagination: String;
+const
+  LinkClass: Array[Boolean] of String = ('navigate', 'hidden');
+
+begin
+  pagination := Templates[tplPagination][isAdmin];
+  pagination := StringReplace(pagination, '{{ClassArtists}}', 'artists', [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{ClassMain}}', LinkClass[LinkMain = ''], [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{ClassOther}}', LinkClass[LinkOther = ''], [rfReplaceAll]);
+
+  pagination := StringReplace(pagination, '{{Letter}}', startLetter, [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{LinkMain}}', LinkMain, [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{LinkOther}}', LinkOther, [rfReplaceAll]);
+
+  // hide File-Navigation
+  pagination := StringReplace(pagination, '{{ClassFiles}}', 'hidden', [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{ClassPrev}}', 'hidden', [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{ClassNext}}', 'hidden', [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{LinkPrev}}', '', [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{LinkNext}}', '', [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{Start}}', '0', [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{End}}', '0', [rfReplaceAll]);
+  pagination := StringReplace(pagination, '{{Count}}', '0', [rfReplaceAll]);
+  result := pagination;
+end;
+
+
+
 function TNempWebServer.fSetBasicFileData(af: TAudioFile; aPattern, baseClass: String): String;
 var duration, aClass: String;
     quality, filesize, filetype, path: String;
     notfound: Boolean;
+    currentAlbumID, currentArtistID, currentGenreID: Integer;
+    afc: TAudioFileCollection;
 begin
     // IDs/Index MUST be replaced befor calling this method
     // (these are specific for playlist/library-view)
@@ -1172,6 +1115,45 @@ begin
     result := StringReplace(result, '{{Title}}'    , EscapeHTMLChars(fWebDisplay.GetNonEmptyTitle(af)) , [rfReplaceAll]);
     result := StringReplace(result, '{{Artist}}'   , EscapeHTMLChars(af.Artist), [rfReplaceAll]);
     result := StringReplace(result, '{{Album}}'    , EscapeHTMLChars(af.Album) , [rfReplaceAll]);
+    result := StringReplace(result, '{{Genre}}'    , EscapeHTMLChars(af.Genre) , [rfReplaceAll]);
+    result := StringReplace(result, '{{Duration}}'    , EscapeHTMLChars(SekIntToMinStr(af.Duration)) , [rfReplaceAll]);
+    if StrToIntDef(af.Year, -1) >= 0  then
+      result := StringReplace(result, '{{Year}}', EscapeHTMLChars(af.Year) , [rfReplaceAll])
+    else
+      result := StringReplace(result, '{{Year}}', '- ? -' , [rfReplaceAll]);
+
+    // Search-Links: Use the WebServerID of the proper Collection
+    afc := fCollectionAlbums.SearchAudioFile(af, False);
+    if assigned(afc) then
+      currentAlbumID := afc.WebServerID
+    else
+      currentAlbumID := 0;
+
+    afc := self.fCollectionArtists.SearchAudioFile(af, False);
+    if assigned(afc) then begin
+      if assigned(afc.Parent) then
+        currentArtistID := afc.Parent.WebServerID
+      else
+        currentArtistID := afc.WebServerID;
+    end
+    else
+      currentArtistID := 0;
+
+    afc := self.fCollectionGenres.SearchAudioFile(af, False);
+    if assigned(afc) then begin
+      if assigned(afc.Parent) then
+        currentGenreID := afc.Parent.WebServerID
+      else
+        currentGenreID := afc.WebServerID;
+    end
+    else
+      currentGenreID := 0;
+
+
+    result := StringReplace(result, '{{ArtistID}}'   , currentArtistID.ToString, [rfReplaceAll]);
+    result := StringReplace(result, '{{AlbumID}}'    , currentAlbumID.ToString, [rfReplaceAll]);
+    result := StringReplace(result, '{{GenreID}}'    , currentGenreID.ToString, [rfReplaceAll]);
+
 
     result := StringReplace(result, '{{Votes}}'    , EscapeHTMLChars(IntToStr(af.VoteCounter)) , [rfReplaceAll]);
     result := StringReplace(result, '{{PrebookIndex}}', IntToStr(af.PrebookIndex) , [rfReplaceAll]);
@@ -1238,18 +1220,32 @@ begin
 
     if (AllowFileDownload or isAdmin) and af.isFile then
     begin
-        btnTmp := PatternButtonFileDownload[isAdmin];
-        btnTmp := StringReplace(btnTmp, '{{Filename}}'          , HRefEncode(af.Dateiname) , [rfReplaceAll]);
-        btnTmp := StringReplace(btnTmp, '{{ID}}'                , IntToStr(af.WebServerID) , [rfReplaceAll]);
-        btnTmp := StringReplace(btnTmp, '{{Action}}'            , 'file_download'          , [rfReplaceAll]);
-        buttons := StringReplace(buttons, '{{BtnFileDownload}}' , btnTmp                   , [rfReplaceAll]);
+        btnTmp := Templates[tplBtnFileDownload][isAdmin];
+        btnTmp := StringReplace(btnTmp, '{{Filename}}', HRefEncode(af.Dateiname), [rfReplaceAll]);
+        btnTmp := StringReplace(btnTmp, '{{ID}}', IntToStr(af.WebServerID), [rfReplaceAll]);
+        btnTmp := StringReplace(btnTmp, '{{Action}}', 'file_download', [rfReplaceAll]);
+        btnTmp := StringReplace(btnTmp, '{{Mime}}', FileType2MimeType(af.Dateiname, 'audio/unknown'), [rfReplaceAll]);
+        buttons := StringReplace(buttons, '{{BtnFileDownload}}', btnTmp, [rfReplaceAll]);
     end else
         buttons := StringReplace(buttons, '{{BtnFileDownload}}' , '', [rfReplaceAll]);
+
+    if (AllowHtmlAudio or isAdmin) and af.IsFile then begin
+        btnTmp := Templates[tplHtmlFileAudio][isAdmin];
+        btnTmp := StringReplace(btnTmp, '{{Filename}}', HRefEncode(af.Dateiname), [rfReplaceAll]);
+        btnTmp := StringReplace(btnTmp, '{{ID}}', IntToStr(af.WebServerID), [rfReplaceAll]);
+        btnTmp := StringReplace(btnTmp, '{{Action}}', 'file_stream', [rfReplaceAll]);
+        btnTmp := StringReplace(btnTmp, '{{Mime}}', FileType2MimeType(af.Dateiname, 'audio/unknown'), [rfReplaceAll]);
+        buttons := StringReplace(buttons, '{{HtmlFileAudio}}', btnTmp, [rfReplaceAll]);
+        buttons := StringReplace(buttons, '{{HtmlFileAudioClass}}', '', [rfReplaceAll]);
+    end else begin
+      buttons := StringReplace(buttons, '{{HtmlFileAudio}}', '', [rfReplaceAll]);
+      buttons := StringReplace(buttons, '{{HtmlFileAudioClass}}', 'hidden', [rfReplaceAll]);
+    end;
 
 
     if AllowVotes or isAdmin then
     begin
-        btnTmp := replaceTag(PatternButtonFileVote[isAdmin], 'file_vote');
+        btnTmp := replaceTag(Templates[tplBtnFileVote][isAdmin], 'file_vote');
         buttons := StringReplace(buttons, '{{BtnFileVote}}', btnTmp, [rfReplaceAll]);
     end else
         buttons := StringReplace(buttons, '{{BtnFileVote}}'   , '', [rfReplaceAll]);
@@ -1257,22 +1253,22 @@ begin
 
     if AllowRemoteControl or isAdmin then
     begin
-        btnTmp := replaceTag(PatternButtonFileMoveUp[isAdmin], 'file_moveup');
+        btnTmp := replaceTag(Templates[tplBtnFileMoveUp][isAdmin], 'file_moveup');
         buttons := StringReplace(buttons, '{{BtnFileMoveUp}}', btnTmp, [rfReplaceAll]);
-        btnTmp := replaceTag(PatternButtonFileMoveDown[isAdmin], 'file_movedown');
+        btnTmp := replaceTag(Templates[tplBtnFileMoveDown][isAdmin], 'file_movedown');
         buttons := StringReplace(buttons, '{{BtnFileMoveDown}}', btnTmp, [rfReplaceAll]);
         if IsPlayingFile then
             buttons := StringReplace(buttons, '{{BtnFileDelete}}', '', [rfReplaceAll])
         else
         begin
-            btnTmp := replaceTag(PatternButtonFileDelete[isAdmin], 'file_delete');
+            btnTmp := replaceTag(Templates[tplBtnFileDelete][isAdmin], 'file_delete');
             buttons := StringReplace(buttons, '{{BtnFileDelete}}', btnTmp, [rfReplaceAll]);
         end;
-        btnTmp := replaceTag(PatternButtonFilePlayNow[isAdmin], 'file_playnow');
+        btnTmp := replaceTag(Templates[tplBtnFilePlayNow][isAdmin], 'file_playnow');
         buttons := StringReplace(buttons, '{{BtnFilePlayNow}}', btnTmp, [rfReplaceAll]);
-        btnTmp := replaceTag(PatternButtonFileAdd[isAdmin], 'file_add');
+        btnTmp := replaceTag(Templates[tplBtnFileAdd][isAdmin], 'file_add');
         buttons := StringReplace(buttons, '{{BtnFileAdd}}', btnTmp, [rfReplaceAll]);
-        btnTmp := replaceTag(PatternButtonFileAddnext[isAdmin], 'file_addnext');
+        btnTmp := replaceTag(Templates[tplBtnFileAddNext][isAdmin], 'file_addnext');
         buttons := StringReplace(buttons, '{{BtnFileAddNext}}', btnTmp, [rfReplaceAll]);
     end else
     begin
@@ -1287,21 +1283,21 @@ begin
     result := buttons;
 end;
 
-function TNempWebServer.fSetControlButtons(aPattern: String; isPlaying, isAdmin: Boolean): String;
+(* function TNempWebServer.fSetControlButtons(aPattern: String; isPlaying, isAdmin: Boolean): String;
 var buttons: String;
 begin
     buttons := aPattern;
-    buttons := StringReplace(buttons, '{{PlayerControls}}'     , PatternPlayerControls[isAdmin]   , [rfReplaceAll]);
+    buttons := StringReplace(buttons, '{{PlayerControls}}'     , Templates[tplPlayerControls][isAdmin]   , [rfReplaceAll]);
 
     if AllowRemoteControl or isAdmin then
     begin
         if isPlaying then
-            buttons := StringReplace(buttons, '{{BtnControlPlayPause}}', PatternButtonPause[isAdmin] , [rfReplaceAll])
+            buttons := StringReplace(buttons, '{{BtnControlPlayPause}}', Templates[tplBtnControlPause][isAdmin] , [rfReplaceAll])
         else
-            buttons := StringReplace(buttons, '{{BtnControlPlayPause}}', PatternButtonPlay[isAdmin] , [rfReplaceAll]);
-        buttons := StringReplace(buttons, '{{BtnControlStop}}'     , PatternButtonStop[isAdmin]      , [rfReplaceAll]);
-        buttons := StringReplace(buttons, '{{BtnControlNext}}'     , PatternButtonNext[isAdmin]      , [rfReplaceAll]);
-        buttons := StringReplace(buttons, '{{BtnControlPrev}}'     , PatternButtonPrev[isAdmin]      , [rfReplaceAll]);
+            buttons := StringReplace(buttons, '{{BtnControlPlayPause}}', Templates[tplBtnControlPlay][isAdmin] , [rfReplaceAll]);
+        buttons := StringReplace(buttons, '{{BtnControlStop}}'     , Templates[tplBtnControlStop][isAdmin]      , [rfReplaceAll]);
+        buttons := StringReplace(buttons, '{{BtnControlNext}}'     , Templates[tplBtnControlNext][isAdmin]      , [rfReplaceAll]);
+        buttons := StringReplace(buttons, '{{BtnControlPrev}}'     , Templates[tplBtnControlPrev][isAdmin]      , [rfReplaceAll]);
     end else
     begin
         buttons := StringReplace(buttons, '{{BtnControlPlayPause}}' , '' , [rfReplaceAll]);
@@ -1310,21 +1306,25 @@ begin
         buttons := StringReplace(buttons, '{{BtnControlPrev}}'      , '' , [rfReplaceAll]);
     end;
     result := buttons;
-end;
+end; *)
 
 function TNempWebServer.GenerateErrorPage(aErrorMessage: String; aPage: Integer; isAdmin: Boolean): String;
 var menu: String;
 begin
     menu := MainMenu(aPage, isAdmin);
-    result := StringReplace(PatternErrorPage[isAdmin], '{{Menu}}', menu, [rfreplaceAll]);
+    result := StringReplace(Templates[tplPageError][isAdmin], '{{Menu}}', menu, [rfreplaceAll]);
     result := StringReplace(result, '{{ErrorMessage}}', aErrorMessage, [rfreplaceAll]);
-    result := StringReplace(result, '{{BrowseMenu}}'  , '' , [rfReplaceAll]);
+    result := StringReplace(result, '{{MenuLibrary}}'  , '' , [rfReplaceAll]);
 end;
 
 
 procedure TNempWebServer.GenerateHTMLfromPlayer(aNempPlayer: TNempPlayer; aPart: Integer; isAdmin: Boolean);
 var menu, PageData, PlayerData: String;
     af: TAudioFile;
+
+const StatusClass: Array[Boolean] of String = ('notplaying', 'playing');
+  ControlClass: Array[Boolean] of String = ('ControlsForbidden', 'ControlsAllowed');
+
 begin
     menu := MainMenu(0, isAdmin);
     af := aNempPlayer.MainAudioFile;
@@ -1334,29 +1334,44 @@ begin
         EnsureFileHasID(af);
 
         case aPart of
-            1: begin
+            1,2: begin
+              PlayerData := Templates[tplItemPlayer][isAdmin];
+              PlayerData := StringReplace(PlayerData, '{{ID}}'    , IntToStr(af.WebServerID), [rfReplaceAll]);
+              PlayerData := fSetBasicFileData(af, PlayerData, '');
+              PlayerData := fSetFileButtons(af, PlayerData, 0, isAdmin);
+              PageData := Templates[tplPagePlayer][isAdmin];
+              // PageData := fSetControlButtons(PageData, aNempPlayer.Status = PLAYER_ISPLAYING, isAdmin);
+              PageData := StringReplace(PageData, '{{Menu}}', menu, [rfReplaceAll]);
+              PageData := StringReplace(PageData, '{{ItemPlayer}}', PlayerData, [rfReplaceAll]);
+              PageData := StringReplace(PageData, '{{ClassPlayerStatus}}', StatusClass[aNempPlayer.Status = PLAYER_ISPLAYING], [rfReplaceAll]);
+              PageData := StringReplace(PageData, '{{ClassControls}}', ControlClass[isAdmin or AllowRemoteControl], [rfReplaceAll]);
+              HTML_Player := UTF8String(PageData);
+            end;
+            (*1: begin
                 // 1: Controls  [[PlayerControls]]
-                HTML_Player := UTF8String(fSetControlButtons(PatternPlayerControls[isAdmin], aNempPlayer.Status = PLAYER_ISPLAYING, isAdmin));
+                HTML_Player := UTF8String(fSetControlButtons(Templates[tplPlayerControls][isAdmin], aNempPlayer.Status = PLAYER_ISPLAYING, isAdmin));
             end;
             2: begin
                 // 2: Playerdata [[ItemPlayer]]
-                PlayerData := PatternItemPlayer[isAdmin];
+                PlayerData := Templates[tplItemPlayer][isAdmin];
                 PlayerData := StringReplace(PlayerData, '{{ID}}'    , IntToStr(af.WebServerID), [rfReplaceAll]);
                 PlayerData := fSetBasicFileData(af, PlayerData, '');
                 PlayerData := fSetFileButtons(af, PlayerData, 0, isAdmin);
                 HTML_Player := UTF8String(PlayerData);
-            end;
+            end;*)
         else
             begin
-                PlayerData := PatternItemPlayer[isAdmin];
+                PlayerData := Templates[tplItemPlayer][isAdmin];
                 PlayerData := StringReplace(PlayerData, '{{ID}}'    , IntToStr(af.WebServerID), [rfReplaceAll]);
                 PlayerData := fSetBasicFileData(af, PlayerData, '');
                 PlayerData := fSetFileButtons(af, PlayerData, 0, isAdmin);
-                PageData := PatternPlayerPage[isAdmin];
-                PageData := fSetControlButtons(PatternPlayerPage[isAdmin], aNempPlayer.Status = PLAYER_ISPLAYING, isAdmin);
+                PageData := Templates[tplPagePlayer][isAdmin];
+                // PageData := fSetControlButtons(PageData, aNempPlayer.Status = PLAYER_ISPLAYING, isAdmin);
                 PageData := StringReplace(PageData, '{{Menu}}', menu, [rfReplaceAll]);
                 PageData := StringReplace(PageData, '{{ItemPlayer}}', PlayerData, [rfReplaceAll]);
-                HTML_Player := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]))
+                PageData := StringReplace(PageData, '{{ClassPlayerStatus}}', StatusClass[aNempPlayer.Status = PLAYER_ISPLAYING], [rfReplaceAll]);
+                PageData := StringReplace(PageData, '{{ClassControls}}', ControlClass[isAdmin or AllowRemoteControl], [rfReplaceAll]);
+                HTML_Player := UTF8String(StringReplace(Templates[tplBody][isAdmin], '{{Content}}', PageData, [rfReplaceAll]))
             end;
         end;
 
@@ -1367,7 +1382,7 @@ begin
         else
             PageData := 'fail';
 
-        HTML_Player := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
+        HTML_Player := UTF8String(StringReplace(Templates[tplBody][isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
     end;
 end;
 
@@ -1384,11 +1399,11 @@ begin
         PageData := GenerateErrorPage(WebServer_EmptyPlaylist, 1, isAdmin)
     end else
     begin
-        PageData := PatternPlaylistPage[isAdmin];
+        PageData := Templates[tplPagePlaylist][isAdmin];
         PageData := StringReplace(PageData, '{{Menu}}', menu, [rfReplaceAll]);
         PageData := StringReplace(PageData, '{{PlaylistItems}}', Items, [rfReplaceAll]);
     end;
-    HTML_PlaylistView := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
+    HTML_PlaylistView := UTF8String(StringReplace(Templates[tplBody][isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
 end;
 
 function TNempWebServer.GenerateHTMLfromPlaylistItem(
@@ -1408,14 +1423,18 @@ begin
             EnsureFileHasID(af);
 
             // create new Item
-            Item := PatternItemPlaylist[isAdmin];
-            Item := StringReplace(Item, '{{Index}}'  , IntToStr(i + 1)         , [rfReplaceAll]);
-            Item := StringReplace(Item, '{{ID}}'     , IntToStr(af.WebServerID), [rfReplaceAll]);
+            Item := Templates[tplItemFilePlaylist][isAdmin];
+            Item := StringReplace(Item, '{{Index}}', IntToStr(i + 1), [rfReplaceAll]);
+            Item := StringReplace(Item, '{{ID}}', IntToStr(af.WebServerID), [rfReplaceAll]);
 
-            if af = aNempPlaylist.PlayingFile then
-                Item := StringReplace(Item, '{{Anchor}}'     , 'name="currentTrack"', [rfReplaceAll])
-            else
-                Item := StringReplace(Item, '{{Anchor}}'     , '', [rfReplaceAll]);
+            if af = aNempPlaylist.PlayingFile then begin
+                Item := StringReplace(Item, '{{Anchor}}', 'id="currentTrack"', [rfReplaceAll]);
+                Item := StringReplace(Item, '{{Progress}}', '<div class="playlistprogresscontainer"><div id="playlistprogress"></div></div>', [rfReplaceAll])
+            end
+            else begin
+                Item := StringReplace(Item, '{{Anchor}}', '', [rfReplaceAll]);
+                Item := StringReplace(Item, '{{Progress}}', '', [rfReplaceAll]);
+            end;
 
             // Set "Current" class
             if af = aNempPlaylist.PlayingFile then
@@ -1435,7 +1454,7 @@ begin
         if (aIdx >= 0) and (aIdx < aNempPlaylist.Count) then
         begin
             af := aNempPlayList.Playlist[aIdx];
-            Item := PatternItemPlaylist[isAdmin];
+            Item := Templates[tplItemFilePlaylist][isAdmin];
             Item := StringReplace(Item, '{{Index}}'  , IntToStr(aIdx + 1)         , [rfReplaceAll]);
 
             Item := StringReplace(Item, '{{ID}}'     , IntToStr(af.WebServerID), [rfReplaceAll]);
@@ -1466,51 +1485,66 @@ begin
     begin
         aAudioFile.FileIsPresent := (not aAudioFile.IsFile) or FileExists(aAudioFile.Pfad);
 
-        FileData := PatternItemPlaylistDetails[isAdmin];
+        FileData := Templates[tplItemFilePlaylistDetails][isAdmin];
         FileData := StringReplace(FileData, '{{Index}}' , IntToStr(aIdx + 1)              , [rfReplaceAll]);
 
         FileData := StringReplace(FileData, '{{ID}}'    , IntToStr(aAudioFile.WebServerID), [rfReplaceAll]);
         FileData := fSetBasicFileData(aAudioFile, FileData, '');
         FileData := fSetFileButtons(aAudioFile, FileData, 1, isAdmin);
 
-        PageData := PatternPlaylistDetailsPage[isAdmin];
+        PageData := Templates[tplPagePlaylistDetails][isAdmin];
         PageData := StringReplace(PageData, '{{Menu}}'               , menu     , [rfReplaceAll]);
         PageData := StringReplace(PageData, '{{ItemPlaylistDetails}}', FileData , [rfReplaceAll]);
     end else
         PageData := GenerateErrorPage(WebServer_InvalidParameter, 1, isAdmin);
 
-    HTML_PlaylistDetails := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
+    HTML_PlaylistDetails := UTF8String(StringReplace(Templates[tplBody][isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
 end;
 
 
-function TNempWebServer.GenerateHTMLMedienbibSearchFormular(aSearchString: UnicodeString;
+function TNempWebServer.GenerateHTMLFileList(aSearchString: UnicodeString;
     Start: Integer; isAdmin: Boolean): UTf8String;
 var ResultList: TAudioFileList;
     af: TAudioFile;
     i, maxIdx: Integer;
-    aClass, PageData, Pagination, menu, browsemenu, Item, Items, warning: String;
-    btnPrev, BtnNext, Link: String;
+    Duration: Int64;
+    aClass, PageData, Pagination, menu, browsemenu, Item, Items, warning, Summary: String;
+    LinkPrev, LinkNext: String;
 begin
     menu := Mainmenu(2, isAdmin);
-    browsemenu := BrowseSubMenu('', '"', '', isAdmin);
+    browsemenu := BrowseSubMenu('', '"', '', false, isAdmin);
 
-    PageData := PatternSearchPage[isAdmin];
+    if trim(aSearchString) = '' then
+      aSearchString := '*';
+
+    PageData := Templates[tplPageLibrary][isAdmin];
     PageData := StringReplace(PageData, '{{Menu}}'       , menu         , [rfReplaceAll]);
-    PageData := StringReplace(PageData, '{{BrowseMenu}}' , browsemenu, [rfReplaceAll]);
+    PageData := StringReplace(PageData, '{{MenuLibrary}}' , browsemenu, [rfReplaceAll]);
     PageData := StringReplace(PageData, '{{SearchString}}', aSearchString, [rfReplaceAll]);
+    PageData := StringReplace(PageData, '{{ClassLibrary}}', 'search', [rfReplaceAll]);
 
     if aSearchString <> '' then
     begin
         Items := '';
-        maxIdx := 0;
         if Start < 0 then
             Start := 0;
 
         ResultList := TAudioFileList.Create(False);
         try
             SearchLibrary(aSearchString, ResultList);
+            Duration := 0;
+            for i := 0 to ResultList.Count-1 do
+              Duration := Duration + ResultList[i].Duration;
+
+            Summary := Templates[tplSummarySearch][isAdmin];
+            Summary := StringReplace(Summary, '{{Search}}', EscapeHTMLChars(aSearchString) , [rfReplaceAll]);
+            Summary := StringReplace(Summary, '{{Count}}', EscapeHTMLChars(ResultList.Count.ToString) , [rfReplaceAll]);
+            Summary := StringReplace(Summary, '{{Duration}}', EscapeHTMLChars(SekToZeitString(Duration)) , [rfReplaceAll]);
+
+
             if ResultList.Count > 0 then
             begin
+                PageData := StringReplace(PageData, '{{Summary}}', Summary, [rfReplaceAll]);
                 maxIdx := Start + MaxCountPerPage - 1;
                 if maxIdx > (ResultList.Count - 1) then
                     maxIdx := ResultList.Count - 1;
@@ -1520,7 +1554,7 @@ begin
                     af := ResultList[i];
                     // ID generieren/setzen
                     EnsureFileHasID(af);
-                    Item := PatternItemSearchlist[isAdmin];
+                    Item := Templates[tplItemFileLibrary][isAdmin];
                     Item := StringReplace(Item, '{{ID}}'  , IntToStr(af.WebServerID), [rfReplaceAll]);
                     aClass := '';
                     // replace tags
@@ -1531,338 +1565,403 @@ begin
             end;
 
             // Build Pagination
+            LinkPrev := '';
+            LinkNext := '';
             if (Start > 0) then
-            begin
-                BtnPrev := PatternPaginationPrev[isAdmin];
-                Link := 'library?start=' + IntToStr(start-MaxCountPerPage) + '&amp;query=' + ParamsEncode(UTF8String(aSearchString));
-                BtnPrev := StringReplace(BtnPrev, '{{Link}}', Link, [rfReplaceAll]);
-            end
-            else
-                BtnPrev := '';
-
+              LinkPrev := 'search?start=' + IntToStr(start-MaxCountPerPage) + '&amp;query=' + ParamsEncode(UTF8String(aSearchString));
             if (Start + MaxCountPerPage) < (ResultList.Count - 1) then
-            begin
-                BtnNext := PatternPaginationNext[isAdmin];
-                Link := 'library?start=' + IntToStr(start+MaxCountPerPage) + '&amp;query=' + ParamsEncode(UTF8String(aSearchString));
-                BtnNext := StringReplace(BtnNext, '{{Link}}', Link, [rfReplaceAll]);
-
-            end
+              LinkNext := 'search?start=' + IntToStr(start+MaxCountPerPage) + '&amp;query=' + ParamsEncode(UTF8String(aSearchString));
+            if (LinkNext = '') and (LinkPrev = '') then
+              Pagination := ''
             else
-                BtnNext := '';
-
-            if (BtnNext = '') and (BtnPrev = '') then
-                Pagination := ''
-            else
-            begin
-                Pagination := StringReplace(PatternPagination[isAdmin], '{{NextPage}}', BtnNext, [rfReplaceAll]);
-                Pagination := StringReplace(Pagination       , '{{PrevPage}}', BtnPrev, [rfReplaceAll]);
-                Pagination := StringReplace(Pagination       , '{{Start}}' , IntToStr(Start+1)           , [rfReplaceAll]);
-                Pagination := StringReplace(Pagination       , '{{End}}'   , IntToStr(MaxIdx+1)          , [rfReplaceAll]);
-                Pagination := StringReplace(Pagination       , '{{Count}}' , IntToStr(ResultList.Count), [rfReplaceAll]);
-            end;
+              Pagination := FilePagination(Start, ResultList.Count, LinkPrev, LinkNext, isAdmin);
 
             if ResultList.Count = 0 then
             begin
-                warning := PatternNoFilesHint[isAdmin];
+                warning := Templates[tplWarningNoFiles][isAdmin];
                 warning := StringReplace(warning, '{{Value}}', aSearchString  , [rfReplaceAll]);
                 PageData := StringReplace(PageData, '{{NoFilesHint}}', warning  , [rfReplaceAll]);
+                PageData := StringReplace(PageData, '{{Summary}}', '', [rfReplaceAll]);
             end
             else
                 PageData := StringReplace(PageData, '{{NoFilesHint}}', ''  , [rfReplaceAll]);
 
             PageData := StringReplace(PageData, '{{Pagination}}', Pagination, [rfReplaceAll]);
-            PageData := StringReplace(PageData, '{{SearchResultItems}}', Items, [rfReplaceAll]);
+            PageData := StringReplace(PageData, '{{LibraryItems}}', Items, [rfReplaceAll]);
             PageData := StringReplace(PageData, '{{SearchCount}}', IntToStr(ResultList.Count), [rfReplaceAll]);
         finally
             ResultList.Free;
         end;
     end else
     begin
-        PageData := StringReplace(PageData, '{{NoFilesHint}}', ''  , [rfReplaceAll]);
+        PageData := StringReplace(PageData, '{{NoFilesHint}}', '<div class="warning">Search string must not be empty.</div>', [rfReplaceAll]);
         PageData := StringReplace(PageData, '{{Pagination}}', '', [rfReplaceAll]);
-        PageData := StringReplace(PageData, '{{SearchResultItems}}', '', [rfReplaceAll]);
+        PageData := StringReplace(PageData, '{{LibraryItems}}', '', [rfReplaceAll]);
         PageData := StringReplace(PageData, '{{SearchCount}}', '0', [rfReplaceAll]);
+        PageData := StringReplace(PageData, '{{Summary}}', '', [rfReplaceAll]);
     end;
 
-    result := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
+    result := UTF8String(StringReplace(Templates[tplBody][isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
 end;
 
 
-function TNempWebServer.GenerateHTMLMedienbibBrowseList(aMode: String; aChar: Char; other, isAdmin: Boolean): UTf8String;
+function TNempWebServer.GenerateHTMLCollectionList(CollectionType: String; startLetter: String; SortAlbumsByArtist, other, isAdmin: Boolean): UTf8String;
 var PageData, menu, browsemenu, pagination: String;
     Items, Item, baseLink, Link, ItemPattern: String;
-    i, ListIdx: Integer;
-    aList, LinkList: TObjectlist;
-    ab: TCountedString;
-    //maxC: Integer;
+    i, requestedArrIdx: Integer;
+    rc: TRootCollection;
+    afc: TAudioFileCollection;
+    ShowAll: Boolean;
+    ShowSwitchLink: Boolean;
+    maxCount: Integer;
+    ValidCollection: Boolean;
+    Comparer: TCollectionComparer;
 
-    {function GetMaxCount(aList: TObjectList): Integer;
+    afcList: TAudioFileCollectionList;
+
+    function CalcFontSize(colCount, maxCount: Integer): Integer;
+    begin
+      result := round((colCount * sqrt(colCount)) / maxCount * 14) + 10;
+      if result > 24 then
+          result := 24;
+    end;
+
+    function CheckRange(StartIdx, EndIdx: Integer): Integer;
     var i: Integer;
     begin
-        result := 1;
-        for i := 0 to aList.Count - 1 do
-        begin
-            if TCountedString(aList[i]).Count > result then
-                result := TCountedString(aList[i]).Count;
+      result := -1;
+      for i := StartIdx to EndIdx do
+        if ((CollectionType = 'artist') and  (fMainArtistCount[i] + fOtherArtistCount[i] > 0))
+          or ((CollectionType = 'album') and (not SortAlbumsByArtist) and (fAlbumCount[i] > 0))
+          or ((CollectionType = 'album') and (SortAlbumsByArtist) and (fAlbumCountByArtist[i] > 0))
+        then begin
+          result := i;
+          break;
         end;
-        if result < 200 then
-            result := 200;
     end;
-    }
 
-   { function PoperSize(aMax, c: Integer): Integer;
+    function FirstValidArrIdx(StartIdx: Integer): Integer;
     begin
-        result := round((c*sqrt(c))/aMax * 14) + 10;
-        if result > 22 then
-            result := 22;
-    end; }
+      if StartIdx <= 0 then StartIdx := 1; // Ignore "0" on the first run
+      if StartIdx >= 26 then StartIdx := 1; // ignore "other" on the first run
+
+      result := CheckRange(StartIdx, 26);
+      if result = -1 then
+        result := CheckRange(1, StartIdx-1);
+      if result = -1 then
+        result := CheckRange(0, 0);
+      if result = -1 then
+        result := CheckRange(27, 27);
+      if result = -1 then
+        result := 0;
+    end;
+
+    function FixedStartLetter(Idx: Integer): String;
+    begin
+      case Idx of
+        0: result := '0';
+        1..26: result := chr(Idx - 1 + ord('A'));
+        27: result := cOtherLetters;
+      else
+        result := '0';
+      end;
+    end;
 
 begin
-    menu := MainMenu(2, isAdmin);
-    browsemenu := BrowseSubMenu(aMode, aChar, '', isAdmin);
 
-    if CharInSet(aChar, ['A'..'Z']) then
-        ListIdx := ord(aChar) - ord('A') + 1
-    else
-        ListIdx := 0;
 
-    aList := MainArtists[1]; // fallback
-    LinkList := Nil;
-    ItemPattern := PatternItemBrowseArtist[isAdmin];
-    if aMode = 'artist' then
-    begin
-        ItemPattern := PatternItemBrowseArtist[isAdmin];
-        if other then
-        begin
-            aList := OtherArtists[ListIdx];
-            LinkList := MainArtists[ListIdx];
-            if LinkList.Count = 0 then
-                LinkList := Nil;
-            if aList.Count = 0 then
-            begin
-                aList := MainArtists[ListIdx]; // Fallback
-                other := False;
-                LinkList := Nil;
-            end;
-        end
+    if startLetter = '' then begin
+      requestedArrIdx := FirstValidArrIdx(1);
+      startLetter := FixedStartLetter(requestedArrIdx);
+    end
+    else begin
+      if startLetter = cOtherLetters then
+        requestedArrIdx := 27
+      else begin
+        case startLetter[1] of
+          '0': requestedArrIdx := 0;
+          'A'..'Z': requestedArrIdx := ord(startLetter[1]) - ord('A') + 1;
         else
-        begin
-            aList := MainArtists[ListIdx];
-            LinkList := OtherArtists[ListIdx];
-            if LinkList.Count = 0 then
-                LinkList := Nil;
-            if aList.Count = 0 then
-            begin
-                aList := OtherArtists[ListIdx]; // Fallback
-                other := True;
-                LinkList := Nil;
-            end;
+          requestedArrIdx := 0;
         end;
+      end;
+
+      if ((CollectionType = 'artist') and  (fMainArtistCount[requestedArrIdx] + fOtherArtistCount[requestedArrIdx] = 0))
+          or ((CollectionType = 'album') and (not SortAlbumsByArtist) and (fAlbumCount[requestedArrIdx] = 0))
+          or ((CollectionType = 'album') and (SortAlbumsByArtist) and (fAlbumCountByArtist[requestedArrIdx] = 0))
+      then begin
+        requestedArrIdx := FirstValidArrIdx(requestedArrIdx);
+        startLetter := FixedStartLetter(requestedArrIdx);
+      end;
     end;
-    if aMode = 'album' then
+
+    menu := MainMenu(2, isAdmin);
+    browsemenu := BrowseSubMenu(CollectionType, startLetter, '', SortAlbumsByArtist, isAdmin);
+
+    ShowAll := True;
+    ShowSwitchLink := False;
+    maxCount := 20;
+    rc := fCollectionArtists;
+    ItemPattern := Templates[tplItemBrowseArtist][isAdmin];
+
+    if CollectionType = 'artist' then
     begin
-        ItemPattern := PatternItemBrowseAlbum[isAdmin];
-        aList := Albums[ListIdx];
+        ItemPattern := Templates[tplItemBrowseArtist][isAdmin];
+        rc := fCollectionArtists;
+        ShowAll := (fMainArtistCount[requestedArrIdx] + fOtherArtistCount[requestedArrIdx] <= MergeArtistConst)
+            or (fMainArtistCount[requestedArrIdx] <= 5)
+            or (fOtherArtistCount[requestedArrIdx] <= 5);
+
+        if ShowAll then begin
+          maxCount := max(fMaxCountOtherArtist[requestedArrIdx], fMaxCountMainArtist[requestedArrIdx]);
+        end
+        else begin
+          if other then begin
+            ShowSwitchLink := fMainArtistCount[requestedArrIdx] > 0;
+            maxCount := fMaxCountOtherArtist[requestedArrIdx];
+          end
+          else begin
+            ShowSwitchLink := fOtherArtistCount[requestedArrIdx] > 0;
+            maxCount := fMaxCountMainArtist[requestedArrIdx];
+          end;
+        end
     end;
-    if aMode = 'genre' then
+    if CollectionType = 'album' then
     begin
-        ItemPattern := PatternItemBrowseGenre[isAdmin];
-        aList := Genres;
+        rc := fCollectionAlbums;
+        ItemPattern := Templates[tplItemBrowseAlbum][isAdmin];
+    end;
+    if CollectionType = 'genre' then
+    begin
+        rc := fCollectionGenres;
+        maxCount := fMaxCountGenre;
+        ItemPattern := Templates[tplItemBrowseGenre][isAdmin];
     end;
 
     Items := '';
-    baseLink := 'browse?mode=' + EscapeHTMLChars(aMode) + '&amp;l=' + EscapeHTMLChars(aChar) + '&amp;value=';
 
-    // maxC := GetMaxCount(aList);
+    if (CollectionType = 'album') and SortAlbumsByArtist then
+      baseLink := 'library?albumsortmode=artist&mode=' + EscapeHTMLChars(CollectionType) + '&amp;l=' + EscapeHTMLChars(startLetter) + '&amp;id='
+    else
+      baseLink := 'library?mode=' + EscapeHTMLChars(CollectionType) + '&amp;l=' + EscapeHTMLChars(startLetter) + '&amp;id=';
 
-    for i := 0 to aList.Count - 1 do
-    begin
-        ab := TCountedString(aList[i]);
-        Item := ItemPattern;
-        Link := baseLink + ParamsEncode(UTF8String(ab.Value));
+    afcList := TAudioFileCollectionList.Create(False);
+    try
+          for i := 0 to rc.CollectionCount - 1 do
+          begin
+              afc := TAudioFileCollection(rc.Collection[i]);
+              ValidCollection := (rc = fCollectionGenres)
+                  or ((CollectionType = 'artist') and (NavigationIndex(afc.Artist) = requestedArrIdx))
+                  or ((CollectionType = 'album') and (not SortAlbumsByArtist) and(NavigationIndex(afc.Album) = requestedArrIdx))
+                  or ((CollectionType = 'album') and SortAlbumsByArtist and (NavigationIndex(afc.Artist) = requestedArrIdx));
 
-        Item := StringReplace(Item, '{{Link}}'   , Link, [rfReplaceAll]);
-        //Item := StringReplace(Item, '{{Font}}'   , IntToStr(PoperSize(maxC, ab.Count)) + 'px', [rfReplaceAll]);
-        Item := StringReplace(Item, '{{Font}}'   , IntToStr(ab.FontSize) + 'px', [rfReplaceAll]);
-        Item := StringReplace(Item, '{{Value}}'  , EscapeHTMLChars(ab.Value), [rfReplaceAll]);
-        Item := StringReplace(Item, '{{SecondValue}}'  , EscapeHTMLChars(ab.SecondValue), [rfReplaceAll]);
+              ValidCollection := ValidCollection and
+                (ShowAll or (other and (afc.Count < cMinCountProperArtist))
+                         or (not other and (afc.Count > cMinCountProperArtist)) );
+              if ValidCollection then
+                afcList.Add(afc);
+          end;
 
-        Item := StringReplace(Item, '{{Count}}'  , IntToStr(ab.Count), [rfReplaceAll]);
-        Item := StringReplace(Item, '{{CoverID}}', EscapeHTMLChars(ab.CoverID), [rfReplaceAll]);
-        Items := Items + Item;
+          if rc = fCollectionAlbums then begin
+            if SortAlbumsByArtist then
+              Comparer := CompareCollection_Artist
+            else
+              Comparer := CompareCollection_Album;
+
+            afcList.Sort (TComparer<TAudioFileCollection>.Construct( function (const item1, item2: TAudioFileCollection): Integer
+                    begin
+                      result := Comparer(item1, item2);
+                    end));
+          end;
+
+          for i := 0 to afcList.Count - 1 do begin
+              afc := afcList[i];
+              Item := ItemPattern;
+              /// Link := baseLink + ParamsEncode(UTF8String(ab.Value));
+              Link := baseLink + ParamsEncode(UTF8String(afc.WebServerID.toString));
+              Item := StringReplace(Item, '{{Link}}'   , Link, [rfReplaceAll]);
+              Item := StringReplace(Item, '{{FontIdx}}'   , IntToStr( CalcFontSize(afc.Count, maxCount)), [rfReplaceAll]);
+              //Item := StringReplace(Item, '{{Value}}'  , EscapeHTMLChars(afc.Artist), [rfReplaceAll]);
+              //Item := StringReplace(Item, '{{SecondValue}}'  , EscapeHTMLChars(afc.Album), [rfReplaceAll]);
+              Item := StringReplace(Item, '{{Artist}}'  , EscapeHTMLChars(afc.Artist), [rfReplaceAll]);
+              Item := StringReplace(Item, '{{Album}}'  , EscapeHTMLChars(afc.Album), [rfReplaceAll]);
+              Item := StringReplace(Item, '{{Genre}}'  , EscapeHTMLChars(afc.Genre), [rfReplaceAll]);
+              if afc.Year >= 0 then
+                Item := StringReplace(Item, '{{Year}}', EscapeHTMLChars(afc.Year.ToString) , [rfReplaceAll])
+              else
+                Item := StringReplace(Item, '{{Year}}', '- ? -' , [rfReplaceAll]);
+
+              Item := StringReplace(Item, '{{Count}}'  , IntToStr(afc.Count), [rfReplaceAll]);
+              Item := StringReplace(Item, '{{CoverID}}', EscapeHTMLChars(afc.CoverID), [rfReplaceAll]);
+              Item := StringReplace(Item, '{{Duration}}'  , SekIntToMinStr(afc.Duration), [rfReplaceAll]);
+              Items := Items + Item;
+          end;
+    finally
+      afcList.Free;
     end;
 
-
-    PageData := PatternSearchPage[isAdmin];
+    PageData := Templates[tplPageLibrary][isAdmin];
     PageData := StringReplace(PageData, '{{Menu}}'        , menu       , [rfReplaceAll]);
-    PageData := StringReplace(PageData, '{{BrowseMenu}}'  , browsemenu , [rfReplaceAll]);
+    PageData := StringReplace(PageData, '{{MenuLibrary}}'  , browsemenu , [rfReplaceAll]);
     PageData := StringReplace(PageData, '{{SearchString}}', ''         , [rfReplaceAll]);
     PageData := StringReplace(PageData, '{{NoFilesHint}}', ''  , [rfReplaceAll]);
+    PageData := StringReplace(PageData, '{{Summary}}', ''  , [rfReplaceAll]);
+    PageData := StringReplace(PageData, '{{ClassLibrary}}', CollectionType, [rfReplaceAll]);
 
+    if CollectionType='artist' then begin
+      if ShowSwitchLink then begin
+        if Other then
+          pagination := ArtistNavigation(startLetter, 'library?mode=' + ParamsEncode(UTF8String(CollectionType)) + '&amp;l=' + ParamsEncode(UTF8String(startLetter)) + '&amp;other=0', '', isAdmin)
+        else
+          pagination := ArtistNavigation(startLetter, '', 'library?mode=' + ParamsEncode(UTF8String(CollectionType)) + '&amp;l=' + ParamsEncode(UTF8String(startLetter)) + '&amp;other=1', isAdmin);
+      end else
+          pagination := '';
 
-    if aMode='artist' then
-    begin
-        if assigned(LinkList) then
-        begin
-            if Other then
-            begin
-                pagination := PatternPaginationMain[isAdmin];
-                Link := 'browse?mode=' + ParamsEncode(UTF8String(aMode)) + '&amp;l=' + ParamsEncode(UTF8String(aChar)) + '&amp;other=0';
-            end
-            else
-            begin
-                pagination := PatternPaginationOther[isAdmin];
-                Link := 'browse?mode=' + ParamsEncode(UTF8String(aMode)) + '&amp;l=' + ParamsEncode(UTF8String(aChar)) + '&amp;other=1';
-            end;
-            pagination := StringReplace(pagination, '{{Letter}}', aChar, [rfReplaceAll]);
-            pagination := StringReplace(pagination, '{{Link}}', Link, [rfReplaceAll]);
-        end else
-            pagination := '';
-        PageData := StringReplace(PageData, '{{Pagination}}', pagination, [rfReplaceAll]);
+      PageData := StringReplace(PageData, '{{Pagination}}', pagination, [rfReplaceAll]);
     end
     else
         PageData := StringReplace(PageData, '{{Pagination}}', '', [rfReplaceAll]);
 
-    PageData := StringReplace(PageData, '{{SearchResultItems}}', Items, [rfReplaceAll]);
-    result := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
+    PageData := StringReplace(PageData, '{{LibraryItems}}', Items, [rfReplaceAll]);
+    result := UTF8String(StringReplace(Templates[tplBody][isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
 end;
 
-function TNempWebServer.GenerateHTMLMedienbibBrowseResult(aMode: String; aValue: String;
-    Start: Integer; isAdmin: Boolean): UTf8String;
+function TNempWebServer.GenerateHTMLFileList(CollectionType: String; CollectionID: String; startLetter: String;
+    Start: Integer; SortAlbumsByArtist, isAdmin: Boolean): UTf8String;
 var PageData, menu, browsemenu: String;
     Items, warning: String;
-    btnPrev, BtnNext, Pagination, Link: String;
+    Pagination, LinkPrev, LinkNext, Summary: String;
     i,  maxIdx: Integer;
-    af: TAudioFile;
     ResultList: TAudioFileList;
+    rc: TRootCollection;
+    afc: TAudioFileCollection;
+    requestedCollectionID: Integer;
 
     procedure AddItem(afile: TAudioFile);
-    var aClass, Item: String;
+    var
+      aClass, Item: String;
     begin
-        //if c < 1000 then
-        //begin
-            EnsureFileHasID(af);
-            Item := PatternItemSearchlist[isAdmin];
-            Item := StringReplace(Item, '{{ID}}'  , IntToStr(afile.WebServerID), [rfReplaceAll]);
-            aClass := '';
-            // replace tags
-            Item := fSetBasicFileData(afile, Item, aClass);
-            Item := fSetFileButtons(afile, Item, 2, isAdmin);
-            Items := Items + Item;
-        //end;
-        //inc(c);
+      EnsureFileHasID(afile);
+      Item := Templates[tplItemFileLibrary][isAdmin];
+      Item := StringReplace(Item, '{{ID}}'  , IntToStr(afile.WebServerID), [rfReplaceAll]);
+      aClass := '';
+      // replace tags
+      Item := fSetBasicFileData(afile, Item, aClass);
+      Item := fSetFileButtons(afile, Item, 2, isAdmin);
+      Items := Items + Item;
     end;
 
 begin
-    menu := MainMenu(2, isAdmin);
-    browsemenu := BrowseSubMenu(aMode, ' ', aValue, isAdmin);
+    rc := Nil;
+    Summary := Templates[tplSummaryArtist][isAdmin];
+    if CollectionType='artist' then begin
+      Summary := Templates[tplSummaryArtist][isAdmin];
+      rc := self.fCollectionArtists;
+    end else
+      if CollectionType='album' then begin
+        Summary := Templates[tplSummaryAlbum][isAdmin];
+        rc := self.fCollectionAlbums;
+      end else
+        if CollectionType='genre' then begin
+          Summary := Templates[tplSummaryGenre][isAdmin];
+          rc := self.fCollectionGenres;
+        end;
 
-    PageData := PatternSearchPage[isAdmin];
+
+    menu := MainMenu(2, isAdmin);
+    browsemenu := BrowseSubMenu(CollectionType, startLetter, CollectionID, SortAlbumsByArtist, isAdmin);
+
+    PageData := Templates[tplPageLibrary][isAdmin];
     PageData := StringReplace(PageData, '{{Menu}}'        , menu       , [rfReplaceAll]);
-    PageData := StringReplace(PageData, '{{BrowseMenu}}'  , browsemenu , [rfReplaceAll]);
+    PageData := StringReplace(PageData, '{{MenuLibrary}}'  , browsemenu , [rfReplaceAll]);
     PageData := StringReplace(PageData, '{{SearchString}}', ''         , [rfReplaceAll]);
+
     Items := '';
 
     EnterCriticalSection(CS_AccessLibrary);
 
     ResultList := TAudioFileList.Create(False);
     try
-        if aMode='artist' then
-            for i := 0 to fWebMedienBib.Count - 1 do
-            begin
-                af := fWebMedienBib[i];
-                if AnsiSameText(af.Artist, aValue) then
-                    ResultList.Add(af);
-            end;
+      if assigned(rc) then begin
+        requestedCollectionID := StrToIntDef(CollectionID, -1);
 
-        if aMode='album' then
-            for i := 0 to fWebMedienBib.Count - 1 do
-            begin
-                af := fWebMedienBib[i];
-                if AnsiSameText(af.Album, aValue) then
-                    ResultList.Add(af);
-                    //AddItem(af);
-            end;
+        for i := 0 to rc.CollectionCount - 1 do
+          if rc.Collection[i].WebServerID = requestedCollectionID then begin
+            /// Generate Summary here
+            afc := TAudioFileCollection(rc.Collection[i]);
+            Summary := StringReplace(Summary, '{{Album}}', EscapeHTMLChars(afc.Album) , [rfReplaceAll]);
+            Summary := StringReplace(Summary, '{{Artist}}', EscapeHTMLChars(afc.Artist) , [rfReplaceAll]);
+            Summary := StringReplace(Summary, '{{CoverID}}', EscapeHTMLChars(afc.CoverID) , [rfReplaceAll]);
 
-        if aMode='genre' then
-            for i := 0 to fWebMedienBib.Count - 1 do
-            begin
-                af := fWebMedienBib[i];
-                if AnsiSameText(af.genre, aValue) then
-                    ResultList.Add(af);
-            end;
+            Summary := StringReplace(Summary, '{{Genre}}', EscapeHTMLChars(afc.Genre) , [rfReplaceAll]);
+            if afc.Year >= 0 then
+              Summary := StringReplace(Summary, '{{Year}}', EscapeHTMLChars(afc.Year.ToString) , [rfReplaceAll])
+            else
+              Summary := StringReplace(Summary, '{{Year}}', '- ? -' , [rfReplaceAll]);
 
-        if Start < 0 then Start := 0;
+            Summary := StringReplace(Summary, '{{Count}}', EscapeHTMLChars(afc.Count.ToString) , [rfReplaceAll]);
+            Summary := StringReplace(Summary, '{{Duration}}', EscapeHTMLChars(SekToZeitString(afc.Duration)) , [rfReplaceAll]);
 
-        maxIdx := Start + MaxCountPerPage - 1;
-        if maxIdx > (ResultList.Count - 1) then
-            maxIdx := ResultList.Count - 1;
+            if CollectionType='artist' then
+              Summary := StringReplace(Summary, '{{AlbumCount}}', EscapeHTMLChars(afc.CollectionCount.ToString) , [rfReplaceAll])
+            else
+              Summary := StringReplace(Summary, '{{AlbumCount}}', '' , [rfReplaceAll]);
 
-        for i := Start to maxIdx do
-            AddItem(ResultList[i]);
+            if CollectionType='genre' then
+              Summary := StringReplace(Summary, '{{ArtistCount}}', EscapeHTMLChars(afc.CollectionCount.ToString) , [rfReplaceAll])
+            else
+              Summary := StringReplace(Summary, '{{ArtistCount}}', '' , [rfReplaceAll]);
 
-        // Build Pagination
-        if (Start > 0) then
-        begin
-            BtnPrev := PatternPaginationPrev[isAdmin];
-            Link := 'browse?start=' + IntToStr(start-MaxCountPerPage) + '&amp;mode=' + ParamsEncode(UTF8String(aMode)) + '&amp;value=' + ParamsEncode(UTF8String(aValue));
-            BtnPrev := StringReplace(BtnPrev, '{{Link}}', Link, [rfReplaceAll]);
-        end
-        else
-            BtnPrev := '';
+            PageData := StringReplace(PageData, '{{Summary}}', Summary  , [rfReplaceAll]);
 
-        if (Start + MaxCountPerPage) < (ResultList.Count - 1) then
-        begin
-            BtnNext := PatternPaginationNext[isAdmin];
-            Link := 'browse?start=' + IntToStr(start+MaxCountPerPage) + '&amp;mode=' + ParamsEncode(UTF8String(aMode)) + '&amp;value=' + ParamsEncode(UTF8String(aValue));
-            BtnNext := StringReplace(BtnNext, '{{Link}}', Link, [rfReplaceAll]);
-        end
-        else
-            BtnNext := '';
+            rc.Collection[i].GetFiles(ResultList, True);
+            break;
+          end;
+      end;
 
-        if (BtnNext = '') and (BtnPrev = '') then
-            Pagination := ''
-        else
-        begin
-            Pagination := StringReplace(PatternPagination[isAdmin], '{{NextPage}}', BtnNext, [rfReplaceAll]);
-            Pagination := StringReplace(Pagination       , '{{PrevPage}}', BtnPrev, [rfReplaceAll]);
-            Pagination := StringReplace(Pagination       , '{{Start}}' , IntToStr(Start+1)           , [rfReplaceAll]);
-            Pagination := StringReplace(Pagination       , '{{End}}'   , IntToStr(MaxIdx+1)          , [rfReplaceAll]);
-            Pagination := StringReplace(Pagination       , '{{Count}}' , IntToStr(ResultList.Count), [rfReplaceAll]);
-        end;
+      if Start < 0 then
+        Start := 0;
 
-        if ResultList.Count = 0 then
-        begin
-            warning := PatternNoFilesHint[isAdmin];
-            warning := StringReplace(warning, '{{Value}}', aValue  , [rfReplaceAll]);
-            PageData := StringReplace(PageData, '{{NoFilesHint}}', warning  , [rfReplaceAll]);
-        end
-        else
-            PageData := StringReplace(PageData, '{{NoFilesHint}}', ''  , [rfReplaceAll])
+      maxIdx := Start + MaxCountPerPage - 1;
+      if maxIdx > (ResultList.Count - 1) then
+          maxIdx := ResultList.Count - 1;
 
-    //if c <= 1000 then
-    //    PageData := StringReplace(PageData, '{{TooManyFilesWarning}}', ''  , [rfReplaceAll])
-    //else
-    //begin
-    //    warning := PatternTooManyFilesWarning;
-    //    warning := StringReplace(warning, '{{Count}}', IntToStr(c)  , [rfReplaceAll]);
-    //    PageData := StringReplace(PageData, '{{TooManyFilesWarning}}', warning  , [rfReplaceAll]);
-    //end;
+      for i := Start to maxIdx do
+        AddItem(ResultList[i]);
+
+      // Build Pagination
+      LinkPrev := '';
+      LinkNext := '';
+      if (Start > 0) then
+        LinkPrev := 'library?start=' + IntToStr(start-MaxCountPerPage) + '&amp;mode=' + ParamsEncode(UTF8String(CollectionType)) + '&amp;id=' + ParamsEncode(UTF8String(CollectionID));
+      if (Start + MaxCountPerPage) < (ResultList.Count - 1) then
+        LinkNext := 'library?start=' + IntToStr(start+MaxCountPerPage) + '&amp;mode=' + ParamsEncode(UTF8String(CollectionType)) + '&amp;id=' + ParamsEncode(UTF8String(CollectionID));
+      if (LinkNext = '') and (LinkPrev = '') then
+        Pagination := ''
+      else
+        Pagination := FilePagination(Start, ResultList.Count, LinkPrev, LinkNext, isAdmin);
+
+      if ResultList.Count = 0 then begin
+        warning := Templates[tplWarningNoFiles][isAdmin];
+        warning := StringReplace(warning, '{{Value}}', CollectionID  , [rfReplaceAll]);
+        PageData := StringReplace(PageData, '{{NoFilesHint}}', warning  , [rfReplaceAll]);
+        PageData := StringReplace(PageData, '{{Summary}}', ''  , [rfReplaceAll]);
+      end
+      else
+        PageData := StringReplace(PageData, '{{NoFilesHint}}', ''  , [rfReplaceAll]);
 
     finally
         ResultList.Free;
+        LeaveCriticalSection(CS_AccessLibrary);
     end;
 
-    LeaveCriticalSection(CS_AccessLibrary);
-
     PageData := StringReplace(PageData, '{{Pagination}}', Pagination, [rfReplaceAll]);
-    PageData := StringReplace(PageData, '{{SearchResultItems}}', Items, [rfReplaceAll]);
-    result := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
-
+    PageData := StringReplace(PageData, '{{LibraryItems}}', Items, [rfReplaceAll]);
+    result := UTF8String(StringReplace(Templates[tplBody][isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
 end;
 
 
-function TNempWebServer.GenerateHTMLfromMedienbibSearch_Details(aAudioFile: TAudioFile; isAdmin: Boolean): UTf8String;
+function TNempWebServer.GenerateHTMLFileDetailsLibrary(aAudioFile: TAudioFile; isAdmin: Boolean): UTf8String;
 var PageData, FileData, menu: String;
 begin
     menu := MainMenu(2, isAdmin);
@@ -1871,19 +1970,19 @@ begin
     begin
         aAudioFile.FileIsPresent := (not aAudioFile.IsFile) or FileExists(aAudioFile.Pfad);
 
-        FileData := PatternItemSearchDetails[isAdmin];
+        FileData := Templates[tplItemFileLibraryDetails][isAdmin];
         FileData := StringReplace(FileData, '{{ID}}'    , IntToStr(aAudioFile.WebServerID), [rfReplaceAll]);
         FileData := fSetBasicFileData(aAudioFile, FileData, '');
         FileData := fSetFileButtons(aAudioFile, FileData, 1, isAdmin);
 
-        PageData := PatternSearchDetailsPage[isAdmin];
+        PageData := Templates[tplPageLibraryDetails][isAdmin];
         PageData := StringReplace(PageData, '{{Menu}}', menu, [rfReplaceAll]);
-        PageData := StringReplace(PageData, '{{ItemSearchDetails}}', FileData, [rfReplaceAll]);
+        PageData := StringReplace(PageData, '{{ItemLibraryDetails}}', FileData, [rfReplaceAll]);
     end
     else
         PageData := GenerateErrorPage(WebServer_InvalidParameter, 2, isAdmin);
 
-    result := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
+    result := UTF8String(StringReplace(Templates[tplBody][isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
 end;
 
 procedure TNempWebServer.CopyDisplayHelper;
@@ -1897,13 +1996,7 @@ procedure TNempWebServer.CopyLibrary(OriginalLib: TMedienBibliothek);
 begin
     EnterCriticalSection(CS_AccessLibrary);
     OriginalLib.CopyLibrary(fWebMedienBib, fCurrentMaxID);
-
-    ClearHelperLists;
-
-    PrepareAlbums;
-    PrepareGenres;
-    PrepareArtists;
-
+    PrepareCollections;
     LeaveCriticalSection(CS_AccessLibrary);
 end;
 
@@ -1923,194 +2016,101 @@ var Keywords: TStringList;
     KeywordsUTF8: TUTF8Stringlist;
     tmpList: TAudioFileList;
     i: Integer;
-
 begin
     if trim(Keyword) = '' then exit;
 
     EnterCriticalSection(CS_AccessLibrary);
 
-    Keywords := TStringList.Create;
-    try
-        ExplodeWithQuoteMarks('+', Keyword, Keywords);
+    if trim(Keyword) = '*' then begin
+      for i := 0 to fWebMedienBib.Count - 1 do
+        DestList.Add(fWebMedienBib[i]);
+    end else begin
+      Keywords := TStringList.Create;
+      try
+          ExplodeWithQuoteMarks('+', Keyword, Keywords);
 
-        SetLength(KeywordsUTF8, Keywords.Count);
-        for i := 0 to Keywords.Count - 1 do
-            KeywordsUTF8[i] := UTF8Encode(AnsiLowerCase(Keywords[i]));
+          SetLength(KeywordsUTF8, Keywords.Count);
+          for i := 0 to Keywords.Count - 1 do
+              KeywordsUTF8[i] := UTF8Encode(AnsiLowerCase(Keywords[i]));
 
-        tmpList := TAudioFileList.Create(False);
-        try
-            for i := 0 to fWebMedienBib.Count - 1 do
-            begin
-                if AudioFileMatchesKeywords(fWebMedienBib[i], Keywords) then
-                    DestList.Add(fWebMedienBib[i])
-                else
-                    if AudioFileMatchesKeywordsApprox(fWebMedienBib[i], KeywordsUTF8) then
-                        tmpList.Add(fWebMedienBib[i]);
-            end;
-            for i := 0 to tmpList.Count - 1 do
-                DestList.Add(tmpList[i]);
-        finally
-            tmpList.Free;
-        end;
-    finally
-      Keywords.Free;
+          tmpList := TAudioFileList.Create(False);
+          try
+              for i := 0 to fWebMedienBib.Count - 1 do
+              begin
+                  if AudioFileMatchesKeywords(fWebMedienBib[i], Keywords) then
+                      DestList.Add(fWebMedienBib[i])
+                  else
+                      if AudioFileMatchesKeywordsApprox(fWebMedienBib[i], KeywordsUTF8) then
+                          tmpList.Add(fWebMedienBib[i]);
+              end;
+              for i := 0 to tmpList.Count - 1 do
+                  DestList.Add(tmpList[i]);
+          finally
+              tmpList.Free;
+          end;
+      finally
+        Keywords.Free;
+      end;
     end;
     LeaveCriticalSection(CS_AccessLibrary);
 end;
 
 procedure TNempWebServer.LoadTemplates(isAdmin: Boolean);
-var sl: TStringList;
-
-    function GetTemplate(aFilename: String): String;
-    begin
-        if FileExists(aFilename) then
-        begin
-            sl.LoadFromFile(aFilename);
-            result := sl.Text;
-        end else
-            result := '';
-    end;
-
+var
+  iTpl: teTemplates;
 begin
     if isAdmin then
-        fLocalDir := ExtractFilePath(Paramstr(0)) + 'HTML\' + Theme + '\Admin\'
+      fLocalDir := ExtractFilePath(Paramstr(0)) + 'HTML\' + Theme + '\Admin\'
     else
-        fLocalDir := ExtractFilePath(Paramstr(0)) + 'HTML\' + Theme + '\';
-    sl := TStringList.Create;
-    try
-        PatternBody[isAdmin] := GetTemplate(fLocalDir + 'Body.tpl');
-        PatternMenu[isAdmin] := GetTemplate(fLocalDir + 'Menu.tpl');
-        PatternBrowseMenu[isAdmin] := GetTemplate(fLocalDir + 'MenuLibraryBrowse.tpl');
+      fLocalDir := ExtractFilePath(Paramstr(0)) + 'HTML\' + Theme + '\';
 
-        PatternPagination[isAdmin]      := GetTemplate(fLocalDir + 'Pagination.tpl');
-        PatternPaginationNext[isAdmin]  := GetTemplate(fLocalDir + 'PaginationNextPage.tpl');
-        PatternPaginationPrev[isAdmin]  := GetTemplate(fLocalDir + 'PaginationPrevPage.tpl');
-        PatternPaginationOther[isAdmin] := GetTemplate(fLocalDir + 'PaginationOther.tpl');
-        PatternPaginationMain[isAdmin]  := GetTemplate(fLocalDir + 'PaginationMain.tpl');
+    // fDefaultCoverFilename
+    if FileExists(fLocalDir + 'default_cover.jpg') then
+      fDefaultCoverFilename := fLocalDir + 'default_cover.jpg'
+    else
+      if FileExists(fLocalDir + 'default_cover.png') then
+        fDefaultCoverFilename := fLocalDir + 'default_cover.png';
 
-
-        // Buttons for Player Control
-        // PatternButtonPlayPause := trim(GetTemplate(fLocalDir + 'BtnControlPlayPause.tpl'));
-        PatternPlayerControls[isAdmin] := trim(GetTemplate(fLocalDir + 'PlayerControls.tpl'));
-        PatternButtonPause[isAdmin] := trim(GetTemplate(fLocalDir + 'BtnControlPause.tpl'));
-        PatternButtonPlay[isAdmin]  := trim(GetTemplate(fLocalDir + 'BtnControlPlay.tpl'));
-        PatternButtonNext[isAdmin]  := trim(GetTemplate(fLocalDir + 'BtnControlNext.tpl'));
-        PatternButtonPrev[isAdmin]  := trim(GetTemplate(fLocalDir + 'BtnControlPrev.tpl'));
-        PatternButtonStop[isAdmin]  := trim(GetTemplate(fLocalDir + 'BtnControlStop.tpl'));
-
-        // Buttons for File-Handling
-        PatternButtonFileDownload[isAdmin] := trim(GetTemplate(fLocalDir + 'BtnFileDownload.tpl'));
-        PatternButtonFilePlayNow[isAdmin]  := trim(GetTemplate(fLocalDir + 'BtnFilePlayNow.tpl'));
-        PatternButtonFileAdd[isAdmin]      := trim(GetTemplate(fLocalDir + 'BtnFileAdd.tpl'));
-        PatternButtonFileAddNext[isAdmin]  := trim(GetTemplate(fLocalDir + 'BtnFileAddNext.tpl'));
-        PatternButtonFileMoveUp[isAdmin]   := trim(GetTemplate(fLocalDir + 'BtnFileMoveUp.tpl'));
-        PatternButtonFileMoveDown[isAdmin] := trim(GetTemplate(fLocalDir + 'BtnFileMoveDown.tpl'));
-        PatternButtonFileDelete[isAdmin]   := trim(GetTemplate(fLocalDir + 'BtnFileDelete.tpl'));
-        PatternButtonFileVote[isAdmin]     := trim(GetTemplate(fLocalDir + 'BtnFileVote.tpl'));
-
-        // The PLAYER page
-        PatternItemPlayer[isAdmin] := trim(GetTemplate(fLocalDir + 'ItemPlayer.tpl'));
-        PatternPlayerPage[isAdmin] := GetTemplate(fLocalDir + 'PagePlayer.tpl');
-
-        // The PLAYLIST page
-        PatternPlaylistPage[isAdmin] := GetTemplate(fLocalDir + 'PagePlaylist.tpl');
-        PatternItemPlaylist[isAdmin] := GetTemplate(fLocalDir + 'ItemPlaylist.tpl');
-
-        // The PLAYLIST DETAILS page
-        PatternPlaylistDetailsPage[isAdmin] := GetTemplate(fLocalDir + 'PagePlaylistDetails.tpl');
-        PatternItemPlaylistDetails[isAdmin] := GetTemplate(fLocalDir + 'ItemPlaylistDetails.tpl');
-
-        // The LIBRARY page
-        PatternSearchPage[isAdmin]       := GetTemplate(fLocalDir + 'PageLibrary.tpl');
-        //PatternSearchResultPage[isAdmin] := GetTemplate(fLocalDir + 'PageLibrarySearchResults.tpl');
-        PatternItemSearchlist[isAdmin]   := GetTemplate(fLocalDir + 'ItemSearchResult.tpl');
-
-        PatternItemBrowseArtist[isAdmin] := GetTemplate(fLocalDir + 'ItemBrowseArtist.tpl');
-        PatternItemBrowseAlbum[isAdmin]  := GetTemplate(fLocalDir + 'ItemBrowseAlbum.tpl');
-        PatternItemBrowseGenre[isAdmin]  := GetTemplate(fLocalDir + 'ItemBrowseGenre.tpl');
-
-        // The LIBRARY DETAILS page
-        PatternSearchDetailsPage[isAdmin] := GetTemplate(fLocalDir + 'PageLibraryDetails.tpl');
-        PatternItemSearchDetails[isAdmin] := GetTemplate(fLocalDir + 'ItemSearchDetails.tpl');
-
-        // The ERROR page
-        PatternErrorPage[isAdmin]   := GetTemplate(fLocalDir + 'PageError.tpl');
-        PatternNoFilesHint[isAdmin] := GetTemplate(fLocalDir + 'WarningNoFiles.tpl');
-
-    finally
-        sl.Free;
+    for iTpl := low(teTemplates) to High(teTemplates) do begin
+      if FileExists(fLocalDir + cTemplateFilenames[iTpl]) then
+        Templates[iTpl][isAdmin] := TFile.ReadAllText(fLocalDir + cTemplateFilenames[iTpl], TEncoding.UTF8)
+      else
+        Templates[iTpl][isAdmin] := '';
     end;
 end;
 
 procedure TNempWebServer.TemplateFallback;
-
-    procedure ProcessTemplate(var aDoubleString: TDoubleString);
-    begin
-        if aDoubleString[True] = '' then
-            aDoubleString[True] := aDoubleString[False]
-    end;
-
+var
+  iTpl: teTemplates;
 begin
-        ProcessTemplate(PatternBody);
-        ProcessTemplate(PatternMenu           );
-        ProcessTemplate(PatternBrowseMenu     );
-        ProcessTemplate(PatternPagination     );
-        ProcessTemplate(PatternPaginationNext );
-        ProcessTemplate(PatternPaginationPrev );
-        ProcessTemplate(PatternPaginationOther);
-        ProcessTemplate(PatternPaginationMain );
-        ProcessTemplate(PatternPlayerControls );
-        ProcessTemplate(PatternButtonPause    );
-        ProcessTemplate(PatternButtonPlay     );
-        ProcessTemplate(PatternButtonNext     );
-        ProcessTemplate(PatternButtonPrev     );
-        ProcessTemplate(PatternButtonStop     );
-        // Buttons for File-Handling
-        ProcessTemplate(PatternButtonFileDownload  );
-        ProcessTemplate(PatternButtonFilePlayNow   );
-        ProcessTemplate(PatternButtonFileAdd       );
-        ProcessTemplate(PatternButtonFileAddNext   );
-        ProcessTemplate(PatternButtonFileMoveUp    );
-        ProcessTemplate(PatternButtonFileMoveDown  );
-        ProcessTemplate(PatternButtonFileDelete    );
-        ProcessTemplate(PatternButtonFileVote      );
-        // The PLAYER page
-        ProcessTemplate(PatternItemPlayer          );
-        ProcessTemplate(PatternPlayerPage          );
-        // The PLAYLIST page
-        ProcessTemplate(PatternPlaylistPage        );
-        ProcessTemplate(PatternItemPlaylist        );
-        // The PLAYLIST DETAILS page
-        ProcessTemplate(PatternPlaylistDetailsPage );
-        ProcessTemplate(PatternItemPlaylistDetails );
-        // The LIBRARY page
-        ProcessTemplate(PatternSearchPage          );
-        //ProcessTemplate(PatternSearchResultPage    );
-        ProcessTemplate(PatternItemSearchlist      );
-        ProcessTemplate(PatternItemBrowseArtist    );
-        ProcessTemplate(PatternItemBrowseAlbum     );
-        ProcessTemplate(PatternItemBrowseGenre     );
-        // The LIBRARY DETAILS page
-        ProcessTemplate(PatternSearchDetailsPage   );
-        ProcessTemplate(PatternItemSearchDetails   );
-        // The ERROR page
-        ProcessTemplate(PatternErrorPage           );
-        ProcessTemplate(PatternNoFilesHint         );
+  for iTpl := low(teTemplates) to High(teTemplates) do
+    if Templates[iTpl][True] = '' then
+      Templates[iTpl][True] := Templates[iTpl][False];
 end;
 
-procedure TNempWebServer.ClearHelperLists;
-var i: Integer;
+
+function TNempWebServer.NavigationIndex(s: String): Integer;
+var
+  c: Char;
 begin
-    for i := 0 to 26 do
-    begin
-        MainArtists[i].Clear;
-        OtherArtists[i].Clear;
-        Albums[i].Clear;
+  if s = '' then
+    result := 27
+  else
+  begin
+    c := AnsiUpperCase(s)[1];
+    case c of
+      '0'..'9': result := 0;
+      'A'..'Z': result := ord(c) - ord('A') + 1;
+      'Ä': result := ord('A') - ord('A') + 1;
+      'Ö': result := ord('O') - ord('A') + 1;
+      'Ü': result := ord('U') - ord('A') + 1;
+    else
+      result := 27;
     end;
-    Genres.Clear;
+  end;
 end;
 
-function CorrectIndex(s: String): Integer;
+(*function CorrectIndex(s: String): Integer;
 var tmp: String;
 begin
     if s = '' then
@@ -2130,280 +2130,86 @@ begin
         else
             result := 0;
     end;
-end;
+end;   *)
 
-function SortCountedString(item1, item2: Pointer): Integer;
+
+procedure TNempWebServer.PrepareCollections;
+var
+  i: Integer;
+  arrIdx: Integer;
 begin
-    result := AnsiCompareText(TCountedString(item1).fValue, TCountedString(item2).fValue);
-end;
+  fCollectionAlbums.Clear;
+  fCollectionArtists.Clear;
+  fCollectionGenres.Clear;
 
-procedure TNempWebServer.MergeArtistsIfNecessary;
-var i, c: Integer;    
-begin
-    for i := 0 to 26 - 1 do
-    begin
-        if MainArtists[i].Count + OtherArtists[i].Count < MergeArtistConst then
-        begin
-            OtherArtists[i].OwnsObjects := False;
-            for c := 0 to OtherArtists[i].Count - 1 do
-                MainArtists[i].Add(OtherArtists[i][c]);
-            OtherArtists[i].Clear;
-            MainArtists[i].Sort(SortCountedString);          
-        end;        
-    end;    
-end;
+  for i := 0 to fWebMedienBib.Count - 1 do begin
+    fCollectionAlbums.AddAudioFile(fWebMedienBib[i]);
+    fCollectionArtists.AddAudioFile(fWebMedienBib[i]);
+    fCollectionGenres.AddAudioFile(fWebMedienBib[i]);
+  end;
+  fCollectionAlbums.Analyse(True, True);
+  fCollectionArtists.Analyse(True, True);
+  fCollectionGenres.Analyse(True, True);
 
-procedure TNempWebServer.PrepareArtists;
-var currentArtist, currentCoverID: String;
-    c, i, idx: Integer;
-    newEntry: TCountedString;
+  fCollectionAlbums.Sort(True);
+  fCollectionArtists.Sort(True);
+  fCollectionGenres.Sort(True);
 
-begin
-    fWebMedienBib.Sort(Sort_ArtistAlbumTrackTitel_asc);
+  // count collections staring with letter 0-9, A-Z, other
+  for i := 0 to 27 do begin
+    fMainArtistCount[i] := 0;
+    fOtherArtistCount[i] := 0;
+    fAlbumCount[i] := 0;
+    fAlbumCountByArtist[i] := 0;
 
-    if fWebMedienBib.Count > 0 then
-    begin
-        currentArtist := fWebMedienBib[0].Artist;
-        currentCoverID := fWebMedienBib[0].CoverID;
-        c := 1;
+    fMaxCountMainArtist[i] := 20;
+    fMaxCountOtherArtist[i] := 20;
+  end;
+  fMaxCountGenre := 20;
 
-        for i := 1 to fWebMedienBib.Count - 1 do
-        begin
-            if not AnsiSameText(fWebMedienBib[i].Artist, currentArtist) then
-            begin
-                if trim(currentArtist) <> '' then
-                begin
-                    // insert currentArtist into one of the Artists-Lists
-                    idx := CorrectIndex(currentArtist);
-                    newEntry := TCountedString.Create(currentArtist, c, currentCoverID);
-                    if c >= GoodArtist then
-                        MainArtists[idx].Add(newEntry)
-                    else
-                        OtherArtists[idx].Add(newEntry);
-                end; // otherwise: Do not add this artist at all
-                // start counting again
-                currentArtist := fWebMedienBib[i].Artist;
-                currentCoverID := fWebMedienBib[i].CoverID;
-                c := 1;
-            end else
-            begin
-                // just count this file to the current-Artist-Count
-                inc(c);
-                if currentCoverID = '' then
-                    currentCoverID := fWebMedienBib[i].CoverID;
-            end;
-        end;
+  for i := 0 to fCollectionAlbums.CollectionCount - 1 do begin
+    fCollectionAlbums.Collection[i].WebServerID := 1000 + i;
 
-        // add last item
-        if trim(currentArtist) <> '' then
-        begin
-            // insert currentArtist into one of the Artists-Lists
-            idx := CorrectIndex(currentArtist);
-            newEntry := TCountedString.Create(currentArtist, c, currentCoverID);
-            if c >= GoodArtist then
-                MainArtists[idx].Add(newEntry)
-            else
-                OtherArtists[idx].Add(newEntry);
-        end; // otherwise: Do not add this artist at all
+    if fCollectionAlbums.Collection[i].Count >= cMinCountProperAlbum then begin
+      arrIdx := NavigationIndex(TAudioFileCollection(fCollectionAlbums.Collection[i]).Album);
+      inc(fAlbumCount[arriDX]);
 
-        // check List counts, and merge eventually
-        MergeArtistsIfNecessary;
-
-        // set Font Sizes
-        for i := 0 to 26 do
-        begin
-            SetFontSizes(MainArtists[i]);
-            SetFontSizes(OtherArtists[i]);
-        end;
+      arrIdx := NavigationIndex(TAudioFileCollection(fCollectionAlbums.Collection[i]).Artist);
+      inc(fAlbumCountByArtist[arriDX]);
     end;
-end;
+  end;
 
-procedure TNempWebServer.PrepareAlbums;
-var currentAlbum, currentCoverID: String;
-    c, i, idx: Integer;
-    newEntry: TCountedString;
-    tmpArtistStrings: TStringList;
+  for i := 0 to fCollectionArtists.CollectionCount - 1 do begin
+    fCollectionArtists.Collection[i].WebServerID := 1000 + i;
+    arrIdx := NavigationIndex(TAudioFileCollection(fCollectionArtists.Collection[i]).Artist);
 
-begin
-    fWebMedienBib.Sort(Sort_AlbumTrack_asc);
-    if fWebMedienBib.Count > 0 then
-    begin
-        tmpArtistStrings := TStringList.Create;
-        try
-            currentAlbum := fWebMedienBib[0].Album;
-            currentCoverID := fWebMedienBib[0].CoverID;
-            c := 1;
-            tmpArtistStrings.Add(fWebMedienBib[0].Artist);
-            for i := 1 to fWebMedienBib.Count - 1 do
-            begin
-
-                if not AnsiSameText(fWebMedienBib[i].Album, currentAlbum) then
-                begin
-                    if (trim(currentAlbum) <> '') and (c >= GoodAlbum) then
-                    begin
-                        // insert currentAlbum into one of the Album-Lists
-                        idx := CorrectIndex(currentAlbum);
-
-                        newEntry := TCountedString.Create(currentAlbum, c, currentCoverID);
-                        // get a proper Artist for the album
-                        newEntry.getSecondValue(tmpArtistStrings);
-                        // clear current artist list
-                        tmpArtistStrings.Clear;
-
-                        Albums[idx].Add(newEntry);
-                    end; // otherwise do not add this album
-                    // start counting again
-                    currentAlbum := fWebMedienBib[i].Album;
-                    currentCoverID := fWebMedienBib[i].CoverID;
-                    c := 1;
-                end else
-                begin
-                    // just count this file to the current-Artist-Count
-                    inc(c);
-                    if currentCoverID = '' then
-                        currentCoverID := fWebMedienBib[i].CoverID;
-                    tmpArtistStrings.Add(fWebMedienBib[i].Artist);
-                end;
-            end;
-
-            // insert last item
-            if (trim(currentAlbum) <> '') and (c >= GoodAlbum) then
-            begin
-                // insert currentAlbum into one of the Album-Lists
-                idx := CorrectIndex(currentAlbum);
-                newEntry := TCountedString.Create(currentAlbum, c, currentCoverID);
-                // get a proper Artist for the album
-                newEntry.getSecondValue(tmpArtistStrings);
-                Albums[idx].Add(newEntry);
-            end;
-
-            // set Font Sizes
-            for i := 0 to 26 do
-                SetFontSizes(Albums[i]);
-        finally
-            tmpArtistStrings.Free;
-        end;
+    if fCollectionArtists.Collection[i].Count >= cMinCountProperArtist then begin
+      inc(fMainArtistCount[arrIdx]);
+      if fCollectionArtists.Collection[i].Count > fMaxCountMainArtist[arrIdx] then
+        fMaxCountMainArtist[arrIdx] := fCollectionArtists.Collection[i].Count;
+    end
+    else begin
+      inc(fOtherArtistCount[arrIdx]);
+      if fCollectionArtists.Collection[i].Count > fMaxCountOtherArtist[arrIdx] then
+        fMaxCountOtherArtist[arrIdx] := fCollectionArtists.Collection[i].Count;
     end;
+  end;
+
+  for i := 0 to fCollectionGenres.CollectionCount - 1 do begin
+    fCollectionGenres.Collection[i].WebServerID := 1000 + i;
+    if fCollectionGenres.Collection[i].Count > fMaxCountGenre then
+      fMaxCountGenre:= fCollectionGenres.Collection[i].Count;
+  end;
+
+  for i := 0 to 27 do begin
+    if fMaxCountMainArtist[i] > 250 then
+      fMaxCountMainArtist[i] := 250;
+    if fMaxCountOtherArtist[i] > 250 then
+      fMaxCountOtherArtist[i] := 250;
+  end;
+  if fMaxCountGenre > 250 then
+    fMaxCountGenre := 250;
 end;
-
-procedure TNempWebServer.PrepareGenres;
-var currentGenre, currentCoverID: String;
-    c, i: Integer;
-    newEntry: TCountedString;
-begin
-    fWebMedienBib.Sort(Sort_Genre_asc);
-    if fWebMedienBib.Count > 0 then
-    begin
-        currentGenre := fWebMedienBib[0].Genre;
-        currentCoverID := fWebMedienBib[0].CoverID;
-        c := 1;
-
-        for i := 1 to fWebMedienBib.Count - 1 do
-        begin
-            if not AnsiSameText(fWebMedienBib[i].Genre, currentGenre) then
-            begin
-                if (trim(currentGenre) <> '')
-                  // and (currentGenre <> 'Other')
-                  and ( not ( (length(currentGenre) <= 5) and CharinSet(trim(currentGenre)[1], ['0'..'9', '('] ) ))
-                then
-                begin
-                    // insert currentGenre into the Genres-List
-                    newEntry := TCountedString.Create(currentGenre, c, currentCoverID);
-                    Genres.Add(newEntry);
-                end;
-                // start counting again
-                currentGenre := fWebMedienBib[i].Genre;
-                currentCoverID := fWebMedienBib[i].CoverID;
-                c := 1;
-            end else
-            begin
-                // just count this file to the current-Artist-Count
-                inc(c);
-                if currentCoverID = '' then
-                    currentCoverID := fWebMedienBib[i].CoverID;
-            end;
-        end;
-        newEntry := TCountedString.Create(currentGenre, c, '1');
-        Genres.Add(newEntry);
-
-        SetFontSizes(Genres);
-    end;
-end;
-
-procedure TNempWebServer.SetFontSizes(aList: TObjectList);
-var i, cMin, cMax: integer;
-    aItem: TCountedString;
-    //TreshHolds: Array[1..8] of Double;
-    //Delta: Double;
-    //Flag: Boolean;
-
-const FontSizes : Array[1..8] of Integer = (10,12,14,16,18,20,22,24);
-
-begin
-    // 1. finding min/max
-    if aList.Count > 0 then
-    begin
-        aItem := TCountedString(aList[0]);
-        cMin := aItem.Count;
-        cMax := aItem.Count;
-    end else
-        exit;
-
-    for i := 1 to aList.Count - 1 do
-    begin
-        aItem := TCountedString(aList[i]);
-        if aItem.Count > cMax then
-            cMax := aItem.Count;
-        if aItem.Count < cMin then
-            cMin := aItem.Count;
-    end;
-
-    // really small values ("other Artists")
-    if cMax < 20 then
-        cMax := 20
-    else
-        // small values (normal artists)
-        if cMax < 250 then
-            cMax := 250;
-
-    // 2. setting Treshholds
-    // Delta := (cMax - cMin) / 8;
-    // for i := 1 to 8 do
-    //    TreshHolds[i] := 100* ln(cMin + i*Delta) + 2;
-
-    // 3. setting Fonts
-    for i := 0 to aList.Count - 1 do
-    begin
-        aItem := TCountedString(aList[i]);
-        aItem.fFontSize := round((aItem.Count * sqrt(aItem.Count)) / cMax * 14) + 10;  // see note below
-        if aItem.fFontSize > 24 then
-            aItem.fFontSize := 24;
-
-        ///  note:
-        ///  the commented code is from http://www.echochamberproject.com/node/247,
-        ///  which is cited by http://en.wikipedia.org/wiki/Tag_cloud
-        ///  However, this logarithmic scale does not work well on my collection
-        ///  especially on "genre" ("Pop" is used VERY often and destroys even the
-        ///  "good look" of a logarithmic scale)
-        ///  the -erm- "semi-quadratic" (x^(1.5)) scheme yields to good results
-        ///  (on my collection, imho)
-
-        {Flag := False;
-        for f := 1 to 8 do
-        begin
-            if (not Flag) and (100* ln(2*aItem.Count + 2) <= TreshHolds[f]) then
-            begin
-                aItem.fFontSize := FontSizes[f];
-                Flag := True;
-            end;
-            if (not Flag) then
-                aItem.fFontSize := FontSizes[8];
-        end;
-        }
-    end;
-end;
-
-
 
 
 procedure TNempWebServer.SetActive(Value: Boolean);
@@ -2424,9 +2230,7 @@ begin
 
             LoadTemplates(True);    // DO NOT SWAP THESE LINES !!
             LoadTemplates(False);
-
             TemplateFallback;
-
 
             IdHTTPServer1.Active := True;
         except
@@ -2487,7 +2291,7 @@ var SR: TSearchRec;
 begin
     if (FindFirst(ExtractFilePath(Paramstr(0)) + 'HTML\' + '*', faDirectory, SR)=0) then
         repeat
-          if (SR.Name<>'.') and (SR.Name<>'..') and ((SR.Attr AND faDirectory)= faDirectory) then
+          if (SR.Name<>'.') and (SR.Name<>'..') and (not AnsiSameText(SR.Name, 'Common')) and ((SR.Attr AND faDirectory)= faDirectory) then
               dest.Add(Sr.Name);
         until FindNext(SR)<>0;
     FindClose(SR);
@@ -2552,7 +2356,7 @@ begin
     end;
 
     PageData := GenerateErrorPage(ErrorMessage, -1, isAdmin);
-    Body := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
+    Body := UTF8String(StringReplace(Templates[tplBody][isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
 
     AResponseInfo.ContentType := 'text/html';
     ms := TMemoryStream.Create;
@@ -2678,9 +2482,10 @@ var queriedAction, queriedValue: String;
     aProgress, aVolume: Integer;
 begin
   AResponseInfo.ContentType := 'text/html; charset=utf-8';
+  queriedAction := aRequestInfo.Params.Values['action'];
+
   if AllowRemoteControl or isAdmin then
   begin
-      queriedAction := aRequestInfo.Params.Values['action'];
       if queriedAction = 'stop' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_STOP, 0)
       else
       if queriedAction = 'playpause' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_PLAY, 0)
@@ -2718,10 +2523,13 @@ begin
           end;
       end;
 
+
       result := ResponsePlayerJS(ARequestInfo, AResponseInfo, isAdmin);
-  end else
-  begin
-      result := HandleError(AResponseInfo, qrRemoteControlDenied, isAdmin)
+  end else begin
+    //if  (queriedAction = 'getprogress') or (queriedAction = 'getprogress') then
+      result := ResponsePlayerJS(ARequestInfo, AResponseInfo, isAdmin)
+    //else
+    //  result := HandleError(AResponseInfo, qrRemoteControlDenied, isAdmin);
   end;
 end;
 
@@ -2896,7 +2704,7 @@ begin
     end;
 end;
 
-function TNempWebServer.ResponseJSPlaylistControl(AContext: TIdContext;
+function TNempWebServer.ResponseJSPlaylistControl (AContext: TIdContext;
     ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 var queriedAction: String;
     queriedID: Integer;
@@ -3133,10 +2941,9 @@ var queriedCover: String;
 begin
     queriedCover := aRequestInfo.Params.Values['ID'];
     fn := TCoverArtSearcher.SavePath + queriedCover + '.jpg';
+
     if not FileExists(fn) then
-        fn := fLocalDir + 'default_cover.png';
-    if not FileExists(fn) then
-        fn := fLocalDir + 'default_cover.jpg';
+        fn := fDefaultCoverFilename;
 
     if FileExists(fn) then
     begin
@@ -3153,7 +2960,7 @@ end;
 
 
 function TNempWebServer.ResponseFileDownload (ARequestInfo: TIdHTTPRequestInfo;
-    AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
+    AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean; HtmlAudio: Boolean): TQueryResult;
 var queriedID: Integer;
     fn: UnicodeString;
     af: TAudioFile;
@@ -3193,7 +3000,12 @@ begin
             begin
                 try
                     AResponseInfo.CustomHeaders.Add(('Content-Disposition: attachment; '));
-                    AResponseInfo.ContentType := 'audio/mp3';
+                    if HtmlAudio then begin
+                      AResponseInfo.CustomHeaders.Add(('Connection: keep-alive; '));  // for streaming
+                      AResponseInfo.CustomHeaders.Add(('Accept-Ranges: bytes; '));  // for streaming
+                    end;
+
+                    AResponseInfo.ContentType := FileType2MimeType(fn, 'audio/unknown');
                     //AResponseInfo.ServeFile(AContext, fn);
                     AResponseInfo.ContentStream := TFileStream.Create(fn, fmOpenRead or fmShareDenyWrite);
                     result := qrPermit;
@@ -3277,7 +3089,7 @@ begin
             SearchString := '';
 
         ms := TMemoryStream.Create;
-        html := GenerateHTMLMedienbibSearchFormular(searchstring, Start, isAdmin);
+        html := GenerateHTMLFileList(searchstring, Start, isAdmin);
         if html = '' then html := ' ';
             ms.Write(html[1], length(html));
         // NOT necessary here AddNoCacheHeader(AResponseInfo);
@@ -3289,21 +3101,22 @@ end;
 
 function TNempWebServer.ResponseBrowseInLibrary (ARequestInfo: TIdHTTPRequestInfo;
     AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
-var QueryMode, QueryLetter, QueryValue, QueryOther: String;
+var QueryMode, QueryLetter, QueryID, QueryOther, QueryAlbumSortMode: String;
     ms: TMemoryStream;
     html: UTf8String;
-    i, Start: Integer;
-    a: AnsiString;
+    Start: Integer;
 begin
     AResponseInfo.ContentType := 'text/html; charset=utf-8';
     if AllowLibraryAccess or isAdmin then
     begin
         Start       := StrToIntDef(aRequestInfo.Params.Values['start'], 0);
         QueryMode   := aRequestInfo.Params.Values['mode'];
-        QueryLetter := UpperCase(aRequestInfo.Params.Values['l']);
-        //QueryValue  := aRequestInfo.Params.Values['value'];
+        QueryLetter := aRequestInfo.Params.Values['l'];
+        QueryID     := aRequestInfo.Params.Values['id'];
+        if length(QueryLetter) = 1 then
+          QueryLetter := AnsiUpperCase(QueryLetter);
 
-        i := pos('value=', ARequestInfo.UnparsedParams);
+        (*i := pos('value=', ARequestInfo.UnparsedParams);
         if i > 0 then
         begin
             // UnparsedParams sollte nur Ascii-Zeichen anthalten - also ist das ok
@@ -3313,17 +3126,19 @@ begin
             QueryValue := Utf8ToString(utf8URLDecode(a));
         end else
             QueryValue := '';
+        *)
 
         QueryOther  := aRequestInfo.Params.Values['other'];
+        QueryAlbumSortMode := aRequestInfo.Params.Values['albumsortmode'];
 
-        if QueryValue = '' then
+        if QueryID = '' then
         begin
             if QueryLetter = '' then
                 QueryLetter := 'A';
             // generate List of Artists/Albums/Genres according to QueryMode (+ Letter)
 
             ms := TMemoryStream.Create;
-            html := GenerateHTMLMedienbibBrowseList(Querymode, QueryLetter[1], QueryOther='1', isAdmin);
+            html := GenerateHTMLCollectionList(Querymode, QueryLetter, QueryAlbumSortMode='artist', QueryOther='1', isAdmin);
             if html = '' then html := ' ';
                 ms.Write(html[1], length(html));
             // NOT necessary here AddNoCacheHeader(AResponseInfo);
@@ -3333,8 +3148,10 @@ begin
         end else
         begin
             // generate List of Titles according to QueryMode + Value
+            if QueryLetter = '' then
+              QueryLetter := ' ';
             ms := TMemoryStream.Create;
-            html := GenerateHTMLMedienbibBrowseResult(Querymode, QueryValue, Start, isAdmin);
+            html := GenerateHTMLFileList(Querymode, QueryID, QueryLetter, Start, QueryAlbumSortMode='artist', isAdmin);
             if html = '' then html := ' ';
                 ms.Write(html[1], length(html));
             // NOT necessary here AddNoCacheHeader(AResponseInfo);
@@ -3362,7 +3179,7 @@ begin
             af := GetAudioFileFromWebServerID(queriedID);
             if assigned(af) then
             begin
-                html := GenerateHTMLfromMedienbibSearch_Details(af, isAdmin);
+                html := GenerateHTMLFileDetailsLibrary(af, isAdmin);
                 ms := TMemoryStream.Create;
                 if html = '' then html := ' ';
                 ms.Write(html[1], length(html));
@@ -3381,7 +3198,7 @@ procedure TNempWebServer.IdHTTPServer1CommandGet(AContext: TIdContext;
 var //ms: TMemoryStream;
     RequestedDocument: String;
     permit: TQueryResult;
-    fn: UnicodeString;
+    fn, basename: UnicodeString;
     queriedAction: String;
     isAdmin: Boolean;
     UserLoginOK, AdminLoginOK, DoLog: Boolean;
@@ -3431,9 +3248,9 @@ begin
         else
         if RequestedDocument = '/playlist' then permit := ResponsePlaylistView(ARequestInfo, AResponseInfo, isAdmin)
         else
-        if RequestedDocument = '/library' then permit := ResponseSearchInLibrary(ARequestInfo, AResponseInfo, isAdmin)
+        if RequestedDocument = '/search' then permit := ResponseSearchInLibrary(ARequestInfo, AResponseInfo, isAdmin)
         else
-        if RequestedDocument = '/browse' then permit := ResponseBrowseInLibrary(ARequestInfo, AResponseInfo, isAdmin)
+        if RequestedDocument = '/library' then permit := ResponseBrowseInLibrary(ARequestInfo, AResponseInfo, isAdmin)
         else
         if RequestedDocument = '/cover' then permit := ResponseCover(ARequestInfo, AResponseInfo, isAdmin)
         else
@@ -3461,7 +3278,11 @@ begin
             // '' dürfte am häufigsten vorkommen (css, bilder, ...)
             if queriedAction = '' then
             begin
-                fn := fLocalDir + StringReplace(RequestedDocument, '/', '\', [rfReplaceAll]);
+                basename := StringReplace(RequestedDocument, '/', '\', [rfReplaceAll]);
+                fn := fLocalDir + basename;
+                if not FileExists(fn) then
+                  fn := fCommonDir + basename;
+
                 if FileExists(fn) then
                 begin
                     DoLog := False;
@@ -3478,10 +3299,11 @@ begin
 
             end else
                 if queriedAction = 'file_download' then
-                begin
-                    permit := ResponseFileDownload(ARequestInfo, AResponseInfo, isAdmin);
-                end
+                  permit := ResponseFileDownload(ARequestInfo, AResponseInfo, isAdmin, False)
                 else
+                  if queriedAction = 'file_stream' then
+                    permit := ResponseFileDownload(ARequestInfo, AResponseInfo, isAdmin, True)
+                  else
                     permit := qrDeny;
         end;
     end else
@@ -3492,23 +3314,18 @@ begin
 end;
 
 
-
 initialization
-
 
   InitializeCriticalSection(CS_AccessHTMLCode);
   InitializeCriticalSection(CS_AccessPlaylistFilename);
   InitializeCriticalSection(CS_AccessLibrary);
   InitializeCriticalSection(CS_Authentification);
 
-
 finalization
-
 
   DeleteCriticalSection(CS_AccessHTMLCode);
   DeleteCriticalSection(CS_AccessPlaylistFilename);
   DeleteCriticalSection(CS_AccessLibrary);
   DeleteCriticalSection(CS_Authentification);
 
-  
 end.

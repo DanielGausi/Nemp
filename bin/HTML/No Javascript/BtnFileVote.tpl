@@ -1,1 +1,1 @@
-<a href="playlistcontrol?id={{ID}}&amp;action=file_vote" class="button" title="Vote for this title"><img src="images/vote.png" width="24" height="24" alt="vote this file" /> Vote for this track</a>
+<a href="playlistcontrol?id={{ID}}&amp;action=file_vote" class="button" title="Vote for this title"><img src="images/vote.png" width="24" height="24" alt="vote this file"> Vote for this track</a>

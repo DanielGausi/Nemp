@@ -1,1 +1,1 @@
-<a class="button" title="Download this title" href="{{Filename}}?id={{ID}}&amp;action={{Action}}"><img src="images/download.png" width="24" height="24" alt="download" /> Download this track</a>
+<a class="button" title="Download this title" href="{{Filename}}?id={{ID}}&amp;action={{Action}}"><img src="images/download.png" width="24" height="24" alt="download"> Download this track</a>

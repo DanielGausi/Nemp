@@ -1,1 +1,1 @@
-<a id="btnAddNext{{ID}}" class="button" onclick="addnext({{ID}})" title="Insert this title after the current title into the playlist"><img src="images/addnext.png" width="24" height="24" alt="add next" /> Insert this track after the current title</a>
+<a id="btnAddNext{{ID}}" class="button" onclick="addnext({{ID}})" title="Insert this title after the current title into the playlist"><img src="images/addnext.png" width="24" height="24" alt="add next"> Insert this track after the current title</a>

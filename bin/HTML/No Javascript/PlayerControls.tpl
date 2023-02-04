@@ -1,1 +1,0 @@
-{{BtnControlPlayPause}}{{BtnControlStop}}{{BtnControlPrev}}{{BtnControlNext}}

@@ -83,7 +83,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 0
       Width = 469
       Height = 632
-      ActivePage = tabViewingSettings
+      ActivePage = tabWebserver
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -1305,7 +1305,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 461
           Height = 568
-          VertScrollBar.Position = 516
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -1316,7 +1315,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpExtendedViewingSettings: TCategoryPanel
-            Top = 389
+            Top = 905
             Height = 175
             Caption = 'Extended viewing settings'
             TabOrder = 0
@@ -1377,7 +1376,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpPlaylistFormatting: TCategoryPanel
-            Top = 199
+            Top = 715
             Height = 190
             Caption = 'Playlist formatting'
             TabOrder = 1
@@ -1534,7 +1533,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpMissingMetaData: TCategoryPanel
-            Top = -223
+            Top = 293
             Height = 422
             Caption = 'Not available metadata'
             TabOrder = 2
@@ -1673,7 +1672,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpViewCategoriesSettings: TCategoryPanel
-            Top = -316
+            Top = 200
             Height = 93
             Caption = 'Display of Albums, Directories, ...'
             TabOrder = 3
@@ -1695,7 +1694,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpVisibleColumns: TCategoryPanel
-            Top = -516
+            Top = 0
             Caption = 'Visible columns in the medialist'
             TabOrder = 4
             object clbViewMainColumns: TCheckListBox
@@ -2525,7 +2524,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object editCDNames: TLabeledEdit
               Left = 16
               Top = 123
-              Width = 35
+              Width = 1
               Height = 21
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -5341,7 +5340,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object cbAllowRemoteControl: TCheckBox
               Left = 16
-              Top = 130
+              Top = 144
               Width = 397
               Height = 15
               Hint = 'Let the user control the player (play/stop/next/volume/...)'
@@ -5351,7 +5350,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object cbPermitLibraryAccess: TCheckBox
               Left = 16
-              Top = 98
+              Top = 96
               Width = 397
               Height = 15
               Hint = 'Let the user search and browse in your library'
@@ -5360,11 +5359,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object cbPermitPlaylistDownload: TCheckBox
               Left = 16
-              Top = 114
+              Top = 112
               Width = 397
               Height = 15
-              Hint = 'Let the user download files from your playlist and/or library'
-              Caption = 'Permit downloading files from the playlist'
+              Hint = 'Let the user download files from your playlist and library'
+              Caption = 'Permit downloading files'
               TabOrder = 4
             end
             object cbPermitVote: TCheckBox
@@ -5393,6 +5392,15 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Height = 21
               TabOrder = 0
               OnKeyPress = EdtUsernameKeyPress
+            end
+            object cbPermitHtmlAudio: TCheckBox
+              Left = 16
+              Top = 128
+              Width = 397
+              Height = 15
+              Hint = 'Let the user play files in the browser'
+              Caption = 'Permit Html audio'
+              TabOrder = 6
             end
           end
           object cpWebserverConfiguration: TCategoryPanel

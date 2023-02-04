@@ -8442,10 +8442,11 @@ begin
         StartNode := PlaylistVst.FocusedNode
     else
         StartNode := PlaylistVst.GetFirst;
-
-    af := PlaylistVST.GetNodeData<TAudioFile>(StartNode);
-    if not af.IsSearchResult then
-        PlaylistSelectNextSearchresult;
+    if assigned(StartNode) then begin
+      af := PlaylistVST.GetNodeData<TAudioFile>(StartNode);
+      if not af.IsSearchResult then
+          PlaylistSelectNextSearchresult;
+    end;
 end;
 
 ///  PlaylistCleared

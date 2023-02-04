@@ -115,6 +115,7 @@ type
 
       fValidArtist: Boolean;
       fValidAlbum: Boolean;
+      fDuration: int64;
 
       function isCloud: Boolean;
 
@@ -155,6 +156,7 @@ type
       function GetCoverID: String; override;
 
       class function HasUniqueValue(aCollection: TAudioFileCollection): teCollectionUniqueness;
+      function CalculateFileDuration: Int64;
       procedure GetCommonArtist;
       procedure GetCommonGenre;
       procedure GetCommonYear;
@@ -182,6 +184,7 @@ type
       // The "Valid" properties should only be called directly after a call of "Analyse"
       property ValidArtist: Boolean read fValidArtist;
       property ValidAlbum: Boolean  read fValidAlbum;
+      property Duration: int64 read fDuration write fDuration;
 
       // CategoryCaption: Used for the TagCloud. The RootCollection should show the Category there
       property CategoryCaption: String read GetCategoryCaption;
@@ -838,6 +841,14 @@ begin
   result := fCoverID;
 end;
 
+function TAudioFileCollection.CalculateFileDuration: Int64;
+var
+  i: Integer;
+begin
+  result := 0;
+  for i := 0 to fFileList.Count - 1 do
+    result := result + fFileList[i].Duration;
+end;
 
 procedure TAudioFileCollection.GetCommonArtist;
 var
@@ -963,7 +974,7 @@ begin
       cuUnique: Result := TAudioFileCollection(aRoot.Collection[0]).fCoverID;
     else
       //cuInvalid, cuSampler
-       Result := '';
+       Result := ''; //TAudioFileCollection(aRoot.Collection[0]).fCoverID;
     end;
     //fCoverID := TAudioFileCollection(aRoot.Collection[0]).fCoverID;
     //if fCoverID= '' then
@@ -1071,12 +1082,17 @@ procedure TAudioFileCollection.Analyse(recursive, ForceAnalysis: Boolean);
 var
   i: Integer;
 begin
+  fDuration := 0;
   if recursive then
-    for i := 0 to fCollectionList.Count - 1 do
+    for i := 0 to fCollectionList.Count - 1 do begin
       fCollectionList[i].Analyse(recursive, ForceAnalysis);
+      fDuration := fDuration + fCollectionList[i].fDuration;
+    end;
 
   if (fFileList.Count = 0) or (not fNeedAnalysis) then
     exit; // nothing more to do in that case
+
+  fDuration := fDuration + CalculateFileDuration;
 
   if ForceAnalysis then begin
     GetCommonArtist;

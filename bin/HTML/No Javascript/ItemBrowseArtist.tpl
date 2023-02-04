@@ -1,1 +1,1 @@
-<span class="tagcloud" style="font-size:{{Font}};"><a href="{{Link}}" title="Show all {{Count}} tracks by {{Value}}">{{Value}}</a></span>
+<span class="tagcloud font{{FontIdx}}"><a href="{{Link}}" title="Show all {{Count}} tracks by {{Artist}}">{{Artist}}</a></span>

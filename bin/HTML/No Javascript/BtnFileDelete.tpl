@@ -1,1 +1,1 @@
-<a class="button" href="playlistcontrol?id={{ID}}&amp;action=file_delete" title="Remove this title from the playlist"><img src="images/delete.png" width="24" height="24" alt="delete from list" /></a>
+<a class="button" href="playlistcontrol?id={{ID}}&amp;action=file_delete" title="Remove this title from the playlist"><img src="images/delete.png" width="24" height="24" alt="delete from list"></a>

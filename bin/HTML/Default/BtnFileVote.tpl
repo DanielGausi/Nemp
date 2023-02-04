@@ -1,1 +1,1 @@
-<a id="btnVote{{ID}}" class="button" onclick="vote({{ID}})" title="Vote for this title"><img src="images/vote.png" width="24" height="24" alt="vote this file" /> Vote for this track</a>
+<a id="btnVote{{ID}}" class="button" onclick="vote({{ID}})" title="Vote for this title"><img src="images/vote.png" width="24" height="24" alt="vote this file"> Vote for this track</a>

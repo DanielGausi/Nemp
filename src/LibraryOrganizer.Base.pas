@@ -319,8 +319,11 @@ type
 
       procedure DoGetFiles(dest: TAudioFileList; recursive: Boolean); virtual; abstract;
       procedure DoChangeCoverIDAfterDownload(newID: String); virtual; abstract;
+      procedure SetWebServerID(value: Integer);
+      function GetWebServerID: Integer;
     public
       property ArchiveID: Integer read fArchiveID;
+      property WebServerID: Integer read GetWebServerID write SetWebServerID;
       property Key: String read fKey;
       property Count: Integer read fCount;
       property Caption: String read GetCaption;
@@ -1190,6 +1193,16 @@ begin
     fArchiveList.Remove(self);
 
   inherited;
+end;
+
+procedure TAudioCollection.SetWebServerID(value: Integer);
+begin
+  fArchiveID := Value;
+end;
+
+function TAudioCollection.GetWebServerID: Integer;
+begin
+  result := fArchiveID;
 end;
 
 procedure TAudioCollection.Archive(ArchiveList: TAudioCollectionList; ID: Integer);
