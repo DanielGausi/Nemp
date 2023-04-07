@@ -1,0 +1,1 @@
+<a class="button" title="Play this title in Browser" onclick="playItemInBrowser({{ID}})"><img src="images/play-browser.png" width="24" height="24" alt="play in browser"></a>

@@ -1,14 +1,16 @@
+* {
+	box-sizing: border-box;
+}  
+
 body {
 	font-size: 100.01%;
 	font-family: Verdana,Arial,sans-serif;
 	text-align: left;
 	margin: 0px auto;
-	padding-top: 0px;
-	padding-bottom: 30px;
+	padding: 0px 10px 30px 10px;
 	background-color: #202020;
     font-size: 0.83em;
 	color: #dddddd;    
-	width: 80%;
 	max-width: 1000px;
 	min-height: 423px;
 }
@@ -22,7 +24,7 @@ a {
 	color: #dddddd;
 }
 a:hover {
-	color: red;	
+	color: red;
 }
 
 a.button {	
@@ -89,8 +91,7 @@ div.menu {
 	padding: 10px 0px;
 	border-bottom: 1px solid #404040;
 	margin-bottom:10px;
-	display: inline-block;
-	width: 100%;	
+	display: inline-block;	
 }
 img.menuicon {
 	margin-right: 5px;
@@ -107,7 +108,7 @@ ul.mainmenu li {
 	list-style: none;
 	float: left;	
 	padding: 4px 4px;	
-	height: 24px;
+	height: 32px;
 }
 ul.mainmenu li.active{			
 	border-radius: 8px;
@@ -157,286 +158,326 @@ ul.charselection li.active a {
 	color: #111;
 }
 
+	ul.charselection::after,
+	div.browsemenu::after
+	{
+		content: " ";
+		clear: both;
+		height: 0px;
+		display: block;
+	}
 
-/*
-  Playlist 
-*/
-div.playlistitem,
-div.libraryitem {	
-	width: 100%;	
-	display: flex;
-	padding: 8px 3px;	
-	clear:both;
-	min-height: 50px;
-	border-bottom:1px solid #333
+
+/* ---------------------------------------- */
+/*  List of titles (Playlist, Librarylist)  */
+/*  --------------------------------------- */
+.listitem {
+    width: 100%;
+    display: flex;
+    padding: 8px 3px;
+    clear: both;
+    min-height: 50px;
+    border-bottom: 1px solid #333
 }
-
-div.playlistitem:hover,
-div.libraryitem:hover {	
+.listitem:hover{	
 	background-color: #333;
 }
 
-div.playlistitem .controls,
-div.playlistitem .index,
-div.playlistitem .title,
-div.playlistitem .cover {		
-	display: inline-block;
-	vertical-align: top;
-	flex-basis: auto;
-	flex-grow: 0;
-}
-div.playlistitem .controls{	
-	flex: none;
-	float: left;
-	margin-right: 5px;
-}
-
-div.playlistitem .index{
-	/*width: 25px;*/
-	flex: none;
-	float: left;
-	padding-right:5px;
-	text-align:right;	
-}
-div.playlistitem .title{		
-	min-width: 120px;
-	flex-grow: 1;
-	float:left;
-	padding-left: 3px;
-}
-div.playlistitem.party .title{	
-	//width: calc(100% - 120px);	
-}
-
-div.playlistitem .cover{
-	width: 50px;
-	flex: none;	
-	float: right;
-	overflow: hidden;	
-}
-div.current ,
-div.current .title{
+/* Playlist: Highlight the current title */
+.listitem.current {
 	background-color: #707070;
 	color: #dddddd;
 }
-span.votes{
-	color: #999999; 
-	font-size: 0.85em;
-}
-span.lineduration {
-	color: #999999; 
+.listitem.current:hover {
+	background-color: #808080;
 }
 
-.prebook{
-	/*font-size:0.85em;*/
-	color: #999999;
+/* different "columns" in the list */
+.listitem .controls {
+	flex: none;		
 }
-div.prebook p {
-	margin-top: 10px;
-	color: #666666;
-	font-size: 0.8em;
+.listitem .browsercontrols {
+	margin-right: 5px;
+	flex: none;
 }
-.noprebook {
-	/*font-size:0.9em;*/
-	display: none;
+.listitem .index{
+	min-width: 2ch;
+	flex: none;	
+	text-align:right;	
 }
-div.libraryitem span.linealbum {
-	color: #999999; 
+.listitem .titleinfo {
+	margin-left: 5px;
+	min-width: 120px;
+	flex-grow: 1;	
+	padding-left: 3px;
+}
+.listitem .cover {
+	width: 50px;
+	flex: none;
+	overflow: hidden;	
 }
 
-div.libraryitem span.linetitle,
-div.playlistitem span.linetitle {
+/* different parts of the titleinfo*/
+.listitem .title {
 	font-size: 1.2em;
 }
-div.libraryitem span.lineartist,
-div.playlistitem span.lineartist {
-	color: #999999; 
+.listitem .artist,
+.listitem .duration,
+.listitem .album {
+	color: #999999;
 }
 
-div.browsealbum span.lineartist{
-	color: #999999; 
-}
-div.browsealbum span.linealbum{
-	font-size:1.1em;
+.listitem .votes {
+	color: #999999;
+	font-size: 0.85em;
 }
 
-/*
-  Library-List 
-*/
+/* prebook-index (This feature should not be used in the player when the webserver is active.) */
+.listitem .prebook {
+	font-size:0.85em;
+	color: #999999;
+}
 
-div.summary{
-	width: calc(100% - 5px);
+/* ------------------------------------------------------ */
+/* Summary section before a list of titles in the library */
+/* Also: The main part of title information */
+/*  ----------------------------------------------------- */
+.mainitem {
 	margin-bottom: 10px;
 	padding-bottom: 10px;
 	padding: 10px 5px;
 	background-color: #333;	
 }
 
-div.summary div.cover,
-div.fileinfo div.cover {
+.mainitem .cover {
 	height: 200px;
-	float: right;
+	float: right;	
 	overflow: hidden;
 }
-
-div.summary div.cover img,
-div.fileinfo div.cover img {
+.mainitem .cover img {
 	width: 200px;
-	margin-right:2px;
+	float: right;
+	margin-right: 2px;
 }
-
-div.summary div.info {
+.mainitem .textcontainer {
 	float: left;
+	max-width: 600px;	
 	padding-bottom: 5px;
 }
 
-div.summary p.maininfo{
+.mainitem .maininfo, .mainitem .additionalinfo, .mainitem .playlistinfo {
 	margin-bottom: 1em;
 }
+/* Main information about the item*/
+.mainitem .albumartist {
+	font-size: 1.5em;
+	color: #999999;
+}
+.mainitem .albumtitle {
+	font-size: 1.5em;	
+}
+.mainitem .fileartist {
+	font-size: 1.5em;
+	color: #999999;
+}
+.mainitem .filetitle {
+	font-size: 1.5em;	
+}
+.mainitem .fileduration {
+	color: #999999;
+}
+.mainitem .playlistinfo {
+	color: #999999;
+}
 
-div.summary div.info .lineartist{
+.mainitem .genrename,
+.maininfo .artistname, 
+.maininfo .searchtitle {
 	font-size: 1.5em;
 }
-div.summary div.info .linealbum{
-	font-size: 1.2em;	
+
+.mainitem .genreartistcount,
+.mainitem .artistalbumcount {
+	font-size: 1.2em;
 	color: #999999;
 }
 
-div.currenttitle,
-div.fileinfo {	
-	padding: 10px 10px;
-	background-color: #333;
-	margin-bottom: 10px;	
-}
-
-div.currenttitle div.info,
-div.fileinfo div.info{
-	float: left;
-	padding-bottom: 5px;
-}
-div.currenttitle div.cover {
-	height: 250px;
-	float: right;
-	overflow: hidden;
-}
-div.currenttitle div.cover img{
-	width: 250px;
-	margin-right:2px;
-}
-
-div.currenttitle p.maininfo,
-div.fileinfo p.maininfo {
-	margin-bottom: 1em;
-}
-div.currenttitle p.maininfo .lineartist,
-div.fileinfo p.maininfo .lineartist {
-	font-size: 1.1em;	
+/* Additional information about the item*/
+.mainitem .additionalinfo, .mainitem .additionalinfo a {
 	color: #999999;
 }
-div.fileinfo p.maininfo a.lineartist,
-div.fileinfo p.moreinfo a.linealbum,
-div.fileinfo p.moreinfo a.genre
-{
-	padding: 0px;
-	color: #999999;
-}
-div.fileinfo p.maininfo a.lineartist:hover,
-div.fileinfo p.moreinfo a.linealbum:hover,
-div.fileinfo p.moreinfo a.genre:hover{
+.mainitem a:hover {
 	color: red;
 }
-
-div.currenttitle p.maininfo .linetitle,
-div.fileinfo p.maininfo .linetitle{
-	font-size: 1.6em;		
-}
-
-div.currenttitle p.moreinfo,
-div.fileinfo p.moreinfo{
+/* Technical information */
+.mainitem .techinfo {
 	color: #999999;
-	margin-bottom: 1em;
 }
-
-div.fileinfo p.playlistinfo {
-	margin-bottom: 1em;
+/* Audio player */
+.mainitem .htmlplayer {
+	padding-top: 10px;
+	margin-top: 10px;	
+	border-top: 1px solid #666666;
 }
-
-div.fileinfo p.techinfo{
-	color: #999999;	
+.mainitem .htmlplayer audio {
+	width: 100%
 }
-
-div.currenttitle .playerdownload a.button {
+/* Download the file */
+.mainitem .playerdownload {
+	margin-top: 10px;	
+}
+.mainitem .playerdownload a.button {
 	padding-left: 0px;
 }
 
-
-div.libraryitem .controls,
-div.libraryitem .title,
-div.libraryitem .cover {	
-	float:left;
-	vertical-align: top;
-}
-div.libraryitem .controls{	
-	flex: none;
-	float: left;
-	margin-right: 5px;
-}
-div.libraryitem .title{		
-	min-width: 120px;
-	flex-grow: 1;
-	padding-left: 3px;
-	float: left;
-}
-div.libraryitem.party .title{	
-	
-}
-
-div.libraryitem .cover,
-div.playlistitem .cover{
-	width: 50px;
-	flex: none;
-	overflow: hidden;	
-	float: right;
-}
-
-/*
-	Player
-*/
-
-div.currentimage {
+/* ------------------------ */
+/* Player Controls          */
+/* ------------------------ */
+#playercontrol {
 	text-align: center;
+	background-color: #333;
+	padding: 15px 0px;
 }
-div.progresscontainer{	
-	margin-top: 0px;	
-	padding: 0px 20px;		
+.progresscontainer {
+	margin-top: 0px;
+	padding: 0px 10px;
 }
-div.volumecontainer{
-	width: 230px;
+
+.playerslider {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 100%;
+	height: 20px;
+	border-radius: 8px;
+	border: 1px solid #5880db;
+	background: linear-gradient(#5880db, #2048a3, #2048a3, #00103e, #012682);
+	-webkit-transition: .2s;
+}
+/* Playerslider, Thumb */
+.playerslider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 40px;
+	height: 16px;
+	border-radius: 7px;
+	background: linear-gradient(white, #bdd5ff);
+	cursor: pointer;
+}
+.playerslider::-moz-range-thumb {
+	width: 40px;
+	height: 14px;
+	border-radius: 8px;
+	background: linear-gradient(white, #bdd5ff);
+	cursor: pointer;
+}
+
+/* Slider, Effects: Hover and disabled */
+.slider:hover {
+	filter: brightness(120%);
+}
+.slider:disabled,
+.slider:disabled:hover {
+	border-color: #999999;
+	background: #dddddd;
+	filter: brightness(100%);
+}
+.slider:disabled::-webkit-slider-thumb {
+	background: #aaaaaa;
+	border-color: #dddddd;
+	cursor: default;
+}
+.slider:disabled::-moz-range-thumb {
+	background: #aaaaaa;
+	border-color: #dddddd;
+	cursor: default;
+}
+
+/* Volume Control */
+.volumecontainer{
+	width: 250px;
+	display:flex;
 	margin: 10px auto ;	
 }
-
 .volumecontainer.ControlsForbidden {
 	display: none;
 }
+.volumecontainer .volumerange {
+	flex-grow:1;
+}
+.volumerange {
+	margin-left: 5px;
+	margin-right: 10px;
+}
+.volumeslider {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 100%;
+	height: 16px;
+	border-radius: 8px;
+	border: 1px solid #5880db;
+	background: linear-gradient(#5880db, #2048a3, #2048a3, #00103e, #012682);
+	-webkit-transition: .2s;	
+	margin-top: 6px;
+}
+/* Volume-Slider, Thumb */
+.volumeslider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 14px;
+	height: 14px;
+	border-radius: 7px;
+	background: linear-gradient(white, #bdd5ff);
+	cursor: pointer;
+}
+.volumeslider::-moz-range-thumb {
+	width: 12px;
+	height: 12px;
+	border-radius: 7px;
+	background: linear-gradient(white, #bdd5ff);
+	cursor: pointer;
+}
 
-.volume {
-	float: left;	
+/* Slider for the current track on the playlist page (currently deactivated by JS, just a progress bar) */
+.playlistprogresscontainer {
+	padding: 5px 3px 5px 0px;
+	margin-right: 10px;
 }
-#volume {
-	width: calc(100% - 70px);
-	margin-top: 7px;	
+.playlistslider {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 100%;
+	height: 10px;
+	border-radius: 5px;
+	border: 1px solid #5880db;
+	background: linear-gradient(#5880db, #2048a3, #2048a3, #00103e, #012682);
+	-webkit-transition: .2s;
 }
+.playlistslider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 20px;
+	height: 10px;
+	border-radius: 5px;
+	background: linear-gradient(white, #bdd5ff);
+	cursor: pointer;
+}
+.playlistslider::-moz-range-thumb {
+	width: 20px;
+	height: 8px;
+	border-radius: 4px;
+	background: linear-gradient(white, #bdd5ff);
+	cursor: pointer;
+}
+
 .playerbuttons{
 	width: 200px;
 	margin: auto;			
 	margin-top: 15px;
 	margin-bottom: 10px;
 }
-
 .playerbuttons.ControlsForbidden {
 	display: none;
 }
-
 
 .playing .btnplay{
 	display: none;
@@ -446,10 +487,9 @@ div.volumecontainer{
 }
 
 .htmlplayer {
-	padding-top: 10px;
-	margin-top: 10px;
-	/*background-color: #202020;*/
-	border-top: 1px solid  #666666;
+    padding-top: 10px;
+    margin-top: 10px;
+    border-top: 1px solid #666666;
 }
 .htmlplayer p {
 	color: #999999;
@@ -459,40 +499,6 @@ div.volumecontainer{
 
 audio {
 	height: 2rem;
-}
-
-.playlistprogresscontainer{
-	padding: 5px 3px 5px 0px;
-	margin-right: 10px;
-}
-
-#playlistprogress.ui-slider-horizontal {
-	height: 5px;
-}
-#playlistprogress.ui-slider-horizontal .ui-slider-handle {
-	top: -2px; /*-.3em;*/
-	margin-left: -.6em;
-	height: 7px;
-	width: 10px;	
-	background-color: #202020;
-}
-
-
-
-#playercontrol {
-	text-align: center;
-	background-color: #333;	
-	padding: 15px 5px;
-}
-
-.details .controls {
-	background-color: #333;		
-	padding: 5px 5px;
-}
-
-.player .filecontrol{
-	text-align: center;
-	padding-top: 15px;
 }
 
 .playlist .button,
@@ -508,22 +514,9 @@ audio {
 	box-shadow: 0 0 11px #666; 
 }
 
-/*
-	Details
-*/
-.details .artist, 
-.details .title {
-	font-size: 1.1em;
-}
-.details .album{
-	color: #999999;
-	padding-bottom: 5px;
-	border-bottom: 1px solid #404040;
-}
-.details .data {
-	color: #999999;
-	margin-top: 5px;
-	margin-bottom: 10px;
+.details .controls {
+	background-color: #333;
+	padding: 5px 5px;
 }
 
 
@@ -545,10 +538,10 @@ div.browsemenu input.button {
 	padding: 0px 2px;
 }
 
-/*
-	Browse-Pages
-*/
 
+/* ------------------------ */
+/* Browse pages             */
+/* ------------------------ */
 div.AlbumContainer{
 	width: 33.33%;
 	height: 86px;
@@ -556,36 +549,37 @@ div.AlbumContainer{
 	float:left;	
 	margin-bottom: 2px;
 }
-
-div.browsealbum{
+.albumitem {
 	padding: 2px;
-	height: 100%;	
+	height: 100%;
 	margin-right: 2px;
-	background-color:#303030;
+	background-color: #303030;
 	border: 1px solid #404040;
-	display: block;	
+	display: block;
 }
-
-.browsealbum .count {
-	color: #999999; 
+.albumitem .artist {
+	color: #999999;
+}
+.albumitem .album {
+	font-size: 1.1em;
+}
+.albumitem .count {
+	color: #999999;
 	font-size: 0.85em;
 }
-.browsealbum .cover{
-	width:80px; 
+.albumitem .cover {
+	width: 80px;
 	float: left;
 	margin-right: 5px;
 }
-.browsealbum .cover img{
-	width:80px; 
+.albumitem .cover img {
+	width: 80px;
 }
-
 span.tagcloud {	
-	margin: 2px;
+	margin: 10px;
 }
 
-/*
-	Pagination
-*/
+/* Pagination */
 div.pagination{
 	text-align: center;
 	border-top: 1px solid #404040;
@@ -598,23 +592,82 @@ a.pagination {
 
 }
 
-@media only screen and (max-width: 750px) {
-  body {
-    width: 92%;
-  }
-  .browsealbum .cover, .browsealbum .cover img{
-	width:60px; 
-  }
+.nowPlayingIcon {
+	position: relative;
+	display: flex;
+	justify-content: space-between;	
+	margin-top:4px;
+	width: 23px;
+	height: 20px;
+}
+.nowPlayingIcon span {
+	width: 5px;
+	height: 0px;
+	background-color: dodgerblue;
+	border: 1px solid blue;	
+	border-radius: 3px;
+	margin-top: 16px;	
+	content: '';
+}
 
-  div.AlbumContainer{
-	width: 50%;
-  }  
+.nowPlaying span {
+	height: 100%;
+	margin-top: 0px;
+	transform-origin: bottom;
+	animation: bounce 1.5s ease infinite alternate;	
+}
+.nowPlaying span.bar1 {
+	animation-delay: -1.5s; 
+}
+.nowPlaying span.bar2 {
+	animation-delay: -1.6s; 
+}
+.nowPlaying span.bar3 {
+	animation-delay: -1.7s; 
+}
+.nowPlaying span.bar4 {
+	animation-delay: -1.8s; 
+}
+
+@keyframes bounce {
+	00% {
+		transform: scaleY(0.1); 
+	}
+
+	10% {
+		transform: scaleY(0.2); 
+	}
+
+	30% {
+		transform: scaleY(0.6); 
+	}
+
+	60% {
+		transform: scaleY(0.4); 
+	}
+
+	80% {
+		transform: scaleY(0.95);
+	}
+
+	100% {
+		transform: scaleY(0.6); 
+	}	
+}
+
+
+@media only screen and (max-width: 750px) {
+	.browsealbum .cover, .browsealbum .cover img {
+		width: 60px;
+	}
+	div.AlbumContainer {
+		width: 50%;
+	}
 }
 
 @media only screen and (max-width: 300px) {
-  
-  div.AlbumContainer{
-	width: 100%;
-  }  
+	div.AlbumContainer {
+		width: 100%;
+	}
 }
 

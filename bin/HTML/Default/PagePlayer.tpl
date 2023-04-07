@@ -6,7 +6,10 @@
 </div>
 
 <div id="playercontrol">	
-	<div class="progresscontainer"><div id="progress" class="{{ClassControls}}"></div></div>
+	<div class="progresscontainer">
+		<!-- <div id="progress" class="{{ClassControls}}"></div>-->
+		<input type="range" min="0" max="100" value="0" class="playerslider slider {{ClassControls}}" id="playerprogress">
+	</div>
 	
 	<div class="playerbuttons {{ClassControls}}">
 		<a class="button btnplay" onclick="playercontrol_playpause()" title="Play"><img src="images/playback-start.png" width="32" height="32" alt="play"></a>
@@ -19,14 +22,16 @@
 	<div style="clear:both;"></div>
 	
 	<div class="volumecontainer {{ClassControls}}">
-		<div class="volume">
-		<a class="button btnVolDown" onclick="playercontrol_VolumeDown()" title="-"><img src="images/volume-down.png" width="24" height="24" alt="pause"></a>
+		<div class="volumeup">
+			<a class="button btnVolDown" onclick="playercontrol_VolumeDown()" title="-"><img src="images/volume-down.png" width="24" height="24" alt="pause"></a>
 		</div>
 		
-		<div class="volume" id="volume"></div>
+		<div class="volumerange">
+			<input type="range" min="0" max="100" value="50" class="volumeslider slider" id="volume">
+		</div>
 		
-		<div class="volume">
-		<a class="button btnVolUp" onclick="playercontrol_VolumeUp()" title="+"><img src="images/volume-up.png" width="24" height="24" alt="pause"></a> 
+		<div class="volumedown">
+			<a class="button btnVolUp" onclick="playercontrol_VolumeUp()" title="+"><img src="images/volume-up.png" width="24" height="24" alt="pause"></a> 
 		</div>
 	</div>	
 

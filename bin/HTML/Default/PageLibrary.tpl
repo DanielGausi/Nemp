@@ -2,8 +2,8 @@
 {{Menu}}
 {{MenuLibrary}}
 {{NoFilesHint}}
-<div>
 {{Summary}}
+<div class="ItemsContainer">
 {{LibraryItems}}
 </div>
 {{Pagination}}

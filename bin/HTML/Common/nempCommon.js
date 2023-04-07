@@ -1,252 +1,435 @@
 var currentProgress=0;
 var t;
-var successBtn = "<img src='images/success.png' width='24' height='24' alt='operation: success'>";
-var failBtn = "<img src='images/fail.png' width='24' height='24' alt='operation: failed'>";
-var MainAudio;
-var PlaylistAudio;
-var PlaylistIndex;
-var AudioFiles = [];
+const successBtn = "<img src='images/success.png' width='24' height='24' alt='operation: success'>";
+const failBtn = "<img src='images/fail.png' width='24' height='24' alt='operation: failed'>";
+const votefailBtn = "<img src='images/vote_fail.png' width='24' height='24' alt='operation: failed'>";
 
-$(document).ready(function() {			
-	initSliders();
-	initVolume();	
-	GetFileIDs();
+var MainAudio;
+var PlaylistPlayer;
+var PlaylistIndex;
+var Playlist = [];
+
+document.addEventListener("DOMContentLoaded", function () {
+	initPlayerSlider();
+	initPlaylistSlider();
+	initPlayerVolumeSlider();
+
+	initBrowserVolume();
+	initBrowserPlaylist();
 });
 
-function initVolume() {
-	MainAudio = document.querySelector('audio');	
+function handleErrors(response) {
+    if (!response.ok) {		
+		return Promise.reject(response);
+    }
+    return response;
+}
+
+
+function initPlaylistSlider() {
+	clearTimeout(t);
+	const PlaylistSlider = document.getElementById('playlistprogress');	
+	if (PlaylistSlider ) {		
+		checkPlaylistProgress();
+		PlaylistSlider.disabled = true;
+		/* If changing progress should be allowed in the Playlist:
+		PlaylistSlider.onchange = function () {
+			clearTimeout(t);
+			fetch("playercontrolJS?action=setprogress&value=" + this.value)
+				.then(checkPlaylistProgress())
+				.catch(error => console.log(error));
+		}
+		PlaylistSlider.oninput = function () {
+			clearTimeout(t);			
+		} */		
+	};		
+}
+
+function initPlayerSlider() {	
+	clearTimeout(t);
+	const PlayerSlider = document.getElementById('playerprogress');
+	if (PlayerSlider) {
+		if (PlayerSlider.classList.contains('ControlsForbidden')) {
+			PlayerSlider.disabled = true;
+		} else {
+			PlayerSlider.onchange = function () {
+				clearTimeout(t);
+				fetch("playercontrolJS?action=setprogress&value=" + this.value + "&data=progress")
+					.then(handleErrors)
+					.then(response => { return response.text(); })
+					.then(text => SetPlayerProgressSlider(text))					
+					.catch(error => console.log('SetProgress: ' + error.status + ':' + error.statusText));
+			}
+			PlayerSlider.oninput = function () {
+				clearTimeout(t);
+			}
+		}
+		checkPlayerProgress();
+		// t=setTimeout("checkPlayerProgress()",1000);
+	};
+}
+function initPlayerVolumeSlider() {
+	const VolSlider = document.getElementById("volume");
+	if (VolSlider) {
+		VolSlider.oninput = function () {
+			fetch("playercontrolJS?action=setvolume&value=" + this.value + "&data=volume")	
+			.then(handleErrors)
+			.catch(error => console.log('SetVolume: ' + error.status + ':' + error.statusText));
+		}
+		VolSlider.onchange = function () {
+			fetch("playercontrolJS?action=setvolume&value=" + this.value + "&data=volume")
+			.then(handleErrors)
+			.catch(error => console.log('SetVolume: ' + error.status + ':' + error.statusText));
+		}
+		checkVolume();
+	}
+}
+
+function checkVolume() {
+	fetch("playerJS?data=volume")
+		.then(response => { return response.text(); })
+		.then(text => {	SetVolumeSlider(text); })
+		.catch(error => console.log(error));
+}
+
+function SetVolumeSlider(vol) {
+	const slider = document.getElementById("volume");
+	if (slider) {
+		slider.value = vol;
+	}
+}
+
+function checkPlayerProgress() {	
+	fetch("playerJS?data=progress")
+		.then(response => { return response.text(); })
+		.then(text => {			
+			if (parseInt(currentProgress) > parseInt(text)) {
+				currentProgress = -1;
+				reloadPlayer();  //// wirklich neu laden ""
+			} else {
+				SetPlayerProgressSlider(text);				
+			}
+		})
+		.catch(error => console.log(error));	
+};
+
+function SetPlayerProgressSlider(progress) {
+	const slider = document.getElementById("playerprogress");
+	if (slider) {
+		currentProgress = progress;
+		slider.value = progress;
+		t = setTimeout("checkPlayerProgress()", 1000);
+	}
+}
+
+function checkPlaylistProgress() {	
+	
+	fetch("playerJS?data=progress")
+		.then(response => { return response.text(); })
+		.then(text => {			
+			if (parseInt(currentProgress) > parseInt(text)) {
+				currentProgress = -1;
+				reloadplaylist();
+			} else {				
+				const slider = document.getElementById("playlistprogress");
+				if (slider) {
+					currentProgress = text;
+					slider.value = text;
+					t = setTimeout("checkPlaylistProgress()", 1000);
+				}
+			}
+		})
+		.catch(error => console.log(error));	
+};
+
+function reloadPlayer() {
+	fetch("playerJS")
+		.then(response => { return response.text(); })
+		.then(text => (replacePlayer(text)))
+		.catch(error => console.log(error));
+}	
+
+function replacePlayer(data) {
+	const currentPlayer = document.getElementById("jsPlayer");
+	if (currentPlayer) {
+		currentPlayer.outerHTML = data;		
+		initPlayerSlider();		
+		initPlayerVolumeSlider();
+		initBrowserVolume();
+	}
+}
+
+function reloadplaylist() {	
+	fetch("playlistJS")
+		.then(handleErrors)
+		.then(response => { return response.text(); })
+		.then(text => {			
+			let playlist = document.getElementById("playlist");
+			if (playlist) {
+				playlist.innerHTML = text;
+				initPlaylistSlider();				
+			}
+		})
+		//.catch(error => console.log('wuppdi' + error));
+		.catch(error => console.log('Playlist control: ' + error.status + ':' + error.statusText));
+}
+
+function doVolumeControl(value) {
+	fetch("playercontrolJS?action=setvolume&value="+value+"&data=volume")
+		.then(handleErrors)
+		.then(response => { return response.text(); })		
+		.then(text => SetVolumeSlider(text))
+		.catch(error => console.log('Volume control: ' + error.status + ':' + error.statusText));
+}
+function playercontrol_VolumeUp() {
+	doVolumeControl(1000);	
+} 
+function playercontrol_VolumeDown() {
+	doVolumeControl(-1000);	
+}  
+
+function doPlayerControl(action) {
+	fetch("playercontrolJS?action=" + action)  
+		.then(handleErrors)
+		.then(response => {return response.text();})
+		.then(text => (replacePlayer(text)))
+		.catch(error => console.log('Player remote control: ' + error.status + ':' + error.statusText));
+}	
+function playercontrol_playpause() {
+	doPlayerControl("playpause");	
+};
+function playercontrol_stop() {
+	doPlayerControl("stop");
+};
+function playercontrol_playnext() {
+	doPlayerControl("next");	
+};
+function playercontrol_playprevious() {
+	doPlayerControl("previous");
+};		
+
+function playtitle(aID) {	
+	fetch("playlistcontrolJS?id=" + aID + "&action=file_playnow")
+		.then(handleErrors)
+		.then(response => { return response.text(); })
+		.then(text => {			
+			if (text == "0") {
+				alert("Playing failed. Please reload this page and try again.");
+			}
+			const oldCurrent = document.getElementsByClassName("current");
+			for (let i = 0; i < oldCurrent.length; i++) {
+				oldCurrent[i].classList.remove("current");
+			}
+			const newCurrent = document.getElementById("js" + text);
+			if (newCurrent) {
+				newCurrent.classList.add("current");
+			}
+		})
+		.catch(error => console.log('Playlist remote control (play): ' + error.status + ':' + error.statusText));
+};
+
+function moveup(aID) {
+	fetch("playlistcontrolJS?id=" + aID + "&action=file_moveup")		
+		.then(handleErrors)
+		.then(response => { reloadplaylist();})	
+		.catch(error => console.log('Playlist remote control (move): ' + error.status + ':' + error.statusText));
+};
+
+function movedown(aID) {	
+	fetch("playlistcontrolJS?id=" + aID + "&action=file_movedown")		
+		.then(handleErrors)		
+		.then(response => { reloadplaylist(); })
+		.catch(error => console.log('Playlist remote control (move): ' + error.status + ':' + error.statusText));
+};
+
+function filedelete(aID) {
+	fetch("playlistcontrolJS?id=" + aID + "&action=file_delete")		
+		.then(handleErrors)
+		.then(response => { reloadplaylist(); })
+		.catch(error => console.log('Playlist remote control (delete): ' + error.status + ':' + error.statusText));
+}
+
+function ReplaceButton(aID, aText) {
+	let btn = document.getElementById(aID);	
+	if (aText == "ok") {
+		btn.outerHTML = successBtn;
+	}
+	else if (aText == "already voted") {
+		btn.outerHTML = votefailBtn;
+	}
+	else if (aText == "spam") {
+		btn.outerHTML = votefailBtn;
+	}
+	// else if (data == "exception") { alert("Failure. Please reload."); }
+	else {
+		btn.outerHTML = failBtn;
+	}	
+}
+
+function HandleVote(aID, aText) {
+	let playlist = document.getElementById("playlist");
+	if (playlist) {
+		reloadplaylist();
+		// ReplaceButton(aID, aText);
+	} else {
+		ReplaceButton(aID, aText);
+	}
+}
+
+function addnext(aID){
+	fetch("playlistcontrolJS?id=" + aID + "&action=file_addnext")
+		.then(handleErrors)
+		.then(response => { return response.text(); })
+		.then(text => ReplaceButton("btnAddNext" + aID, text))
+		.catch(error => console.log('Playlist remote control (add): ' + error.status + ':' + error.statusText));
+}
+
+function add(aID) {
+	fetch("playlistcontrolJS?id=" + aID + "&action=file_add")
+		.then(handleErrors)
+		.then(response => { return response.text(); })
+		.then(text => ReplaceButton("btnAdd" + aID, text))
+		.catch(error => console.log('Playlist remote control (add): ' + error.status + ':' + error.statusText));
+}
+
+function vote(aID) {	
+	fetch("playlistcontrolJS?id=" + aID + "&action=file_vote")
+		.then(handleErrors)
+		.then(response => { return response.text(); })
+		.then(text => HandleVote("btnVote" + aID, text))
+		.catch(error => console.log('Playlist remote control (vote): ' + error.status + ':' + error.statusText));
+}
+
+/*
+ ******************************************
+ * Methods to play Audio in the Browser 
+ ******************************************
+*/
+function initBrowserVolume() {
+	MainAudio = document.querySelector('audio');
 	if (MainAudio) {
 		MainAudio.onvolumechange = (event) => {
 			localStorage.setItem('volume', MainAudio.volume);
 		};
 		if (localStorage.getItem('volume') != null) {
-			MainAudio.volume = parseFloat(localStorage.getItem('volume')); 
+			MainAudio.volume = parseFloat(localStorage.getItem('volume'));
 		};
 	}
 }
 
-function initPlaylistSlider() {
-	var prog = document.getElementById('playlistprogress');	
-	if ( prog ) {		
-		$("#playlistprogress").slider({animate: 1000, disabled: true} );		 
-		checkPlaylistProgress();
-		t=setTimeout("checkPlaylistProgress()",1000);
-	};		
-}
-
-function initSliders() {
-	var prog = document.getElementById('progress');	
-	if ( prog ) {
-		if (prog.classList.contains('ControlsForbidden')) {
-			$("#progress").slider({animate: 1000, disabled: true} );
-		} else {
-			$("#progress").slider({ stop: function(event, ui) { 				
-				$.ajax({url:"playercontrolJS?action=setprogress&value="+ui.value, dataType:"html"});},
-				animate: 1000					
-				} );
+function initBrowserPlaylist() {
+	let items = document.getElementsByClassName("listitem");
+	if (items) {
+		for (let i = 0; i < items.length; i++) {
+			let title = items[i].getElementsByClassName("title")[0];
+			if (title) {
+				title = title.innerHTML;
+			} else {
+				title = '';
+			}			
+			Playlist.push({
+				id: items[i].id.substring(2),
+				name: title,
+				filename: items[i].dataset.filename,
+				mime: items[i].dataset.mime,
+				extension: items[i].dataset.extension				
+			});
 		}
-		checkProgress();
-		t=setTimeout("checkProgress()",1000);
-	};	
-	var vol = document.getElementById('volume');
-	if ( vol ){
-		$("#volume").slider( 
-				{ stop: function(event, ui){$.ajax({url:"playercontrolJS?action=setvolume&value="+ui.value, dataType:"html"});},
-				  slide: function(event, ui){$.ajax({url:"playercontrolJS?action=setvolume&value="+ui.value, dataType:"html"}) }
-				} 
-			);
-		checkVolume();
-	}	
-	initPlaylistSlider();	
+		// console.log("Found Files: ");
+		// Playlist.forEach(element => console.log(element));
+	}
+	PlaylistPlayer = document.getElementById('htmlaudioplaylist');
+	if (PlaylistPlayer) {
+		PlaylistIndex = 0;
+		PlaylistPlayer.addEventListener('ended', PlayNextItemInBrowser, false);
+		PlaylistPlayer.addEventListener('pause', AutoRefreshIcon, false);
+		PlaylistPlayer.addEventListener('play', AutoRefreshIcon, false);
+		PlaylistPlayer.addEventListener('playing', AutoRefreshIcon, false);
+		if (Playlist.length > 0) {
+			loadItemIntoBrowserPlayer(Playlist[0].id)
+		}		
+	}
 }
 
-function GetFileIDs() {
-	let items = document.getElementsByClassName("libraryitem");
-	let numItems = items.length;
+function AutoRefreshIcon() {
+	RefreshAnimationIcon(-1);
+}
 
-	for (let i=0; i<numItems; i++) {
-		let title = items[i].getElementsByClassName("linetitle")[0].innerHTML;
-		// todo: Mimetype/endung ins template bzw. ins HTML zum auslesen
-		AudioFiles.push( { id: items[i].id.substring(2), name: title });
-		
-	}	
-	console.log("Gefundene Files: ");
-	AudioFiles.forEach(element => console.log(element));
+function RefreshAnimationIcon(aID) {
+	if (aID == -1) {
+		aID = Playlist[PlaylistIndex].id;
+	}
 	
-	PlaylistAudio = document.getElementById('htmlaudioplaylist');	
-	PlaylistIndex = -1;
-	PlaylistAudio.addEventListener('ended', PlayNext, false);
-	PlayNext();	
+	let items = document.getElementsByClassName("nowPlayingIcon");
+	if (items) {
+		for (let i = 0; i < items.length; i++) {
+			items[i].classList.remove("nowPlaying");
+		}
+	}
+
+	if (!PlaylistPlayer.paused) {
+		let currentTrack = document.getElementById("nowPlaying" + aID);
+		if (currentTrack) {			
+			currentTrack.classList.add("nowPlaying");
+		}
+	}
 }
 
-function PlayNext() {
-   	if (PlaylistIndex === AudioFiles.length - 1) {
+function RefreshPlaylistIndex(aID) {
+	for (let i = 0; i < Playlist.length; i++) {
+		if (Playlist[i].id == aID) {
+			PlaylistIndex = i;
+			return;
+		}		
+	}
+}
+
+function loadItemIntoBrowserPlayer(aID) {
+	const source = document.getElementById('PlaylistSource');
+	source.src = Playlist[PlaylistIndex].filename + "?id=" + aID + "&action=file_stream";
+	source.type = Playlist[PlaylistIndex].mime;
+	PlaylistPlayer.load();
+}
+
+function SameIdClickedAgain(aID) {
+	if (PlaylistIndex == -1) {
+		return false;
+	}
+	if (PlaylistIndex > Playlist.length - 1) {
+		return false;
+	}
+	if (Playlist[PlaylistIndex].id == aID) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function TogglePlayPause() {
+	return PlaylistPlayer.paused ? PlaylistPlayer.play() : PlaylistPlayer.pause();	
+}
+
+function playItemInBrowser(aID) {
+	// The user clicked on an item in the Browsers Playlist
+	// Get the Index of the Item in the Playlist
+	if (SameIdClickedAgain(aID) == true) {
+		TogglePlayPause();
+		RefreshAnimationIcon(aID);
+	} else {
+		RefreshPlaylistIndex(aID);
+		// Load it into the Player
+		loadItemIntoBrowserPlayer(aID);
+		// play it!
+		PlaylistPlayer.play();
+		RefreshAnimationIcon(aID);
+	}
+}
+
+function PlayNextItemInBrowser() {
+	if (PlaylistIndex === Playlist.length - 1) {
 		PlaylistIndex = 0;
 	} else {
 		PlaylistIndex++;
-	}	
-	let source = document.getElementById('PlaylistSource');
-	source.src = AudioFiles[PlaylistIndex].name+".mp3?id="+AudioFiles[PlaylistIndex].id+"&action=file_stream";
-	source.type = 'audio/mpeg';			
-		
-	PlaylistAudio.load();
-	PlaylistAudio.play();		
-}
-
-function checkVolume() {
-	$.ajax({url:"playercontrolJS?action=getvolume", dataType:"text", success: 
-		function(data, textStatus, jqXHR){$("#volume").slider( "value" , data);}
-		});				
-}
-
-function checkProgress(){
-	$.ajax({url:"playercontrolJS?action=getprogress", dataType:"text", success: setslider});
-};
-
-function checkPlaylistProgress(){
-	$.ajax({url:"playercontrolJS?action=getprogress", dataType:"text", success: setPlaylistSlider});
-};
-
-function setslider(data, textStatus, jqXHR){
-	if (parseInt(currentProgress) > parseInt(data)){
-		// reload playerdata/controls			
-		$.ajax({url:"playercontrolJS?part=controls", dataType:"html", success: reloadplayer});		
 	}
-	currentProgress = data;
-	$("#progress").slider( "value" , data);
-	
-	if ( $("#progress").length > 0 ) {
-		t=setTimeout("checkProgress()",1000);
-	}
-}
-
-function setPlaylistSlider(data, textStatus, jqXHR){
-	if (parseInt(currentProgress) > parseInt(data)){
-		// reload playerlist
-		reloadplaylist();
-	}
-	currentProgress = data;
-	$("#playlistprogress").slider( "value" , data);
-	
-	if ( $("#playlistprogress").length > 0 ) {
-		t=setTimeout("checkPlaylistProgress()",1000);
-	}
-}
-
-function playercontrol_VolumeUp() {
-	$.ajax({url:"playercontrolJS?action=setvolume&value=1000", dataType:"html", success: checkVolume});	
-}
-  
-function playercontrol_VolumeDown() {
-	$.ajax({url:"playercontrolJS?action=setvolume&value=-1000", dataType:"html", success: checkVolume});
-}
-  
-function reloadplayer(data, textStatus, jqXHR){			
-	var	$currentDOM = $("#jsPlayer");			
-	$currentDOM.replaceWith(data);
-	initSliders();
-	initVolume();
-}
-		
-function playercontrol_playpause(){			
-	$.ajax({url:"playercontrolJS?action=playpause&part=controls", dataType:"html", success: reloadplayer});
-};
-function playercontrol_stop(){
-	$.ajax({url:"playercontrolJS?action=stop&part=controls", dataType:"html", success: reloadplayer});		
-};
-function playercontrol_playnext(){
-	$.ajax({url:"playercontrolJS?action=next&part=controls", dataType:"html", success: reloadplayer});		
-};
-function playercontrol_playprevious(){
-	$.ajax({url:"playercontrolJS?action=previous&part=controls", dataType:"html", success: reloadplayer});
-};		
-
-function playtitle(aID){			
-	$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_playnow", dataType:"html", success: showtest});			
-	function showtest(data, textStatus, jqXHR)
-	{ 				
-		if (data == "0") {
-			alert("Playing failed. Please reload this page and try again.");
-		}				
-		$(".current").removeClass("current");				
-		$("#js"+data).addClass("current");
-	}			
-};
-
-function reloadplaylist(){	
-	$.ajax({url:"playlistcontrolJS?id=-1&action=loaditem", dataType:"html", success: replacePlaylist});
-	function replacePlaylist(data, textStatus, jqXHR) {			
-		$("#playlist").html(data);
-		initPlaylistSlider();
-	};
-};		
-
-
-function moveup(aID){
-	$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_moveup", dataType:"text", success: moveup2});		
-	function moveup2(data, textStatus, jqXHR) {		
-		// moveup of a Prebooklist-Item. reloading playlist is recommended
-		reloadplaylist();
-	}		
-};
-
-function movedown(aID){	
-	$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_movedown", dataType:"text", success: movedown2});		
-	function movedown2(data, textStatus, jqXHR) {		
-		// movedown of a Prebooklist-Item. reloading playlist is recommended
-		reloadplaylist();
-	}
-};
-
-function filedelete(aID){
-	$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_delete", dataType:"text", success: filedelete2});
-	function filedelete2(data, textStatus, jqXHR){
-		if (data == "1") {
-			// delete item from DOM
-			$("#js"+aID).remove();				
-		} else
-		{	// invalid item or prebook-delete => reload playlist
-			reloadplaylist();
-		}				
-	}		
-};
-
-function addnext(aID){
-	$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_addnext", dataType:"text", success: fileaddnext2});
-	function fileaddnext2(data, textStatus, jqXHR){						
-		if (data == "ok") { 
-			$("#btnAddNext"+aID).html(successBtn); } 
-		else {
-			$("#btnAddNext"+aID).html(failBtn); }
-		$("#btnAddNext"+aID).removeAttr('onclick');
-		}
-}
-
-function add(aID){
-	$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_add", dataType:"text", success: fileadd2});
-	function fileadd2(data, textStatus, jqXHR){
-		if (data == "ok") { 
-			$("#btnAdd"+aID).html(successBtn); } 
-		else {
-			$("#btnAdd"+aID).html(failBtn); }
-		$("#btnAdd"+aID).removeAttr('onclick');
-	}
-}
-
-function vote(aID){	
-	$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_vote", dataType:"html", success: votereply});
-	
-	function votereply(data, textStatus, jqXHR){
-		if (data == "ok") { 
-			if ( $("#playlist").length > 0 ) {reloadplaylist();}
-			else // replace ID with Success-button
-				{ 
-				$("#btnVote"+aID).html(successBtn);
-				$("#btnVote"+aID).removeAttr('onclick');
-				}
-			} 
-		else if (data == "already voted") { alert("You can't vote for the same file that fast again."); }
-		else if (data == "spam") { alert("Don't you think you liked enough files for now? - Voting not accepted."); }
-		else if (data == "exception") { alert("Failure. Please reload.");}
-	}
+	playItemInBrowser(Playlist[PlaylistIndex].id);
 }

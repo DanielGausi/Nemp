@@ -1056,7 +1056,7 @@ begin
                                   aMsg.Result := newAudioFile.WebServerID;
                               end;
                            end;
-        WS_PlaylistMoveUpCheck : begin  // returns a copy of the previous file in the playlist
+        (*WS_PlaylistMoveUpCheck : begin  // returns a copy of the previous file in the playlist
                               if AcceptApiCommands then
                               begin
                                   aMsg.Result := -3;   // invalid
@@ -1081,7 +1081,7 @@ begin
                                       end;
                                   end;
                               end;
-        end;
+        end;   *)
         WS_PlaylistMoveUp : begin
                               if AcceptApiCommands then
                               begin
@@ -1096,10 +1096,10 @@ begin
                                           if af.PrebookIndex > 1 then
                                           begin
                                               NempPlaylist.SetNewPrebookIndex(af, af.PrebookIndex - 1);
-                                              aMsg.Result := 1;
+                                              aMsg.Result := 2;
                                           end
                                           else
-                                              aMsg.Result := 2; // move up of the firstfile in prebooklist
+                                              aMsg.Result := 3; // move up of the first file in prebooklist, cancel
                                       end
                                       else
                                       begin
@@ -1109,12 +1109,12 @@ begin
                                                   aMsg.Result := 1;
                                           end else
                                           if idx = 0 then
-                                              aMsg.Result := 2; // move up of the first title
+                                              aMsg.Result := 3; // move up of the first title
                                       end;
                                   end;
                               end;
                            end;
-        WS_PlaylistMoveDownCheck: begin
+        (*WS_PlaylistMoveDownCheck: begin
                               if AcceptApiCommands then
                               begin
                                   aMsg.Result := -3;   // invalid
@@ -1139,7 +1139,7 @@ begin
                                       end;
                                   end;
                               end;
-        end;
+        end;*)
         WS_PlaylistMoveDown : begin
                               if AcceptApiCommands then
                               begin
@@ -1154,14 +1154,14 @@ begin
                                           if af.PrebookIndex < NempPlaylist.PrebookCount then
                                           begin
                                               NempPlaylist.SetNewPrebookIndex(af, af.PrebookIndex + 1);
-                                              aMsg.Result := 1;
+                                              aMsg.Result := 2;
                                           end
                                           else
                                           begin
                                               // move down of the last file in prebooklist
                                               // => delete from prebooklist
                                               NempPlaylist.SetNewPrebookIndex(af, 0);
-                                              aMsg.Result := 1;
+                                              aMsg.Result := 2;
                                           end;
                                       end
                                       else
@@ -1169,12 +1169,10 @@ begin
                                           if (idx > -1) and (idx < NempPlaylist.Count - 1) then
                                           begin
                                               NempPlaylist.SwapFiles(idx, idx+1);
-                                              //Playlist.Move(idx, idx+1);
-                                              //NempPlaylist.FillPlaylistView;
                                               aMsg.Result := 1;
                                           end else
                                               if idx = NempPlaylist.Count - 1 then
-                                                  aMsg.Result := 2;// move down of the last title
+                                                  aMsg.Result := 3;// move down of the last title
                                       end;
                                   end;
                               end;
@@ -1205,45 +1203,18 @@ begin
                               end;
                            end;
 
-        WS_QueryPlayer: NempWebServer.GenerateHTMLfromPlayer(NempPlayer, 0, False);
-        WS_QueryPlayerAdmin: NempWebServer.GenerateHTMLfromPlayer(NempPlayer, 0, True);
+        // player data
+        WS_QueryPlayer: NempWebServer.GenerateHTMLfromPlayer(NempPlayer, True, False);
+        WS_QueryPlayerAdmin: NempWebServer.GenerateHTMLfromPlayer(NempPlayer, True, True);
+        WS_QueryPlayerJS: NempWebServer.GenerateHTMLfromPlayer(NempPlayer, False, False);
+        WS_QueryPlayerJSAdmin: NempWebServer.GenerateHTMLfromPlayer(NempPlayer, False, True);
 
-        WS_QueryPlayerJS: begin
-                        if aMsg.LParam = 1 then
-                            NempWebServer.GenerateHTMLfromPlayer(NempPlayer, 1, False)   // 1: Controls  [[PlayerControls]]
-                        else
-                            NempWebServer.GenerateHTMLfromPlayer(NempPlayer, 2, False);  // 2: Playerdata [[ItemPlayer]]
-        end;
-        WS_QueryPlayerJSAdmin: begin
-                        if aMsg.LParam = 1 then
-                            NempWebServer.GenerateHTMLfromPlayer(NempPlayer, 1, True)   // 1: Controls  [[PlayerControls]]
-                        else
-                            NempWebServer.GenerateHTMLfromPlayer(NempPlayer, 2, True);  // 2: Playerdata [[ItemPlayer]]
-        end;
+        // playlist data
+        WS_QueryPlaylist: NempWebServer.GenerateHTMLfromPlaylist(NempPlaylist, True, False);
+        WS_QueryPlaylistAdmin: NempWebServer.GenerateHTMLfromPlaylist(NempPlaylist, True, True);
+        WS_QueryPlaylistJS: NempWebServer.GenerateHTMLfromPlaylist(NempPlaylist, False, False);
+        WS_QueryPlaylistJSAdmin: NempWebServer.GenerateHTMLfromPlaylist(NempPlaylist, False, True);
 
-        WS_QueryPlaylist: NempWebServer.GenerateHTMLfromPlaylist_View(NempPlaylist, False);
-        WS_QueryPlaylistAdmin: NempWebServer.GenerateHTMLfromPlaylist_View(NempPlaylist, True);
-
-        WS_QueryPlaylistItem: begin
-                              if aMsg.lParam = -1 then
-                                  // get ALL items
-                                  NempWebServer.GenerateHTMLfromPlaylistItem(NempPlaylist, -1, False)
-                              else
-                              begin
-                                  idx := NempPlaylist.GetPlaylistIndexByWebServerID(aMsg.LParam);
-                                  NempWebServer.GenerateHTMLfromPlaylistItem(NempPlaylist, idx, False);
-                              end;
-                          end;
-        WS_QueryPlaylistItemAdmin: begin
-                              if aMsg.lParam = -1 then
-                                  // get ALL items
-                                  NempWebServer.GenerateHTMLfromPlaylistItem(NempPlaylist, -1, True)
-                              else
-                              begin
-                                  idx := NempPlaylist.GetPlaylistIndexByWebServerID(aMsg.LParam);
-                                  NempWebServer.GenerateHTMLfromPlaylistItem(NempPlaylist, idx, True);
-                              end;
-                          end;
         WS_QueryPlaylistDetail: begin
                                 // ID aus Lparam lesen
                                 idx := NempPlaylist.GetPlaylistIndexByWebServerID(aMsg.LParam);

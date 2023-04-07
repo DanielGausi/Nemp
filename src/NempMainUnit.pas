@@ -8218,11 +8218,14 @@ end;
 procedure TNemp_MainForm.PlaylistScrollToPlayingFile;
 var aNode: PVirtualNode;
 begin
-    aNode := GetNodeWithAudioFile(PlaylistVST, NempPlaylist.PlayingFile);
-    // if there is a CueList attached: scroll into the active CueNode
-    if assigned(NempPlaylist.PlayingFile.CueList) then
-      aNode := GetNodeWithCueFile(PlaylistVST, aNode, NempPlayer.GetActiveCue);
-    PlaylistVST.ScrollIntoView(aNode, True);
+  if not assigned(NempPlaylist.PlayingFile) then
+    exit;
+
+  aNode := GetNodeWithAudioFile(PlaylistVST, NempPlaylist.PlayingFile);
+  // if there is a CueList attached: scroll into the active CueNode
+  if assigned(NempPlaylist.PlayingFile.CueList) then
+    aNode := GetNodeWithCueFile(PlaylistVST, aNode, NempPlayer.GetActiveCue);
+  PlaylistVST.ScrollIntoView(aNode, True);
 end;
 
 procedure TNemp_MainForm.PlayerArtistLabelDblClick(Sender: TObject);
