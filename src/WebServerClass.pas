@@ -1111,17 +1111,28 @@ begin
 
     // Search-Links: Use the WebServerID of the proper Collection
     afc := fCollectionAlbums.SearchAudioFile(af, False);
-    currentAlbumID := IfThen(assigned(afc), afc.WebServerID, 0);
+    if assigned(afc) then
+      currentAlbumID := afc.WebServerID
+    else
+      currentAlbumID := 0;
 
     afc := fCollectionArtists.SearchAudioFile(af, False);
-    if assigned(afc) then
-      currentArtistID := IfThen(assigned(afc.Parent), afc.Parent.WebServerID, afc.WebServerID)
+    if assigned(afc) then begin
+      if assigned(afc.Parent) then
+        currentArtistID := afc.Parent.WebServerID
+      else
+        currentArtistID := afc.WebServerID;
+    end
     else
       currentArtistID := 0;
 
     afc := fCollectionGenres.SearchAudioFile(af, False);
-    if assigned(afc) then
-      currentGenreID := IfThen(assigned(afc.Parent), afc.Parent.WebServerID, afc.WebServerID)
+    if assigned(afc) then begin
+      if assigned(afc.Parent) then
+        currentGenreID := afc.Parent.WebServerID
+      else
+        currentGenreID := afc.WebServerID;
+    end
     else
       currentGenreID := 0;
 
@@ -2361,7 +2372,7 @@ begin
 
       if queriedAction = 'stop' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_STOP, 0)
       else
-      if queriedAction = 'playpause' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_PLAY, 0)
+      if queriedAction = 'playpause' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_PLAY, WM_WebServer)
       else
       if queriedAction = 'next' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_NEXTTITLE, 0)
       else
@@ -2395,7 +2406,7 @@ begin
       ActionExecuted := True; // think positive
       if queriedAction = 'stop' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_STOP, 0)
       else
-      if queriedAction = 'playpause' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_PLAY, 0)
+      if queriedAction = 'playpause' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_PLAY, WM_WebServer)
       else
       if queriedAction = 'next' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_NEXTTITLE, 0)
       else

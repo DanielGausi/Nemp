@@ -472,7 +472,7 @@ type
         // used for editing-stuff in the detail-panel besides the tree
         // Note: This File is not necessary in the library. It can be just in
         // the playlist! Or one entry in a Library-Playlist.
-        CurrentAudioFile: TAudioFile;
+        //CurrentAudioFile: TAudioFile; // Changed to Nemp_MainForm.CurrentlySelectedFile
 
 
         NewCoverFlow: TNempCoverFlow;
@@ -881,7 +881,7 @@ begin
   fJobList.OwnsObjects := True;
   fAudioExport := Nil;
   fChangeCategory := Nil;
-  CurrentAudioFile := Nil;
+  // CurrentAudioFile := Nil;
 end;
 
 destructor TMedienBibliothek.Destroy;
@@ -952,7 +952,10 @@ end;
 procedure TMedienBibliothek.Clear;
 var i: Integer;
 begin
-  CurrentAudioFile := Nil;
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_ClearFilesTree, 0);
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_ClearBrowseTrees, 0);
+
+  // CurrentAudioFile := Nil;
   fJobList.Clear;
   for i := 0 to Mp3ListePfadSort.Count - 1 do
       Mp3ListePfadSort[i].Free;
@@ -1005,6 +1008,7 @@ end;
 
 procedure TMedienBibliothek.ClearFileCategories;
 begin
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_ClearBrowseTrees, 0);
   FileCategories.Clear;
   CurrentCategory := Nil;
   fNewFilesCategory := Nil;
@@ -2583,6 +2587,9 @@ var
   i, actualCatIdx: Integer;
   checked: Boolean;
 begin
+
+  //bibFile := MedienBib.GetAudioFileWithFilename(Original.Pfad);
+
   result := False;
   checked := False;
   for i := 0 to FileCategories.Count - 1 do begin
@@ -3556,8 +3563,8 @@ begin
 
   result := true;
 
-  if aAudioFile = CurrentAudioFile then
-      currentAudioFile := Nil;
+  // if aAudioFile = CurrentAudioFile then
+  //  currentAudioFile := Nil;
 
   LastBrowseResultList      .Extract(aAudioFile);
   LastQuickSearchResultList .Extract(aAudioFile);
@@ -4042,12 +4049,12 @@ begin
           SortAnzeigeliste;
       end;
       ccPlaylists: begin
-        CurrentAudioFile := Nil;
+        // CurrentAudioFile := Nil;
         BibSearcher.GetNewEmptyListMessage(elmPlaylist);
         DisplayContent := DISPLAY_BrowsePlaylist;
       end;
       ccWebStations: begin  // nothing to do, there are no files to display at all.
-        CurrentAudioFile := Nil;
+        // CurrentAudioFile := Nil;
         BibSearcher.GetNewEmptyListMessage(elmTitle);
       end;
     end;
@@ -5869,6 +5876,7 @@ end;
 
 procedure TMedienBibliothek.ReFillFileCategories;
 begin
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_ClearBrowseTrees, 0);
   CreateRootCollections;
   MergeFileIntoCategories(Mp3ListePfadSort);
   SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, 1);
@@ -6516,8 +6524,8 @@ begin
     // - without Mp3ListePfadSort.Extract (this is done before more efficiently)
     // - without check for "AnzeigeShowsPlaylistFiles" (we do have "real" files here)
     // - no AudioFile.free (this is done later)
-    if missingFiles[i] = CurrentAudioFile then
-      currentAudioFile := Nil;
+    //if missingFiles[i] = CurrentAudioFile then
+    //  currentAudioFile := Nil;
 
     LastBrowseResultList      .Extract(missingFiles[i]);
     LastQuickSearchResultList .Extract(missingFiles[i]);

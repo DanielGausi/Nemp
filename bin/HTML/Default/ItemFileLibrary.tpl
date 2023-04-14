@@ -2,7 +2,7 @@
 	<div class="controls">
 		{{BtnFileVote}}{{BtnFileAdd}}{{BtnFileAddNext}}
 	</div>	
-	<div class="titleinfo"><a href="library_details?id={{ID}}" title="Show more details about this title"><span class="title">{{Title}}</span>&nbsp;<span class=""duration">({{Duration}})</span><br> <span class="artist">{{Artist}}</span><br><span class="album">{{Album}} (Track {{Track}})</span>
+	<div class="titleinfo"><a href="library_details?id={{ID}}" title="Show more details about this title"><span class="title">{{Title}}</span>&nbsp;<span class="duration">({{Duration}})</span><br> <span class="artist">{{Artist}}</span><br><span class="album">{{Album}} (Track {{Track}})</span>
 	</a></div>	
 
 	<div class="browsercontrols">

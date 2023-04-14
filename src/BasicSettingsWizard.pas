@@ -157,10 +157,13 @@ implementation
 {$R *.dfm}
 
 uses NempMainUnit, Nemp_ConstantsAndTypes, SystemHelper, Nemp_RessourceStrings,
-    UpdateUtils, PlayerClass, MedienBibliothekClass, filetypes;
+    UpdateUtils, PlayerClass, MedienBibliothekClass, filetypes, UpdateCleaning, fUpdateCleaning;
 
 procedure RunWizard;
+var
+  WizardShown: Boolean;
 begin
+    WizardShown := False;
     if NempOptions.LastKnownVersion < WIZ_CURRENT_VERSION then
     begin
         // Show Wizard only if Writeaccess is possible (i.e. dont show it everytime when starting from CD/DVD)
@@ -168,6 +171,7 @@ begin
         begin
             if not assigned(Wizard) then
                 Application.CreateForm(TWizard, Wizard);
+            WizardShown := True;
             Wizard.Show;
         end;
     end;
@@ -184,6 +188,21 @@ begin
               SetSkinRadioBox(NempOptions.SkinName);
           end;
         end;
+    end;
+
+    if not WizardShown then begin // do NOT show both dialogs, Wizard and UdateCleaner
+      if (NempOptions.LastUpdateCleaningCheck < cCurrentCleanUpdate) and NempSettingsManager.WriteAccessPossible then begin
+        // There has been no Check so far: Its the first start after the Update
+        NempOptions.LastUpdateCleaningCheck := cCurrentCleanUpdate;
+        if (CountOutDatedFiles + CountOutDatedDirectories = 0) then
+          // everything is ok, obsolete files have been deleted by setup
+          NempOptions.LastUpdateCleaningSuccess := cCurrentCleanUpdate
+        else begin
+          if not assigned(FormUpdateCleaning) then
+              Application.CreateForm(TFormUpdateCleaning, FormUpdateCleaning);
+            FormUpdateCleaning.Show;
+        end;
+      end;
     end;
 
     //if (NempOptions.LastKnownVersion < WIZ_CURRENT_TAGSVERSION) and (NempOptions.LastKnownVersion > 0) then begin

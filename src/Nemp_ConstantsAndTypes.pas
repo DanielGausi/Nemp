@@ -229,6 +229,8 @@ type
         // etaws Kleinkram und allgemeine Optionen
         //DenyID3Edit: Boolean;
         LastKnownVersion: Integer;
+        LastUpdateCleaningCheck: Integer;
+        LastUpdateCleaningSuccess: Integer;
         AllowOnlyOneInstance: Boolean;
         RegisterHotKeys: Boolean;
         IgnoreVolumeUpDownKeys: Boolean;
@@ -409,6 +411,8 @@ const
     MB_BlockReadAccess =  3;
     // Update ist fertig. Jetzt müssen die Trees neu befüllt werden
     MB_RefillTrees = 4;
+    MB_ClearBrowseTrees = 11;
+    MB_ClearFilesTree = 12;
     MB_ClearEmptyNodes = 8;
     // Aufräumen ist auch erledigt. Controls wieder entsperren
     MB_Unblock =  5;
@@ -1075,6 +1079,9 @@ begin
   fMainFormHandle := aHandle;
 
   LastKnownVersion := NempSettingsManager.ReadInteger('Allgemein','LastKnownVersion',0 );
+  LastUpdateCleaningCheck := NempSettingsManager.ReadInteger('Allgemein','LastUpdateCleaningCheck', 0);
+  LastUpdateCleaningSuccess := NempSettingsManager.ReadInteger('Allgemein','LastUpdateCleaningSuccess', 0);
+
   ShowSplashScreen := NempSettingsManager.ReadBool('Allgemein', 'ShowSplashScreen', True);
 
   AutoCloseProgressWindow := NempSettingsManager.ReadBool('Allgemein', 'AutoCloseProgressWindow', True);
@@ -1174,6 +1181,9 @@ begin
   NempSettingsManager.WriteBool('Allgemein', 'AutoCloseProgressWindow', AutoCloseProgressWindow);
   NempSettingsManager.WriteBool('Allgemein', 'ShowSplashScreen', ShowSplashScreen);
   NempSettingsManager.WriteInteger('Allgemein','LastKnownVersion', WIZ_CURRENT_SKINVERSION);
+  NempSettingsManager.WriteInteger('Allgemein','LastUpdateCleaningCheck', LastUpdateCleaningCheck);
+  NempSettingsManager.WriteInteger('Allgemein','LastUpdateCleaningSuccess', LastUpdateCleaningSuccess);
+
   NempSettingsManager.WriteBool('Allgemein', 'AllowOnlyOneInstance', AllowOnlyOneInstance);
   NempSettingsManager.WriteBool('Allgemein', 'RegisterHotKeys', RegisterHotKeys);
   NempSettingsManager.WriteBool('Allgemein', 'RegisterMediaHotkeys', RegisterMediaHotkeys);

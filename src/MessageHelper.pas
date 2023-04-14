@@ -543,6 +543,14 @@ begin
           ClearEmptyCollectionNodes(AlbenVST);
         end;
 
+        MB_ClearBrowseTrees: begin
+          ClearBrowseTrees;
+        end;
+
+        MB_ClearFilesTree: begin
+          ClearTreeView;
+        end;
+
         MB_RefillTrees: begin
           ReFillBrowseTrees(LongBool(aMsg.LParam));
           ResetBrowsePanels;

@@ -294,6 +294,7 @@ type
       procedure PreparePlayAgain;
       procedure Pause;
       procedure Stop;
+      procedure TogglePlayPause(DirectUserInput: Boolean);
 
       procedure ClearPlaylist(StopPlayer: Boolean = True);      // Delete whole playlist
       procedure DeleteDeadFiles;    // Delete dead (non existing) files
@@ -964,6 +965,43 @@ begin
   fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtUserInput; //DisableAutoDeleteAtStop;
   Player.stop;
 end;
+
+procedure TNempPlaylist.TogglePlayPause(DirectUserInput: Boolean);
+begin
+  case Player.BassStatus of
+      BASS_ACTIVE_PAUSED  : begin
+            if DirectUserInput then
+              Player.LastUserWish := USER_WANT_PLAY;
+            Player.resume;
+      end;
+      BASS_ACTIVE_STOPPED : begin
+            if DirectUserInput then
+              NempPlayer.LastUserWish := USER_WANT_PLAY;
+            // Der Stream-Status ist also STOPPED
+            // Da kann durch echten Stop passiert sein,
+            // oder durch ein ausfaden nach Klick auf den Pause-Button.
+            if Player.Status = PLAYER_ISPAUSED then
+              Player.resume
+            else
+              PlayAgain(True);
+      end;
+      BASS_ACTIVE_PLAYING: begin
+            if Player.Status = PLAYER_ISPLAYING then begin
+              if DirectUserInput then
+                Player.LastUserWish := USER_WANT_STOP;
+              Pause;
+            end
+            else
+              if Player.Status = PLAYER_ISPAUSED then begin
+                  if DirectUserInput then
+                    Player.LastUserWish := USER_WANT_PLAY;
+                  Player.resume;
+              end;
+      end;
+    end;
+end;
+
+
 
 
 {

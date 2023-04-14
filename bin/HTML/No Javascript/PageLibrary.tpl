@@ -1,12 +1,12 @@
-<div class="library">
+<div class="library {{ClassLibrary}}">
 {{Menu}}
 {{MenuLibrary}}
 {{NoFilesHint}}
-<div>
 {{Summary}}
+<div class="ItemsContainer">
 {{LibraryItems}}
 </div>
 {{Pagination}}
 </div>
-
+    
 <div style="clear:both;"></div>

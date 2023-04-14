@@ -3224,6 +3224,7 @@ object Nemp_MainForm: TNemp_MainForm
     end
     object MM_Help: TMenuItem
       Caption = '&Help'
+      OnClick = MM_HelpClick
       object MM_H_About: TMenuItem
         Caption = '&About Nemp'
         ImageIndex = 17
@@ -3242,6 +3243,10 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = 'Check for updates'
         ImageIndex = 22
         OnClick = MM_H_CheckForUpdatesClick
+      end
+      object MM_H_CleanupUpdate: TMenuItem
+        Caption = 'Clean up update'
+        OnClick = MM_H_CleanupUpdateClick
       end
     end
     object MM_H_ErrorLog: TMenuItem
@@ -6433,20 +6438,29 @@ object Nemp_MainForm: TNemp_MainForm
     object Help1: TMenuItem
       Caption = 'Help'
       ImageIndex = 4
+      OnClick = MM_HelpClick
       object PM_P_About: TMenuItem
         Caption = 'About Nemp'
         ImageIndex = 17
         OnClick = MM_H_AboutClick
+      end
+      object PM_P_Help: TMenuItem
+        Caption = 'Help'
+        ImageIndex = 4
+        OnClick = ToolButton7Click
+      end
+      object PM_P_OnlineHelp: TMenuItem
+        Caption = 'Online help'
+        OnClick = MM_H_HelpOnlineClick
       end
       object PM_P_CheckForUpdates: TMenuItem
         Caption = 'Check for updates'
         ImageIndex = 22
         OnClick = MM_H_CheckForUpdatesClick
       end
-      object PM_P_Help: TMenuItem
-        Caption = 'Help'
-        ImageIndex = 4
-        OnClick = ToolButton7Click
+      object PM_P_CleanupUpdate: TMenuItem
+        Caption = 'Clean up update'
+        OnClick = MM_H_CleanupUpdateClick
       end
     end
   end

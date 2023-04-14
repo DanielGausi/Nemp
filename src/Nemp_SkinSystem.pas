@@ -2672,10 +2672,10 @@ begin
     RatingGraphics.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap, CountStarBitmap);
 
     Nemp_MainForm.BibRatingHelper.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap, CountStarBitmap);
-    if Assigned(MedienBib.CurrentAudioFile) then
-        Nemp_MainForm.BibRatingHelper.DrawRatingInStarsOnBitmap(MedienBib.CurrentAudioFile.Rating, Nemp_MainForm.ImgBibRating.Picture.Bitmap, Nemp_MainForm.ImgBibRating.Width, Nemp_MainForm.ImgBibRating.Height)
-    else
-        Nemp_MainForm.BibRatingHelper.DrawRatingInStarsOnBitmap(128, Nemp_MainForm.ImgBibRating.Picture.Bitmap, Nemp_MainForm.ImgBibRating.Width, Nemp_MainForm.ImgBibRating.Height);
+    //if Assigned(MedienBib.CurrentAudioFile) then
+        Nemp_MainForm.BibRatingHelper.DrawRatingInStarsOnBitmap(Nemp_MainForm.CurrentlySelectedFile.Rating, Nemp_MainForm.ImgBibRating.Picture.Bitmap, Nemp_MainForm.ImgBibRating.Width, Nemp_MainForm.ImgBibRating.Height);
+    //else
+    //    Nemp_MainForm.BibRatingHelper.DrawRatingInStarsOnBitmap(128, Nemp_MainForm.ImgBibRating.Picture.Bitmap, Nemp_MainForm.ImgBibRating.Width, Nemp_MainForm.ImgBibRating.Height);
 
     LoadGraphicFromBaseName(SetStarBitmap, BaseDir + 'starset', True);
     LoadGraphicFromBaseName(UnSetStarBitmap, BaseDir + 'starunset', True);

@@ -144,7 +144,8 @@ uses
   fConfigErrorDlg in 'fConfigErrorDlg.pas' {ConfigErrorDlg},
   AudioExportUtils in 'AudioExportUtils.pas',
   fExport in 'fExport.pas' {FormExport},
-  UpdateCleaning in 'UpdateCleaning.pas';
+  UpdateCleaning in 'UpdateCleaning.pas',
+  fUpdateCleaning in 'fUpdateCleaning.pas' {FormUpdateCleaning};
 
 {$R *.res}
 

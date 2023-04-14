@@ -4,7 +4,7 @@
 			<span class="genrename">Genre "{{Genre}}"</span><br>
 			<span class="genreartistcount">Artists: {{ArtistCount}}</span>
 		</p>
-		<p class="additionalinfo"	
+		<p class="additionalinfo">
 			<span class="count">total {{Count}} Tracks, {{Duration}}</span><br>	
 		</p>
 	</div>

@@ -75,7 +75,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Columns = <
         item
           Position = 0
-          Width = 201
+          Width = 203
         end>
     end
     object PageControl1: TPageControl
@@ -83,7 +83,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 0
       Width = 469
       Height = 632
-      ActivePage = tabWebserver
+      ActivePage = tabCategories
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -110,6 +110,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Caption = 'Failsafe'
             TabOrder = 4
             Visible = False
+            ExplicitWidth = 457
             object XXX_CB_BetaDontUseThreadedUpdate: TCheckBox
               Left = 16
               Top = 16
@@ -125,6 +126,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 128
             Caption = 'Hibernate/standby'
             TabOrder = 3
+            ExplicitWidth = 457
             object Btn_ReinitPlayerEngine: TButton
               Left = 16
               Top = 59
@@ -167,6 +169,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 160
             Caption = 'Search for Updates'
             TabOrder = 2
+            ExplicitWidth = 185
             object Btn_CHeckNowForUpdates: TButton
               Left = 16
               Top = 92
@@ -221,6 +224,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 180
             Caption = 'Nemp portable'
             TabOrder = 1
+            ExplicitWidth = 457
             object lblNempPortable: TLabel
               Left = 16
               Top = 113
@@ -278,6 +282,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 340
             Caption = 'Starting Nemp'
             TabOrder = 0
+            ExplicitWidth = 457
             object lblNempStartPlayer: TLabel
               Left = 16
               Top = 16
@@ -471,6 +476,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 285
             Caption = 'Global Hotkeys'
             TabOrder = 1
+            ExplicitWidth = 185
             object CB_Activate_DecVol: TCheckBox
               Left = 34
               Top = 200
@@ -1319,6 +1325,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 175
             Caption = 'Extended viewing settings'
             TabOrder = 0
+            ExplicitWidth = 457
             object cb_limitMarkerToCurrentFiles: TCheckBox
               Left = 16
               Top = 56
@@ -1380,6 +1387,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 190
             Caption = 'Playlist formatting'
             TabOrder = 1
+            ExplicitWidth = 185
             object lblPlaylistTitle: TLabel
               Left = 16
               Top = 16
@@ -1537,6 +1545,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 422
             Caption = 'Not available metadata'
             TabOrder = 2
+            ExplicitWidth = 185
             object LblReplaceAlbumBy: TLabel
               Left = 16
               Top = 126
@@ -1676,6 +1685,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 93
             Caption = 'Display of Albums, Directories, ...'
             TabOrder = 3
+            ExplicitWidth = 457
             object cbShowCoverForAlbum: TCheckBox
               Left = 16
               Top = 16
@@ -1697,6 +1707,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Top = 0
             Caption = 'Visible columns in the medialist'
             TabOrder = 4
+            ExplicitWidth = 457
             object clbViewMainColumns: TCheckListBox
               Left = 0
               Top = 0
@@ -1739,6 +1750,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 255
             Caption = 'Party mode'
             TabOrder = 1
+            ExplicitWidth = 185
             object Lbl_PartyMode_ResizeFactor: TLabel
               Left = 16
               Top = 16
@@ -1810,6 +1822,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 329
             Caption = 'Font settings'
             TabOrder = 0
+            ExplicitWidth = 185
             object lblFontBrowselists: TLabel
               Left = 16
               Top = 16
@@ -2058,6 +2071,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 280
             Caption = 'Cover art'
             TabOrder = 2
+            ExplicitWidth = 185
             object lblSearchCoverArt: TLabel
               Left = 16
               Top = 16
@@ -2178,6 +2192,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 235
             Caption = 'File types for the media library'
             TabOrder = 1
+            ExplicitWidth = 457
             object LblConst_OnlythefollowingTypes: TLabel
               Left = 16
               Top = 39
@@ -2226,6 +2241,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 260
             Caption = 'Directories'
             TabOrder = 0
+            ExplicitWidth = 457
             object BtnAutoScanAdd: TButton
               AlignWithMargins = True
               Left = 303
@@ -2361,6 +2377,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 145
             Caption = 'Category "Playlists"'
             TabOrder = 0
+            ExplicitWidth = 185
             object lblPlaylistCaptionMode: TLabel
               Left = 16
               Top = 16
@@ -2424,6 +2441,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 333
             Caption = 'Group and sort settings'
             TabOrder = 1
+            ExplicitWidth = 185
             object lblSamplerSorting: TLabel
               Left = 16
               Top = 248
@@ -2524,7 +2542,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object editCDNames: TLabeledEdit
               Left = 16
               Top = 123
-              Width = 1
+              Width = -17
               Height = 21
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -2533,6 +2551,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               EditLabel.Caption = 'Folder names not forming an album of their own (comma separated)'
               TabOrder = 2
               Text = ''
+              ExplicitWidth = 0
             end
           end
           object cpCategoryCoverflow: TCategoryPanel
@@ -2540,6 +2559,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 125
             Caption = 'Display as "Coverflow"'
             TabOrder = 2
+            ExplicitWidth = 185
             object btnEditCoverflow: TButton
               Left = 375
               Top = 32
@@ -2581,6 +2601,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 329
             Caption = 'Categories and tree view layers'
             TabOrder = 3
+            ExplicitWidth = 457
             object lblDefaultCategory: TLabel
               Left = 16
               Top = 190
@@ -2642,7 +2663,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Columns = <
                 item
                   Position = 0
-                  Width = 192
+                  Width = 196
                 end>
             end
             object btnCategoryEdit: TButton
@@ -2715,7 +2736,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Columns = <
                 item
                   Position = 0
-                  Width = 192
+                  Width = 196
                 end>
             end
             object cbLibConfigShowPlaylistCategories: TCheckBox
@@ -2761,6 +2782,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 445
             Caption = 'Meta data (e.g. ID3-Tags)'
             TabOrder = 0
+            ExplicitWidth = 457
             object lblQuickAccess: TLabel
               Left = 16
               Top = 16
@@ -2936,6 +2958,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 290
             Caption = 'CDDB settings'
             TabOrder = 1
+            ExplicitWidth = 457
             object lblInvalidCDDBMail: TLabel
               Left = 16
               Top = 167
@@ -3199,6 +3222,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 76
             Caption = 'Advanced'
             TabOrder = 4
+            ExplicitWidth = 457
             object cb_SafePlayback: TCheckBox
               Left = 16
               Top = 16
@@ -3213,6 +3237,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 162
             Caption = 'Visualization'
             TabOrder = 3
+            ExplicitWidth = 185
             object Lbl_Framerate: TLabel
               Left = 191
               Top = 42
@@ -3271,6 +3296,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 187
             Caption = 'Pause between tracks'
             TabOrder = 2
+            ExplicitWidth = 457
             object Lbl_SilenceDB: TLabel
               Left = 95
               Top = 59
@@ -3346,6 +3372,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 188
             Caption = 'Fading'
             TabOrder = 1
+            ExplicitWidth = 457
             object LblConst_ms1: TLabel
               Left = 90
               Top = 64
@@ -3445,6 +3472,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 350
             Caption = 'Output devices'
             TabOrder = 0
+            ExplicitWidth = 185
             object LblConst_MainDevice: TLabel
               Left = 16
               Top = 16
@@ -3623,6 +3651,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 120
             Caption = 'Playlist log'
             TabOrder = 3
+            ExplicitWidth = 457
             object LblLogDuration: TLabel
               Left = 36
               Top = 39
@@ -3662,6 +3691,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 350
             Caption = 'Random playback'
             TabOrder = 2
+            ExplicitWidth = 457
             object lbl_WeightedRandom: TLabel
               Left = 34
               Top = 100
@@ -4010,6 +4040,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 235
             Caption = 'General playlist settings'
             TabOrder = 1
+            ExplicitWidth = 457
             object CB_AutoScanPlaylist: TCheckBox
               Left = 16
               Top = 16
@@ -4103,6 +4134,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 220
             Caption = 'Default actions'
             TabOrder = 0
+            ExplicitWidth = 185
             object LblPlaylistDefaultAction: TLabel
               Left = 16
               Top = 16
@@ -4232,6 +4264,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 345
             Caption = 'Recording settings'
             TabOrder = 0
+            ExplicitWidth = 185
             object LblConst_DownloadDir: TLabel
               Left = 16
               Top = 16
@@ -4842,6 +4875,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 240
             Caption = 'Scrobble log (this session only)'
             TabOrder = 2
+            ExplicitWidth = 185
             object MemoScrobbleLog: TMemo
               Left = 0
               Top = 0
@@ -5201,6 +5235,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 650
             Caption = 'Webserver URLs'
             TabOrder = 2
+            ExplicitWidth = 185
             object LabelLANIP: TLabel
               Left = 16
               Top = 16
@@ -5307,6 +5342,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Top = 209
             Caption = 'User rights'
             TabOrder = 1
+            ExplicitWidth = 457
             object LblConst_Password2: TLabel
               Left = 224
               Top = 16
@@ -5408,6 +5444,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 209
             Caption = 'Webserver configuration'
             TabOrder = 0
+            ExplicitWidth = 457
             object Label7: TLabel
               Left = 16
               Top = 85
@@ -5573,6 +5610,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 150
             Caption = 'Mixed settings'
             TabOrder = 5
+            ExplicitWidth = 457
             object lblCoverflowTextures: TLabel
               Left = 92
               Top = 19
@@ -5635,6 +5673,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 125
             Caption = 'Reflection'
             TabOrder = 4
+            ExplicitWidth = 457
             object lblCoverFlowIntensity: TLabel
               Left = 16
               Top = 37
@@ -5695,6 +5734,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 100
             Caption = 'Angles'
             TabOrder = 3
+            ExplicitWidth = 457
             object lblCoverFlowAngleLeft: TLabel
               Left = 16
               Top = 16
@@ -5769,6 +5809,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 130
             Caption = 'Spacing between cover art'
             TabOrder = 2
+            ExplicitWidth = 457
             object lblCoverFlowGapLeft: TLabel
               Left = 16
               Top = 16
@@ -5853,6 +5894,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 80
             Caption = 'Viewing position (x-axis)'
             TabOrder = 1
+            ExplicitWidth = 457
             object tbCoverViewPosition: TNempTrackBar
               AlignWithMargins = True
               Left = 16
@@ -5875,6 +5917,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 135
             Caption = 'Position of cover art (z-axis)'
             TabOrder = 0
+            ExplicitWidth = 457
             object LblCoverZLeft: TLabel
               Left = 16
               Top = 41
@@ -5968,6 +6011,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 467
             Caption = 'Register file types'
             TabOrder = 0
+            ExplicitWidth = 185
             object lbl_AudioFormats: TLabel
               Left = 16
               Top = 16
@@ -6226,7 +6270,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object BtnHelp: TButton
       AlignWithMargins = True
       Left = 72
-      Top = 4
+      Top = 3
       Width = 75
       Height = 25
       Caption = 'Help'

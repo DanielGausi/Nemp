@@ -309,9 +309,16 @@ end;
 
 function GetNextNodeOrFirst(aTree: TVirtualStringTree; aNode: PVirtualNode): PVirtualNode;
 begin
-    result := aTree.GetNextSibling(aNode);
+  if not assigned(aNode) then
+    result := Nil
+  else begin
+    if aTree.GetNodeLevel(aNode) > 0 then
+      aNode := aNode.Parent;
+
+    result := aTree.GetNextSibling(aNode); // aTree.GetNext(aNode);
     if not assigned(result) then
         result := aTree.GetFirst;
+  end;
 end;
 
 function GetNodeWithAudioFile(aTree: TVirtualStringTree; aAudioFile: TAudioFile): PVirtualNode;

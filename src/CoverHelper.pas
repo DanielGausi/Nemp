@@ -1769,7 +1769,13 @@ finalization
   DeleteCriticalSection(CSAccessRandomCoverlist);
   DeleteCriticalSection(CSAccessCoverSearcherProperties);
 
-  if WICImagingFactory_VCL <> Nil then
-      WICImagingFactory_VCL._Release;
+  Pointer(WICImagingFactory_ScanThread) := Nil;
+  Pointer(WICImagingFactory_VCL) := Nil;
+  (*if WICImagingFactory_VCL <> Nil then begin
+    if WICImagingFactory_VCL._Release = 0 then
+              Pointer(WICImagingFactory_VCL) := Nil; // (?) https://community.embarcadero.com/blogs/entry/access-violation-in-_intfclear-3593
+  end;*)
+  // if WICImagingFactory_VCL <> Nil then
+  //    WICImagingFactory_VCL._Release;
 
 end.

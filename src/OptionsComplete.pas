@@ -2237,9 +2237,10 @@ end;
 
 function TOptionsCompleteForm.GetFocussedAudioFileName: UnicodeString;
 begin
-  result := '';
-  if assigned(MedienBib.CurrentAudioFile) then
-      result := MedienBib.CurrentAudioFile.Pfad;
+  // result := '';
+  // if assigned(MedienBib.CurrentAudioFile) then
+  //    result := MedienBib.CurrentAudioFile.Pfad;
+  result := Nemp_MainForm.CurrentlySelectedFile.Pfad;
 end;
 
 procedure TOptionsCompleteForm.BtnGetCountDownTitelClick(Sender: TObject);

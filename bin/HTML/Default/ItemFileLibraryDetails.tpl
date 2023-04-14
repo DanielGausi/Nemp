@@ -24,8 +24,6 @@
 	</div>
 </div>
 
-
-
 <div class="controls">
 	<div>{{BtnFileDownload}}</div>
 	<div>{{BtnFileVote}}</div>
