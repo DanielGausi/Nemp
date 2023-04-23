@@ -635,8 +635,15 @@ type
     cbAutoCheckNewCDs: TCheckBox;
     lblLocalCDDBCache: TLabel;
     btnClearCDDBCache: TButton;
-    cbApplyDefaultActionToWholeList: TCheckBox;
     cbPermitHtmlAudio: TCheckBox;
+    cbUseDefaultActionOnCoverFlowDoubleClick: TCheckBox;
+    cbApplyDefaultActionToWholeList: TCheckBox;
+    cbIgnoreFadingOnLiveRecordings: TCheckBox;
+    lblIdentifyLiveTracksBy: TLabel;
+    edtLiveRecordingCheckIdentifier: TEdit;
+    cbLiveRecordingCheckTitle: TCheckBox;
+    cbLiveRecordingCheckAlbum: TCheckBox;
+    cbLiveRecordingCheckTags: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1270,6 +1277,13 @@ begin
   CB_IgnoreFadingOnShortTracks.Checked := NempPlayer.IgnoreFadingOnShortTracks;
   CB_IgnoreFadingOnPause.Checked := NempPlayer.IgnoreFadingOnPause;
   CB_IgnoreFadingOnStop.Checked := NempPlayer.IgnoreFadingOnStop;
+
+  cbIgnoreFadingOnLiveRecordings.Checked := NempPlayer.IgnoreFadingOnLiveRecordings;
+  cbLiveRecordingCheckTitle.Checked := NempPlayer.LiveRecordingCheckTitle;
+  cbLiveRecordingCheckAlbum.Checked := NempPlayer.LiveRecordingCheckAlbum;
+  cbLiveRecordingCheckTags.Checked := NempPlayer.LiveRecordingCheckTags;
+  edtLiveRecordingCheckIdentifier.Text := NempPlayer.LiveRecordingCheckIdentifier;
+
   EnableFadingControls;
   // Skip silence
   CB_SilenceDetection.Checked  := NempPlayer.DoSilenceDetection;
@@ -1324,6 +1338,7 @@ begin
   // Standard-Aktionen
   GrpBox_DefaultAction.ItemIndex := NempPlaylist.DefaultAction;
   cbApplyDefaultActionToWholeList.Checked := NempPlaylist.ApplyDefaultActionToWholeList;
+  cbUseDefaultActionOnCoverFlowDoubleClick.Checked := NempPlaylist.UseDefaultActionOnCoverFlowDoubleClick;
   GrpBox_HeadsetDefaultAction.ItemIndex := NempPlaylist.HeadSetAction;
   cb_AutoStopHeadsetSwitchTab.Checked := NempPlaylist.AutoStopHeadsetSwitchTab;
   cb_AutoStopHeadsetAddToPlayist.Checked := NempPlaylist.AutoStopHeadsetAddToPlayist;
@@ -1839,6 +1854,12 @@ begin
   LblConst_TitleFade.Enabled := CB_Fading.Checked;
   LblConst_ms1.Enabled := CB_Fading.Checked;
   LblConst_ms2.Enabled := CB_Fading.Checked;
+  cbIgnoreFadingOnLiveRecordings.Enabled := CB_Fading.Checked;
+  lblIdentifyLiveTracksBy.Enabled := CB_Fading.Checked and cbIgnoreFadingOnLiveRecordings.Checked;
+  cbLiveRecordingCheckTitle.Enabled := CB_Fading.Checked and cbIgnoreFadingOnLiveRecordings.Checked;
+  cbLiveRecordingCheckAlbum.Enabled := CB_Fading.Checked and cbIgnoreFadingOnLiveRecordings.Checked;
+  cbLiveRecordingCheckTags.Enabled := CB_Fading.Checked and cbIgnoreFadingOnLiveRecordings.Checked;
+  edtLiveRecordingCheckIdentifier.Enabled := CB_Fading.Checked and cbIgnoreFadingOnLiveRecordings.Checked;
 end;
 
 procedure TOptionsCompleteForm.CB_FadingClick(Sender: TObject);
@@ -2471,6 +2492,12 @@ begin
   NempPlayer.IgnoreFadingOnShortTracks := CB_IgnoreFadingOnShortTracks.Checked;
   NempPlayer.IgnoreFadingOnPause := CB_IgnoreFadingOnPause.Checked;
   NempPlayer.IgnoreFadingOnStop := CB_IgnoreFadingOnStop.Checked;
+  NempPlayer.IgnoreFadingOnLiveRecordings  := cbIgnoreFadingOnLiveRecordings.Checked;
+  NempPlayer.LiveRecordingCheckTitle       := cbLiveRecordingCheckTitle.Checked;
+  NempPlayer.LiveRecordingCheckAlbum       := cbLiveRecordingCheckAlbum.Checked;
+  NempPlayer.LiveRecordingCheckTags        := cbLiveRecordingCheckTags.Checked;
+  NempPlayer.LiveRecordingCheckIdentifier  := Trim(edtLiveRecordingCheckIdentifier.Text);
+
   NempPlayer.DoSilenceDetection := CB_SilenceDetection.Checked ;
   NempPlayer.SilenceThreshold   := SE_SilenceThreshold.Value   ;
   NempPlayer.DoPauseBetweenTracks       := cb_AddBreakBetweenTracks.Checked;
@@ -2701,6 +2728,7 @@ begin
   // default actions
   NempPlaylist.DefaultAction := GrpBox_DefaultAction.ItemIndex;
   NempPlaylist.ApplyDefaultActionToWholeList := cbApplyDefaultActionToWholeList.Checked;
+  NempPlaylist.UseDefaultActionOnCoverFlowDoubleClick := cbUseDefaultActionOnCoverFlowDoubleClick.Checked;
   NempPlaylist.HeadSetAction := GrpBox_HeadsetDefaultAction.ItemIndex;
   NempPlaylist.AutoStopHeadsetSwitchTab := cb_AutoStopHeadsetSwitchTab.Checked;
   NempPlaylist.AutoStopHeadsetAddToPlayist := cb_AutoStopHeadsetAddToPlayist.Checked;
@@ -3936,6 +3964,11 @@ begin
   (NempPlayer.IgnoreFadingOnShortTracks <> CB_IgnoreFadingOnShortTracks.Checked) or
   (NempPlayer.IgnoreFadingOnPause <> CB_IgnoreFadingOnPause.Checked) or
   (NempPlayer.IgnoreFadingOnStop <> CB_IgnoreFadingOnStop.Checked) or
+  (NempPlayer.IgnoreFadingOnLiveRecordings  <> cbIgnoreFadingOnLiveRecordings.Checked) or
+  (NempPlayer.LiveRecordingCheckTitle       <> cbLiveRecordingCheckTitle.Checked) or
+  (NempPlayer.LiveRecordingCheckAlbum       <> cbLiveRecordingCheckAlbum.Checked) or
+  (NempPlayer.LiveRecordingCheckTags        <> cbLiveRecordingCheckTags.Checked) or
+  (NempPlayer.LiveRecordingCheckIdentifier  <> edtLiveRecordingCheckIdentifier.Text) or
   (NempPlayer.DoSilenceDetection <> CB_SilenceDetection.Checked ) or
   (NempPlayer.SilenceThreshold   <> SE_SilenceThreshold.Value) or
   (NempPlayer.DoPauseBetweenTracks  <> cb_AddBreakBetweenTracks.Checked) or
@@ -3953,6 +3986,7 @@ begin
   result :=
   (NempPlaylist.DefaultAction <> GrpBox_DefaultAction.ItemIndex) or
   (NempPlaylist.ApplyDefaultActionToWholeList <> cbApplyDefaultActionToWholeList.Checked) or
+  (NempPlaylist.UseDefaultActionOnCoverFlowDoubleClick <> cbUseDefaultActionOnCoverFlowDoubleClick.Checked) or
   (NempPlaylist.HeadSetAction <> GrpBox_HeadsetDefaultAction.ItemIndex) or
   (NempPlaylist.AutoStopHeadsetSwitchTab <> cb_AutoStopHeadsetSwitchTab.Checked) or
   (NempPlaylist.AutoStopHeadsetAddToPlayist <> cb_AutoStopHeadsetAddToPlayist.Checked) or
@@ -4272,7 +4306,7 @@ begin
   nLevel := VSTSortings.GetNodeLevel(Node);
   ActionEditLayer.Enabled := nLevel > 0;
   ActionAddLayer.Enabled := rc.SpecialContent = scRegular; //NOT rc.IsDirectoryCollection;
-  ActionDeleteLayer.Enabled := (nLevel = 0) or (rc.LayerDepth > 1)
+  ActionDeleteLayer.Enabled := ((nLevel = 0) and (RootCollections.Count > 1) )or (rc.LayerDepth > 1)
 end;
 
 procedure TOptionsCompleteForm.PrepareEditLayerForm(AllowDirectory: Boolean; aConfig: TCollectionConfig);

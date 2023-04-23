@@ -598,10 +598,10 @@ type
         function AddNewTag(aAudioFile: TAudioFile; newTag: String; IgnoreWarnings: Boolean; Threaded: Boolean = False): TTagError;
 
         // Check, whether AudioFiles already exists in the library.
-        function AudioFileExists(aFilename: UnicodeString): Boolean;
-        function GetAudioFileWithFilename(aFilename: UnicodeString): TAudioFile; overload;
-        function GetAudioFileWithFilename(aFilename: UnicodeString; SourceList: TAudioFileList): TAudioFile; overload;
-        function PlaylistFileExists(aFilename: UnicodeString): Boolean;
+        function AudioFileExists(const aFilename: UnicodeString): Boolean;
+        function GetAudioFileWithFilename(const aFilename: UnicodeString): TAudioFile; overload;
+        function GetAudioFileWithFilename(const aFilename: UnicodeString; SourceList: TAudioFileList): TAudioFile; overload;
+        function PlaylistFileExists(const aFilename: UnicodeString): Boolean;
 
         // 2018: new helper method to set the BaseMarkerList properly
         procedure SetBaseMarkerList(aList: TAudioFileList);
@@ -3931,15 +3931,15 @@ end;
     - Check, whether fa file is already in the library
     --------------------------------------------------------
 }
-function TMedienBibliothek.AudioFileExists(aFilename: UnicodeString): Boolean;
+function TMedienBibliothek.AudioFileExists(const aFilename: UnicodeString): Boolean;
 begin
     result := binaersuche(Mp3ListePfadSort, ExtractFileDir(aFilename), ExtractFileName(aFilename), 0,Mp3ListePfadSort.Count-1) > -1;
 end;
-function TMedienBibliothek.PlaylistFileExists(aFilename: UnicodeString): Boolean;
+function TMedienBibliothek.PlaylistFileExists(const aFilename: UnicodeString): Boolean;
 begin
     result := BinaerPlaylistSuche(AllPlaylistsPfadSort, aFilename, 0, AllPlaylistsPfadSort.Count-1) > -1;
 end;
-function TMedienBibliothek.GetAudioFileWithFilename(aFilename: UnicodeString): TAudioFile;
+function TMedienBibliothek.GetAudioFileWithFilename(const aFilename: UnicodeString): TAudioFile;
 var idx: Integer;
 begin
   idx := binaersuche(Mp3ListePfadSort,ExtractFileDir(aFilename), ExtractFileName(aFilename),0,Mp3ListePfadSort.Count-1);
@@ -3948,7 +3948,7 @@ begin
   else
     result := Mp3ListePfadSort[idx];
 end;
-function TMedienBibliothek.GetAudioFileWithFilename(aFilename: UnicodeString; SourceList: TAudioFileList): TAudioFile;
+function TMedienBibliothek.GetAudioFileWithFilename(const aFilename: UnicodeString; SourceList: TAudioFileList): TAudioFile;
 var idx: Integer;
 begin
   idx := binaersuche(SourceList,ExtractFileDir(aFilename), ExtractFileName(aFilename),0,SourceList.Count-1);

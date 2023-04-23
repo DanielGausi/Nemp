@@ -1800,6 +1800,7 @@ begin
     PageData := StringReplace(PageData, '{{Menu}}'        , menu       , [rfReplaceAll]);
     PageData := StringReplace(PageData, '{{MenuLibrary}}'  , browsemenu , [rfReplaceAll]);
     PageData := StringReplace(PageData, '{{SearchString}}', ''         , [rfReplaceAll]);
+    PageData := StringReplace(PageData, '{{ClassLibrary}}', CollectionType, [rfReplaceAll]);
 
     Items := '';
 
@@ -2190,6 +2191,7 @@ end;
 procedure TNempWebServer.GetThemes(dest: TStrings);
 var SR: TSearchRec;
 begin
+    dest.Clear;
     if (FindFirst(ExtractFilePath(Paramstr(0)) + 'HTML\' + '*', faDirectory, SR)=0) then
         repeat
           if (SR.Name<>'.') and (SR.Name<>'..') and (not AnsiSameText(SR.Name, 'Common')) and ((SR.Attr AND faDirectory)= faDirectory) then

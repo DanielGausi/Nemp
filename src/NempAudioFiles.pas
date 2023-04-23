@@ -447,6 +447,7 @@ type
 
         constructor Create;
         destructor Destroy; override;
+        procedure Clear;
 
         // Copy the data from aAudiofile
         procedure Assign(aAudioFile: TAudioFile);
@@ -824,6 +825,48 @@ begin
   end;
 
   inherited destroy;
+end;
+
+procedure TAudioFile.Clear;
+begin
+  if assigned(CueList) then
+    CueList.Clear;
+  
+  Description        := '';                               
+  fFileSize          := 0;                                
+  fFileAge           := 40300; 
+  Duration           := 0;
+  fBitrate           := 160;
+  fvbr               := false;
+  fChannelModeIDX    := 1;
+  fSamplerateIDX     := 7;                  
+  FileIsPresent      := True;                   
+  Titel              := '';                  
+  Artist             := '';                  
+  AlbumArtist        := '';                  
+  Composer           := '';                   
+  Album              := '';                   
+  Genre              := '';                  
+  Year               := '';                  
+  Track              := 0 ;                   
+  CD                 := '';                  
+  Comment            := '';
+  Lyrics             := '';
+  CoverID            := '';
+  Rating             := 0;
+  PlayCounter        := 0;
+  fAudioType         := at_File;
+  Pfad               := '';
+  RawTagLastFM       := '';
+  Favorite           := 0;
+  fCategory          := 0;
+  fBPM               := '';
+  TrackGain          := 0;
+  AlbumGain          := 0;
+  TrackPeak          := 1;
+  AlbumPeak          := 1;
+  ID3TagNeedsUpdate := False;
+  fParent := Nil;
 end;
 
 procedure TAudioFile.AddCopyToList(aList: TAudioFileList);

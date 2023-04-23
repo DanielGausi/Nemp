@@ -2037,6 +2037,8 @@ begin
     begin
         ID      := ST_ID_Medialist;
         Recurse := True;
+        ListFiles := False;
+        ListDirs := False;
         MHandle := FOwnMessageHandler;
         MCurrentDir := mkNoneMessage;
         MFound      := mkSendMessage;
@@ -2045,6 +2047,8 @@ begin
     begin
         ID      := ST_ID_Playlist;
         Recurse := True;
+        ListFiles := False;
+        ListDirs := False;
         MHandle := FOwnMessageHandler;
         MCurrentDir := mkNoneMessage;
         MFound      := mkSendMessage;
@@ -2108,8 +2112,8 @@ begin
     NempLayout.MainContainer   := __MainContainerPanel;
     NempLayout.OnAfterBuild := AfterLayoutBuild;
 
-
     fCurrentlySelectedFile := TAudioFile.Create;
+    fCurrentlySelectedFile.AudioType := at_File;
     // Create Player
     NempPlayer            := TNempPlayer.Create(FOwnMessageHandler);
     NempPlayer.Statusproc := StatusProc;
@@ -4003,7 +4007,7 @@ begin
     if not NempPlaylist.ApplyDefaultActionToWholeList then
       GenerateSortedListFromFileView(FileList, True)
     else begin
-      if MedienBib.AnzeigeListe.Count <= 10000 then
+      if MedienBib.AnzeigeListe.Count <= 1000 then
         CopyAudioFileList(MedienBib.AnzeigeListe, FileList)
       else begin
         case TranslateMessageDLG(Format((Playlist_QueryTooManyFiles), [MedienBib.AnzeigeListe.Count]), mtConfirmation, [MBYes, MBNo, MBCancel], 0) of
@@ -8234,7 +8238,11 @@ end;
 
 procedure TNemp_MainForm.SetCurrentlySelectedFile(Value: TAudioFile);
 begin
-  fCurrentlySelectedFile.Assign(Value);
+  if assigned(Value) then
+    fCurrentlySelectedFile.Assign(Value)
+  else
+    fCurrentlySelectedFile.Clear;
+
 end;
 
 
@@ -9833,7 +9841,7 @@ begin
   TabBtn_Cover.GlyphLine := TabBtn_Cover.Tag;
 
   LyricsMemo.Visible     := TabBtn_Cover.Tag = 1;
-  ImgDetailCover.Visible := TabBtn_Cover.Tag = 0;
+  ImgDetailCover.Visible := (TabBtn_Cover.Tag = 0);
 end;
 
 procedure TNemp_MainForm.TabBtn_SummaryLockClick(Sender: TObject);
@@ -12101,12 +12109,15 @@ begin
   if (CoverScrollbar.Position > MedienBib.NewCoverFlow.CoverCount - 1) then
     exit;
 
-  ac := MedienBib.NewCoverFlow.Collection[CoverScrollbar.Position];
-  if ac.CollectionClass = ccWebStations then begin
-    TAudioWebradioCollection(ac).Station.TuneIn(NempPlaylist.BassHandlePlaylist);
+  if NempPlaylist.UseDefaultActionOnCoverFlowDoubleClick then begin
+    ac := MedienBib.NewCoverFlow.Collection[CoverScrollbar.Position];
+    case  ac.CollectionClass of
+      ccFiles: PlayEnqueue(ac, NempPlaylist.DefaultAction);
+      ccPlaylists: PlayEnqueue(ac, NempPlaylist.DefaultAction);
+      ccWebStations: TAudioWebradioCollection(ac).Station.TuneIn(NempPlaylist.BassHandlePlaylist);
+    end;
   end;
 end;
-
 
 procedure TNemp_MainForm.PanelCoverBrowseMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);

@@ -89,7 +89,7 @@ Const SO_Pfad = 0;
 
 
 
-  function BinaerPlaylistSuche(Liste: TLibraryPlaylistList; filename: UnicodeString; l,r:integer):integer;
+  function BinaerPlaylistSuche(Liste: TLibraryPlaylistList; const filename: UnicodeString; l,r:integer):integer;
   procedure MergePlaylists(MainList, NewList: TLibraryPlaylistList);
   // Procedure AntiMergePlaylists(MainList, DeleteList: TLibraryPlaylistList);
 
@@ -99,7 +99,7 @@ implementation
 uses AudioFileHelper, StringHelper, Hilfsfunktionen;
 
 
-function BinaerPlaylistSuche(Liste: TLibraryPlaylistList; Filename: UnicodeString; l,r: integer):integer;
+function BinaerPlaylistSuche(Liste: TLibraryPlaylistList; const Filename: UnicodeString; l,r: integer):integer;
 var m: integer;
     strm: UnicodeString;
     c: integer;

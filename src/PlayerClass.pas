@@ -34,7 +34,7 @@ unit PlayerClass;
 
 interface
 
-uses  Windows, Classes,  Controls, StdCtrls, ExtCtrls, Buttons, SysUtils, Contnrs,
+uses  Windows, Classes,  Controls, StdCtrls, ExtCtrls, Buttons, SysUtils, Contnrs, System.StrUtils,
       ShellApi, IniFiles, Dialogs, Graphics, cddaUtils, math, CoverHelper,
       bass, bass_fx, basscd, spectrum_vis, DateUtils, bassmidi,
       NempAudioFiles,  Nemp_ConstantsAndTypes, NempAPI, ShoutCastUtils, PostProcessorUtils,
@@ -265,6 +265,7 @@ type
 
         MainStreamIsReverseStream: Boolean;
         MainStreamIsTempoStream: Boolean;
+        MainAudioFileIsLiveRecording: Boolean;
 
         ///  MainAudioFileIsPresentAndPlaying:
         ///  Used for Playlist.AutoDelete - FileNotFound-entries in the
@@ -291,6 +292,11 @@ type
         IgnoreFadingOnShortTracks: Boolean;
         IgnoreFadingOnPause: Boolean;
         IgnoreFadingOnStop: Boolean;
+        IgnoreFadingOnLiveRecordings: Boolean;
+        LiveRecordingCheckTitle: Boolean;
+        LiveRecordingCheckAlbum: Boolean;
+        LiveRecordingCheckTags: Boolean;
+        LiveRecordingCheckIdentifier: String;
 
         UseDefaultEffects: Boolean;
         UseDefaultEqualizer: Boolean;
@@ -1134,6 +1140,11 @@ begin
   IgnoreFadingOnShortTracks := NempSettingsManager.ReadBool('Player', 'IgnoreOnShortTracks', True);
   IgnoreFadingOnPause   := NempSettingsManager.ReadBool('Player', 'IgnoreOnPause', True);
   IgnoreFadingOnStop    := NempSettingsManager.ReadBool('Player', 'IgnoreOnStop', True);
+  IgnoreFadingOnLiveRecordings  := NempSettingsManager.ReadBool('Player', 'IgnoreFadingOnLiveRecordings', True);
+  LiveRecordingCheckTitle       := NempSettingsManager.ReadBool('Player', 'LiveRecordingCheckTitle', True);
+  LiveRecordingCheckAlbum       := NempSettingsManager.ReadBool('Player', 'LiveRecordingCheckAlbum', True);
+  LiveRecordingCheckTags        := NempSettingsManager.ReadBool('Player', 'LiveRecordingCheckTags', True);
+  LiveRecordingCheckIdentifier  := NempSettingsManager.ReadString('Player', 'LiveRecordingCheckIdentifier', 'live');
 
   DoSilenceDetection    := NempSettingsManager.ReadBool('Player', 'DoSilenceDetection', True);
   SilenceThreshold      := NempSettingsManager.ReadInteger('Player', 'SilenceThreshold', -40);
@@ -1251,6 +1262,12 @@ begin
   NempSettingsManager.WriteBool('Player', 'IgnoreOnShortTracks', IgnoreFadingOnShortTracks);
   NempSettingsManager.WriteBool('Player', 'IgnoreOnPause', IgnoreFadingOnPause);
   NempSettingsManager.WriteBool('Player', 'IgnoreOnStop', IgnoreFadingOnStop);
+
+  NempSettingsManager.WriteBool('Player', 'IgnoreFadingOnLiveRecordings', IgnoreFadingOnLiveRecordings);
+  NempSettingsManager.WriteBool('Player', 'LiveRecordingCheckTitle', LiveRecordingCheckTitle);
+  NempSettingsManager.WriteBool('Player', 'LiveRecordingCheckAlbum', LiveRecordingCheckAlbum);
+  NempSettingsManager.WriteBool('Player', 'LiveRecordingCheckTags', LiveRecordingCheckTags);
+  NempSettingsManager.WriteString('Player', 'LiveRecordingCheckIdentifier', LiveRecordingCheckIdentifier);
 
   NempSettingsManager.WriteBool('Player', 'DoSilenceDetection', DoSilenceDetection);
   NempSettingsManager.WriteInteger('Player', 'SilenceThreshold', SilenceThreshold);
@@ -1562,8 +1579,12 @@ begin
         else
             ScanMode := ps_None;
 
-
       // ScanMode := ps_Now;
+      MainAudioFileIsLiveRecording :=
+        (MainAudioFile.AudioType = at_File) and
+        (   (LiveRecordingCheckTitle and AnsiContainsText(MainAudioFile.Titel, LiveRecordingCheckIdentifier)) or
+            (LiveRecordingCheckAlbum and AnsiContainsText(MainAudioFile.Album, LiveRecordingCheckIdentifier)) or
+            (LiveRecordingCheckTags and MainAudioFile.ContainsTag(LiveRecordingCheckIdentifier)));
 
       Mainstream := NEMP_CreateStream(MainAudioFile, AvoidMickyMausEffect, False, ScanMode, True);
 
@@ -1592,11 +1613,13 @@ begin
               fIsURLStream := False;
               aAudioFile.FileIsPresent := FileExists(MainAudioFile.Pfad);
               MainStreamIsTempoStream := AvoidMickyMausEffect;
+              MainStreamIsReverseStream := False;
 
               // Bestimmen, ob Faden oder nicht
               if UseFading AND fReallyUseFading
                            // (...Und Titel ist auch lang genug)
                            AND NOT (IgnoreFadingOnShortTracks AND (Bass_ChannelBytes2Seconds(MainStream,Bass_ChannelGetLength(MainStream, BASS_POS_BYTE)) < FadingInterval DIV 200))
+                           AND NOT (IgnoreFadingOnLiveRecordings and MainAudioFileIsLiveRecording)
               then // zunächst stummschalten, und dann einfaden
               begin
                     // Attribute setzen
@@ -1629,7 +1652,7 @@ begin
                     if StartPlay then
                       BASS_ChannelPlay(MainStream , False);
               end;
-              MainStreamIsReverseStream := False;
+
 
               // Anzeige initialisieren
               StreamType := GetStreamType(Mainstream);
@@ -2812,6 +2835,7 @@ end;
 
 procedure TNempPlayer.SetEndSyncs(Dest: DWord);
 var silencepos, syncposFading: LongWord;
+  tmpEnd, tmpNearEnd, tmpSilenceStart: Cardinal;
 begin
 
     // ruhig die Dauer des mainstreams nehmen - sonst is eh was verkehrt ;-)
@@ -2826,9 +2850,47 @@ begin
         silencepos := 0;
     end;
 
+    tmpNearEnd := 0;
+    tmpSilenceStart := 0;
+    BASS_ChannelRemoveSync(Dest, fFileEndSyncHandleM);
+    BASS_ChannelRemoveSync(Dest, fFileNearEndSyncHandleM);
+    BASS_ChannelRemoveSync(Dest, fFileNearEndSyncHandleS);
+    BASS_ChannelRemoveSync(Dest, fFileEndSyncHandleS);
+    BASS_ChannelRemoveSync(Dest, fSilenceBeginSyncHandleM);
+    BASS_ChannelRemoveSync(Dest, fSilenceBeginSyncHandleS);
+    if UseFading And fReallyUsefading
+          AND NOT (IgnoreFadingOnShortTracks AND (Dauer < FadingInterval DIV 200))
+          AND NOT (IgnoreFadingOnLiveRecordings and MainAudioFileIsLiveRecording)
+          AND (Not MainStreamIsReverseStream)
+    then
+        tmpNearEnd := Bass_ChannelSetSync(Dest, BASS_SYNC_POS, syncposFading, @EndFileProc, Self)
+    else
+    begin
+      // no fading, so set sync at the beginning of silence (if detected)
+      if fSilenceDetected then
+        tmpSilenceStart := Bass_ChannelSetSync(Dest, BASS_SYNC_POS, silencepos, @EndFileProc, Self)
+    end;
+
+    // End-Sync: Always
+    tmpEnd := Bass_ChannelSetSync(Dest, BASS_SYNC_END, 0, @EndFileProc, Self);
+
+    // tmpEnd, tmpNearEnd, tmpSilenceStart: Cardinal;
+    if dest = Mainstream then begin
+      fFileNearEndSyncHandleM := IfThen(tmpNearEnd > 0, tmpNearEnd);
+      fSilenceBeginSyncHandleM := IfThen(tmpSilenceStart > 0, tmpSilenceStart);
+      fFileEndSyncHandleM := IfThen(tmpEnd > 0, tmpEnd);
+    end else
+    begin
+      fFileNearEndSyncHandleS := IfThen(tmpNearEnd > 0, tmpNearEnd);
+      fSilenceBeginSyncHandleS := IfThen(tmpSilenceStart > 0, tmpSilenceStart);
+      fFileEndSyncHandleS := IfThen(tmpEnd > 0, tmpEnd);
+    end;
+
+
+     (*
     if dest = Mainstream then
     begin
-          BASS_ChannelRemoveSync(MainStream, fFileEndSyncHandleM); //then
+         BASS_ChannelRemoveSync(MainStream, fFileEndSyncHandleM); //then
           BASS_ChannelRemoveSync(MainStream, fFileNearEndSyncHandleM);
           BASS_ChannelRemoveSync(MainStream, fFileNearEndSyncHandleS);
           BASS_ChannelRemoveSync(MainStream, fFileEndSyncHandleS);
@@ -2862,6 +2924,7 @@ begin
           BASS_ChannelRemoveSync(SlideStream, fFileEndSyncHandleS);
           BASS_ChannelRemoveSync(SlideStream, fSilenceBeginSyncHandleM);
           BASS_ChannelRemoveSync(SlideStream, fSilenceBeginSyncHandleS);
+
           // Sync im SlideStream setzen
           if UseFading And fReallyUsefading
               AND (Dauer > FadingInterval DIV 200)
@@ -2882,38 +2945,34 @@ begin
           fFileEndSyncHandleS := Bass_ChannelSetSync(SlideStream,
                     BASS_SYNC_END, 0,
                     @EndFileProc, Self);
-    end;
+    end;   *)
+
     SendMessage(MainWindowHandle, WM_ChangeStopBtn, 0, 0);
     fStopStatus := PLAYER_STOP_NORMAL
 end;
 
 procedure TNempPlayer.SetNoEndSyncs(Dest: DWord);
 begin
-    if dest = Mainstream then
-    begin
-          BASS_ChannelRemoveSync(MainStream, fFileEndSyncHandleM); //then
-          BASS_ChannelRemoveSync(MainStream, fFileNearEndSyncHandleM);
-          BASS_ChannelRemoveSync(MainStream, fFileNearEndSyncHandleS);
-          BASS_ChannelRemoveSync(MainStream, fFileEndSyncHandleS);
-          BASS_ChannelRemoveSync(MainStream, fSilenceBeginSyncHandleM);
-          BASS_ChannelRemoveSync(MainStream, fSilenceBeginSyncHandleS);
-          // Sync im Mainstream setzen
-          fFileEndSyncHandleM := Bass_ChannelSetSync(MainStream,
-                    BASS_SYNC_END, 0,
-                    @StopPlaylistProc, Self);
-    end
-    else begin
-          BASS_ChannelRemoveSync(SlideStream, fFileNearEndSyncHandleM);
-          BASS_ChannelRemoveSync(SlideStream, fFileEndSyncHandleM);
-          BASS_ChannelRemoveSync(SlideStream, fFileNearEndSyncHandleS);
-          BASS_ChannelRemoveSync(SlideStream, fFileEndSyncHandleS);
-          BASS_ChannelRemoveSync(SlideStream, fSilenceBeginSyncHandleM);
-          BASS_ChannelRemoveSync(SlideStream, fSilenceBeginSyncHandleS);
-         // Sync im SlideStream setzen
-         fFileEndSyncHandleS := Bass_ChannelSetSync(SlideStream,
-                    BASS_SYNC_END, 0,
-                    @StopPlaylistProc, Self);
-    end;
+  BASS_ChannelRemoveSync(Dest, fFileEndSyncHandleM);
+  BASS_ChannelRemoveSync(Dest, fFileNearEndSyncHandleM);
+  BASS_ChannelRemoveSync(Dest, fFileNearEndSyncHandleS);
+  BASS_ChannelRemoveSync(Dest, fFileEndSyncHandleS);
+  BASS_ChannelRemoveSync(Dest, fSilenceBeginSyncHandleM);
+  BASS_ChannelRemoveSync(Dest, fSilenceBeginSyncHandleS);
+
+  if dest = Mainstream then
+  begin
+        // Sync im Mainstream setzen
+        fFileEndSyncHandleM := Bass_ChannelSetSync(MainStream,
+                  BASS_SYNC_END, 0,
+                  @StopPlaylistProc, Self);
+  end
+  else begin
+       // Sync im SlideStream setzen
+       fFileEndSyncHandleS := Bass_ChannelSetSync(SlideStream,
+                  BASS_SYNC_END, 0,
+                  @StopPlaylistProc, Self);
+  end;
     SendMessage(MainWindowHandle, WM_ChangeStopBtn, 1, 0);
     fStopStatus := PLAYER_STOP_AFTERTITLE;
 end;

@@ -791,13 +791,12 @@ begin
         MedienBibDetailStatusLbl      .OnMouseUP := ExtendedControlForm.OnMouseUP;
 
 
-         Nemp_MainForm.Borderstyle := bsNone;
-    Nemp_MainForm.Top     := NempOptions.FormPositions[nfMainMini].Top;
-    Nemp_MainForm.Left    := NempOptions.FormPositions[nfMainMini].Left;
-    Nemp_MainForm.Width   := NempOptions.FormPositions[nfMainMini].Width;
-    Nemp_MainForm.Height  := Nemp_MainForm._ControlPanel.Height + 4;
-
-    Constraints.MaxHeight := Height;
+        Borderstyle := bsNone;
+        Top     := NempOptions.FormPositions[nfMainMini].Top;
+        Left    := NempOptions.FormPositions[nfMainMini].Left;
+        Width   := NempOptions.FormPositions[nfMainMini].Width;
+        Height  := _ControlPanel.Height + 4;
+        Constraints.MaxHeight := Height;
         //Constraints.MinHeight := Height;
         //if NempFormBuildOptions.ControlPanelTwoRows then
         //    Constraints.MinWidth := 214
@@ -824,7 +823,7 @@ begin
       Constraints.MinWidth := MAINFORM_MinWidth;
       Constraints.MinHeight := MAINFORM_MinHeight;
 
-      Nemp_MainForm.Borderstyle := bsSizeable;
+      Borderstyle := bsSizeable;
 
     FixScrollbar;
 

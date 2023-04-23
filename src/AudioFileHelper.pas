@@ -53,7 +53,7 @@ var Sort_Pfad_asc,
     Sort_Genre_asc                ,
     Sort_CoverID                  : IComparer<TAudioFile>;
 
-function binaersuche(Liste: TAudioFileList; FilePath, FileName: UnicodeString; l,r:integer):integer;
+function binaersuche(Liste: TAudioFileList; const FilePath, FileName: UnicodeString; l,r:integer):integer;
 
 // Gets the Data for a new created AudioFile
 // First: GetAudiodata.
@@ -308,7 +308,7 @@ begin
 end;
 
 
-function binaersuche(Liste: TAudioFileList; FilePath, FileName: UnicodeString; l,r:integer):integer;
+function binaersuche(Liste: TAudioFileList; const FilePath, FileName: UnicodeString; l,r:integer):integer;
 var m:integer;
     c:integer;
 begin

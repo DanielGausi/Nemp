@@ -93,9 +93,9 @@ const
 
 type
 
-  {$IFNDEF UNICODE}
-  UnicodeString = WideString;
-  {$ENDIF}
+  // {$IFNDEF UNICODE}
+  // UnicodeString = WideString;
+  // {$ENDIF}
 
 
   MessageKind = (mkNoneMessage=$10000001, mkPostMessage, mkSendMessage);

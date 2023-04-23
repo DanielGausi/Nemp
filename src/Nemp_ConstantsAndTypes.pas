@@ -42,24 +42,24 @@ uses Windows, Messages, Graphics, IniFiles, Forms,  Classes, Controls,
      dialogs;
 
 
-const MAXCHILDS = 10;
-      CONTROL_PANEL_HEIGHT_1 = 100;
-      CONTROL_PANEL_HEIGHT_2 = 200;
-      CONTROL_PANEL_CoverWidth = 100;
-      CONTROL_PANEL_VisualisationWidth = 140;
+const // MAXCHILDS = 10;
+      // CONTROL_PANEL_HEIGHT_1 = 100;
+      // CONTROL_PANEL_HEIGHT_2 = 200;
+      // CONTROL_PANEL_CoverWidth = 100;
+      // CONTROL_PANEL_VisualisationWidth = 140;
 
-      CONTROL_PANEL_MinWidth_1 = 550;
-      CONTROL_PANEL_MinWidth_2 = 309;  // check later, maybe
+      //CONTROL_PANEL_MinWidth_1 = 550;
+      //CONTROL_PANEL_MinWidth_2 = 309;  // check later, maybe
 
       MAINFORM_MinHeight = 300;
       MAINFORM_MinWidth = 400;
 
-      MAIN_PANEL_MinHeight = 250;
-      MAIN_PANEL_MinWidth = 250;
+      // MAIN_PANEL_MinHeight = 250;
+      // MAIN_PANEL_MinWidth = 250;
       // these values are for childs in a "2-rows-layout", without ControlPanel
       // Formbuilder should adjust Constraints accoding to the Layout, especially the Height
-      CHILD_PANEL_MinWidth = 250;
-      CHILD_PANEL_MinHeight = 180;
+      // CHILD_PANEL_MinWidth = 250;
+      // CHILD_PANEL_MinHeight = 180;
 
 type
 

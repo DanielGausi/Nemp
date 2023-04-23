@@ -194,6 +194,7 @@ type
       // default-action when the user doubleclick an item in the medialibrary
       DefaultAction: Integer;
       ApplyDefaultActionToWholeList: Boolean;
+      UseDefaultActionOnCoverFlowDoubleClick: Boolean;
       // default-action when the user clicks "Add current Headphone-title to playlist"
       HeadSetAction: Integer;
       AutoStopHeadsetSwitchTab: Boolean;
@@ -433,6 +434,7 @@ procedure TNempPlaylist.LoadSettings;
 begin
   DefaultAction         := NempSettingsManager.ReadInteger('Playlist','DefaultAction',0);
   ApplyDefaultActionToWholeList := NempSettingsManager.ReadBool('Playlist','ApplyDefaultActionToWholeList',False);
+  UseDefaultActionOnCoverFlowDoubleClick := NempSettingsManager.ReadBool('Playlist','UseDefaultActionOnCoverFlowDoubleClick', False);
   HeadSetAction         := NempSettingsManager.ReadInteger('Playlist','HeadSetAction',0);
   AutoStopHeadsetSwitchTab       := NempSettingsManager.ReadBool('Playlist','AutoStopHeadset',True);
   AutoStopHeadsetAddToPlayist    := NempSettingsManager.ReadBool('Playlist','AutoStopHeadsetAddToPlayist',False);
@@ -478,6 +480,7 @@ procedure TNempPlaylist.SaveSettings;
 begin
   NempSettingsManager.WriteInteger('Playlist','DefaultAction', DefaultAction);
   NempSettingsManager.WriteBool('Playlist','ApplyDefaultActionToWholeList',ApplyDefaultActionToWholeList);
+  NempSettingsManager.WriteBool('Playlist','UseDefaultActionOnCoverFlowDoubleClick', UseDefaultActionOnCoverFlowDoubleClick);
   NempSettingsManager.WriteInteger('Playlist','HeadSetAction',HeadSetAction);
   NempSettingsManager.WriteBool('Playlist','AutoStopHeadset',AutoStopHeadsetSwitchTab);
   NempSettingsManager.WriteBool('Playlist','AutoStopHeadsetAddToPlayist',AutoStopHeadsetAddToPlayist);
