@@ -39,7 +39,8 @@ uses  Windows, Classes,  Controls, StdCtrls, ExtCtrls, Buttons, SysUtils, Contnr
       bass, bass_fx, basscd, spectrum_vis, DateUtils, bassmidi,
       NempAudioFiles,  Nemp_ConstantsAndTypes, NempAPI, ShoutCastUtils, PostProcessorUtils,
       Hilfsfunktionen, gnuGettext, Nemp_RessourceStrings, OneINst,
-      Easteregg, ScrobblerUtils, CustomizedScrobbler, SilenceDetection, System.UITypes;
+      Easteregg, ScrobblerUtils, CustomizedScrobbler, SilenceDetection, System.UITypes,
+      mmSystem, System.WideStrUtils;
 
 const USER_WANT_PLAY = 1;
       USER_WANT_STOP = 2;
@@ -226,6 +227,7 @@ type
       /// procedure SetPlayingTitelMode(Value: Word);     // Playing-title-mode
       procedure SetAutoSplitMaxSize(Value: Integer);  // Split size for webstream recording
       function GetFloatable: Boolean;
+
 
       procedure GetURLDetails;  // Get Data from a webstream and set syncs for Meta-information
 
@@ -548,8 +550,6 @@ type
 
         Procedure SetEqualizer(band: Integer; gain: Single);
 
-        //procedure ReadBirthdayOptions(aIniFilename: UnicodeString);
-        //procedure WriteBirthdayOptions(aIniFilename: UnicodeString);
         function GetCountDownLength(aFilename: UnicodeString): Integer;
         procedure PauseForBirthday; // the same as nomale pause, but force fading
         Procedure PlayCountDown; // Countdown abspielen mit setzen der Syncs
@@ -574,9 +574,15 @@ type
         function StartPauseBetweenTracksTimer: Boolean;
 
         function SwapStreams(ScannedFile: TAudioFile): Integer;
+
+        function ProcessNewMetaData(MetaDataType: Integer; newMetaData: LParam): Boolean;
+        function FinishBuffering: Boolean;
+        function GetBufferProgress: Integer;
   end;
 
-var CSPrescanList: RTL_CRITICAL_SECTION;
+var
+  CSPrescanList: RTL_CRITICAL_SECTION;
+  FBufferTimerId: DWORD = 0;
 
 
 Const
@@ -601,10 +607,14 @@ begin
   // If this is called, the file is on its end.
   aPlayer.EndFileProcReached := True;
 
-  if aPlayer.DoPauseBetweenTracks then
-    SendMessage(aPlayer.MainWindowHandle, WM_PrepareNextFile, 0, 0)
-  else
-    SendMessage(aPlayer.MainWindowHandle, WM_NextFile, 0, 0);
+  if assigned(aPlayer.MainAudioFile) and (aPlayer.MainAudioFile.isStream) then
+    SendMessage(aPlayer.MainWindowHandle, WM_PlayerPlayAgain, 0, 0)
+  else begin
+    if aPlayer.DoPauseBetweenTracks then
+      SendMessage(aPlayer.MainWindowHandle, WM_PrepareNextFile, 0, 0)
+    else
+      SendMessage(aPlayer.MainWindowHandle, WM_NextFile, 0, 0);
+  end;
 end;
 
 procedure EndHeadSetFileProc(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
@@ -650,85 +660,83 @@ begin
     SendMessage(TNempPlayer(User).MainWindowHandle, WM_BIRThDAY_FINISH, 0, 0);
 end;
 
+procedure CheckBufferCallback(uID, uMsg: Cardinal; dwUser, dw1, dw2: DWord); stdcall;
+begin
+  SendMessage(TNempPlayer(dwUser).MainWindowHandle, WM_WebRadio, wWebRadioBuffering, 0);
+end;
+
+procedure DoStall(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
+begin
+  if (data = 0) then // stalled
+    FBufferTimerId := TimeSetEvent(25, 10, @CheckBufferCallback, NativeUInt(User), TIME_PERIODIC);
+end;
+
 procedure DoMeta(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
 var
-  p: Integer;
-  newStreamMetadata: String;
-  newDataReceived: Boolean;
+  ShoutCastData, OggData: PAnsiChar;
 begin
-  newStreamMetadata := String(BASS_ChannelGetTags(channel, BASS_TAG_META));
-  newDataReceived := newStreamMetadata <> TNempPlayer(User).fCurrentStreamMetadata;
-  // DetectUTF8Encoding ?? somehow ?
-
-  if (newStreamMetadata <> '') AND (TNempPlayer(User).MainAudioFile <> NIL) then
-  begin
-        p := Pos('StreamTitle=', newStreamMetadata);
-        if (p > 0) then
-        begin
-              p := p + 13;
-              TNempPlayer(User).MainAudioFile.Titel := Copy(newStreamMetadata, p, Pos(';', newStreamMetadata) - p - 1);
-        end;
-
-        if TNempPlayer(User).StreamRecording
-            AND newDataReceived
-            AND TNempPlayer(User).AutoSplitByTitle
-        then
-            TNempPlayer(User).StartRecording;
-
-        if newDataReceived then
-            TNempPlayer(User).fCurrentStreamMetadata := newStreamMetadata;
-
-        SendMessage(TNempPlayer(User).MainWindowHandle, WM_NewMetaData, 0, 0);
+  ShoutCastData := BASS_ChannelGetTags(channel, BASS_TAG_META);
+  if ShoutCastData <> nil then begin
+    SendMessage(TNempPlayer(User).MainWindowHandle, WM_WebRadio, wWebRadioNewMetaData, LParam(ShoutCastData));
+  end else begin
+    OggData := BASS_ChannelGetTags(channel, BASS_TAG_OGG);
+    if OggData <> nil then
+      SendMessage(TNempPlayer(User).MainWindowHandle, WM_WebRadio, wWebRadioNewMetaDataOgg, LParam(OggData));
   end;
 end;
 
-procedure DoOggMeta(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
+function TNempPlayer.ProcessNewMetaData(MetaDataType: Integer; newMetaData: LParam): Boolean;
 var
-  meta: PAnsiChar;
-  metaStr: String;
-  newStreamMetadata: String;
+  POggLines: PAnsiChar;
+  OggLine: String;
   newDataReceived: Boolean;
+  p: Integer;
+  ProcessedNewMetaData: String;
 begin
-  newStreamMetadata := ''; // Concatenation of all the 0-terminated metaStr
-
-  meta := BASS_ChannelGetTags(channel, BASS_TAG_OGG);
-
-  if (meta <> nil) AND (TNempPlayer(User).MainAudioFile <> NIL) then
-  begin
-      // nach Ogg-Daten suchen
-      if (meta <> nil) then
-          try
-              while (meta^ <> #0) do
-              begin
-                  metaStr := String(meta);
-                  newStreamMetadata := newStreamMetadata + metaStr;
-                  if (AnsiUppercase(Copy(metaStr, 1, 7)) = 'ARTIST=') then
-                  begin
-                    TNempPlayer(User).MainAudioFile.Artist := Copy(metaStr, 8, Length(metaStr) - 7);
-                  end else
-                    if (AnsiUppercase(Copy(metaStr,1,6)) = 'TITLE=') then
-                    begin
-                      TNempPlayer(User).MainAudioFile.Titel := trim(Copy(metaStr, 7, Length(metaStr) - 6 ));
-                    end;
-                  meta := meta + Length(meta) + 1;
-              end;
-          except
-            // Wenn was schief gelaufen ist: Dann gibts halt keine Tags...
-          end;
-
-      newDataReceived := newStreamMetadata <> TNempPlayer(User).fCurrentStreamMetadata;
-
-      if TNempPlayer(User).StreamRecording
-          AND newDataReceived
-          AND TNempPlayer(User).AutoSplitByTitle
-      then
-          TNempPlayer(User).StartRecording;
-
-      if newDataReceived then
-          TNempPlayer(User).fCurrentStreamMetadata := newStreamMetadata;
-
-      SendMessage(TNempPlayer(User).MainWindowHandle, WM_NewMetaData, 0, 0);
+  result := False;
+  newDataReceived := False;
+  case MetaDataType of
+    wWebRadioNewMetaData: begin
+      if IsUTf8String(RawByteString(PAnsiChar(newMetaData))) then
+        ProcessedNewMetaData := UTF8ToString(PAnsiChar(newMetaData))
+      else
+        ProcessedNewMetaData := String(PAnsiChar(newMetaData));
+      newDataReceived := ProcessedNewMetaData <> fCurrentStreamMetadata;
+      if (ProcessedNewMetaData <> '') AND (MainAudioFile <> NIL) then begin
+        p := Pos('StreamTitle=', ProcessedNewMetaData);
+        if (p > 0) then
+          MainAudioFile.Titel := Copy(ProcessedNewMetaData, p+13, Pos(';', ProcessedNewMetaData) - (p+13) - 1);
+      end;
+      result := newDataReceived;
+    end;
+    wWebRadioNewMetaDataOgg: begin
+      POggLines := PAnsiChar(newMetaData);
+      ProcessedNewMetaData := '';
+      try
+        while (POggLines^ <> #0) do begin
+          OggLine := String(UTF8String(POggLines));
+          ProcessedNewMetaData := ProcessedNewMetaData + OggLine;
+          if AnsiStartsText('artist=', OggLine) then
+            MainAudioFile.Artist := Copy(OggLine, 8, Length(OggLine) - 7)
+          else
+            if AnsiStartsText('title=', OggLine) then
+              MainAudioFile.Titel := trim(Copy(OggLine, 7, Length(OggLine) - 6));
+          POggLines := POggLines + Length(POggLines) + 1;
+        end;
+      except
+        // no valid data
+      end;
+      newDataReceived := ProcessedNewMetaData <> fCurrentStreamMetadata;
+      result := newDataReceived;
+    end;
+  else
+    ; // nothing to do, unkown data
   end;
+
+  if StreamRecording AND newDataReceived AND AutoSplitByTitle then
+    StartRecording;
+  if newDataReceived then
+    fCurrentStreamMetadata := ProcessedNewMetaData;
 end;
 
 
@@ -1420,7 +1428,7 @@ begin
       end;
 
       at_Stream: begin
-          result := BASS_StreamCreateURL(PChar(Pointer(localPath)), 0, BASS_STREAM_STATUS or BASS_UNICODE , @StatusProc, nil);
+          result := BASS_StreamCreateURL(PChar(Pointer(localPath)), 0, BASS_STREAM_STATUS or BASS_UNICODE or BASS_STREAM_BLOCK, @StatusProc, nil);
       end;
 
       at_CDDA: begin
@@ -1595,6 +1603,9 @@ begin
               fOnMessage(Self, BassErrorString(Bass_ErrorGetCode));
           // something is wrong
           MainAudioFileIsPresentAndPlaying := False;
+          // to display the error more permanently in PlayerControl and Playlist
+          if MainAudioFile.isStream then
+            MainAudioFile.Description := Format(Shoutcast_DisplayErrorMessage, [BassErrorString(Bass_ErrorGetCode)])
       end;
 
       SetEndSyncs(mainstream);
@@ -1684,8 +1695,9 @@ begin
               fIsURLStream := True;
               MainStreamIsReverseStream := False;
 
-              // Stratplay künstlich auf True setzen!
-              // StartPlay := True;          // why ?????
+              BASS_ChannelSetSync(MainStream, BASS_SYNC_META, 0, @DoMeta, self);
+              BASS_ChannelSetSync(MainStream, BASS_SYNC_OGG_CHANGE, 0, @DoMeta, self);
+              BASS_ChannelSetSync(MainStream, BASS_SYNC_STALL, 0, @DoStall, self);
 
               // Wenn Faden
               if UseFading AND fReallyUseFading then
@@ -1705,8 +1717,7 @@ begin
               end;
               fStatus := PLAYER_ISPLAYING;
 
-              // Hier werden die Details ermittelt, Die Hauptform benachrichtigt
-              // und MetaSyncs gesetzt, Playingtitel wird da auch gesetzt
+              // geturlDetails: ggf. überarbeiten (2023)
               GetURLDetails;
           end;
 
@@ -1772,7 +1783,8 @@ begin
 
       SetCueSyncs;
       // wurde direkt nach der Erzeugung gemacht SetEndSyncs;
-      SetSlideEndSyncs;
+      if not MainAudioFile.IsStream then
+        SetSlideEndSyncs;
 
       // get the cover for the currently playing file
       CoverIsLoaded := RefreshCoverBitmap;
@@ -3278,6 +3290,24 @@ begin
   end;
 end;
 
+function TNempPlayer.FinishBuffering: Boolean;
+begin
+  result := (BASS_ChannelIsActive(MainStream) = BASS_ACTIVE_PLAYING);
+  if result then begin
+    timeKillEvent(FBufferTimerId); // finished buffering, stop monitoring
+    GetURLDetails;
+  end
+end;
+
+function TNempPlayer.GetBufferProgress: Integer;
+begin
+  if BASS_StreamGetFilePosition(MainStream, BASS_FILEPOS_BUFFERING) > 0 then
+    // this check will prevent that the Buffer display do not start with 100
+    result := 100 - Integer(BASS_StreamGetFilePosition(MainStream, BASS_FILEPOS_BUFFERING))
+  else
+    result := 0;
+end;
+
 procedure TNempPlayer.GetURLDetails;
 var
   icy: PAnsiChar;
@@ -3315,10 +3345,7 @@ begin
       end;
 
      DoMeta(0, Mainstream, 0, self);
-     BASS_ChannelSetSync(MainStream, BASS_SYNC_META, 0, @DoMeta, self);
 
-     DoOggMeta(0, Mainstream, 0, self);
-     BASS_ChannelSetSync(MainStream, BASS_SYNC_OGG_CHANGE, 0, @DoOggMeta, self);
 
     StreamType := GetStreamType(MainStream);
   end;
@@ -3738,56 +3765,6 @@ begin
   SendMessage(MainWindowHandle, WM_ActualizePlayPauseBtn, wParam, lParam);
 end;
 
- (*
-{
-    --------------------------------------------------------
-    Birthday-settings
-    --------------------------------------------------------
-}
-procedure TNempPlayer.WriteBirthdayOptions(aIniFilename: UnicodeString);
-var ini: TMemIniFile;
-begin
-    EXIT ;
-    ini := TMeminiFile.Create(aIniFilename, TEncoding.UTF8);
-    try
-        ini.Encoding := TEncoding.UTF8;
-        Ini.WriteBool('Event', 'UseCountDown', NempBirthdayTimer.UseCountDown);
-        Ini.WriteTime('Event', 'StartTime'            , NempBirthdayTimer.StartTime);
-        // StartCountDownTime will be calculated when the event is activated
-        // Ini.WriteTime('Event', 'StartCountDownTime'   , NempBirthdayTimer.StartCountDownTime);
-        Ini.WriteString('Event', 'BirthdaySongFilename' , (NempBirthdayTimer.BirthdaySongFilename));
-        Ini.WriteString('Event', 'CountDownFileName'    , (NempBirthdayTimer.CountDownFileName));
-        Ini.WriteBool('Event', 'ContinueAfter'        , NempBirthdayTimer.ContinueAfter);
-        ini.Encoding := TEncoding.UTF8;
-        try
-            Ini.UpdateFile;
-        except
-            // Silent Exception
-        end;
-    finally
-      ini.Free
-    end;
-end;
-procedure TNempPlayer.ReadBirthdayOptions(aIniFilename: UnicodeString);
-var ini: TMemIniFile;
-begin
-  EXIT;
-    ini := TMeminiFile.Create(aIniFilename, TEncoding.UTF8);
-    try
-        ini.Encoding := TEncoding.UTF8;
-        NempBirthdayTimer.UseCountDown := Ini.ReadBool('Event', 'UseCountDown', True);
-        NempBirthdayTimer.StartTime := Ini.ReadTime('Event', 'StartTime', 0 );
-        // NempBirthdayTimer.StartCountDownTime := Ini.ReadTime('Event', 'StartCountDownTime',0);
-        NempBirthdayTimer.BirthdaySongFilename := (Ini.ReadString('Event', 'BirthdaySongFilename', ''));
-        NempBirthdayTimer.CountDownFileName := (Ini.ReadString('Event', 'CountDownFileName', ''));
-        NempBirthdayTimer.ContinueAfter :=Ini.ReadBool('Event', 'ContinueAfter', True);
-
-        showmessage(NempBirthdayTimer.BirthdaySongFilename);
-    finally
-      ini.Free
-    end;
-end;
-*)
 
 function TNempPlayer.GetCountDownLength(aFilename: UnicodeString): Integer;
 var tmpstream: DWord;
@@ -4167,8 +4144,6 @@ begin
                 aFile.Assign(aPlayer.fPrescanFiles[c-1]);
             aPlayer.fPrescanFiles.Clear;
             LeaveCriticalSection(CSPrescanList);
-
-            //sleep(2000);
 
             BASS_SetDevice(aPlayer.MainDevice);
 

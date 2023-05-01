@@ -205,7 +205,7 @@ end;
 procedure TAudioExport.ParseMetaBlock;
 var
   i, PosSpace: Integer;
-  escLine, escFrom, escTo: String;
+  escLine: String;
 begin
   for i := 0 to fMetaLines.Count - 1 do begin
     if SameText(fMetaLines.Names[i], '%EXTENSION%') then
@@ -348,7 +348,7 @@ function TAudioExport.ParseTemplateLine(Template: String;
   AudioFile: TAudioFile): String;
 var
   CurrentSegment: String;
-  i, offset: Integer;
+  offset: Integer;
   IsPlaceHolder: Boolean;
 
   function GetNextSegment: String;

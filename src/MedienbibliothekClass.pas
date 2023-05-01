@@ -4742,7 +4742,7 @@ begin
         try
             fs.LoadFromFile(aFilename);
             fs.Position := 0;
-            LoadRadioStationsFromStream_DEPRECATED(fs);
+            LoadRadioStationsFromStream(fs);
             Changed := True;
         finally
             fs.Free;

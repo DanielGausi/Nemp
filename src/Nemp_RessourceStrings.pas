@@ -179,8 +179,6 @@ Warning_TooManyFiles = 'Warning: Too many files for Drag&Drop and Copy&Paste res
 
 Warning_MagicCopyFailed = 'Extended Copy&Paste failed. This method doesn''t work from write-protected drives (e.g. CD/DVD).';
 
-Error_ID3OnlyInMp3Files = 'ID3-tags can only be written to mp3-files.';
-
 //ErrorSavingPlaylist = 'An error occured while saving the playlist. This should not happen.';
 //ErrorSavingMediaLib = 'An error occured while saving the medialibrary. This should not happen.';
 ErrorLoadingMediaLib = 'An error occured while loading the media library. This should not happen.';
@@ -188,9 +186,6 @@ ErrorLoadingMediaLib = 'An error occured while loading the media library. This s
 Error_HelpFileNotFound = 'The helpfile could not be found.';
 Error_ReadmeFileNotFound = 'The readme.txt could not be found.';
 Error_LGPLFileNotFound = 'The licence.txt could not be found.';
-
-Error_ID3EditDenied = 'Edit of ID3-Tags denied. You can allow this by Preferences -> System -> Other.';
-
 
 
     BASS_ERRORSTR_INIT       = 'Initialization of the bass.dll failed';
@@ -782,9 +777,9 @@ Medialibrary_LoadingFile             = 'Loading media library (%s)';
 Medialibrary_InvalidLibFile          = 'Invalid media library-file.';
 Medialibrary_LibFileTooYoung         = 'The media library was probably created by a newer version of Nemp. This version of Nemp doesn''t know how to read this file.';
 Medialibrary_LibFileTooOld           = 'Media library of Nemp 2.4 or earlier detected. This is not supported any more.';
-Medialibrary_OldFileHint        = 'You are loading a media library of an earlier version of Nemp. Please connect all relevant drives to your computer before you proceed. '
-                                 + 'Otherwise some files will be deleted from the library.';
-Medialibrary_OldFileHint2       = 'Some problems occured while converting the old library and some audiofiles were ignored. You should rebuild it by searching your harddrives for new files.';
+//Medialibrary_OldFileHint        = 'You are loading a media library of an earlier version of Nemp. Please connect all relevant drives to your computer before you proceed. '
+//                                 + 'Otherwise some files will be deleted from the library.';
+//Medialibrary_OldFileHint2       = 'Some problems occured while converting the old library and some audiofiles were ignored. You should rebuild it by searching your harddrives for new files.';
 
 Medialibrary_SaveException1 = 'An error occured while saving the media library. Please report this error.';
 //Medialibrary_SaveException = 'Saving failed. Probably the directory is write protected or there is not enough available free space.';
@@ -882,21 +877,22 @@ Progressform_ReplayGain_AlreadyRunning = 'ReplayGain calculation is already runn
 
     AutoScanDirsDialog_ShowAgain = 'Save selection and do not show this dialog again.';
 
-Shoutcast_Error_ConnectionFailed = 'Connection failed. Please check your internet configuration.';
+// Shoutcast_Error_ConnectionFailed = 'Connection failed. Please check your internet configuration.';
 Shoutcast_Error_DownloadFailed = 'Download failed. If the stream is available in other players, disable the parsing of the playlist in the settings dialog and try again.';
 Shoutcast_Connecting = 'Connecting to shoutcast.com ...';
 Shoutcast_Connecting_MainForm = 'Connecting...';
-Shoutcast_Downloading = 'Downloading stationlist...';
-Shoutcast_ParsingXMLData = 'Download complete. Parsing XML-Data...';
-Shoutcast_DownloadingPlaylist = 'Downloading playlist...';
+// Shoutcast_Downloading = 'Downloading stationlist...';
+// Shoutcast_ParsingXMLData = 'Download complete. Parsing XML-Data...';
+// Shoutcast_DownloadingPlaylist = 'Downloading playlist...';
 Shoutcast_DownloadComplete = 'Download complete.';
 Shoutcast_OK     = 'OK';
 Shoutcast_Cancel = 'Cancel';
-Shoutcast_MainForm_BibError = 'Cannot find station data. This should not happen.';
+//Shoutcast_MainForm_BibError = 'Cannot find station data. This should not happen.';
 Shoutcast_UnknownFormat = 'Unknown format';
+Shoutcast_DisplayErrorMessage = 'Error: %s';
 
-Shoutcast_InputStreamCaption = 'Nemp: Play Webstream';
-Shoutcast_InputStreamLabel   = 'URL (e.g. "http://myhits.com/tune_in.pls" or "http://123.12.34.56:5000")';
+// Shoutcast_InputStreamCaption = 'Nemp: Play Webstream';
+// Shoutcast_InputStreamLabel   = 'URL (e.g. "http://myhits.com/tune_in.pls" or "http://123.12.34.56:5000")';
 
 TabBtnBrowse_OriginalHint = 'Browse your media library through a tree view';
 TabBtnCoverFlow_OriginalHint = 'Browse your media library through a coverflow';

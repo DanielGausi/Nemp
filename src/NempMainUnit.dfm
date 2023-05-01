@@ -3,8 +3,8 @@ object Nemp_MainForm: TNemp_MainForm
   Top = 0
   HelpContext = 10000
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 789
-  ClientWidth = 1090
+  ClientHeight = 698
+  ClientWidth = 1096
   Color = clBtnFace
   Constraints.MinHeight = 300
   Constraints.MinWidth = 400
@@ -34,8 +34,8 @@ object Nemp_MainForm: TNemp_MainForm
     Tag = 2
     Left = 0
     Top = 0
-    Width = 1090
-    Height = 789
+    Width = 1096
+    Height = 698
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
@@ -46,10 +46,11 @@ object Nemp_MainForm: TNemp_MainForm
     OwnerDraw = False
     HierarchyLevel = 0
     SplitterMinSize = 110
+    ExplicitHeight = 816
     object _ControlPanel: TNempPanel
       Left = 0
-      Top = 689
-      Width = 1090
+      Top = 598
+      Width = 1096
       Height = 100
       Align = alBottom
       BevelOuter = bvNone
@@ -62,10 +63,11 @@ object Nemp_MainForm: TNemp_MainForm
       Ratio = 0
       FixedHeight = True
       OwnerDraw = False
+      ExplicitTop = 716
       object ControlContainer2: TNempPanel
         Left = 481
         Top = 0
-        Width = 609
+        Width = 615
         Height = 100
         Align = alClient
         BevelOuter = bvNone
@@ -76,7 +78,7 @@ object Nemp_MainForm: TNemp_MainForm
           Tag = 4
           Left = 0
           Top = 0
-          Width = 609
+          Width = 615
           Height = 100
           Align = alClient
           BevelInner = bvRaised
@@ -92,12 +94,12 @@ object Nemp_MainForm: TNemp_MainForm
           OnPaint = ControlPanelPaint
           OwnerDraw = False
           DesignSize = (
-            609
+            615
             100)
           object SlideBarShape: TProgressShape
             Left = 100
             Top = 78
-            Width = 451
+            Width = 457
             Height = 6
             Anchors = [akLeft, akTop, akRight]
             Brush.Color = clGradientActiveCaption
@@ -110,6 +112,7 @@ object Nemp_MainForm: TNemp_MainForm
             ProgressPen.Color = 12678971
             ProgressBrush.Color = clMaroon
             Progress = 0.500000000000000000
+            ExplicitWidth = 451
           end
           object RatingImage: TImage
             Left = 11
@@ -138,7 +141,7 @@ object Nemp_MainForm: TNemp_MainForm
             OnStartDrag = ab1StartDrag
           end
           object PlayerTimeLbl: TLabel
-            Left = 566
+            Left = 572
             Top = 74
             Width = 34
             Height = 13
@@ -168,7 +171,7 @@ object Nemp_MainForm: TNemp_MainForm
             OnStartDrag = ab1StartDrag
           end
           object PaintFrame: TImage
-            Left = 525
+            Left = 531
             Top = 34
             Width = 75
             Height = 25
@@ -296,7 +299,7 @@ object Nemp_MainForm: TNemp_MainForm
             Color2 = clBlack
           end
           object BtnClose: TSkinButton
-            Left = 591
+            Left = 597
             Top = 4
             Width = 12
             Height = 12
@@ -319,7 +322,7 @@ object Nemp_MainForm: TNemp_MainForm
             Color2 = clBlack
           end
           object BtnMinimize: TSkinButton
-            Left = 576
+            Left = 582
             Top = 4
             Width = 12
             Height = 12

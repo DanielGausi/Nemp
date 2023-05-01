@@ -1608,6 +1608,10 @@ begin
                           end;
                       end;
                  end;
+    WM_PlayerPlayAgain: begin
+      NempPlaylist.AcceptInput := True;
+      NempPlaylist.PlayAgain;
+    end;
 
     WM_PrepareNextFile: begin
                       NempPlaylist.AcceptInput := True;
@@ -1728,16 +1732,36 @@ begin
                             end;
     end;
 
-    WM_NewMetaData: begin
-                        Application.Title := NempPlayer.GenerateTaskbarTitel;
-                        NempTrayIcon.Hint := StringReplace(NempPlaylist.PlayingFile.Titel, '&', '&&&', [rfReplaceAll]);
-                        PlaylistVST.Invalidate;
-                        PlaylistCueChanged(NempPlaylist);
+    //WM_NewMetaData
+    WM_WebRadio: begin
+                    case Message.wParam of
+                      wWebRadioNewMetaData,
+                      wWebRadioNewMetaDataOgg: begin
+                          if NempPlayer.ProcessNewMetaData((Message.wParam), Message.lParam) then begin
+                            Application.Title := NempPlayer.GenerateTaskbarTitel;
+                            NempTrayIcon.Hint := StringReplace(NempPlaylist.PlayingFile.Titel, '&', '&&&', [rfReplaceAll]);
+                            PlaylistVST.Invalidate;
+                            PlaylistCueChanged(NempPlaylist);
+                          end;
+                      end; // new Metadata
+
+                      wWebRadioBuffering: begin
+                          if NempPlayer.FinishBuffering then begin
+                            PlaylistCueChanged(NempPlaylist);
+                            RecordBtn.Enabled := assigned(NempPlayer.MainAudioFile)
+                                         and NempPlayer.MainAudioFile.isStream
+                                         and (NempPlayer.BassStatus = BASS_ACTIVE_PLAYING)
+                                         and (NempPlayer.StreamType <> 'Ogg');
+                          end
+                          else
+                            // monitor buffering progress
+                            PlayerArtistLabel.Caption := 'Buffering ' + NempPlayer.GetBufferProgress.ToString + '%';
+                      end;
                     end;
+    end;
 
     WM_PlayerStop, WM_PlayerPlay: begin
-                                    BassTimer.Enabled := //NempPlayer.BassStatus = BASS_ACTIVE_PLAYING;
-                                                         NempPlayer.Status = PLAYER_ISPLAYING;
+                                    BassTimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
 
                                     RecordBtn.Enabled := assigned(NempPlayer.MainAudioFile)
                                          and NempPlayer.MainAudioFile.isStream

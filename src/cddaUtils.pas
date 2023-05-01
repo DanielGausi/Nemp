@@ -71,7 +71,7 @@ type
       Track    : Integer;
       Year     : String;
       Genre    : String;
-      CddbID   : String;
+      CddbID   : UTF8String;
     end;
 
 
@@ -238,8 +238,8 @@ end;
 
 procedure RemoveLocalCDDBData(aDrive: TCDDADrive);
 begin
-  if LocalCDDBData.ContainsKey(aDrive.fCddbID) then
-    LocalCDDBData.Remove(aDrive.fCddbID)
+  if LocalCDDBData.ContainsKey(String(aDrive.fCddbID)) then
+    LocalCDDBData.Remove(String(aDrive.fCddbID))
 end;
 
 procedure ClearAllLocalCDDBData;
@@ -305,7 +305,7 @@ var
 begin
   aDrive := TCDDADrive.GetDriveNumber(aPath);
   if aDrive >= 0 then begin
-    result := CDDriveList[aDrive].fCddbID;
+    result := String(CDDriveList[aDrive].fCddbID);
     result := StringReplace(result, ' ', '-', [rfReplaceAll]);
     if Length(result) > 32 then
       SetLength(Result, 32);
@@ -440,9 +440,9 @@ end;
 
 function TCDDADrive.GetLocalCDDBInformation: Boolean;
 begin
-  if LocalCDDBData.ContainsKey(fCddbID) then begin
+  if LocalCDDBData.ContainsKey(String(fCddbID)) then begin
     fCDDBTitles.Clear;
-    fCDDBTitles.AddStrings(LocalCDDBData[fCddbID]);
+    fCDDBTitles.AddStrings(LocalCDDBData[String(fCddbID)]);
     CheckForCompilation;
     result := True;
   end else
@@ -511,7 +511,7 @@ begin
                 end;
               end;
               if result = cddaErr_None then begin
-                AddLocalCDDBData(fCddbID, fCDDBTitles);
+                AddLocalCDDBData(String(fCddbID), fCDDBTitles);
                 CheckForCompilation;
               end;
           end;
@@ -536,7 +536,7 @@ begin
   fOutOfDate := False;
   result := cddaErr_None;
 
-  if BASS_CD_GetID(fIndex, BASS_CDID_CDDB) = fCddbID then
+  if UTf8String(BASS_CD_GetID(fIndex, BASS_CDID_CDDB)) = fCddbID then
     exit;   // nothing has changed
 
   ClearDiscInformation;

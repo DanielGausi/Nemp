@@ -961,7 +961,7 @@ begin
     Duration := 0;
     Genre := '';
     Year := '';
-    Comment := TrackData.CddbID;
+    Comment := String(TrackData.CddbID);
     CoverID := CoverFilenameFromCDDA(Pfad);
   end else begin
     Titel := TrackData.Title;
@@ -971,7 +971,7 @@ begin
     Track := TrackData.Track;
     Year := TrackData.Year;
     Genre := TrackData.Genre;
-    Comment := TrackData.CddbID;
+    Comment := String(TrackData.CddbID);
     CoverID := CoverFilenameFromCDDA(Pfad);
   end;
 end;

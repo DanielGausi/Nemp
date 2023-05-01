@@ -371,7 +371,12 @@ const
     // Playback Angehalten
     WM_SlideComplete = WM_USER + 505;
     WM_ResetPlayerVCL = WM_USER + 506;
-    WM_NewMetaData = WM_USER + 507;
+    WM_WebRadio = WM_USER + 507;
+      wWebRadioBuffering = 2;
+      wWebRadioNewMetaData = 3;
+      wWebRadioNewMetaDataOgg = 4;
+    // WM_NewMetaData = WM_USER + 507;
+
     WM_PlayerStop = WM_USER + 508;
     WM_PlayerPlay = WM_USER + 509;
     WM_PlayerAcceptInput = WM_User + 510;
@@ -389,6 +394,7 @@ const
     WM_PrepareNextFile = WM_USER + 518;
     WM_PlayerDelayedPlayNext = WM_USER + 519;
     WM_PlayerDelayCompleted = WM_USER + 520;
+    WM_PlayerPlayAgain = WM_USER + 521;
 
     //---------------------------------------
     // Messages der Medienbibliothek

@@ -13600,12 +13600,20 @@ begin
 end;
 
 procedure TNemp_MainForm.ReAlignControlCover;
+var
+  currentVis: Boolean;
 begin
+  currentVis := PlayerControlCoverPanel.Visible;
   PlayerControlCoverPanel.Visible := (_ControlPanel.Width > 550) and NempLayout.ShowControlCover;
-  if PlayerControlCoverPanel.Visible then
-      ControlContainer1.Width := OutputControlPanel.Width
+
+  if PlayerControlCoverPanel.Visible then begin
+    if not currentVis then
+      // refresh Display, especially the cover (otherwise there is a problem with transparency)
+      ShowMatchingControls;
+    ControlContainer1.Width := OutputControlPanel.Width
                          + PlayerControlCoverPanel.Width
                          + PlayerControlPanel.Width
+  end
   else
       ControlContainer1.Width := OutputControlPanel.Width
                          + PlayerControlPanel.Width

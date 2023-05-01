@@ -419,7 +419,7 @@ function GetAudioProperty(aAudioFile: TAudioFile; aProp: TEAudioProperty): strin
       cpSamplerate : result := Mp3db_SampleratesInt[aAudioFile.SampleRateIdx].ToString;
       cpRating : result := aAudioFile.Rating.ToString;
       cpPlaycounter : result := aAudioFile.PlayCounter.ToString;
-      cpLyrics : result := aAudioFile.Lyrics;
+      cpLyrics : result := String(aAudioFile.Lyrics);
       cpLyricsExist : if aAudioFile.LyricsExisting then result := '1' else result := '0';
       cpBPM : result := aAudioFile.BPM;
       cpTrackGain : result := ReplayGainValueToNumberString(aAudioFile.TrackGain);
