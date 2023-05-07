@@ -46,7 +46,6 @@ object Nemp_MainForm: TNemp_MainForm
     OwnerDraw = False
     HierarchyLevel = 0
     SplitterMinSize = 110
-    ExplicitHeight = 816
     object _ControlPanel: TNempPanel
       Left = 0
       Top = 598
@@ -63,7 +62,6 @@ object Nemp_MainForm: TNemp_MainForm
       Ratio = 0
       FixedHeight = True
       OwnerDraw = False
-      ExplicitTop = 716
       object ControlContainer2: TNempPanel
         Left = 481
         Top = 0

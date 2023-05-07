@@ -1735,12 +1735,12 @@ end;
 
 
 function TOptionsCompleteForm.ValidTime(aText: String): Boolean;
-var txt_time: String;
-    h, min: Integer;
+var
+  h, min: Integer;
 begin
-    txt_time := mskEdt_BirthdayTime.Text;
-    h := StrToInt(TrimRight(Copy(txt_time, 0, 2)));
-    min := StrToInt(TrimRight(Copy(txt_time, 4, 2)));
+    //txt_time := mskEdt_BirthdayTime.Text;
+    h := StrToInt(TrimRight(Copy(aText, 0, 2)));
+    min := StrToInt(TrimRight(Copy(aText, 4, 2)));
 
     result := (min >= 0) AND (min < 60)
             AND (h >= 0) AND (h < 24);

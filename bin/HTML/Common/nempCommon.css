@@ -204,6 +204,7 @@ ul.charselection li.active a {
 	min-width: 2ch;
 	flex: none;	
 	text-align:right;	
+	padding-left: 4px;
 }
 .listitem .titleinfo {
 	margin-left: 5px;
