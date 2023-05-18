@@ -76,9 +76,11 @@ end;
 
 procedure TFormUpdateCleaning.FormShow(Sender: TObject);
 begin
+  NempOptions.LastUpdateCleaningCheck := cCurrentCleanUpdate;
   if ShowOutdatedElements = 0 then begin
     lblCaption.Caption := rsCaptionCleanupCompleted;
     lblMessage.Caption := rsMessageCleanupCompleted;
+    NempOptions.LastUpdateCleaningSuccess := cCurrentCleanUpdate;
     BtnCleanUp.Enabled := False;
     btnNoCleanUp.Enabled := False;
   end else
@@ -88,8 +90,6 @@ begin
     BtnCleanUp.Enabled := True;
     btnNoCleanUp.Enabled := True;
   end;
-
-  NempOptions.LastUpdateCleaningCheck := cCurrentCleanUpdate;
 end;
 
 function TFormUpdateCleaning.ShowOutdatedElements: Integer;

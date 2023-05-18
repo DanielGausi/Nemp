@@ -70,7 +70,6 @@ object FormUpdateCleaning: TFormUpdateCleaning
     Images = ImageList1
     TabOrder = 0
     OnClick = BtnCleanUpClick
-    ExplicitTop = 370
   end
   object btnHelp: TButton
     Left = 104
@@ -83,7 +82,6 @@ object FormUpdateCleaning: TFormUpdateCleaning
     Images = ImageList1
     TabOrder = 1
     OnClick = btnHelpClick
-    ExplicitTop = 462
   end
   object btnNoCleanUp: TButton
     Left = 104
@@ -95,7 +93,6 @@ object FormUpdateCleaning: TFormUpdateCleaning
     ImageIndex = 0
     Images = ImageList1
     TabOrder = 2
-    ExplicitTop = 416
   end
   object pnlContainer: TPanel
     Left = 104
@@ -105,7 +102,6 @@ object FormUpdateCleaning: TFormUpdateCleaning
     Anchors = [akLeft, akTop, akRight, akBottom]
     BevelOuter = bvNone
     TabOrder = 3
-    ExplicitHeight = 253
     object Splitter1: TSplitter
       Left = 0
       Top = 142
@@ -124,7 +120,6 @@ object FormUpdateCleaning: TFormUpdateCleaning
       Align = alClient
       Caption = 'Obsolete files'
       TabOrder = 0
-      ExplicitHeight = 171
       object LBFiles: TListBox
         Left = 2
         Top = 17
@@ -135,7 +130,6 @@ object FormUpdateCleaning: TFormUpdateCleaning
         ItemHeight = 13
         TabOrder = 0
         OnDrawItem = LBFilesDrawItem
-        ExplicitHeight = 152
       end
     end
     object grpboxDirectories: TGroupBox
@@ -146,7 +140,6 @@ object FormUpdateCleaning: TFormUpdateCleaning
       Align = alBottom
       Caption = 'Obsolete directories'
       TabOrder = 1
-      ExplicitTop = 174
       object LBDirectories: TListBox
         Left = 2
         Top = 17
@@ -172,7 +165,6 @@ object FormUpdateCleaning: TFormUpdateCleaning
     Images = ImageList1
     TabOrder = 4
     OnClick = btnOpenDirectoryClick
-    ExplicitTop = 370
   end
   object pnlButtons: TPanel
     Left = 0
@@ -182,8 +174,6 @@ object FormUpdateCleaning: TFormUpdateCleaning
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 5
-    ExplicitTop = 269
-    ExplicitWidth = 554
     DesignSize = (
       624
       41)
