@@ -32,9 +32,9 @@ Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 
-[InstallDelete]
-Type: files; Name: "{app}\UseLocalData.cfg"
-Type: files; Name: "{app}\DONT_UseLocalData.cfg"
+//[InstallDelete]
+//Type: files; Name: "{app}\UseLocalData.cfg"
+//Type: files; Name: "{app}\DONT_UseLocalData.cfg"
 
 
 [Languages]
@@ -62,10 +62,11 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 var
   UsagePage: TInputOptionWizardPage;
   UsagePageID: Integer; 
+  IsUpdateInstall: Boolean;
 
 function IsModeSelected(Mode: Integer): Boolean;
 begin
-  Result := (UsagePage.SelectedValueIndex = Mode);
+  Result := (UsagePage.SelectedValueIndex = Mode) and (not IsUpdateInstall);
 end;
 
 function NextButtonClick(apage: Integer): boolean;
@@ -82,6 +83,7 @@ end;
 
 procedure InitializeWizard();
 begin 
+  IsUpdateInstall := False;
   UsagePage :=
     CreateInputOptionPage(
       wpSelectDir, CustomMessage('InstallMode'), CustomMessage('InstallModeHint'), CustomMessage('InstallModeSubCaption'), True, False);
@@ -99,6 +101,14 @@ begin
         begin
             UsagePage.SelectedValueIndex := 0
             result := true;
+        end else
+        begin
+            if (WizardForm.PrevAppDir <> '') then begin
+              IsUpdateInstall := True;
+              result := true;
+            end;
+            // todo: Check for new install/update by checking "nemp.exe" ???
+            // and setting a new varibale to "do not change UseLocalDir" ???
         end;
     end;
 end;	        
@@ -286,6 +296,27 @@ Type: files; Name: "{userappdata}\Gausi\Nemp\Nemp_EQ.ini"
 Type: files; Name: "{userappdata}\Gausi\Nemp\RandomPlaylist.ini"
 Type: files; Name: "{userappdata}\Gausi\Nemp\Nemp-PlayerLog.log"
 Type: filesandordirs; Name: "{userappdata}\Gausi\Nemp\Cover"
+Type: filesandordirs; Name: "{userappdata}\Gausi\Nemp\Export"
+Type: filesandordirs; Name: "{userappdata}\Gausi\Nemp\Playlists"
 Type: dirifempty; Name: "{userappdata}\Gausi\Nemp\Webradio"
 Type: dirifempty; Name: "{userappdata}\Gausi\Nemp"
 Type: dirifempty; Name: "{userappdata}\Gausi"
+// delete user data for portable installations
+Type: files; Name: "{app}\Data\Nemp.ini"
+Type: files; Name: "{app}\Data\CoverCache"
+Type: files; Name: "{app}\Data\Hotkeys.ini"
+Type: files; Name: "{app}\Data\Nemp.npl"
+Type: files; Name: "{app}\Data\Nemp.gmp"
+Type: files; Name: "{app}\Data\NempWebServer.ini"
+Type: files; Name: "{app}\Data\tag_ignore"
+Type: files; Name: "{app}\Data\tag_merge"
+Type: files; Name: "{app}\Data\temp.npl"
+Type: files; Name: "{app}\Data\temp.old.npl"
+Type: files; Name: "{app}\Data\Nemp_EQ.ini"
+Type: files; Name: "{userappdata}\Data\RandomPlaylist.ini"
+Type: files; Name: "{app}\Data\Nemp-PlayerLog.log"
+Type: filesandordirs; Name: "{app}\Data\Cover"
+Type: filesandordirs; Name: "{app}\Data\Export"
+Type: dirifempty; Name: "{app}\Data\Webradio"
+Type: dirifempty; Name: "{app}\Data\Playlists"
+Type: dirifempty; Name: "{app}\Data\"
