@@ -152,15 +152,15 @@ initialization
   ID3Genres.Add('A capella');
   ID3Genres.Add('Euro-House');
   ID3Genres.Add('Dance Hall');
-  // some more genres, source: http://www.steffen-hanske.de/mp3_genre.htm
-  ID3Genres.Add('Goa');
+  // some more genres, source: https://en.wikipedia.org/wiki/List_of_ID3v1_genres
+  ID3Genres.Add('Goa music');
   ID3Genres.Add('Drum & Bass');
   ID3Genres.Add('Club-House');
-  ID3Genres.Add('Hardcore');
+  ID3Genres.Add('Hardcore techno');
   ID3Genres.Add('Terror');
   ID3Genres.Add('Indie');
-  ID3Genres.Add('BritPop');
-  ID3Genres.Add('Negerunk');
+  ID3Genres.Add('Britpop');
+  ID3Genres.Add('Negerpunk');
   ID3Genres.Add('Polsk Punk');
   ID3Genres.Add('Beat');
   ID3Genres.Add('Christian Gangsta Rap');

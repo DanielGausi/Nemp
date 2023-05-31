@@ -2207,8 +2207,9 @@ begin
                         // for non-standard genres, we need the ID3v2Tag
                         if MainFile.FileType = at_Mp3 then
                         begin
-                              if NOT (ID3Genres.IndexOf(aValue) in [0..125]) then
-                                  EnsureID3v2Exists(TMp3File(MainFile));
+                              //if NOT (ID3Genres.IndexOf(aValue) in [0..125]) then
+                              if ID3Genres.IndexOf(aValue) < 0 then
+                                EnsureID3v2Exists(TMp3File(MainFile));
                         end;
                         MainFile.Genre := aValue;
                     end;
@@ -2965,7 +2966,8 @@ begin
                         end;
             MP3DB_GENRE: begin
                              GenreIDX := ReadByteFromStream(aStream);
-                             if GenreIDX <= 125 then
+                             //if GenreIDX <= 125 then
+                             if GenreIDX <= ID3Genres.Count - 1 then
                                  genre := ID3Genres[GenreIDX]
                              else
                                  genre := '';
@@ -3067,7 +3069,8 @@ begin
             end;
             MP3DB_GENRE: begin
                 aStream.Read(GenreIDX,SizeOf(GenreIDX));
-                if GenreIDX <= 125 then
+                //if GenreIDX <= 125 then
+                if GenreIDX <= ID3Genres.Count - 1 then
                   genre := ID3Genres[GenreIDX]
                 else
                   genre := '';
@@ -3159,7 +3162,8 @@ begin
             end;
             MP3DB_GENRE: begin
                 aStream.Read(GenreIDX,SizeOf(GenreIDX));
-                if GenreIDX <= 125 then
+                //if GenreIDX <= 125 then
+                if GenreIDX <= ID3Genres.Count - 1 then
                   genre := ID3Genres[GenreIDX]
                 else
                   genre := '';
