@@ -119,9 +119,15 @@ SL_OGG.Add('REPLAYGAIN_ALBUM_GAIN');  SL_APE.Add('REPLAYGAIN_ALBUM_GAIN');
 SL_OGG.Add('REPLAYGAIN_ALBUM_PEAK');  SL_APE.Add('REPLAYGAIN_ALBUM_PEAK');
 
 SL_OGG.Add('UNSYNCEDLYRICS');         SL_APE.Add('UNSYNCEDLYRICS');   // Lyrics
+SL_OGG.Add('UNSYNCED LYRICS');        SL_APE.Add('UNSYNCED LYRICS');  // Lyrics
+SL_OGG.Add('LYRICS');                 SL_APE.Add('LYRICS');           // Lyrics
 
 SL_OGG.Add('COPYRIGHT');              SL_APE.Add('Copyright');
 SL_OGG.Add('ISRC');                   SL_APE.Add('ISRC');
+
+SL_OGG.Add('METADATA_BLOCK_PICTURE'); SL_APE.Add('METADATA_BLOCK_PICTURE'); // Cover
+SL_OGG.Add('COVERART');               SL_APE.Add('COVERART');               // Cover (deprecated, not supported by Nemp to get the cover)
+
 
 ///  ===================================================
 ///

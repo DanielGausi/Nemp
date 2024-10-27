@@ -3,8 +3,8 @@ object AboutForm: TAboutForm
   Top = 122
   BorderStyle = bsDialog
   Caption = 'About Nemp'
-  ClientHeight = 394
-  ClientWidth = 371
+  ClientHeight = 393
+  ClientWidth = 367
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,14 +16,14 @@ object AboutForm: TAboutForm
   OnHide = FormHide
   OnShow = FormShow
   DesignSize = (
-    371
-    394)
+    367
+    393)
   TextHeight = 13
   object NempCredits: TACredits
     AlignWithMargins = True
     Left = 8
     Top = 8
-    Width = 347
+    Width = 339
     Height = 345
     Cursor = crDefault
     Images = ImageList1
@@ -32,7 +32,7 @@ object AboutForm: TAboutForm
       ''
       '[b]Nemp - Noch ein Mp3-Player[/b]'
       ''
-      'Copyright '#169' 2005-2023 Daniel '#39'Gausi'#39' Gaussmann'
+      'Copyright '#169' 2005-2024 Daniel '#39'Gausi'#39' Gaussmann'
       ' '
       'Website: [url="https://www.gausi.de"]https://www.gausi.de[/url]'
       'e-Mail: [url="mailto:mail@gausi.de"]mail@gausi.de[/url]'
@@ -62,7 +62,7 @@ object AboutForm: TAboutForm
       '[row="200"]'
       ''
       ''
-      'Programmed with CodeGear Delphi 2009 / XE2 / XE3 / 10.x / 11.1'
+      'Programmed with CodeGear Delphi 2009 - 11.3'
       ''
       ''
       '[b]Used components/units[/b]'
@@ -113,12 +113,12 @@ object AboutForm: TAboutForm
       'Chrystal Project Icons by Everaldo Coelho'
       ''
       
-        'Silk Icon Set by [url="http://www.famfamfam.com/lab/icons/silk"]' +
-        'famfamfam.com[/url]'
+        'Silk Icon Set by [url="https://github.com/legacy-icons/famfamfam' +
+        '-silk"]famfamfam.com[/url]'
       ''
       
-        '[url="http://tango.freedesktop.org/Tango_Icon_Library"]Tango Ico' +
-        'n Library[/url]'
+        '[url="https://github.com/nigeltao/tango-icon-library-pngs"]Tango' +
+        ' Icon Library[/url]'
       ''
       'Nemp Logo and default skin by J'#252'rgen Poley'
       ''

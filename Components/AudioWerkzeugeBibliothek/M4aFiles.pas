@@ -2,7 +2,7 @@
     -----------------------------------
     Audio Werkzeuge Bibliothek
     -----------------------------------
-    (c) 2012-2020, Daniel Gaussmann
+    (c) 2012-2024, Daniel Gaussmann
               Website : www.gausi.de
               EMail   : mail@gausi.de
     -----------------------------------
@@ -50,7 +50,7 @@ unit M4aFiles;
 interface
 
 uses Windows, Messages, SysUtils, StrUtils, Variants, ContNrs, Classes,
- AudioFiles.Base, AudioFiles.Declarations, M4aAtoms;
+ AudioFiles.Base, AudioFiles.BaseTags, AudioFiles.Declarations, M4aAtoms;
 
 
 const DEFAULT_MEAN: AnsiString = 'com.apple.iTunes';
@@ -59,27 +59,20 @@ type
 
 
     TM4AFile = class (TBaseAudioFile)
-
         private
             fBytesBeforeMDTA: DWord;
             fTmpStcoOffset: DWord;
 
             function fPrepareSaving(ExistingTag: TM4AFile; dest: TStream): TAudioError;
             procedure fFixAudioOffsets(st: TStream; diff: Integer);
-
             function BackupAudioData(source: TStream; BackUpFilename: UnicodeString): TAudioError;
             function AppendBackup(Destination: TStream; BackUpFilename: UnicodeString): TAudioError;
-            
 
         protected
-
-            function fGetFileSize   : Int64;    override;
             function fGetDuration   : Integer;  override;
             function fGetBitrate    : Integer;  override;
             function fGetSamplerate : Integer;  override;
             function fGetChannels   : Integer;  override;
-            function fGetValid      : Boolean;  override;
-
             // standard properties
             // Setter
             procedure fSetTitle      (aValue: UnicodeString); override;
@@ -90,6 +83,7 @@ type
             procedure fSetGenre      (aValue: UnicodeString); override;
             procedure fSetComment    (aValue: UnicodeString);
             procedure fSetAlbumArtist (value: UnicodeString); override;
+            procedure fSetLyrics (value: UnicodeString); override;
             // Getter
             function fGetTitle       : UnicodeString; override;
             function fGetArtist      : UnicodeString; override;
@@ -99,17 +93,15 @@ type
             function fGetGenre       : UnicodeString; override;
             function fGetComment     : UnicodeString;
             function fGetAlbumArtist : UnicodeString; override;
-
+            function fGetLyrics      : UnicodeString; override;
             procedure fSetDisc      (aValue: UnicodeString);
             function fGetDisc       : UnicodeString;
-
 
             procedure __fSetAlbumArtist       (aValue: UnicodeString);
             procedure __fSetGrouping          (aValue: UnicodeString);
             procedure __fSetComposer          (aValue: UnicodeString);
             procedure __fSetDescription       (aValue: UnicodeString);
             procedure __fSetLongDescription   (aValue: UnicodeString);
-            procedure __fSetLyrics            (aValue: UnicodeString);
             procedure __fSetCopyright         (aValue: UnicodeString);
             procedure __fSetEncodingTool      (aValue: UnicodeString);
             procedure __fSetEncodedBy         (aValue: UnicodeString);
@@ -120,7 +112,6 @@ type
             function __fGetComposer           : UnicodeString;
             function __fGetDescription        : UnicodeString;
             function __fGetLongDescription    : UnicodeString;
-            function __fGetLyrics             : UnicodeString;
             function __fGetCopyright          : UnicodeString;
             function __fGetEncodingTool       : UnicodeString;
             function __fGetEncodedBy          : UnicodeString;
@@ -134,22 +125,17 @@ type
             FTYP: TBaseAtom;
             MOOV: TMoovAtom;
             PADDING: TBaseAtom;
-
             UsePadding: Boolean; // Set UsePadding to False before WriteToFile to delete Free-Atoms
                                  // Note: If it is True, all Free-Atoms will be merged to one large
                                  //       Free-Atom to fill the unused space before the actual audio-data
 
-
             property Comment : UnicodeString read fGetComment write fSetComment;
             property Disc    : UnicodeString read fGetDisc   write  fSetDisc   ;
-
-
             property AlbumArtist        : UnicodeString read __fGetAlbumArtist      write  __fSetAlbumArtist    ;
             property Grouping           : UnicodeString read __fGetGrouping         write  __fSetGrouping       ;
             property Composer           : UnicodeString read __fGetComposer         write  __fSetComposer       ;
             property Description        : UnicodeString read __fGetDescription      write  __fSetDescription    ;
             property LongDescription    : UnicodeString read __fGetLongDescription  write  __fSetLongDescription;
-            property Lyrics             : UnicodeString read __fGetLyrics           write  __fSetLyrics         ;
             property Copyright          : UnicodeString read __fGetCopyright        write  __fSetCopyright      ;
             property EncodingTool       : UnicodeString read __fGetEncodingTool     write  __fSetEncodingTool   ;
             property EncodedBy          : UnicodeString read __fGetEncodedBy        write  __fSetEncodedBy      ;
@@ -162,21 +148,14 @@ type
             function WriteToFile(aFilename: UnicodeString): TAudioError;     override;
             function RemoveFromFile(aFilename: UnicodeString): TAudioError;  override;
 
-            function GetPictureStream(Dest: TStream; var typ: TM4APicTypes): Boolean;
-            procedure SetPicture(Source: TStream; typ: TM4APicTypes);      // set a Picture
-                                                                          // use Source=NIL, to delete the picture
+            procedure GetTagList(Dest: TTagItemList; ContentTypes: TTagContentTypes = cDefaultTagContentTypes); override;
+            procedure DeleteTagItem(aTagItem: TTagItem); override;
+            function GetUnusedTextTags: TTagItemInfoDynArray; override;
+            function AddTextTagItem(aKey, aValue: UnicodeString): TTagItem; override;
 
-            function GetTextDataByDescription(aDescription: UnicodeString): UnicodeString;
+            function SetPicture(Source: TStream; Mime: AnsiString; PicType: TPictureType; Description: UnicodeString): Boolean; override;
             function GetSpecialData(mean, name: AnsiString): UnicodeString;
             procedure SetSpecialData(mean, name: AnsiString; aValue: UnicodeString);
-
-            procedure GetAllTextAtomDescriptions(dest: TStrings);
-            procedure GetAllTextAtoms(dest: TObjectList);
-
-            procedure GetAllAtoms(dest: TObjectList);
-            procedure RemoveMetaAtom(aAtom: TMetaAtom);
-
-
     end;
 
 implementation
@@ -209,7 +188,7 @@ end;
 
 function TM4AFile.fGetFileTypeDescription: String;
 begin
-    result := TAudioFileNames[at_M4A];
+    result := cAudioFileType[at_M4A];
 end;
 
 procedure TM4AFile.Clear;
@@ -220,24 +199,10 @@ begin
     fValid      := False;
 end;
 
-
-function TM4AFile.fGetValid: Boolean;
-begin
-    result := fValid;
-end;
-
-
-function TM4AFile.fGetFileSize: Int64;
-begin
-    result := fFileSize;
-end;
-
-
 function TM4AFile.fGetSamplerate: Integer;
 begin
     result := MOOV.Samplerate
 end;
-
 
 function TM4AFile.fGetDuration: Integer;
 begin
@@ -347,47 +312,9 @@ begin
     MOOV.UdtaAtom.SetDiscNumber(aValue);
 end;
 
-
-function TM4AFile.GetPictureStream(Dest: TStream; var typ: TM4APicTypes): Boolean;
+function TM4AFile.SetPicture(Source: TStream; Mime: AnsiString; PicType: TPictureType; Description: UnicodeString): Boolean;
 begin
-    result := MOOV.UdtaAtom.GetPictureStream(Dest, typ);
-end;
-
-procedure TM4AFile.SetPicture(Source: TStream; typ: TM4APicTypes);
-begin
-    MOOV.UdtaAtom.SetPicture(Source, typ);
-end;
-
-
-function TM4AFile.GetTextDataByDescription(aDescription: UnicodeString): UnicodeString;
-var idx, i: Integer;
-    aMean, aName: AnsiString;
-    aAtomName: TAtomName;
-begin
-
-    idx := pos('::', aDescription);
-    if idx > 0 then
-    begin
-        aName := AnsiString(copy(aDescription, 1, idx-1));
-        aMean := AnsiString(copy(aDescription, idx+2, length(aDescription) - idx + 1));
-        result := MOOV.UdtaAtom.GetSpecialData(aMean, aName);
-    end else
-    begin
-        if AnsiStartsText('Unknown Atom (', aDescription) then
-        begin
-            aName := AnsiString(copy(aDescription, 15, 4));
-            move(aName[1], aAtomName[1], 4);
-            result := MOOV.UdtaAtom.GetTextData(aAtomName);
-        end else
-        begin
-            for i := 0 to length(KnownMetaAtoms) - 1 do
-                if KnownMetaAtoms[i].Description = aDescription then
-                begin
-                    result := MOOV.UdtaAtom.GetTextData(KnownMetaAtoms[i].AtomName);
-                    break;
-                end;
-        end;
-    end;
+  result := MOOV.UdtaAtom.SetPictureStream(Source, MimeStringToM4APicType(Mime));
 end;
 
 function TM4AFile.GetSpecialData(mean, name: AnsiString): UnicodeString;
@@ -401,24 +328,24 @@ begin
     MOOV.UdtaAtom.SetSpecialData(mean, name, aValue);
 end;
 
-procedure TM4AFile.GetAllTextAtomDescriptions(dest: TStrings);
+procedure TM4AFile.GetTagList(Dest: TTagItemList; ContentTypes: TTagContentTypes = cDefaultTagContentTypes);
 begin
-    MOOV.UdtaAtom.GetAllTextAtomDescriptions(dest);
+  MOOV.UdtaAtom.GetTagList(Dest, ContentTypes);
 end;
 
-procedure TM4AFile.GetAllTextAtoms(dest: TObjectList);
+procedure TM4AFile.DeleteTagItem(aTagItem: TTagItem);
 begin
-    MOOV.UdtaAtom.GetAllTextAtoms(dest);
+  MOOV.UdtaAtom.DeleteTagItem(aTagItem);
 end;
 
-procedure TM4AFile.GetAllAtoms(dest: TObjectList);
+function TM4AFile.GetUnusedTextTags: TTagItemInfoDynArray;
 begin
-    MOOV.UdtaAtom.GetAllAtoms(dest);
+  result := MOOV.UdtaAtom.GetUnusedTextTags;
 end;
 
-procedure TM4AFile.RemoveMetaAtom(aAtom: TMetaAtom);
+function TM4AFile.AddTextTagItem(aKey, aValue: UnicodeString): TTagItem;
 begin
-    MOOV.UdtaAtom.RemoveAtom(aAtom);
+  result := MOOV.UdtaAtom.AddTextTagItem(aKey, aValue);
 end;
 
 function TM4AFile.ReadFromFile(aFilename: UnicodeString): TAudioError;
@@ -507,7 +434,7 @@ end;
 function TM4AFile.RemoveFromFile(aFilename: UnicodeString): TAudioError;
 begin
     inherited RemoveFromFile(aFilename);
-    result := M4aErr_RemovingNotSupported;
+    result := TagErr_RemovingNotSupported;
 end;
 
 
@@ -575,7 +502,7 @@ begin
             fs.Free;
         end;
     except
-        result := FlacErr_BackupFailed;
+        result := FileErr_BackupFailed;
     end;
 end;
 
@@ -584,6 +511,7 @@ var ExistingTag: TM4AFile;
     tmpMetaStream: TMemoryStream;
     FreeAtom: TFreeAtom;
     fs: TAudioFileStream;
+    backupFilename: String;
 
           function WriteData: TAudioError;
           begin
@@ -625,7 +553,6 @@ begin
                     // nothing special todo
                     result := WriteData
                 else
-
                 begin
                     // we need a FREE-Atom (which has a minimum size of 8 bytes)
                     if (tmpMetaStream.Size + 8 < ExistingTag.fBytesBeforeMDTA) and UsePadding then
@@ -638,8 +565,6 @@ begin
                         finally
                             FreeAtom.Free;
                         end
-
-
                     end else
                     begin
                         // we do not have enough space for writing our data,
@@ -653,7 +578,6 @@ begin
                             finally
                                 FreeAtom.Free;
                             end;
-
                         end;
 
                         fFixAudioOffsets(tmpMetaStream, tmpMetaStream.Size - ExistingTag.fBytesBeforeMDTA);
@@ -661,22 +585,23 @@ begin
                             fs := TAudioFileStream.Create(aFilename, fmOpenReadWrite or fmShareDenyWrite);
                             try
                                 fs.Seek(ExistingTag.fBytesBeforeMDTA, soBeginning);
-                                result := BackupAudioData(fs, aFilename+'~');
+                                backupFilename := GetBackupFilename(aFilename);
+                                result := BackupAudioData(fs, backupFilename);
                                 if result = FileErr_None then
                                 begin
                                     fs.Seek(0, soBeginning);
                                     // copy the new tmpMetaStream into the file
                                     fs.CopyFrom(tmpMetaStream, 0);
                                     // write AudioData back to the File
-                                    result := self.AppendBackup(fs, aFilename+'~');
+                                    result := self.AppendBackup(fs, backupFilename);
                                     // cleanup
                                     if result = FileErr_None then
                                     begin
                                         // Set End of File here (in case new Metadata is smaller)
                                         SetEndOfFile((fs as THandleStream).Handle);
                                         //delete backupfile
-                                        if not DeleteFile(aFilename + '~') then
-                                            result := FlacErr_DeleteBackupFailed;
+                                        if not DeleteFile(backupFilename) then
+                                            result := FileErr_DeleteBackupFailed;
                                     end;
                                 end;
                             finally
@@ -736,7 +661,7 @@ begin
     result := MOOV.UdtaAtom.GetTextData('ldes');
 end;
 
-function TM4AFile.__fGetLyrics: UnicodeString;
+function TM4AFile.fGetLyrics: UnicodeString;
 begin
     result := MOOV.UdtaAtom.GetTextData('©lyr');
 end;
@@ -786,9 +711,9 @@ begin
     MOOV.UdtaAtom.SetTextData('ldes', aValue);
 end;
 
-procedure TM4AFile.__fSetLyrics(aValue: UnicodeString);
+procedure TM4AFile.fSetLyrics(Value: UnicodeString);
 begin
-    MOOV.UdtaAtom.SetTextData('©lyr', aValue);
+    MOOV.UdtaAtom.SetTextData('©lyr', Value);
 end;
 
 procedure TM4AFile.__fSetKeywords(aValue: UnicodeString);

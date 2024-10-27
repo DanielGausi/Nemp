@@ -210,7 +210,7 @@ end;
 
 function TMonkeyFile.fGetFileTypeDescription: String;
 begin
-    result := TAudioFileNames[at_Monkey];
+    result := cAudioFileType[at_Monkey];
 end;
 
 function TMonkeyFile.fGetVersionStr: String;

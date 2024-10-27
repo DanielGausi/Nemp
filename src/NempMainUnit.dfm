@@ -3,8 +3,8 @@ object Nemp_MainForm: TNemp_MainForm
   Top = 0
   HelpContext = 10000
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 698
-  ClientWidth = 1096
+  ClientHeight = 695
+  ClientWidth = 1084
   Color = clBtnFace
   Constraints.MinHeight = 300
   Constraints.MinWidth = 400
@@ -34,8 +34,8 @@ object Nemp_MainForm: TNemp_MainForm
     Tag = 2
     Left = 0
     Top = 0
-    Width = 1096
-    Height = 698
+    Width = 1084
+    Height = 695
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
@@ -46,10 +46,12 @@ object Nemp_MainForm: TNemp_MainForm
     OwnerDraw = False
     HierarchyLevel = 0
     SplitterMinSize = 110
+    ExplicitWidth = 1080
+    ExplicitHeight = 694
     object _ControlPanel: TNempPanel
       Left = 0
-      Top = 598
-      Width = 1096
+      Top = 595
+      Width = 1084
       Height = 100
       Align = alBottom
       BevelOuter = bvNone
@@ -62,21 +64,24 @@ object Nemp_MainForm: TNemp_MainForm
       Ratio = 0
       FixedHeight = True
       OwnerDraw = False
+      ExplicitTop = 594
+      ExplicitWidth = 1080
       object ControlContainer2: TNempPanel
         Left = 481
         Top = 0
-        Width = 615
+        Width = 603
         Height = 100
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
         Ratio = 0
         OwnerDraw = False
+        ExplicitWidth = 599
         object NewPlayerPanel: TNempPanel
           Tag = 4
           Left = 0
           Top = 0
-          Width = 615
+          Width = 603
           Height = 100
           Align = alClient
           BevelInner = bvRaised
@@ -91,13 +96,14 @@ object Nemp_MainForm: TNemp_MainForm
           Ratio = 0
           OnPaint = ControlPanelPaint
           OwnerDraw = False
+          ExplicitWidth = 599
           DesignSize = (
-            615
+            603
             100)
           object SlideBarShape: TProgressShape
             Left = 100
             Top = 78
-            Width = 457
+            Width = 445
             Height = 6
             Anchors = [akLeft, akTop, akRight]
             Brush.Color = clGradientActiveCaption
@@ -139,7 +145,7 @@ object Nemp_MainForm: TNemp_MainForm
             OnStartDrag = ab1StartDrag
           end
           object PlayerTimeLbl: TLabel
-            Left = 572
+            Left = 560
             Top = 74
             Width = 34
             Height = 13
@@ -169,7 +175,7 @@ object Nemp_MainForm: TNemp_MainForm
             OnStartDrag = ab1StartDrag
           end
           object PaintFrame: TImage
-            Left = 531
+            Left = 519
             Top = 34
             Width = 75
             Height = 25
@@ -297,7 +303,7 @@ object Nemp_MainForm: TNemp_MainForm
             Color2 = clBlack
           end
           object BtnClose: TSkinButton
-            Left = 597
+            Left = 585
             Top = 4
             Width = 12
             Height = 12
@@ -318,9 +324,10 @@ object Nemp_MainForm: TNemp_MainForm
             FocusDrawMode = fdm_Windows
             Color1 = clBlack
             Color2 = clBlack
+            ExplicitLeft = 581
           end
           object BtnMinimize: TSkinButton
-            Left = 582
+            Left = 570
             Top = 4
             Width = 12
             Height = 12
@@ -341,6 +348,7 @@ object Nemp_MainForm: TNemp_MainForm
             FocusDrawMode = fdm_Windows
             Color1 = clBlack
             Color2 = clBlack
+            ExplicitLeft = 566
           end
         end
       end
@@ -1746,6 +1754,7 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 2
           Width = 549
           Height = 119
+          AccessibleName = 'Harmonic key'
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -1940,6 +1949,10 @@ object Nemp_MainForm: TNemp_MainForm
             item
               Position = 30
               Text = 'Marker'
+            end
+            item
+              Position = 31
+              Text = 'Harmonic key'
             end>
         end
       end
@@ -2169,6 +2182,7 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 0
           TextMargin = 2
           TreeOptions.AutoOptions = [toAutoDropExpand, toAutoTristateTracking]
+          TreeOptions.MiscOptions = [toAcceptOLEDrop, toFullRepaintOnResize, toInitOnSave, toWheelPanning, toEditOnClick]
           TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
           TreeOptions.SelectionOptions = [toFullRowSelect, toRightClickSelect]
           OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
@@ -2226,7 +2240,7 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 1
           TextMargin = 2
           TreeOptions.AutoOptions = [toAutoDropExpand, toAutoTristateTracking]
-          TreeOptions.MiscOptions = [toAcceptOLEDrop, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning, toVariableNodeHeight, toEditOnClick]
+          TreeOptions.MiscOptions = [toAcceptOLEDrop, toFullRepaintOnResize, toInitOnSave, toWheelPanning, toVariableNodeHeight, toEditOnClick]
           TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
           TreeOptions.SelectionOptions = [toFullRowSelect, toRightClickSelect]
           OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw

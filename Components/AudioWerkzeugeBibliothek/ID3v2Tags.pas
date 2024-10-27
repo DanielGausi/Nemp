@@ -55,7 +55,7 @@ interface
 uses
   SysUtils, Classes, Windows, Contnrs, U_CharCode
   {$IFDEF USE_SYSTEM_TYPES}, System.Types{$ENDIF}
-  , AudioFiles.Declarations, ID3v2Frames;
+  , AudioFiles.Declarations, AudioFiles.BaseTags, ID3v2Frames;
 
 type
 
@@ -197,9 +197,9 @@ type
 
     // get the size of another ID3v2Tag in the Stream. used for removing/writing
     function GetExistingTagSize(aStream: TStream): Cardinal;
+    function GetVersionString: String;
 
   public
-
 
     constructor Create;
     destructor Destroy; override;
@@ -250,13 +250,14 @@ type
     property PaddingSize:Longword    read fPaddingSize; //
 
     property Version:    TID3Version read fVersion;
+    property VersionString: String read GetVersionString;
     property UsePadding: Boolean     read fUsePadding write fUsePadding;
     property UseClusteredPadding: Boolean read fUseClusteredPadding write fUseClusteredPadding;
 
-    property  AlwaysWriteUnicode: Boolean read fAlwaysWriteUnicode write fAlwaysWriteUnicode;
+    property AlwaysWriteUnicode: Boolean read fAlwaysWriteUnicode write fAlwaysWriteUnicode;
 
     property CharCode: TCodePage read fCharCode write SetCharCode;
-    property  AutoCorrectCodepage: Boolean read fAutoCorrectCodepage write SetAutoCorrectCodepage;
+    property AutoCorrectCodepage: Boolean read fAutoCorrectCodepage write SetAutoCorrectCodepage;
 
     function ReadFromStream(Stream: TStream): TAudioError;
     function WriteToStream(Stream: TStream): TAudioError;
@@ -265,7 +266,6 @@ type
     function WriteToFile(Filename: UnicodeString): TAudioError;
     function RemoveFromFile(Filename: UnicodeString): TAudioError;
     procedure Clear;
-
 
     // "Level 2": Some advanced Frames. Get/edit them on Tag-Level
     //           Setting a value to '' will delete the frame
@@ -292,7 +292,7 @@ type
     // Pictures (APIC)
     // Note: Delete by setting Stream = Nil
     function GetPicture(stream: TStream; Description: UnicodeString): AnsiString; // Rückgabe: Mime-Type
-    procedure SetPicture(MimeTyp: AnsiString; PicType: Byte; Description: UnicodeString; stream: TStream);
+    function SetPicture(Source: TStream; MimeTyp: AnsiString; PicType: TPictureType; Description: UnicodeString): Boolean;
 
     // User-defined URL (WXXX)
     // Note: Delete by Set(..., '');
@@ -300,7 +300,6 @@ type
     procedure SetUserDefinedURL(Description: UnicodeString; Value: AnsiString);
 
     // Ratings (POPM)
-
     // Note: GetRating('*') gets an arbitrary rating (in case more than one exist in the tag)
     function GetRating(aEMail: AnsiString): Byte;
     //procedure SetRating(aEMail: AnsiString; Value: Byte); (method from version 0.5)
@@ -317,34 +316,27 @@ type
     function GetPrivateFrame(aOwnerID: AnsiString; Content: TStream): Boolean;
     procedure SetPrivateFrame(aOwnerID: AnsiString; Content: TStream);
 
+    procedure GetTagList(Dest: TTagItemList; ContentTypes: TTagContentTypes = cDefaultTagContentTypes);
+    procedure DeleteTagItem(aTagItem: TTagItem);
 
+    function GetUnusedTextTags: TTagItemInfoDynArray;
+    function AddTextTagItem(aKey, aValue: UnicodeString): TID3v2Frame;
 
     // "Level 3": Manipulation on Frame-Level
     //            Be careful with writing on this level
     //            These Methods gives you some lists with different types of frames
     //            See ID3v2Frames.pas how to edit these Frames
-    function GetAllFrames              : TObjectlist; overload; deprecated;
-    function GetAllTextFrames          : TObjectlist; overload; deprecated;
-    function GetAllUserTextFrames      : TObjectlist; overload; deprecated;
-    function GetAllCommentFrames       : TObjectlist; overload; deprecated;
-    function GetAllLyricFrames         : TObjectlist; overload; deprecated;
-    function GetAllUserDefinedURLFrames: TObjectlist; overload; deprecated;
-    function GetAllPictureFrames       : TObjectlist; overload; deprecated;
-    function GetAllPopularimeterFrames : TObjectlist; overload; deprecated;
-    function GetAllURLFrames           : TObjectlist; overload; deprecated;
-    function GetAllPrivateFrames       : TObjectList; overload; deprecated;
 
-    procedure GetAllFrames(aList: TObjectlist); overload;
-    procedure GetAllTextFrames          (aList: TObjectlist); overload;
-    procedure GetAllUserTextFrames      (aList: TObjectlist); overload;
-    procedure GetAllCommentFrames       (aList: TObjectlist); overload;
-    procedure GetAllLyricFrames         (aList: TObjectlist); overload;
-    procedure GetAllUserDefinedURLFrames(aList: TObjectlist); overload;
-    procedure GetAllPictureFrames       (aList: TObjectlist); overload;
-    procedure GetAllPopularimeterFrames (aList: TObjectlist); overload;
-    procedure GetAllURLFrames           (aList: TObjectlist); overload;
-    procedure GetAllPrivateFrames       (aList: TObjectlist); overload;
-
+    procedure GetAllFrames(aList: TTagItemList);
+    procedure GetAllTextFrames          (aList: TTagItemList);
+    procedure GetAllUserTextFrames      (aList: TTagItemList);
+    procedure GetAllCommentFrames       (aList: TTagItemList);
+    procedure GetAllLyricFrames         (aList: TTagItemList);
+    procedure GetAllUserDefinedURLFrames(aList: TTagItemList);
+    procedure GetAllPictureFrames       (aList: TTagItemList);
+    procedure GetAllPopularimeterFrames (aList: TTagItemList);
+    procedure GetAllURLFrames           (aList: TTagItemList);
+    procedure GetAllPrivateFrames       (aList: TTagItemList);
 
     // Check, wether a new frame is valid, i.e. unique
     function ValidNewCommentFrame(Language: AnsiString; Description: UnicodeString): Boolean;
@@ -354,14 +346,9 @@ type
     function ValidNewPopularimeterFrame(EMail: AnsiString): Boolean;
 
     // Get allowed Frame-IDs (not every frame is allowed in every subversion)
-    function GetAllowedTextFrames: TList; overload; deprecated;
-    function GetAllowedURLFrames: TList;  overload; deprecated;  // WOAR, ... Not the user definied WXXX-Frame
-    procedure GetAllowedTextFrames(aList: TList); overload;
-    procedure GetAllowedURLFrames(aList: TList);  overload;
-
-
+    procedure GetAllowedTextFrames(aList: TList);
+    procedure GetAllowedURLFrames(aList: TList);
     function AddFrame(aID: TFrameIDs): TID3v2Frame;
-    procedure DeleteFrame(aFrame: TID3v2Frame);
   end;
 //--------------------------------------------------------------------
 
@@ -548,6 +535,11 @@ begin
   inherited destroy;
 end;
 
+function TID3v2Tag.GetVersionString: String;
+begin
+  result := '2.' + IntToStr(Version.Major) + '.' + IntToStr(Version.Minor);
+end;
+
 function TID3v2Tag.GetFrameIDString(ID:TFrameIDs):AnsiString;
 begin
   case fVersion.Major of
@@ -584,7 +576,7 @@ begin
     result := -1;
     for i := 0 to Frames.Count - 1 do
     begin
-        if (TID3v2Frame(Frames[i]).FrameType = FT_UserTextFrame) then
+        if (TID3v2Frame(Frames[i]).TagContentType = tctUserText) then
         begin
             TID3v2Frame(Frames[i]).GetUserText(iDescription);
             If AnsiSameText(aDescription, iDescription) then
@@ -603,7 +595,6 @@ var i:integer;
   IDstr: AnsiString;
   iLanguage: AnsiString;
   iDescription: UnicodeString;
-  check: Boolean;
 begin
   result := -1;
   idstr := GetFrameIDString(ID);
@@ -612,10 +603,8 @@ begin
       if (Frames[i] as TID3v2Frame).FrameIDString = IDstr then
       begin
           (Frames[i] as TID3v2Frame).GetCommentsLyrics(iLanguage, iDescription);
-          check := False;
-          if ((Language = '*') OR (Language = '')) or (Language = iLanguage) then
-              Check := True;
-          If Check and ((Description = '*') or (Description = iDescription)) then
+          if (((Language = '*') OR (Language = '')) or (Language = iLanguage))
+            and ((Description = '*') or (Description = iDescription)) then
           begin
               result := i;
               break;
@@ -629,7 +618,7 @@ var mime, idstr: AnsiString;
   i: integer;
   PictureData : TMemoryStream;
   desc: UnicodeString;
-  picTyp: Byte;
+  picTyp: TPictureType;
 begin
   result := -1;
   idstr := GetFrameIDString(IDv2_PICTURE);
@@ -638,7 +627,7 @@ begin
     begin
         // matching IDstring found
         PictureData := TMemoryStream.Create;
-        (Frames[i] as TID3v2Frame).GetPicture(Mime, PicTyp, Desc, PictureData);
+        (Frames[i] as TID3v2Frame).GetPicture(PictureData, Mime, PicTyp, Desc);
         PictureData.Free;
 
         if (aDescription = Desc) or (aDescription = '*') then
@@ -795,7 +784,7 @@ begin
           result := MP3ERR_Invalid_Header;
     end;
   except
-    on EReadError do result := MP3ERR_StreamRead;
+    on EReadError do result := FileErr_StreamRead;
     on E: Exception do
     begin
       result := Mp3ERR_Unclassified;
@@ -853,7 +842,7 @@ begin
     end;
 
   except
-    on EReadError do result := MP3ERR_StreamRead;
+    on EReadError do result := FileErr_StreamRead;
     on E: Exception do
     begin
       result := Mp3ERR_Unclassified;
@@ -1063,7 +1052,7 @@ begin
                       if TmpStream.CopyFrom(Stream, Stream.Size - Stream.Position) <> AudioDataSize then
                       begin
                           TmpStream.Free;
-                          result := Mp3ERR_Cache;
+                          result := FileErr_BackupFailed;
                           Exit;
                       end;
 
@@ -1082,7 +1071,7 @@ begin
                       TmpStream.Free;
                   end;
               except
-                  result := Mp3ERR_Cache;
+                  result := FileErr_BackupFailed;
                   // Failure -> Exit, to not damage the file
                   Exit;
               end;
@@ -1158,7 +1147,7 @@ begin
     end;
   except
     on EFCreateError do result := FileErr_FileCreate;
-    on EWriteError do result := MP3ERR_StreamWrite;
+    on EWriteError do result := FileErr_StreamWrite;
     on E: Exception do
     begin
       result := Mp3ERR_Unclassified;
@@ -1195,7 +1184,7 @@ begin
               tmpsize := Stream.Size - Stream.Position;
               if TmpStream.CopyFrom(Stream, Stream.Size - Stream.Position) <> tmpsize then
               begin
-                  result := Mp3ERR_Cache;
+                  result := FileErr_BackupFailed;
                   Exit;
               end;
               // ...cut the stream...
@@ -1206,11 +1195,11 @@ begin
               TmpStream.Seek(0, soBeginning);
               if Stream.CopyFrom(TmpStream, TmpStream.Size) <> TmpStream.Size then
               begin
-                  result := Mp3ERR_Cache;
+                  result := FileErr_BackupFailed;
                   Exit;
               end;
           except
-              on EWriteError do result := MP3ERR_StreamWrite;
+              on EWriteError do result := FileErr_StreamWrite;
               on E: Exception do
               begin
                   result := Mp3ERR_Unclassified;
@@ -1336,7 +1325,7 @@ var i:integer;
 begin
   i := GetFrameIndex(FrameID);
   if i > -1 then
-    result := (Frames[i] as TID3v2Frame).GetText
+    result := (Frames[i] as TID3v2Frame).GetText(tmStrict)
   else
     result := '';
 end;
@@ -1352,7 +1341,7 @@ var i:integer;
 begin
   // Check for valid frame-id
   idStr := GetFrameIDString(FrameID);
-  if not ValidTextFrame(iDStr) then exit;
+  if not ValidTextFrame(iDStr) then exit;       ///  dieser check reicht nicht.... TXXX wird als valide angesehen  .... ist er aber nicht XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
   i := GetFrameIndex(FrameID);
   if i > -1 then
@@ -1361,7 +1350,7 @@ begin
       if value = '' then
           Frames.Delete(i)
       else
-          (Frames[i] as TID3v2Frame).SetText(Value);
+          (Frames[i] as TID3v2Frame).SetText(Value, tmStrict);
   end
   else
       if value <> '' then
@@ -1373,7 +1362,7 @@ begin
           newFrame.CharCode := fCharCode;
           NewFrame.AutoCorrectCodepage := fAutoCorrectCodepage;
           Frames.Add(newFrame);
-          newFrame.SetText(Value);
+          newFrame.SetText(Value, tmStrict);
       end;
 end;
 
@@ -1549,13 +1538,13 @@ end;
 function TID3v2Tag.GetPicture(stream: TStream; Description: UnicodeString): AnsiString;
 var idx: Integer;
     mime: AnsiString;
-    DummyPicTyp: Byte;
+    DummyPicTyp: TPictureType;
     DummyDesc: UnicodeString;
 begin
     IDX := GetPictureFrameIndex( Description);
     if IDX <> -1 then
     begin
-      (Frames[IDX] as TID3v2Frame).GetPicture(Mime, DummyPicTyp, DummyDesc, stream);
+      (Frames[IDX] as TID3v2Frame).GetPicture(stream, Mime, DummyPicTyp, DummyDesc);
       result := mime;
     end else
       result := '';
@@ -1563,41 +1552,42 @@ end;
 // ------------------------------------------
 // set pictures
 // ------------------------------------------
-procedure TID3v2Tag.SetPicture(MimeTyp: AnsiString; PicType: Byte; Description: UnicodeString; stream: TStream);
+function TID3v2Tag.SetPicture(Source: TStream; MimeTyp: AnsiString; PicType: TPictureType; Description: UnicodeString): Boolean;
 var IDX: Integer;
     NewFrame: TID3v2Frame;
     idStr: AnsiString;
     oldMime: AnsiString;
     oldDescription: UnicodeString;
-    oldType: Byte;
+    oldType: TPictureType;
     oldStream: TMemoryStream;
 begin
+    result := True;
     idStr := GetFrameIDString(IDv2_PICTURE);
-    IDX := GetPictureFrameIndex({PicType,} Description);
+    IDX := GetPictureFrameIndex(Description);
     if IDX <> -1 then
     begin
-        if Stream = NIL then
+        if Source = NIL then
           Frames.Delete(IDX)
         else
         begin
-            if (Description = '*') or (MimeTyp = '*') or (Stream.size = 0) then
+            if (Description = '*') or (MimeTyp = '*') or (Source.size = 0) then
             begin
                 oldStream := TMemoryStream.Create;
-                (Frames[IDX] as TID3v2Frame).GetPicture(oldMime, oldType, oldDescription, oldStream);
+                (Frames[IDX] as TID3v2Frame).GetPicture(oldStream, oldMime, oldType, oldDescription);
                 if (Description = '*') then
                   Description := oldDescription;
                 if (MimeTyp = '*') then
                   MimeTyp := oldMime;
-                if Stream.Size = 0 then
-                  oldStream.SaveToStream(Stream);
+                if Source.Size = 0 then
+                  oldStream.SaveToStream(Source);
                 oldStream.Free;
             end;
-            (Frames[IDX] as TID3v2Frame).SetPicture(MimeTyp, PicType, Description, Stream)
+            (Frames[IDX] as TID3v2Frame).SetPicture(Source, MimeTyp, PicType, Description)
         end;
 
     end else
     begin
-        if (Stream <> NIL) and (Stream.Size > 0)then
+        if (Source <> NIL) and (Source.Size > 0)then
         begin
             NewFrame := TID3v2Frame.Create(idStr, TID3v2FrameVersions(FVersion.Major));
             NewFrame.AlwaysWriteUnicode := fAlwaysWriteUnicode;
@@ -1607,8 +1597,8 @@ begin
             if (Description = '*') then
                 Description := '';
             if (MimeTyp = '*') then
-                  MimeTyp := 'image/jpeg';
-            newFrame.SetPicture(MimeTyp, PicType, Description, stream)
+                  MimeTyp := AWB_MimeJpeg;
+            newFrame.SetPicture(Source, MimeTyp, PicType, Description)
         end;
     end;
 end;
@@ -1737,7 +1727,6 @@ begin
 end;
 procedure TID3v2Tag.SetArbitraryRating(Value: Byte);
 begin
-    // SetRating('*', Value);
     SetRatingAndCounter('*', Value, -1);
 end;
 function TID3v2Tag.GetArbitraryPersonalPlayCounter: Cardinal;
@@ -1746,7 +1735,6 @@ begin
 end;
 procedure TID3v2Tag.SetArbitraryPersonalPlayCounter(Value: Cardinal);
 begin
-    //SetPersonalPlayCounter('*', Value);
     SetRatingAndCounter('*', -1, Value);
 end;
 
@@ -2122,89 +2110,52 @@ begin
   result := GetText(IDv2_BPM);
 end;
 
+procedure TID3v2Tag.GetTagList(Dest: TTagItemList; ContentTypes: TTagContentTypes = cDefaultTagContentTypes);
+var
+  i: Integer;
+begin
+  for i := 0 to Frames.Count - 1 do
+    if TID3v2Frame(Frames[i]).MatchContentType(ContentTypes) then
+      Dest.Add(TID3v2Frame(Frames[i]));
+end;
+
+procedure TID3v2Tag.DeleteTagItem(aTagItem: TTagItem);
+begin
+  Frames.Remove(aTagItem);
+end;
+
 
 // ------------------------------------------
 // some methods for "level 3"
 // for experienced users only
 // ------------------------------------------
-function TID3v2Tag.GetAllFrames: TObjectlist;
-begin
-    result := TObjectList.Create(False);
-    GetAllFrames(result);
-end;
-function TID3v2Tag.GetAllTextFrames: TObjectlist;
-begin
-    result := TObjectList.Create(False);
-    GetAllTextFrames(result);
-end;
-function TID3v2Tag.GetAllUserTextFrames: TObjectlist;
-begin
-    result := TObjectList.Create(False);
-    GetAllUserTextFrames(result);
-end;
-function TID3v2Tag.GetAllCommentFrames: TObjectlist;
-begin
-    result := TObjectList.Create(False);
-    GetAllCommentFrames(result);
-end;
-function TID3v2Tag.GetAllLyricFrames: TObjectlist;
-begin
-    result := TObjectList.Create(False);
-    GetAllLyricFrames(result);
-end;
-function TID3v2Tag.GetAllUserDefinedURLFrames: TObjectlist;
-begin
-    result := TObjectList.Create(False);
-    GetAllUserDefinedURLFrames(result);
-end;
-function TID3v2Tag.GetAllPictureFrames: TObjectlist;
-begin
-    result := TObjectList.Create(False);
-    GetAllPictureFrames(result);
-end;
-function TID3v2Tag.GetAllPopularimeterFrames: TObjectlist;
-begin
-    result := TObjectList.Create(False);
-    GetAllPopularimeterFrames(result);
-end;
-function TID3v2Tag.GetAllURLFrames: TObjectlist;
-begin
-    result := TObjectList.Create(False);
-    GetAllURLFrames(result);
-end;
-
-function TID3v2Tag.GetAllPrivateFrames: TObjectList;
-begin
-    result := TObjectList.Create(False);
-    GetAllPrivateFrames(result);
-end;
 
 // New versions of the GetAll* functions:
 // Target list as a Parameter
-procedure TID3v2Tag.GetAllFrames(aList: TObjectlist);
+procedure TID3v2Tag.GetAllFrames(aList: TTagItemList);
 var i: Integer;
 begin
     aList.Clear;
     for i := 0 to Frames.Count-1 do
-        aList.Add(Frames[i]);
+        aList.Add(TTagItem(Frames[i]));
 end;
-procedure TID3v2Tag.GetAllTextFrames(aList: TObjectlist);
+procedure TID3v2Tag.GetAllTextFrames(aList: TTagItemList);
 var i: Integer;
 begin
     aList.Clear;
     for i := 0 to Frames.Count-1 do
-        if TID3v2Frame(Frames[i]).FrameType = FT_TextFrame then
-            aList.Add(Frames[i]);
+        if TID3v2Frame(Frames[i]).TagContentType = tctText then
+            aList.Add(TTagItem(Frames[i]));
 end;
-procedure TID3v2Tag.GetAllUserTextFrames(aList: TObjectlist);
+procedure TID3v2Tag.GetAllUserTextFrames(aList: TTagItemList);
 var i: Integer;
 begin
     aList.Clear;
     for i := 0 to Frames.Count - 1 do
-        if TID3v2Frame(Frames[i]).FrameType = FT_UserTextFrame then
-            aList.Add(Frames[i]);
+        if TID3v2Frame(Frames[i]).TagContentType = tctUserText then
+            aList.Add(TTagItem(Frames[i]));
 end;
-procedure TID3v2Tag.GetAllCommentFrames(aList: TObjectlist);
+procedure TID3v2Tag.GetAllCommentFrames(aList: TTagItemList);
 var i: Integer;
     idStr: AnsiString;
 begin
@@ -2212,9 +2163,9 @@ begin
     idStr := GetFrameIDString(IDv2_Comment);
     for i := 0 to Frames.Count-1 do
         if (Frames[i] as TID3v2Frame).FrameIDString = idStr then
-            aList.Add(Frames[i]);
+            aList.Add(TTagItem(Frames[i]));
 end;
-procedure TID3v2Tag.GetAllLyricFrames(aList: TObjectlist);
+procedure TID3v2Tag.GetAllLyricFrames(aList: TTagItemList);
 var i: Integer;
     idStr: AnsiString;
 begin
@@ -2222,9 +2173,9 @@ begin
     idStr := GetFrameIDString(IDv2_Lyrics);
     for i := 0 to Frames.Count-1 do
         if (Frames[i] as TID3v2Frame).FrameIDString = idStr then
-            aList.Add(Frames[i]);
+            aList.Add(TTagItem(Frames[i]));
 end;
-procedure TID3v2Tag.GetAllUserDefinedURLFrames(aList: TObjectlist);
+procedure TID3v2Tag.GetAllUserDefinedURLFrames(aList: TTagItemList);
 var i: Integer;
     idStr: AnsiString;
 begin
@@ -2232,9 +2183,9 @@ begin
     idStr := GetFrameIDString(IDv2_USERDEFINEDURL);
     for i := 0 to Frames.Count-1 do
         if (Frames[i] as TID3v2Frame).FrameIDString = idStr then
-            aList.Add(Frames[i]);
+            aList.Add(TTagItem(Frames[i]));
 end;
-procedure TID3v2Tag.GetAllPictureFrames(aList: TObjectlist);
+procedure TID3v2Tag.GetAllPictureFrames(aList: TTagItemList);
 var i: Integer;
     idStr: AnsiString;
 begin
@@ -2242,9 +2193,9 @@ begin
     idStr := GetFrameIDString(IDv2_Picture);
     for i := 0 to Frames.Count-1 do
         if (Frames[i] as TID3v2Frame).FrameIDString = idStr then
-            aList.Add(Frames[i]);
+            aList.Add(TTagItem(Frames[i]));
 end;
-procedure TID3v2Tag.GetAllPopularimeterFrames(aList: TObjectlist);
+procedure TID3v2Tag.GetAllPopularimeterFrames(aList: TTagItemList);
 var i: Integer;
     idStr: AnsiString;
 begin
@@ -2252,17 +2203,17 @@ begin
     idStr := GetFrameIDString(IDv2_Rating);
     for i := 0 to Frames.Count-1 do
         if (Frames[i] as TID3v2Frame).FrameIDString = idStr then
-            aList.Add(Frames[i]);
+            aList.Add(TTagItem(Frames[i]));
 end;
-procedure TID3v2Tag.GetAllURLFrames(aList: TObjectlist);
+procedure TID3v2Tag.GetAllURLFrames(aList: TTagItemList);
 var i: Integer;
 begin
     aList.Clear;
     for i := 0 to Frames.Count-1 do
-        if (Frames[i] as TID3v2Frame).FrameType = FT_URLFrame then
-            aList.Add(Frames[i]);
+        if (Frames[i] as TID3v2Frame).TagContentType = tctURL then
+            aList.Add(TTagItem(Frames[i]));
 end;
-procedure TID3v2Tag.GetAllPrivateFrames(aList: TObjectlist);
+procedure TID3v2Tag.GetAllPrivateFrames(aList: TTagItemList);
 var i: Integer;
     idStr: AnsiString;
 begin
@@ -2270,10 +2221,8 @@ begin
     idStr := GetFrameIDString(IDv2_PRIVATE);
     for i := 0 to Frames.Count-1 do
         if (Frames[i] as TID3v2Frame).FrameIDString = idStr then
-            aList.Add(Frames[i]);
+            aList.Add(TTagItem(Frames[i]));
 end;
-
-
 
 
 function TID3v2Tag.ValidNewCommentFrame(Language: AnsiString; Description: UnicodeString): Boolean;
@@ -2297,45 +2246,114 @@ begin
     result := GetPopularimaterFrameIndex(EMail) = -1;
 end;
 
+function TID3v2Tag.GetUnusedTextTags: TTagItemInfoDynArray;
+var
+  resultArray: TTagItemInfoDynArray;
+  iID: TFrameIDs;
+  iRes: Integer;
 
-function TID3v2Tag.GetAllowedTextFrames: TList;
+  procedure AddUnusedValidTag(aID: TFrameIDs; ct: teTagContentType);
+  begin
+    if (GetFrameIDString(aID)[1] <> '-') AND (GetFrameIndex(aID) = -1) then begin
+      resultArray[iRes].Key := UnicodeString(GetFrameIDString(aID));
+      resultArray[iRes].Description := ID3v2KnownFrames[aID].Description;
+      resultArray[iRes].TagType := ttID3v2;
+      resultArray[iRes].TagContentType := ct;
+      inc(iRes);
+    end;
+  end;
+
 begin
-    result := TList.Create;
-    GetAllowedTextFrames(result);
+  SetLength(resultArray, Length(ID3v2KnownFrames));  // max. possible length
+  iRes := 0;
+
+  // regular text frames
+  for iID := IDv2_ARTIST to IDv2_SETSUBTITLE do
+    AddUnusedValidTag(iID, tctText);
+  // regular URLs
+  for iID := IDv2_AUDIOFILEURL to IDv2_PAYMENTURL do
+    AddUnusedValidTag(iID, tctURL);
+  // Comment
+  AddUnusedValidTag(IDv2_COMMENT, tctComment);
+
+  SetLength(resultArray, iRes); // correct length
+  result := resultArray;
 end;
 
-function TID3v2Tag.GetAllowedURLFrames: TList;
+function TID3v2Tag.AddTextTagItem(aKey, aValue: UnicodeString): TID3v2Frame;
+var
+  iID, aFrameID: TFrameIDs;
+  id3v2Key: AnsiString;
+  idx: Integer;
+
+const
+  reasonableTextFrames: Array[0..9] of TFrameIDs = (
+    IDv2_AUDIOFILEURL, IDv2_ARTISTURL, IDv2_AUDIOSOURCEURL, IDv2_COMMERCIALURL, IDv2_COPYRIGHTURL,
+    IDv2_PUBLISHERSURL, IDv2_RADIOSTATIONURL, IDv2_PAYMENTURL,
+    IDv2_LYRICS, IDv2_COMMENT);
 begin
-    result := TList.Create;
-    GetAllowedURLFrames(result);
+  result := Nil;
+
+  // search for a FrameID that matches the given Key
+  id3v2Key := AnsiString(AnsiUpperCase(aKey));
+  aFrameID := IDv2_UNKNOWN;
+
+  for iID := IDv2_ARTIST to IDv2_SETSUBTITLE do begin
+    if GetFrameIDString(iID) = id3v2Key then begin
+      aFrameID := iID;
+      break;
+    end;
+  end;
+
+  if aFrameID = IDv2_UNKNOWN then begin
+    for idx := Low(reasonableTextFrames) to High(reasonableTextFrames) do begin
+      if GetFrameIDString(reasonableTextFrames[idx]) = id3v2Key then begin
+        aFrameID := reasonableTextFrames[idx];
+        break;
+      end;
+    end;
+  end;
+
+  if aFrameID <> IDv2_UNKNOWN then begin
+    // we have a valid key => set the Value
+    idx := GetFrameIndex(aFrameID);
+    if idx >= 0 then begin
+      if aValue = '' then begin
+        Frames.Delete(idx);
+        result := Nil;
+      end
+      else begin
+        TID3v2Frame(Frames[idx]).SetText(aValue, tmReasonable);
+        result := TID3v2Frame(Frames[idx]);
+      end;
+    end else begin
+      result := TID3v2Frame.Create( id3v2Key, TID3v2FrameVersions(Version.Major));
+      Frames.Add(result);
+      result.SetText(aValue, tmReasonable);
+    end;
+  end;
 end;
 
 procedure TID3v2Tag.GetAllowedTextFrames(aList: TList);
 var i: TFrameIDs;
 begin
-    for i := IDv2_ARTIST to IDv2_SETSUBTITLE do
-      if (GetFrameIDString(i)[1] <> '-') AND (GetFrameIndex(i) = -1) then
-        aList.Add(Pointer(i));
+  for i := IDv2_ARTIST to IDv2_SETSUBTITLE do
+    if (GetFrameIDString(i)[1] <> '-') AND (GetFrameIndex(i) = -1) then
+      aList.Add(Pointer(i));
 end;
 
 procedure TID3v2Tag.GetAllowedURLFrames(aList: TList);
 var i: TFrameIDs;
 begin
-    for i := IDv2_AUDIOFILEURL to IDv2_PAYMENTURL do
-      if (GetFrameIDString(i)[1] <> '-') AND (GetFrameIndex(i) = -1) then
-        aList.Add(Pointer(i));
+  for i := IDv2_AUDIOFILEURL to IDv2_PAYMENTURL do
+    if (GetFrameIDString(i)[1] <> '-') AND (GetFrameIndex(i) = -1) then
+      aList.Add(Pointer(i));
 end;
-
 
 function TID3v2Tag.AddFrame(aID: TFrameIDs): TID3v2Frame;
 begin
     result := TID3v2Frame.Create( GetFrameIDString(aID), TID3v2FrameVersions(Version.Major));
     Frames.Add(result);
-end;
-
-procedure TID3v2Tag.DeleteFrame(aFrame: TID3v2Frame);
-begin
-    Frames.Remove(aFrame);
 end;
 
 procedure TID3v2Tag.SetCharCode(Value: TCodePage);

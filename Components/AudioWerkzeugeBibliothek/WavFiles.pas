@@ -58,7 +58,7 @@ unit WavFiles;
 
 interface
 
-uses Classes, SysUtils, AudioFiles.Base, AudioFiles.Declarations;
+uses Classes, SysUtils, AudioFiles.Base, AudioFiles.Declarations, AudioFiles.BaseTags;
 
 
 type
@@ -67,12 +67,6 @@ type
         private
             procedure fResetData;
         protected
-            function fGetFileSize   : Int64;    override;
-            function fGetDuration   : Integer;  override;
-            function fGetBitrate    : Integer;  override;
-            function fGetSamplerate : Integer;  override;
-            function fGetChannels   : Integer;  override;
-            function fGetValid      : Boolean;  override;
 
             procedure fSetTitle           (aValue: UnicodeString); override;
             procedure fSetArtist          (aValue: UnicodeString); override;
@@ -81,6 +75,7 @@ type
             procedure fSetTrack           (aValue: UnicodeString); override;
             procedure fSetGenre           (aValue: UnicodeString); override;
             procedure fSetAlbumArtist (value: UnicodeString); override;
+            procedure fSetLyrics          (aValue: UnicodeString); override;
 
             function fGetTitle            : UnicodeString; override;
             function fGetArtist           : UnicodeString; override;
@@ -91,6 +86,7 @@ type
             function fGetFileType            : TAudioFileType; override;
             function fGetFileTypeDescription : String;         override;
             function fGetAlbumArtist : UnicodeString; override;
+            function fGetLyrics           : UnicodeString;  override;
 
         public
             { Public declarations }
@@ -98,6 +94,12 @@ type
             function ReadFromFile(aFilename: UnicodeString): TAudioError;   override;
             function WriteToFile(aFilename: UnicodeString): TAudioError;    override;
             function RemoveFromFile(aFilename: UnicodeString): TAudioError; override;
+            // dummy methods
+            procedure GetTagList(Dest: TTagItemList; ContentTypes: TTagContentTypes = cDefaultTagContentTypes); override;
+            procedure DeleteTagItem(aTagItem: TTagItem); override;
+            function GetUnusedTextTags: TTagItemInfoDynArray; override;
+            function AddTextTagItem(aKey, aValue: UnicodeString): TTagItem; override;
+            function SetPicture(Source: TStream; Mime: AnsiString; PicType: TPictureType; Description: UnicodeString): Boolean; override;
         end;
 
 implementation
@@ -116,7 +118,7 @@ end;
 
 function Twavfile.fGetFileTypeDescription: String;
 begin
-    result := TAudioFileNames[at_Wav];
+    result := cAudioFileType[at_Wav];
 end;
 
 procedure TWavfile.FResetData;
@@ -149,6 +151,12 @@ begin
 end;
 
 procedure TWavfile.fSetGenre(aValue: UnicodeString);
+begin
+  inherited;
+  // nothing. This Unit is read-Only
+end;
+
+procedure Twavfile.fSetLyrics(aValue: UnicodeString);
 begin
   inherited;
   // nothing. This Unit is read-Only
@@ -189,34 +197,14 @@ begin
     result := '';
 end;
 
-function TWavfile.fGetBitrate: Integer;
-begin
-    result := fBitrate;
-end;
-
-function TWavfile.fGetChannels: Integer;
-begin
-    result := fChannels;
-end;
-
-function TWavfile.fGetDuration: Integer;
-begin
-    result := fDuration;
-end;
-
-function TWavfile.fGetFileSize: Int64;
-begin
-    result := fFileSize;
-end;
-
 function TWavfile.fGetGenre: UnicodeString;
 begin
     result := '';
 end;
 
-function TWavfile.fGetSamplerate: Integer;
+function Twavfile.fGetLyrics: UnicodeString;
 begin
-    result := fSamplerate;
+    result := '';
 end;
 
 function TWavfile.fGetTitle: UnicodeString;
@@ -229,17 +217,41 @@ begin
     result := '';
 end;
 
-function TWavfile.fGetValid: Boolean;
-begin
-    result := fValid;
-end;
-
 function TWavfile.fGetYear: UnicodeString;
 begin
     result := '';
 end;
 
 { ********************** Public functions & procedures ********************** }
+
+procedure TWavfile.GetTagList(Dest: TTagItemList; ContentTypes: TTagContentTypes = cDefaultTagContentTypes);
+begin
+  // not supported
+end;
+
+procedure TWavfile.DeleteTagItem(aTagItem: TTagItem);
+begin
+  // not supported
+end;
+
+function TWavfile.GetUnusedTextTags: TTagItemInfoDynArray;
+begin
+  // not supported
+  SetLength(Result, 0);
+end;
+
+function TWavfile.AddTextTagItem(aKey, aValue: UnicodeString): TTagItem;
+begin
+  // not supported
+  result := Nil;
+end;
+
+function TWavfile.SetPicture(Source: TStream; Mime: AnsiString; PicType: TPictureType; Description: UnicodeString): Boolean;
+begin
+  // not supported
+  result := False;
+end;
+
 
 
 { --------------------------------------------------------------------------- }
@@ -347,13 +359,13 @@ end;
 function TWavfile.RemoveFromFile(aFilename: UnicodeString): TAudioError;
 begin
     inherited RemoveFromFile(aFilename);
-    result := WavErr_WritingNotSupported;
+    result := TagErr_WritingNotSupported;
 end;
 
 function TWavfile.WriteToFile(aFilename: UnicodeString): TAudioError;
 begin
     inherited WriteToFile(aFilename);
-    result := WavErr_WritingNotSupported;
+    result := TagErr_WritingNotSupported;
 end;
 
 

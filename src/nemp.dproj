@@ -108,19 +108,17 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MajorVer>5</VerInfo_MajorVer>
-        <VerInfo_Build>795</VerInfo_Build>
+        <VerInfo_Build>802</VerInfo_Build>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=5.1.1.795;InternalName=;LegalCopyright=Daniel Gaußmann;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=5.1.1;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=5.2.0.802;InternalName=;LegalCopyright=Daniel Gaußmann;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=5.2.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <DCC_MapFile>3</DCC_MapFile>
         <DCC_DebugInformation>2</DCC_DebugInformation>
         <DCC_LocalDebugSymbols>true</DCC_LocalDebugSymbols>
         <Icon_MainIcon>nemp_Icon2.ico</Icon_MainIcon>
-        <DCC_ExeOutput>F:\Nemp Github\Nemp\bin\</DCC_ExeOutput>
-        <DCC_DcuOutput>F:\Nemp Github\Nemp\dcu\</DCC_DcuOutput>
-        <DCC_Define>madExcept;$(DCC_Define)</DCC_Define>
-        <VerInfo_MinorVer>1</VerInfo_MinorVer>
-        <VerInfo_Release>1</VerInfo_Release>
+        <DCC_ExeOutput>.\..\bin\</DCC_ExeOutput>
+        <DCC_DcuOutput>.\..\dcu\</DCC_DcuOutput>
+        <VerInfo_MinorVer>2</VerInfo_MinorVer>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -132,7 +130,6 @@
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
@@ -145,8 +142,8 @@
         <DCC_Define>madExcept;$(DCC_Define)</DCC_Define>
         <Icon_MainIcon>nemp_Icon2.ico</Icon_MainIcon>
         <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
-        <DCC_ExeOutput>F:\Nemp Github\Nemp\bin\</DCC_ExeOutput>
-        <DCC_DcuOutput>F:\Nemp Github\Nemp\dcu\</DCC_DcuOutput>
+        <DCC_ExeOutput>.\..\bin\</DCC_ExeOutput>
+        <DCC_DcuOutput>.\..\dcu\</DCC_DcuOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -184,7 +181,6 @@
         <DCCReference Include="3rd Party Units\MyDialogs.pas"/>
         <DCCReference Include="3rd Party Units\unitFlyingCow.pas"/>
         <DCCReference Include="3rd Party Units\dglOpenGL.pas"/>
-        <DCCReference Include="3rd Party Units\fldbrows.pas"/>
         <DCCReference Include="3rd Party Units\SearchTool.pas"/>
         <DCCReference Include="3rd Party Units\filetypes.pas"/>
         <DCCReference Include="3rd Party Units\WindowsVersionInfo.pas"/>
@@ -370,6 +366,10 @@
             <Form>FormUpdateCleaning</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="c:\program files (x86)\embarcadero\studio\22.0\ObjRepos\DE\DelphiWin32\OKCANCL1.PAS">
+            <Form>OKBottomDlg</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <RcItem Include="ressources\csv.nxp">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
@@ -422,10 +422,40 @@
             <Deployment Version="4">
                 <DeployFile LocalName="..\bin\nemp.exe" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployFile LocalName="..\bin\nemp.exe" Configuration="Release" Class="ProjectOutput"/>
+                <DeployFile LocalName="..\bin\nemp.exe" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>nemp.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="ressources\csv.nxp" Configuration="Release" Class="ProjectFile"/>
+                <DeployFile LocalName="ressources\csv.nxp" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="ressources\empty.nxp" Configuration="Release" Class="ProjectFile"/>
+                <DeployFile LocalName="ressources\empty.nxp" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="ressources\html.nxp" Configuration="Release" Class="ProjectFile"/>
+                <DeployFile LocalName="ressources\html.nxp" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="ressources\json.nxp" Configuration="Release" Class="ProjectFile"/>
+                <DeployFile LocalName="ressources\json.nxp" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="iOSSimulator">
                         <Operation>1</Operation>

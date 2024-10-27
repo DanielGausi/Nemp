@@ -147,7 +147,7 @@ end;
 
 function TOptimFrogFile.fGetFileTypeDescription: String;
 begin
-    result := TAudioFileNames[at_OptimFrog];
+    result := cAudioFileType[at_OptimFrog];
 end;
 
 function TOptimFrogFile.FGetBits: ShortInt;

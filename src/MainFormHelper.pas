@@ -115,7 +115,7 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     procedure HandleError(aAction: TAudioFileAction; aFile: String; aErr: TNempAudioError; Important: Boolean = false); overload;
     procedure HandleError(aAction: TAudioFileAction; aFile: TAudioFile; aErr: TNempAudioError; Important: Boolean = false); overload;
 
-    procedure CollectionDblClick(ac: TAudioCollection; Node: PVirtualNode);
+    procedure CollectionDblClick(ac: TAudioCollection; Node: PVirtualNode; aVST: TVirtualStringTree);
 
     function GetSpecialPermissionToChangeMetaData:Boolean;
 
@@ -316,50 +316,49 @@ begin
         else
             VST.Header.SortColumn := MedienBib.Sortparams[0].Tag;
 
-
         VST.EmptyListMessage := MedienBib.BibSearcher.EmptyListMessage;
 
-            for i := 0 to MP3Liste.Count-1 do
-                VST.AddChild(Nil, MP3Liste.Items[i]);
+        for i := 0 to MP3Liste.Count-1 do
+            VST.AddChild(Nil, MP3Liste.Items[i]);
 
-            // Knoten mit AudioFile suchen und focussieren
-            NewNode := VST.GetFirst;
-            if assigned(Newnode) then
-            begin
-                tmpAudioFile := VST.GetNodeData<TAudioFile>(NewNode);
-                if assigned(AudioFile) then begin
-                    if Not SameFile(tmpAudioFile, AudioFile) then
-                    repeat
-                        NewNode := VST.GetNext(NewNode);
-                        if assigned(NewNode) then
-                        begin
-                            // Data := VST.GetNodeData(NewNode);
-                            tmpAudioFile := VST.GetNodeData<TAudioFile>(NewNode);
-                        end;
-                    until SameFile(tmpAudioFile, AudioFile) OR (NewNode=NIL);
-                end;
-
-                // Ok, we didn't found our AudioFile.
-                // get the first one in the list.
-                if not assigned(NewNode) then
-                begin
-                    NewNode := VST.GetFirst;
-                    // and get the corresponding AudioFile again
+        // Knoten mit AudioFile suchen und focussieren
+        NewNode := VST.GetFirst;
+        if assigned(Newnode) then
+        begin
+            tmpAudioFile := VST.GetNodeData<TAudioFile>(NewNode);
+            if assigned(AudioFile) then begin
+                if Not SameFile(tmpAudioFile, AudioFile) then
+                repeat
+                    NewNode := VST.GetNext(NewNode);
                     if assigned(NewNode) then
+                    begin
+                        // Data := VST.GetNodeData(NewNode);
                         tmpAudioFile := VST.GetNodeData<TAudioFile>(NewNode);
-                end;
-
-                if assigned(Newnode) then // Nur zur Sicherheit!
-                begin
-                    VST.Selected[NewNode] := True;
-                    VST.FocusedNode := NewNode;
-                    ShowVSTDetails(tmpAudioFile, SD_MEDIENBIB);
-                end
-            end else
-            begin
-                // no file in view
-                ShowVSTDetails(Nil);
+                    end;
+                until SameFile(tmpAudioFile, AudioFile) OR (NewNode=NIL);
             end;
+
+            // Ok, we didn't found our AudioFile.
+            // get the first one in the list.
+            if not assigned(NewNode) then
+            begin
+                NewNode := VST.GetFirst;
+                // and get the corresponding AudioFile again
+                if assigned(NewNode) then
+                    tmpAudioFile := VST.GetNodeData<TAudioFile>(NewNode);
+            end;
+
+            if assigned(Newnode) then // Nur zur Sicherheit!
+            begin
+                VST.Selected[NewNode] := True;
+                VST.FocusedNode := NewNode;
+                ShowVSTDetails(tmpAudioFile, SD_MEDIENBIB);
+            end
+        end else
+        begin
+            // no file in view
+            ShowVSTDetails(Nil);
+        end;
 
         VST.EndUpdate;
     end;
@@ -1856,18 +1855,20 @@ begin
           AUDIO_FILEERR_SRead,
           AUDIO_FILEERR_SWrite,
           AUDIO_ID3ERR_Cache,
+          AUDIO_ID3ERR_DeleteBackupFailed,
           AUDIO_ID3ERR_NoTag,
           AUDIO_ID3ERR_Invalid_Header,
           AUDIO_ID3ERR_Compression,
           AUDIO_ID3ERR_Unclassified,
           AUDIO_MPEGERR_NoFrame,
-          AUDIO_OVErr_InvalidFirstPageHeader,
-          AUDIO_OVErr_InvalidFirstPage,
-          AUDIO_OVErr_InvalidSecondPageHeader,
-          AUDIO_OVErr_InvalidSecondPage,
-          AUDIO_OVErr_CommentTooLarge,
-          AUDIO_OVErr_BackupFailed,
-          AUDIO_OVErr_DeleteBackupFailed,
+
+          AUDIO_OVErr_InvalidPageHeader,
+          AUDIO_OVErr_InvalidPage,
+          AUDIO_OVErr_InvalidPacket,
+          AUDIO_OVErr_InvalidHeader,
+          AUDIO_OVErr_InvalidComment,
+
+
           AUDIO_FlacErr_InvalidFlacFile,
           AUDIO_FlacErr_MetaDataTooLarge,
           AUDIOERR_DriveNotReady,
@@ -1997,10 +1998,13 @@ begin
   end;
 end;
 
-procedure CollectionDblClick(ac: TAudioCollection; Node: PVirtualNode);
+procedure CollectionDblClick(ac: TAudioCollection; Node: PVirtualNode; aVST: TVirtualStringTree);
 begin
   case ac.CollectionClass of
     ccFiles: begin
+        if not (vsExpanded in Node.States) then
+          aVST.Expanded[Node] := True;
+
         if (TAudioFileCollection(ac).Content = ccRoot) and (TAudioFileCollection(ac).ChildContent = ccTagCloud) then
         begin
           TRootCollection(ac).ResetTagCloud;
@@ -2016,7 +2020,10 @@ begin
             Nemp_MainForm.AlbenVST.EndUpdate;
           end
           else
-            MedienBib.GenerateReverseAnzeigeListe(ac);
+            MedienBib.GenerateAnzeigeListe(ac, True);
+            //MedienBib.GenerateReverseAnzeigeListe(ac);
+            // todo: MedienBib.GenerateAnzeigeListe(ac); - aber mit REKURSIV
+
         end;
 
     end;

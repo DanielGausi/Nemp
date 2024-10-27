@@ -46,7 +46,7 @@ uses
     spectrum_vis,
   Hilfsfunktionen, Systemhelper, CoverHelper, TreeHelper, NempDragFiles,
   ComObj, ShlObj, clipbrd, Spin,  U_CharCode,
-      fldbrows, MainFormHelper, MessageHelper, BibSearchClass, MainFormLayout,
+  MainFormHelper, MessageHelper, BibSearchClass, MainFormLayout,
   Nemp_ConstantsAndTypes, NempApi, SplitForm_Hilfsfunktionen, SearchTool, mmsystem,
    Nemp_SkinSystem, NempPanel, SkinButtons, math, PlayerLog,
 
@@ -3418,6 +3418,7 @@ begin
       colIdx_TRACKGAIN: MedienBib.AddSorter(colIdx_TRACKGAIN, False);
       colIdx_ALBUMGAIN: MedienBib.AddSorter(colIdx_ALBUMGAIN, False);
       colIdx_BPM: MedienBib.AddSorter(colIdx_BPM, False);
+      colIdx_HARMONICKEY: MedienBib.AddSorter(colIdx_HARMONICKEY, False);
   end;
 
   MedienBib.SortAnzeigeListe;
@@ -3637,33 +3638,33 @@ begin
 end;
 
 procedure TNemp_MainForm.SearchDirectoryForNewFiles(TargetCategory: TLibraryCategory);
-var newdir: UnicodeString;
-    FB: TFolderBrowser;
+var
+  newdir: UnicodeString;
+  OpenDlg: TFileOpenDialog;
 begin
   MedienBib.InitTargetCategory(TargetCategory);
-
   if MedienBib.InitialDialogFolder = ''  then
       MedienBib.InitialDialogFolder := GetShellFolder(CSIDL_MYMUSIC);
 
   ST_Medienliste.Mask := GenerateMedienBibSTFilter;
-  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_BibCaption, MedienBib.InitialDialogFolder );
+  OpenDlg :=  TFileOpenDialog.Create(self);
   try
-      if fb.Execute then
-      begin
-          newdir := fb.SelectedItem;
-          MedienBib.InitialDialogFolder := fb.SelectedItem;
-          MedienBib.ST_Ordnerlist.Add(newdir);
-          // DateiSuche starten
-          if (Not ST_Medienliste.IsSearching) then
-          begin
-            PutDirListInAutoScanList(MedienBib.ST_Ordnerlist);
-            MedienBib.StatusBibUpdate := 1;
-            BlockGUI(1);
-            StartMediaLibraryFileSearch;
-          end;
+    OpenDlg.Options := OpenDlg.Options + [fdoPickFolders];
+    OpenDlg.DefaultFolder := MedienBib.InitialDialogFolder;
+    if OpenDlg.Execute then begin
+      newDir := OpenDlg.FileName;
+      MedienBib.InitialDialogFolder := OpenDlg.FileName;
+      MedienBib.ST_Ordnerlist.Add(newdir);
+      // DateiSuche starten
+      if (Not ST_Medienliste.IsSearching) then begin
+        PutDirListInAutoScanList(MedienBib.ST_Ordnerlist);
+        MedienBib.StatusBibUpdate := 1;
+        BlockGUI(1);
+        StartMediaLibraryFileSearch;
       end;
+    end;
   finally
-      fb.Free;
+    OpenDlg.Free
   end;
 end;
 
@@ -4975,6 +4976,7 @@ begin
           colIdx_TRACKPEAK : Celltext := PeakValueToString(af.TrackPeak);
           colIdx_ALBUMPEAK : Celltext := PeakValueToString(af.AlbumPeak);
           colIdx_BPM : Celltext := af.BPM;
+          colIdx_HARMONICKEY: CellText := af.HarmonicKey;
 
         else
           CellText := ' ';
@@ -6497,12 +6499,20 @@ var
   subCollectionNode: PVirtualNode;
   subCollection: TAudioCollection;
 begin
-  for i := 0 to aCollection.CollectionCount - 1 do
-  begin
-    subCollection := aCollection.Collection[i];
-    if (not OnlySearchResults) or subCollection.MatchesCurrentSearch  then begin
-      subCollectionNode := AlbenVST.AddChild(aNode, subCollection);
-      AddCollection(subCollection, subCollectionNode, OnlySearchResults)
+  if aCollection.WantCombine then begin
+    subCollection := aCollection.Collection[0];
+    if (not OnlySearchResults) or subCollection.MatchesCurrentSearch then begin
+      // AlbenVST.SetNodeData<TAudioCollection>(aNode, subCollection);
+      AddCollection(subCollection, aNode, OnlySearchResults)
+    end;
+  end else begin
+    for i := 0 to aCollection.CollectionCount - 1 do
+    begin
+      subCollection := aCollection.Collection[i];
+      if (not OnlySearchResults) or subCollection.MatchesCurrentSearch then begin
+        subCollectionNode := AlbenVST.AddChild(aNode, subCollection);
+        AddCollection(subCollection, subCollectionNode, OnlySearchResults)
+      end;
     end;
   end;
 end;
@@ -7062,7 +7072,7 @@ begin
     end;
     VK_RETURN: begin
       ac := AlbenVST.GetNodeData<TAudioCollection>(AlbenVST.FocusedNode);
-      CollectionDblClick(ac, AlbenVST.FocusedNode);
+      CollectionDblClick(ac, AlbenVST.FocusedNode, AlbenVST);
     end;
   end;
 end;
@@ -7080,7 +7090,7 @@ begin
     exit;
 
   ac := AlbenVST.GetNodeData<TAudioCollection>(albumNode);
-  CollectionDblClick(ac, AlbenVST.FocusedNode);
+  CollectionDblClick(ac, AlbenVST.FocusedNode, AlbenVST);
 end;
 
 
@@ -8871,46 +8881,41 @@ begin
     MedienBib.EmptySearch(42);
 end;
 
-
 procedure TNemp_MainForm.MM_PL_DirectoryClick(Sender: TObject);
-var newdir: UnicodeString;
-    FB: TFolderBrowser;
+var
+  OpenDlg: TFileOpenDialog;
 begin
   if (NempPlaylist.InitialDialogFolder = '') then
       NempPlaylist.InitialDialogFolder := GetShellFolder(CSIDL_MYMUSIC);
 
-  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_PlaylistCaption, NempPlaylist.InitialDialogFolder );
+  OpenDlg := TFileOpenDialog.Create(self);
   try
-      if fb.Execute then
-      begin
-          newdir := fb.SelectedItem;
-          NempPlaylist.InitialDialogFolder := fb.SelectedItem;
-          MarkCDDriveDataAsDeprecated;
-          //NempPlaylist.InsertNode := Nil;
-          NempPlaylist.ResetInsertIndex;
-          ST_Playlist.Mask := GeneratePlaylistSTFilter;
+    OpenDlg.Options := OpenDlg.Options + [fdoPickFolders];
+    OpenDlg.DefaultFolder := NempPlaylist.InitialDialogFolder;
 
-          if NameOfMyComputer <> newdir then
-          begin
-            NempPlaylist.ST_Ordnerlist.Add(newdir);
-            if (Not ST_Playlist.IsSearching) then
-            begin
-              NempPlaylist.Status := 1;
-              NempPlaylist.FileSearchCounter := 0;
-              ProgressFormPlaylist.AutoClose := True;
-              ProgressFormPlaylist.InitiateProcess(True, pa_SearchFilesForPlaylist);
-              ST_Playlist.SearchFiles(NempPlaylist.ST_Ordnerlist[0]);
-            end;
-          end
-          else
-            TranslateMessageDLG((Playlist_NotEverything), mtInformation, [MBOK], 0);
-      end;
+    if OpenDlg.Execute then begin
+      NempPlaylist.InitialDialogFolder := OpenDlg.FileName;
+      MarkCDDriveDataAsDeprecated;
+      NempPlaylist.ResetInsertIndex;
+      ST_Playlist.Mask := GeneratePlaylistSTFilter;
+
+      if NameOfMyComputer <> OpenDlg.FileName then begin
+        NempPlaylist.ST_Ordnerlist.Add(OpenDlg.FileName);
+        if (Not ST_Playlist.IsSearching) then begin
+          NempPlaylist.Status := 1;
+          NempPlaylist.FileSearchCounter := 0;
+          ProgressFormPlaylist.AutoClose := True;
+          ProgressFormPlaylist.InitiateProcess(True, pa_SearchFilesForPlaylist);
+          ST_Playlist.SearchFiles(NempPlaylist.ST_Ordnerlist[0]);
+        end;
+      end
+      else
+        TranslateMessageDLG((Playlist_NotEverything), mtInformation, [MBOK], 0);
+    end;
   finally
-      fb.Free;
+    OpenDlg.Free;
   end;
 end;
-
-
 
 procedure TNemp_MainForm.PM_PL_AddCDAudioClick(Sender: TObject);
 var i: integer;
@@ -11411,6 +11416,7 @@ begin
                     colIdx_GENRE,
                     colIdx_Track,
                     colIdx_BPM,
+                    colIdx_HarmonicKey,
                     colIdx_CD: begin
                         if af.HasSupportedTagFormat then
                         begin
@@ -11545,6 +11551,7 @@ begin
         colIdx_TRACK : af.Track := StrToIntDef(NewText, 0);
         colIdx_CD: af.CD := NewText;
         colIdx_BPM: af.BPM := NewText;
+        colIdx_HarmonicKey: af.HarmonicKey := NewText;
     else
         {CON_DAUER, CON_BITRATE, CON_CBR, CON_MODE, CON_SAMPLERATE, CON_FILESIZE,
         CON_PFAD, CON_ORDNER, CON_DATEINAME, CON_LYRICSEXISTING, CON_EXTENSION, ... }
@@ -12464,15 +12471,12 @@ end;
 
 procedure TNemp_MainForm.AlbenVSTClick(Sender: TObject);
 begin
-    AlbenVSTFocusChanged(AlbenVST, AlbenVST.FocusedNode, 0);
+    //AlbenVSTFocusChanged(AlbenVST, AlbenVST.FocusedNode, 0);
 end;
-
-
-
 
 procedure TNemp_MainForm.ArtistsVSTClick(Sender: TObject);
 begin
-    ArtistsVSTFocusChanged(ArtistsVST, ArtistsVST.FocusedNode, 0);
+    //ArtistsVSTFocusChanged(ArtistsVST, ArtistsVST.FocusedNode, 0);
 end;
 
 

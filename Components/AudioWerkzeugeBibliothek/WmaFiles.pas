@@ -58,7 +58,7 @@ unit WmaFiles;
 
 interface
 
-uses Classes, SysUtils, AudioFiles.Base, AudioFiles.Declarations;
+uses Classes, SysUtils, AudioFiles.Base, AudioFiles.Declarations, AudioFiles.BaseTags;
 
 const
   // Channel modes
@@ -85,12 +85,7 @@ type
             procedure fResetData;
             function fGetChannelMode: String;
         protected
-            function fGetFileSize   : Int64;    override;
-            function fGetDuration   : Integer;  override;
-            function fGetBitrate    : Integer;  override;
-            function fGetSamplerate : Integer;  override;
             function fGetChannels   : Integer;  override;
-            function fGetValid      : Boolean;  override;
 
             procedure fSetTitle           (aValue: UnicodeString); override;
             procedure fSetArtist          (aValue: UnicodeString); override;
@@ -99,6 +94,7 @@ type
             procedure fSetTrack           (aValue: UnicodeString); override;
             procedure fSetGenre           (aValue: UnicodeString); override;
             procedure fSetAlbumArtist (value: UnicodeString); override;
+            procedure fSetLyrics          (aValue: UnicodeString); override;
 
             function fGetTitle            : UnicodeString; override;
             function fGetArtist           : UnicodeString; override;
@@ -109,6 +105,7 @@ type
             function fGetFileType            : TAudioFileType; override;
             function fGetFileTypeDescription : String;         override;
             function fGetAlbumArtist : UnicodeString; override;
+            function fGetLyrics           : UnicodeString;  override;
 
         public
             { Public declarations }
@@ -119,6 +116,12 @@ type
             property ChannelModeID: Byte read FChannelModeID;   { Channel mode code }
             property ChannelMode: string read FGetChannelMode;  { Channel mode name }
             property Comment: UnicodeString read FComment;               { Comment }
+            // dummy methods
+            procedure GetTagList(Dest: TTagItemList; ContentTypes: TTagContentTypes = cDefaultTagContentTypes); override;
+            procedure DeleteTagItem(aTagItem: TTagItem); override;
+            function GetUnusedTextTags: TTagItemInfoDynArray; override;
+            function AddTextTagItem(aKey, aValue: UnicodeString): TTagItem; override;
+            function SetPicture(Source: TStream; Mime: AnsiString; PicType: TPictureType; Description: UnicodeString): Boolean; override;
         end;
 
 implementation
@@ -307,7 +310,7 @@ end;
 
 function TWMAfile.fGetFileTypeDescription: String;
 begin
-  result := TAudioFileNames[at_Wma];
+  result := cAudioFileType[at_Wma];
 end;
 
 { ********************** Private functions & procedures ********************* }
@@ -373,6 +376,11 @@ begin
   // nothing. This Unit is read-Only
 end;
 
+procedure TWMAfile.fSetLyrics(aValue: UnicodeString);
+begin
+  // nothing. This Unit is read-Only
+end;
+
 { --------------------------------------------------------------------------- }
 
 function TWMAfile.fGetAlbum: UnicodeString;
@@ -390,11 +398,6 @@ begin
     result := fArtist;
 end;
 
-function TWMAfile.fGetBitrate: Integer;
-begin
-    result := fBitrate;
-end;
-
 function TWMAfile.FGetChannelMode: string;
 begin
   { Get channel mode name }
@@ -406,24 +409,9 @@ begin
     result := fChannelModeID;
 end;
 
-function TWMAfile.fGetDuration: Integer;
-begin
-    result := fDuration;
-end;
-
-function TWMAfile.fGetFileSize: Int64;
-begin
-    result := fFileSize
-end;
-
 function TWMAfile.fGetGenre: UnicodeString;
 begin
     result := fGenre;
-end;
-
-function TWMAfile.fGetSamplerate: Integer;
-begin
-    result := fSamplerate;
 end;
 
 function TWMAfile.fGetTitle: UnicodeString;
@@ -436,15 +424,40 @@ begin
     result := fTrack;
 end;
 
-function TWMAfile.fGetValid: Boolean;
-begin
-    result := fValid;
-end;
-
 function TWMAfile.fGetYear: UnicodeString;
 begin
     result := fYear;
 end;
+
+function TWMAfile.fGetLyrics: UnicodeString;
+begin
+  result := ''; // not supported
+end;
+
+procedure TWMAfile.GetTagList(Dest: TTagItemList; ContentTypes: TTagContentTypes = cDefaultTagContentTypes);
+begin
+  // not supported
+end;
+procedure TWMAfile.DeleteTagItem(aTagItem: TTagItem);
+begin
+  // not supported
+end;
+function TWMAfile.GetUnusedTextTags: TTagItemInfoDynArray;
+begin
+    // not supported
+  setlength(result, 0);
+end;
+function TWMAfile.AddTextTagItem(aKey, aValue: UnicodeString): TTagItem;
+begin
+  // not supported
+  result := Nil;
+end;
+function TWMAfile.SetPicture(Source: TStream; Mime: AnsiString; PicType: TPictureType; Description: UnicodeString): Boolean;
+begin
+    // not supported
+  result := False;
+end;
+
 
 { ********************** Public functions & procedures ********************** }
 
@@ -531,13 +544,13 @@ end;
 function TWMAfile.RemoveFromFile(aFilename: UnicodeString): TAudioError;
 begin
     inherited RemoveFromFile(aFilename);
-    result := WmaErr_WritingNotSupported;
+    result := TagErr_WritingNotSupported;
 end;
 
 function TWMAfile.WriteToFile(aFilename: UnicodeString): TAudioError;
 begin
     inherited   WriteToFile(aFilename);
-    result := WmaErr_WritingNotSupported;
+    result := TagErr_WritingNotSupported;
 end;
 
 

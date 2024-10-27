@@ -2,14 +2,19 @@
     -----------------------------------
     Audio Werkzeuge Bibliothek
     -----------------------------------
-    (c) 2012-2020, Daniel Gaussmann
+    (c) 2012-2024, Daniel Gaussmann
               Website : www.gausi.de
               EMail   : mail@gausi.de
     -----------------------------------
 
     Unit AudioFileBasics
 
-    Abstract base class for all other AudioFiles
+    TBaseAudioFile
+      Abstract base class for all other AudioFiles
+
+    TTagItem
+      Base class for all TagItems like TID3v2Frame, TVorbisComment, ...
+
 
     ---------------------------------------------------------------------------
 
@@ -51,47 +56,10 @@ interface
 
 {$I config.inc}
 
-uses Classes, SysUtils, AudioFiles.Declarations;
+uses Classes, SysUtils, AudioFiles.Declarations, AudioFiles.BaseTags
+  {$IFDEF USE_GENERICS}, System.Generics.Collections {$ELSE}, System.Contnrs {$ENDIF}
+  ;
 
-
-{    const
-      AudioErrorString: Array[TAudioError] of String = (
-              'No Error',
-              'File not found',
-              'FileCreate failed.',
-              'Could not read from file',
-              'Could not write into file',
-              'File is read-only',
-              'Reading from stream failed',
-              'Writing to stream failed',
-              // Id3
-              'Caching audiodata failed',
-              'No ID3-Tag found',
-              'Invalid header for ID3v2-Tag',
-              'Compressed ID3-Tag found',
-              'Unknown ID3-Error',
-              // mpeg
-              'Invalid MP3-File: No audioframe found',
-              // Ogg
-              'Invalid Ogg-Vorbis-File: First Vorbis-Header corrupt',
-              'Invalid Ogg-Vorbis-File: First Ogg-Page corrupt',
-              'Invalid Ogg-Vorbis-File: Second Vorbis-Header corrupt',
-              'Invalid Ogg-Vorbis-File: Second Ogg-Page corrupt',
-              'Comment too large (sorry, Flogger limitation)',
-              'Backup failed',
-              'Delete backup failed',
-              'Removing Tag not supported.',
-              // Flac
-              'Invalid Flac-File',
-              'Metadata-Block exceeds maximum size',
-              'Type of Metadata is not supported - use mp3, ogg or flac',
-              'Quick access to metadata denied',
-              'Removing Tag not supported.',
-
-               'Invalid Apev2 file',
-               'Invalid Apev2Tag',
-               'No Apev2tag found' );
-       }
 type
 
     TBaseAudioFile = class
@@ -104,12 +72,12 @@ type
             fValid      : Boolean;
             fFileName   : UnicodeString;
 
-            function fGetFileSize   : Int64;    virtual; abstract;
-            function fGetDuration   : Integer;  virtual; abstract;
-            function fGetBitrate    : Integer;  virtual; abstract;
-            function fGetSamplerate : Integer;  virtual; abstract;
-            function fGetChannels   : Integer;  virtual; abstract;
-            function fGetValid      : Boolean;  virtual; abstract;
+            function fGetFileSize   : Int64;    virtual;
+            function fGetDuration   : Integer;  virtual;
+            function fGetBitrate    : Integer;  virtual;
+            function fGetSamplerate : Integer;  virtual;
+            function fGetChannels   : Integer;  virtual;
+            function fGetValid      : Boolean;  virtual;
 
             // Setter/Getter for basic Metadata
             function fGetTitle     : UnicodeString;  virtual; abstract;
@@ -119,6 +87,8 @@ type
             function fGetYear      : UnicodeString;  virtual; abstract;
             function fGetTrack     : UnicodeString;  virtual; abstract;
             function fGetGenre     : UnicodeString;  virtual; abstract;
+            function fGetLyrics    : UnicodeString;  virtual; abstract;
+
             procedure fSetTitle    (aValue: UnicodeString);  virtual; abstract;
             procedure fSetArtist   (aValue: UnicodeString);  virtual; abstract;
             procedure fSetAlbumArtist   (aValue: UnicodeString);  virtual; abstract;
@@ -126,6 +96,7 @@ type
             procedure fSetYear     (aValue: UnicodeString);  virtual; abstract;
             procedure fSetTrack    (aValue: UnicodeString);  virtual; abstract;
             procedure fSetGenre    (aValue: UnicodeString);  virtual; abstract;
+            procedure fSetLyrics   (aValue: UnicodeString);  virtual; abstract;
 
             function fGetFileType            : TAudioFileType; virtual; abstract;
             function fGetFileTypeDescription : String;         virtual; abstract;
@@ -151,6 +122,7 @@ type
             property Year    : UnicodeString read fGetYear   write fSetYear  ;
             property Track   : UnicodeString read fGetTrack  write fSetTrack ;
             property Genre   : UnicodeString read fGetGenre  write fSetGenre ;
+            property Lyrics  : UnicodeString read fGetLyrics write fSetLyrics;
 
             constructor Create; virtual; abstract;
 
@@ -158,6 +130,29 @@ type
             function WriteToFile(aFilename: UnicodeString): TAudioError;     virtual;
             function RemoveFromFile(aFilename: UnicodeString): TAudioError;  virtual;
             function UpdateFile: TAudioError;
+
+            // - GetTagList will return a list of all contained tag items in the file that
+            //   matches the given ContentTypes.
+            // - DeleteTagItem will remove a tag item from the file.
+            //   Note: It is simple to remove a tag item. *Restoring* it may be more
+            //         complicated or even close to impossible in some cases, as the tag item
+            //         could use a proprietary binary format which is unknown to you.
+            procedure GetTagList(Dest: TTagItemList; ContentTypes: TTagContentTypes = cDefaultTagContentTypes); virtual; abstract;
+            procedure DeleteTagItem(aTagItem: TTagItem); virtual; abstract;
+
+            // These methods are designed to add new text tag items easily.
+            // - GetUnusedTextTags can be used to create a list of “permitted” standard text tag items that are
+            //   not yet existing in the file.
+            function GetUnusedTextTags: TTagItemInfoDynArray; virtual; abstract;
+            // - AddTextTagItem creates a new text tag item selected from this list.
+            // You may use other (tag specific) methods to allow the end user to add more tag items than
+            // returned by GetUnusedTextTags
+            function AddTextTagItem(aKey, aValue: UnicodeString): TTagItem; virtual; abstract;
+
+            // Abstract methods to get/set picture data from the meta tag of the file.
+            // Note that not all parameters are used in all meta tag formats.
+            function GetPicture(Dest: TStream; out Mime: AnsiString; out PicType: TPictureType; out Description: UnicodeString): Boolean; virtual;
+            function SetPicture(Source: TStream; Mime: AnsiString; PicType: TPictureType; Description: UnicodeString): Boolean; virtual; abstract;
     end;
 
     TBaseAudioFileClass = class of TBaseAudioFile;
@@ -167,6 +162,37 @@ implementation
 
 
 { TBaseAudioFile }
+
+
+function TBaseAudioFile.fGetFileSize: Int64;
+begin
+  result := fFileSize;
+end;
+
+function TBaseAudioFile.fGetDuration: Integer;
+begin
+  result := fDuration;
+end;
+
+function TBaseAudioFile.fGetBitrate: Integer;
+begin
+  result := fBitrate;
+end;
+
+function TBaseAudioFile.fGetSamplerate: Integer;
+begin
+  result := fSamplerate;
+end;
+
+function TBaseAudioFile.fGetChannels: Integer;
+begin
+  result := fChannels;
+end;
+
+function TBaseAudioFile.fGetValid: Boolean;
+begin
+  result := fValid;
+end;
 
 function TBaseAudioFile.ReadFromFile(aFilename: UnicodeString): TAudioError;
 begin
@@ -189,6 +215,26 @@ end;
 function TBaseAudioFile.UpdateFile: TAudioError;
 begin
     result := WriteToFile(fFileName);
+end;
+
+function TBaseAudioFile.GetPicture(Dest: TStream; out Mime: AnsiString; out PicType: TPictureType; out Description: UnicodeString): Boolean;
+var
+  TagItems: TTagItemList;
+begin
+  TagItems := TTagItemList.Create;
+  try
+    GetTagList(TagItems, [tctPicture]);
+    if TagItems.Count > 0 then begin
+      result := TagItems[0].GetPicture(Dest, Mime, PicType, Description);
+    end else begin
+      result := False;
+      Mime := '';
+      PicType := ptOther;
+      Description := '';
+    end;
+  finally
+    TagItems.Free;
+  end;
 end;
 
 end.

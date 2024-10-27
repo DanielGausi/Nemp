@@ -149,6 +149,7 @@ type
       function GetPrimaryChildSortDirection: teSortDirection;
       function GetSecondaryChildSorting: teCollectionSorting;
 
+      function GetWantCombine: Boolean; override;
       function BuildCaption(IncludeCount: Boolean): String;
       function GetCaption: String; override;
       function GetSimpleCaption: String; override;
@@ -166,7 +167,7 @@ type
       procedure GetCommonDirectory;
 
       procedure DecreaseCount(recursive: Boolean);
-      procedure GetReverseFilesByProperty(dest: TAudioFileList; aCollectionType: teCollectionContent; aProperty: String);
+      // procedure GetReverseFilesByProperty(dest: TAudioFileList; aCollectionType: teCollectionContent; aProperty: String);
 
       function CompareCollection_Main(const item1,item2: TAudioFileCollection): Integer;
 
@@ -224,7 +225,7 @@ type
 
       procedure DoGetFiles(dest: TAudioFileList; recursive: Boolean); override;
       procedure DoChangeCoverIDAfterDownload(newID: String); override;
-      procedure GetReverseFiles(dest: TAudioFileList);
+      // procedure GetReverseFiles(dest: TAudioFileList);
       // Some special methods for TagCloud
       // Expand: Adds a new Layer of Tags by changing the subCollectionType to "Cloud" and adding all files into it
       // ClearSubCollections: Clears the SubCollections, but remains the FileList
@@ -265,6 +266,7 @@ type
       fCaptionConfigList: TCollectionConfigList;
 
     protected
+      function GetWantCombine: Boolean; override;
       function GetCaption: String; override;
       function GetLevelCaption(Index: Integer): String;
       function GetLayerDepth: Integer;
@@ -671,12 +673,16 @@ begin
   for i := 0 to fFileList.Count - 1 do
     dest.Add(fFileList[i]);
 
-  if recursive and (not isCloud) and assigned(fCollectionList) then begin
+  if ((recursive or WantCombine) and (not isCloud) and assigned(fCollectionList))
+  or ((dest.Count = 0) and (not isCloud) and (fCollectionList.Count = 1) and (not isCloud))  // if there is only one subcollection: List files recursively anyway.
+  then begin
     for i := 0 to fCollectionList.Count - 1 do
       fCollectionList[i].DoGetFiles(dest, recursive);
   end;
+
 end;
 
+(*
 procedure TAudioFileCollection.GetReverseFiles(dest: TAudioFileList);
 var
   aProp: String;
@@ -736,6 +742,7 @@ begin
       fCollectionList[i].GetReverseFilesByProperty(dest, aCollectionType, aProperty);
   end;
 end;
+*)
 
 procedure TAudioFileCollection.ClearSubCollections;
 begin
@@ -765,6 +772,14 @@ begin
     ReSort(Root.ChildSorting, Root.ChildSortDirection);
 
   result := True;
+end;
+
+function TAudioFileCollection.GetWantCombine: Boolean;
+begin
+  result := NempOrganizerSettings.CombineLayers
+      and (Content = ccDirectory)
+      and (CollectionCount = 1)
+      and (fFileList.Count = 0);
 end;
 
 function TAudioFileCollection.BuildCaption(IncludeCount: Boolean): String;
@@ -807,6 +822,12 @@ begin
   else
     mainValue := fKey;
   end;
+
+  if WantCombine then begin
+    MainValue := MainValue + '\' + self.Collection[0].SimpleCaption;
+
+  end;
+
 
   if mainValue = '' then
     mainValue := rsCollectionDataUnknown;
@@ -2119,6 +2140,11 @@ begin
     result := fCollectionConfigList[aLevel].PrimarySorting
   else
     result := csDefault;
+end;
+
+function TRootCollection.GetWantCombine: Boolean;
+begin
+  result := False;
 end;
 
 function TRootCollection.GetCaption: String;

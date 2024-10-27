@@ -2,7 +2,7 @@
     -----------------------------------
     Audio Werkzeuge Bibliothek
     -----------------------------------
-    (c) 2012-2020, Daniel Gaussmann
+    (c) 2012-2024, Daniel Gaussmann
               Website : www.gausi.de
               EMail   : mail@gausi.de
     -----------------------------------
@@ -71,8 +71,8 @@ unit Apev2Tags;
 
 interface
 
-uses Windows, Messages, SysUtils, StrUtils, Variants, ContNrs, Classes,
-     AudioFiles.Base, AudioFiles.Declarations,
+uses Windows, Messages, SysUtils, StrUtils, Variants, ContNrs, Classes, Types,
+     AudioFiles.Base, AudioFiles.BaseTags, AudioFiles.Declarations,
      Id3Basics, ApeTagItem;
 
 type
@@ -93,6 +93,8 @@ type
 
             function fIsValidHeader(aApeHeader: TApeHeader): Boolean;
             function fTagContainsHeader: Boolean;
+
+            function fGetTagItemByKey(aKey: String): TApeTagItem;
 
             function fGetComment          : UnicodeString;
             function fGetSubTitle         : UnicodeString;
@@ -118,6 +120,7 @@ type
             function fGetBibliography     : UnicodeString;
             function fGetIntroplay        : UnicodeString;
             function fGetAlbumArtist      : UnicodeString;
+            function fGetLyrics           : UnicodeString;
 
             procedure fSetComment         (aValue: UnicodeString);
             procedure fSetSubTitle        (aValue: UnicodeString);
@@ -143,6 +146,7 @@ type
             procedure fSetBibliography    (aValue: UnicodeString);
             procedure fSetIntroplay       (aValue: UnicodeString);
             procedure fSetAlbumArtist     (aValue: UnicodeString);
+            procedure fSetLyrics          (aValue: UnicodeString);
 
             function fComputeNewTagSize: Integer;  // Used to get the new ApeTag size before writing (EXcluding the Header)
             function fGetTagSize: Cardinal;        // The Size of the ApeTag in the File. Including Header AND Footer.
@@ -214,6 +218,7 @@ type
             property Introplay        : UnicodeString read fGetIntroplay         write fSetIntroplay        ;
             // Additional properties
             property AlbumArtist      : UnicodeString read fGetAlbumArtist       write fSetAlbumArtist      ;
+            property Lyrics           : UnicodeString read fGetLyrics            write fSetLyrics           ;
 
             constructor Create;
             destructor Destroy; override;
@@ -225,14 +230,17 @@ type
             // Get/Set arbitrary Keys
             // Use this with caution - you probably don't need this
             function GetValueByKey(aKey: AnsiString): UnicodeString;
-            procedure SetValueByKey(aKey: AnsiString; aValue: UnicodeString);
+            function SetValueByKey(aKey: AnsiString; aValue: UnicodeString): Boolean;
+
             // Set/Get Binary Data
             // You REALLY SHOULD NOT use this. ;-)
             function GetBinaryDataByKey(aKey: AnsiString; dest: TStream): Boolean;
             procedure SetBinaryByKey(aKey: AnsiString; source: TStream);
-            // Get a List of all TagItems in the tag (e.g. for use in a TListBox)
-            procedure GetAllFrames(dest: TStrings);
-            procedure GetAllTextFrames(dest: TStrings);
+
+            procedure GetTagList(Dest: TTagItemList; ContentTypes: TTagContentTypes = cDefaultTagContentTypes);
+            procedure DeleteTagItem(aTagItem: TTagItem);
+            function GetUnusedTextTags: TTagItemInfoDynArray;
+            function AddTextTagItem(aKey, aValue: UnicodeString): TTagItem;
 
             // Get/Set Cover Art
             // return value of the getter:
@@ -240,12 +248,10 @@ type
             //     Here a special format is expected, which seems to be used by other taggers:
             //     <Key> $00 <UTF8-Encoded description> $00 <actual picture data>
             //     The getter will return TRUE if a matching TagItem in this Format was found, FALSE otherwise
-            function GetPicture(aType: TApePictureTypes; dest: TStream; var description: UnicodeString): boolean; overload;
+            function GetPicture(aType: TPictureType; dest: TStream; var description: UnicodeString): boolean; overload;
             function GetPicture(aKey: AnsiString; dest: TStream; var description: UnicodeString): boolean; overload;
-            procedure SetPicture(aType: TApePictureTypes;description: String; source: TStream); overload;
-            procedure SetPicture(aKey: AnsiString; description: UnicodeString; source: TStream); overload;
-            // Get all available CoverArt-TagItems (e.g. for use in a TComboBox)
-            procedure GetAllPictureFrames(dest: TStrings);
+            function SetPicture(aType: TPictureType;description: String; source: TStream): boolean; overload;
+            function SetPicture(aKey: AnsiString; description: UnicodeString; source: TStream): boolean; overload;
 
             function ReadFromStream(aStream: TStream): TAudioError;
 
@@ -347,12 +353,16 @@ end;
       - If no matching Item can be found, a new one is created
     Used for property setters for Artist, Album, etc.
 }
-procedure TApeTag.SetValueByKey(aKey: AnsiString; aValue: UnicodeString);
+function TApeTag.SetValueByKey(aKey: AnsiString; aValue: UnicodeString): Boolean;
 var i: Integer;
     aTagItem: TApeTagItem;
     success: Boolean;
 begin
     success := False;
+    result := False;
+    if not ValidApeKey(aKey) then
+      exit;
+
     for i := 0 to fItemList.Count - 1 do
     begin
         aTagItem := TApeTagItem(fItemList[i]);
@@ -361,7 +371,8 @@ begin
             if aValue = '' then
                 fItemList.Delete(i)
             else
-                aTagItem.Value := aValue;
+                //aTagItem.Value := aValue;
+                result := aTagItem.SetText(aValue);
             success := True;
             break;
         end;
@@ -371,131 +382,158 @@ begin
     begin
         // create a new item
         aTagItem := TApeTagItem.Create(aKey);
-        aTagItem.Value := aValue;
+        result := aTagItem.SetText(aValue);
+        //aTagItem.Value := aValue;
         fItemList.Add(aTagItem);
     end;
 end;
 
 procedure TApeTag.fSetAbstract(aValue: UnicodeString);
 begin
-    SetValueByKey('Abstract', aValue);
+    SetValueByKey(APE_Abstract, aValue);
 end;
 procedure TApeTag.fSetAlbum(aValue: UnicodeString);
 begin
-    SetValueByKey('Album', aValue);
+    SetValueByKey(APE_Album, aValue);
 end;
 procedure TApeTag.fSetAlbumArtist(aValue: UnicodeString);
 begin
-  SetValueByKey('albumartist', aValue);
+  SetValueByKey(APE_albumartist, aValue);
 end;
 
 procedure TApeTag.fSetArtist(aValue: UnicodeString);
 begin
-    SetValueByKey('Artist', aValue);
+    SetValueByKey(APE_Artist, aValue);
 end;
 procedure TApeTag.fSetBibliography(aValue: UnicodeString);
 begin
-    SetValueByKey('Bibliography', aValue);
+    SetValueByKey(APE_Bibliography, aValue);
 end;
 procedure TApeTag.fSetCatalog(aValue: UnicodeString);
 begin
-    SetValueByKey('Catalog', aValue);
+    SetValueByKey(APE_Catalog, aValue);
 end;
 procedure TApeTag.fSetComment(aValue: UnicodeString);
 begin
-    SetValueByKey('Comment', aValue);
+    SetValueByKey(APE_Comment, aValue);
 end;
 procedure TApeTag.fSetComposer(aValue: UnicodeString);
 begin
-    SetValueByKey('Composer', aValue);
+    SetValueByKey(APE_Composer, aValue);
 end;
 procedure TApeTag.fSetConductor(aValue: UnicodeString);
 begin
-    SetValueByKey('Conductor', aValue);
+    SetValueByKey(APE_Conductor, aValue);
 end;
 procedure TApeTag.fSetCopyright(aValue: UnicodeString);
 begin
-    SetValueByKey('Copyright', aValue);
+    SetValueByKey(APE_Copyright, aValue);
 end;
 procedure TApeTag.fSetDebutAlbum(aValue: UnicodeString);
 begin
-    SetValueByKey('Debut album', aValue);
+    SetValueByKey(APE_DebutAlbum, aValue);
 end;
 procedure TApeTag.fSetEAN(aValue: UnicodeString);
 begin
-    SetValueByKey('EAN/UBC', aValue);
+    SetValueByKey(APE_EANUBC, aValue);
 end;
 procedure TApeTag.fSetFile(aValue: UnicodeString);
 begin
-    SetValueByKey('File', aValue);
+    SetValueByKey(APE_File, aValue);
 end;
 procedure TApeTag.fSetGenre(aValue: UnicodeString);
 begin
-    SetValueByKey('Genre', aValue);
+    SetValueByKey(APE_Genre, aValue);
 end;
 procedure TApeTag.fSetIndex(aValue: UnicodeString);
 begin
-    SetValueByKey('Index', aValue);
+    SetValueByKey(APE_Index, aValue);
 end;
 procedure TApeTag.fSetIntroplay(aValue: UnicodeString);
 begin
-    SetValueByKey('Introplay', aValue);
+    SetValueByKey(APE_Introplay, aValue);
 end;
 procedure TApeTag.fSetISBN(aValue: UnicodeString);
 begin
-   SetValueByKey('ISBN', aValue);
+   SetValueByKey(APE_ISBN, aValue);
 end;
 procedure TApeTag.fSetISRC(aValue: UnicodeString);
 begin
-    SetValueByKey('ISRC', aValue);
+    SetValueByKey(APE_ISRC, aValue);
 end;
 procedure TApeTag.fSetLanguage(aValue: UnicodeString);
 begin
-    SetValueByKey('Language', aValue);
+    SetValueByKey(APE_Language, aValue);
 end;
 procedure TApeTag.fSetLC(aValue: UnicodeString);
 begin
-    SetValueByKey('LC', aValue);
+    SetValueByKey(APE_LC, aValue);
 end;
 procedure TApeTag.fSetMedia(aValue: UnicodeString);
 begin
-    SetValueByKey('Media', aValue);
+    SetValueByKey(APE_Media, aValue);
 end;
 procedure TApeTag.fSetPublicationright(aValue: UnicodeString);
 begin
-    SetValueByKey('Publicationright', aValue);
+    SetValueByKey(APE_PublicationRight, aValue);
 end;
 procedure TApeTag.fSetPublisher(aValue: UnicodeString);
 begin
-    SetValueByKey('Publisher', aValue);
+    SetValueByKey(APE_Publisher, aValue);
 end;
 procedure TApeTag.fSetRecordDate(aValue: UnicodeString);
 begin
-    SetValueByKey('Record Date', aValue);
+    SetValueByKey(APE_RecordDate, aValue);
 end;
 procedure TApeTag.fSetRecordLocation(aValue: UnicodeString);
 begin
-    SetValueByKey('Record Location', aValue);
+    SetValueByKey(APE_RecordLocation, aValue);
 end;
 procedure TApeTag.fSetRelated(aValue: UnicodeString);
 begin
-    SetValueByKey('Related', aValue);
+    SetValueByKey(APE_Related, aValue);
 end;
 procedure TApeTag.fSetSubTitle(aValue: UnicodeString);
 begin
-    SetValueByKey('Subtitle', aValue);
+    SetValueByKey(APE_Subtitle, aValue);
 end;
 procedure TApeTag.fSetTitle(aValue: UnicodeString);
 begin
-    SetValueByKey('Title', aValue);
+    SetValueByKey(APE_Title, aValue);
 end;
 procedure TApeTag.fSetTrack(aValue: UnicodeString);
 begin
-    SetValueByKey('Track', aValue);
+    SetValueByKey(APE_Track, aValue);
 end;
 procedure TApeTag.fSetYear(aValue: UnicodeString);
 begin
-    SetValueByKey('Year', aValue);
+    SetValueByKey(APE_Year, aValue);
+end;
+
+procedure TApeTag.fSetLyrics(aValue: UnicodeString);
+var
+  i: Integer;
+  LyricItem: TApeTagItem;
+begin
+  LyricItem := Nil;
+  i := 0;
+  while (LyricItem = Nil) and (i <= High(AWB_SupportedLyricsKeys)) do begin
+    LyricItem := fGetTagItemByKey(AWB_SupportedLyricsKeys[i]);
+    inc(i);
+  end;
+
+  if trim(aValue) = '' then begin
+    if assigned(LyricItem) then
+      DeleteTagItem(LyricItem);
+  end else
+  begin
+    // if no lyric Vector was found: Create a new one and add it to the VectorList
+    if not assigned(LyricItem) then begin
+      LyricItem := TApeTagItem.Create(AnsiString(AWB_DefaultLyricsKey));
+      fItemList.Add(LyricItem);
+    end;
+    LyricItem.SetText(aValue);
+  end;
 end;
 
 {
@@ -511,130 +549,157 @@ begin
     for i := 0 to fItemList.Count - 1 do
     begin
         aTagItem := TApeTagItem(fItemList[i]);
-        if AnsiSameText(String(aKey), String(aTagItem.Key)) then
-            result := aTagItem.Value;
+        if AnsiSameText(String(aKey), String(aTagItem.Key)) then begin
+            result := aTagItem.GetText;
+            break;
+        end;
     end;
+end;
+
+function TApeTag.fGetTagItemByKey(aKey: String): TApeTagItem;
+var
+  i: Integer;
+begin
+  result := Nil;
+  for i := 0 to fItemList.Count - 1 do begin
+    if AnsiSameText(String(aKey), String(TApeTagItem(fItemList[i]).Key)) then begin
+      result := TApeTagItem(fItemList[i]);
+      break;
+    end;
+  end;
 end;
 
 function TApeTag.fGetAbstract: UnicodeString;
 begin
-    result := GetValueByKey('Abstract');
+    result := GetValueByKey(APE_Abstract);
 end;
 function TApeTag.fGetAlbum: UnicodeString;
 begin
-    result := GetValueByKey('Album');
+    result := GetValueByKey(APE_Album);
 end;
 function TApeTag.fGetAlbumArtist: UnicodeString;
 begin
-  result := GetValueByKey('albumartist');
+  result := GetValueByKey(APE_AlbumArtist);
 end;
 function TApeTag.fGetArtist: UnicodeString;
 begin
-    result := GetValueByKey('Artist');
+    result := GetValueByKey(APE_Artist);
 end;
 function TApeTag.fGetBibliography: UnicodeString;
 begin
-    result := GetValueByKey('Bibliography');
+    result := GetValueByKey(APE_Bibliography);
 end;
 function TApeTag.fGetCatalog: UnicodeString;
 begin
-    result := GetValueByKey('Catalog');
+    result := GetValueByKey(APE_Catalog);
 end;
 function TApeTag.fGetComment: UnicodeString;
 begin
-    result := GetValueByKey('Comment');
+    result := GetValueByKey(APE_Comment);
 end;
 function TApeTag.fGetComposer: UnicodeString;
 begin
-    result := GetValueByKey('Composer');
+    result := GetValueByKey(APE_Composer);
 end;
 function TApeTag.fGetConductor: UnicodeString;
 begin
-    result := GetValueByKey('Conductor');
+    result := GetValueByKey(APE_Conductor);
 end;
 function TApeTag.fGetCopyright: UnicodeString;
 begin
-    result := GetValueByKey('Copyright');
+    result := GetValueByKey(APE_Copyright);
 end;
 function TApeTag.fGetDebutAlbum: UnicodeString;
 begin
-    result := GetValueByKey('Debut album');
+    result := GetValueByKey(APE_DebutAlbum);
 end;
 function TApeTag.fGetEAN: UnicodeString;
 begin
-    result := GetValueByKey('EAN/UPC');
+    result := GetValueByKey(APE_EANUBC);
 end;
 function TApeTag.fGetFile: UnicodeString;
 begin
-    result := GetValueByKey('File');
+    result := GetValueByKey(APE_File);
 end;
 function TApeTag.fGetGenre: UnicodeString;
 begin
-    result := GetValueByKey('Genre');
+    result := GetValueByKey(APE_Genre);
 end;
 function TApeTag.fGetIndex: UnicodeString;
 begin
-    result := GetValueByKey('Index');
+    result := GetValueByKey(APE_Index);
 end;
 function TApeTag.fGetIntroplay: UnicodeString;
 begin
-    result := GetValueByKey('Introplay');
+    result := GetValueByKey(APE_Introplay);
 end;
 function TApeTag.fGetISBN: UnicodeString;
 begin
-    result := GetValueByKey('ISBN');
+    result := GetValueByKey(APE_ISBN);
 end;
 function TApeTag.fGetISRC: UnicodeString;
 begin
-    result := GetValueByKey('ISRC');
+    result := GetValueByKey(APE_ISRC);
 end;
 function TApeTag.fGetLanguage: UnicodeString;
 begin
-    result := GetValueByKey('Language');
+    result := GetValueByKey(APE_Language);
 end;
 function TApeTag.fGetLC: UnicodeString;
 begin
-    result := GetValueByKey('LC');
+    result := GetValueByKey(APE_LC);
 end;
 function TApeTag.fGetMedia: UnicodeString;
 begin
-    result := GetValueByKey('Media');
+    result := GetValueByKey(APE_Media);
 end;
 function TApeTag.fGetPublicationright: UnicodeString;
 begin
-    result := GetValueByKey('Publicationright');
+    result := GetValueByKey(APE_Publicationright);
 end;
 function TApeTag.fGetPublisher: UnicodeString;
 begin
-    result := GetValueByKey('Publisher');
+    result := GetValueByKey(APE_Publisher);
 end;
 function TApeTag.fGetRecordDate: UnicodeString;
 begin
-    result := GetValueByKey('Record Date');
+    result := GetValueByKey(APE_RecordDate);
 end;
 function TApeTag.fGetRecordLocation: UnicodeString;
 begin
-    result := GetValueByKey('Record Location');
+    result := GetValueByKey(APE_RecordLocation);
 end;
 function TApeTag.fGetRelated: UnicodeString;
 begin
-    result := GetValueByKey('Related');
+    result := GetValueByKey(APE_Related);
 end;
 function TApeTag.fGetSubTitle: UnicodeString;
 begin
-    result := GetValueByKey('Subtitle');
+    result := GetValueByKey(APE_Subtitle);
 end;
 function TApeTag.fGetTitle: UnicodeString;
 begin
-    result := GetValueByKey('Title');
+    result := GetValueByKey(APE_Title);
 end;
 function TApeTag.fGetTrack: UnicodeString;
 begin
-    result := GetValueByKey('Track');
+    result := GetValueByKey(APE_Track);
 end;
 function TApeTag.fGetYear: UnicodeString;
 begin
-    result := GetValueByKey('Year');
+    result := GetValueByKey(APE_Year);
+end;
+
+function TApeTag.fGetLyrics: UnicodeString;
+var
+  i: Integer;
+begin
+  result := '';
+  i := 0;
+  while (result = '') and (i <= High(AWB_SupportedLyricsKeys)) do begin
+    result := GetValueByKey(AnsiString(AWB_SupportedLyricsKeys[i]));
+    inc(i);
+  end;
 end;
 
 
@@ -656,6 +721,9 @@ var i: Integer;
     success: Boolean;
 begin
     success := False;
+    if not ValidApeKey(aKey) then
+      exit;
+
     for i := 0 to fItemList.Count - 1 do
     begin
         aTagItem := TApeTagItem(fItemList[i]);
@@ -673,46 +741,64 @@ begin
     begin
         if assigned(source) and (Source.Size > 0) then
         begin
-            aTagItem := TApeTagItem.Create(aKey);
+            aTagItem := TApeTagItem.Create(aKey, ctApeBinary);
             aTagItem.SetBinaryData(source);
             fItemList.Add(aTagItem);
         end;
     end;
 end;
 
-procedure TApeTag.GetAllFrames(dest: TStrings);
-var i: Integer;
+procedure TApeTag.GetTagList(Dest: TTagItemList; ContentTypes: TTagContentTypes = cDefaultTagContentTypes);
+var
+  i: Integer;
 begin
-    dest.Clear;
-    for i := 0 to fItemList.Count - 1 do
-        dest.Add(String(TApeTagItem(fItemList[i]).Key));
+  for i := 0 to fItemList.Count - 1 do
+    if TApeTagItem(fItemList[i]).MatchContentType(ContentTypes) then
+      Dest.Add(TApeTagItem(fItemList[i]));
 end;
 
-procedure TApeTag.GetAllTextFrames(dest: TStrings);
-var i: Integer;
+procedure TApeTag.DeleteTagItem(aTagItem: TTagItem);
 begin
-    dest.Clear;
-    for i := 0 to fItemList.Count - 1 do
-        if TApeTagItem(fItemList[i]).ContentType = ctText then
-            dest.Add(String(TApeTagItem(fItemList[i]).Key));
+  fItemList.Extract(aTagItem);
+  FreeAndNil(aTagItem);
 end;
 
-procedure TApeTag.GetAllPictureFrames(dest: TStrings);
-var i: Integer;
-    aTagItem: TApeTagItem;
+function TApeTag.GetUnusedTextTags: TTagItemInfoDynArray;
+var
+  iKey, iRes: Integer;
+  resultArray: TTagItemInfoDynArray;
 begin
-    dest.Clear;
-    for i := 0 to fItemList.Count - 1 do
-    begin
-        aTagItem := TApeTagItem(fItemList[i]);
-        if AnsiStartsText('Cover Art', String(aTagItem.Key)) then
-            dest.Add(String(aTagItem.Key));
+  SetLength(resultArray, Length(cTextApeKeys));  // max. possible length
+  iRes := 0;
+
+  for iKey := Low(cTextApeKeys) to High(cTextApeKeys) do begin
+    if not assigned(fGetTagItemByKey(cTextApeKeys[iKey])) then begin
+      resultArray[iRes].Key := cTextApeKeys[iKey];
+      resultArray[iRes].Description := '';
+      resultArray[iRes].TagType := ttApev2;
+      resultArray[iRes].TagContentType := tctText;
+      inc(iRes);
     end;
+  end;
+
+  SetLength(resultArray, iRes); // correct length
+  result := resultArray;
+end;
+
+function TApeTag.AddTextTagItem(aKey, aValue: UnicodeString): TTagItem;
+begin
+  if SetValueByKey(AnsiString(aKey), aValue) then
+    result := fGetTagItemByKey(aKey)
+  else
+    result := Nil;
 end;
 
 function TApeTag.GetPicture(aKey: AnsiString; dest: TStream; var description: UnicodeString): boolean;
 var i: Integer;
     aTagItem: TApeTagItem;
+    dummyMime: AnsiString;
+    dummyType: TPictureType;
+
 begin
     result := False;
     for i := 0 to fItemList.Count - 1 do
@@ -721,52 +807,54 @@ begin
         if AnsiSameText(String(aKey), String(aTagItem.Key))
            or ((aKey = '') and AnsiStartsText('Cover Art', String(aTagItem.Key))) then
         begin
-            result := aTagItem.GetPicture(dest, description);
+            result := aTagItem.GetPicture(dest, dummyMime, dummyType, description);
         end;
     end;
 end;
 
-function TApeTag.GetPicture(aType: TApePictureTypes; dest: TStream;
+function TApeTag.GetPicture(aType: TPictureType; dest: TStream;
   var description: UnicodeString): boolean;
 begin
-    result := GetPicture(TPictureTypeStrings[aType], dest, description);
+    result := GetPicture(cApePictureKeys[aType], dest, description);
 end;
 
-procedure TApeTag.SetPicture(aKey: AnsiString; description: UnicodeString; source: TStream);
+function TApeTag.SetPicture(aKey: AnsiString; description: UnicodeString; source: TStream): Boolean;
 var i: Integer;
     aTagItem: TApeTagItem;
-    success: Boolean;
 begin
-    success := False;
+    result := False;
+    if not ValidApeKey(aKey) then
+      exit;
+
     for i := 0 to fItemList.Count - 1 do
     begin
         aTagItem := TApeTagItem(fItemList[i]);
         if AnsiSameText(String(aKey), String(aTagItem.Key)) then
         begin
             if assigned(source) and (source.Size > 0) then
-                aTagItem.SetPicture(source, description)
-            else
+                result := aTagItem.SetPicture(source, '', ptOther, description) // Mime and PicType will be ignored
+            else begin
                 fItemList.Delete(i);
-            success := True;
+                result := True;
+            end;
             break;
         end;
     end;
-    if not success then
+    if not result then
     begin
         if assigned(source) and (Source.Size > 0) then
         begin
-            aTagItem := TApeTagItem.Create(aKey);
-            aTagItem.SetPicture(source, description);
+            aTagItem := TApeTagItem.Create(aKey, ctApeBinary);
+            result := aTagItem.SetPicture(source, '', ptOther, description); // Mime and PicType will be ignored
             fItemList.Add(aTagItem);
         end;
     end;
 end;
 
-procedure TApeTag.SetPicture(aType: TApePictureTypes;description: String; source: TStream);
+function TApeTag.SetPicture(aType: TPictureType;description: String; source: TStream): Boolean;
 begin
-    SetPicture(TPictureTypeStrings[aType], description, source);
+    result := SetPicture(cApePictureKeys[aType], description, source);
 end;
-
 
 
 {
@@ -792,7 +880,7 @@ begin
     // Check for ID3/APE-Markers at the end of the file
     aStream.Seek(-160, soFromEnd);
     if (aStream.Read(CombinedTagStructure, 160) <> 160) then
-        result := MP3ERR_StreamRead
+        result := FileErr_StreamRead
     else
     begin
         if IsValidID3Tag(CombinedTagStructure.ID3Tag) then

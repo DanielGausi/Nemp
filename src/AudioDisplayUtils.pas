@@ -125,14 +125,15 @@ resourcestring
   rsFormatReplayGainAlbum_WithPeak = 'Album: %.2f dB, Peak: %.6f';
 
 const
-  cCSVHeader = 'Artist;Title;Album;Album-Artist;Composer;Genre;Year;Track;CD;Directory;Filename;Type;Filesize;Duration;Bitrate;vbr;Channelmode;Samplerate;Rating;Playcounter;Lyrics;BPM;TrackGain;AlbumGain;TrackPeak;AlbumPeak';
-  cCSVFormat = '%s;%s;%s;%s;%s;%s;%s;%d;%s;%s;%s;%s;%d;%d;%d;%s;%s;%s;%d;%d;%s;%s;%s;%s;%s;%s;';
+  // cCSVHeader = 'Artist;Title;Album;Album-Artist;Composer;Genre;Year;Track;CD;Directory;Filename;Type;Filesize;Duration;Bitrate;vbr;Channelmode;Samplerate;Rating;Playcounter;Lyrics;BPM;TrackGain;AlbumGain;TrackPeak;AlbumPeak';
+  // cCSVFormat = '%s;%s;%s;%s;%s;%s;%s;%d;%s;%s;%s;%s;%d;%d;%d;%s;%s;%s;%d;%d;%s;%s;%s;%s;%s;%s;';
   phArtist   =   '<artist>';
   phAlbum    =    '<album>';
   phTitle    =    '<title>';
   phTrack    =    '<track>';
   phYear     =     '<year>';
   phGenre    =    '<genre>';
+  phComment =   '<comment>';
   phStation  =   '<station>';
   phFileName = '<filename>';
   phFileNameExt = '<filenameExt>';
@@ -155,6 +156,7 @@ const
   phLyrics       = '<Lyrics>';
   phLyricsExist  = '<LyricsExist>';
   phBPM          = '<BPM>';
+  phHarmonicKey  = '<HarmonicKey>';
   phTrackGain    = '<TrackGain>';
   phAlbumGain    = '<AlbumGain>';
   phTrackPeak    = '<TrackPeak>';
@@ -199,21 +201,21 @@ type
 
   TESubstituteValue = (svEmpty, svNA, svFileName, svSubDirectory, svDirectory, svFullPath, svFileNameWithExtension);
 
-  TEAudioProperty = (cpArtist, cpTitle, cpAlbum, cpTrack, cpYear, cpGenre,
+  TEAudioProperty = (cpArtist, cpTitle, cpAlbum, cpTrack, cpYear, cpGenre, cpComment,
       cpFileName, cpFileNameExt, cpExtension, cpSubDir, cpDir, cpFullPath, cpStation,
       cpAlbumArtist, cpComposer, cpCD, cpType,
       cpFilesize, cpDuration, cpBitrate, cpVBR, cpChannelmode, cpSamplerate, cpRating, cpPlaycounter, cpLyrics, cpLyricsExist,
-      cpBPM, cpTrackGain, cpAlbumGain, cpTrackPeak, cpAlbumPeak, cpCoverID);
+      cpBPM, cpHarmonicKey, cpTrackGain, cpAlbumGain, cpTrackPeak, cpAlbumPeak, cpCoverID);
 
   TSetOfAudioProperties = set of TEAudioProperty;
 
 const
   PlaceHolders: Array[TEAudioProperty] of String = (
-        phArtist, phTitle, phAlbum, phTrack, phYear, phGenre,
+        phArtist, phTitle, phAlbum, phTrack, phYear, phGenre, phComment,
         phFileName, phFileNameExt, phExtension, phSubDir, phDir, phFullPath, phStation,
         phAlbumArtist, phComposer, phCD, phType,
         phFilesize, phDuration, phBitrate, phVBR, phChannelmode, phSamplerate, phRating, phPlaycounter, phLyrics, phLyricsExist,
-        phBPM, phTrackGain, phAlbumGain, phTrackPeak, phAlbumPeak, phCoverID);
+        phBPM, phHarmonicKey, phTrackGain, phAlbumGain, phTrackPeak, phAlbumPeak, phCoverID);
 
 type
 
@@ -347,7 +349,7 @@ type
 
       function DetailSummarySamplerate(af: TAudioFile): String;
 
-      function CSVLine(af: tAudioFile): String;
+      // function CSVLine(af: tAudioFile): String;
 
       function GetNonEmptyTitle(af: TAudioFile): String;
 
@@ -396,6 +398,7 @@ function GetAudioProperty(aAudioFile: TAudioFile; aProp: TEAudioProperty): strin
       cpTrack   : result := IntToStr(aAudioFile.Track);
       cpYear    : result := aAudioFile.Year;
       cpGenre   : result := aAudioFile.Genre;
+      cpComment : result := aAudioFile.Comment;
       cpFileName: result := ChangeFileExt(aAudioFile.Dateiname, '');
       cpFileNameExt: result := aAudioFile.Dateiname;
       cpExtension: result := aAudioFile.Extension;
@@ -1295,7 +1298,7 @@ end;
 
 
 
-function TAudioDisplay.CSVLine(af: tAudioFile): String;
+(*function TAudioDisplay.CSVLine(af: tAudioFile): String;
 var vbrstr, Lyricsstr : UnicodeString;
 
     function EscapeStr(aStr: String): String;
@@ -1343,6 +1346,7 @@ begin
           PeakValueToString(af.AlbumPeak)
         ]);
 end;
+*)
 
 function TAudioDisplay.PlayerLine1(MainFile, CueFile: TAudioFile): String;
 begin

@@ -112,6 +112,7 @@ function AFCompareTrackGain(a1,a2: tAudioFile): Integer;
 function AFCompareAlbumPeak(a1,a2: tAudioFile): Integer;
 function AFCompareTrackPeak(a1,a2: tAudioFile): Integer;
 function AFCompareBPM(a1,a2: tAudioFile): Integer;
+function AFCompareHarmonicKey(a1,a2: tAudioFile): Integer;
 
 var MainSort: IComparer<TAudioFile>;
 
@@ -295,6 +296,11 @@ end;
 function AFCompareBPM(a1,a2: tAudioFile): Integer;
 begin
   result := CompareText(a1.bpm, a2.bpm);
+end;
+
+function AFCompareHarmonicKey(a1,a2: tAudioFile): Integer;
+begin
+  result := CompareText(a1.HarmonicKey, a2.HarmonicKey);
 end;
 
 

@@ -108,7 +108,7 @@ end;
 
 function TTrueAudioFile.fGetFileTypeDescription: String;
 begin
-    result := TAudioFileNames[at_TrueAudio];
+    result := cAudioFileType[at_TrueAudio];
 end;
 
 procedure TTrueAudioFile.fResetData;

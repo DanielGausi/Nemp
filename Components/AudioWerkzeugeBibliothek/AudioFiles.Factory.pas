@@ -126,7 +126,7 @@ var AudioFileFactory: TAudioFileFactory;
 implementation
 
 uses
-  Mp3Files, FlacFiles, OggVorbisFiles,
+  Mp3Files, FlacFiles, OggVorbisFiles, OpusFiles,
   MonkeyFiles, WavPackFiles, MusePackFiles, OptimFrogFiles, TrueAudioFiles,
   M4AFiles, WmaFiles, WavFiles, DummyFiles;
 
@@ -168,6 +168,8 @@ begin
     RegisterClass(TMP3File, '.mp1');
     RegisterClass(TFlacFile, '.flac');
     RegisterClass(TFlacFile, '.fla');
+
+    RegisterClass(TOpusFile, '.opus');
 
     RegisterClass(TOggVorbisFile, '.ogg');
     RegisterClass(TOggVorbisFile, '.oga');

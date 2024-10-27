@@ -371,7 +371,7 @@ end;
 
 function TWavPackFile.fGetFileTypeDescription: String;
 begin
-    result := TAudioFileNames[at_WavPack];
+    result := cAudioFileType[at_WavPack];
 end;
 
 function TWavPackFile.fGetChannelMode: string;

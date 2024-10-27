@@ -4,8 +4,8 @@ object FDetails: TFDetails
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'File properties'
-  ClientHeight = 545
-  ClientWidth = 621
+  ClientHeight = 541
+  ClientWidth = 605
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -24,13 +24,12 @@ object FDetails: TFDetails
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 615
-    Height = 503
-    ActivePage = Tab_General
+    Width = 599
+    Height = 499
+    ActivePage = Tab_MetaData
     Align = alClient
     MultiLine = True
     TabOrder = 0
-    OnChange = MainPageControlChange
     object Tab_General: TTabSheet
       Caption = 'Overview'
       DoubleBuffered = False
@@ -39,7 +38,7 @@ object FDetails: TFDetails
       object GrpBox_File: TGroupBox
         Left = 0
         Top = 0
-        Width = 607
+        Width = 591
         Height = 145
         Align = alTop
         Caption = 'File properties'
@@ -47,7 +46,7 @@ object FDetails: TFDetails
         ParentColor = False
         TabOrder = 0
         DesignSize = (
-          607
+          591
           145)
         object LBLName: TLabel
           Left = 103
@@ -238,13 +237,14 @@ object FDetails: TFDetails
         end
         object CoverLibrary1: TImage
           AlignWithMargins = True
-          Left = 476
+          Left = 456
           Top = 13
           Width = 120
           Height = 120
           Anchors = [akTop, akRight]
           Center = True
           OnDblClick = CoverIMAGEDblClick
+          ExplicitLeft = 476
         end
         object PnlWarnung: TPanel
           Left = 235
@@ -336,16 +336,16 @@ object FDetails: TFDetails
       object PnlLibraryMetadata: TPanel
         Left = 0
         Top = 145
-        Width = 607
-        Height = 330
+        Width = 591
+        Height = 326
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
         object GrpBox_MetaDataLibrary: TGroupBox
           Left = 0
           Top = 0
-          Width = 607
-          Height = 330
+          Width = 591
+          Height = 326
           Align = alClient
           Caption = 'Metadata overview'
           DoubleBuffered = False
@@ -354,14 +354,14 @@ object FDetails: TFDetails
           object pnlExtendedTags: TPanel
             Left = 409
             Top = 15
-            Width = 196
-            Height = 313
+            Width = 180
+            Height = 309
             Align = alClient
             BevelOuter = bvNone
             TabOrder = 1
             DesignSize = (
-              196
-              313)
+              180
+              309)
             object lblExtendedTags: TLabel
               Left = 6
               Top = 8
@@ -382,8 +382,8 @@ object FDetails: TFDetails
               AlignWithMargins = True
               Left = 6
               Top = 27
-              Width = 179
-              Height = 273
+              Width = 159
+              Height = 268
               Anchors = [akLeft, akTop, akRight, akBottom]
               ItemHeight = 13
               PopupMenu = PM_EditExtendedTags
@@ -395,7 +395,7 @@ object FDetails: TFDetails
             Left = 2
             Top = 15
             Width = 407
-            Height = 313
+            Height = 309
             Align = alLeft
             BevelOuter = bvNone
             TabOrder = 0
@@ -738,8 +738,8 @@ object FDetails: TFDetails
       object GrpBox_Lyrics: TGroupBox
         Left = 0
         Top = 0
-        Width = 607
-        Height = 475
+        Width = 595
+        Height = 472
         Align = alClient
         Caption = 'Lyrics'
         TabOrder = 0
@@ -747,8 +747,8 @@ object FDetails: TFDetails
           AlignWithMargins = True
           Left = 5
           Top = 18
-          Width = 597
-          Height = 416
+          Width = 585
+          Height = 410
           Align = alClient
           ScrollBars = ssVertical
           TabOrder = 0
@@ -759,32 +759,41 @@ object FDetails: TFDetails
         object pnlSearchLyrics: TPanel
           AlignWithMargins = True
           Left = 5
-          Top = 440
-          Width = 597
-          Height = 30
+          Top = 434
+          Width = 585
+          Height = 33
           Align = alBottom
           BevelOuter = bvNone
           TabOrder = 1
-          DesignSize = (
-            597
-            30)
           object lblLyricSearchEngines: TLabel
             AlignWithMargins = True
-            Left = 3
-            Top = 5
-            Width = 438
-            Height = 13
+            Left = 8
+            Top = 3
+            Width = 413
+            Height = 27
+            Margins.Left = 8
+            Margins.Right = 8
+            Align = alClient
             Alignment = taRightJustify
-            Anchors = [akLeft, akTop, akRight]
             AutoSize = False
             Caption = 'Search Lyrics'
+            Layout = tlCenter
+            ExplicitLeft = 3
+            ExplicitTop = 5
             ExplicitWidth = 444
+            ExplicitHeight = 13
           end
           object btnSearchLyrics: TButton
-            Left = 453
-            Top = 0
+            AlignWithMargins = True
+            Left = 433
+            Top = 4
             Width = 144
             Height = 25
+            Margins.Left = 4
+            Margins.Top = 4
+            Margins.Right = 8
+            Margins.Bottom = 4
+            Align = alRight
             Caption = 'Search Lyrics'
             DropDownMenu = PM_SearchEngines
             Style = bsSplitButton
@@ -802,22 +811,22 @@ object FDetails: TFDetails
         AlignWithMargins = True
         Left = 3
         Top = 3
-        Width = 357
-        Height = 469
+        Width = 341
+        Height = 465
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         object gpBoxExistingCoverArt: TGroupBox
           Left = 0
           Top = 0
-          Width = 357
-          Height = 469
+          Width = 341
+          Height = 465
           Align = alClient
           Caption = 'Cover art (meta data and image files)'
           TabOrder = 0
           DesignSize = (
-            357
-            469)
+            341
+            465)
           object lblCoverInfo: TLabel
             Left = 16
             Top = 430
@@ -827,8 +836,8 @@ object FDetails: TFDetails
           end
           object VSTCover: TVirtualStringTree
             Left = 16
-            Top = 24
-            Width = 323
+            Top = 19
+            Width = 303
             Height = 94
             Anchors = [akLeft, akRight, akBottom]
             Colors.UnfocusedSelectionColor = clHighlight
@@ -847,10 +856,12 @@ object FDetails: TFDetails
             OnGetImageIndex = VSTCoverGetImageIndex
             Touch.InteractiveGestures = [igPan, igPressAndTap]
             Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+            ExplicitTop = 20
+            ExplicitWidth = 307
             Columns = <
               item
                 Position = 0
-                Width = 319
+                Width = 307
               end>
           end
           object pnlCoverCurrentSelection: TPanel
@@ -881,16 +892,16 @@ object FDetails: TFDetails
       end
       object GrpBox_CoverLibrary: TGroupBox
         AlignWithMargins = True
-        Left = 366
+        Left = 350
         Top = 3
         Width = 238
-        Height = 469
+        Height = 465
         Align = alRight
         Caption = 'Cover art for the Media library'
         TabOrder = 1
         DesignSize = (
           238
-          469)
+          465)
         object CoverLibrary2: TImage
           AlignWithMargins = True
           Left = 19
@@ -935,16 +946,18 @@ object FDetails: TFDetails
       object GrpBox_TextFrames: TGroupBox
         Left = 0
         Top = 0
-        Width = 607
-        Height = 286
+        Width = 591
+        Height = 282
         Align = alClient
         Caption = 'Metadata frames'
         TabOrder = 0
+        ExplicitWidth = 595
+        ExplicitHeight = 283
         object VST_MetaData: TVirtualStringTree
           Left = 2
           Top = 15
-          Width = 603
-          Height = 269
+          Width = 591
+          Height = 266
           Align = alClient
           BorderStyle = bsNone
           BorderWidth = 1
@@ -987,14 +1000,14 @@ object FDetails: TFDetails
             item
               Position = 3
               Text = 'Value'
-              Width = 381
+              Width = 371
             end>
         end
       end
       object Pnl_ID3v1_MPEG: TPanel
         Left = 0
-        Top = 286
-        Width = 607
+        Top = 282
+        Width = 591
         Height = 189
         Align = alBottom
         BevelOuter = bvNone
@@ -1202,13 +1215,14 @@ object FDetails: TFDetails
           end
         end
         object GrpBox_Mpeg: TGroupBox
-          Left = 369
+          Left = 353
           Top = 0
           Width = 238
           Height = 189
           Align = alRight
           Caption = 'MPEG'
           TabOrder = 1
+          ExplicitLeft = 357
           object LblConst_MpegBitrate: TLabel
             Left = 8
             Top = 48
@@ -1476,17 +1490,17 @@ object FDetails: TFDetails
   object pnlButtons: TPanel
     AlignWithMargins = True
     Left = 3
-    Top = 512
-    Width = 615
+    Top = 508
+    Width = 599
     Height = 30
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
     DesignSize = (
-      615
+      599
       30)
     object Btn_Close: TButton
-      Left = 370
+      Left = 350
       Top = 0
       Width = 75
       Height = 25
@@ -1497,7 +1511,7 @@ object FDetails: TFDetails
       OnClick = Btn_CloseClick
     end
     object BtnUndo: TButton
-      Left = 451
+      Left = 431
       Top = 0
       Width = 75
       Height = 25
@@ -1507,7 +1521,7 @@ object FDetails: TFDetails
       OnClick = BtnUndoClick
     end
     object BtnApply: TButton
-      Left = 532
+      Left = 512
       Top = 0
       Width = 75
       Height = 25
@@ -1517,7 +1531,7 @@ object FDetails: TFDetails
       OnClick = BtnApplyClick
     end
     object BtnRefreshCoverflow: TButton
-      Left = 197
+      Left = 177
       Top = 0
       Width = 157
       Height = 25
@@ -1530,7 +1544,7 @@ object FDetails: TFDetails
     object cbQuickRefresh: TCheckBox
       Left = 12
       Top = 0
-      Width = 179
+      Width = 167
       Height = 17
       Hint = 
         'Refresh this form whenever you select another file in the main w' +

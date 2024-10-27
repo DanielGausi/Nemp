@@ -94,8 +94,6 @@ type
         procedure fResetData;
         function fGetChannelMode: string;
 
-        //function fGetBitRate: Word;
-        //function fGetDuration: Double;
         function fIsCorrupted: Boolean;
         function fGetRatio: Double;
         function fGetVersionString: String;
@@ -107,10 +105,10 @@ type
         function fGetFrameCount: Integer;  // used up to Version 7
         function fGetSampleCount: Int64; // used in Version 8
 
-    protected
+        function CalculateGetSamplerate: Integer;
+        function CalculateChannels: Integer;
 
-        function fGetChannels: Integer;      override;
-        function fGetSamplerate: Integer; override;
+    protected
 
         function ReadAudioDataFromStream(aStream: TStream): Boolean; override;
 
@@ -203,7 +201,7 @@ begin
         fDataIndex := 1;  // invalid Header
 end;
 
-function TMusePackFile.fGetSampleRate: Integer;
+function TMusePackFile.CalculateGetSamplerate: Integer;
 var sr: Integer;
 begin
    if fStreamVersion = 8 then
@@ -243,7 +241,7 @@ begin
     end;
 end;
 
-function TMusePackFile.fGetChannels: Integer;
+function TMusePackFile.CalculateChannels: Integer;
 begin
     if fStreamVersion = 8 then
         result := (fHeader.ByteArray[fDataIndex+1] shr 4) + 1
@@ -263,7 +261,7 @@ end;
 
 function TMusePackFile.fGetFileTypeDescription: String;
 begin
-    result := TAudioFileNames[at_MusePack];
+    result := cAudioFileType[at_MusePack];
 end;
 
 
@@ -342,9 +340,8 @@ begin
         else
             fFrameCount    := fGetFrameCount;
 
-        fChannels := fGetChannels;
-
-        fSampleRate    := fGetSampleRate;
+        fChannels      := CalculateChannels;
+        fSampleRate    := CalculateGetSamplerate;
         fChannelModeID := fGetChannelModeID;
 
         // Compute Duration

@@ -2,7 +2,7 @@
     -----------------------------------
     Audio Werkzeuge Bibliothek
     -----------------------------------
-    (c) 2012-2020, Daniel Gaussmann
+    (c) 2012-2024, Daniel Gaussmann
               Website : www.gausi.de
               EMail   : mail@gausi.de
     -----------------------------------
@@ -49,19 +49,12 @@ unit ApeTagItem;
 
 interface
 
-uses Windows, Messages, SysUtils, Variants, ContNrs, Classes, AudioFiles.Declarations;
-
-type
-    TApePictureTypes = (
-      apt_Arbitrary,
-      apt_Other, apt_Icon, apt_OtherIcon, apt_Front, apt_Back, apt_Leaflet,
-      apt_Media, apt_Lead, apt_Artist, apt_Conductor, apt_Band, apt_Composer,
-      apt_Lyricist, apt_Studio, apt_Recording, apt_Performance, apt_MovieScene,
-      apt_ColoredFish, apt_Illustration, apt_BandLogo, apt_PublisherLogo );
+uses Windows, Messages, SysUtils, Variants, ContNrs, Classes, StrUtils,
+  AudioFiles.Declarations, AudioFiles.BaseTags;
 
 const
-    TPictureTypeStrings: Array[TApePictureTypes] of AnsiString = (
-      '',
+
+    cApePictureKeys: Array[TPictureType] of AnsiString = (
       'Cover Art (other)', 'Cover Art (icon)', 'Cover Art (other icon)',
       'Cover Art (front)', 'Cover Art (back)', 'Cover Art (leaflet)',
       'Cover Art (media)', 'Cover Art (lead)', 'Cover Art (artist)',
@@ -71,13 +64,58 @@ const
       'Cover Art (colored fish)', 'Cover Art (illustration)',
       'Cover Art (band logo)', 'Cover Art (publisher logo)' );
 
+      APE_AlbumArtist     = 'Albumartist';
+      APE_Artist          = 'Artist';
+      APE_Title           = 'Title';
+      APE_Album           = 'Album';
+      APE_Genre           = 'Genre';
+      APE_Track           = 'Track';
+      APE_Year            = 'Year';
+      APE_Abstract        = 'Abstract';
+      APE_Bibliography    = 'Bibliography';
+      APE_Catalog         = 'Catalog';
+      APE_Comment         = 'Comment';
+      APE_Composer        = 'Composer';
+      APE_Conductor       = 'Conductor';
+      APE_Copyright       = 'Copyright';
+      APE_DebutAlbum      = 'Debut album';
+      APE_EANUBC          = 'EAN/UBC';
+      APE_File            = 'File';
+      APE_Index           = 'Index';
+      APE_Introplay       = 'Introplay';
+      APE_ISBN            = 'ISBN';
+      APE_ISRC            = 'ISRC';
+      APE_Language        = 'Language';
+      APE_LC              = 'LC';
+      APE_Media           = 'Media';
+      APE_PublicationRight = 'Publicationright';
+      APE_Publisher       = 'Publisher';
+      APE_RecordDate      = 'Record Date';
+      APE_RecordLocation  = 'Record Location';
+      APE_Related         = 'Related';
+      APE_Subtitle        = 'Subtitle';
+      APE_BPM             = 'BPM';
+      // additional keys that I use in my Player Nemp, that seems to be used by other players as well
+      APE_HARMONIC_KEY    = 'InitialKey';
+      APE_Discnumber      = 'DISCNUMBER';
+
+    cTextApeKeys: Array[0..32] of string = (
+      APE_Abstract, APE_Album, APE_AlbumArtist, APE_Artist, APE_Bibliography,
+      APE_BPM, APE_Catalog, APE_Comment, APE_Composer, APE_Conductor, APE_Copyright,
+      APE_DebutAlbum, APE_Discnumber, APE_EANUBC, APE_File, APE_Genre, APE_Index,
+      APE_HARMONIC_KEY, APE_Introplay, APE_ISBN, APE_ISRC, APE_Language, APE_LC,
+      APE_Media, APE_PublicationRight, APE_Publisher, APE_RecordDate,
+      APE_RecordLocation, APE_Related, APE_Subtitle, APE_Title, APE_Track,
+      APE_Year);
 
 type
     TBuffer = Array of Byte;
 
-    TApeTagItemContentType = (ctText, ctBinary, ctExternal, ctreserved);
+    // TApeTagItemContentType is just used in the Constructor of an ApetagItem
+    // Otherwise, the more general teTagContentType is used
+    TApeTagItemContentType = (ctApeText, ctApeBinary, ctApeExternal); // ctApeReserved not supported
 
-    TApeTagItem = class
+    TApeTagItem = class(TTagItem)
         private
             fValueSize: Integer;
             fFlags: DWord;
@@ -85,76 +123,118 @@ type
             fValue: UTF8String;    // for normal String Data
             fData: TBuffer;        // for Binary Data
 
-            function fCheckKey(aKey: AnsiString): Boolean;
-
             function fGetCompleteSize: Integer;
-
-            procedure fSetValue(aValue: UnicodeString);
-            function fGetValue: UnicodeString;
-
-            procedure fSetContentType(aValue: TApeTagItemContentType);
-            function fGetContentType: TApeTagItemContentType;
-
+            procedure SetTagContentType(aValue: teTagContentType);
             procedure fSetReadOnly(aValue: Boolean);
             function fGetReadOnly: Boolean;
+            function GetPicType: TPictureType;
+
+        protected
+            function GetKey: UnicodeString; override;
+            function GetTagContentType: teTagContentType; override;
+            function GetDataSize: Integer; override;
         public
             property ValueSize: Integer read fValueSize;
             property CompleteSize: Integer read fGetCompleteSize;
             property Flags: DWord read fFlags;
-            property Key: AnsiString read fKey;
-            property Value: UnicodeString read fGetValue write fSetValue;
-
-            property ContentType: TApeTagItemContentType read fGetContentType write fSetContentType;
             property ReadOnlyFlag: Boolean read fGetReadOnly write fSetReadOnly;
-            constructor Create(aKey: AnsiString);
+
+            // Create a ApeTagItem
+            // If you want to add a new TagItem to an existing ApeTag-Structure by yourself, you MUST set Key and TagType
+            // While reading TagItems from an existing ApeTag, these values will be overwritten be ReadFromStream
+            constructor Create(aKey: AnsiString; aType: TApeTagItemContentType = ctApeText);
+
+            function GetText(TextMode: teTextMode = tmReasonable): UnicodeString; override;
+            function SetText(aValue: UnicodeString; TextMode: teTextMode = tmReasonable): Boolean; override;
+
+            function GetPicture(Dest: TStream; out Mime: AnsiString; out PicType: TPictureType; out Description: UnicodeString): Boolean; override;
+            function SetPicture(Source: TStream; Mime: AnsiString; PicType: TPictureType; Description: UnicodeString): Boolean; override;
 
             function GetBinaryData(dest: TStream): boolean;
             procedure SetBinaryData(source: TStream);
-
-            function GetPicture(dest: TStream; var description: UnicodeString): boolean;
-            procedure SetPicture(source: TStream; description: UnicodeString);
 
             function ReadFromStream(aStream: TStream): Boolean;
             function WriteToStream(aStream: TStream): Boolean;
     end;
 
+    function ValidApeKey(aKey: AnsiString): Boolean;
+
 implementation
+
+function ValidApeKey(aKey: AnsiString): Boolean;
+var
+  i: Integer;
+begin
+  result := True;
+  for i := 1 to length(aKey) do
+    if not (aKey[i] in [' '..'~'] ) then begin
+      result := false;
+      break;
+    end;
+end;
 
 { TApeTagItem }
 
-constructor TApeTagItem.Create(aKey: AnsiString);
+constructor TApeTagItem.Create(aKey: AnsiString; aType: TApeTagItemContentType = ctApeText);
 begin
-    if fCheckKey(aKey) then
-        fKey := aKey;
-end;
-
-function TApeTagItem.fCheckKey(aKey: AnsiString): Boolean;
-var i: Integer;
-begin
-    result := True;
-    for i := 1 to length(aKey) do
-        if Not (aKey[i] in [' '..'~'] ) then
-            result := false;
+  fTagType := ttApev2;
+  fKey := aKey;
+  case aType  of
+    ctApeText: SetTagContentType(tctText);
+    ctApeBinary: SetTagContentType(tctBinary);
+    ctApeExternal: SetTagContentType(tctExternal);
+  end;
 end;
 
 function TApeTagItem.fGetCompleteSize: Integer;
 begin
-    result := 8 + length(fKey) + 1 + fValueSize;
+  result := 8 + length(fKey) + 1 + fValueSize;
 end;
 
-function TApeTagItem.fGetContentType: TApeTagItemContentType;
+function TApeTagItem.GetKey: UnicodeString;
 begin
-    result := TApeTagItemContentType((Flags shr 1) AND 3);
+  result := UnicodeString(fKey);
 end;
 
-procedure TApeTagItem.fSetContentType(aValue: TApeTagItemContentType);
+function TApeTagItem.GetTagContentType: teTagContentType;
+var
+  b: Cardinal;
 begin
+    // result := TApeTagItemContentType((Flags shr 1) AND 3);
+    // former TApeTagItemContentType = (ctText, ctBinary, ctExternal, ctreserved);
+    b := (Flags shr 1) AND 3;
+    case b of
+      0: result := tctText;
+      1: begin
+        result := tctBinary;
+        if AnsiStartsText('Cover Art', String(fKey)) then
+          result := tctPicture;
+      end;
+      2: result := tctExternal;
+    else
+      result := tctReserved; // kinda invalid.
+    end;
+end;
+
+procedure TApeTagItem.SetTagContentType(aValue: teTagContentType);
+var
+  b: Cardinal;
+begin
+    case aValue of
+      tctText: b := 0;
+      tctBinary: b := 1;
+      tctExternal: b := 2;
+      tctReserved: b := 3;
+    else
+      b := 1;
+    end;
+
     fFlags :=
     (((not 0)     // all Bits 1
     - (3 shl 1))  // all Bits 1 except bit 1,2
     and fFlags)   // Flag-Bits Niled
     or
-    (DWord(aValue) shl 1);  // Set new Flag
+    (b shl 1);  // Set new Flag
 end;
 
 procedure TApeTagItem.fSetReadOnly(aValue: Boolean);
@@ -170,27 +250,31 @@ begin
     result := (fFlags And 1) = 1;
 end;
 
-function TApeTagItem.fGetValue: UnicodeString;
+function TApeTagItem.GetText(TextMode: teTextMode = tmReasonable): UnicodeString;
 begin
-    if ContentType in [ctText, ctExternal] then
+    result := '';
+    if TagContentType in [tctText, tctExternal] then
         result := ConvertUTF8ToString(fValue)
-    else
-        result := '<Binary Data>';
+    else begin
+      if TextMode = tmForced then
+        result := ByteArrayToString(fData)
+    end;
 end;
 
-procedure TApeTagItem.fSetValue(aValue: UnicodeString);
+function TApeTagItem.SetText(aValue: UnicodeString; TextMode: teTextMode = tmReasonable): Boolean;
 begin
-    fValue := ConvertStringToUTF8(aValue);
+    result := TagContentType in [tctText, tctExternal];
 
-    fValueSize := length(fValue);
-    ContentType := ctText;
-    ReadOnlyFlag := False;
+    if result then begin
+      fValue := ConvertStringToUTF8(aValue);
+      fValueSize := length(fValue);
+      ReadOnlyFlag := False;
+    end;
 end;
-
 
 function TApeTagItem.GetBinaryData(dest: TStream): boolean;
 begin
-    if ContentType <> ctBinary then
+    if TagContentType <> tctBinary then
         result := False
     else
     begin
@@ -198,57 +282,80 @@ begin
         result := True;
     end;
 end;
+
 procedure TApeTagItem.SetBinaryData(source: TStream);
 begin
     Setlength(fData, source.Size);
     source.Position := 0;
     source.Read(fData[0], source.Size);
     fValueSize := length(fData);
-    ContentType := ctBinary;
+    SetTagContentType(tctBinary);
     ReadOnlyFlag := False;
 end;
 
-function TApeTagItem.GetPicture(dest: TStream;
-  var description: UnicodeString): boolean;
+function TApeTagItem.GetPicType: TPictureType;
+var
+  i: TPictureType;
+begin
+  result := ptOther;
+  for i := Low(TPictureType) to High(TPictureType) do begin
+    if fKey = cApePictureKeys[i] then begin
+      result := i;
+      break;
+    end;
+  end;
+end;
+
+function TApeTagItem.GetPicture(Dest: TStream; out Mime: AnsiString; out PicType: TPictureType; out Description: UnicodeString): Boolean;
 var i, c: Integer;
     tmp: Utf8String;
 begin
-    if ContentType <> ctBinary then
-        result := False
-    else
-    begin
-        // expected data format:
-        // <description> (UTF8 encoded)
-        // $00           (delimter)
-        // data          (actual picture data)
-        c := High(Integer);
-        for i := 0 to length(fData) - 1 do
-            // get position of $00 Delimiter
-            if fData[i] = 0 then
-            begin
-                c := i;
-                break;
-            end;
-        if c < length(fData)-1 then
-        begin
-            Setlength(tmp, c);
-            Move(fData[0], tmp[1], c);
-            description := ConvertUTF8ToString(tmp);
+    Mime := '';
+    Description := '';
+    PicType := GetPicType;
+    result := TagContentType in [tctBinary, tctPicture];
+    if not result then
+        exit;
 
-            dest.Write(fData[c+1], length(fData)-(c+1));
-            result := True;
-        end else
-            // invalid data format
-            result := False;
-    end;
+    // expected data format:
+    // <description> (UTF8 encoded)
+    // $00           (delimiter)
+    // data          (actual picture data)
+    c := High(Integer);
+    for i := 0 to length(fData) - 1 do
+        // get position of $00 Delimiter
+        if fData[i] = 0 then
+        begin
+            c := i;
+            break;
+        end;
+    if c < length(fData)-1 then
+    begin
+        Setlength(tmp, c);
+        Move(fData[0], tmp[1], c);
+        description := ConvertUTF8ToString(tmp);
+
+        dest.Write(fData[c+1], length(fData)-(c+1));
+        result := True;
+    end else
+        // unexpected data format
+        result := False;
 end;
 
-procedure TApeTagItem.SetPicture(source: TStream;
-  description: UnicodeString);
+
+function TApeTagItem.SetPicture(Source: TStream; Mime: AnsiString; PicType: TPictureType; Description: UnicodeString): Boolean;
 var descUTF8: UTF8String;
 begin
-    if description = '' then
-        description := 'cover art';
+    // parameters PicType and Mime are ignored
+    // * a TagItem cannot change it's key (because it must be unique in the Tag)
+    // * There is no Mimetype information provided in this format
+    result := TagContentType in [tctBinary, tctPicture];
+    if not result then
+      exit;
+
+    if (description = '') then
+        description := 'Cover Art';
+
     descUTF8 := ConvertStringToUTF8(description);
     Setlength(fData, length(descUTF8) + 1 + source.Size);
     Move(descUTF8[1], fData[0], length(descUTF8));
@@ -257,8 +364,16 @@ begin
     source.Read(fData[length(descUTF8)+1], source.Size);
 
     fValueSize := length(fData);
-    ContentType := ctBinary;
+    SetTagContentType(tctBinary);
     ReadOnlyFlag := False;
+end;
+
+function TApeTagItem.GetDataSize: Integer;
+begin
+  if TagContentType in [tctBinary, tctPicture] then
+    result := Length(fData)
+  else
+    result := Length(fValue);
 end;
 
 function TApeTagItem.ReadFromStream(aStream: TStream): Boolean;
@@ -292,7 +407,7 @@ begin
 
     tmpKey := Copy(KeyBuf, 1, keyLength - 1);
     // Check for valid key
-    if Not fCheckKey(tmpKey) then
+    if Not ValidApeKey(tmpKey) then
     begin
         result := False;
         Exit;
@@ -302,7 +417,7 @@ begin
 
     aStream.Position := cPos + keyLength;
 
-    if ContentType = ctBinary then
+    if TagContentType in [tctBinary, tctPicture] then
     begin
         // fill fDATA with the binary data for further parsing
         SetLength(fData, fValueSize);
@@ -327,7 +442,7 @@ begin
     b := 0;
     aStream.Write(b, 1);
 
-    if ContentType = ctBinary then
+    if TagContentType = tctBinary then
         aStream.Write(fData[0], fValueSize)
     else
         aStream.Write(fValue[1], fValueSize);

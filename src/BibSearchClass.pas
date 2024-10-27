@@ -43,7 +43,7 @@ unit BibSearchClass;
 interface
 
 uses Windows, Contnrs, Sysutils,  Classes, dialogs, Messages, IniFiles,
-     NempAudioFiles, System.Types,
+     NempAudioFiles, LibraryOrganizer.Base, LibraryOrganizer.Files, System.Types,
      Hilfsfunktionen, StringSearchHelper, StrUtils, Nemp_ConstantsAndTypes,
      Nemp_RessourceStrings;
 
@@ -126,6 +126,7 @@ type
         CurrentList: TAudioFileList;
 
         fEmptyListMessageIdx: teEmptyListMessages;
+        fLastCollection: TAudioCollection;
         fIPCSearchIsRunning: Boolean;
 
         // Some Flags for the search
@@ -177,8 +178,6 @@ type
         function GetAccelerateSearchIncludeAlbumArtist: LongBool;
         function GetAccelerateLyricSearch: LongBool;
         procedure SetAccelerateLyricSearch(Value: LongBool);
-
-        function GetEmptyListMessage: String;
 
         procedure CalculateTotalStringLengths(FileList: TAudioFileList);
         procedure CalculateLyricStringLengths(FileList: TAudioFileList);
@@ -232,14 +231,15 @@ type
         property AccelerateSearchIncludeAlbumArtist: LongBool read GetAccelerateSearchIncludeAlbumArtist write SetAccelerateSearchIncludeAlbumArtist;
 
         property AccelerateLyricSearch: LongBool read GetAccelerateLyricSearch write SetAccelerateLyricSearch;
-        property EmptyListMessage: string read GetEmptyListMessage;
+        //property EmptyListMessage: string read GetEmptyListMessage;
         property IPCSearchIsRunning: Boolean read fIPCSearchIsRunning;
         property MostRecentQuickSearch: String read fGetMostrecentQuickSearch;
 
         constructor Create(aWnd: DWord);
         destructor Destroy; override;
 
-        function GetNewEmptyListMessage(msgIdx: teEmptyListMessages): String;
+        function EmptyListMessage: String;
+        function GetNewEmptyListMessage(msgIdx: teEmptyListMessages; aCollection: TAudioCollection = Nil): String;
 
         procedure Clear;
         // Deletes an AudioFile from the ObjectLists
@@ -298,7 +298,6 @@ function AudioFileMatchesKeywordsApprox(aAudioFile: TAudioFile; Keywords: TUTF8S
 function AudioFileMatchesKeywordsPlaylist(aAudioFile: TAudioFile; Keywords: TStringList): Boolean;
 
 implementation
-
 
 function AudioFileMatchesKeywordsPlaylist(aAudioFile: TAudioFile; Keywords: TStringList): Boolean;
 var i: Integer;
@@ -431,11 +430,25 @@ begin
         RemoveAudioFileFromLists(aList[i]);
 end;
 
-function TBibSearcher.GetEmptyListMessage: String;
+function TBibSearcher.EmptyListMessage: String;
 begin
   case fEmptyListMessageIdx of
     elmLibrary: result := MainForm_LibraryIsEmpty;
-    elmCategory: result := MainForm_EmptyCategory;
+    elmCategory: begin
+      if fLastCollection = Nil then
+        result := MainForm_EmptyCategory
+      else begin
+        if NempOrganizerSettings.ShowFilesRecursively then
+          result := Format(MainForm_EmptyCategoryNamed, [fLastCollection.SimpleCaption])
+        else begin
+          if (fLastCollection is TRootCollection) then
+            result := MainForm_EmptyRootCategory
+          else
+            result := Format(MainForm_EmptyCategoryNamedTryDoubleClick, [fLastCollection.SimpleCaption]);
+        end;
+      end;
+
+    end;
     elmSearch: result := MainForm_NoSearchresults;
     elmShortSearch: result := MainForm_SearchQueryTooShort;
     elmFavorite: result := MainForm_NoFavorites;
@@ -446,10 +459,11 @@ begin
   end;
 end;
 
-function TBibSearcher.GetNewEmptyListMessage(msgIdx: teEmptyListMessages): String;
+function TBibSearcher.GetNewEmptyListMessage(msgIdx: teEmptyListMessages; aCollection: TAudioCollection = Nil): String;
 begin
   fEmptyListMessageIdx := msgIdx;
-  result := GetEmptyListMessage;
+  fLastCollection := aCollection;
+  result := EmptyListMessage;
 end;
 
 {

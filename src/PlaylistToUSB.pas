@@ -47,12 +47,11 @@ uses
   Dialogs, StdCtrls, ExtCtrls, ComCtrls, IniFiles, MyDialogs, System.Contnrs,
   System.StrUtils,
   gnuGettext, Nemp_RessourceStrings, DriveRepairTools,
-  SystemHelper, fldBrows, NempAudioFiles, Hilfsfunktionen, AudioDisplayUtils,
+  SystemHelper, NempAudioFiles, Hilfsfunktionen, AudioDisplayUtils,
   Vcl.Mask;
 
 type
   TPlaylistCopyForm = class(TForm)
-    BtnCopyFiles: TButton;
     cbCloseWindow: TCheckBox;
     GrpboxSettings: TGroupBox;
     BtnSelectDirectory: TButton;
@@ -67,14 +66,14 @@ type
     PBComplete: TProgressBar;
     cbIncludeCuesheets: TCheckBox;
     cbConvertSpaces: TCheckBox;
-    BtnClose: TButton;
+    pnlButtons: TPanel;
+    BtnCopyFiles: TButton;
     procedure FormCreate(Sender: TObject);
     procedure BtnSelectDirectoryClick(Sender: TObject);
     procedure BtnCopyFilesClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure BtnCloseClick(Sender: TObject);
   private
     { Private-Deklarationen }
   public
@@ -278,7 +277,6 @@ begin
     PBCurrentFile.Position := 0;
     BtnCopyFiles.Caption := CopyToUSB_Copy;
     BtnCopyFiles.Tag := 0;
-    BtnClose.Enabled := True;
 end;
 
 
@@ -356,7 +354,6 @@ begin
         PBCurrentFile.Position := PBCurrentFile.Max;
         BtnCopyFiles.Caption := CopyToUSB_Copy;
         BtnCopyFiles.Tag := 0;
-        BtnClose.Enabled := True;
 
         if (not Boolean(Msg.wParam)) and (cbCloseWindow.Checked) then
             close;
@@ -397,23 +394,17 @@ end;
 }
 procedure TPlaylistCopyForm.BtnSelectDirectoryClick(Sender: TObject);
 var
-  FB: TFolderBrowser;
+  OpenDlg: TFileOpenDialog;
 begin
-  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_BibCaption, EditDirectory.Text);
+  OpenDlg := TFileOpenDialog.Create(self);
   try
-    fb.NewFolderButton := True;
-    if fb.Execute then
-      EditDirectory.Text := FB.SelectedItem;
+    OpenDlg.Options := OpenDlg.Options + [fdoPickFolders];
+    OpenDlg.DefaultFolder := EditDirectory.Text;
+    if OpenDlg.Execute then
+      EditDirectory.Text := OpenDlg.FileName;
   finally
-    fb.Free;
+    OpenDlg.Free;
   end;
-end;
-
-
-
-procedure TPlaylistCopyForm.BtnCloseClick(Sender: TObject);
-begin
-  Close;
 end;
 
 procedure TPlaylistCopyForm.BtnCopyFilesClick(Sender: TObject);
@@ -449,7 +440,6 @@ begin
             (Sender as TButton).Tag := 1;
             // Start the Copy-process
             BtnCopyFiles.Caption := CopyToUSB_Abort;
-            BtnClose.Enabled := False;
 
             cancelCopy := False;
             newCopyThread := TCopyExThread.Create;
@@ -479,7 +469,6 @@ begin
             // Cancel copying
             BtnCopyFiles.Caption := CopyToUSB_Copy;
             CancelCopy := True;
-            BtnClose.Enabled := True;
         end;
     end;
 end;

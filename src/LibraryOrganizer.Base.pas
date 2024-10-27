@@ -226,6 +226,8 @@ type
       // fShowCategoryCount: Boolean;
       fShowElementCount: Boolean;
       fShowCoverArtOnAlbum: Boolean;
+      fCombineLayers: Boolean;
+      fShowFilesRecursively: Boolean;
 
       fSamplerSortingIgnoreReleaseYear: Boolean;
       fPreferAlbumArtist: Boolean;
@@ -260,6 +262,8 @@ type
       property ShowWebradioCategory: Boolean read fShowWebradioCategory write fShowWebradioCategory;
       property ShowElementCount     : Boolean read fShowElementCount write fShowElementCount;
       property ShowCoverArtOnAlbum  : Boolean read fShowCoverArtOnAlbum write fShowCoverArtOnAlbum;
+      property CombineLayers: Boolean read fCombineLayers write fCombineLayers;
+      property ShowFilesRecursively: Boolean read fShowFilesRecursively write fShowFilesRecursively;
       // property UseNewCategory       : Boolean read fUseNewCategory write fUseNewCategory;
       // property UseSmartAdd          : Boolean read fUseSmartAdd write fUseSmartAdd;
       property AlbumKeyMode: teAlbumKeyMode read fAlbumKeyMode write fAlbumKeyMode;
@@ -310,6 +314,7 @@ type
       fCount: Integer;
       fKey: String;
       fMatchesCurrentSearch: Boolean;
+      function GetWantCombine: Boolean; virtual;
       function GetCaption: String; virtual; abstract;
       function GetSimpleCaption: String; virtual; abstract;
 
@@ -326,6 +331,7 @@ type
       property WebServerID: Integer read GetWebServerID write SetWebServerID;
       property Key: String read fKey;
       property Count: Integer read fCount;
+      property WantCombine: Boolean read GetWantCombine;
       property Caption: String read GetCaption;
       property SimpleCaption: String read GetSimpleCaption;
       property CoverID: String read GetCoverID;
@@ -412,6 +418,7 @@ type
 
       function GetCollection(Index: Integer): TAudioCollection;
       function GetCollectionCount: Integer;
+
 
     protected
       // Category.Collections:
@@ -741,6 +748,9 @@ begin
   // fShowCollectionCount := True;
   // fShowCategoryCount   := True;
   fShowCoverArtOnAlbum := True;
+  fCombineLayers := True;
+  fShowFilesRecursively := True;
+
   // fUseNewCategory := True;
   // fUseSmartAdd := True;
 
@@ -802,6 +812,9 @@ begin
   // fShowCollectionCount := Source.fShowCollectionCount;
   // fShowCategoryCount   := Source.fShowCategoryCount;
   fShowCoverArtOnAlbum := Source.fShowCoverArtOnAlbum;
+  fCombineLayers        := Source.fCombineLayers;
+  fShowFilesRecursively := Source.fShowFilesRecursively;
+
   // fUseNewCategory      := Source.fUseNewCategory;
   // fUseSmartAdd         := Source.fUseSmartAdd;
   fShowPlaylistCategories := Source.fShowPlaylistCategories;
@@ -991,6 +1004,9 @@ begin
   //fShowCategoryCount   := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowCategoryCount', True);
   fShowElementCount   := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowElementCount', True);
   fShowCoverArtOnAlbum := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowCoverArtOnAlbum', True);
+  fCombineLayers        := NempSettingsManager.ReadBool('LibraryOrganizer', 'CombineLayers', True);
+  fShowFilesRecursively := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowFilesRecursively', True);
+
   fShowPlaylistCategories := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowPlaylistCategories', True);
   fShowWebradioCategory := NempSettingsManager.ReadBool('LibraryOrganizer', 'ShowWebradioCategory', True);
 
@@ -1022,6 +1038,8 @@ begin
   //NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowCategoryCount', fShowCategoryCount);
   NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowElementCount', fShowElementCount);
   NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowCoverArtOnAlbum', fShowCoverArtOnAlbum);
+  NempSettingsManager.WriteBool('LibraryOrganizer', 'CombineLayers', fCombineLayers);
+  NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowFilesRecursively', fShowFilesRecursively);
   NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowPlaylistCategories', fShowPlaylistCategories);
   NempSettingsManager.WriteBool('LibraryOrganizer', 'ShowWebradioCategory', fShowWebradioCategory);
 
@@ -1229,6 +1247,11 @@ begin
   if Remember and assigned(fOwnerCategory) then
     fOwnerCategory.RememberLastCollection(self);
   DoGetFiles(dest, recursive);
+end;
+
+function TAudioCollection.GetWantCombine: Boolean;
+begin
+  result := False;
 end;
 
 { TCollectionMetaInfo }

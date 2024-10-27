@@ -42,7 +42,7 @@ uses
   Windows, Messages, SysUtils,  Variants, Classes, Graphics, Controls, Forms,
   Dialogs, VirtualTrees,  ComCtrls, StdCtrls, Spin, CheckLst, ExtCtrls, shellapi,
   DateUtils,  IniFiles, jpeg, PNGImage,  math, Contnrs,
-  bass, fldbrows, StringHelper, MainFormHelper, RatingCtrls,
+  bass, StringHelper, MainFormHelper, RatingCtrls,
   NempAudioFiles, Spectrum_vis, Hilfsfunktionen, Systemhelper, TreeHelper,
   CoverHelper, UpdateUtils, HtmlHelper,
   Nemp_ConstantsAndTypes, filetypes, Buttons, gnuGettext,
@@ -644,6 +644,8 @@ type
     cbLiveRecordingCheckTitle: TCheckBox;
     cbLiveRecordingCheckAlbum: TCheckBox;
     cbLiveRecordingCheckTags: TCheckBox;
+    cbCombineLayers: TCheckBox;
+    cbShowFilesRecursively: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -2136,6 +2138,7 @@ begin
             or (CBIncludeFiles.Items[i] = '.mp2')
             or (CBIncludeFiles.Items[i] = '.flac')
             or (CBIncludeFiles.Items[i] = '.fla')
+            or (CBIncludeFiles.Items[i] = '.opus')
             or (CBIncludeFiles.Items[i] = '.oga')
             or (CBIncludeFiles.Items[i] = '.wma')
             or (CBIncludeFiles.Items[i] = '.mp4')
@@ -2941,44 +2944,41 @@ begin
 end;
 
 procedure TOptionsCompleteForm.BtnAutoScanAddClick(Sender: TObject);
-var tmp, newdir: UnicodeString;
+var tmp: UnicodeString;
     i: Integer;
-    FB: TFolderBrowser;
+    OpenDlg: TFileOpenDialog;
 begin
   if MedienBib.InitialDialogFolder = '' then
       MedienBib.InitialDialogFolder := GetShellFolder(CSIDL_MYMUSIC);
 
-  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_BibCaption, MedienBib.InitialDialogFolder);
+  OpenDlg := TFileOpenDialog.Create(self);
   try
-      if fb.Execute then
-      begin
-          newdir := Fb.SelectedItem;
-          // save selected dir for next call of this dialog
-          MedienBib.InitialDialogFolder := Fb.SelectedItem;
+    OpenDlg.Options := OpenDlg.Options + [fdoPickFolders];
+    OpenDlg.DefaultFolder := MedienBib.InitialDialogFolder;
 
-          // Parentdir schon drin? - Nicht einfügen
-          if MedienBib.ScanListContainsParentDir(newdir) <> '' then
-            MessageDLG((AutoScanDir_AlreadyExists), mtInformation, [MBOK], 0)
-          else
-          begin
-            // parentdir noch nicht drin.
-            // Überprüfen auf SubDirs:
-            tmp := MedienBib.ScanListContainsSubDirs(newdir);
-            if  tmp <> '' then
-              MessageDLG((AutoSacnDir_SubDirExisted) + #13#10
-                          + tmp
-              , mtInformation, [MBOK], 0);
+    if OpenDlg.Execute then begin
+      // save selected dir for next call of this dialog
+      MedienBib.InitialDialogFolder := OpenDlg.FileName;
 
-              MedienBib.AutoScanDirList.Add(IncludeTrailingPathDelimiter(newdir));
-              LBAutoScan.Items.Clear;
-              for i := 0 to MedienBib.AutoScanDirList.Count - 1 do
-                LBAutoScan.Items.Add(MedienBib.AutoScanDirList[i]);
-          end;
+      // Parentdir schon drin? - Nicht einfügen
+      if MedienBib.ScanListContainsParentDir(OpenDlg.FileName) <> '' then
+        MessageDLG((AutoScanDir_AlreadyExists), mtInformation, [MBOK], 0)
+      else begin
+        // parentdir noch nicht drin.
+        // Überprüfen auf SubDirs:
+        tmp := MedienBib.ScanListContainsSubDirs(OpenDlg.FileName);
+        if  tmp <> '' then
+          MessageDLG((AutoSacnDir_SubDirExisted) + #13#10 + tmp, mtInformation, [MBOK], 0);
+
+        MedienBib.AutoScanDirList.Add(IncludeTrailingPathDelimiter(OpenDlg.FileName));
+        LBAutoScan.Items.Clear;
+        for i := 0 to MedienBib.AutoScanDirList.Count - 1 do
+          LBAutoScan.Items.Add(MedienBib.AutoScanDirList[i]);
       end;
+    end;
   finally
-      fb.Free;
+    OpenDlg.Free;
   end;
-
 end;
 
 procedure TOptionsCompleteForm.BtnAutoScanDeleteClick(Sender: TObject);
@@ -3175,8 +3175,9 @@ begin
 end;
 
 procedure TOptionsCompleteForm.BtnChooseDownloadDirClick(Sender: TObject);
-var adir: UnicodeString;
-    FB: TFolderBrowser;
+var
+  adir: UnicodeString;
+  OpenDlg: TFileOpenDialog;
 begin
   aDir := NempPlayer.DownloadDir;
 
@@ -3186,21 +3187,19 @@ begin
   //     which is created automatically anyway.
   if NOT DirectoryExists(ExtractFilePath(aDir)) then
   try
-      ForceDirectories(aDir);
+    ForceDirectories(aDir);
   except
-      TranslateMessageDLG((Warning_RecordingDirNotFoundCreationFailed), mtWarning, [mbOk], 0);
+    TranslateMessageDLG((Warning_RecordingDirNotFoundCreationFailed), mtWarning, [mbOk], 0);
   end;
 
-
-  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_Webradio_Caption, NempPlayer.DownloadDir);
+  OpenDlg := TFileOpenDialog.Create(self);
   try
-      if fb.Execute then
-      begin
-          aDir := fb.SelectedItem;
-          EdtDownloadDir.Text := IncludeTrailingPathDelimiter(aDir);
-      end;
+    OpenDlg.Options := OpenDlg.Options + [fdoPickFolders];
+    OpenDlg.DefaultFolder := NempPlayer.DownloadDir;
+    if OpenDlg.Execute then
+      EdtDownloadDir.Text := IncludeTrailingPathDelimiter(OpenDlg.FileName);
   finally
-      fb.Free;
+    OpenDlg.Free;
   end;
 end;
 
@@ -3825,6 +3824,8 @@ begin
   editCDNames.Text := OrganizerSettings.CDNames.DelimitedText;
   cbShowElementCount.Checked := OrganizerSettings.ShowElementCount;
   cbShowCoverForAlbum.Checked := OrganizerSettings.ShowCoverArtOnAlbum;
+  cbCombineLayers.Checked := OrganizerSettings.CombineLayers;
+  cbShowFilesRecursively.Checked := OrganizerSettings.ShowFilesRecursively;
   cbLibConfigShowPlaylistCategories.Checked := OrganizerSettings.ShowPlaylistCategories;
   cbLibConfigShowWebRadioCategory.Checked := OrganizerSettings.ShowWebradioCategory;
   cbPlaylistCaptionMode.ItemIndex := Integer(OrganizerSettings.PlaylistCaptionMode);
@@ -3879,6 +3880,8 @@ begin
   OrganizerSettings.CDNames.DelimitedText := editCDNames.Text;
   OrganizerSettings.ShowElementCount := cbShowElementCount.Checked;
   OrganizerSettings.ShowCoverArtOnAlbum := cbShowCoverForAlbum.Checked;
+  OrganizerSettings.CombineLayers := cbCombineLayers.Checked;
+  OrganizerSettings.ShowFilesRecursively := cbShowFilesRecursively.Checked;
   OrganizerSettings.ShowPlaylistCategories := cbLibConfigShowPlaylistCategories.Checked;
   OrganizerSettings.ShowWebradioCategory := cbLibConfigShowWebRadioCategory.Checked;
   OrganizerSettings.PlaylistCaptionMode := tePlaylistCaptionMode(cbPlaylistCaptionMode.ItemIndex);
@@ -4215,6 +4218,8 @@ begin
       or (OrganizerSettings.CDNames.DelimitedText <> editCDNames.Text)
       or (OrganizerSettings.ShowElementCount <> cbShowElementCount.Checked)
       or (OrganizerSettings.ShowCoverArtOnAlbum <> cbShowCoverForAlbum.Checked)
+      or (OrganizerSettings.ShowFilesRecursively <> cbShowFilesRecursively.Checked)
+      or (OrganizerSettings.CombineLayers <> cbCombineLayers.Checked)
       or (OrganizerSettings.ShowPlaylistCategories <> cbLibConfigShowPlaylistCategories.Checked)
       or (OrganizerSettings.ShowWebradioCategory <> cbLibConfigShowWebRadioCategory.Checked)
       or (OrganizerSettings.PlaylistCaptionMode <> tePlaylistCaptionMode(cbPlaylistCaptionMode.ItemIndex))

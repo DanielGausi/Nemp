@@ -10,7 +10,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2022, Daniel Gaussmann
+    Copyright (C) 2005-2024, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -42,7 +42,9 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Contnrs,
   Dialogs, NempAudioFiles, StdCtrls, ExtCtrls, StrUtils, JPEG, PNGImage,
   ShellApi, ComCtrls, U_CharCode, myDialogs,
-  AudioFiles.Base, AudioFiles.Declarations, AudioFiles.Factory, ID3v1Tags, ID3v2Tags, MpegFrames, ID3v2Frames, ID3GenreList, Mp3Files, FlacFiles, OggVorbisFiles,
+  AudioFiles.Base, AudioFiles.BaseTags, AudioFiles.Declarations, AudioFiles.Factory,
+  ID3v1Tags, ID3v2Tags, MpegFrames, ID3v2Frames, ID3GenreList, Mp3Files,
+  BaseVorbisFiles, FlacFiles, OggVorbisFiles,
   VorbisComments, BaseApeFiles, Apev2Tags, ApeTagItem, MusePackFiles, cddaUtils,
   M4AFiles, M4AAtoms, md5, NempHelp,
 
@@ -54,48 +56,42 @@ uses
 type
 
   TTagEditItem = class
-      private
-        fTagType        : TTagType    ;
-        fKey            : String      ;
-        fKeyDescription : String      ;
-        fValue          : String      ;
-        fID3v2Frame     : TID3v2Frame ;
-        fMetaAtom       : TMetaAtom   ;
-        fEditable       : Boolean     ;
-        fNiledByUser    : Boolean     ;
-      public
-        property TagType         : TTagType    read fTagType    write fTagType    ;
-        property Key             : String      read fKey        write fKey        ;
-        property KeyDescription  : String      read fKeyDescription write fKeyDescription;
-        property Value           : String      read fValue      write fValue      ;
-        property ID3v2Frame      : TID3v2Frame read fID3v2Frame write fID3v2Frame ;
-        property MetaAtom        : TMetaAtom   read fMetaAtom   write fMetaAtom   ;
-        property Editable        : Boolean     read fEditable; // not through a getter, as the getter is quite complex (probably)
+    private
+      fTagItem: TTagItem;
+      fDescription: String;
+      fValue: String;
+      fEditable       : Boolean     ;
+      fNiledByUser    : Boolean     ;
+      procedure Init;
+    public
+      property TagItem: TTagItem read fTagItem;
+      property Editable: Boolean read fEditable; // not through a getter, as the getter is quite complex (probably)
+      property Description: String read fDescription;
+      property Value: String read fValue;
 
-        constructor Create(aTagType: TTagType; aKey, aValue: String; aID3v2Frame: TID3v2Frame); overload;
-        procedure InitEditability;
+      constructor Create(aTagItem: TTagItem); overload;
   end;
 
-  TEPictureItemType = (ptIndexedMetaData, ptNamedMetaData, ptFile);
+  TEPictureItemType = (ptMetaData, ptFile);
 
   TPictureItem = class
-      private
-        fItemType: TEPictureItemType;
-        fMetaDataType: String;
-        fDescription: String; // Description in MetaData
-        fFileName: String; // Filename
-        fMetaFrame: TObject; // TID3v2Frame or TFlacPictureBlock, for APE use Description tpo access a Frame
-        fSize: Int64;
-        function GetCaption: String;
-      public
-        property ItemType: TEPictureItemType read fItemType write fItemType;
-        property Description: String read fDescription write fDescription;
-        property FileName: String read fFileName write fFileName;
+    private
+      fItemType: TEPictureItemType;
+      fFileName: String;  // Filename or
+      fTagItem: TTagItem; // TagItem from the Metdata
+      fCaption: String;
+      fSize: Int64;
+      procedure InitFromMetaFrame;
+    public
+      property ItemType: TEPictureItemType read fItemType;
+      property FileName: String read fFileName write fFileName;
+      property TagItem: TTagItem read fTagItem;
+      property Size: Int64 read fSize;
+      property Caption: String read fCaption;
 
-        property Caption: String read GetCaption;
-
-        constructor Create(MetaType, MetaDescription: String; Frame: TObject); overload;
-        constructor Create(aFilename: String); overload;
+      constructor Create(aTagItem: TTagItem); overload;
+      constructor Create(aFilename: String); overload;
+      procedure LoadImage(Dest: TPicture);
   end;
 
   TFDetails = class(TForm)
@@ -320,9 +316,8 @@ type
     procedure IMG_LibraryRatingMouseLeave(Sender: TObject);
     procedure CoverIMAGEDblClick(Sender: TObject);
     // Load an image from Pfad and shows it on page 1
-    procedure ShowSelectedImage_Files(PicItem: TPictureItem = NIL);
-    procedure ShowSelectedImage_MetaData(PicItem: TPictureItem = NIL);
-    procedure ExtractPicStreamFromMetaData(PicItem: TPictureItem; stream: TStream; var MimeType: AnsiString);
+    procedure ShowSelectedImage_Files(PicItem: TPictureItem; Dest: TImage);
+    procedure ShowSelectedImage_MetaData(PicItem: TPictureItem; Dest: TImage);
 
     // Live-Checking for valid inputs
     procedure Edit_LibraryTrackChange(Sender: TObject);
@@ -356,7 +351,6 @@ type
       Column: TColumnIndex; var Allowed: Boolean);
     procedure VST_MetaDataNewText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; NewText: string);
-    procedure MainPageControlChange(Sender: TObject);
     procedure BtnRefreshCoverflowClick(Sender: TObject);
     procedure VST_MetaDataCompareNodes(Sender: TBaseVirtualTree; Node1,
       Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
@@ -419,7 +413,6 @@ type
     fDataChanged: Boolean;
     fRatingsAreSynched: Boolean;
     CoverArtHasChanged: Boolean;
-    PicturesLoaded: Boolean;
 
     // When we change the "media library cover" for a file, it may be wanted for other files as well.
     // The changed CoverID ist stored in NewLibraryCoverID.
@@ -455,7 +448,6 @@ type
 
     procedure UpdateRatingGUI(ValuesAreSynched: Boolean = False);
     procedure ShowMainProperties; // Editable properties on the first page.
-    procedure ShowLyrics;
     function CheckRatings: Boolean;
     function ApplyExternalChanges: Boolean;
 
@@ -480,7 +472,6 @@ type
     procedure GetListOfCoverArt_Files;
 
     procedure HandleCoverIDSetting(aNewID: String);
-
     procedure SyncFilesAfterEdit;
 
     procedure CheckForChangedData(BackupFile: TAudioFile);
@@ -489,11 +480,12 @@ type
     function GetID3v1TagfromBaseAudioFile(aBaseAudioFile: TBaseAudioFile): TID3v1Tag;
     procedure PrepareLyricSearchEngines;
 
+    procedure SwitchToTab(aTab: TTabSheet);
+
   public
 
     procedure AudioFileEdited(AudioFile: TAudioFile);
     procedure NewAudioFileSelected(AudioFile: TAudioFile; UserDoWantShow: Boolean);
-
     procedure RefreshStarGraphics;
   end;
 
@@ -514,73 +506,79 @@ Uses NempMainUnit, NewPicture, Clipbrd, MedienbibliothekClass, MainFormHelper, T
 
 { TTagEditItem }
 
-constructor TTagEditItem.Create(aTagType: TTagType; aKey, aValue: String;
-  aID3v2Frame: TID3v2Frame);
+constructor TTagEditItem.Create(aTagItem: TTagItem);
 begin
-    fTagType   := aTagType    ;
-    fKey       := aKey        ;
-    fValue     := aValue      ;
-    fID3v2Frame:= aID3v2Frame ;
-    fNiledByUser := False;
+  fTagItem := aTagItem;
+  fNiledByUser := False;
+  Init;
 end;
 
-procedure TTagEditItem.InitEditability;
-var i: Integer;
+procedure TTagEditItem.Init;
+var
+  aFrameDescription, dummy: String;
 begin
-    // default setting: Do not allow editing
-    fEditable := False;
-    case fTagType of
-      TT_ID3v2: begin
-            fEditable := (self.ID3v2Frame.FrameType = FT_TextFrame) OR
-                         (self.ID3v2Frame.FrameType = FT_CommentFrame) OR         // careful!!
-                         (self.ID3v2Frame.FrameType = FT_UserDefinedURLFrame) OR  // careful!!
-                         (self.ID3v2Frame.FrameType = FT_URLFrame);
+    // Allow editing for (kinda) text items
+    fEditable := fTagItem.TagContentType in [
+      tctText, // generic
+      tctComment, tctLyrics, tctURL, tctUserText, tctUserURL, // ID3v2-specific
+      tctExternal, // Apev2-specific
+      tctTrackOrDiskNumber, tctGenre, tctSpecialText // m4a specific
+    ];
+
+    // exclude some TagItems from editing, even if they're in text format
+    case fTagItem.TagType of
+      ttVorbis,
+      ttApev2: begin
+        if SameText(fTagItem.Key, 'CATEGORIES') or
+           AnsiStartsText('REPLAYGAIN', fTagItem.Key) OR
+           AnsiStartsText('MP3GAIN', fTagItem.Key) OR
+           SameText(fTagItem.Key, 'UNSYNCEDLYRICS') OR
+           SameText(fTagItem.Key, 'UNSYNCED LYRICS') OR
+           SameText(fTagItem.Key, 'LYRICS') OR
+           SameText(fTagItem.Key, 'CATEGORIES')
+        then
+          fEditable := False
       end;
-      TT_OggVorbis,
-      TT_Flac,
-      TT_Ape: begin
-            fEditable := True;
-            if SameText(KeyDescription, 'CATEGORIES') or
-               AnsiStartsText('REPLAYGAIN', KeyDescription) OR
-               AnsiStartsText('MP3GAIN', KeyDescription) OR
-               SameText(KeyDescription, 'UNSYNCEDLYRICS') OR
-               SameText(KeyDescription, 'CATEGORIES')
-            then
-                fEditable := False
+
+      ttM4AAtom: begin
+        // exclude some known Atoms from editing, as they're kinda "special"
+        if SameText(fTagItem.Key, '始yr') OR  // Lyrics
+           SameText(fTagItem.Key, 'keyw') OR  // Keyword // Nemp-Tags
+           SameText(fTagItem.Key, '孤oo') OR  // Encoding Tool
+           SameText(fTagItem.Key, '委nc') OR
+           SameText(fTagItem.Key, 'apID')
+        then
+          fEditable := False;
       end;
-      TT_M4A: begin
-          if not assigned(self.MetaAtom) then
-              fEditable := False
-          else
-          begin
-              // there are some special cases here ...
-              // not really clean code, but for now it should be ok
-              if (MetaAtom.Name = 'trkn') or (MetaAtom.Name = 'disk') then
-                  fEditable := true
-              else
-              begin
-                  if not MetaAtom.ContainsTextData then
-                      fEditable := False
-                  else
-                  begin
-                      for i := 0 to length(KnownMetaAtoms) - 1 do
-                          if SameText(String(KnownMetaAtoms[i].AtomName), String(MetaAtom.Name)) then
-                          begin
-                              fEditable := True;
-                              break;
-                          end;
-                      // exclude some known Atoms from editing, as they're kinda "special"
-                      if (MetaAtom.Name = '始yr') OR  // Lyrics
-                         (MetaAtom.Name = 'keyw') OR  // Keyword // Nemp-Tags
-                         (MetaAtom.Name = '孤oo') OR  // Encoding Tool
-                         (MetaAtom.Name = '委nc') OR
-                         (MetaAtom.Name = 'apID')
-                      then
-                          fEditable := False;
-                  end;
-              end;
-          end;
-      end;
+      // ttID3v2: ;         // nothing to do
+      // ttFlacMetaBlock: ; // nothing to do
+    end;
+
+    if (fTagItem.TagContentType in
+        [tctInvalid, tctUndef, tctPicture, tctBinary, tctPrivate, tctUnknown, tctReserved, tctSpecial])
+    and (fTagItem.DataSize >= 500)
+    then
+      fValue := Format('<Binary Data>, %d Bytes', [fTagItem.DataSize])
+    else
+      fValue := fTagItem.GetText(tmForced);
+
+    // default value for the Description
+    fDescription := fTagItem.Description;
+
+    // change Description in some special cases
+    if fTagItem.TagType = ttID3v2 then begin
+      case fTagItem.TagContentType of
+        tctUserText: begin
+          dummy := TID3v2Frame(fTagItem).GetUserText(aFrameDescription);
+          if aFrameDescription <> '' then
+            fDescription := Format('%s, %s', [fTagItem.Description, aFrameDescription])
+        end;
+        tctUserURL: begin
+          dummy := String(TID3v2Frame(fTagItem).GetUserDefinedURL(aFrameDescription));
+          if aFrameDescription <> '' then
+            fDescription := Format('%s, %s', [fTagItem.Description, aFrameDescription]);
+        end;
+       end;
     end;
 end;
 {$ENDREGION}
@@ -593,25 +591,69 @@ begin
   inherited create;
   fItemType := ptFile;
   fFileName := aFilename;
-  fMetaFrame := Nil;
+  fTagItem := Nil;
+  fCaption := ExtractFilename(fFileName);
+  fSize := GetFileSize(fFileName);
 end;
 
-constructor TPictureItem.Create(MetaType, MetaDescription: String; Frame: TObject);
+constructor TPictureItem.Create(aTagItem: TTagItem);
 begin
-  fItemType := ptIndexedMetaData;
-  fMetaDataType := MetaType;
-  fDescription := MetaDescription;
-  fMetaFrame := Frame;
+  fItemType := ptMetaData;
+  fTagItem := aTagItem;
+  fFilename := '';
+  InitFromMetaFrame;
 end;
 
-function TPictureItem.GetCaption: String;
+procedure TPictureItem.InitFromMetaFrame;
+var
+  tmpDescription: String;
+  tmpStream: TMemoryStream;
+  tmpMime: AnsiString;
+  tmpPicType: TPictureType;
 begin
-  case self.fItemType of
-    ptIndexedMetaData: result := Format('%s, %s', [fMetaDataType, Description]);
-    ptNamedMetaData: result := Description;
-    ptFile: result := ExtractFilename(fFileName);
-  else
-    result  := '';
+  tmpStream := TMemoryStream.Create;
+  try
+    if fTagItem.GetPicture(tmpStream, tmpMime, tmpPicType, tmpDescription) then begin
+      fSize := tmpStream.Size;
+      if tmpPicType = ptOther then
+        fCaption := CoverList_Default
+      else
+        fCaption := _(cPictureTypes[tmpPicType]);
+      if tmpDescription <> '' then
+        fCaption := fCaption + ', ' + tmpDescription;
+    end else begin
+      fCaption := '';
+      fSize := 0;
+    end;
+  finally
+    tmpStream.Free;
+  end;
+end;
+
+procedure TPictureItem.LoadImage(Dest: TPicture);
+var
+  tmpDescription: String;
+  tmpStream: TMemoryStream;
+  tmpMime: AnsiString;
+  tmpPicType: TPictureType;
+begin
+  tmpStream := TMemoryStream.Create;
+  try
+    if (fSize > 0) and fTagItem.GetPicture(tmpStream, tmpMime, tmpPicType, tmpDescription) then begin
+      tmpStream.Position := 0;
+      try
+        Dest.LoadFromStream(tmpStream);
+      except
+        on E: Exception do begin
+            Dest.Assign(Nil);
+            TranslateMessageDLG(Error_CoverInvalid + #13#10 + #13#10 + E.Message, mtError, [mbOK], 0);
+          end;
+      end;
+    end else begin
+      Dest.Assign(Nil);
+    end;
+  finally
+    tmpStream.Free;
   end;
 end;
 
@@ -898,12 +940,13 @@ begin
     if fEditTag.Valid and (fEditTag.filetype = at_mp3) then
       ShowMPEGDetails(TMP3File(fEditTag));
 
-    if MainPageControl.ActivePage = Tab_Pictures then begin
-      PicturesLoaded := True;
-      ShowCoverArt;
-    end else
-      PicturesLoaded := False; // Show Pictures later, if needed
-    ShowLyrics;
+    // Load Pictures
+    ShowCoverArt;
+
+    // Lyrics may NOT be stored in the media library, and therefore not in the fEditFile-Object
+    // Therefore: Use the fEditTag-Object here to display the Lyrics
+    Memo_Lyrics.Text := fEdittag.Lyrics;
+
     fDataChanged := False;
     CoverArtHasChanged := False;
     if not visible then
@@ -935,8 +978,7 @@ end;
 procedure TFDetails.ApplyEditFileToEditTag;
 var
   mp3File: TMP3File;
-  oggFile: TOggVorbisFile;
-  flacFile: TFlacFile;
+  oggFile: TBaseVorbisFile;
   m4aFile: TM4aFile;
   apeFile: TBaseApeFile;
 begin
@@ -984,20 +1026,14 @@ begin
                       mp3file.ApeTag.SetValueByKey(APE_DISCNUMBER, fEditFile.CD);
         end;
 
-        at_Ogg: begin
+        at_Ogg,
+        at_Opus,
+        at_Flac: begin
                     fEditTag.AlbumArtist := fEditFile.AlbumArtist;
-                    oggFile := TOggVorbisFile(fEditTag);
+                    oggFile := TBaseVorbisFile(fEditTag);
                     oggFile.SetPropertyByFieldname(VORBIS_COMMENT, fEditFile.Comment);
                     oggFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, fEditFile.CD);
                     oggFile.SetPropertyByFieldname(VORBIS_COMPOSER, fEditFile.Composer);
-        end;
-
-        at_Flac: begin
-                    fEditTag.AlbumArtist := fEditFile.AlbumArtist;
-                    flacFile := TFlacFile(fEditTag);
-                    flacFile.SetPropertyByFieldname(VORBIS_COMMENT, fEditFile.Comment);
-                    flacFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, fEditFile.CD);
-                    flacFile.SetPropertyByFieldname(VORBIS_COMPOSER, fEditFile.Composer);
         end;
 
         at_M4A: begin
@@ -1029,8 +1065,7 @@ end;
 procedure TFDetails.ApplyRatingToAudioFile(newRating: Byte);
 var
   mp3File: TMP3File;
-  oggFile: TOggVorbisFile;
-  flacFile: TFlacFile;
+  oggFile: TBaseVorbisFile;
   m4aFile: TM4aFile;
   apeFile: TBaseApeFile;
 begin
@@ -1045,17 +1080,13 @@ begin
                 mp3File.ID3v2Tag.PlayCounter := fEditFile.PlayCounter;
     end;
 
-    at_Ogg: begin
-                oggFile := TOggVorbisFile(fEditTag);
+    at_Ogg,
+    at_Opus,
+    at_Flac: begin
+                oggFile := TBaseVorbisFile(fEditTag);
                 // Empty values (= '') will delete the field from the Tag
                 oggFile.SetPropertyByFieldname(VORBIS_RATING   , IntToStrEmptyZero(fEditFile.Rating) );
                 oggFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStrEmptyZero(fEditFile.PlayCounter));
-    end;
-
-    at_Flac: begin
-                flacFile := TFlacFile(fEditTag);
-                flacFile.SetPropertyByFieldname(VORBIS_RATING   , IntToStrEmptyZero(fEditFile.Rating) );
-                flacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStrEmptyZero(fEditFile.PlayCounter));
     end;
 
     at_M4A: begin
@@ -1086,29 +1117,18 @@ begin
   fEditFile.Lyrics := UTF8String(Trim(Memo_Lyrics.Text));
 
   case fEditTag.FileType of
-        at_Mp3: begin
-                    mp3File := TMP3File(fEditTag);
-                    // Lyrics (no default-lyrics in APE-Tag, skip that)
-                    if fEditFile.Lyrics <> '' then
-                      fEditFile.EnsureID3v2Exists(mp3File);
-                    if mp3File.ID3v2Tag.Lyrics <> string(fEditFile.Lyrics) then
-                      mp3File.ID3v2Tag.Lyrics := string(fEditFile.Lyrics);
-        end;
-
-        at_Ogg: TOggVorbisFile(fEditTag).SetPropertyByFieldname(VORBIS_LYRICS, string(fEditFile.Lyrics));
-        at_Flac: TFlacFile(fEditTag).SetPropertyByFieldname(VORBIS_LYRICS, string(fEditFile.Lyrics));
-        at_M4A: TM4aFile(fEditTag).Lyrics := string(fEditFile.Lyrics);
-
-        at_Monkey,
-        at_WavPack,
-        at_MusePack,
-        at_OptimFrog,
-        at_TrueAudio: TBaseApeFile(fEditTag).ApeTag.SetValueByKey(APE_LYRICS, string(fEditFile.Lyrics));
-
-        at_Wma: ;
-        at_Wav: ;
-        at_Invalid: ;
+    at_Mp3: begin
+                mp3File := TMP3File(fEditTag);
+                // Lyrics (no default-lyrics in APE-Tag, skip that)
+                if fEditFile.Lyrics <> '' then
+                  fEditFile.EnsureID3v2Exists(mp3File);
+                fEditTag.Lyrics := string(fEditFile.Lyrics);
+                //if mp3File.ID3v2Tag.Lyrics <> string(fEditFile.Lyrics) then
+                //  mp3File.ID3v2Tag.Lyrics := string(fEditFile.Lyrics);
     end;
+  else
+    fEditTag.Lyrics := string(fEditFile.Lyrics);
+  end;
 end;
 
 procedure TFDetails.ApplyExtendedTagsToAudioFile;
@@ -1117,40 +1137,43 @@ var s: UTF8String;
 begin
     case fEditTag.FileType of
         at_Mp3: begin
-
-                    if self.lb_Tags.Items.Count > 0 then
-                    begin
-                        // Ensure that ID3v2Tag exists and set PrivateFrame with "Tags"
-                        fEditFile.EnsureID3v2Exists(TMP3File(fEditTag));
-                        s := Utf8String(Trim(lb_Tags.Items.Text));
-                        if length(s) > 0 then
-                        begin
-                            ms := TMemoryStream.Create;
-                            try
-                                ms.Write(s[1], length(s));
-                                TMP3File(fEditTag).ID3v2Tag.SetPrivateFrame('NEMP/Tags', ms);
-                            finally
-                                ms.Free;
-                            end;
-                        end else
-                            // delete Tags-Frame, if there are none
-                            TMP3File(fEditTag).ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
-                    end else
-                    begin
-                        // If ID3v2Tag exists, remove "Tags", if the user removed all of them
-                        if TMP3File(fEditTag).ID3v2Tag.Exists then
-                            TMP3File(fEditTag).ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
-                    end;
+              if self.lb_Tags.Items.Count > 0 then
+              begin
+                  // Ensure that ID3v2Tag exists and set PrivateFrame with "Tags"
+                  fEditFile.EnsureID3v2Exists(TMP3File(fEditTag));
+                  s := Utf8String(Trim(lb_Tags.Items.Text));
+                  if length(s) > 0 then
+                  begin
+                      ms := TMemoryStream.Create;
+                      try
+                          ms.Write(s[1], length(s));
+                          TMP3File(fEditTag).ID3v2Tag.SetPrivateFrame('NEMP/Tags', ms);
+                      finally
+                          ms.Free;
+                      end;
+                  end else
+                      // delete Tags-Frame, if there are none
+                      TMP3File(fEditTag).ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
+              end else
+              begin
+                  // If ID3v2Tag exists, remove "Tags", if the user removed all of them
+                  if TMP3File(fEditTag).ID3v2Tag.Exists then
+                      TMP3File(fEditTag).ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
+              end;
         end;
 
-        at_Ogg:     TOggVorbisFile(fEditTag).SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(lb_Tags.Items.Text));
-        at_Flac:    TFlacFile(fEditTag).SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(lb_Tags.Items.Text));
-        at_M4A:     TM4aFile(fEditTag).Keywords := Trim(lb_Tags.Items.Text);
+        at_Ogg,
+        at_Opus,
+        at_Flac: TBaseVorbisFile(fEditTag).SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(lb_Tags.Items.Text));
+
+        at_M4A: TM4aFile(fEditTag).Keywords := Trim(lb_Tags.Items.Text);
+
         at_Monkey,
         at_WavPack,
         at_MusePack,
         at_OptimFrog,
         at_TrueAudio: TBaseApeFile(fEditTag).ApeTag.SetValueByKey(APE_CATEGORIES, Trim(lb_Tags.Items.Text));
+
         at_Wma: ;
         at_Wav: ;
         at_Invalid: ;
@@ -1161,7 +1184,6 @@ procedure TFDetails.MetaDataFramesToAudioFile;
 begin
   fEditFile.GetAudioData(fEditTag);
 end;
-
 
 {
     --------------------------------------------------------
@@ -1254,28 +1276,6 @@ begin
   end;
 end;
 
-procedure TFDetails.ShowLyrics;
-begin
-    {
-      Lyrics may NOT be stored in the media library, and therefore not in the fEditFile-Object
-      Therefore: Use the fEditTag-Object here to display the Lyrics
-    }
-    case fEditTag.FileType of
-        at_Mp3: Memo_Lyrics.Text := TMP3File(fEditTag).ID3v2Tag.Lyrics;
-        at_Ogg: Memo_Lyrics.Text := TOggVorbisFile(fEditTag).GetPropertyByFieldname(VORBIS_LYRICS);
-        at_Flac: Memo_Lyrics.Text := TFlacFile(fEditTag).GetPropertyByFieldname(VORBIS_LYRICS);
-        at_M4A: Memo_Lyrics.Text := TM4aFile(fEditTag).Lyrics;
-        at_Monkey,
-        at_WavPack,
-        at_MusePack,
-        at_OptimFrog,
-        at_TrueAudio: Memo_Lyrics.Text := TBaseApeFile(fEditTag).ApeTag.GetValueByKey(APE_LYRICS);
-    else
-        Memo_Lyrics.Text := '';
-    end;
-end;
-
-
 procedure TFDetails.ApplyCoverIDChanges;
 var
   aErr: TNempAudioError;
@@ -1339,40 +1339,26 @@ begin
 end;
 
 procedure TFDetails.RemoveNiledFrames;
-var aNode, nextNode: PVirtualNode;
-    aTagEditItem: TTagEditItem;
+var
+  aNode, nextNode: PVirtualNode;
+  aTagEditItem: TTagEditItem;
 begin
-    if not fDataChanged then
-        // nothing to do
-        exit;
+  if not fDataChanged then
+    exit; // nothing to do
 
-    // If the Item has been Niled by the User (i.e. new value = ''), then
-    // we should remove the matching Frame/MetaAtom from the inner Tag structure.
-    // For Ogg/Flac/Ape, this is not necessary, as we just work with "KEY=VALUE"
-    // items there.
-    if (fEditTag.FileType = at_Mp3) OR (fEditTag.FileType = at_M4A) then
-    begin
-        aNode := VST_MetaData.GetFirst;
-        while assigned(aNode) do
-        begin
-            aTagEditItem := VST_MetaData.GetNodeData<TTagEditItem>(aNode);
-
-            if aTagEdititem.fNiledByUser then
-            begin
-                nextNode := VST_MetaData.GetNext(aNode);
-
-                if fEditTag.FileType = at_Mp3 then
-                    TMP3File(fEditTag).ID3v2Tag.DeleteFrame(aTagEdititem.ID3v2Frame);
-
-                if fEditTag.FileType = at_M4A then
-                    TM4aFile(fEditTag).RemoveMetaAtom(aTagEditItem.MetaAtom);
-
-                VST_MetaData.DeleteNode(aNode);
-                aNode := nextNode;
-            end else
-                aNode := VST_MetaData.GetNext(aNode);
-        end;
-    end;
+  aNode := VST_MetaData.GetFirst;
+  while assigned(aNode) do begin
+    aTagEditItem := VST_MetaData.GetNodeData<TTagEditItem>(aNode);
+    if aTagEdititem.fNiledByUser then begin
+      nextNode := VST_MetaData.GetNext(aNode);
+      // delete Node from View and TagItem from the MetaTag
+      VST_MetaData.DeleteNode(aNode);
+      fEditTag.DeleteTagItem(aTagEdititem.fTagItem);
+      // go on
+      aNode := nextNode;
+    end else
+      aNode := VST_MetaData.GetNext(aNode);
+  end;
 end;
 
 {
@@ -1477,15 +1463,6 @@ begin
 end;
 
 
-procedure TFDetails.MainPageControlChange(Sender: TObject);
-begin
-  if (MainPageControl.ActivePage = Tab_Pictures) and (NOT PicturesLoaded) then begin
-    PicturesLoaded := True;
-    ShowCoverArt;
-  end;
-end;
-
-
 {$REGION 'Small Supporting methods, little QoL-Features'}
 
 procedure TFDetails.RefreshStarGraphics;
@@ -1552,25 +1529,27 @@ procedure TFDetails.ActionTagAddExecute(Sender: TObject);
 var newTagDummy: String;
     IgnoreWarningsDummy: Boolean;
 begin
-    if HandleSingleFileTagChange(fEditFile, '', newTagDummy, IgnoreWarningsDummy) then
-        TagsHasChanged(lb_Tags.Items.Count-1);
+  SwitchToTab(Tab_General);
+  if HandleSingleFileTagChange(fEditFile, '', newTagDummy, IgnoreWarningsDummy) then
+    TagsHasChanged(lb_Tags.Items.Count-1);
 end;
 
 procedure TFDetails.ActionTagRemoveExecute(Sender: TObject);
 var CurrentTagToChange: String;
     CurrentIdx: Integer;
 begin
-    CurrentIdx := lb_Tags.ItemIndex;
-    if (MedienBib.StatusBibUpdate <= 1)
-        and assigned(fEditFile)
-        and (MedienBib.CurrentThreadFilename <> fEditFile.Pfad)
-        and (CurrentIdx >= 0)
-    then
-    begin
-        CurrentTagToChange := lb_Tags.Items[CurrentIdx];
-        if fEditFile.RemoveTag(CurrentTagToChange) then
-            TagsHasChanged(CurrentIdx);
-    end;
+  SwitchToTab(Tab_General);
+  CurrentIdx := lb_Tags.ItemIndex;
+  if (MedienBib.StatusBibUpdate <= 1)
+      and assigned(fEditFile)
+      and (MedienBib.CurrentThreadFilename <> fEditFile.Pfad)
+      and (CurrentIdx >= 0)
+  then
+  begin
+      CurrentTagToChange := lb_Tags.Items[CurrentIdx];
+      if fEditFile.RemoveTag(CurrentTagToChange) then
+          TagsHasChanged(CurrentIdx);
+  end;
 end;
 
 
@@ -1579,52 +1558,55 @@ var newTagDummy, CurrentTagToChange: String;
     IgnoreWarningsDummy: Boolean;
     CurrentIdx: Integer;
 begin
-    CurrentIdx := lb_Tags.ItemIndex;
-    if (MedienBib.StatusBibUpdate <= 1)
-        and assigned(fEditFile)
-        and (MedienBib.CurrentThreadFilename <> fEditFile.Pfad)
-        and (CurrentIdx >= 0)
-    then
-    begin
-        CurrentTagToChange := lb_Tags.Items[CurrentIdx];
-        if HandleSingleFileTagChange(fEditFile, CurrentTagToChange, newTagDummy, IgnoreWarningsDummy) then
-            TagsHasChanged(lb_Tags.Count - 1);
-    end;
+  SwitchToTab(Tab_General);
+  CurrentIdx := lb_Tags.ItemIndex;
+  if (MedienBib.StatusBibUpdate <= 1)
+      and assigned(fEditFile)
+      and (MedienBib.CurrentThreadFilename <> fEditFile.Pfad)
+      and (CurrentIdx >= 0)
+  then
+  begin
+      CurrentTagToChange := lb_Tags.Items[CurrentIdx];
+      if HandleSingleFileTagChange(fEditFile, CurrentTagToChange, newTagDummy, IgnoreWarningsDummy) then
+          TagsHasChanged(lb_Tags.Count - 1);
+  end;
 end;
 
 procedure TFDetails.ActionTagGetLastFMExecute(Sender: TObject);
 var s: String;
     TagPostProcessor: TTagPostProcessor;
 begin
-    fEditFile.RawTagLastFM := UTF8String(Trim(lb_Tags.Items.Text));
+  SwitchToTab(Tab_General);
+  fEditFile.RawTagLastFM := UTF8String(Trim(lb_Tags.Items.Text));
 
-    TagPostProcessor := TTagPostProcessor.Create;
-    try
-        TagPostProcessor.LoadFiles;
-        s := MedienBib.BibScrobbler.GetTags(fEditFile);
-        if trim(s) = '' then
-            TranslateMessageDLG(MediaLibrary_GetTagsFailed, mtInformation, [MBOK], 0)
-        else
-        begin
-            // process new Tags. Rename, delete ignored and duplicates.
-            MedienBib.AddNewTag(fEditFile, s, False);
-            fDataChanged := True;
-        end;
+  TagPostProcessor := TTagPostProcessor.Create;
+  try
+      TagPostProcessor.LoadFiles;
+      s := MedienBib.BibScrobbler.GetTags(fEditFile);
+      if trim(s) = '' then
+          TranslateMessageDLG(MediaLibrary_GetTagsFailed, mtInformation, [MBOK], 0)
+      else
+      begin
+          // process new Tags. Rename, delete ignored and duplicates.
+          MedienBib.AddNewTag(fEditFile, s, False);
+          fDataChanged := True;
+      end;
 
-        // Show tags of temporary file in the memo
-        lb_Tags.Items.Text := String(fEditFile.RawTagLastFM);
-        ApplyExtendedTagsToAudioFile;
-        ShowMetaDataFrames;
-    finally
-        TagPostProcessor.Free;
-    end;
+      // Show tags of temporary file in the memo
+      lb_Tags.Items.Text := String(fEditFile.RawTagLastFM);
+      ApplyExtendedTagsToAudioFile;
+      ShowMetaDataFrames;
+  finally
+      TagPostProcessor.Free;
+  end;
 end;
 
 procedure TFDetails.ActionTagOpenCloudEditorExecute(Sender: TObject);
 begin
-    if not assigned(CloudEditorForm) then
-        Application.CreateForm(TCloudEditorForm, CloudEditorForm);
-    CloudEditorForm.Show;
+  SwitchToTab(Tab_General);
+  if not assigned(CloudEditorForm) then
+      Application.CreateForm(TCloudEditorForm, CloudEditorForm);
+  CloudEditorForm.Show;
 end;
 
 // extended tags has changed
@@ -1672,28 +1654,34 @@ begin
   end;
 end;
 
+procedure TFDetails.SwitchToTab(aTab: TTabSheet);
+begin
+  if MainPageControl.ActivePage <> aTab then
+    MainPageControl.ActivePage := aTab;
+end;
+
 procedure TFDetails.mmExtendedTagsClick(Sender: TObject);
 begin
-  if MainPageControl.ActivePage <> Tab_General then
-    MainPageControl.ActivePage := Tab_General;
+//  if MainPageControl.ActivePage <> Tab_General then
+//    MainPageControl.ActivePage := Tab_General;
 end;
 
 procedure TFDetails.mmFileClick(Sender: TObject);
 begin
-  if MainPageControl.ActivePage <> Tab_General then
-    MainPageControl.ActivePage := Tab_General;
+//  if MainPageControl.ActivePage <> Tab_General then
+//    MainPageControl.ActivePage := Tab_General;
 end;
 
 procedure TFDetails.mmLyricsClick(Sender: TObject);
 begin
-  if MainPageControl.ActivePage <> Tab_Lyrics then
-    MainPageControl.ActivePage := Tab_Lyrics;
+//  if MainPageControl.ActivePage <> Tab_Lyrics then
+//    MainPageControl.ActivePage := Tab_Lyrics;
 end;
 
 procedure TFDetails.mmMetaDataClick(Sender: TObject);
 begin
-  if MainPageControl.ActivePage <> Tab_MetaData then
-    MainPageControl.ActivePage := Tab_MetaData;
+//  if MainPageControl.ActivePage <> Tab_MetaData then
+//    MainPageControl.ActivePage := Tab_MetaData;
 end;
 
 procedure TFDetails.Memo_LyricsChange(Sender: TObject);
@@ -1747,6 +1735,7 @@ end;
 
 procedure TFDetails.SelectLyricSourceClick(Sender: TObject);
 begin
+  SwitchToTab(Tab_Lyrics);
   btnSearchLyrics.Tag := (Sender as TMenuItem).Tag;
   btnSearchLyrics.Caption := (Sender as TMenuItem).Caption;
   NempOptions.PreferredLyricSearch := (Sender as TMenuItem).Tag;
@@ -1903,14 +1892,11 @@ begin
       TagCounter := TMP3File(fEditTag).ID3v2Tag.PlayCounter;
     end;
 
-    at_Ogg: begin
-      TagRating := StrToIntDef(TOggVorbisFile(fEditTag).GetPropertyByFieldname(VORBIS_RATING), 0);
-      TagCounter := StrToIntDef(TOggVorbisFile(fEditTag).GetPropertyByFieldname(VORBIS_PLAYCOUNT), 0);
-    end;
-
+    at_Ogg,
+    at_Opus,
     at_Flac: begin
-      TagRating := StrToIntDef(TFlacFile(fEditTag).GetPropertyByFieldname(VORBIS_RATING), 0);
-      TagCounter := StrToIntDef(TFlacFile(fEditTag).GetPropertyByFieldname(VORBIS_PLAYCOUNT), 0);
+      TagRating := StrToIntDef(TBaseVorbisFile(fEditTag).GetPropertyByFieldname(VORBIS_RATING), 0);
+      TagCounter := StrToIntDef(TBaseVorbisFile(fEditTag).GetPropertyByFieldname(VORBIS_PLAYCOUNT), 0);
     end;
 
     at_M4A: begin
@@ -1980,6 +1966,7 @@ begin
             case fEditTag.FileType of
                 at_Mp3,
                 at_Ogg,
+                at_Opus,
                 at_Flac,
                 at_M4a,
                 at_Monkey,
@@ -1987,6 +1974,8 @@ begin
                 at_MusePack,
                 at_OptimFrog,
                 at_TrueAudio: CurrentTagObjectWriteAccessPossible := True;
+            else
+              CurrentTagObjectWriteAccessPossible := False;
             end;
         end;
 
@@ -1998,15 +1987,10 @@ begin
                                 Lbl_Warnings.Caption := (Warning_InvalidMp3file);
                                 Lbl_Warnings.Hint    := (Warning_InvalidMp3file_Hint);
                         end;
-                at_Ogg: begin
-                                Lbl_Warnings.Caption := NempAudioErrorString[AudioToNempAudioError(aErr)];
-                                Lbl_Warnings.Hint := (Warning_ReadError_Hint);
-                        end;
-                at_Flac: begin
-                                Lbl_Warnings.Caption := NempAudioErrorString[AudioToNempAudioError(aErr)];
-                                Lbl_Warnings.Hint := (Warning_ReadError_Hint);
-                          end;
-                at_M4a: begin
+                at_Ogg,
+                at_Opus,
+                at_Flac,
+                at_m4a: begin
                                 Lbl_Warnings.Caption := NempAudioErrorString[AudioToNempAudioError(aErr)];
                                 Lbl_Warnings.Hint := (Warning_ReadError_Hint);
                         end;
@@ -2327,63 +2311,6 @@ end;
 
 {$REGION 'Display and editing of Metadata on FrameLevel, through VirtualStringTree'}
 
-
-function ID3v2FrameAsString(aFrame: TID3v2Frame): String;
-var aFrameDescription, tmp: String;
-    aLang, aEmail, dataString: AnsiString;
-    aRating: Byte;
-    Data: TMemoryStream;
-    i: Integer;
-begin
-
-    case aFrame.FrameType of
-      FT_INVALID       : result := '';
-      FT_UNKNOWN       : begin
-            if aFrame.DataSize > 200 then
-                // too much data, just show a summary
-                result := Format('<Binary Data>, %d Bytes', [aFrame.DataSize])
-            else
-            begin
-                // visualize the Frame as a String
-                Data := TMemoryStream.Create;
-                try
-                    aFrame.GetData(Data);
-                    setlength(dataString, Data.Size);
-                    Data.Position := 0;
-                    Data.Read(dataString[1], length(dataString));
-                    for i := 1 to length(dataString) do
-                        if ord(dataString[i]) < 32 then
-                            dataString[i] := '.';
-                    result := String(dataString);
-                finally
-                    Data.Free;
-                end;
-            end;
-      end;
-
-      FT_TextFrame     : result := aFrame.GetText;
-      FT_CommentFrame  : result := aFrame.GetCommentsLyrics(aLang, aFrameDescription);
-      FT_LyricFrame    : result := aFrame.GetCommentsLyrics(aLang, aFrameDescription);
-      FT_UserDefinedURLFrame : begin
-          tmp := aFrame.GetCommentsLyrics(aLang, aFrameDescription);
-          result := Format('%s: %s', [aFrameDescription, tmp]);
-      end;
-
-      FT_PictureFrame        : result := Format('<Binary Data>, %d Bytes', [aFrame.DataSize]);
-
-      FT_PopularimeterFrame  : begin
-            aRating := aFrame.GetRating(aEmail);
-            result := Format('%d, %s', [aRating, aEmail]);
-      end;
-      FT_URLFrame            : result := String(aFrame.GetURL);
-      FT_UserTextFrame       : begin
-            tmp := aFrame.GetUserText(aFrameDescription);
-            result := Format('%s: %s', [aFrameDescription, tmp]);
-      end;
-    end;
-end;
-
-
 procedure TFDetails.VST_MetaDataEditing(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
 begin
@@ -2392,96 +2319,22 @@ end;
 
 procedure TFDetails.VST_MetaDataNewText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; NewText: string);
-var aTagEditItem: TTagEditItem;
-    aFrame: TID3v2Frame;
-    aLang, dummyA: AnsiString;
-    dummy, aDesc: String;
-    aAtom: TMetaAtom;
+var
+  aTagEditItem: TTagEditItem;
 begin
     aTagEditItem := VST_MetaData.GetNodeData<TTagEditItem>(Node);
-    aTagEditItem.fValue := NewText;
+    aTagEditItem.fTagItem.SetText(NewText);
     aTagEditItem.fNiledByUser := NewText = '';
-
     fDataChanged := True;
+    aTagEditItem.Init;
 
-    case aTagEditItem.TagType of
-        TT_ID3v2: begin
-            AddWantedTag(mt_ID3v2);
-            // we have different FrameTypes here
-            aFrame := VST_MetaData.GetNodeData<TTagEditItem>(Node).ID3v2Frame;
-            case aFrame.FrameType of
-                FT_TextFrame: begin
-                    // this is simple, just a new string :)
-                    aFrame.SetText(NewText);
-                end;
-
-                FT_CommentFrame: begin
-                    // get the current "Meta-stuff" from this comment Frame
-                    dummy := aFrame.GetCommentsLyrics(aLang, aDesc);
-                    // set the new comment, leave other content as it is
-                    aFrame.SetCommentsLyrics(aLang, aDesc, NewText);
-                end;
-
-                FT_UserDefinedURLFrame : begin
-                    // get the current "Meta-stuff" from this URL Frame
-                    dummyA := aFrame.GetUserdefinedURL(aDesc);
-                    // set the new URL, leave other content as it is
-                    aFrame.SetUserdefinedURL(aDesc, AnsiString(NewText));
-                end;
-
-                FT_URLFrame: begin
-                    // there may be several such URL-Frames in the ID3v2-Tag,
-                    // but settng a new value is easy.
-                    aFrame.SetURL(AnsiString(NewText));
-                end;
-            end;
-
-        end;
-        TT_OggVorbis: begin
-            TOggVorbisFile(fEditTag).SetPropertyByFieldname(
-                VST_MetaData.GetNodeData<TTagEditItem>(Node).KeyDescription,
-                NewText);
-        end;
-
-        TT_Flac: begin
-            TFlacFile(fEditTag).SetPropertyByFieldname(
-                VST_MetaData.GetNodeData<TTagEditItem>(Node).KeyDescription,
-                NewText);
-        end;
-
-        TT_Ape: begin
-            AddWantedTag(mt_APE);
-            case fEditTag.FileType of
-              at_Invalid: ;
-              at_Mp3: TMp3File(fEditTag).ApeTag.SetValueByKey(
-                    AnsiString(VST_MetaData.GetNodeData<TTagEditItem>(Node).KeyDescription),
-                    NewText);
-              at_Ogg: ;
-              at_Flac: ;
-              at_M4A: ;
-              at_Monkey,
-              at_WavPack,
-              at_MusePack,
-              at_OptimFrog,
-              at_TrueAudio: TBaseApeFile(fEditTag).ApeTag.SetValueByKey(
-                    AnsiString(VST_MetaData.GetNodeData<TTagEditItem>(Node).KeyDescription),
-                    NewText);
-              at_Wma: ;
-              at_Wav: ;
-              at_AbstractApe: ;
-            end;
-        end;
-
-        TT_M4A: begin
-            aAtom := VST_MetaData.GetNodeData<TTagEditItem>(Node).MetaAtom;
-
-            if (aAtom.Name = 'trkn') or (aAtom.Name = 'disk') then
-                // Note: "Track" and "Disk" have the same format, so we can just
-                // do it that way ... both Methods "set***Number" will call "prepareDiskTrackAtom" anyway
-                aAtom.setTrackNumber(newText)
-            else
-                aAtom.SetTextData(NewText);
-        end;
+    case aTagEditItem.fTagItem.TagType of
+      ttID3v2: AddWantedTag(mt_ID3v2);
+      ttVorbis: ;
+      ttFlacMetaBlock: ;
+      ttApev2: AddWantedTag(mt_APE);
+      ttM4AAtom: ;
+      ttUndef: ;
     end;
 
     MetaDataFramesToAudioFile;
@@ -2490,20 +2343,27 @@ end;
 
 procedure TFDetails.ActionMetaNewFrameExecute(Sender: TObject);
 begin
+  SwitchToTab(Tab_MetaData);
+
   if not assigned(NewMetaFrameForm) then
     Application.CreateForm(TNewMetaFrameForm, NewMetaFrameForm);
 
   NewMetaFrameForm.CurrentTagObject := self.fEditTag;
-  // Show "new-Frame"-input and show new frameset
-  if NewMetaFrameForm.ShowModal = MrOK then begin
-    case NewMetaFrameForm.SelectedTagType of
-      TT_ID3v2: AddWantedTag(mt_ID3v2);
-      TT_Ape: AddWantedTag(mt_APE);
+
+  if NewMetaFrameForm.AvalailableFrameCount = 0 then
+    TranslateMessageDLG(DetailForm_NoNewFramesPossible, mtInformation, [mbOK], 0)
+  else begin
+    // Show "new-Frame"-input and show new frameset
+    if NewMetaFrameForm.ShowModal = MrOK then begin
+      case NewMetaFrameForm.SelectedTagType of
+        ttID3v2: AddWantedTag(mt_ID3v2);
+        ttApev2: AddWantedTag(mt_APE);
+      end;
+      ShowMetaDataFrames;
+      fDataChanged := True;
+      MetaDataFramesToAudioFile;
+      ShowMainProperties;
     end;
-    ShowMetaDataFrames;
-    fDataChanged := True;
-    MetaDataFramesToAudioFile;
-    ShowMainProperties;
   end;
 end;
 
@@ -2516,255 +2376,98 @@ end;
 procedure TFDetails.VST_MetaDataGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
   var CellText: string);
+var
+  aTagItem: TTagEditItem;
 begin
-    case Column of
-        0: Celltext := TagTypeDescriptions[VST_MetaData.GetNodeData<TTagEditItem>(Node).TagType];
-        1: CellText := VST_MetaData.GetNodeData<TTagEditItem>(Node).Key;
-        2: CellText := VST_MetaData.GetNodeData<TTagEditItem>(Node).KeyDescription;
-        3: CellText := VST_MetaData.GetNodeData<TTagEditItem>(Node).Value;
-    end;
+  aTagItem := VST_MetaData.GetNodeData<TTagEditItem>(Node);
+  case Column of
+    0: Celltext := cTagTypes[aTagItem.TagItem.TagType];
+    1: CellText := aTagItem.TagItem.Key;
+    2: CellText := aTagItem.Description;
+    3: CellText := aTagItem.Value;
+  end;
 end;
-
 
 procedure TFDetails.VST_MetaDataPaintText(Sender: TBaseVirtualTree;
   const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
   TextType: TVSTTextType);
 begin
-    if VST_MetaData.GetNodeData<TTagEditItem>(Node).Editable then
-        TargetCanvas.Font.Color := TStyleManager.ActiveStyle.GetSystemColor(clWindowText)
-    else
-        TargetCanvas.Font.Color := TStyleManager.ActiveStyle.GetSystemColor(clGrayText);
-
+  if VST_MetaData.GetNodeData<TTagEditItem>(Node).Editable then
+    TargetCanvas.Font.Color := TStyleManager.ActiveStyle.GetSystemColor(clWindowText)
+  else
+    TargetCanvas.Font.Color := TStyleManager.ActiveStyle.GetSystemColor(clGrayText);
 end;
 
 procedure TFDetails.ShowMetaDataFrames;
-var mp3File: TMP3File;
-    oggFile: TOggVorbisFile;
-    flacFile: TFlacFile;
-    apeFile: TBaseApeFile;
-    m4aFile: TM4aFile;
-    FrameList: TObjectlist;
-    i: Integer;
-    NewTagEditItem: TTagEditItem;
-    aFrame: TID3v2Frame;
-    aAtom: TMetaAtom;
-    CommentList: TStringList;
-
-    procedure FillApeFrames(aApetag: TApetag);
-    var j: Integer;
-    begin
-        CommentList := TStringList.Create;
-        try
-            aApeTag.GetAllFrames(CommentList);
-            for j := 0 to CommentList.Count - 1 do
-            begin
-                NewTagEditItem := TTagEditItem.Create; //
-
-                NewTagEditItem.TagType := TT_APE;
-                NewTagEditItem.Key     := '';
-                NewTagEditItem.KeyDescription := CommentList[j];
-                NewTagEditItem.Value   := aApeTag.GetValueByKey(AnsiString(CommentList[j]));
-                NewTagEditItem.ID3v2Frame := NIL;
-                NewTagEditItem.MetaAtom   := Nil;
-                NewTagEditItem.InitEditability;
-
-                VST_MetaData.AddChild(Nil, NewTagEditItem);
-            end;
-        finally
-            CommentList.Free;
-        end;
-    end;
+var
+  mp3File: TMP3File;
+  i: Integer;
+  NewTagEditItem: TTagEditItem;
+  TagItems: TTagItemList;
 
 begin
     VST_MetaData.Clear;
+    if not assigned(fEditFile) then exit;
+    if not assigned(fEditTag) then exit;
+    if not FileExists(fEditFile.Pfad) then exit;
 
-    if not assigned(fEditFile) then
-        exit;
-    if not assigned(fEditTag) then
-        exit;
-    if not FileExists(fEditFile.Pfad) then
-        exit;
-
-    // show the ID3v1-Box only for MP3-Files
+    // Hide the ID3v1/Mpeg Data if not available
     Pnl_ID3v1_MPEG.Visible := fEditTag.FileType in [at_Mp3, at_Monkey, at_WavPack, at_MusePack, at_OptimFrog, at_TrueAudio];
     GrpBox_Mpeg.Visible := (fEditTag.FileType = at_Mp3);
 
-    case fEditTag.FileType of
-          at_Mp3: begin
-                      mp3File := TMp3File(fEditTag);
-
-                      if (mp3File.ApeTag.Exists) or (mt_APE in mp3File.TagsToBeWritten) then
-                        GrpBox_TextFrames.Caption := Format('ID3v2-Tag (Version 2.%d.%d), APE-Tag (Version %d.000)', [mp3File.id3v2Tag.Version.Major, mp3File.id3v2Tag.Version.Minor, mp3File.ApeTag.Version])
-                      else
-                        GrpBox_TextFrames.Caption := Format('ID3v2-Tag (Version 2.%d.%d)', [mp3File.id3v2Tag.Version.Major, mp3File.id3v2Tag.Version.Minor]);
-
-                      mp3File.ID3v1Tag.AutoCorrectCodepage := NempCharCodeOptions.AutoDetectCodePage;
-                      mp3File.ID3v2Tag.AutoCorrectCodepage := NempCharCodeOptions.AutoDetectCodePage;
-
-                      ShowID3v1Details(mp3File.ID3v1Tag);
-
-                      if fEditTag.Valid then
-                      begin
-                          if (mp3File.ID3v2Tag.Exists) or (mt_ID3v2 in mp3File.TagsToBeWritten) then begin
-                            FrameList := TObjectList.Create(False);
-                            try
-                              MP3File.ID3v2Tag.GetAllFrames(FrameList);
-                              for i := 0 to FrameList.Count - 1 do
-                              begin
-                                aFrame := (FrameList[i] as TID3v2Frame);
-                                NewTagEditItem := TTagEditItem.Create; //
-                                NewTagEditItem.TagType := TT_ID3v2;
-                                NewTagEditItem.Key     := String(aFrame.FrameIDString);
-                                NewTagEditItem.Value   := ID3v2FrameAsString(aFrame);
-                                NewTagEditItem.ID3v2Frame := aFrame;
-                                NewTagEditItem.MetaAtom   := Nil;
-                                NewTagEditItem.KeyDescription := aFrame.FrameTypeDescription;
-                                NewTagEditItem.InitEditability;
-
-                                VST_MetaData.AddChild(Nil, NewTagEditItem);
-                              end;
-                            finally
-                              FrameList.Free;
-                            end;
-                          end;
-
-                          if (mp3File.ApeTag.Exists) or (mt_APE in mp3File.TagsToBeWritten) then
-                            FillApeFrames(Mp3File.ApeTag);
-
-                      end else
-                      begin
-                          Lbl_Warnings.Caption := (Warning_InvalidMp3file);
-                          Lbl_Warnings.Hint    := (Warning_InvalidMp3file_Hint);
-                          PnlWarnung.Visible   := True;
-                      end;
-
-                      if NempCharCodeOptions.  AutoDetectCodePage then
-                      begin
-                          mp3File.ID3v1Tag.CharCode := GetCodepage(fEditFile.Pfad, NempCharCodeOptions);
-                          mp3File.ID3v2Tag.CharCode := mp3File.ID3v1Tag.CharCode;
-                      end; //else: keep default values, nothing to do
-                      mp3File.ID3v1Tag.AutoCorrectCodepage := NempCharCodeOptions.AutoDetectCodePage;
-                      mp3File.ID3v2Tag.AutoCorrectCodepage := NempCharCodeOptions.AutoDetectCodePage;
-                  end;
-          at_Ogg: begin
-                      oggFile := TOggVorbisFile(fEditTag);
-                      GrpBox_TextFrames.Caption := 'Vorbis-Comments';
-
-                      if fEditTag.Valid then
-                      begin
-                          CommentList := TStringList.Create;
-                          try
-                              oggFile.GetAllFields(CommentList);
-                              for i := 0 to CommentList.Count - 1 do
-                              begin
-                                  NewTagEditItem := TTagEditItem.Create; //
-
-                                  NewTagEditItem.TagType := TT_OggVorbis;
-                                  NewTagEditItem.Key     := '';
-                                  NewTagEditItem.KeyDescription := CommentList[i];
-                                  NewTagEditItem.Value   := oggFile.GetPropertyByIndex(i);
-                                  NewTagEditItem.ID3v2Frame := NIL;
-                                  NewTagEditItem.MetaAtom   := Nil;
-                                  NewTagEditItem.InitEditability;
-
-                                  VST_MetaData.AddChild(Nil, NewTagEditItem);
-                              end;
-
-                          finally
-                              CommentList.Free;
-                          end;
-
-                      end;
-                  end;
-          at_Flac: begin
-                        flacFile := TFlacFile(fEditTag);
-                        GrpBox_TextFrames.Caption := 'Vorbis-Comments';
-
-                        if fEditTag.Valid then
-                        begin
-                            CommentList := TStringList.Create;
-                            try
-                                flacFile.GetAllFields(CommentList);
-                                for i := 0 to CommentList.Count - 1 do
-                                begin
-                                    NewTagEditItem := TTagEditItem.Create; //
-
-                                    NewTagEditItem.TagType := TT_Flac;
-                                    NewTagEditItem.Key     := '';
-                                    NewTagEditItem.KeyDescription := CommentList[i];
-                                    NewTagEditItem.Value   := flacFile.GetPropertyByIndex(i);
-                                    NewTagEditItem.ID3v2Frame := NIL;
-                                    NewTagEditItem.MetaAtom   := Nil;
-                                    NewTagEditItem.InitEditability;
-
-                                    VST_MetaData.AddChild(Nil, NewTagEditItem);
-                                end;
-
-                            finally
-                                CommentList.Free;
-                            end;
-                        end;
-                    end;
-          at_M4a: begin
-                        m4aFile := TM4aFile(fEditTag);
-                        GrpBox_TextFrames.Caption := 'iTunes-Tags';
-
-                        if fEditTag.Valid then
-                        begin
-                            FrameList := TObjectList.Create(False);
-                            try
-                                m4aFile.GetAllAtoms(FrameList);
-                                for i := 0 to FrameList.Count - 1 do
-                                begin
-                                    NewTagEditItem := TTagEditItem.Create; //
-                                    aAtom := TMetaAtom(FrameList[i]);
-
-                                    NewTagEditItem.TagType := TT_M4A;
-                                    NewTagEditItem.Key     :=  String(aAtom.Name);
-                                    NewTagEditItem.KeyDescription :=  aAtom.GetListDescription;
-                                    if aAtom.ContainsTextData then
-                                        NewTagEditItem.Value   := aAtom.GetTextData
-                                    else
-                                        if aAtom.Name = 'trkn' then
-                                            NewTagEditItem.Value := aAtom.GetTrackNumber
-                                        else
-                                            if aAtom.Name = 'disk' then
-                                                NewTagEditItem.Value := aAtom.GetDiscNumber
-                                            else
-                                                if aAtom.Name = 'covr' then
-                                                    NewTagEditItem.Value := Format('<Picture>, %d Bytes', [aAtom.Size])
-                                                else
-                                                    NewTagEditItem.Value := ''; //'<Binary Data>';
-
-                                    NewTagEditItem.ID3v2Frame := NIL;
-                                    NewTagEditItem.MetaAtom   := aAtom;
-                                    NewTagEditItem.InitEditability;
-
-                                    VST_MetaData.AddChild(Nil, NewTagEditItem);
-                                end;
-                            finally
-                                FrameList.Free;
-                            end;
-                        end;
-                  end;
-          at_Monkey,
-          at_WavPack,
-          at_MusePack,
-          at_OptimFrog,
-          at_TrueAudio: begin
-                        apeFile := TBaseApeFile(fEditTag);
-                        GrpBox_TextFrames.Caption := 'APEv2-Tags';
-
-                        ShowID3v1Details(apeFile.ID3v1Tag);
-                        if fEditTag.Valid then
-                            FillApeFrames(apeFile.ApeTag);
-                    end;
-
-          at_Invalid,
-          at_Wma,
-          at_Wav: ; // nothing to do
+    // Fill VST_MetaData with all Metadata TagItems
+    if fEditTag.Valid then begin
+      TagItems := TTagItemList.Create;
+      try
+        fEditTag.GetTagList(TagItems, [tctAll]);  // note: this will include APEv2Tags in mp3 files (if it exists)
+        for i := 0 to TagItems.Count - 1 do begin
+          NewTagEditItem := TTagEditItem.Create(TagItems[i]);
+          VST_MetaData.AddChild(Nil, NewTagEditItem);
+        end;
+      finally
+        TagItems.Free;
       end;
+    end;
 
+    case fEditTag.FileType of
+      at_Mp3:
+        begin
+          mp3File := TMp3File(fEditTag);
+          if (mp3File.ApeTag.Exists) or (mt_APE in mp3File.TagsToBeWritten) then
+            GrpBox_TextFrames.Caption := Format('ID3v2-Tag (Version 2.%d.%d), APE-Tag (Version %d.000)', [mp3File.id3v2Tag.Version.Major, mp3File.id3v2Tag.Version.Minor, mp3File.ApeTag.Version])
+          else
+            GrpBox_TextFrames.Caption := Format('ID3v2-Tag (Version 2.%d.%d)', [mp3File.id3v2Tag.Version.Major, mp3File.id3v2Tag.Version.Minor]);
+
+          if NempCharCodeOptions.AutoDetectCodePage then begin
+            mp3File.ID3v1Tag.CharCode := GetCodepage(fEditFile.Pfad, NempCharCodeOptions);
+            mp3File.ID3v2Tag.CharCode := mp3File.ID3v1Tag.CharCode;
+          end; //else: keep default values, nothing to do
+          mp3File.ID3v1Tag.AutoCorrectCodepage := NempCharCodeOptions.AutoDetectCodePage;
+          mp3File.ID3v2Tag.AutoCorrectCodepage := NempCharCodeOptions.AutoDetectCodePage;
+
+          ShowID3v1Details(mp3File.ID3v1Tag);
+        end;
+
+      at_Monkey,
+      at_WavPack,
+      at_MusePack,
+      at_OptimFrog,
+      at_TrueAudio:
+        begin
+          GrpBox_TextFrames.Caption := 'APEv2-Tags';
+          ShowID3v1Details(TBaseApeFile(fEditTag).ID3v1Tag);
+        end;
+
+      at_Ogg,
+      at_Opus,
+      at_Flac: GrpBox_TextFrames.Caption := 'Vorbis-Comments';
+
+      at_M4a: GrpBox_TextFrames.Caption := 'iTunes-Tags';
+
+      at_Invalid,
+      at_Wma,
+      at_Wav: ; // nothing to do
+    end;
 
       VST_MetaData.SortTree(0, sdAscending);
       ActionMetaCopyFromID3v1.Enabled := fEditTag.FileType in [at_Mp3, at_Monkey, at_WavPack, at_MusePack, at_OptimFrog, at_TrueAudio];
@@ -2788,46 +2491,43 @@ begin
     idx1 := 0;
     idx2 := 0;
     case Column of
-        0: begin
-            aTagItem1 := VST_MetaData.GetNodeData<TTagEditItem>(Node1);
-            aTagItem2 := VST_MetaData.GetNodeData<TTagEditItem>(Node2);
+      0: begin
+        aTagItem1 := VST_MetaData.GetNodeData<TTagEditItem>(Node1);
+        aTagItem2 := VST_MetaData.GetNodeData<TTagEditItem>(Node2);
 
-            case atagItem1.TagType of
-                TT_ID3v2: begin
-                        if length(aTagItem1.Key) = 3 then
-                        begin
-                            idx1 := SL_ID3_22.IndexOf(aTagItem1.Key);
-                            idx2 := SL_ID3_22.IndexOf(aTagItem2.Key);
-                        end else
-                        begin
-                            idx1 := SL_ID3_23.IndexOf(aTagItem1.Key);
-                            idx2 := SL_ID3_23.IndexOf(aTagItem2.Key);
-                        end;
-                end;
-                TT_OggVorbis, TT_Flac: begin
-                        idx1 := SL_OGG.IndexOf(aTagItem1.KeyDescription);
-                        idx2 := SL_OGG.IndexOf(aTagItem2.KeyDescription);
-                end;
-                TT_Ape: begin
-                        idx1 := SL_APE.IndexOf(aTagItem1.KeyDescription);
-                        idx2 := SL_APE.IndexOf(aTagItem2.KeyDescription);
-                end;
-                TT_M4A:  begin
-                        idx1 := SL_M4A.IndexOf(aTagItem1.Key);
-                        idx2 := SL_M4A.IndexOf(aTagItem2.Key);
-                end;
-            end;
+        case atagItem1.fTagItem.TagType of
+          ttID3v2: begin
+                  if length(aTagItem1.fTagItem.Key) = 3 then begin
+                    idx1 := SL_ID3_22.IndexOf(aTagItem1.fTagItem.Key);
+                    idx2 := SL_ID3_22.IndexOf(aTagItem2.fTagItem.Key);
+                  end else begin
+                    idx1 := SL_ID3_23.IndexOf(aTagItem1.fTagItem.Key);
+                    idx2 := SL_ID3_23.IndexOf(aTagItem2.fTagItem.Key);
+                  end;
+          end;
+          ttVorbis, ttFlacMetaBlock: begin
+                  idx1 := SL_OGG.IndexOf(aTagItem1.fTagItem.Description);
+                  idx2 := SL_OGG.IndexOf(aTagItem2.fTagItem.Description);
+          end;
+          ttApev2: begin
+                  idx1 := SL_APE.IndexOf(aTagItem1.fTagItem.Description);
+                  idx2 := SL_APE.IndexOf(aTagItem2.fTagItem.Description);
+          end;
+          ttM4AAtom: begin
+                  idx1 := SL_M4A.IndexOf(aTagItem1.fTagItem.Key);
+                  idx2 := SL_M4A.IndexOf(aTagItem2.fTagItem.Key);
+          end;
+        end;
 
-            // correct index "-1" (not existing) to "put it somewhere at the end"
-            if idx1 = -1 then idx1 := 5000;
-            if idx2 = -1 then idx2 := 5000;
+        // correct index "-1" (not existing) to "put it somewhere at the end"
+        if idx1 = -1 then idx1 := 5000;
+        if idx2 = -1 then idx2 := 5000;
 
-            result := CompareValue(idx1, idx2);
-        end
+        result := CompareValue(idx1, idx2);
+      end
     else
         Result := 0;
     end;
-
 end;
 {$ENDREGION}
 
@@ -2890,6 +2590,7 @@ begin
   if (not fEditTag.Valid) then
         exit;
 
+  SwitchToTab(Tab_MetaData);
     case fEditTag.FileType of
         at_Mp3: begin
             success := True;
@@ -2972,6 +2673,7 @@ begin
   if (not fEditTag.Valid) then
         exit;
 
+  SwitchToTab(Tab_MetaData);
     case fEditTag.FileType of
         at_Mp3: begin
             mp3 := TMp3File(fEditTag);
@@ -3245,10 +2947,9 @@ var
 begin
   if assigned(Node) then begin
     PicItem := Node.GetData<TPictureItem>;
-    case PicItem.fItemType of
-      ptIndexedMetaData: ShowSelectedImage_MetaData(PicItem);
-      ptNamedMetaData: ShowSelectedImage_MetaData(PicItem);
-      ptFile: ShowSelectedImage_Files(PicItem);
+    case PicItem.ItemType of
+      ptMetaData: ShowSelectedImage_MetaData(PicItem, ImgCurrentSelection);
+      ptFile: ShowSelectedImage_Files(PicItem, ImgCurrentSelection);
     end;
 
     ImgCurrentSelection.Stretch := assigned(ImgCurrentSelection.Picture)
@@ -3276,9 +2977,8 @@ procedure TFDetails.VSTCoverGetImageIndex(Sender: TBaseVirtualTree;
 begin
   if Kind in [ikNormal, ikSelected] then begin
     case Node.GetData<TPictureItem>.fItemType of
-      ptIndexedMetaData: ImageIndex := 0;
-        ptNamedMetaData: ImageIndex := 0;
-        ptFile: ImageIndex := 1;
+      ptMetaData: ImageIndex := 0;
+      ptFile: ImageIndex := 1;
     end;
   end;
 end;
@@ -3319,108 +3019,27 @@ begin
 end;
 
 procedure TFDetails.GetListOfCoverArt_MetaFrames;
-var i: Integer;
-  stream: TMemoryStream;
-  mime: AnsiString;
-  PicType: Byte;
-  m4aPictype: TM4APicTypes;
-  Description: UnicodeString;
+var
+  i: Integer;
   newPicItem: TPictureItem;
-  tmpStrings: TStringList;
-  picFrames: TObjectList;
+  picItems: TTagItemList;
 begin
-    if not assigned(fEditFile) then
-        exit;
-    if not assigned(fEditTag) then
-        exit;
-    if not FileExists(fEditFile.Pfad) then
-        exit;
+  if not assigned(fEditFile) then exit;
+  if not assigned(fEditTag) then exit;
+  if not FileExists(fEditFile.Pfad) then exit;
 
-    case fEditTag.FileType of
-        at_Invalid: ;
-        at_Mp3: begin
-
-                      picFrames := TObjectList.Create(False);
-                      try
-                        TMp3File(fEditTag).ID3v2Tag.GetAllPictureFrames(picFrames);
-                        stream := TMemoryStream.Create;
-                        try
-                            for i := 0 to picFrames.Count - 1 do
-                            begin
-                                Stream.Clear;
-                                (picFrames[i] as TID3v2Frame).GetPicture(Mime, PicType, Description, stream);
-                                if PicType < length(Picture_Types) then
-                                  newPicItem := TPictureItem.Create(Picture_Types[PicType], Description, picFrames[i])
-                                else
-                                  newPicItem := TPictureItem.Create(Picture_Types[0], Description, picFrames[i]);
-                                VSTCover.AddChild(Nil, newPicItem);
-                            end;
-                        finally
-                            stream.Free;
-                        end;
-                      finally
-                        picFrames.Free;
-                      end;
-                end;
-        at_Ogg: begin
-                      // Pictures not supported in OggFiles by NEMP
-                      // cbCoverArtMetadata.Items.Add(DetailForm_NoPictureInOggMetaDataSuppotred);
-                end;
-        at_Flac: begin
-                      picFrames := TObjectList.Create(False);
-                      try
-                        TFlacFile(fEditTag).GetAllPictureBlocks(picFrames);
-
-                        for i := 0 to picFrames.Count - 1 do
-                        begin
-                            PicType := TFlacPictureBlock(picFrames[i]).PictureType;
-                            Description := TFlacPictureBlock(picFrames[i]).Description;
-                            if PicType < length(Picture_Types) then
-                              newPicItem := TPictureItem.Create(Picture_Types[PicType], Description, picFrames[i])
-                            else
-                              newPicItem := TPictureItem.Create(Picture_Types[0], Description, picFrames[i]);
-                            VSTCover.AddChild(Nil, newPicItem);
-                        end;
-                      finally
-                        picFrames.Free;
-                      end;
-                  end;
-        at_M4A: begin
-                      stream := TMemoryStream.Create;
-                      try
-                          // Only one Image supprted in M4A-Files
-                          if TM4aFile(fEditTag).GetPictureStream(stream, m4aPictype) then begin
-                              newPicItem := TPictureItem.Create(Picture_Types[3], '', Nil);
-                              VSTCover.AddChild(Nil, newPicItem);
-                          end;
-                      finally
-                          stream.Free;
-                      end;
-
-                  end;
-        at_Monkey,
-        at_WavPack,
-        at_MusePack,
-        at_OptimFrog,
-        at_TrueAudio: begin
-            tmpStrings := TStringList.Create;
-            try
-              TBaseApeFile(fEditTag).ApeTag.GetAllPictureFrames(tmpStrings);
-              for i := 0 to tmpStrings.Count - 1 do begin
-                newPicItem := TPictureItem.Create(Picture_Types[3], tmpStrings[i], Nil);
-                newPicItem.fItemType := ptNamedMetaData;
-                VSTCover.AddChild(Nil, newPicItem);
-              end;
-            finally
-              tmpStrings.Free;
-            end;
-        end;
-
-        at_Wma: ;
-        at_Wav: ;
+  picItems := TTagItemList.Create;
+  try
+    fEditTag.GetTagList(picItems, [tctPicture]);
+    for i := 0 to picItems.Count - 1 do begin
+      newPicItem := TPictureItem.Create(picItems[i]);
+      VSTCover.AddChild(Nil, newPicItem);
     end;
+  finally
+    picItems.Free;
+  end;
 
-    ActionCoverResetMediaLibrary.Enabled := fEditFile.GetUserCoverIDFromMetaData(fEditTag) <> '';
+  ActionCoverResetMediaLibrary.Enabled := fEditFile.GetUserCoverIDFromMetaData(fEditTag) <> '';
 end;
 
 {
@@ -3432,13 +3051,8 @@ var
   CurrentPicItem: TPictureItem;
 
 begin
-  if MainPageControl.ActivePage <> Tab_Pictures then
-    MainPageControl.ActivePage := Tab_Pictures;
-
-  if not PicturesLoaded then begin
-    PicturesLoaded := True;
-    ShowCoverArt;
-  end;
+  //if MainPageControl.ActivePage <> Tab_Pictures then
+  //  MainPageControl.ActivePage := Tab_Pictures;
 
   FileOK := assigned(fEditFile)
       and assigned(fEditTag)
@@ -3449,7 +3063,7 @@ begin
   else
     CurrentPicItem := Nil;
 
-  MetaPicsAllowed := FileOK and (fEditTag.filetype <> at_Ogg);
+  MetaPicsAllowed := FileOK; // and (fEditTag.filetype <> at_Ogg);
   MetaPicSelected := assigned(CurrentPicItem) and (CurrentPicItem.ItemType <> ptFile);
   FilePicSelected := assigned(CurrentPicItem) and (CurrentPicItem.ItemType = ptFile);
 
@@ -3535,112 +3149,47 @@ begin
   end;
 end;
 
-procedure TFDetails.ShowSelectedImage_Files(PicItem: TPictureItem = NIL);
+procedure TFDetails.ShowSelectedImage_Files(PicItem: TPictureItem; Dest: TImage);
 begin
-    if not assigned(PicItem) then
-      exit;
-
-    LoadPictureIntoImage(PicItem.FileName, ImgCurrentSelection);
-    PicItem.fSize := GetFileSize(PicItem.FileName);
+  if not assigned(PicItem) then exit;
+  LoadPictureIntoImage(PicItem.FileName, Dest);
 end;
 
-procedure TFDetails.ExtractPicStreamFromMetaData(PicItem: TPictureItem; stream: TStream; var MimeType: AnsiString);
+procedure TFDetails.ShowSelectedImage_MetaData(PicItem: TPictureItem; Dest: TImage);
 var
-  PicType: Byte;
-  m4aPictype: TM4APicTypes;
-  Description: UnicodeString;
+  aPic: TPicture;
 begin
-    if not assigned(PicItem) then exit;
-
-    case fEditTag.FileType of
-      at_Mp3: TID3v2Frame(PicItem.fMetaFrame).GetPicture(MimeType, PicType, Description, stream);
-      at_Flac: TFlacPictureBlock(PicItem.fMetaFrame).CopyPicData(stream);
-
-      at_M4A: begin
-            if TM4aFile(fEditTag).GetPictureStream(stream, m4aPictype) then
-            begin
-                case m4aPictype of
-                  M4A_JPG: MimeType := 'image/jpeg';
-                  M4A_PNG: MimeType := 'image/png';
-                  M4A_Invalid: MimeType := '-'; // invalid
-                end;
-            end else
-              MimeType := '-';
-      end;
-      at_Monkey,
-      at_WavPack,
-      at_MusePack,
-      at_OptimFrog,
-      at_TrueAudio: begin
-            // Load APE-Image
-            if TBaseApeFile(fEditTag).ApeTag.GetPicture(AnsiString( PicItem.Description ), Stream, Description) then
-              MimeType := '' // unknown
-            else
-              MimeType := '-'; // invalid
-      end;
-    else
-      MimeType := '-'; // invalid
-    end;
+  if not assigned(PicItem) then exit;
+  aPic := TPicture.Create;
+  try
+    PicItem.LoadImage(aPic);
+    Dest.Picture.Bitmap.Assign(aPic.Graphic);
+  finally
+    aPic.Free;
+  end;
 end;
-
-procedure TFDetails.ShowSelectedImage_MetaData(PicItem: TPictureItem = NIL);
-var
-  stream: TMemorystream;
-  MimeType: AnsiString;
-begin
-    if not assigned(PicItem) then
-      exit;
-
-    stream := TMemoryStream.Create;
-    try
-      // Get the PictureData fomr the PicItems assigned MetaFrame ando display it in the Image.
-      ExtractPicStreamFromMetaData(PicItem, stream, MimeType);
-      if (MimeType = '-') or (stream.Size = 0) then begin
-        // invalid MimeType or empty PicData
-        ImgCurrentSelection.Picture.Assign(NIL);
-        PicItem.fSize := 0;
-      end else
-      if (MimeType = '') then begin
-        // unknown MimeType, try different types
-        PicItem.fSize := Stream.Size;
-        if not PicStreamToBitmap(Stream, 'image/jpeg', ImgCurrentSelection.Picture.Bitmap) then
-          if not PicStreamToBitmap(Stream, 'image/png', ImgCurrentSelection.Picture.Bitmap) then
-              if not PicStreamToBitmap(Stream, 'image/bmp', ImgCurrentSelection.Picture.Bitmap) then begin
-                ImgCurrentSelection.Picture.Assign(NIL);
-                PicItem.fSize := 0;
-              end;
-      end else begin
-        // the regular case, defined MimeType
-        PicStreamToBitmap(stream, MimeType, ImgCurrentSelection.Picture.Bitmap);
-        PicItem.fSize := Stream.Size;
-      end;
-    finally
-      stream.Free;
-    end;
-end;
-
 
 procedure TFDetails.ActionCoverNewMetaDataExecute(Sender: TObject);
 begin
-    if Not Assigned(FNewPicture) then
-        Application.CreateForm(TFNewPicture, FNewPicture);
+  SwitchToTab(Tab_Pictures);
+  if Not Assigned(FNewPicture) then
+      Application.CreateForm(TFNewPicture, FNewPicture);
 
-    FNewPicture.CurrentTagObject := fEditTag;
-    FNewPicture.LblConst_PictureType.Enabled := fEditTag.FileType <> at_M4A;
-    FNewPicture.LblConst_PictureDescription.Enabled := fEditTag.FileType <> at_M4A;
-    FNewPicture.cbPictureType.Enabled := fEditTag.FileType <> at_M4A;
-    FNewPicture.EdtPictureDescription.Enabled := fEditTag.FileType <> at_M4A;
+  FNewPicture.CurrentTagObject := fEditTag;
+  FNewPicture.LblConst_PictureType.Enabled := fEditTag.FileType <> at_M4A;
+  FNewPicture.LblConst_PictureDescription.Enabled := fEditTag.FileType <> at_M4A;
+  FNewPicture.cbPictureType.Enabled := fEditTag.FileType <> at_M4A;
+  FNewPicture.EdtPictureDescription.Enabled := fEditTag.FileType <> at_M4A;
 
-    // Adding the Picture to the CurrentTagObject is done in the Form FNewPicture
-    if FNewPicture.Showmodal = MROK then begin
-        fDataChanged := True;
-        FrameBasedTagNeeded;
-        // not exactly the most efficient method to add the new frame to the tree view ...
-        ShowCoverArt;
-        ShowMetaDataFrames;
-    end;
+  // Adding the Picture to the CurrentTagObject is done in the Form FNewPicture
+  if FNewPicture.Showmodal = MROK then begin
+      fDataChanged := True;
+      FrameBasedTagNeeded;
+      // not exactly the most efficient method to add the new frame to the tree view ...
+      ShowCoverArt;
+      ShowMetaDataFrames;
+  end;
 end;
-
 
 procedure TFDetails.ActionCoverDeleteMetaDataExecute(Sender: TObject);
 var
@@ -3649,26 +3198,15 @@ begin
   if not assigned(VSTCover.FocusedNode) then
     exit;
 
+  SwitchToTab(Tab_Pictures);
   PicItem := VSTCover.FocusedNode.GetData<TPictureItem>;
-
-  if not assigned(PicItem.fMetaFrame) then
-    exit;
-
-  case fEditTag.FileType of
-      at_Mp3: TMp3File(fEditTag).Id3v2Tag.DeleteFrame(PicItem.fMetaFrame as TID3v2Frame );
-      at_Flac: TFlacFile(fEditTag).DeletePicture(TFlacPictureBlock(PicItem.fMetaFrame));
-      at_M4A: TM4aFile(fEditTag).SetPicture(Nil, M4A_Invalid);
-      at_Monkey,
-      at_WavPack,
-      at_MusePack,
-      at_OptimFrog,
-      at_TrueAudio: TBaseApeFile(fEditTag).ApeTag.SetPicture(AnsiString(PicItem.Description), '', NIL );
-      // at_Invalid: ;at_Ogg: ; at_Wma: ; at_Wav: ; // nothing to do, not supported.
+  if PicItem.fItemType = ptMetaData then begin
+    fEdittag.DeleteTagItem(PicItem.fTagItem);
+    VSTCover.DeleteNode(VSTCover.FocusedNode);
+    SelectFirstCover;
+    fDataChanged := True;
+    ShowMetaDataFrames;
   end;
-  VSTCover.DeleteNode(VSTCover.FocusedNode);
-  SelectFirstCover;
-  fDataChanged := True;
-  ShowMetaDataFrames;
 end;
 
 {
@@ -3680,22 +3218,73 @@ end;
 
 procedure TFDetails.ActionCoverMetaDataSaveToFileExecute(Sender: TObject);
 var Stream: TMemoryStream;
-    mime: AnsiString;
-    PicType: Byte;
-    m4aPictype: TM4APicTypes;
-    Description: UnicodeString;
-    tmpBmp: TBitmap;
+    Mime: AnsiString;
+    PicType: TPictureType;
+    Description: String;
     PicItem: TPictureItem;
+
+    function AutoDetectMime(aStream: TStream): AnsiString;
+    var
+      tmpPicture: TPicture;
+    begin
+      result := '';
+      tmpPicture := TPicture.Create;
+      try
+        aStream.Position := 0;
+        try
+          tmpPicture.LoadFromStream(aStream);
+          if tmpPicture.Graphic is TJpegImage then
+            result := AWB_MimeJpeg
+          else if tmpPicture.Graphic is TPngImage then
+            result := AWB_MimePNG;
+        except
+          // nothing
+        end;
+      finally
+        tmpPicture.Free;
+      end;
+    end;
+
 begin
   if not assigned(VSTCover.FocusedNode) then
     exit;
 
+  SwitchToTab(Tab_Pictures);
   PicItem := VSTCover.FocusedNode.GetData<TPictureItem>;
 
-  if not assigned(PicItem.fMetaFrame) then
-    exit;
+  if PicItem.ItemType = ptMetaData then begin
+    Mime := '';
+    Stream := TMemoryStream.Create;
+    try
+      if PicItem.TagItem.GetPicture(Stream, Mime, PicType, Description) then begin
+        if Mime = '' then
+          Mime := AutoDetectMime(Stream);
+      end;
 
+      // Prepare SaveDialog
+      //if (mime = 'image/png') or (Uppercase(UnicodeString(Mime)) = 'PNG') then
+      if Mime = AWB_MimePNG then begin
+        SaveDialog1.DefaultExt := 'png';
+        SaveDialog1.Filter := '*.png|*.png;';
+      end else begin
+        SaveDialog1.DefaultExt := 'jpg';
+        SaveDialog1.Filter := '*.jpg;*.jpeg;|*.jpg;*.jpeg;';
+      end;
 
+      // Save the Picture
+      if SaveDialog1.Execute then begin
+        try
+          Stream.SaveToFile(SaveDialog1.FileName);
+        except
+          on E: Exception do TranslateMessageDLG(E.Message, mtError, [mbOK], 0);
+        end;
+      end;
+    finally
+      Stream.Free;
+    end;
+  end;
+
+  (*
   stream := TMemoryStream.Create;
   try
       mime := ''; // something invalid
@@ -3770,6 +3359,7 @@ begin
   finally
       stream.Free;
   end;
+  *)
 end;
 
 
@@ -3816,9 +3406,12 @@ begin
                   TMp3File(fEditTag).ID3v2Tag.SetPrivateFrame('NEMP/UserCoverID', NIL);
         end;
 
-        at_Ogg : TOggVorbisFile(fEditTag).SetPropertyByFieldname(VORBIS_USERCOVERID, aNewID);
-        at_Flac: TFlacFile(fEditTag).SetPropertyByFieldname(VORBIS_USERCOVERID, aNewID);
+        at_Ogg,
+        at_Opus,
+        at_Flac: TBaseVorbisFile(fEditTag).SetPropertyByFieldname(VORBIS_USERCOVERID, aNewID);
+
         at_M4A : TM4aFile(fEditTag).SetSpecialData(DEFAULT_MEAN, M4AUserCoverID, aNewID);
+
         at_Monkey,
         at_WavPack,
         at_MusePack,
@@ -3871,17 +3464,21 @@ var
   stream: TMemoryStream;
   currentPic: TPictureItem;
   MimeType: AnsiString;
+  tmpPicType: TPictureType;
+  tmpDescription: String;
 begin
   if not Assigned(VSTCover.FocusedNode) then
     exit;
 
+  SwitchToTab(Tab_Pictures);
   stream := TMemoryStream.Create;
   try
     currentPic := VSTCover.FocusedNode.GetData<TPictureItem>;
     if currentPic.fItemType = ptFile then
       stream.LoadFromFile(currentpic.FileName)
     else
-      ExtractPicStreamFromMetaData(currentPic, stream, MimeType);
+      currentPic.TagItem.GetPicture(Stream, MimeType, tmpPicType, tmpDescription);
+
     stream.Seek(0, soFromBeginning);
     // calculate a new ID from the stream data
     newID := MD5DigestToStr(MD5Stream(stream));
@@ -3899,13 +3496,15 @@ end;
 
 procedure TFDetails.ActionCoverResetMediaLibraryExecute(Sender: TObject);
 begin
-    HandleCoverIDSetting('');
+  SwitchToTab(Tab_Pictures);
+  HandleCoverIDSetting('');
 end;
 
 procedure TFDetails.ActionCoverLoadLibraryExecute(Sender: TObject);
 var newID: String;
     fs: TFileStream;
 begin
+  SwitchToTab(Tab_Pictures);
   if OpenDlgCoverArt.Execute(self.Handle) then
     begin
         fs := TFileStream.Create(OpenDlgCoverArt.FileName, fmOpenread);
@@ -3942,6 +3541,7 @@ begin
   if not Assigned(VSTCover.FocusedNode) then
     exit;
 
+  SwitchToTab(Tab_Pictures);
   currentPic := VSTCover.FocusedNode.GetData<TPictureItem>;
   if currentPic.fItemType = ptFile then
     ShellExecute(Handle, nil, PChar(currentPic.FileName), nil, nil, SW_SHOWNORMAl)

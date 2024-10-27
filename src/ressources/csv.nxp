@@ -3,7 +3,7 @@
 %ENCODING%=UTF8
 %ESCAPE%=" ""
 %</META>%
-"Artist";"Title";"Album";"Album-Artist";"Composer";"Genre";"Year";"Track";"CD";"Directory";"Filename";"Type";"Filesize";"Duration";"Bitrate";"vbr";"Channelmode";"Samplerate";"Rating";"Playcounter";"BPM";"TrackGain";"AlbumGain";"TrackPeak";"AlbumPeak";
+"Artist";"Title";"Album";"Album-Artist";"Composer";"Genre";"Year";"Track";"CD";"Comment";"Directory";"Filename";"Type";"Filesize";"Duration";"Bitrate";"vbr";"Channelmode";"Samplerate";"Rating";"Playcounter";"BPM";"TrackGain";"AlbumGain";"TrackPeak";"AlbumPeak";
 %<FILES>%
-"<artist>";"<title>";"<album>";"<AlbumArtist>";"<Composer>";"<genre>";"<year>";"<track>";"<CD>";"<dir>";"<filename>";"<ext>";"<Filesize>";"<Duration>";"<Bitrate>";"<VBR>";"<Channelmode>";"<Samplerate>";"<Rating>";"<Playcounter>";"<BPM>";"<TrackGain>";"<AlbumGain>";"<TrackPeak>";"<AlbumPeak>";
+"<artist>";"<title>";"<album>";"<AlbumArtist>";"<Composer>";"<genre>";"<year>";"<track>";"<CD>";"<comment>";"<dir>";"<filename>";"<ext>";"<Filesize>";"<Duration>";"<Bitrate>";"<VBR>";"<Channelmode>";"<Samplerate>";"<Rating>";"<Playcounter>";"<BPM>";"<TrackGain>";"<AlbumGain>";"<TrackPeak>";"<AlbumPeak>";
 %</FILES>%

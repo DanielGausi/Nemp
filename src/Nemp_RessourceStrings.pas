@@ -129,6 +129,9 @@ DetailForm_NoNewFramesPossible = 'All supported meta frames are already set.';
 DetailForm_CurrentLibraryCover = 'Current cover art';
 DetailForm_CoverflowNotActive = 'The Coverflow will update automatically when you activate it';
 DetailForm_NoPictureInOggMetaDataSuppotred = 'Not supported';
+
+DetailForm_DuplicatePictureDescription = 'There is already an image with this description contained in the metadata. Please enter a different description for this image.';
+DetailForm_NewFrameEmptyValue = 'Please enter a value for the new meta data frame.';
 // DetailForm_CopyFromID3v2 = 'Copy from ID3 v2';
 // DetailForm_CopyFromAPE = 'Copy from APE';
 
@@ -283,10 +286,10 @@ FloatingPointChannels_Off = 'Current status: Off';
     +#13#10+'If this message occurs continuously, please report this to mail@gausi.de. Thank you.';
 
 
-SelectDirectoryDialog_BibCaption = 'Please select the root directory of the audiofiles you want to add to the media library.';
-SelectDirectoryDialog_PlaylistCaption = 'Please select the root directory of the audiofiles you want to add to the playlist.';
-SelectDirectoryDialog_Webradio_Caption = 'Select download directory for webstreams';
-SelectDirectoryDialog_RemoteNemp = 'Select download directory';
+// SelectDirectoryDialog_BibCaption = 'Please select the root directory of the audiofiles you want to add to the media library.';
+// SelectDirectoryDialog_PlaylistCaption = 'Please select the root directory of the audiofiles you want to add to the playlist.';
+// SelectDirectoryDialog_Webradio_Caption = 'Select download directory for webstreams';
+// SelectDirectoryDialog_RemoteNemp = 'Select download directory';
 
 AutoScanDir_AlreadyExists = 'The selected directory (or a parent directory) is already in the list.';
 AutoSacnDir_SubDirExisted = 'A subdirectory of the selected directory was removed from the list: ';
@@ -455,6 +458,10 @@ MainForm_GlobalQuickSearch    = 'Quicksearch (library)';
 /// MainForm_MoreSearchresults  = 'Additional results (not limited to current preselection)';
 MainForm_NoSearchresults    = 'Nothing found. Try another search.';
 MainForm_EmptyCategory      = 'There are no files in the current category.';
+MainForm_EmptyRootCategory  = 'Please select an option in the tree view or double click to show all files.';
+MainForm_EmptyCategoryNamed = 'There are no files in "%s".';
+MainForm_EmptyCategoryNamedTryDoubleClick = 'There are no files directly in "%s". Use double click to show all files recursively.';
+
 MainForm_EmptyBibPlaylist      = 'The playlist file doesn''t exist or contains no files.';
 MainForm_SearchQueryTooShort = 'Search query too short. Please enter at least 2 characters.';
 MainForm_NoFavorites = 'No files flagged with this marker.';
@@ -1189,6 +1196,7 @@ ExportNewTemplatePrompt = 'Please enter a name for the new template';
 ExportDeleteTemplateConfirmation = 'Do you really want to delete the template "%s"?';
 ExportDeleteTemplateFailed = 'The template could not be deleted.';
 
+CoverList_Default = 'Cover';
 
 implementation
 

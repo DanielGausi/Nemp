@@ -234,7 +234,7 @@ begin
         CopyFromRawTag(RawTag);
     end
     else
-      result := MP3ERR_StreamRead;
+      result := FileErr_StreamRead;
   except
     on E: Exception do
     begin
@@ -276,9 +276,9 @@ begin
         Stream.Seek(0, soEnd);
 
       if Stream.Write(NewRawTag, 128) <> 128 then
-        result := MP3ERR_StreamWrite;
+        result := FileErr_StreamWrite;
     end else
-      result := MP3ERR_StreamRead;
+      result := FileErr_StreamRead;
   except
     on E: Exception do
     begin
@@ -304,7 +304,7 @@ begin
       end;
       // else: nothing to do, there was no ID3v1Tag
     end else
-      result := MP3ERR_StreamRead;
+      result := FileErr_StreamRead;
   except
     on E: Exception do
     begin

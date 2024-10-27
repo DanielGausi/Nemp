@@ -3,7 +3,7 @@ object PlaylistCopyForm: TPlaylistCopyForm
   Top = 0
   BorderStyle = bsSingle
   Caption = 'Nemp: Copy playlist to USB'
-  ClientHeight = 388
+  ClientHeight = 374
   ClientWidth = 415
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,35 +18,8 @@ object PlaylistCopyForm: TPlaylistCopyForm
   OnShow = FormShow
   DesignSize = (
     415
-    388)
+    374)
   TextHeight = 13
-  object BtnCopyFiles: TButton
-    AlignWithMargins = True
-    Left = 300
-    Top = 350
-    Width = 107
-    Height = 25
-    Hint = 'Start copying the files into the specified directory'
-    Anchors = [akRight, akBottom]
-    Caption = 'Copy files'
-    ParentShowHint = False
-    ShowHint = True
-    TabOrder = 0
-    OnClick = BtnCopyFilesClick
-  end
-  object cbCloseWindow: TCheckBox
-    AlignWithMargins = True
-    Left = 8
-    Top = 322
-    Width = 374
-    Height = 17
-    Hint = 'Close this window when the copy process is completed'
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'Close this window after copying'
-    ParentShowHint = False
-    ShowHint = True
-    TabOrder = 1
-  end
   object GrpboxSettings: TGroupBox
     AlignWithMargins = True
     Left = 3
@@ -55,7 +28,11 @@ object PlaylistCopyForm: TPlaylistCopyForm
     Height = 185
     Align = alTop
     Caption = 'Settings'
-    TabOrder = 2
+    TabOrder = 0
+    ExplicitWidth = 405
+    DesignSize = (
+      409
+      185)
     object LblRenameSetting: TLabel
       Left = 16
       Top = 65
@@ -64,11 +41,12 @@ object PlaylistCopyForm: TPlaylistCopyForm
       Caption = 'Rename files'
     end
     object BtnSelectDirectory: TButton
-      Left = 335
-      Top = 36
+      Left = 361
+      Top = 38
       Width = 26
-      Height = 25
+      Height = 21
       Hint = 'Select directory'
+      Anchors = [akTop, akRight]
       Caption = '...'
       ParentShowHint = False
       ShowHint = True
@@ -78,7 +56,7 @@ object PlaylistCopyForm: TPlaylistCopyForm
     object cbRenameSetting: TComboBox
       Left = 16
       Top = 84
-      Width = 265
+      Width = 339
       Height = 21
       Hint = 'Choose how the files should be renamed'
       ParentShowHint = False
@@ -94,7 +72,7 @@ object PlaylistCopyForm: TPlaylistCopyForm
     object EditDirectory: TLabeledEdit
       Left = 16
       Top = 38
-      Width = 313
+      Width = 339
       Height = 21
       EditLabel.Width = 100
       EditLabel.Height = 13
@@ -152,44 +130,73 @@ object PlaylistCopyForm: TPlaylistCopyForm
     Height = 122
     Align = alTop
     Caption = 'Status'
-    TabOrder = 3
+    TabOrder = 1
+    ExplicitWidth = 405
     object LblProgressFile: TLabel
-      Left = 18
+      Left = 16
       Top = 20
       Width = 18
       Height = 13
       Caption = 'Idle'
     end
     object LblCompleteProgress: TLabel
-      Left = 18
+      Left = 16
       Top = 69
       Width = 79
       Height = 13
       Caption = 'Overall progress'
     end
     object PBCurrentFile: TProgressBar
-      Left = 18
+      Left = 16
       Top = 39
       Width = 369
       Height = 17
       TabOrder = 0
     end
     object PBComplete: TProgressBar
-      Left = 18
+      Left = 16
       Top = 88
       Width = 369
       Height = 17
       TabOrder = 1
     end
   end
-  object BtnClose: TButton
-    Left = 194
-    Top = 350
-    Width = 87
-    Height = 25
-    Anchors = [akRight, akBottom]
-    Caption = 'Close'
-    TabOrder = 4
-    OnClick = BtnCloseClick
+  object pnlButtons: TPanel
+    Left = 0
+    Top = 339
+    Width = 415
+    Height = 35
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 2
+    ExplicitTop = 136
+    ExplicitWidth = 375
+    DesignSize = (
+      415
+      35)
+    object BtnCopyFiles: TButton
+      Left = 302
+      Top = 6
+      Width = 97
+      Height = 21
+      Anchors = [akTop, akRight]
+      Caption = 'Copy files'
+      Default = True
+      TabOrder = 0
+      OnClick = BtnCopyFilesClick
+    end
+  end
+  object cbCloseWindow: TCheckBox
+    AlignWithMargins = True
+    Left = 19
+    Top = 322
+    Width = 370
+    Height = 17
+    Hint = 'Close this window when the copy process is completed'
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Close this window after copying'
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 3
   end
 end

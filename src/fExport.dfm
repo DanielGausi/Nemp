@@ -2,8 +2,8 @@ object FormExport: TFormExport
   Left = 0
   Top = 0
   Caption = 'Nemp: Export'
-  ClientHeight = 241
-  ClientWidth = 495
+  ClientHeight = 240
+  ClientWidth = 491
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,11 +16,11 @@ object FormExport: TFormExport
   OnDestroy = FormDestroy
   OnShow = FormShow
   DesignSize = (
-    495
-    241)
+    491
+    240)
   TextHeight = 15
   object btnSelectExportFilename: TButton
-    Left = 453
+    Left = 449
     Top = 167
     Width = 34
     Height = 23
@@ -28,11 +28,12 @@ object FormExport: TFormExport
     Caption = '...'
     TabOrder = 2
     OnClick = btnSelectExportFilenameClick
+    ExplicitLeft = 453
   end
   object rgExportSelection: TRadioGroup
     Left = 195
     Top = 8
-    Width = 292
+    Width = 288
     Height = 129
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Files for export'
@@ -43,11 +44,12 @@ object FormExport: TFormExport
       'Currently displayed files'
       'The Playlist')
     TabOrder = 1
+    ExplicitWidth = 292
   end
   object edtExportFileName: TLabeledEdit
     Left = 8
     Top = 167
-    Width = 439
+    Width = 435
     Height = 23
     Anchors = [akLeft, akTop, akRight]
     EditLabel.Width = 93
@@ -56,17 +58,18 @@ object FormExport: TFormExport
     TabOrder = 3
     Text = ''
     OnChange = edtExportFileNameChange
+    ExplicitWidth = 439
   end
   object pnlButtons: TPanel
     Left = 0
-    Top = 203
-    Width = 495
+    Top = 202
+    Width = 491
     Height = 38
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 4
     DesignSize = (
-      495
+      491
       38)
     object ImgHelp: TImage
       Left = 16
@@ -152,7 +155,7 @@ object FormExport: TFormExport
       OnClick = ImgHelpClick
     end
     object btnCancel: TButton
-      Left = 401
+      Left = 397
       Top = 4
       Width = 79
       Height = 25
@@ -161,9 +164,10 @@ object FormExport: TFormExport
       Caption = 'Cancel'
       ModalResult = 2
       TabOrder = 0
+      ExplicitLeft = 401
     end
     object btnOK: TButton
-      Left = 314
+      Left = 310
       Top = 4
       Width = 79
       Height = 25
@@ -172,6 +176,7 @@ object FormExport: TFormExport
       Default = True
       ModalResult = 1
       TabOrder = 1
+      ExplicitLeft = 314
     end
   end
   object grpBoxTemplateSelection: TGroupBox

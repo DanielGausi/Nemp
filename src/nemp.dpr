@@ -37,7 +37,6 @@ uses
   MyDialogs in '3rd Party Units\MyDialogs.pas',
   unitFlyingCow in '3rd Party Units\unitFlyingCow.pas',
   dglOpenGL in '3rd Party Units\dglOpenGL.pas',
-  fldbrows in '3rd Party Units\fldbrows.pas',
   SearchTool in '3rd Party Units\SearchTool.pas',
   filetypes in '3rd Party Units\filetypes.pas',
   WindowsVersionInfo in '3rd Party Units\WindowsVersionInfo.pas',
@@ -145,7 +144,8 @@ uses
   AudioExportUtils in 'AudioExportUtils.pas',
   fExport in 'fExport.pas' {FormExport},
   UpdateCleaning in 'UpdateCleaning.pas',
-  fUpdateCleaning in 'fUpdateCleaning.pas' {FormUpdateCleaning};
+  fUpdateCleaning in 'fUpdateCleaning.pas' {FormUpdateCleaning},
+  OKCANCL1 in 'c:\program files (x86)\embarcadero\studio\22.0\ObjRepos\DE\DelphiWin32\OKCANCL1.PAS' {OKBottomDlg};
 
 {$R *.res}
 

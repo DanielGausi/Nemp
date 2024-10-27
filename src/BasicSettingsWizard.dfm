@@ -3,8 +3,8 @@ object Wizard: TWizard
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Nemp Configuration Wizard'
-  ClientHeight = 321
-  ClientWidth = 544
+  ClientHeight = 320
+  ClientWidth = 540
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,12 +19,14 @@ object Wizard: TWizard
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 538
-    Height = 315
+    Width = 534
+    Height = 314
     ActivePage = TabSheet1
     Align = alClient
     MultiLine = True
     TabOrder = 0
+    ExplicitWidth = 538
+    ExplicitHeight = 315
     object TabSheet1: TTabSheet
       Caption = '(welcome)'
       object Lbl_Welcome: TLabel

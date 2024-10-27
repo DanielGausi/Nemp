@@ -739,6 +739,7 @@ function TCoverArtSearcher.InitCoverFromMetaData(aAudioFile: tAudioFile;
   ScanMode: CoverScanThreadMode; Flags: Integer): String;
 var CoverStream: TMemoryStream;
     newID: String;
+    dummy: AnsiString;
     MainFile: TBaseAudioFile;
 
 begin
@@ -765,7 +766,7 @@ begin
                 begin
                     ///  However, if the "UserID.jpg" does not exist (or, more probably, the UserCover is not set),
                     ///  we need to check for regular CoverArt information in the MetaData
-                    if aAudioFile.GetCoverStreamFromMetaData(CoverStream, MainFile) then
+                    if aAudioFile.GetCoverStreamFromMetaData(MainFile, CoverStream, dummy) then
                     begin
                         // there is a Picture-Tag in the Metadata, and its content is now stored in Coverstream
                         CoverStream.Seek(0, soFromBeginning);

@@ -6,7 +6,12 @@
 }
 
 {$DEFINE USE_SYSTEM_TYPES}
-{$DEFINE USE_DICTIONARY}
+
+
+{$if CompilerVersion > 20} // Delphi 2009 or later
+  {$DEFINE USE_DICTIONARY}
+  {$DEFINE USE_GENERICS}
+{$ifend}
 
 {
   Compiler-Switch-TNT:
@@ -15,7 +20,7 @@
     - WideFileExists and
     - TTntFileStream
   If you do not want to use this, only Ansi-Filenames are supported
-  (in Delphi 2007 or earlier).  
+  (in Delphi 2007 or earlier).
 }
 
 {$DEFINE USE_TNT_COMPOS}

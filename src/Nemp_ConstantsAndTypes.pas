@@ -561,9 +561,7 @@ const
     PBT_APMSUSPEND = 4;
 
     // WM_TRAYMSG = WM_USER + 10; // not needed any more (tTrayIcon)
-
-    // Spaltenzahl = 31;
-    cLibraryColumnCount = 31; // formerly known as Spaltenzahl
+    cLibraryColumnCount = 32; // formerly known as Spaltenzahl
 
     // Nicht Ändern! Das sind auch die Tags in den Menu-Einträgen zum Sortieren!!
     (*CON_ARTIST    = 0 ;
@@ -751,6 +749,7 @@ const
       colIdx_Lyrics       = 28;
       colIdx_LastFMTags   = 29;
       colIdx_Marker       = 30;
+      colIdx_HarmonicKey  = 31;
 
       //-----
       colIdx_EX_ARTISTALBUMTITEL = 117;
@@ -789,7 +788,8 @@ const
         (Position:27; Width:  50; Visible: False; Name: 'BPM'),
         (Position:28; Width:  50; Visible: False; Name: 'Lyrics'),
         (Position:29; Width:  50; Visible: False; Name: 'Tags'),
-        (Position:30; Width:  50; Visible: False; Name: 'Marker')
+        (Position:30; Width:  50; Visible: False; Name: 'Marker'),
+        (Position:31; Width:  50; Visible: False; Name: 'Harmonic key')
       );
 
       // für die Prozedur ActualizeEQ:
@@ -815,28 +815,23 @@ const
       // For starting VST
       WM_STARTEDITING = WM_User + 778;
 
-      VORBIS_COMMENT = 'COMMENT';
-      VORBIS_LYRICS = 'UNSYNCEDLYRICS';
       VORBIS_RATING = 'RATING';
       VORBIS_PLAYCOUNT = 'PLAYCOUNT';
       VORBIS_CATEGORIES = 'CATEGORIES';
-      VORBIS_DISCNUMBER = 'DISCNUMBER';
       VORBIS_USERCOVERID = 'NEMP_COVER_ID';
-      VORBIS_COMPOSER = 'COMPOSER';
 
-      APE_COMMENT = 'COMMENT';
-      APE_LYRICS = 'UNSYNCEDLYRICS';
+      // APE_LYRICS = 'UNSYNCEDLYRICS';
       APE_RATING = 'RATING';
       APE_PLAYCOUNT = 'PLAYCOUNT';
       APE_CATEGORIES = 'CATEGORIES';
-      APE_DISCNUMBER = 'DISCNUMBER';
       APE_USERCOVERID = 'NEMP_COVER_ID';
 
-      TRACK_BPM = 'BPM';
+      M4A_BPM = 'BPM';
+      M4A_TMPO = 'tmpo';
+      M4A_HARMONIC_KEY = 'initialkey';
 
       REPLAYGAIN_TRACK_GAIN = 'REPLAYGAIN_TRACK_GAIN';
       REPLAYGAIN_ALBUM_GAIN = 'REPLAYGAIN_ALBUM_GAIN';
-
       REPLAYGAIN_TRACK_PEAK = 'REPLAYGAIN_TRACK_PEAK';
       REPLAYGAIN_ALBUM_PEAK = 'REPLAYGAIN_ALBUM_PEAK';
 

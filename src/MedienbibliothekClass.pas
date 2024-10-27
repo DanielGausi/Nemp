@@ -47,7 +47,7 @@ interface
 
 uses Windows, Contnrs, Sysutils,  Classes, Inifiles, RTLConsts,
      dialogs, Messages, JPEG, PNGImage, MD5, Graphics,  Lyrics,
-     AudioFiles.Base, NempFileUtils,
+     AudioFiles.Base, AudioFiles.BaseTags, NempFileUtils,
      NempAudioFiles, AudioFileHelper, Nemp_ConstantsAndTypes, Hilfsfunktionen,
      HtmlHelper, ID3v2Tags, ID3v2Frames,
      U_CharCode, gnuGettext, oneInst, StrUtils,  CoverHelper, BibHelper, StringHelper,
@@ -651,8 +651,10 @@ type
         procedure RepairSearchStrings;
 
         function AnzeigeShowsPlaylistFiles: Boolean;
-        procedure GenerateAnzeigeListe(aCollection: TAudioCollection);
-        procedure GenerateReverseAnzeigeListe(aCollection: TAudioCollection);
+        procedure GenerateAnzeigeListe(aCollection: TAudioCollection); overload;
+        procedure GenerateAnzeigeListe(aCollection: TAudioCollection; DoRecusive: Boolean); overload;
+
+        // procedure GenerateReverseAnzeigeListe(aCollection: TAudioCollection);
         procedure GenerateAlbumAnzeigeListe(aAudioFile: TAudioFile);
         procedure GetAlbumTitelListFromAudioFile(Target: TAudioFileList; aAudioFile: TAudioFile);
 
@@ -721,7 +723,7 @@ type
         function DoExport(Mode: Integer; TargetFilename: String): Boolean;
         function DoPlaylistExport(Playlist: TAudioFileList; TargetFilename: String): Boolean;
         procedure FinishExport(Finished: Boolean);
-        function SaveAsCSV(aFilename: UnicodeString): Boolean;
+        // function SaveAsCSV(aFilename: UnicodeString): Boolean;
         // b. Loading/Saving the *.gmp-File
         // will call several private methods
         procedure SaveToFile(aFilename: UnicodeString; Silent: Boolean = True);
@@ -3411,7 +3413,7 @@ procedure TMedienBibliothek.fBugFixID3Tags;
 var i, f: Integer;
     af: TAudioFile;
     id3: TID3v2Tag;
-    FrameList: TObjectList;
+    FrameList: TTagItemList; //TObjectList;
     ms: TMemoryStream;
     privateOwner: AnsiString;
     LogList: TStringList;
@@ -3452,7 +3454,7 @@ begin
                 af.FileIsPresent := True;
 
                 id3 := TID3v2Tag.Create;
-                FrameList := TObjectList.Create(False);
+                FrameList := TTagItemList.Create;
                 try
                     // Read the tag from the file
                     id3.ReadFromFile(af.Pfad);
@@ -3481,7 +3483,7 @@ begin
                         // Oops, we have duplicate 'NEMP/Tags' in the file :(
                         for f := FrameList.Count - 1 downto 0 do
                             // Delete all these Frames
-                            id3.DeleteFrame(TID3v2Frame(FrameList[f]));
+                            id3.DeleteTagItem(FrameList[f]);
 
                         // Set New Private Frame
                         if length(af.RawTagLastFM) > 0 then
@@ -4022,6 +4024,11 @@ end;
 }
 
 procedure TMedienBibliothek.GenerateAnzeigeListe(aCollection: TAudioCollection);
+begin
+  GenerateAnzeigeListe(aCollection, NempOrganizerSettings.ShowFilesRecursively);
+end;
+
+procedure TMedienBibliothek.GenerateAnzeigeListe(aCollection: TAudioCollection; DoRecusive: Boolean);
 var
   i: Integer;
 begin
@@ -4039,11 +4046,11 @@ begin
       SortAnzeigeliste;
   end else
   begin
-    aCollection.GetFiles(AnzeigeListe, True);
+    aCollection.GetFiles(AnzeigeListe, DoRecusive);//True);
 
     case aCollection.CollectionClass of
       ccFiles: begin
-        BibSearcher.GetNewEmptyListMessage(elmCategory);
+        BibSearcher.GetNewEmptyListMessage(elmCategory, aCollection);
         DisplayContent := DISPLAY_BrowseFiles;
         if IsAutoSortWanted then
           SortAnzeigeliste;
@@ -4063,6 +4070,7 @@ begin
   SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList, 0);
 end;
 
+(*
 procedure TMedienBibliothek.GenerateReverseAnzeigeListe(aCollection: TAudioCollection);
 var
   afc: TAudioFileCollection;
@@ -4081,6 +4089,7 @@ begin
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList, 0);
   end;
 end;
+*)
 
 procedure TMedienBibliothek.GenerateAlbumAnzeigeListe(aAudioFile: TAudioFile);
 begin
@@ -4312,6 +4321,7 @@ begin
         colIdx_TRACKPEAK           : NewSortMethod := AFCompareTrackPeak;
         colIdx_ALBUMPEAK           : NewSortMethod := AFCompareAlbumPeak;
         colIdx_BPM                 : NewSortMethod := AFCompareBPM;
+        colIdx_HARMONICKEY         : NewSortMethod := AFCompareHarmonicKey;
     else
         NewSortMethod := AFComparePath;
     end;
@@ -4876,6 +4886,7 @@ begin
 end;
 
 
+(*
 function TMedienBibliothek.SaveAsCSV(aFilename: UnicodeString): boolean;
 var i: integer;
   tmpStrList : TStringList;
@@ -4907,6 +4918,7 @@ begin
   end;
   LeaveCriticalSection(CSUpdate);
 end;
+*)
 
 
 {

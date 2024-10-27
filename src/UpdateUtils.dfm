@@ -24,6 +24,8 @@ object UpdateForm: TUpdateForm
     Width = 494
     Height = 201
     Align = alClient
+    EditMargins.Left = 16
+    EditMargins.Right = 16
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -43,6 +45,7 @@ object UpdateForm: TUpdateForm
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 1
+    ExplicitWidth = 496
     DesignSize = (
       500
       89)
@@ -89,7 +92,7 @@ object UpdateForm: TUpdateForm
       OnClick = BtnDownloadClick
     end
     object BtnClose: TButton
-      Left = 363
+      Left = 359
       Top = 56
       Width = 129
       Height = 25
@@ -97,6 +100,7 @@ object UpdateForm: TUpdateForm
       Caption = 'Maybe later'
       TabOrder = 1
       OnClick = BtnCloseClick
+      ExplicitLeft = 355
     end
   end
 end

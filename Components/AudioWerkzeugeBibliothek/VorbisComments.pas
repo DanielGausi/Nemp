@@ -9,7 +9,7 @@
 
     Unit VorbisComments
 
-    Helper class for Ogg-Vorbis-Comments (as used in *.ogg and *.flac)
+    Helper class for Ogg-Vorbis-Comments (as used in *.ogg, *.opus and *.flac)
 
     ---------------------------------------------------------------------------
 
@@ -52,11 +52,14 @@ unit VorbisComments;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, ContNrs, Classes
+  Windows, Messages, SysUtils, Variants, ContNrs, Classes, System.NetEncoding,
+  AudioFiles.Declarations, AudioFiles.BaseTags
   {$IFDEF USE_SYSTEM_TYPES}, System.Types{$ENDIF} ;
 
 const
+
     VORBIS_ID = 'vorbis';
+    Opus_ID = 'OpusTags';
 
     VORBIS_ALBUM        = 'ALBUM'        ;
     VORBIS_ARTIST       = 'ARTIST'       ;
@@ -75,6 +78,40 @@ const
     VORBIS_TRACKNUMBER  = 'TRACKNUMBER'  ;
     VORBIS_VERSION      = 'VERSION'      ;
     VORBIS_ALBUMARTIST  = 'ALBUMARTIST'  ;
+    METADATA_BLOCK_PICTURE = 'METADATA_BLOCK_PICTURE';
+    COVERART = 'COVERART'; // deprecated, not directly supported by this Library
+
+    // keys from https://age.hobba.nl/audio/mirroredpages/ogg-tagging.html
+    VORBIS_PUBLISHER = 'PUBLISHER';
+    VORBIS_DISCNUMBER = 'DISCNUMBER';
+    VORBIS_EANUPN = 'EAN/UPN';
+    VORBIS_LABEL = 'LABEL';
+    VORBIS_LABELNO = 'LABELNO';
+    VORBIS_OPUS = 'OPUS';
+    VORBIS_SOURCEMEDIA = 'SOURCEMEDIA';
+    VORBIS_ENCODEDBY = 'ENCODED-BY';
+    VORBIS_COMPOSER = 'COMPOSER'; //
+    VORBIS_ARRANGER = 'ARRANGER';
+    VORBIS_LYRICIST = 'LYRICIST';
+    VORBIS_AUTHOR = 'AUTHOR';
+    VORBIS_CONDUCTOR = 'CONDUCTOR';
+    VORBIS_ENSEMBLE = 'ENSEMBLE';
+    VORBIS_PART = 'PART';
+    VORBIS_PARTNUMBER = 'PARTNUMBER';
+    VORBIS_COMMENT = 'COMMENT';
+
+    // additional keys that I use in my Player Nemp, that seems to be used by other players as well
+    VORBIS_HARMONIC_KEY = 'INITIALKEY';
+    VORBIS_BPM = 'BPM';
+
+    cTextVorbisKeys: Array[0..35] of String = (
+        VORBIS_ALBUM, VORBIS_ALBUMARTIST, VORBIS_ARRANGER, VORBIS_ARTIST, VORBIS_AUTHOR, VORBIS_BPM,
+        VORBIS_COMMENT, VORBIS_COMPOSER, VORBIS_CONDUCTOR, VORBIS_CONTACT, VORBIS_COPYRIGHT,
+        VORBIS_DATE, VORBIS_DESCRIPTION, VORBIS_DISCNUMBER, VORBIS_EANUPN, VORBIS_ENCODEDBY,
+        VORBIS_ENSEMBLE, VORBIS_GENRE, VORBIS_HARMONIC_KEY, VORBIS_ISRC, VORBIS_LABEL, VORBIS_LABELNO,
+        VORBIS_LICENSE, VORBIS_LOCATION, VORBIS_LYRICIST, VORBIS_OPUS, VORBIS_ORGANIZATION, VORBIS_PART,
+        VORBIS_PARTNUMBER, VORBIS_PERFORMER, VORBIS_PUBLISHER, VORBIS_SOURCEMEDIA, VORBIS_TITLE,
+        VORBIS_TRACKNUMBER, VORBIS_VERSION, VORBIS_YEAR);
 
 type
 
@@ -82,10 +119,16 @@ type
         UnicodeString = WideString;
     {$ENDIF}
 
+    teOggContainerType = (octInvalid, octOgg, octFlac, octOpus);
+
 
     TVorbisHeader = packed record
         PacketType: Byte;                       // 1, 3, 5 for the first 3 Vorbis-Header in an Ogg-Stream (we need only the first and second)
         ID: array [1..6] of AnsiChar;           // always "vorbis"
+    end;
+
+    TOpusHeader = packed record
+        ID: array [1..8] of AnsiChar;           // always "OpusTags"
     end;
 
     TVorbisIdentification = packed record
@@ -101,7 +144,7 @@ type
         StopFlag: Byte;                         // always 1
     end;
 
-    TCommentVector = class
+    TCommentVector = class(TTagItem)
         private
             // FieldName is AnsiString
             // Value is UTf8String
@@ -115,11 +158,76 @@ type
             procedure fSetFieldname(aName: String);
             function fGetValue: UnicodeString;
             procedure fSetValue(aValue: UnicodeString);
+
+            function PicDataToBase64(Source: TStream; aMime: AnsiString;
+                      aPicType: TPictureType; aDescription: UnicodeString): UTF8String;
+
+        protected
+          function GetKey: UnicodeString; override;
+          function GetTagContentType: teTagContentType; override;
+          function GetDataSize: Integer; override;
+
         public
-            property FieldName: String read fGetFieldName write fSetFieldName;
-            property Value: UnicodeString read fGetValue write fSetValue;
+            property FieldName: String read fGetFieldName write fSetFieldName;  // = TTagItem.Key
+            property Value: UnicodeString read fGetValue write fSetValue;       // = TTagItem.Get/SetText(tmForced)
+
+            constructor Create;
             function ReadFromStream(Source: TStream): Boolean;
             function WriteToStream(Destination: TStream): Boolean;
+
+            function GetText(TextMode: teTextMode = tmReasonable): UnicodeString; override;
+            function SetText(aValue: UnicodeString; TextMode: teTextMode = tmReasonable): Boolean; override;
+
+            function GetPicture(Dest: TStream; out Mime: AnsiString; out PicType: TPictureType; out Description: UnicodeString): Boolean; override;
+            function SetPicture(Source: TStream; Mime: AnsiString; PicType: TPictureType; Description: UnicodeString): Boolean; override;
+
+
+    end;
+
+    {
+      TMetaDataBlockPicture is a structure from the FLAC documentation.
+      However, it is recommended to uses this structure in VorbisComments as well
+      for storing CoverArt (Encoded as Base64 in that case).
+      Therefore we need it here already, not in unit FlacFiles.pas
+    }
+    TMetaDataBlockPicture = class
+      private
+        fPictureType: TPictureType;
+        fMime: AnsiString;
+        fDescription: Utf8String;
+        fWidth         : Cardinal;
+        fHeight        : Cardinal;
+        fColorDepth    : Cardinal;
+        fNumberOfColors: Cardinal;
+        fPicData: TMemoryStream;
+        function GetDescription: UnicodeString;
+        procedure SetDescription(value: UnicodeString);
+        function CalculateBlockSize: Cardinal;
+
+        function GetAsBase64: UTF8String;
+        procedure SetAsBase64(Value: UTF8String);
+
+    public
+        property PicData: TMemoryStream read fPicData;
+        property PictureType: TPictureType read fPictureType write fPictureType;
+        property Mime: AnsiString read fMime write fMime;
+        property Description: UnicodeString read GetDescription write SetDescription;
+        property Width         : Cardinal read fWidth          write fWidth          ;
+        property Height        : Cardinal read fHeight         write fHeight         ;
+        property ColorDepth    : Cardinal read fColorDepth     write fColorDepth     ;
+        property NumberOfColors: Cardinal read fNumberOfColors write fNumberOfColors ;
+        property Size: Cardinal read CalculateBlockSize;
+        property AsBase64: UTF8String read GetAsBase64 write SetAsBase64;
+
+        constructor Create;
+        destructor Destroy; override;
+        procedure Clear;
+        function IsEmpty: Boolean;
+
+        procedure CopyPicData(Target: TStream);
+        function ReadFromStream(Source: TStream): Boolean;
+        function WriteToStream(Destination: TStream): Boolean;
+
     end;
 
     {
@@ -128,11 +236,16 @@ type
     }
     TVorbisComments = class
         private
-            fHeader: TVorbisHeader;
+            fContainerType: teOggContainerType;
+            fVorbisHeader: TVorbisHeader;
+            fOpusHeader: TOpusHeader;
+
             fVendorString: UTF8String;
             fCommentVectorList: TObjectList;
             fValidComment: Boolean;
 
+            function GetCount: Integer;
+            function fGetCommentVectorByFieldname(aField: String): TCommentVector;
             function fGetPropertyByFieldname(aField: String): UnicodeString;
             // The following fields are listed in the official Ogg-Vorbis-Documentation
             function fGetTitle       : UnicodeString;
@@ -151,6 +264,7 @@ type
             function fGetContact     : UnicodeString;
             function fGetISRC        : UnicodeString;
             function fGetAlbumArtist : UnicodeString;
+            function fGetLyrics      : UnicodeString;
 
             procedure fSetPropertyByFieldname(aField: String; aValue: UnicodeString);
             procedure fSetTitle       (value: UnicodeString);
@@ -169,8 +283,11 @@ type
             procedure fSetContact     (value: UnicodeString);
             procedure fSetISRC        (value: UnicodeString);
             procedure fSetAlbumArtist (value: UnicodeString);
+            procedure fSetLyrics      (value: UnicodeString);
 
         public
+            property Count: Integer read GetCount;
+            property ContainerType: teOggContainerType read fContainerType write fContainerType;
             property ValidComment: Boolean read fValidComment;
             property VendorString: UTF8String read fVendorString    ;
             property Title       : UnicodeString read fGetTitle        write fSetTitle       ;
@@ -189,34 +306,71 @@ type
             property Contact     : UnicodeString read fGetContact      write fSetContact     ;
             property ISRC        : UnicodeString read fGetISRC         write fSetISRC        ;
             property AlbumArtist : UnicodeString read fGetAlbumArtist  write fSetAlbumArtist ;
+            property Lyrics      : UnicodeString read fGetLyrics       write fSetLyrics      ;
 
             //property CommentVectorList: TObjectList read fCommentVectorList;
 
             constructor Create;
             destructor Destroy; override;
             procedure Clear;
-            function ReadFromStream(Source: TStream; Size: Integer; SkipHeader: Boolean=False): Boolean;
-            function WriteToStream(Destination: TStream; SkipHeader: Boolean=False): Boolean;
+            function ReadFromStream(Source: TStream; Size: Integer): Boolean;
+            function WriteToStream(Destination: TStream): Boolean;
             // The SizeInStream is just the size of the Comments.
             // It does NOT include optional padding!
-            function GetSizeInStream: Integer;
+            // function GetSizeInStream: Integer;   // not needed any more
 
             // public versions of the private Methods
             function GetPropertyByFieldname(aField: String): UnicodeString;
             // the Set-method also implements some Validations
             function SetPropertyByFieldname(aField: String; aValue: UnicodeString): Boolean;
 
-            // Get All FieldNames in the CommentVectorList
-            procedure GetAllFields(Target: TStrings);
-            // Give Access to these Fields (note: Fieldnames dont have to be unique)
-            function GetPropertyByIndex(aIndex: Integer): UnicodeString;
-            function SetPropertyByIndex(aIndex: Integer; aValue: UnicodeString): Boolean;
+            procedure GetTagList(Dest: TTagItemList; ContentTypes: TTagContentTypes = cDefaultTagContentTypes);
+            procedure DeleteTagItem(aTagItem: TTagItem);
+
+            function GetUnusedTextTags: TTagItemInfoDynArray;
+            function AddTextTagItem(aKey, aValue: UnicodeString): TTagItem;
+
+            function GetPicture(Destination: TStream;
+                                        var aMime: AnsiString;
+                                        var aPicType: TPictureType;
+                                        var aDescription: UnicodeString): Boolean; overload;
+
+            function SetPicture(Source: TStream; aMime: AnsiString;
+                        aPicType: TPictureType; aDescription: UnicodeString): Boolean;  // use Source=NIL, to delete the picture
+            // Add a new Picture
+            procedure AddPicture(Source: TStream; aMime: AnsiString; aPicType: TPictureType;
+                  aDescription: UnicodeString);
     end;
 
 
 implementation
 
+uses
+  WinApi.WinSock;
+
+
+// In FlacFiles, all Integers (except in the Comments) are stored BigEndian
+// We need to convert them to LittleEndian
+function ReadBigEndianCardinal(source: TStream): Cardinal;
+begin
+    Source.Read(result, SizeOf(result));
+    result := ntohl(result);
+end;
+
+procedure WriteBigEndianCardinal(Destination: TStream; value: Cardinal);
+var x: Cardinal;
+begin
+    x := htonl(value);
+    Destination.Write(x, sizeOf(value));
+end;
+
+
 { TCommentVector }
+
+constructor TCommentVector.Create;
+begin
+  inherited create(ttVorbis);
+end;
 
 function TCommentVector.fGetFieldName: String;
 begin
@@ -225,6 +379,8 @@ end;
 
 procedure TCommentVector.fSetFieldname(aName: String);
 begin
+  // A case-insensitive field name that may consist of ASCII 0x20 through 0x7D, 0x3D ('=') excluded.
+  // ASCII 0x41 through 0x5A inclusive (A-Z) is to be considered equivalent to ASCII 0x61 through 0x7A inclusive (a-z).
     fFieldname := AnsiString(aName);
 end;
 
@@ -236,6 +392,114 @@ end;
 procedure TCommentVector.fSetValue(aValue: UnicodeString);
 begin
     fValue := aValue;
+end;
+
+function TCommentVector.GetKey: UnicodeString;
+begin
+  result := UnicodeString(FieldName);
+end;
+
+function TCommentVector.GetTagContentType: teTagContentType;
+begin
+  // note: by design, *ALL* CommentVectors contain text data.
+  // However, there are workarounds for coverart, using Base64 encoding
+  // for binary data.
+  // There may be other fieldnames containing Base64 encoded binary data.
+  // It is up to the developer (= YOU ;-) ) to decide how to deal with it
+  // in the application.
+  if SameText(Key, METADATA_BLOCK_PICTURE)  then
+    result := tctPicture
+  else if SameText(Key, COVERART) then
+    result := tctBinary
+  else
+    result := tctText;
+end;
+
+function TCommentVector.GetText(TextMode: teTextMode = tmReasonable): UnicodeString;
+begin
+  if TagContentType = tctText then
+    result := Value
+  else begin
+    if TextMode = tmForced then
+      result := Value
+    else
+      result := '';
+  end;
+end;
+
+function TCommentVector.SetText(aValue: UnicodeString; TextMode: teTextMode = tmReasonable): Boolean;
+begin
+  if TagContentType = tctText then begin
+    Value := aValue;
+    result := True;
+  end
+  else begin
+    if TextMode = tmForced then begin
+      Value := aValue;
+      result := True;
+    end
+    else
+      result := False;
+  end;
+end;
+
+function TCommentVector.PicDataToBase64(Source: TStream; aMime: AnsiString;
+                      aPicType: TPictureType; aDescription: UnicodeString): UTF8String;
+var
+  PicBlock: TMetaDataBlockPicture;
+begin
+  // returns the data as a base64 encoded TMetaDataBlockPicture structure
+  PicBlock := TMetaDataBlockPicture.Create;
+  try
+    picBlock.PictureType := aPicType;
+    picBlock.Mime := aMime;
+    picBlock.Description := aDescription;
+    picBlock.PicData.Clear;
+    picBlock.PicData.CopyFrom(Source, 0);
+    result := PicBlock.AsBase64;
+  finally
+    PicBlock.Free;
+  end;
+end;
+
+function TCommentVector.GetPicture(Dest: TStream; out Mime: AnsiString;
+  out PicType: TPictureType; out Description: UnicodeString): Boolean;
+var
+  PicBlock: TMetaDataBlockPicture;
+begin
+  result := (TagContentType = tctPicture) and (fValue <> '');
+  Mime := '';
+  PicType := ptOther;
+  Description := '';
+
+  if result then begin
+    PicBlock := TMetaDataBlockPicture.Create;
+    try
+      PicBlock.AsBase64 := UTF8String(fValue);
+      result := PicBlock.Size > 0;
+      if result then begin
+        Dest.CopyFrom(picBlock.PicData, 0);
+        Mime := picBlock.Mime;
+        PicType := picBlock.PictureType;
+        Description := picBlock.Description;
+      end;
+    finally
+      PicBlock.Free;
+    end;
+  end;
+end;
+
+function TCommentVector.SetPicture(Source: TStream; Mime: AnsiString;
+  PicType: TPictureType; Description: UnicodeString): Boolean;
+begin
+  result := TagContentType = tctPicture;
+  if result then
+    Value := UnicodeString(PicDataToBase64(Source, Mime, PicType, Description));
+end;
+
+function TCommentVector.GetDataSize: Integer;
+begin
+  result := Length(Value);
 end;
 
 function TCommentVector.ReadFromStream(Source: TStream): Boolean;
@@ -284,8 +548,9 @@ end;
 
 procedure TVorbisComments.Clear;
 begin
-    fheader.PacketType := 0;
-    fHeader.ID := '123456';
+    fVorbisHeader.PacketType := 0;
+    fVorbisHeader.ID := '123456'; // invalid
+    fOpusHeader.ID := '12345678'; // invalid
     fVendorString := '';
     fCommentVectorList.Clear;
     fValidComment := False;
@@ -302,6 +567,25 @@ begin
     inherited;
 end;
 
+function TVorbisComments.GetCount: Integer;
+begin
+  result := fCommentVectorList.Count;
+end;
+
+function TVorbisComments.fGetCommentVectorByFieldname(aField: String): TCommentVector;
+var
+  i: Integer;
+begin
+    result := Nil;
+    for i := 0 to fCommentVectorList.Count - 1 do
+    begin
+        if SameText(aField, TCommentVector(fCommentVectorList[i]).FieldName) then
+        begin
+            result := TCommentVector(fCommentVectorList[i]);
+            break;
+        end;
+    end;
+end;
 
 function TVorbisComments.fGetPropertyByFieldname(aField: String): UnicodeString;
 var i: integer;
@@ -316,7 +600,6 @@ begin
         end;
     end;
 end;
-
 
 function TVorbisComments.fGetAlbum: UnicodeString;
 begin
@@ -398,6 +681,18 @@ end;
 function TVorbisComments.fGetVersion: UnicodeString;
 begin
     result := fGetPropertyByFieldname(VORBIS_VERSION);
+end;
+
+function TVorbisComments.fGetLyrics: UnicodeString;
+var
+  i: Integer;
+begin
+  result := '';
+  i := 0;
+  while (result = '') and (i <= High(AWB_SupportedLyricsKeys)) do begin
+    result := fGetPropertyByFieldname(AWB_SupportedLyricsKeys[i]);
+    inc(i);
+  end;
 end;
 
 
@@ -519,37 +814,75 @@ begin
     fSetPropertyByFieldname(VORBIS_VERSION, Value);
 end;
 
+procedure TVorbisComments.fSetLyrics(value: UnicodeString);
+var
+  i: Integer;
+  lyricVector: TCommentVector;
+begin
+  lyricVector := Nil;
+  i := 0;
+  while (lyricVector = Nil) and (i <= High(AWB_SupportedLyricsKeys)) do begin
+    lyricVector := fGetCommentVectorByFieldname(AWB_SupportedLyricsKeys[i]);
+    inc(i);
+  end;
 
-function TVorbisComments.ReadFromStream(Source: TStream; Size: Integer; SkipHeader: Boolean=False): Boolean;
+  if trim(Value) = '' then begin
+    if assigned(lyricVector) then begin
+      fCommentVectorList.Extract(lyricVector);
+      FreeAndNil(lyricVector);
+    end;
+  end else
+  begin
+    // if no lyric Vector was found: Create a new one and add it to the VectorList
+    if not assigned(lyricVector) then begin
+      lyricVector := TCommentVector.Create;
+      lyricVector.FieldName := AnsiUppercase(AWB_DefaultLyricsKey);
+      fCommentVectorList.Add(lyricVector);
+    end;
+    lyricVector.Value := Value;
+  end;
+end;
+
+
+function TVorbisComments.ReadFromStream(Source: TStream; Size: Integer): Boolean;
 var vendorLength: Integer;
     i, CommentCount: Integer;
     newCommentVector: TCommentVector;
     framingBit: Byte;
-
     currentPos: Int64;
+    ValidHeader: Boolean;
 begin
     // store currentPos in the Stream
     currentPos := Source.Position;
     Clear;
-    if Not SkipHeader then
-    begin
-        // read Header
-        source.Read(fHeader, sizeOf(fHeader));
-        if not ((fHeader.PacketType = 3) and (fHeader.ID = VORBIS_ID)) then
-        begin
-            fValidComment := False;
-            result := False;
-            Source.Seek(currentPos + Size, soBeginning);
-            exit;
-        end;
-        // ok, valid Vorbis-Header found. Proceed with comments.
+
+    ValidHeader := True;
+    case fContainerType of
+      octOgg: begin
+        source.Read(fVorbisHeader, sizeOf(fVorbisHeader));
+        ValidHeader := (fVorbisHeader.PacketType = 3) and (fVorbisHeader.ID = VORBIS_ID);
+      end;
+      octFlac: ValidHeader := True; // nothing else to to
+      octOpus: begin
+        source.Read(fOpusHeader, sizeOf(fOpusHeader));
+        ValidHeader := fOpusHeader.ID = Opus_ID
+      end;
+    end;
+
+    if not ValidHeader then begin
+      fValidComment := False;
+      result := False;
+      Source.Seek(currentPos + Size, soBeginning);
+      exit;
     end;
 
     // first: VendorString
     // should be something like "Xiph.Org libVorbis I 20020717"
     source.Read(vendorLength, sizeOf(vendorlength));
-    setlength(fVendorString, vendorLength);
-    source.Read(fVendorString[1], length(fVendorString));
+    if vendorLength > 0 then begin
+      setlength(fVendorString, vendorLength);
+      source.Read(fVendorString[1], length(fVendorString));
+    end;
 
     // read Number of Comments ...
     source.Read(CommentCount, sizeOf(CommentCount));
@@ -562,15 +895,15 @@ begin
         fCommentVectorList.Add(newCommentVector);
     end;
 
-    // read closing framing bit
-    if Not SkipHeader then
-    begin
+    case fContainerType of
+      octOgg: begin
         source.Read(framingBit, sizeOf(framingBit));
         // this should be 1, otherwise the Header is invalid
         fValidComment := framingBit = 1;
-    end else
-        fValidComment := True;
-
+      end;
+      octFlac: fValidComment := True;
+      octOpus: fValidComment := True;
+    end;
     result := ValidComment;
 
     // Seek in the Stream after the Comment-Packet (which could include some padding
@@ -580,21 +913,23 @@ begin
 end;
 
 
-
-function TVorbisComments.WriteToStream(Destination: TStream; SkipHeader: Boolean=False): Boolean;
+function TVorbisComments.WriteToStream(Destination: TStream): Boolean;
 var l,c,i: integer;
     framingBit: Byte;
 begin
     result := True;
     try
-        if not SkipHeader then
-            // write header
-            Destination.Write(fHeader, SizeOf(fHeader)); // #3 + vorbis
+        case fContainerType of
+          octOgg: Destination.Write(fVorbisHeader, SizeOf(fVorbisHeader)); // #3 + vorbis
+          octFlac: ;
+          octOpus: Destination.Write(fOpusHeader, SizeOf(fOpusHeader)); // "OpusTags"
+        end;
 
         // write vendorstring
         l := length(fVendorString);
         Destination.Write(l, sizeOf(l));
-        Destination.Write(fVendorString[1], l);
+        if l > 0 then
+          Destination.Write(fVendorString[1], l);
         // write number of comments
         c := fCommentVectorList.Count;
         Destination.Write(c, sizeOf(c));
@@ -603,14 +938,77 @@ begin
             if not TCommentVector(fCommentVectorList[i]).WriteToStream(Destination) then
                 result := False;
 
-        if Not SkipHeader then
-        begin
+        case fContainerType of
+          octOgg: begin
             framingBit := 1;
             Destination.Write(framingBit, sizeOf(framingBit));
+          end;
+          octFlac: ;
+          octOpus: ;
         end;
+
     except
         result := False;
     end;
+end;
+
+function TVorbisComments.GetPicture(Destination: TStream;
+  var aMime: AnsiString; var aPicType: TPictureType;
+  var aDescription: UnicodeString): Boolean;
+var
+  picTags: TTagItemList;
+begin
+  result := False;
+  picTags := TTagItemList.Create;
+  try
+    GetTagList(picTags, [tctPicture]);
+    if picTags.Count > 0 then begin
+      result := picTags[0].GetPicture(Destination, aMime, aPicType, aDescription);
+    end;
+  finally
+     picTags.Free;
+  end;
+end;
+
+function TVorbisComments.SetPicture(Source: TStream; aMime: AnsiString; aPicType: TPictureType; aDescription: UnicodeString): Boolean;
+var
+  picTags: TTagItemList;
+begin
+  picTags := TTagItemList.Create;
+  try
+    GetTagList(picTags, [tctPicture]);
+
+    result := picTags.Count > 0;
+    // currently no pic in the file, and stream contains a pic: Add a pic.
+    if (picTags.Count = 0) and assigned(Source) then begin
+      AddPicture(Source, aMime, aPicType, aDescription);
+      result := True;
+    end;
+    // otherwise: replace a current pic (or delete it)
+    if picTags.Count > 0 then begin
+      if assigned(Source) then
+        result := picTags[0].SetPicture(Source, aMime, aPicType, aDescription)
+      else begin
+        fCommentVectorList.Extract(picTags[0]);
+        FreeAndNil(picTags[0]);
+      end;
+    end;
+  finally
+    picTags.Free;
+  end;
+end;
+
+procedure TVorbisComments.AddPicture(Source: TStream; aMime: AnsiString; aPicType: TPictureType;
+      aDescription: UnicodeString);
+var
+  newCommentVector: TCommentVector;
+begin
+  if assigned(Source) and (Source.Size > 0) then begin
+    newCommentVector := TCommentVector.Create;
+    newCommentVector.FieldName := AnsiUppercase(METADATA_BLOCK_PICTURE);
+    newCommentVector.SetPicture(Source, aMime, aPicType, aDescription);
+    fCommentVectorList.Add(newCommentVector);
+  end;
 end;
 
 function TVorbisComments.GetPropertyByFieldname(aField: String): UnicodeString;
@@ -642,38 +1040,52 @@ begin
         fSetPropertyByFieldname(aField, aValue);
 end;
 
-
-procedure TVorbisComments.GetAllFields(Target: TStrings);
-var i: Integer;
+procedure TVorbisComments.GetTagList(Dest: TTagItemList; ContentTypes: TTagContentTypes = cDefaultTagContentTypes);
+var
+  i: Integer;
 begin
-    Target.Clear;
-    for i := 0 to fCommentVectorList.Count - 1 do
-        Target.Add(String(TCommentVector(fCommentVectorList[i]).fFieldName));
+  for i := 0 to fCommentVectorList.Count - 1 do
+    if TCommentVector(fCommentVectorList[i]).MatchContentType(ContentTypes) then
+      Dest.Add(TCommentVector(fCommentVectorList[i]));
 end;
 
-function TVorbisComments.GetPropertyByIndex(aIndex: Integer): UnicodeString;
+procedure TVorbisComments.DeleteTagItem(aTagItem: TTagItem);
 begin
-    if (aIndex >= 0) and (aIndex <= fCommentVectorList.Count - 1) then
-        result := TCommentVector(fCommentVectorList[aIndex]).Value
-    else
-        result := '';
+  fCommentVectorList.Remove(aTagItem);
 end;
 
-function TVorbisComments.SetPropertyByIndex(aIndex: Integer;
-  aValue: UnicodeString): Boolean;
+function TVorbisComments.GetUnusedTextTags: TTagItemInfoDynArray;
+var
+  iKey, iRes: Integer;
+  resultArray: TTagItemInfoDynArray;
 begin
-    if (aIndex >= 0) and (aIndex <= fCommentVectorList.Count - 1) then
-    begin
-        if trim(aValue) = '' then
-            fCommentVectorList.Delete(aIndex)
-        else
-            TCommentVector(fCommentVectorList[aIndex]).Value := aValue;
-        result := True;
-    end else
-        result := False;
+  SetLength(resultArray, Length(cTextVorbisKeys));  // max. possible length
+  iRes := 0;
+
+  for iKey := Low(cTextVorbisKeys) to High(cTextVorbisKeys) do begin
+    if not assigned(fGetCommentVectorByFieldname(cTextVorbisKeys[iKey])) then begin
+      resultArray[iRes].Key := cTextVorbisKeys[iKey];
+      resultArray[iRes].Description := '';
+      resultArray[iRes].TagType := ttVorbis;
+      resultArray[iRes].TagContentType := tctText;
+      inc(iRes);
+    end;
+  end;
+
+  SetLength(resultArray, iRes); // correct length
+  result := resultArray;
 end;
 
-function TVorbisComments.GetSizeInStream: Integer;
+function TVorbisComments.AddTextTagItem(aKey, aValue: UnicodeString): TTagItem;
+begin
+  if SetPropertyByFieldname(aKey, aValue) then
+    result := fGetCommentVectorByFieldname(aKey)
+  else
+    result := Nil;
+end;
+
+
+(*function TVorbisComments.GetSizeInStream: Integer;
 var ms: TMemoryStream;
 begin
     ms := TMemoryStream.Create;
@@ -683,6 +1095,159 @@ begin
     finally
         ms.Free;
     end;
+end;*)
+
+{ TMetaDataBlockPicture }
+
+constructor TMetaDataBlockPicture.Create;
+begin
+  fPicData := TMemoryStream.Create;
+end;
+
+destructor TMetaDataBlockPicture.Destroy;
+begin
+  fPicData.Free;
+  inherited;
+end;
+
+procedure TMetaDataBlockPicture.Clear;
+begin
+  fPicData.Clear;
+  Mime := '';
+  Description := '';
+  fWidth := 0;
+  fHeight := 0;
+  fColorDepth := 0;
+  fNumberOfColors:= 0;
+end;
+
+function TMetaDataBlockPicture.CalculateBlockSize: Cardinal;
+begin
+  result := 8*4 // the Integers/lengths stored in the block
+        + length(fMime)
+        + length(fDescription)
+        + fPicData.Size;
+end;
+
+procedure TMetaDataBlockPicture.CopyPicData(Target: TStream);
+begin
+  Target.CopyFrom(fPicData, 0);
+end;
+
+
+function TMetaDataBlockPicture.IsEmpty: Boolean;
+begin
+  result := fPicData.Size = 0;
+end;
+
+function TMetaDataBlockPicture.GetDescription: UnicodeString;
+begin
+  {$IFDEF UNICODE}
+  result := UnicodeString(fDescription);
+  {$ELSE}
+  result := UTF8Decode(fDescription);
+  {$ENDIF}
+end;
+
+procedure TMetaDataBlockPicture.SetAsBase64(Value: UTF8String);
+var
+  InputStream, OutputStream: TMemoryStream;
+begin
+  InputStream := TMemoryStream.Create;
+  OutputStream := TMemoryStream.Create;
+  try
+    InputStream.Write(Value[1], Length(Value));
+    InputStream.Position := 0;
+    TNetEncoding.Base64.Decode(InputStream, OutPutStream);
+    OutPutStream.Position := 0;
+    ReadFromStream(OutputStream);
+  finally
+    InputStream.Free;
+    OutputStream.Free;
+  end;
+end;
+
+function TMetaDataBlockPicture.GetAsBase64: UTF8String;
+var
+  Base64: TBase64Encoding;
+  InputStream, OutputStream: TMemoryStream;
+begin
+  Base64 := TBase64Encoding.Create(0); // no LineBreaks!!
+  try
+    InputStream := TMemoryStream.Create;
+    OutputStream := TMemoryStream.Create;
+    try
+      WriteToStream(InputStream);
+      InputStream.Position := 0;
+      Base64.Encode(InputStream, OutputStream);
+      OutputStream.Position := 0;
+      SetLength(result, OutputStream.Size);
+      OutputStream.Read(result[1], length(result));
+    finally
+      OutputStream.Free;
+      InputStream.Free;
+    end;
+  finally
+    Base64.Free;
+  end;
+end;
+
+
+procedure TMetaDataBlockPicture.SetDescription(value: UnicodeString);
+begin
+  {$IFDEF UNICODE}
+  fDescription := Utf8String(value);
+  {$ELSE}
+  fDescription := UTF8Encode(value);
+  {$ENDIF}
+end;
+
+function TMetaDataBlockPicture.ReadFromStream(Source: TStream): Boolean;
+var
+  mimeLength, descLength, picSize: Cardinal;
+begin
+  // 1. Picture-Type
+  fPictureType := TPictureType(ReadBigEndianCardinal(Source));
+  // 2. Mime-type
+  mimeLength := ReadBigEndianCardinal(Source);
+  SetLength(fMime, mimeLength);
+  Source.Read(fMime[1], mimeLength);
+  // 3. Description
+  descLength := ReadBigEndianCardinal(Source);
+  SetLength(fDescription, descLength);
+  Source.Read(fDescription[1], descLength);
+  // 4. Some data about the Picture
+  fWidth          := ReadBigEndianCardinal(Source);
+  fHeight         := ReadBigEndianCardinal(Source);
+  fColorDepth     := ReadBigEndianCardinal(Source);
+  fNumberOfColors := ReadBigEndianCardinal(Source);
+  // 5. Picture Data
+  picSize := ReadBigEndianCardinal(Source);
+  fPicData.Clear;
+  fPicData.CopyFrom(Source, PicSize);
+  result := True;
+end;
+
+function TMetaDataBlockPicture.WriteToStream(Destination: TStream): Boolean;
+begin
+
+    // 1. Picture-Type
+    WriteBigEndianCardinal(Destination, Cardinal(fPictureType));
+    // 2. Mime-type
+    WriteBigEndianCardinal(Destination, length(fMime));
+    Destination.Write(fMime[1], length(fMime));
+    // 3. Description
+    WriteBigEndianCardinal(Destination, length(fDescription));
+    Destination.Write(fDescription[1], length(fDescription));
+    // 4. Some data about the Picture
+    WriteBigEndianCardinal(Destination, fWidth         );
+    WriteBigEndianCardinal(Destination, fHeight        );
+    WriteBigEndianCardinal(Destination, fColorDepth    );
+    WriteBigEndianCardinal(Destination, fNumberOfColors);
+    // 5. Picture Data
+    WriteBigEndianCardinal(Destination, fPicData.Size);
+    Destination.CopyFrom(fPicData, 0);
+    result := True;
 end;
 
 end.

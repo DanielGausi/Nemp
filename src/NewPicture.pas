@@ -8,7 +8,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2019, Daniel Gaussmann
+    Copyright (C) 2005-2024, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -37,7 +37,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls,  id3v2Frames, ExtDlgs, JPEG,
-  PNGImage, gnuGettext,  CoverHelper,  M4aAtoms, AudioFiles.Base,
+  PNGImage, gnuGettext,  CoverHelper,  M4aAtoms,
+  AudioFiles.Base, AudioFiles.BaseTags, AudioFiles.Declarations,
   Nemp_RessourceStrings, System.UITypes;
 
 type
@@ -54,18 +55,30 @@ type
     Btn_OK: TButton;
     Btn_Cancel: TButton;
     OpenPictureDialog1: TOpenPictureDialog;
+    pnlButtons: TPanel;
+    EdtFilename: TEdit;
+    LblConst_PictureFilename: TLabel;
+    pnlMain: TPanel;
+    grpData: TGroupBox;
+    grpPreview: TGroupBox;
     procedure FormCreate(Sender: TObject);
     procedure Btn_ChoosePictureClick(Sender: TObject);
-    procedure Btn_CancelClick(Sender: TObject);
     procedure Btn_OKClick(Sender: TObject);
 
     function CheckDescription:boolean;
     procedure FormShow(Sender: TObject);
     procedure EdtPictureDescriptionChange(Sender: TObject);
+    procedure Image1DblClick(Sender: TObject);
+    procedure EdtFilenameExit(Sender: TObject);
+    procedure EdtFilenameEnter(Sender: TObject);
   private
     { Private-Deklarationen }
     fCurrentTagObject: TBaseAudioFile;
+    fValidFileSelected: Boolean;
+    fLastCheckedFilename: String;
     procedure UpdateWarning;
+    procedure SelectImage;
+    procedure PreviewPicture(aFilename: String);
   public
     { Public-Deklarationen }
 
@@ -75,160 +88,133 @@ type
 var
   FNewPicture: TFNewPicture;
 
-const picKeys: Array [0..20] of String =
-      ( 'Cover Art (other)',
-        'Cover Art (icon)',
-        'Cover Art (other icon)',
-        'Cover Art (front)',
-        'Cover Art (back)',
-        'Cover Art (leaflet)',
-        'Cover Art (media)',
-        'Cover Art (lead)',
-        'Cover Art (artist)',
-        'Cover Art (conductor)',
-        'Cover Art (band)',
-        'Cover Art (composer)',
-        'Cover Art (lyricist)',
-        'Cover Art (studio)',
-        'Cover Art (recording)',
-        'Cover Art (performance)',
-        'Cover Art (movie scene)',
-        'Cover Art (colored fish)',
-        'Cover Art (illustration)',
-        'Cover Art (band logo)',
-        'Cover Art (publisher logo)'
-      );
-
 implementation
 
-uses AudioFiles.Declarations, Mp3Files, FlacFiles,
-  M4AFiles, BaseApeFiles;
+uses
+  Mp3Files;
 
 {$R *.dfm}
 
 procedure TFNewPicture.FormCreate(Sender: TObject);
-var i:integer;
+var
+  i: TPictureType;
 begin
-    TranslateComponent (self);
-    for i := 0 to 20 do
-        cbPicturetype.Items.Add(picKeys[i]);
-    cbPictureType.ItemIndex := 0;
+  TranslateComponent(self);
+  for i := Low(cPictureTypes) to High(cPictureTypes) do
+    cbPicturetype.Items.Add(cPictureTypes[i]);
+  cbPictureType.ItemIndex := 3;
+  fValidFileSelected := False;
 end;
 
 procedure TFNewPicture.FormShow(Sender: TObject);
 begin
-    cbPictureType.ItemIndex := 0;
-    EdtPictureDescription.Text := '';
-    Image1.Picture.Bitmap.Assign(NIL);
-    Image1.Visible := False;
-    Btn_OK.Enabled := False;
-    UpdateWarning;
+  //cbPictureType.ItemIndex := 3;
+  //fValidFileSelected := False;
+  //EdtPictureDescription.Text := '';
+  // Image1.Picture.Bitmap.Assign(NIL);
+  // Image1.Visible := False;
+  //Btn_OK.Enabled := False;
+  // (do NOT reset the GUI on the next "Show")
+  UpdateWarning;
 end;
-
 
 function TFNewPicture.CheckDescription:boolean;
 begin
-    case CurrentTagObject.FileType of
-        at_mp3: result := TMP3File(CurrentTagObject).ID3v2Tag.ValidNewPictureFrame(EdtPictureDescription.Text);
-        at_Flac: result := True;
-        at_M4a: result := True;
-        at_Monkey,
-        at_WavPack,
-        at_MusePack,
-        at_OptimFrog,
-        at_TrueAudio: result := True;
-    else
-        result := False;
-    end;
+  case CurrentTagObject.FileType of
+    at_mp3: result := TMP3File(CurrentTagObject).ID3v2Tag.ValidNewPictureFrame(EdtPictureDescription.Text);
+    at_Flac,
+    at_Ogg,
+    at_Opus,
+    at_M4a,
+    at_Monkey,
+    at_WavPack,
+    at_MusePack,
+    at_OptimFrog,
+    at_TrueAudio: result := True;
+  else
+    result := False;
+  end;
+end;
+
+procedure TFNewPicture.EdtFilenameEnter(Sender: TObject);
+begin
+  fLastCheckedFilename := EdtFilename.Text;
+end;
+
+procedure TFNewPicture.EdtFilenameExit(Sender: TObject);
+begin
+  if FileExists(EdtFilename.Text) then
+    PreviewPicture(EdtFilename.Text)
+  else
+    EdtFilename.Text := fLastCheckedFilename;
 end;
 
 procedure TFNewPicture.EdtPictureDescriptionChange(Sender: TObject);
 begin
-    UpdateWarning;
+  UpdateWarning;
 end;
 
 procedure TFNewPicture.UpdateWarning;
 begin
-    if CheckDescription then
-    begin
-        Btn_OK.Enabled := Image1.Visible;
-        PnlWarnung.Visible := False;
-    end else
-    begin
-        Btn_OK.Enabled := False;
-        PnlWarnung.Visible := True;
-    end;
-end;
-
-
-
-procedure TFNewPicture.Btn_ChoosePictureClick(Sender: TObject);
-begin
-  if OpenPictureDialog1.Execute then
-  begin
-      try
-          Image1.Picture.LoadFromFile(OpenPictureDialog1.FileName);
-          Image1.Visible := True;
-          UpdateWarning;
-       except
-          Image1.Picture.Bitmap.Assign(NIL);
-          Image1.Visible := False;
-          Btn_OK.Enabled := False;
-      end;
+  if CheckDescription then begin
+    Btn_OK.Enabled := fValidFileSelected;
+    PnlWarnung.Visible := False;
+  end else begin
+    Btn_OK.Enabled := False;
+    Lbl_Warnings.Caption := DetailForm_DuplicatePictureDescription;
+    PnlWarnung.Visible := True;
   end;
 end;
 
-procedure TFNewPicture.Btn_CancelClick(Sender: TObject);
+procedure TFNewPicture.PreviewPicture(aFilename: String);
 begin
-    ModalResult := MRCANCEL;
+  try
+    EdtFilename.Text := aFileName;
+    Image1.Picture.LoadFromFile(aFileName);
+    fValidFileSelected := True;
+    UpdateWarning;
+  except
+    Image1.Picture.Bitmap.Assign(NIL);
+    fValidFileSelected := False;
+    Btn_OK.Enabled := False;
+  end;
+end;
+
+procedure TFNewPicture.SelectImage;
+begin
+  if OpenPictureDialog1.Execute then
+    PreviewPicture(OpenPictureDialog1.FileName);
+end;
+
+procedure TFNewPicture.Btn_ChoosePictureClick(Sender: TObject);
+begin
+  SelectImage;
+end;
+
+procedure TFNewPicture.Image1DblClick(Sender: TObject);
+begin
+  SelectImage;
 end;
 
 procedure TFNewPicture.Btn_OKClick(Sender: TObject);
-var str: TFilestream;
-    mime: AnsiString;
-    m4aPictype: TM4APicTypes;
+var
+  str: TFilestream;
+  mime: AnsiString;
 begin
   try
-      str := TFilestream.Create(OpenPictureDialog1.FileName, fmOpenread);
-      try
-          if (AnsiLowerCase(ExtractFileExt(OpenPictureDialog1.FileName))='.png') then
-          begin
-              mime := AnsiString('image/png');
-              m4aPictype := M4A_PNG;
-          end
-          else
-          begin
-              mime := AnsiString('image/jpeg');
-              m4aPictype := M4A_JPG;
-          end;
+    str := TFilestream.Create(EdtFilename.Text, fmOpenread);
+    try
+      if (AnsiLowerCase(ExtractFileExt(EdtFilename.Text))='.png') then
+        mime := AWB_MimePNG // AnsiString('image/png');
+      else
+        mime := AWB_MimeJpeg; //AnsiString('image/jpeg');
 
-          case CurrentTagObject.FileType of
-              at_mp3: TMp3File(CurrentTagObject).ID3v2Tag.SetPicture(mime,
-                                       cbPicturetype.Itemindex,
-                                       EdtPictureDescription.Text,
-                                       str);
-
-              at_Flac: TFlacFile(CurrentTagObject).AddPicture(str,
-                                       cbPicturetype.Itemindex,
-                                       mime,
-                                       EdtPictureDescription.Text);
-
-              at_M4a: TM4aFile(CurrentTagObject).SetPicture(str, m4aPictype);
-
-              at_Monkey,
-              at_WavPack,
-              at_MusePack,
-              at_OptimFrog,
-              at_TrueAudio: TBaseApeFile(CurrentTagObject).ApeTag.SetPicture(
-                                      AnsiString(cbPictureType.Text),
-                                      EdtPictureDescription.Text,
-                                      str) ;
-          end;
-      finally
-          str.Free;
-      end;
+      CurrentTagObject.SetPicture(str, mime, TPictureType(cbPicturetype.Itemindex), EdtPictureDescription.Text);
+    finally
+      str.Free;
+    end;
   except
-      on E: Exception do MessageDLG(E.Message, mtError, [mbOK], 0);
+    on E: Exception do MessageDLG(E.Message, mtError, [mbOK], 0);
   end;
   ModalResult := MROK;
 end;
