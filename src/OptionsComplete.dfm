@@ -86,7 +86,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 0
       Width = 461
       Height = 630
-      ActivePage = tabViewingSettings
+      ActivePage = tabPlayer
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -1319,11 +1319,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
           HeaderFont.Style = []
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
+          ExplicitWidth = 449
+          ExplicitHeight = 565
           object cpExtendedViewingSettings: TCategoryPanel
             Top = 940
             Height = 175
             Caption = 'Extended viewing settings'
             TabOrder = 0
+            ExplicitWidth = 428
             object cb_limitMarkerToCurrentFiles: TCheckBox
               Left = 16
               Top = 56
@@ -1385,6 +1388,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 190
             Caption = 'Playlist formatting'
             TabOrder = 1
+            ExplicitWidth = 428
             object lblPlaylistTitle: TLabel
               Left = 16
               Top = 16
@@ -1542,6 +1546,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 422
             Caption = 'Not available metadata'
             TabOrder = 2
+            ExplicitWidth = 428
             object LblReplaceAlbumBy: TLabel
               Left = 16
               Top = 126
@@ -1681,6 +1686,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 128
             Caption = 'Display of Albums, Directories, ...'
             TabOrder = 3
+            ExplicitWidth = 428
             object cbShowCoverForAlbum: TCheckBox
               Left = 16
               Top = 16
@@ -1720,6 +1726,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Top = 0
             Caption = 'Visible columns in the medialist'
             TabOrder = 4
+            ExplicitWidth = 428
             object clbViewMainColumns: TCheckListBox
               Left = 0
               Top = 0
@@ -1731,6 +1738,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Style = lbOwnerDrawFixed
               TabOrder = 0
               OnDrawItem = clbViewMainColumnsDrawItem
+              ExplicitWidth = 426
             end
           end
         end
@@ -3208,6 +3216,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 0
           Width = 453
           Height = 566
+          VertScrollBar.Position = 550
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -3217,14 +3226,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
           HeaderFont.Style = []
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
-          ExplicitWidth = 449
-          ExplicitHeight = 565
           object cpAdvanced: TCategoryPanel
-            Top = 1012
-            Height = 250
+            Top = 462
+            Height = 100
             Caption = 'Advanced'
             TabOrder = 0
-            ExplicitWidth = 428
             object cb_SafePlayback: TCheckBox
               Left = 16
               Top = 16
@@ -3243,11 +3249,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpVisualisation: TCategoryPanel
-            Top = 850
+            Top = 300
             Height = 162
             Caption = 'Visualization'
             TabOrder = 1
-            ExplicitWidth = 428
             object Lbl_Framerate: TLabel
               Left = 191
               Top = 42
@@ -3302,11 +3307,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpSilenceDetection: TCategoryPanel
-            Top = 663
+            Top = 113
             Height = 187
             Caption = 'Pause between tracks'
             TabOrder = 2
-            ExplicitWidth = 428
             object Lbl_SilenceDB: TLabel
               Left = 95
               Top = 59
@@ -3378,11 +3382,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpFading: TCategoryPanel
-            Top = 350
+            Top = -200
             Height = 313
             Caption = 'Fading'
             TabOrder = 3
-            ExplicitWidth = 428
             object LblConst_ms1: TLabel
               Left = 90
               Top = 64
@@ -3527,11 +3530,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpOutputDevices: TCategoryPanel
-            Top = 0
+            Top = -550
             Height = 350
             Caption = 'Output devices'
             TabOrder = 4
-            ExplicitWidth = 428
             object LblConst_MainDevice: TLabel
               Left = 16
               Top = 16

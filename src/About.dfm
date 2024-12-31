@@ -23,7 +23,7 @@ object AboutForm: TAboutForm
     AlignWithMargins = True
     Left = 8
     Top = 8
-    Width = 339
+    Width = 335
     Height = 345
     Cursor = crDefault
     Images = ImageList1
@@ -32,7 +32,7 @@ object AboutForm: TAboutForm
       ''
       '[b]Nemp - Noch ein Mp3-Player[/b]'
       ''
-      'Copyright '#169' 2005-2024 Daniel '#39'Gausi'#39' Gaussmann'
+      'Copyright '#169' 2005-2025 Daniel '#39'Gausi'#39' Gaussmann'
       ' '
       'Website: [url="https://www.gausi.de"]https://www.gausi.de[/url]'
       'e-Mail: [url="mailto:mail@gausi.de"]mail@gausi.de[/url]'
