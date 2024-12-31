@@ -342,11 +342,11 @@ const
     NEMP_CAPTION = 'Nemp - Noch ein MP3-Player';
     NEMP_NAME_TASK_LONG = '[ N e m p ]';
     NEMP_NAME_TASK = '[Nemp]';
-    NEMP_VERSION_SPLASH = 'version 5.1';
-    NEMP_BASS_DEFAULT_USERAGENT = 'Nemp/5.1';
+    NEMP_VERSION_SPLASH = 'version 5.2';
+    NEMP_BASS_DEFAULT_USERAGENT = 'Nemp/5.2';
     CDDB_DEFAULT_SERVER = 'gnudb.gnudb.org';
     CDDB_DEFAULT_EMAIL = 'nemp@gausi.de';
-    CDDB_APPNAME = 'nemp+5.1';
+    CDDB_APPNAME = 'nemp+5.2';
 
     NEMP_ONLINE_HELP_DE = 'https://nemp-help.gausi.de/de/';
     NEMP_ONLINE_HELP_EN = 'https://nemp-help.gausi.de/en/';
