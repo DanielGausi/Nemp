@@ -593,7 +593,6 @@ begin
         PM_P_ScrobblerActivate.Caption := MenuString;
         PM_T_ScrobblerActivate.Caption := MenuString;
 
-
         If assigned(NempWebserver) and NempWebserver.Active then
         begin
             WebserverImage.Top := newTop;
@@ -647,6 +646,17 @@ begin
         MM_T_ShutDownOff.Caption := MenuString;
         PM_P_ShutDownOff.Caption := MenuString;
         PM_T_ShutDownActivate.Caption := MenuString;
+
+        if NempPlayer.DSPPluginActive then begin
+          DSPPluginImage.Top := newTop;
+          DSPPluginImage.Left := currentLeft;
+          DSPPluginImage.Visible := True;
+          inc(currentLeft, decvalue);
+        end else begin
+          DSPPluginImage.Visible := False;
+        end;
+
+
 
         if WalkmanModeTimer.Tag = 1 then
         begin

@@ -145,7 +145,8 @@ uses
   fExport in 'fExport.pas' {FormExport},
   UpdateCleaning in 'UpdateCleaning.pas',
   fUpdateCleaning in 'fUpdateCleaning.pas' {FormUpdateCleaning},
-  OKCANCL1 in 'c:\program files (x86)\embarcadero\studio\22.0\ObjRepos\DE\DelphiWin32\OKCANCL1.PAS' {OKBottomDlg};
+  OKCANCL1 in 'c:\program files (x86)\embarcadero\studio\22.0\ObjRepos\DE\DelphiWin32\OKCANCL1.PAS' {OKBottomDlg},
+  bass_wadsp in '3rd Party Units\bass_wadsp.pas';
 
 {$R *.res}
 
@@ -185,8 +186,6 @@ begin
     Application.CreateForm(TAuswahlForm    , AuswahlForm    );
     Application.CreateForm(TMedienlisteForm, MedienlisteForm);
     Application.CreateForm(TExtendedControlForm, ExtendedControlForm);
-
-
 
 
     StuffToDoAfterCreate ;

@@ -108,10 +108,10 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MajorVer>5</VerInfo_MajorVer>
-        <VerInfo_Build>802</VerInfo_Build>
+        <VerInfo_Build>803</VerInfo_Build>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=5.2.0.802;InternalName=;LegalCopyright=Daniel Gaußmann;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=5.2.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=5.2.0.803;InternalName=;LegalCopyright=Daniel Gaußmann;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=5.2.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <DCC_MapFile>3</DCC_MapFile>
         <DCC_DebugInformation>2</DCC_DebugInformation>
         <DCC_LocalDebugSymbols>true</DCC_LocalDebugSymbols>
@@ -370,6 +370,7 @@
             <Form>OKBottomDlg</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="3rd Party Units\bass_wadsp.pas"/>
         <RcItem Include="ressources\csv.nxp">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
@@ -389,6 +390,11 @@
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>nxpJson</ResourceId>
+        </RcItem>
+        <RcItem Include="ressources\How to add Winamp DSP Plugins.txt">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>WinampDSP</ResourceId>
         </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
@@ -425,6 +431,12 @@
                 <DeployFile LocalName="..\bin\nemp.exe" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>nemp.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ressources\How to add Winamp DSP Plugins.txt" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

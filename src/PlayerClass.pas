@@ -35,8 +35,8 @@ unit PlayerClass;
 interface
 
 uses  Windows, Classes,  Controls, StdCtrls, ExtCtrls, Buttons, SysUtils, Contnrs, System.StrUtils,
-      ShellApi, IniFiles, Dialogs, Graphics, cddaUtils, math, CoverHelper,
-      bass, bass_fx, basscd, spectrum_vis, DateUtils, bassmidi,
+      System.Types, System.IOUtils, ShellApi, IniFiles, Dialogs, Graphics, cddaUtils, math, CoverHelper,
+      bass, bass_fx, basscd, bass_wadsp, spectrum_vis, DateUtils, bassmidi,
       NempAudioFiles,  Nemp_ConstantsAndTypes, NempAPI, ShoutCastUtils, PostProcessorUtils,
       Hilfsfunktionen, gnuGettext, Nemp_RessourceStrings, OneINst,
       Easteregg, ScrobblerUtils, CustomizedScrobbler, SilenceDetection, System.UITypes,
@@ -61,6 +61,8 @@ type
 
   TNempPlayer = class
     private
+      fMainStream: DWord;
+      fSlideStream: DWord;
 
       fMainVolume: Single;          // the main volume of the player
       fHeadsetVolume: Single;       // the volume of the secondary player (headset)
@@ -126,7 +128,6 @@ type
       fDefaultGainWithRG    : Single;
       fPreventClipping      : Boolean;
 
-
       fStatus: Integer;       // Playing, paused, stopped
       fStopStatus: Integer;   // "normal Stop" or "Stop after title"
 
@@ -153,6 +154,7 @@ type
       fUseFloatingPointChannels: Integer; // 0: Auto-Detect, 1: Aus, 2: An
       fUseHardwareMixing: Boolean;        // False: OR BASS_SAMPLE_SOFTWARE
       fSafePlayback: Boolean;
+      fActivateDSPPlugins: Boolean;
 
       fAvoidMickyMausEffect: LongBool; // this is also used in the Prescan-Thread: therefore: InterLockedExchange
 
@@ -173,6 +175,10 @@ type
       fOnPlayerStopped: TNotifyEvent;
       fOnMessage: TPlayerMessageEvent;
 
+      fDSPPluginFilenames: TStringList;
+      fdspPlugin: Cardinal;
+      fdspHandle: Cardinal;
+      fActivePluginIndex: Integer;
 
       // Basic method for creating a stream from a given file   //filename
       function NEMP_CreateStream(aFile: TAudioFile; //UnicodeString;
@@ -184,7 +190,6 @@ type
       function EqualizerIsNeeded: boolean;
       procedure InitStreamEqualizer(aStream: DWord);
       procedure ApplyReplayGainToStream(aStream: DWord; aAudioFile: TAudioFile);
-
 
       // Setter/getter for some properties
       procedure SetVolume(Value: Single);         // Volume
@@ -198,7 +203,6 @@ type
 
       function fGetSeconds: Integer; // current Progress, rounded to full seconds
       function fGetSecondsHeadset: Integer;
-
 
       function GetAvoidMickyMausEffect: LongBool;
       procedure SetAvoidMickyMausEffect(aValue: LongBool);
@@ -248,17 +252,17 @@ type
       }
 
       function GetCurrentAudioFile: TPlaylistFile;
+      procedure SetMainStream(const Value: DWord);
+      function GetActivePluginName: AnsiString;
+    function GetDSPPluginActive: Boolean;
 
     public
         MainAudioFile: TPlaylistFile;
         HeadSetAudioFile: TPlaylistFile;
         MainWindowHandle: DWord;
 
-        MainStream: DWord;
-        SlideStream: DWord;
         Jinglestream: DWORD;
         HeadsetStream: DWord;
-
 
         CountDownStream: DWord;
         BirthdayStream: DWord;
@@ -382,6 +386,9 @@ type
 
         CoverArtSearcher: TCoverArtSearcher;
 
+        property MainStream: DWord read fMainStream write SetMainStream;
+        property SlideStream: DWord read fSlideStream write fSlideStream;
+
         property Volume: Single read GetVolume write SetVolume;
         property HeadSetVolume: Single read GetHeadsetVolume write SetHeadsetVolume;
         property BirthdayVolume: Single read GetBirthdayVolume write SetBirthdayVolume;
@@ -418,6 +425,7 @@ type
         property UseFloatingPointChannels: Integer read fUseFloatingPointChannels write fUseFloatingPointChannels;
         property UseHardwareMixing: Boolean read fUseHardwareMixing write fUseHardwareMixing;
         property SafePlayback: Boolean read fSafePlayback write fSafePlayback;
+        property ActivateDSPPlugins: Boolean read fActivateDSPPlugins write fActivateDSPPlugins;
 
         property AvoidMickyMausEffect: LongBool read GetAvoidMickyMausEffect write SetAvoidMickyMausEffect;
 
@@ -446,10 +454,21 @@ type
         property OnPlayerStopped: TNotifyEvent read fOnPlayerStopped write fOnPlayerStopped;
         property OnMessage: TPlayerMessageEvent read fOnMessage write fOnMessage;
 
+        property DSPPluginFilenames: TStringList read fDSPPluginFilenames;
+        property DSPPlugin: Cardinal read fdspPlugin;
+        property DSPPluginActive: Boolean read GetDSPPluginActive;
+        property ActivePluginIndex: Integer read fActivePluginIndex;
+        property ActivePluginName: AnsiString read GetActivePluginName;
+
         constructor Create(AHnd: HWND);
         destructor Destroy; override;
 
         procedure InitBassEngine(HND: HWND; PathToDlls: String; var Filter: UnicodeString);
+        procedure InitWinampDSPPlugins(HND: HWND; PathToDlls: String);
+        procedure BindDSPPluginToStream(aPlugin, aStream: Cardinal);
+        procedure ActivateDSPPlugin(aIndex: Integer);
+        procedure ConfigureActiveDSPPlugin;
+        procedure StopActiveDSPPlugin;
 
         procedure SetSoundFont(aFilename: String);
 
@@ -749,6 +768,7 @@ constructor TNempPlayer.Create(AHnd: HWND);
 begin
     inherited create;
     ValidExtensions := TStringlist.Create;
+    fDSPPluginFilenames := TStringlist.Create;
     // Standard-Extensions hinzufügen
     ValidExtensions.CaseSensitive := False;
     ValidExtensions.Add('.mp3'); ValidExtensions.Add('.ogg');
@@ -763,6 +783,7 @@ begin
     isMute := False;
     ReadyForRecord := False;
     StreamRecording := False;
+    fActivateDSPPlugins := False;
 
     fReallyUseFading := True;
     MainWindowHandle := AHnd;
@@ -790,6 +811,7 @@ begin
 
     CoverArtSearcher := TCoverArtSearcher.create;
     fTrackDelayTimer := 0;
+    fActivePluginIndex := -1;
 end;
 
 procedure DelayedPlayNext(lpParameter: Pointer; TimerOrWaitFired: Boolean); stdcall;
@@ -852,12 +874,14 @@ begin
     HeadsetPicture.Free;
     PreviewBackGround.Free;
     FreeAndNil(ValidExtensions);
+    StopActiveDSPPlugin;
+    BASS_Stop;
+    BASS_WADSP_Free;
     i := 0;
-    while (Bass_GetDeviceInfo(i, BassInfo)) do
-    begin
-        BASS_SetDevice(i);
-        BASS_Free;
-        inc(i);
+    while (Bass_GetDeviceInfo(i, BassInfo)) do begin
+      BASS_SetDevice(i);
+      BASS_Free;
+      inc(i);
     end;
     MainStation.Free;
     PostProcessor.Free;
@@ -872,8 +896,8 @@ begin
     fPrescanFiles.Free;
     fPrescanFiles := Nil;
     LeaveCriticalSection(CSPrescanList);
-
     CoverArtSearcher.Free;
+    fDSPPluginFilenames.Free;
 
     inherited Destroy;
 end;
@@ -956,10 +980,6 @@ begin
 
     BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1);
     BASS_SetConfig(BASS_CONFIG_DEV_DEFAULT, 1);
-
-
-
-
 
     if NOT BASS_Init(MainDevice, 44100, 0, HND, nil) then
     begin
@@ -1049,6 +1069,88 @@ begin
     Filter := 'All supported files|' + tmpfilter
                                      + Filter;
                                        // + '|CD-Audio|*.cda' ;
+end;
+
+procedure TNempPlayer.InitWinampDSPPlugins(HND: HWND; PathToDlls: String);
+var
+  plugins: TStringDynArray;
+  i: Integer;
+begin
+  DSPPluginFilenames.Clear;
+  DSPPluginFilenames.NameValueSeparator := '>'; // invalid char for filenames
+
+  if NempPlayer.ActivateDSPPlugins then begin
+    BASS_WADSP_Init(HND);
+    plugins := TDirectory.GetFiles(PathToDlls, 'dsp_*.dll');
+
+    for i := Low(plugins) to High(plugins) do begin
+      if BASS_WADSP_PluginInfoLoad(pChar(plugins[i])) then begin
+        DSPPluginFilenames.AddPair(plugins[i], String(BASS_WADSP_PluginInfoGetName));
+        BASS_WADSP_PluginInfoFree;
+      end;
+    end;
+  end;
+end;
+
+procedure TNempPlayer.BindDSPPluginToStream(aPlugin, aStream: Cardinal);
+begin
+  fdspHandle := BASS_WADSP_ChannelSetDSP(aPlugin, aStream, 1);
+  if assigned(MainAudioFile) then
+    BASS_WADSP_SetSongTitle(aPlugin, PAnsiChar(AnsiString(NempDisplay.PlaylistTitle(MainAudioFile))));
+end;
+
+function TNempPlayer.GetDSPPluginActive: Boolean;
+begin
+  result := fdspPlugin <> 0;
+end;
+
+function TNempPlayer.GetActivePluginName: AnsiString;
+begin
+  if fdspPlugin <> 0 then
+    result := BASS_WADSP_GetName(fdspPlugin)
+  else
+    result := '';
+end;
+
+procedure TNempPlayer.ActivateDSPPlugin(aIndex: Integer);
+var
+  err: Integer;
+  currentPlugin, newPlugin: AnsiString;
+begin
+  newPlugin := 'N/A';
+  currentPlugin := '';
+  if (aIndex >= 0) and (aIndex <= DSPPluginFilenames.Count - 1) then
+    newPlugin := AnsiString(DSPPluginFilenames.ValueFromIndex[aIndex]);
+  if fdspPlugin <> 0 then
+    currentPlugin := BASS_WADSP_GetName(fdspPlugin);
+
+  if (newPlugin <> currentPlugin) and
+     (aIndex >= 0) and (aIndex <= DSPPluginFilenames.Count - 1)
+  then begin
+    StopActiveDSPPlugin;
+    // load and start new plugin
+    fActivePluginIndex := aIndex;
+    fdspPlugin := BASS_WADSP_Load(PChar(DSPPluginFilenames.KeyNames[aIndex]), 5, 5, 360, 480, nil);
+    BASS_WADSP_Start(fdspPlugin, 0, 0);
+    BindDSPPluginToStream(fdspPlugin, fMainStream);
+  end;
+end;
+
+procedure TNempPlayer.ConfigureActiveDSPPlugin;
+begin
+  if fdspPlugin <> 0 then
+    BASS_WADSP_Config(fdspPlugin);
+end;
+
+procedure TNempPlayer.StopActiveDSPPlugin;
+begin
+  if fdspPlugin <> 0 then begin
+    BASS_WADSP_Stop(fdspPlugin);
+    BASS_WADSP_ChannelRemoveDSP(fdspPlugin);
+    BASS_WADSP_FreeDSP(fdspPlugin);
+    fdspPlugin := 0;
+    fActivePluginIndex := -1;
+  end;
 end;
 
 procedure TNempPlayer.ReInitBassEngine;
@@ -1141,6 +1243,7 @@ begin
 
   fUseHardwareMixing := NempSettingsManager.ReadBool('Player', 'HardwareMixing', True);  // False: OR BASS_SAMPLE_SOFTWARE
   fSafePlayback := NempSettingsManager.ReadBool('Player', 'SafePlayback', False);
+  fActivateDSPPlugins := NempSettingsManager.ReadBool('Player', 'ActivateDSPPlugins', True);
 
   UseFading             := NempSettingsManager.ReadBool('Player','UseFading',True);
   FadingInterval        := NempSettingsManager.ReadInteger('Player','FadingInterval',2000);
@@ -1263,6 +1366,7 @@ begin
   NempSettingsManager.WriteInteger('Player', 'FloatingPointChannels', fUseFloatingPointChannels);
   NempSettingsManager.WriteBool('Player', 'HardwareMixing', fUseHardwareMixing);
   NempSettingsManager.WriteBool('Player', 'SafePlayback', fSafePlayback);
+  NempSettingsManager.WriteBool('Player', 'ActivateDSPPlugins', fActivateDSPPlugins);
 
   NempSettingsManager.WriteBool('Player','UseFading',UseFading);
   NempSettingsManager.WriteInteger('Player','FadingInterval',FadingInterval);
@@ -2212,6 +2316,14 @@ begin
   BASS_ChannelSetAttribute(HeadsetStream, BASS_ATTRIB_VOL, fHeadsetVolume);
 end;
 
+procedure TNempPlayer.SetMainStream(const Value: DWord);
+begin
+  fMainStream := Value;
+  // If there is a Plugin Loaded: Bind the Plugin to this stream (and release it from the other)
+  if fdspPlugin <> 0 then
+    BindDSPPluginToStream(fdspPlugin, fMainStream);
+end;
+
 function TNempPlayer.GetBirthdayVolume: Single;
 begin
     result := fBirthdayVolume * 100;
@@ -2276,7 +2388,7 @@ begin
         if Status = PLAYER_ISPLAYING then
           BASS_ChannelPlay(SlideStream , False);
         // Mainstream ausfaden und stoppen
-        BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, -2, SeekFadingInterval);
+        BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, -1, SeekFadingInterval);
         BASS_ChannelSlideAttribute(SlideStream, BASS_ATTRIB_VOL, fMainVolume, SeekFadingInterval);
         // Streams vertauschen
         tmp := Mainstream;

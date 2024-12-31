@@ -42,7 +42,7 @@ iniFiles, jpeg, NempPanel, Classes, oneinst, SkinButtons, PNGImage, ProgressShap
 
 Nemp_ConstantsAndTypes, PartyModeClass{$IFDEF USESTYLES}, vcl.themes, vcl.styles, Vcl.CheckLst {$ENDIF};
 
-const MAX_MENUIMAGE_INDEX = 42;
+const MAX_MENUIMAGE_INDEX = 43;
       MAX_PLAYLIST_IMAGE_INDEX = 24;
 
 type

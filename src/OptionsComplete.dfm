@@ -5,8 +5,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsDialog
   Caption = 'Preferences'
-  ClientHeight = 675
-  ClientWidth = 680
+  ClientHeight = 674
+  ClientWidth = 676
   Color = clWindow
   Constraints.MinHeight = 520
   Constraints.MinWidth = 594
@@ -29,21 +29,21 @@ object OptionsCompleteForm: TOptionsCompleteForm
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 674
-    Height = 631
+    Width = 670
+    Height = 630
     Align = alClient
     BevelEdges = []
     BevelOuter = bvNone
     Caption = 'Panel1'
     TabOrder = 0
-    ExplicitWidth = 670
-    ExplicitHeight = 630
+    ExplicitWidth = 666
+    ExplicitHeight = 629
     object OptionsVST: TVirtualStringTree
       AlignWithMargins = True
       Left = 3
       Top = 3
       Width = 203
-      Height = 625
+      Height = 624
       Align = alLeft
       BevelInner = bvNone
       BevelOuter = bvNone
@@ -74,6 +74,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       OnMeasureTextWidth = OptionsVSTMeasureTextWidth
       Touch.InteractiveGestures = [igPan, igPressAndTap]
       Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+      ExplicitHeight = 623
       Columns = <
         item
           Position = 0
@@ -83,22 +84,22 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object PageControl1: TPageControl
       Left = 209
       Top = 0
-      Width = 465
-      Height = 631
+      Width = 461
+      Height = 630
       ActivePage = tabViewingSettings
       Align = alClient
       MultiLine = True
       TabOrder = 1
       TabStop = False
-      ExplicitWidth = 461
-      ExplicitHeight = 630
+      ExplicitWidth = 457
+      ExplicitHeight = 629
       object tabGeneral: TTabSheet
         Caption = 'General'
         object cpgMainOptions: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 457
-          Height = 567
+          Width = 453
+          Height = 566
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -437,8 +438,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgControlSettings: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 457
-          Height = 567
+          Width = 453
+          Height = 566
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -1307,8 +1308,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgViewingSettings: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 457
-          Height = 567
+          Width = 453
+          Height = 566
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -1323,7 +1324,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 175
             Caption = 'Extended viewing settings'
             TabOrder = 0
-            ExplicitTop = 905
             object cb_limitMarkerToCurrentFiles: TCheckBox
               Left = 16
               Top = 56
@@ -1385,7 +1385,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 190
             Caption = 'Playlist formatting'
             TabOrder = 1
-            ExplicitTop = 715
             object lblPlaylistTitle: TLabel
               Left = 16
               Top = 16
@@ -1543,7 +1542,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 422
             Caption = 'Not available metadata'
             TabOrder = 2
-            ExplicitTop = 293
             object LblReplaceAlbumBy: TLabel
               Left = 16
               Top = 126
@@ -1704,7 +1702,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Top = 56
               Width = 401
               Height = 17
-              Caption = 'Combine treeview layers when reasonable'
+              Caption = 'Combine tree view layers when reasonable'
               TabOrder = 2
             end
             object cbShowFilesRecursively: TCheckBox
@@ -1725,7 +1723,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object clbViewMainColumns: TCheckListBox
               Left = 0
               Top = 0
-              Width = 434
+              Width = 430
               Height = 174
               Align = alClient
               Columns = 3
@@ -1743,8 +1741,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgDisplaySettings: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 457
-          Height = 567
+          Width = 453
+          Height = 566
           VertScrollBar.Tracking = True
           Align = alClient
           ChevronColor = clWindowText
@@ -2067,8 +2065,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgFileManagement: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 457
-          Height = 567
+          Width = 453
+          Height = 566
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -2078,8 +2076,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           HeaderFont.Style = []
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
-          ExplicitWidth = 453
-          ExplicitHeight = 566
           object cpLibraryCoverArt: TCategoryPanel
             Top = 495
             Height = 280
@@ -2237,7 +2233,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cbIncludeFiles: TCheckListBox
               Left = 16
               Top = 54
-              Width = 406
+              Width = 410
               Height = 111
               Hint = 'List of supported audio files.'
               Anchors = [akLeft, akTop, akRight]
@@ -2255,7 +2251,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             TabOrder = 2
             object BtnAutoScanAdd: TButton
               AlignWithMargins = True
-              Left = 307
+              Left = 311
               Top = 39
               Width = 125
               Height = 21
@@ -2266,7 +2262,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object BtnAutoScanDelete: TButton
               AlignWithMargins = True
-              Left = 307
+              Left = 311
               Top = 64
               Width = 125
               Height = 21
@@ -2277,7 +2273,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object BtnAutoScanNow: TButton
               AlignWithMargins = True
-              Left = 307
+              Left = 311
               Top = 88
               Width = 125
               Height = 21
@@ -2343,7 +2339,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object LBAutoscan: TListBox
               Left = 28
               Top = 39
-              Width = 265
+              Width = 269
               Height = 70
               Style = lbOwnerDrawVariable
               Anchors = [akLeft, akTop, akRight]
@@ -2372,8 +2368,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgCategories: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 457
-          Height = 567
+          Width = 453
+          Height = 566
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -2772,8 +2768,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgMetadata: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 457
-          Height = 567
+          Width = 453
+          Height = 566
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -3054,8 +3050,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgSearchSettings: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 457
-          Height = 567
+          Width = 453
+          Height = 566
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -3210,8 +3206,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgPlayerMain: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 457
-          Height = 567
+          Width = 453
+          Height = 566
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -3221,11 +3217,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
           HeaderFont.Style = []
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
+          ExplicitWidth = 449
+          ExplicitHeight = 565
           object cpAdvanced: TCategoryPanel
             Top = 1012
-            Height = 76
+            Height = 250
             Caption = 'Advanced'
             TabOrder = 0
+            ExplicitWidth = 428
             object cb_SafePlayback: TCheckBox
               Left = 16
               Top = 16
@@ -3234,12 +3233,21 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Caption = 'Use safe playback'
               TabOrder = 0
             end
+            object cbActivatePluginSystem: TCheckBox
+              Left = 16
+              Top = 36
+              Width = 401
+              Height = 17
+              Caption = 'Activate Winamp DSP plugins (beta, restart required)'
+              TabOrder = 1
+            end
           end
           object cpVisualisation: TCategoryPanel
             Top = 850
             Height = 162
             Caption = 'Visualization'
             TabOrder = 1
+            ExplicitWidth = 428
             object Lbl_Framerate: TLabel
               Left = 191
               Top = 42
@@ -3298,6 +3306,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 187
             Caption = 'Pause between tracks'
             TabOrder = 2
+            ExplicitWidth = 428
             object Lbl_SilenceDB: TLabel
               Left = 95
               Top = 59
@@ -3373,6 +3382,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 313
             Caption = 'Fading'
             TabOrder = 3
+            ExplicitWidth = 428
             object LblConst_ms1: TLabel
               Left = 90
               Top = 64
@@ -3521,6 +3531,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 350
             Caption = 'Output devices'
             TabOrder = 4
+            ExplicitWidth = 428
             object LblConst_MainDevice: TLabel
               Left = 16
               Top = 16
@@ -3683,8 +3694,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgPlaylistSettings: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 457
-          Height = 567
+          Width = 453
+          Height = 566
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -4267,8 +4278,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgWebstreams: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 457
-          Height = 567
+          Width = 453
+          Height = 566
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -4354,7 +4365,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object LblConst_WebradioHint: TLabel
               Left = 16
               Top = 288
-              Width = 398
+              Width = 394
               Height = 33
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -4478,8 +4489,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgEffects: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 457
-          Height = 567
+          Width = 453
+          Height = 566
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -4715,8 +4726,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgBirthday: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 457
-          Height = 567
+          Width = 453
+          Height = 566
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -4911,8 +4922,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgScrobble: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 457
-          Height = 567
+          Width = 453
+          Height = 566
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -4929,7 +4940,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object MemoScrobbleLog: TMemo
               Left = 0
               Top = 0
-              Width = 451
+              Width = 447
               Height = 214
               Align = alClient
               Lines.Strings = (
@@ -5269,8 +5280,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgWebserverConfiguration: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 457
-          Height = 567
+          Width = 453
+          Height = 566
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -5607,18 +5618,18 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 8
         object PnlCoverFlowControl: TPanel
           Left = 0
-          Top = 537
-          Width = 457
+          Top = 536
+          Width = 453
           Height = 30
           Align = alBottom
           BevelOuter = bvNone
           TabOrder = 1
           DesignSize = (
-            457
+            453
             30)
           object BtnUndoCoverFlowSettings: TButton
             AlignWithMargins = True
-            Left = 328
+            Left = 324
             Top = 3
             Width = 123
             Height = 25
@@ -5629,7 +5640,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object BtnCoverFlowDefault: TButton
             AlignWithMargins = True
-            Left = 189
+            Left = 185
             Top = 3
             Width = 123
             Height = 25
@@ -5642,8 +5653,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgCoverFlowView: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 457
-          Height = 537
+          Width = 453
+          Height = 536
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -6037,8 +6048,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgFileTypesRegistration: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 457
-          Height = 567
+          Width = 453
+          Height = 566
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -6183,16 +6194,16 @@ object OptionsCompleteForm: TOptionsCompleteForm
   end
   object Panel2: TPanel
     Left = 0
-    Top = 637
-    Width = 680
+    Top = 636
+    Width = 676
     Height = 38
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitTop = 636
-    ExplicitWidth = 676
+    ExplicitTop = 635
+    ExplicitWidth = 672
     DesignSize = (
-      680
+      676
       38)
     object ImgHelp: TImage
       Left = 6
@@ -6278,7 +6289,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       OnClick = BtnHelpClick
     end
     object BTNok: TButton
-      Left = 433
+      Left = 429
       Top = 4
       Width = 75
       Height = 25
@@ -6287,10 +6298,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Default = True
       TabOrder = 0
       OnClick = BTNokClick
-      ExplicitLeft = 429
+      ExplicitLeft = 425
     end
     object BTNCancel: TButton
-      Left = 514
+      Left = 510
       Top = 4
       Width = 75
       Height = 25
@@ -6299,10 +6310,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Caption = 'Cancel'
       TabOrder = 1
       OnClick = BTNCancelClick
-      ExplicitLeft = 510
+      ExplicitLeft = 506
     end
     object BTNApply: TButton
-      Left = 595
+      Left = 591
       Top = 4
       Width = 77
       Height = 25
@@ -6310,7 +6321,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Caption = 'Apply'
       TabOrder = 2
       OnClick = BTNApplyClick
-      ExplicitLeft = 591
+      ExplicitLeft = 587
     end
     object BtnHelp: TButton
       AlignWithMargins = True

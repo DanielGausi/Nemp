@@ -646,6 +646,7 @@ type
     cbLiveRecordingCheckTags: TCheckBox;
     cbCombineLayers: TCheckBox;
     cbShowFilesRecursively: TCheckBox;
+    cbActivatePluginSystem: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1310,6 +1311,8 @@ begin
   editSoundFont.Text := NempPlayer.SoundfontFilename;
   // safe playback
   cb_SafePlayback.Checked := NempPlayer.SafePlayback;
+  cbActivatePluginSystem.Checked := NempPlayer.ActivateDSPPlugins;
+
   // visualization
   CB_visual.Checked := NempPlayer.UseVisualization;
   TB_Refresh.Position := 100 - NempPlayer.VisualizationInterval;
@@ -2519,6 +2522,7 @@ begin
     Application.Title := NempPlayer.GenerateTaskbarTitel;
   // Safe playback
   NempPlayer.SafePlayback := cb_SafePlayback.Checked;
+  NempPlayer.ActivateDSPPlugins := cbActivatePluginSystem.Checked;
 end;
 
 procedure TOptionsCompleteForm.ApplyListViewSettings;
@@ -3982,7 +3986,8 @@ begin
   (Nemp_MainForm.HeadsetTimer.Interval <> NempPlayer.VisualizationInterval) or
   (NempPlayer.ScrollTaskbarTitel <> CB_ScrollTitelTaskBar.Checked) or
   (NempPlayer.ScrollTaskbarDelay <>  (4 - CB_TaskbarDelay.ItemIndex + 1)* 5) or
-  (NempPlayer.SafePlayback <> cb_SafePlayback.Checked);
+  (NempPlayer.SafePlayback <> cb_SafePlayback.Checked) or
+  (NempPlayer.ActivateDSPPlugins <> cbActivatePluginSystem.Checked);
 end;
 function TOptionsCompleteForm.PlaylistSettingsChanged: Boolean;
 begin

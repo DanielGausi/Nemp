@@ -184,9 +184,6 @@ type
     function GetStandardUserDefinedURL: AnsiString;
     procedure SetStandardUserDefinedURL(Value: AnsiString);
 
-    // SetRatingAndCounter: use aRating = -1 or aCounter = -1 to let this value untouched
-    //                      use aRating = 0 AND aCounter = 0 to delete the frame
-    //procedure SetRatingAndCounter(aEMail: AnsiString; aRating: Integer {Byte}; aCounter: Integer{Cardinal});
     function GetArbitraryRating: Byte;
     procedure SetArbitraryRating(Value: Byte);
     function GetArbitraryPersonalPlayCounter: Cardinal;
@@ -302,9 +299,7 @@ type
     // Ratings (POPM)
     // Note: GetRating('*') gets an arbitrary rating (in case more than one exist in the tag)
     function GetRating(aEMail: AnsiString): Byte;
-    //procedure SetRating(aEMail: AnsiString; Value: Byte); (method from version 0.5)
     function GetPersonalPlayCounter(aEMail: AnsiString): Cardinal;
-    // procedure SetPersonalPlayCounter(aEMail: AnsiString; Value: Cardinal); (method from version 0.5)
 
     // SetRatingAndCounter('*', .., ..) overwrites an arbitrary rating/counter
     // SetRatingAndCounter(.., -1, ..) lets the rating untouched
@@ -352,14 +347,6 @@ type
   end;
 //--------------------------------------------------------------------
 
-
-{.$Message Hint 'You should change the default rating description for your projects'}
-var
-  DefaultRatingDescription: AnsiString = 'Mp3ileUtils, www.gausi.de';
-  // Changig this should be done e.g. in MainFormCreate or in the initialization-part
-  // It should be like "<Name of the program>, <URL to your webpage>"
-
-
 // Some useful functions.
 // Use them e.g. in OnChange of a TEdit
 function IsValidV2TrackString(value:string):boolean;
@@ -368,7 +355,11 @@ function IsValidV2TrackString(value:string):boolean;
   // e.g.: 3/15 => 3
 function GetTrackFromV2TrackString(value: string): Integer;
 
-
+{.$Message Hint 'You should change the default rating description for your projects'}
+var
+  DefaultRatingDescription: AnsiString = 'Mp3ileUtils';
+  // Changig this should be done e.g. in MainFormCreate or in the initialization-part
+  // It should be like "<Name of the program>, <URL to your webpage>"
 
 implementation
 
@@ -651,7 +642,7 @@ begin
       if (Frames[i] as TID3v2Frame).FrameIDString = IDstr then
       begin
           (Frames[i] as TID3v2Frame).GetUserdefinedURL(iDescription);
-          If Description = iDescription then
+          If (Description = iDescription) then
           begin
               result := i;
               break;
@@ -1475,13 +1466,13 @@ begin
   // Many programs show a "comment" or "lyric" without further information.
   // in this case, the description is often '' (empty string), language may differ
   // To get this "pseudo-default-comment/lyric" and overwrite it:
-  // Use '*' as language to get the first frame mathcing the id and description
+  // Use '*' as language to get the first frame matching the id and description
   // if no matching frame can be found, the language will be changed to 'eng'
 
   idStr := GetFrameIDString(ID);
   if not ValidFrame(iDStr) then exit;
 
-  if (language <>'*') AND (length(language)<>3)
+  if (language <> '*') AND (language <> '') AND (length(language) <> 3)
     then language := 'eng';
 
   // search Frame
@@ -1573,18 +1564,20 @@ begin
             if (Description = '*') or (MimeTyp = '*') or (Source.size = 0) then
             begin
                 oldStream := TMemoryStream.Create;
-                (Frames[IDX] as TID3v2Frame).GetPicture(oldStream, oldMime, oldType, oldDescription);
-                if (Description = '*') then
-                  Description := oldDescription;
-                if (MimeTyp = '*') then
-                  MimeTyp := oldMime;
-                if Source.Size = 0 then
-                  oldStream.SaveToStream(Source);
-                oldStream.Free;
+                try
+                    (Frames[IDX] as TID3v2Frame).GetPicture(oldStream, oldMime, oldType, oldDescription);
+                    if (Description = '*') then
+                      Description := oldDescription;
+                    if (MimeTyp = '*') then
+                      MimeTyp := oldMime;
+                    if Source.Size = 0 then
+                      oldStream.SaveToStream(Source);
+                finally
+                    oldStream.Free;
+                end;
             end;
             (Frames[IDX] as TID3v2Frame).SetPicture(Source, MimeTyp, PicType, Description)
         end;
-
     end else
     begin
         if (Source <> NIL) and (Source.Size > 0)then
@@ -1693,9 +1686,8 @@ begin
         else
         begin
             // Set new information, the frame should NOT be deleted
-            if aEMail = '*' then
+            if (aEMail = '*') then
                 aEMail := currentMail;
-
             if aRating <> -1 then
                 (Frames[IDX] as TID3v2Frame).SetRating(aEMail, newRating);
             if aCounter <> -1 then
@@ -1709,10 +1701,8 @@ begin
         newFrame.CharCode := fCharCode;
         NewFrame.AutoCorrectCodepage := fAutoCorrectCodepage;
         Frames.Add(newFrame);
-
-        if aEMail = '*' then
+        if (aEMail = '*') then
             aEMail := DefaultRatingDescription;
-
         if aRating <> -1 then
             newFrame.SetRating(aEMail, newRating);
         if aCounter <> -1 then

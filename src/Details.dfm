@@ -4,8 +4,8 @@ object FDetails: TFDetails
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'File properties'
-  ClientHeight = 541
-  ClientWidth = 605
+  ClientHeight = 539
+  ClientWidth = 597
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -24,8 +24,8 @@ object FDetails: TFDetails
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 599
-    Height = 499
+    Width = 591
+    Height = 497
     ActivePage = Tab_MetaData
     Align = alClient
     MultiLine = True
@@ -38,7 +38,7 @@ object FDetails: TFDetails
       object GrpBox_File: TGroupBox
         Left = 0
         Top = 0
-        Width = 591
+        Width = 583
         Height = 145
         Align = alTop
         Caption = 'File properties'
@@ -46,7 +46,7 @@ object FDetails: TFDetails
         ParentColor = False
         TabOrder = 0
         DesignSize = (
-          591
+          583
           145)
         object LBLName: TLabel
           Left = 103
@@ -237,7 +237,7 @@ object FDetails: TFDetails
         end
         object CoverLibrary1: TImage
           AlignWithMargins = True
-          Left = 456
+          Left = 448
           Top = 13
           Width = 120
           Height = 120
@@ -336,16 +336,16 @@ object FDetails: TFDetails
       object PnlLibraryMetadata: TPanel
         Left = 0
         Top = 145
-        Width = 591
-        Height = 326
+        Width = 583
+        Height = 324
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
         object GrpBox_MetaDataLibrary: TGroupBox
           Left = 0
           Top = 0
-          Width = 591
-          Height = 326
+          Width = 583
+          Height = 324
           Align = alClient
           Caption = 'Metadata overview'
           DoubleBuffered = False
@@ -354,14 +354,14 @@ object FDetails: TFDetails
           object pnlExtendedTags: TPanel
             Left = 409
             Top = 15
-            Width = 180
-            Height = 309
+            Width = 172
+            Height = 307
             Align = alClient
             BevelOuter = bvNone
             TabOrder = 1
             DesignSize = (
-              180
-              309)
+              172
+              307)
             object lblExtendedTags: TLabel
               Left = 6
               Top = 8
@@ -382,8 +382,8 @@ object FDetails: TFDetails
               AlignWithMargins = True
               Left = 6
               Top = 27
-              Width = 159
-              Height = 268
+              Width = 151
+              Height = 266
               Anchors = [akLeft, akTop, akRight, akBottom]
               ItemHeight = 13
               PopupMenu = PM_EditExtendedTags
@@ -395,7 +395,7 @@ object FDetails: TFDetails
             Left = 2
             Top = 15
             Width = 407
-            Height = 309
+            Height = 307
             Align = alLeft
             BevelOuter = bvNone
             TabOrder = 0
@@ -811,22 +811,22 @@ object FDetails: TFDetails
         AlignWithMargins = True
         Left = 3
         Top = 3
-        Width = 341
-        Height = 465
+        Width = 333
+        Height = 463
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         object gpBoxExistingCoverArt: TGroupBox
           Left = 0
           Top = 0
-          Width = 341
-          Height = 465
+          Width = 333
+          Height = 463
           Align = alClient
           Caption = 'Cover art (meta data and image files)'
           TabOrder = 0
           DesignSize = (
-            341
-            465)
+            333
+            463)
           object lblCoverInfo: TLabel
             Left = 16
             Top = 430
@@ -836,8 +836,8 @@ object FDetails: TFDetails
           end
           object VSTCover: TVirtualStringTree
             Left = 16
-            Top = 19
-            Width = 303
+            Top = 17
+            Width = 295
             Height = 94
             Anchors = [akLeft, akRight, akBottom]
             Colors.UnfocusedSelectionColor = clHighlight
@@ -861,7 +861,7 @@ object FDetails: TFDetails
             Columns = <
               item
                 Position = 0
-                Width = 307
+                Width = 299
               end>
           end
           object pnlCoverCurrentSelection: TPanel
@@ -892,16 +892,16 @@ object FDetails: TFDetails
       end
       object GrpBox_CoverLibrary: TGroupBox
         AlignWithMargins = True
-        Left = 350
+        Left = 342
         Top = 3
         Width = 238
-        Height = 465
+        Height = 463
         Align = alRight
         Caption = 'Cover art for the Media library'
         TabOrder = 1
         DesignSize = (
           238
-          465)
+          463)
         object CoverLibrary2: TImage
           AlignWithMargins = True
           Left = 19
@@ -946,8 +946,8 @@ object FDetails: TFDetails
       object GrpBox_TextFrames: TGroupBox
         Left = 0
         Top = 0
-        Width = 591
-        Height = 282
+        Width = 583
+        Height = 280
         Align = alClient
         Caption = 'Metadata frames'
         TabOrder = 0
@@ -1006,8 +1006,8 @@ object FDetails: TFDetails
       end
       object Pnl_ID3v1_MPEG: TPanel
         Left = 0
-        Top = 282
-        Width = 591
+        Top = 280
+        Width = 583
         Height = 189
         Align = alBottom
         BevelOuter = bvNone
@@ -1215,7 +1215,7 @@ object FDetails: TFDetails
           end
         end
         object GrpBox_Mpeg: TGroupBox
-          Left = 353
+          Left = 345
           Top = 0
           Width = 238
           Height = 189
@@ -1490,17 +1490,17 @@ object FDetails: TFDetails
   object pnlButtons: TPanel
     AlignWithMargins = True
     Left = 3
-    Top = 508
-    Width = 599
+    Top = 506
+    Width = 591
     Height = 30
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
     DesignSize = (
-      599
+      591
       30)
     object Btn_Close: TButton
-      Left = 350
+      Left = 342
       Top = 0
       Width = 75
       Height = 25
@@ -1509,9 +1509,10 @@ object FDetails: TFDetails
       Caption = 'Cancel'
       TabOrder = 0
       OnClick = Btn_CloseClick
+      ExplicitLeft = 350
     end
     object BtnUndo: TButton
-      Left = 431
+      Left = 423
       Top = 0
       Width = 75
       Height = 25
@@ -1519,9 +1520,10 @@ object FDetails: TFDetails
       Caption = 'Undo'
       TabOrder = 1
       OnClick = BtnUndoClick
+      ExplicitLeft = 431
     end
     object BtnApply: TButton
-      Left = 512
+      Left = 504
       Top = 0
       Width = 75
       Height = 25
@@ -1529,9 +1531,10 @@ object FDetails: TFDetails
       Caption = 'Apply'
       TabOrder = 2
       OnClick = BtnApplyClick
+      ExplicitLeft = 512
     end
     object BtnRefreshCoverflow: TButton
-      Left = 177
+      Left = 169
       Top = 0
       Width = 157
       Height = 25
@@ -1540,6 +1543,7 @@ object FDetails: TFDetails
       TabOrder = 3
       Visible = False
       OnClick = BtnRefreshCoverflowClick
+      ExplicitLeft = 177
     end
     object cbQuickRefresh: TCheckBox
       Left = 12

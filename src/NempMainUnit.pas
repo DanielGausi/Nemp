@@ -728,6 +728,22 @@ type
     PM_P_OnlineHelp: TMenuItem;
     MM_H_CleanupUpdate: TMenuItem;
     PM_P_CleanupUpdate: TMenuItem;
+    MM_T_Plugins: TMenuItem;
+    PM_P_Plugins: TMenuItem;
+    MM_T_PluginConfigure: TMenuItem;
+    MM_T_PluginStop: TMenuItem;
+    N43: TMenuItem;
+    N44: TMenuItem;
+    PM_P_PluginConfigure: TMenuItem;
+    PM_P_PluginStop: TMenuItem;
+    DSPPluginImage: TImage;
+    MM_T_PluginOpenFolder: TMenuItem;
+    PM_P_PluginOpenFolder: TMenuItem;
+    PM_T_Plugins: TMenuItem;
+    PM_T_PluginOpenFolder: TMenuItem;
+    PM_T_PluginStop: TMenuItem;
+    PM_T_PluginConfigure: TMenuItem;
+    N45: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -736,6 +752,7 @@ type
     procedure ActivateSkin(aName: String);
 
     procedure ChangeLanguage(Sender: TObject);
+    procedure ActivateDSPPlugin(Sender: TObject);
 
     Procedure AnzeigeSortMENUClick(Sender: TObject);
 
@@ -1399,6 +1416,12 @@ type
       Node: PVirtualNode; Column: TColumnIndex; var R: TRect);
     procedure MM_H_CleanupUpdateClick(Sender: TObject);
     procedure MM_HelpClick(Sender: TObject);
+    procedure MM_T_PluginConfigureClick(Sender: TObject);
+    procedure MM_T_PluginStopClick(Sender: TObject);
+    procedure MM_T_PluginsClick(Sender: TObject);
+    procedure PM_P_PluginsClick(Sender: TObject);
+    procedure MM_T_PluginOpenFolderClick(Sender: TObject);
+    procedure PM_T_PluginsClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -2236,10 +2259,7 @@ begin
     TabBtn_MainPlayerControl.GlyphLine := 1;
     ShowMatchingControls;//(TabBtn_MainPlayerControl.GlyphLine);
 
-
     MostRecentInsertNodeForPlaylist := Nil;
-
-
 end;
 
 procedure TNemp_MainForm.FormDeactivate(Sender: TObject);
@@ -2440,6 +2460,24 @@ begin
         TagLabelList.Clear;
 
         FreeAndNil(NempLayout);
+
+
+        fCurrentlySelectedFile.Free;
+        Spectrum.Free;
+        NempSkin.Free;
+        NempPlaylist.Free;
+        NempPlayer.Free;
+        MedienBib.NewCoverFlow.DownloadThread := Nil;
+        CoverDownloadThread.Terminate;
+        CoverDownloadThread.WaitFor;
+        CoverDownloadThread.Free;
+        MedienBib.Free;
+        BibRatingHelper.Free;
+        LanguageList.Free;
+        NempUpdater.Free;
+        FreeAndNil(ErrorLog);
+
+
 
         Set8087CW(Default8087CW);
     except
@@ -7905,7 +7943,6 @@ begin
     end;
 end;
 
-
 procedure TNemp_MainForm.MM_T_PlaylistLogClick(Sender: TObject);
 begin
     if not assigned(PlayerLogForm) then
@@ -9838,8 +9875,6 @@ begin
 end;
 
 
-
-
 procedure TNemp_MainForm.PlayerTabsClick(Sender: TObject);
 begin
   TabBtn_Cover.Tag       := (TabBtn_Cover.Tag + 1) mod 2;
@@ -10525,6 +10560,7 @@ begin
         CoverScrollbar.WindowProc := OldScrollbarWindowProc;
         LyricsMemo.WindowProc := OldLyricMemoWindowProc;
         AlphaBlendBMP.Free;
+        (*
         fCurrentlySelectedFile.Free;
         Spectrum.Free;
         NempSkin.Free;
@@ -10538,7 +10574,7 @@ begin
         BibRatingHelper.Free;
         LanguageList.Free;
         NempUpdater.Free;
-        FreeAndNil(ErrorLog);
+        FreeAndNil(ErrorLog);*)
     except
         halt;
     end;
@@ -12411,10 +12447,70 @@ begin
             newLanguage := 'en';
           end;
     end;
-    NempOptions.Language := newLanguage; 
+    NempOptions.Language := newLanguage;
     ReTranslateNemp(newLanguage);
 end;
 
+procedure TNemp_MainForm.MM_T_PluginsClick(Sender: TObject);
+var
+  i: Integer;
+begin
+  MM_T_PluginConfigure.Enabled := NempPlayer.DSPPluginActive;
+  MM_T_PluginStop.Enabled := NempPlayer.DSPPluginActive;
+  for i := 0 to MM_T_Plugins.Count - 5 do
+    MM_T_Plugins.Items[i].Checked := MM_T_Plugins.Items[i].Tag = NempPlayer.ActivePluginIndex;
+end;
+
+procedure TNemp_MainForm.PM_P_PluginsClick(Sender: TObject);
+var
+  i: Integer;
+begin
+  PM_P_PluginConfigure.Enabled := NempPlayer.DSPPluginActive;
+  PM_P_PluginStop.Enabled := NempPlayer.DSPPluginActive;
+  for i := 0 to PM_P_Plugins.Count - 5 do
+    PM_P_Plugins.Items[i].Checked := PM_P_Plugins.Items[i].Tag = NempPlayer.ActivePluginIndex;
+end;
+
+procedure TNemp_MainForm.PM_T_PluginsClick(Sender: TObject);
+var
+  i: Integer;
+begin
+  PM_T_PluginConfigure.Enabled := NempPlayer.DSPPluginActive;
+  PM_T_PluginStop.Enabled := NempPlayer.DSPPluginActive;
+  for i := 0 to PM_T_Plugins.Count - 5 do
+    PM_T_Plugins.Items[i].Checked := PM_T_Plugins.Items[i].Tag = NempPlayer.ActivePluginIndex;
+end;
+
+procedure TNemp_MainForm.ActivateDSPPlugin(Sender: TObject);
+begin
+  if (Sender is TMenuItem) then begin
+    NempPlayer.ActivateDSPPlugin(TMenuItem(Sender).Tag);
+    ReArrangeToolImages;
+  end;
+end;
+
+procedure TNemp_MainForm.MM_T_PluginConfigureClick(Sender: TObject);
+begin
+  NempPlayer.ConfigureActiveDSPPlugin;
+end;
+
+procedure TNemp_MainForm.MM_T_PluginStopClick(Sender: TObject);
+begin
+  NempPlayer.StopActiveDSPPlugin;
+  ReArrangeToolImages;
+end;
+
+procedure TNemp_MainForm.MM_T_PluginOpenFolderClick(Sender: TObject);
+var
+  PluginPath: String;
+begin
+  PluginPath := IncludeTrailingPathdelimiter(SavePath) + 'Plugins\';
+  if ForceDirectories(PluginPath) then
+    ShellExecute(Handle, 'open' ,'explorer.exe', PChar('"' + PluginPath + '"'), '', sw_ShowNormal)
+  else
+    TranslateMessageDLG((Warning_PluginDirNotFound), mtWarning, [mbOk], 0);
+
+end;
 
 procedure TNemp_MainForm.VST_ColumnPopupOnClick(Sender: TObject);
 var s: Integer;
@@ -12432,7 +12528,6 @@ end;
 procedure TNemp_MainForm.VST_ColumnPopupPopup(Sender: TObject);
 var i: Integer;
 begin
-
     for i := 0 to VST_ColumnPopup.Items.Count - 1 do
     begin
         VST_ColumnPopup.Items[i].Checked :=

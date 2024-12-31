@@ -43,7 +43,7 @@ unit CreateHelper;
 interface
 
     uses Forms, Windows, Graphics, Classes, Menus, Controls, SysUtils, IniFiles, VirtualTrees, Messages,
-    dialogs, shellApi, ID3GenreList, ActiveX, OneInst, MainFormlayout
+    dialogs, shellApi, ID3GenreList, ActiveX, OneInst, MainFormlayout, System.IOUtils, System.Types
     {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF};
 
 
@@ -118,6 +118,9 @@ begin
 
         //Player initialisieren, Load Plugins.
         NempPlayer.InitBassEngine(FOwnMessageHandler, ExtractFilePath(ParamStr(0)) + 'Bass\', tmpwstr);
+
+
+
         // VCL an den Player anpassen
         PlaylistDateienOpenDialog.Filter := tmpwstr;
 
@@ -234,6 +237,87 @@ begin
             PM_P_Languages.Add(aMenuItem);
         end;
     end;
+end;
+
+procedure SaveResourceAsFile(resID, TargetFilename: String);
+var
+  Stream: TResourceStream;
+begin
+  Stream := TResourceStream.Create(HInstance, resID, RT_RCDATA);
+  try
+    Stream.SaveToFile(TargetFilename);
+  finally
+    Stream.Free;
+  end;
+end;
+
+procedure SearchDSPPlugins;
+var
+  aMenuItem: TMenuItem;
+  i: Integer;
+  pluginPath: String;
+
+
+  procedure ClearMenu(aMenuItem: TMenuItem);
+  const
+    FixedMenuItemCount = 4;
+  begin
+    for var i:Integer := aMenuItem.Count - 1 - FixedMenuItemCount downto 0 do
+      aMenuItem.Delete(0);
+  end;
+
+begin
+  if not NempPlayer.ActivateDSPPlugins then begin
+    with Nemp_MainForm do begin
+      MM_T_Plugins.Visible := False;
+      PM_P_Plugins.Visible := False;
+    end;
+
+  end else begin
+    with Nemp_MainForm do begin
+      TStyleManager.SystemHooks := [shMenus, shToolTips]; // no shDialogs, that will interfere with Plugin Forms
+
+      pluginPath := IncludeTrailingPathdelimiter(SavePath) + 'Plugins\';
+
+      if not DirectoryExists(pluginPath) then
+        ForceDirectories(pluginPath);
+      if DirectoryExists(PluginPath) and (not FileExists(pluginPath + 'How to add Winamp DSP Plugins.txt')) then
+        SaveResourceAsFile('WinampDSP', pluginPath + 'How to add Winamp DSP Plugins.txt');
+
+      NempPlayer.InitWinampDSPPlugins(Application.Handle, pluginPath);
+      MM_T_Plugins.Visible := True;
+      PM_P_Plugins.Visible := True;
+      PM_T_Plugins.Visible := True;
+      // MM_T_Plugins.Clear;
+      // PM_P_Plugins.Clear;
+      ClearMenu(MM_T_Plugins);
+      ClearMenu(PM_P_Plugins);
+      ClearMenu(PM_T_Plugins);
+
+      for i := 0 to NempPlayer.DSPPluginFilenames.Count - 1 do begin
+        aMenuItem := TMenuItem.Create(Nemp_MainForm);
+        aMenuItem.AutoHotkeys := maManual;
+        aMenuItem.OnClick := ActivateDSPPlugin;
+        aMenuItem.Caption := NempPlayer.DSPPluginFilenames.ValueFromIndex[i];
+        aMenuItem.Tag := i;
+        MM_T_Plugins.Insert(i, aMenuItem);
+
+        aMenuItem := TMenuItem.Create(Nemp_MainForm);
+        aMenuItem.AutoHotkeys := maManual;
+        aMenuItem.OnClick := ActivateDSPPlugin;
+        aMenuItem.Caption := NempPlayer.DSPPluginFilenames.ValueFromIndex[i];
+        aMenuItem.Tag := i;
+        PM_P_Plugins.Insert(i, aMenuItem);
+
+        aMenuItem := TMenuItem.Create(Nemp_MainForm);
+        aMenuItem.AutoHotkeys := maManual;
+        aMenuItem.OnClick := ActivateDSPPlugin;
+        aMenuItem.Caption := NempPlayer.DSPPluginFilenames.ValueFromIndex[i];
+        aMenuItem.Tag := i;
+        PM_T_Plugins.Insert(i, aMenuItem);
+      end;
+    end;
+  end;
 end;
 
 procedure AutoLoadPlaylist(LastExitOK: Boolean);
@@ -524,6 +608,7 @@ begin
 
         SearchSkins;
         SearchLanguages;
+        SearchDSPPlugins;
 
         ApplySettings;
 
