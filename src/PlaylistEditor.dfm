@@ -45,7 +45,7 @@ object PlaylistEditorForm: TPlaylistEditorForm
       Left = 3
       Top = 3
       Width = 214
-      Height = 220
+      Height = 219
       Align = alTop
       Anchors = [akLeft, akTop, akRight, akBottom]
       Colors.UnfocusedSelectionColor = clHighlight
@@ -73,17 +73,18 @@ object PlaylistEditorForm: TPlaylistEditorForm
       OnStartDrag = PlaylistSelectionVSTStartDrag
       Touch.InteractiveGestures = [igPan, igPressAndTap]
       Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+      ExplicitHeight = 220
       Columns = <
         item
           Position = 0
           Text = 'Favorite playlists'
-          Width = 210
+          Width = 214
         end>
     end
     object BtnNew: TButton
       AlignWithMargins = True
       Left = 3
-      Top = 232
+      Top = 231
       Width = 100
       Height = 25
       Hint = 'Create a new favorite playlist'
@@ -91,11 +92,12 @@ object PlaylistEditorForm: TPlaylistEditorForm
       Caption = 'New'
       TabOrder = 1
       OnClick = BtnNewClick
+      ExplicitTop = 232
     end
     object BtnRemove: TButton
       AlignWithMargins = True
       Left = 109
-      Top = 232
+      Top = 231
       Width = 100
       Height = 25
       Hint = 'Remove selected favorite playlist'
@@ -103,6 +105,7 @@ object PlaylistEditorForm: TPlaylistEditorForm
       Caption = 'Delete'
       TabOrder = 2
       OnClick = BtnRemoveClick
+      ExplicitTop = 232
     end
   end
   object PnlPlaylistFiles: TPanel
@@ -122,7 +125,7 @@ object PlaylistEditorForm: TPlaylistEditorForm
       Left = 3
       Top = 3
       Width = 325
-      Height = 220
+      Height = 219
       Align = alTop
       Anchors = [akLeft, akTop, akRight, akBottom]
       Colors.UnfocusedSelectionColor = clHighlight
@@ -155,11 +158,12 @@ object PlaylistEditorForm: TPlaylistEditorForm
       OnStartDrag = PlaylistFilesVSTStartDrag
       Touch.InteractiveGestures = [igPan, igPressAndTap]
       Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+      ExplicitHeight = 220
       Columns = <
         item
           Position = 0
           Text = 'Title'
-          Width = 257
+          Width = 261
         end
         item
           Alignment = taRightJustify
@@ -173,7 +177,7 @@ object PlaylistEditorForm: TPlaylistEditorForm
     object BtnSave: TButton
       AlignWithMargins = True
       Left = 215
-      Top = 232
+      Top = 231
       Width = 100
       Height = 25
       Hint = 'Save current playlist'
@@ -181,11 +185,12 @@ object PlaylistEditorForm: TPlaylistEditorForm
       Caption = 'Save'
       TabOrder = 3
       OnClick = PM_PL_SaveClick
+      ExplicitTop = 232
     end
     object BtnImport: TButton
       AlignWithMargins = True
       Left = 109
-      Top = 232
+      Top = 231
       Width = 100
       Height = 25
       Hint = 'Import files from an existing playlist'
@@ -193,11 +198,12 @@ object PlaylistEditorForm: TPlaylistEditorForm
       Caption = 'Import'
       TabOrder = 2
       OnClick = PM_PL_ImportClick
+      ExplicitTop = 232
     end
     object BtnAdd: TButton
       AlignWithMargins = True
       Left = 3
-      Top = 232
+      Top = 231
       Width = 100
       Height = 25
       Hint = 'Add files to the current playlist'
@@ -205,6 +211,7 @@ object PlaylistEditorForm: TPlaylistEditorForm
       Caption = 'Add'
       TabOrder = 1
       OnClick = PM_PL_AddFilesClick
+      ExplicitTop = 232
     end
   end
   object PlayListOpenDialog: TOpenDialog

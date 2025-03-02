@@ -42,8 +42,8 @@ uses
   Windows, Messages, SysUtils,  Variants, Classes, Graphics, Controls, Forms,
   Dialogs, VirtualTrees,  ComCtrls, StdCtrls, Spin, CheckLst, ExtCtrls, shellapi,
   DateUtils,  IniFiles, jpeg, PNGImage,  math, Contnrs,
-  bass, StringHelper, MainFormHelper, RatingCtrls,
-  NempAudioFiles, Spectrum_vis, Hilfsfunktionen, Systemhelper, TreeHelper,
+  bass, StringHelper, MainFormHelper,
+  NempAudioFiles, Hilfsfunktionen, Systemhelper, TreeHelper,
   CoverHelper, UpdateUtils, HtmlHelper,
   Nemp_ConstantsAndTypes, filetypes, Buttons, gnuGettext,
   Nemp_RessourceStrings,  ScrobblerUtils, ExtDlgs, NempCoverFlowClass,
@@ -52,7 +52,7 @@ uses
   LibraryOrganizer.Configuration.NewLayer,
   LibraryOrganizer.Base, LibraryOrganizer.Files, LibraryOrganizer.Playlists, LibraryOrganizer.Webradio,
   Vcl.Menus, System.Actions, Vcl.ActnList, ActiveX, System.ImageList,
-  Vcl.ImgList
+  Vcl.ImgList, SkinButtons
   {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF};
 
 type
@@ -123,16 +123,6 @@ type
     LblConst_AvoidRepetitions: TLabel;
     TBRandomRepeat: TTrackBar;
     lbl_WeightedRandom: TLabel;
-    RatingImage05: TImage;
-    RatingImage10: TImage;
-    RatingImage15: TImage;
-    RatingImage20: TImage;
-    RatingImage25: TImage;
-    RatingImage30: TImage;
-    RatingImage35: TImage;
-    RatingImage40: TImage;
-    RatingImage45: TImage;
-    RatingImage50: TImage;
     lblCount30: TLabel;
     lblCount35: TLabel;
     lblCount40: TLabel;
@@ -647,6 +637,16 @@ type
     cbCombineLayers: TCheckBox;
     cbShowFilesRecursively: TCheckBox;
     cbActivatePluginSystem: TCheckBox;
+    BtnRating05: TRatingButton;
+    BtnRating10: TRatingButton;
+    BtnRating15: TRatingButton;
+    BtnRating20: TRatingButton;
+    BtnRating25: TRatingButton;
+    BtnRating30: TRatingButton;
+    BtnRating35: TRatingButton;
+    BtnRating40: TRatingButton;
+    BtnRating45: TRatingButton;
+    BtnRating50: TRatingButton;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -812,7 +812,6 @@ type
 
   private
     { Private-Deklarationen }
-    DetailRatingHelper: TRatingHelper;
 
     FileCategories: TLibraryCategoryList;
     RootCollections: TAudioCollectionList;
@@ -923,6 +922,7 @@ type
     procedure EnsureNewCategoryIsSet;
     procedure MoveLayer(Direction: teMoveDirection);
     procedure MoveCategory(Direction: teMoveDirection);
+    procedure SetRatingImageList(const Value: TCustomImageList);
 
   protected
     Procedure ScrobblerMessage(Var aMsg: TMessage); message WM_Scrobbler;
@@ -938,10 +938,7 @@ type
     VorauswahlNode: pVirtualNode;
     CategoriesNode: PVirtualNode;
 
-
-    //procedure LoadStarGraphics;
-    procedure RefreshStarGraphics;
-
+    property RatingImageList: TCustomImageList write SetRatingImageList;
   end;
 
 var
@@ -949,7 +946,7 @@ var
 
 implementation
 
-uses NempMainUnit, Details, SplitForm_Hilfsfunktionen, WindowsVersionInfo,
+uses NempMainUnit, PlayerClass, PlaylistClass, Details, SplitForm_Hilfsfunktionen, WindowsVersionInfo,
   WebServerLog, MedienBibliothekClass, DriveRepairTools, WebQRCodes,
   AudioDisplayUtils, unitFlyingCow, RedeemerQR, NempHelp, cddaUtils;
 
@@ -1007,22 +1004,6 @@ begin
   OnCloseQuery := FormCloseQuery;
 end;
 
-
-procedure TOptionsCompleteForm.RefreshStarGraphics;
-begin
-    LoadStarGraphics(DetailRatingHelper);
-    DetailRatingHelper.DrawRatingInStarsOnBitmap(1, RatingImage05.Picture.Bitmap, RatingImage05.Width, RatingImage05.Height);
-    DetailRatingHelper.DrawRatingInStarsOnBitmap(36 + 1, RatingImage10.Picture.Bitmap, RatingImage10.Width, RatingImage10.Height);
-    DetailRatingHelper.DrawRatingInStarsOnBitmap(51 + 1, RatingImage15.Picture.Bitmap, RatingImage15.Width, RatingImage15.Height);
-    DetailRatingHelper.DrawRatingInStarsOnBitmap(51+26 + 1, RatingImage20.Picture.Bitmap, RatingImage20.Width, RatingImage20.Height);
-    DetailRatingHelper.DrawRatingInStarsOnBitmap(2*51 + 1, RatingImage25.Picture.Bitmap, RatingImage25.Width, RatingImage25.Height);
-    DetailRatingHelper.DrawRatingInStarsOnBitmap(2*51+26 + 1, RatingImage30.Picture.Bitmap, RatingImage30.Width, RatingImage30.Height);
-    DetailRatingHelper.DrawRatingInStarsOnBitmap(3*51 + 1, RatingImage35.Picture.Bitmap, RatingImage35.Width, RatingImage35.Height);
-    DetailRatingHelper.DrawRatingInStarsOnBitmap(3*51+26 + 1, RatingImage40.Picture.Bitmap, RatingImage40.Width, RatingImage40.Height);
-    DetailRatingHelper.DrawRatingInStarsOnBitmap(4*51 + 1, RatingImage45.Picture.Bitmap, RatingImage45.Width, RatingImage45.Height);
-    DetailRatingHelper.DrawRatingInStarsOnBitmap(4*51+26 + 1, RatingImage50.Picture.Bitmap, RatingImage50.Width, RatingImage50.Height);
-end;
-
 procedure TOptionsCompleteForm.FormCloseQuery(Sender: TObject;
   var CanClose: Boolean);
 begin
@@ -1054,20 +1035,6 @@ begin
   HelpContext := HELP_Einstellungen;
   for i := 0 to 16 do
     PageControl1.Pages[i].HelpContext := HelpContexts[i];
-
-  DetailRatingHelper := TRatingHelper.Create;
-  LoadStarGraphics(DetailRatingHelper);
-
-  DetailRatingHelper.DrawRatingInStarsOnBitmap(1, RatingImage05.Picture.Bitmap, RatingImage05.Width, RatingImage05.Height);
-  DetailRatingHelper.DrawRatingInStarsOnBitmap(36 + 1, RatingImage10.Picture.Bitmap, RatingImage10.Width, RatingImage10.Height);
-  DetailRatingHelper.DrawRatingInStarsOnBitmap(51 + 1, RatingImage15.Picture.Bitmap, RatingImage15.Width, RatingImage15.Height);
-  DetailRatingHelper.DrawRatingInStarsOnBitmap(51+26 + 1, RatingImage20.Picture.Bitmap, RatingImage20.Width, RatingImage20.Height);
-  DetailRatingHelper.DrawRatingInStarsOnBitmap(2*51 + 1, RatingImage25.Picture.Bitmap, RatingImage25.Width, RatingImage25.Height);
-  DetailRatingHelper.DrawRatingInStarsOnBitmap(2*51+26 + 1, RatingImage30.Picture.Bitmap, RatingImage30.Width, RatingImage30.Height);
-  DetailRatingHelper.DrawRatingInStarsOnBitmap(3*51 + 1, RatingImage35.Picture.Bitmap, RatingImage35.Width, RatingImage35.Height);
-  DetailRatingHelper.DrawRatingInStarsOnBitmap(3*51+26 + 1, RatingImage40.Picture.Bitmap, RatingImage40.Width, RatingImage40.Height);
-  DetailRatingHelper.DrawRatingInStarsOnBitmap(4*51 + 1, RatingImage45.Picture.Bitmap, RatingImage45.Width, RatingImage45.Height);
-  DetailRatingHelper.DrawRatingInStarsOnBitmap(4*51+26 + 1, RatingImage50.Picture.Bitmap, RatingImage50.Width, RatingImage50.Height);
 
   cbIncludeFiles.Items.BeginUpdate;
   CBFileTypes.Items.BeginUpdate;
@@ -1164,6 +1131,21 @@ begin
   BackUpCoverFlowSettings := MedienBib.NewCoverFlow.Settings;
   ShowCoverFlowSettings;
   ShowMediaLibraryConfiguration;
+end;
+
+procedure TOptionsCompleteForm.SetRatingImageList(
+  const Value: TCustomImageList);
+begin
+  BtnRating05.Images := Value;
+  BtnRating10.Images := Value;
+  BtnRating15.Images := Value;
+  BtnRating20.Images := Value;
+  BtnRating25.Images := Value;
+  BtnRating30.Images := Value;
+  BtnRating35.Images := Value;
+  BtnRating40.Images := Value;
+  BtnRating45.Images := Value;
+  BtnRating50.Images := Value;
 end;
 
 
@@ -1674,7 +1656,6 @@ end;
 
 procedure TOptionsCompleteForm.FormDestroy(Sender: TObject);
 begin
-  DetailRatingHelper.Free;
   OptionsVST.Clear;
 
   FileCategories.OwnsObjects := True;
@@ -2510,11 +2491,11 @@ begin
   NempPlayer.PauseBetweenTracksDuration := SE_BreakBetweenTracks.Value;
   // Visualization
   NempPlayer.UseVisualization := CB_Visual.Checked;
-  if not NempPlayer.UseVisualization then
-    spectrum.DrawClear;
+  //if not NempPlayer.UseVisualization then
+  //  spectrum.DrawClear;
+  Nemp_MainForm.NempSpectrum.Visible := NempPlayer.UseVisualization;
   NempPlayer.VisualizationInterval := 100 - TB_Refresh.Position;
   Nemp_MainForm.BassTimer.Interval := NempPlayer.VisualizationInterval;
-  Nemp_MainForm.HeadsetTimer.Interval := NempPlayer.VisualizationInterval;
   // Taskbar scrolling
   NempPlayer.ScrollTaskbarTitel := CB_ScrollTitelTaskBar.Checked;
   NempPlayer.ScrollTaskbarDelay :=  (4 - CB_TaskbarDelay.ItemIndex + 1)* 5;
@@ -3983,7 +3964,6 @@ begin
   (NempPlayer.UseVisualization <> CB_Visual.Checked) or
   (NempPlayer.VisualizationInterval <> 100 - TB_Refresh.Position) or
   (Nemp_MainForm.BassTimer.Interval <> NempPlayer.VisualizationInterval) or
-  (Nemp_MainForm.HeadsetTimer.Interval <> NempPlayer.VisualizationInterval) or
   (NempPlayer.ScrollTaskbarTitel <> CB_ScrollTitelTaskBar.Checked) or
   (NempPlayer.ScrollTaskbarDelay <>  (4 - CB_TaskbarDelay.ItemIndex + 1)* 5) or
   (NempPlayer.SafePlayback <> cb_SafePlayback.Checked) or

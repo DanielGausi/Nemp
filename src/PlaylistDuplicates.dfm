@@ -2,8 +2,8 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
   Left = 0
   Top = 0
   Caption = 'Nemp: Playlist duplicates'
-  ClientHeight = 507
-  ClientWidth = 592
+  ClientHeight = 506
+  ClientWidth = 588
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,16 +17,16 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
   object pnlMain: TPanel
     Left = 0
     Top = 60
-    Width = 592
-    Height = 140
+    Width = 588
+    Height = 139
     Align = alClient
     BevelOuter = bvNone
-    Constraints.MinHeight = 140
+    Constraints.MinHeight = 139
     TabOrder = 0
     object Splitter2: TSplitter
-      Left = 298
+      Left = 295
       Top = 0
-      Height = 140
+      Height = 139
       ResizeStyle = rsUpdate
       ExplicitLeft = 448
       ExplicitTop = 128
@@ -34,10 +34,10 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
     end
     object grpBoxDuplicates: TGroupBox
       AlignWithMargins = True
-      Left = 304
+      Left = 301
       Top = 3
-      Width = 285
-      Height = 134
+      Width = 284
+      Height = 133
       Align = alClient
       Caption = 'Identified duplicates'
       Constraints.MinHeight = 80
@@ -46,7 +46,7 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       object VstDuplicates: TVirtualStringTree
         Left = 2
         Top = 15
-        Width = 281
+        Width = 284
         Height = 82
         Align = alTop
         BevelEdges = []
@@ -100,7 +100,7 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
             Position = 1
             Spacing = 0
             Text = 'Title'
-            Width = 211
+            Width = 214
           end
           item
             Alignment = taRightJustify
@@ -136,15 +136,15 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 292
-      Height = 134
+      Width = 289
+      Height = 133
       Align = alLeft
       Caption = 'Summary'
       Constraints.MinWidth = 100
       TabOrder = 1
       DesignSize = (
-        292
-        134)
+        289
+        133)
       object lblTracksBetweenCaption: TLabel
         Left = 16
         Top = 16
@@ -155,11 +155,12 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       object lblTracksBetween: TLabel
         Left = 57
         Top = 35
-        Width = 225
+        Width = 222
         Height = 13
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
         Caption = '..............'
+        ExplicitWidth = 225
       end
       object lblSummaryDuplicate: TLabel
         Left = 16
@@ -171,11 +172,12 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       object lblTimeBetween: TLabel
         Left = 57
         Top = 50
-        Width = 225
+        Width = 222
         Height = 13
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
         Caption = '..............'
+        ExplicitWidth = 225
       end
       object imgDuplicateInfo: TImage
         AlignWithMargins = True
@@ -194,27 +196,29 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       object lblDuplicateReason1: TLabel
         Left = 57
         Top = 91
-        Width = 225
+        Width = 222
         Height = 13
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
         Caption = '..............'
+        ExplicitWidth = 225
       end
       object lblDuplicateReason2: TLabel
         Left = 57
         Top = 106
-        Width = 225
+        Width = 222
         Height = 13
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
         Caption = '..............'
+        ExplicitWidth = 225
       end
     end
   end
   object PnlDetails: TPanel
     Left = 0
-    Top = 200
-    Width = 592
+    Top = 199
+    Width = 588
     Height = 266
     Align = alBottom
     BevelOuter = bvNone
@@ -249,15 +253,6 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
         Anchors = [akLeft, akTop, akRight]
         Shape = bsBottomLine
         ExplicitWidth = 297
-      end
-      object ImgRatingPlaylist: TImage
-        Left = 16
-        Top = 204
-        Width = 70
-        Height = 14
-        Hint = 'Click to change rating'
-        Transparent = True
-        Visible = False
       end
       object LblAlbumPlaylist: TLabel
         Tag = 2
@@ -317,8 +312,8 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
         ShowAccelChar = False
       end
       object LblPlayCounterPlaylist: TLabel
-        Left = 92
-        Top = 204
+        Left = 102
+        Top = 205
         Width = 104
         Height = 13
         Caption = '..........................'
@@ -380,29 +375,35 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
         ParentFont = False
         ShowAccelChar = False
       end
+      object BtnRatingPlaylist: TRatingButton
+        Left = 16
+        Top = 204
+        Width = 80
+        Height = 16
+        DrawMode = dm_Windows
+        TabOrder = 0
+        TransparentBackground = True
+        StyleElements = [seFont, seBorder]
+        Rating = 230
+        AllowChangeRating = False
+        StarFullImageIndex = 0
+        StarHalfImageIndex = 1
+        StarEmptyImageIndex = 2
+      end
     end
     object grpBoxDetailsDuplicate: TGroupBox
       AlignWithMargins = True
       Left = 301
       Top = 3
-      Width = 288
+      Width = 284
       Height = 260
       Align = alClient
       Caption = 'Currently selected possible duplicate'
       Constraints.MinWidth = 100
       TabOrder = 1
       DesignSize = (
-        288
+        284
         260)
-      object ImgRatingDuplicate: TImage
-        Left = 16
-        Top = 204
-        Width = 70
-        Height = 14
-        Hint = 'Click to change rating'
-        Transparent = True
-        Visible = False
-      end
       object LblAlbumDuplicate: TLabel
         Tag = 2
         Left = 16
@@ -461,8 +462,8 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
         ShowAccelChar = False
       end
       object LblPlayCounterDuplicate: TLabel
-        Left = 92
-        Top = 204
+        Left = 102
+        Top = 205
         Width = 107
         Height = 13
         Caption = '.......................... '
@@ -512,7 +513,7 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       object Bevel1: TBevel
         Left = 12
         Top = 103
-        Width = 255
+        Width = 251
         Height = 5
         Anchors = [akLeft, akTop, akRight]
         Shape = bsBottomLine
@@ -549,22 +550,37 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
         ParentFont = False
         ShowAccelChar = False
       end
+      object BtnRatingDuplicate: TRatingButton
+        Left = 16
+        Top = 204
+        Width = 80
+        Height = 16
+        DrawMode = dm_Windows
+        TabOrder = 0
+        TransparentBackground = True
+        StyleElements = [seFont, seBorder]
+        Rating = 128
+        AllowChangeRating = False
+        StarFullImageIndex = 0
+        StarHalfImageIndex = 1
+        StarEmptyImageIndex = 2
+      end
     end
   end
   object PnlFooter: TPanel
     Left = 0
-    Top = 466
-    Width = 592
+    Top = 465
+    Width = 588
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
     DesignSize = (
-      592
+      588
       41)
     object BtnOK: TButton
       AlignWithMargins = True
-      Left = 509
+      Left = 501
       Top = 8
       Width = 75
       Height = 25
@@ -589,7 +605,7 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
   object PnlPlaylistSelect: TPanel
     Left = 0
     Top = 0
-    Width = 592
+    Width = 588
     Height = 60
     Align = alTop
     BevelOuter = bvNone
@@ -598,13 +614,13 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 586
+      Width = 582
       Height = 54
       Align = alClient
       Caption = 'Selection in Nemp playlist'
       TabOrder = 0
       DesignSize = (
-        586
+        582
         54)
       object imgPlaylist: TImage
         AlignWithMargins = True
@@ -618,7 +634,7 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       object LblPlaylistTitle: TLabel
         Left = 123
         Top = 20
-        Width = 402
+        Width = 398
         Height = 19
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
@@ -629,9 +645,10 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
         Font.Name = 'Tahoma'
         Font.Style = []
         ParentFont = False
+        ExplicitWidth = 402
       end
       object LblPlaylistTime: TLabel
-        Left = 528
+        Left = 524
         Top = 20
         Width = 50
         Height = 19
@@ -645,6 +662,7 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
         Font.Name = 'Tahoma'
         Font.Style = []
         ParentFont = False
+        ExplicitLeft = 528
       end
       object lblPlaylistIndex: TLabel
         Left = 86

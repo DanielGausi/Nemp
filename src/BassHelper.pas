@@ -42,7 +42,7 @@ uses Windows, Forms, Classes, SysUtils, hilfsfunktionen;
 
 implementation
 
-uses NempMainUnit, Spectrum_Vis, PlayerClass;
+uses NempMainUnit, PlayerClass;
 
 
 procedure StatusProc(buffer: Pointer; length: DWORD; user: Pointer); stdcall;

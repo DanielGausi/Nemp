@@ -34,10 +34,10 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Generics.Collections,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, VCL.ImgList, Generics.Collections,
   NempAudioFiles, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, PlaylistClass,
-  AudioDisplayUtils, RatingCtrls, TreeHelper, gnuGetText, NempHelp,
-  VirtualTrees, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Menus;
+  AudioDisplayUtils, TreeHelper, gnuGetText, NempHelp,
+  VirtualTrees, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Menus, SkinButtons;
 
 type
 
@@ -54,7 +54,7 @@ type
     LblQuality,
     LblReplayGain,
     LblPlaylistPosition: TLabel;
-    ImgRating: TImage;
+    BtnRating: TRatingButton;
   end;
 
   TDuplicateDistance = record
@@ -138,7 +138,6 @@ type
     PnlDetails: TPanel;
     grpBoxDetailsPlaylist: TGroupBox;
     Bevel2: TBevel;
-    ImgRatingPlaylist: TImage;
     LblAlbumPlaylist: TLabel;
     LblArtistPlaylist: TLabel;
     lblDirectoryPlaylist: TLabel;
@@ -152,7 +151,6 @@ type
     LblYearPlaylist: TLabel;
     Splitter1: TSplitter;
     grpBoxDetailsDuplicate: TGroupBox;
-    ImgRatingDuplicate: TImage;
     LblAlbumDuplicate: TLabel;
     LblArtistDuplicate: TLabel;
     lblDirectoryDuplicate: TLabel;
@@ -190,6 +188,8 @@ type
     lblPlaylistIndex: TLabel;
     btnDeleteOriginal: TButton;
     btnDeleteDuplicate: TButton;
+    BtnRatingPlaylist: TRatingButton;
+    BtnRatingDuplicate: TRatingButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -205,7 +205,6 @@ type
       Column: TColumnIndex; Shift: TShiftState);
   private
     { Private declarations }
-    RatingHelper: TRatingHelper;
     currentPlaylistRating,
     currentDuplicateRating: Byte;
     fCurrentPlaylistFile: TAudioFile;
@@ -237,6 +236,8 @@ type
     // called when the user deletes an entry from the middle treeview in this form
     procedure DeleteAudioFile(af: TAudioFile);
     procedure DeleteFocussedAudioFile;
+    procedure SetRatingImageList(const Value: TCustomImageList);
+    procedure OnAfterAudioFileChanged(Sender: TObject);
 
   public
     { Public declarations }
@@ -247,8 +248,8 @@ type
     property OnAfterLastDuplicateDeleted: TDuplicateNotifyEvent read fOnAfterLastDuplicateDeleted write fOnAfterLastDuplicateDeleted;
     property OnAfterRefreshDuplicateScan: TNotifyEvent read fOnAfterRefreshScan write fOnAfterRefreshScan;
     property OnDuplicateDblClick: TDuplicateNotifyEvent read fOnDuplicateDblClick write fOnDuplicateDblClick;
+    property RatingImageList: TCustomImageList write SetRatingImageList;
 
-    procedure RefreshStarGraphics;
     procedure RefreshAnalysisView; // after a Retranslate
     procedure ShowDuplicateAnalysis(af: TAudioFile);
 
@@ -264,7 +265,7 @@ var
 
 implementation
 
-uses NempMainUnit, MainFormHelper, math;
+uses NempMainUnit, MainFormHelper, math, AudioFileManagement;
 
 {$R *.dfm}
 
@@ -534,7 +535,7 @@ begin
     LblQuality     := LblQualityPlaylist;
     LblReplayGain  := LblReplayGainPlaylist;
     LblPlaylistPosition := LblPlaylistPositionPlaylist;
-    ImgRating      := ImgRatingPlaylist;
+    BtnRating      := BtnRatingPlaylist;
   end;
 
   with fDuplicateInfoLabel do
@@ -551,11 +552,9 @@ begin
     LblQuality     := LblQualityDuplicate;
     LblReplayGain  := LblReplayGainDuplicate;
     LblPlaylistPosition := LblPlaylistPositionDuplicate;
-    ImgRating      := ImgRatingDuplicate;
+    BtnRating      := BtnRatingDuplicate;
   end;
 
-  RatingHelper := TRatingHelper.Create;
-  LoadStarGraphics(RatingHelper);
   Warning1 := TPicture.Create;
   Warning2 := TPicture.Create;
   InitGraphics;
@@ -564,11 +563,13 @@ begin
   fPlaylistDuplicateCollector := Nil;
   fCurrentPlaylistFile := Nil;
   fCurrentDuplicateFile := Nil;
+
+  TAudioFileManager.OnAudioFileChanged.Add(OnAfterAudioFileChanged);
 end;
 
 procedure TFormPlaylistDuplicates.FormDestroy(Sender: TObject);
 begin
-  RatingHelper.Free;
+  TAudioFileManager.OnAudioFileChanged.Delete(OnAfterAudioFileChanged);
   Warning1.Free;
   Warning2.Free;
 end;
@@ -583,6 +584,38 @@ begin
   fCurrentPlaylistFile := Nil;
   fCurrentDuplicateFile := Nil;
 end;
+
+procedure TFormPlaylistDuplicates.OnAfterAudioFileChanged(Sender: TObject);
+begin
+  if not visible then exit;
+  if not (Sender is TAudioFile) then exit;
+  if TAudioFile(Sender).pfad = fCurrentPlaylistFile.Pfad then
+    ShowPlaylistDetails(fCurrentPlaylistFile);
+  if TAudioFile(Sender).pfad = fCurrentDuplicateFile.Pfad then
+    ShowAudioDetails(fDuplicateInfoLabel, fCurrentDuplicateFile);
+end;
+
+
+(*
+procedure TFDetails.OnAfterAudioFileChanged(Sender: TObject);
+begin
+  if not visible then exit;
+  if not (Sender is TAudioFile) then exit;
+
+  //if not assigned(AudioFile) then exit;
+
+  if TAudioFile(Sender).pfad = fEditFile.Pfad then begin
+    //ReloadTimer.Enabled := False;
+    fReloadFile := TAudioFile(Sender);
+
+    ReloadTimerTimer(Nil); // quick$Dirty: bisherige Timer-Funktion direkt aufrufen
+    //ReloadTimer.Enabled := True;
+  end;
+
+end;
+
+*)
+
 
 procedure TFormPlaylistDuplicates.InitGraphics;
 var
@@ -605,6 +638,13 @@ begin
   filename := basePath + 'Images\NempLogo_b.png';
   if FileExists(filename) then
     imgPlaylist.Picture.LoadFromFile(filename);
+end;
+
+procedure TFormPlaylistDuplicates.SetRatingImageList(
+  const Value: TCustomImageList);
+begin
+  BtnRatingPlaylist.Images := Value;
+  BtnRatingDuplicate.Images := Value;
 end;
 
 procedure TFormPlaylistDuplicates.VstDuplicatesChange(Sender: TBaseVirtualTree;
@@ -651,18 +691,6 @@ begin
     2: CellText := NempDisplay.TreeDuration(af)
   end;
 end;
-
-procedure TFormPlaylistDuplicates.RefreshStarGraphics;
-begin
-  LoadStarGraphics(RatingHelper);
-
-  if IMGRatingPlaylist.Visible then
-    RatingHelper.DrawRatingInStarsOnBitmap(currentPlaylistRating, IMGRatingPlaylist.Picture.Bitmap, IMGRatingPlaylist.Width, IMGRatingPlaylist.Height);
-  if IMGRatingDuplicate.Visible then
-    RatingHelper.DrawRatingInStarsOnBitmap(currentDuplicateRating, IMGRatingDuplicate.Picture.Bitmap, IMGRatingDuplicate.Width, IMGRatingDuplicate.Height);
-end;
-
-
 
 procedure TFormPlaylistDuplicates.FillTreeWithDuplicates(
   aSourceDuplicate: TDuplicate);
@@ -734,7 +762,6 @@ begin
   else
     result := aString;
 end;
-
 
 procedure TFormPlaylistDuplicates.Deletethisduplicate1Click(Sender: TObject);
 begin
@@ -862,7 +889,7 @@ begin
   dest.LblQuality     .Visible := afIsNotNil;
   dest.LblReplayGain  .Visible := afIsNotNil;
   dest.LblPlaylistPosition.Visible := afIsNotNil;
-  dest.ImgRating      .Visible := afIsNotNil;
+  dest.BtnRating      .Visible := afIsNotNil;
 
   if not afIsNotNil then
     exit;
@@ -897,26 +924,24 @@ begin
 
   case af.AudioType of
       at_File: begin
-          dest.ImgRating .Visible := True;
+          dest.BtnRating.Visible := True;
           dest.LblDuration    .Caption := NempDisplay.SummaryDurationSize(af);
           dest.LblQuality     .Caption := NempDisplay.SummaryQuality(af);
           dest.LblPlayCounter .Caption := NempDisplay.SummaryPlayCounter(af);
           dest.LblReplayGain  .Caption := NempDisplay.SummaryReplayGain(af);
-
-          RatingHelper.DrawRatingInStarsOnBitmap(af.Rating, dest.ImgRating.Picture.Bitmap, dest.ImgRating.Width, dest.ImgRating.Height);
+          dest.BtnRating.Rating := af.Rating;
       end;
 
       at_Cue: begin
-            dest.ImgRating .Visible := False;
+            dest.BtnRating.Visible := False;
             dest.LblDuration   .Caption := NempDisplay.SummaryDurationSizeCue(af, af);
             dest.LblQuality    .Caption := NempDisplay.SummaryQuality(af);
             dest.LblReplayGain .Caption := NempDisplay.SummaryReplayGain(af);
             dest.LblPlayCounter .Caption := '';
-            // BibRatingHelper.DrawRatingInStarsOnBitmap(aAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
       end;
 
       at_Stream: begin
-          dest.ImgRating .Visible := False;
+          dest.BtnRating.Visible := False;
           dest.LblDuration   .Caption := '';
           dest.LblPlayCounter .Caption := '';
           dest.LblQuality .Caption := '';
@@ -924,7 +949,7 @@ begin
       end;
 
       at_CDDA: begin
-          dest.ImgRating .Visible := False;
+          dest.BtnRating.Visible := False;
           dest.LblDuration   .Caption := NempDisplay.SummaryDuration(af) ;
           dest.LblQuality .Caption := 'CD-Audio';
           dest.LblPlayCounter .Caption := '';

@@ -2,8 +2,8 @@ object RandomPlaylistForm: TRandomPlaylistForm
   Left = 861
   Top = 45
   Caption = 'Create random playlist'
-  ClientHeight = 554
-  ClientWidth = 504
+  ClientHeight = 548
+  ClientWidth = 508
   Color = clBtnFace
   Constraints.MinHeight = 500
   Constraints.MinWidth = 520
@@ -12,16 +12,14 @@ object RandomPlaylistForm: TRandomPlaylistForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnResize = FormResize
   OnShow = FormShow
   DesignSize = (
-    504
-    554)
-  PixelsPerInch = 96
+    508
+    548)
   TextHeight = 13
   object GrpBox_Date: TGroupBox
     Left = 312
@@ -85,23 +83,27 @@ object RandomPlaylistForm: TRandomPlaylistForm
   object GrpBox_Tags: TGroupBox
     Left = 8
     Top = 191
-    Width = 492
-    Height = 324
+    Width = 448
+    Height = 318
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Tags'
     TabOrder = 2
+    ExplicitWidth = 444
+    ExplicitHeight = 317
     DesignSize = (
-      492
-      324)
+      448
+      318)
     object LblTagViewCount: TLabel
-      Left = 206
-      Top = 295
+      Left = 162
+      Top = 289
       Width = 200
       Height = 13
       Alignment = taRightJustify
       Anchors = [akRight, akBottom]
       AutoSize = False
       Caption = 'Number of shown tags'
+      ExplicitLeft = 206
+      ExplicitTop = 295
     end
     object LblTagMatchType: TLabel
       Left = 130
@@ -126,38 +128,42 @@ object RandomPlaylistForm: TRandomPlaylistForm
     object cbGenres: TCheckListBox
       Left = 16
       Top = 70
-      Width = 461
-      Height = 214
+      Width = 417
+      Height = 208
       Anchors = [akLeft, akTop, akRight, akBottom]
       Columns = 4
       Enabled = False
       ItemHeight = 13
       Sorted = True
       TabOrder = 2
+      ExplicitWidth = 413
+      ExplicitHeight = 207
     end
     object Btn_Save: TButton
       Left = 130
-      Top = 290
+      Top = 284
       Width = 70
       Height = 25
       Anchors = [akLeft, akBottom]
       Caption = 'Save'
       TabOrder = 4
       OnClick = Btn_SaveClick
+      ExplicitTop = 283
     end
     object cb_Preselection: TComboBox
       Left = 16
-      Top = 292
+      Top = 286
       Width = 108
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akBottom]
       TabOrder = 3
       OnChange = cb_PreselectionChange
+      ExplicitTop = 285
     end
     object cbTagCountSelection: TComboBox
-      Left = 412
-      Top = 290
+      Left = 368
+      Top = 284
       Width = 65
       Height = 21
       Style = csDropDownList
@@ -178,6 +184,8 @@ object RandomPlaylistForm: TRandomPlaylistForm
         '300'
         '400'
         '500')
+      ExplicitLeft = 364
+      ExplicitTop = 283
     end
     object cbTagMatchType: TComboBox
       Left = 16
@@ -196,7 +204,7 @@ object RandomPlaylistForm: TRandomPlaylistForm
         'one tag')
     end
     object BtnRefreshTags: TButton
-      Left = 376
+      Left = 332
       Top = 19
       Width = 101
       Height = 25
@@ -204,6 +212,7 @@ object RandomPlaylistForm: TRandomPlaylistForm
       Caption = 'Refresh'
       TabOrder = 6
       OnClick = BtnRefreshTagsClick
+      ExplicitLeft = 328
     end
   end
   object GrpBox_General: TGroupBox
@@ -255,8 +264,8 @@ object RandomPlaylistForm: TRandomPlaylistForm
     end
   end
   object Btn_Ok: TButton
-    Left = 329
-    Top = 521
+    Left = 285
+    Top = 515
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -264,10 +273,12 @@ object RandomPlaylistForm: TRandomPlaylistForm
     Default = True
     TabOrder = 3
     OnClick = Btn_OkClick
+    ExplicitLeft = 281
+    ExplicitTop = 514
   end
   object Btn_Cancel: TButton
-    Left = 410
-    Top = 521
+    Left = 366
+    Top = 515
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -276,10 +287,12 @@ object RandomPlaylistForm: TRandomPlaylistForm
     ModalResult = 2
     TabOrder = 4
     OnClick = Btn_CancelClick
+    ExplicitLeft = 362
+    ExplicitTop = 514
   end
   object CBInsertMode: TComboBox
     Left = 8
-    Top = 521
+    Top = 515
     Width = 217
     Height = 21
     Style = csDropDownList
@@ -291,6 +304,7 @@ object RandomPlaylistForm: TRandomPlaylistForm
       'Enqueue (at the end of the playlist)'
       'Play (and clear current playlist)'
       'Enqueue (at the end of the prebook-list)')
+    ExplicitTop = 514
   end
   object GrpBox_Rating: TGroupBox
     Left = 312
@@ -299,16 +313,6 @@ object RandomPlaylistForm: TRandomPlaylistForm
     Height = 82
     Caption = 'Rating'
     TabOrder = 6
-    object RatingImage: TImage
-      Left = 8
-      Top = 51
-      Width = 70
-      Height = 14
-      Transparent = True
-      OnMouseDown = RatingImageMouseDown
-      OnMouseLeave = RatingImageMouseLeave
-      OnMouseMove = RatingImageMouseMove
-    end
     object CBRating: TComboBox
       Left = 8
       Top = 24
@@ -323,6 +327,38 @@ object RandomPlaylistForm: TRandomPlaylistForm
         'equal or better than'
         'equal to'
         'equal or worse than')
+    end
+    object RatingButton: TRatingButton
+      Left = 8
+      Top = 51
+      Width = 80
+      Height = 16
+      DrawMode = dm_Windows
+      TabOrder = 1
+      TransparentBackground = True
+      StyleElements = [seFont, seBorder]
+      Rating = 128
+      AllowChangeRating = True
+      OnRatingChanged = RatingButtonRatingChanged
+      CustomBackground.Data = {
+        C6010000424DC60100000000000036000000280000000A0000000A0000000100
+        2000000000009001000000000000000000000000000000000000FFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFF}
+      StarFullImageIndex = 0
+      StarHalfImageIndex = 1
+      StarEmptyImageIndex = 2
     end
   end
   object GrpBox_Duration: TGroupBox

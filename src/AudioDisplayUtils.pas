@@ -99,6 +99,7 @@ resourcestring
   rsFormatSummaryDurationSize = '%d:%.2d min, %.2f MB';
   rsFormatSummaryDurationSizeCue = '%d:%.2d min (total %d:%.2d, %.2f MB)';
   rsFormatSummaryPlayCounter = 'Played %d times';
+  rsWuppdi = 'Played %d timessi';
   rsFormatSummaryReplayGainTrack       = 'ReplayGain: %.2f dB';
   rsFormatSummaryReplayGainTrackAlbum  = 'ReplayGain: %.2f dB (Album %.2f dB)';
 
@@ -1275,7 +1276,7 @@ end;
 
 function TAudioDisplay.SummaryPlayCounter(af: TAudioFile): String;
 begin
-  Format(rsFormatSummaryPlayCounter, [af.PlayCounter]);
+  result := Format(rsFormatSummaryPlayCounter, [af.PlayCounter]);
 end;
 
 function TAudioDisplay.SummaryReplayGain(af: TAudioFile): String;

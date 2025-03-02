@@ -37,7 +37,11 @@ contains
   Ole2 in 'Ole2.pas',
   SkinButtons in 'SkinButtons.pas',
   ProgressShape in 'ProgressShape.pas',
-  NempTrackbar in 'NempTrackbar.pas';
+  NempTrackbar in 'NempTrackbar.pas',
+  NempSkinnedTrackbar in 'NempSkinnedTrackbar.pas',
+  uNempHintWindow in 'uNempHintWindow.pas',
+  NempSpectrum in 'NempSpectrum.pas',
+  NempControls.Common in 'NempControls.Common.pas';
 
 //Vcl.ExtCtrls;
 end.

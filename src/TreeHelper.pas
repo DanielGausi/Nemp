@@ -34,9 +34,9 @@ interface
 
 uses Windows, Graphics, SysUtils, VirtualTrees, Forms, Controls, NempAudioFiles, Types, StrUtils,
   Contnrs, Classes, Jpeg, PNGImage, NempDragFiles, math, WinApi.ActiveX, ShlObj, ComObj,
-  ShellApi,
+  ShellApi, SkinButtons,
   Id3v2Frames, dialogs, Hilfsfunktionen, LibraryOrganizer.Base, LibraryOrganizer.Files,
-  Nemp_ConstantsAndTypes, CoverHelper, MedienbibliothekClass, BibHelper, RatingCtrls,
+  Nemp_ConstantsAndTypes, CoverHelper, MedienbibliothekClass, BibHelper,
   gnuGettext, Nemp_RessourceStrings;
 
   function LengthToSize(len:integer; def:integer):integer;
@@ -68,14 +68,14 @@ uses Windows, Graphics, SysUtils, VirtualTrees, Forms, Controls, NempAudioFiles,
   function InitiateFocussedPlay(aTree: TVirtualStringTree): Boolean;
 
   // Methods for TreeView-Hint with Coverart
-  function MinHintHeight(RatingHelper: TRatingHelper): Integer;
-  procedure VSTDrawCoverHint(Sender: TVirtualStringTree; HintCanvas: TCanvas; af: TAudioFile; R: TRect; RatingHelper: TRatingHelper);
-  procedure VSTGetCoverHintSize(Sender: TVirtualStringTree; af: TAudioFile; var R: TRect; RatingHelper: TRatingHelper);
+  procedure VSTDrawCoverHint(Sender: TVirtualStringTree; HintCanvas: TCanvas; af: TAudioFile; R: TRect; RatingPainter: TRatingPainter);
+  procedure VSTGetCoverHintSize(Sender: TVirtualStringTree; af: TAudioFile; var R: TRect; RatingPainter: TRatingPainter);
 
+  function GetFocussedAudioFile(Sender: TVirtualStringTree; IsPlayListTree: Boolean): TAudioFile;
 
 implementation
 
-uses  NempMainUnit, PlayerClass, MainFormHelper, AudioDisplayUtils, Cover.ViewCache, VCL.Themes, VCL.GraphUtil;
+uses  NempMainUnit, PlayerClass, PlaylistClass, MainFormHelper, AudioDisplayUtils, Cover.ViewCache, VCL.Themes, VCL.GraphUtil;
 
 
 function MaxFontSize(default: Integer): Integer;
@@ -153,7 +153,7 @@ end;
 
 procedure VSTColumns_LoadSettings(aVST: TVirtualStringTree);
 var
-  i: Integer;
+  i, colIdx: Integer;
   VisibleList, PosList, WidthList: TStringList;
 begin
     NempSettingsManager.ReadString('MediaListColumns', 'Position', '');
@@ -172,12 +172,15 @@ begin
 
       if (PosList.Count <= cLibraryColumnCount) and (PosList.Count = WidthList.Count) and (WidthList.Count = VisibleList.Count) then
       begin
-        for i := 0 to PosList.Count - 1 do
-        begin
-          aVST.Header.Columns[i].Position := StrToIntDef(PosList[i], DefaultColumns[i].Position);
-          aVST.Header.Columns[i].Width := StrToIntDef(WidthList[i], DefaultColumns[i].width);
-          if not StrToBool(VisibleList[i]) then
-            aVST.Header.Columns[i].Options := aVST.Header.Columns[i].Options - [coVisible]
+        // The Index of i in PosList is the Column we want on Position i.
+        for i := 0 to PosList.Count - 1 do begin
+          colIdx := Poslist.IndexOf(IntToStr(i));
+          if colIdx = -1 then
+            colIdx := i;
+          aVST.Header.Columns[colIdx].Position := i;
+          aVST.Header.Columns[colIdx].Width := StrToIntDef(WidthList[colIdx], DefaultColumns[colIdx].width);
+          if not StrToBool(VisibleList[colIdx]) then
+            aVST.Header.Columns[colIdx].Options := aVST.Header.Columns[colIdx].Options - [coVisible]
         end;
 
         // if there are more Columns than defined in the Inifile (due to a new version): Set Default values
@@ -446,12 +449,7 @@ begin
     end;
 end;
 
-function MinHintHeight(RatingHelper: TRatingHelper): Integer;
-begin
-  result :=  5 + CoverManagerHint.CoverSize + 3 * CoverManagerHint.VerticalMargin;
-end;
-
-procedure VSTGetCoverHintSize(Sender: TVirtualStringTree; af: TAudioFile; var R: TRect; RatingHelper: TRatingHelper);
+procedure VSTGetCoverHintSize(Sender: TVirtualStringTree; af: TAudioFile; var R: TRect; RatingPainter: TRatingPainter);
 var
   Bitmap: TBitmap;
   TM: TTextMetric;
@@ -490,9 +488,9 @@ begin
 
     // Height for Rating and PlayCounter
     if af.AudioType in [at_File, at_Cue] then
-      R.Height := R.Height + 2 * RatingHelper.fSetStar.Height + 1 * CoverManagerHint.VerticalMargin + TM.tmHeight Div 2;
+      R.Height := R.Height + 2 * RatingPainter.Height + 1 * CoverManagerHint.VerticalMargin + TM.tmHeight Div 2;
 
-    minHeight := MinHintHeight(RatingHelper);
+    minHeight := 5 + CoverManagerHint.CoverSize + 3 * CoverManagerHint.VerticalMargin;
     if R.Height <  minHeight then
       R.Height := minHeight;
 
@@ -505,7 +503,7 @@ end;
   VSTDrawCoverHint: Draw the AudioFile Information on the Canvas of the generated Hint Window.
   Several things copied from the VST code
 }
-procedure VSTDrawCoverHint(Sender: TVirtualStringTree; HintCanvas: TCanvas; af: TAudioFile; R: TRect; RatingHelper: TRatingHelper);
+procedure VSTDrawCoverHint(Sender: TVirtualStringTree; HintCanvas: TCanvas; af: TAudioFile; R: TRect; RatingPainter: TRatingPainter);
 var
   HintText: String;
   rating: Integer;
@@ -611,18 +609,17 @@ begin
           if rating = 0 then
             rating := 127;
           // Rating
-          RatingHelper.DrawRatingInStars(rating, HintCanvas, RatingHelper.fSetStar.Height,
-              txtRect.Left, txtRect.Top);
+          RatingPainter.PaintRating(rating, HintCanvas, txtRect.Left, txtRect.Top);
           // Play-Icon
-          HintCanvas.Draw(txtRect.Left,
-            txtRect.Top + RatingHelper.fSetStar.Height + 1 * CoverManagerHint.VerticalMargin,
-            RatingHelper.fCountIcon);
+          RatingPainter.PaintCountIcon(HintCanvas,
+                txtRect.Left,
+                txtRect.Top + RatingPainter.Height + 1 * CoverManagerHint.VerticalMargin);
           // actual counter
           HintCanvas.TextOut(
-                txtRect.Left + RatingHelper.fCountIcon.Width + 2*CoverManagerHint.VerticalMargin,
-                txtRect.Top + RatingHelper.fSetStar.Height + 1 * CoverManagerHint.VerticalMargin,
+                txtRect.Left + RatingPainter.Width + 2*CoverManagerHint.VerticalMargin,
+                txtRect.Top + RatingPainter.Height + 1 * CoverManagerHint.VerticalMargin,
                 NempDisplay.HintLinePlayCounter(af));
-          txtRect.Top := txtRect.Top + RatingHelper.fSetStar.Height + RatingHelper.fCountIcon.Height + 2*CoverManagerHint.VerticalMargin;
+          txtRect.Top := txtRect.Top + RatingPainter.Height + RatingPainter.Height + 2*CoverManagerHint.VerticalMargin;
         end;
 
         // Draw horizontal line
@@ -637,6 +634,20 @@ begin
         // txtRect.Top := txtRect.Top + tmpRect.Height + TM.tmHeight Div 2;
         // tmpRect.Height := TM.tmHeight;
     end;
+end;
+
+
+function GetFocussedAudioFile(Sender: TVirtualStringTree; IsPlayListTree: Boolean): TAudioFile;
+var
+  Node: PVirtualNode;
+begin
+  result := Nil;
+  Node := Sender.FocusedNode;
+  if not Assigned(Node) then Node := Sender.GetFirstSelected;
+  if not Assigned(Node) then exit;
+  if IsPlayListTree and (Sender.GetNodeLevel(Node) = 1) then Node := Node.Parent;
+
+  result := Node.GetData<TAudioFile>;
 end;
 
 

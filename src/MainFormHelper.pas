@@ -35,21 +35,16 @@ interface
 
 uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTrees,
     NempAudioFiles, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, dialogs, CoverHelper,
-    MyDialogs, System.UITypes, math, Vcl.ExtCtrls, Vcl.Graphics, RatingCtrls, SkinButtons,
+    MyDialogs, System.UITypes, math, Vcl.ExtCtrls, Vcl.Graphics,  SkinButtons,
     LibraryOrganizer.Base, LibraryOrganizer.Files, LibraryOrganizer.Playlists, LibraryOrganizer.Webradio,
     MainFormLayout, System.StrUtils;
 
-type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
+type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls, ws_HeadsetControls);
 
 
-    procedure CorrectVolButton;
     function APIEQToPlayer(Value: Integer): Single;
-    function VCLVolToPlayer: Integer;
 
     procedure PlayerScrollIntoView;
-
-    procedure SetProgressButtonPosition(aProgress: Double);
-    function ProgressButtonPositionToProgress: Double;
 
     procedure StopFluttering;
 
@@ -87,15 +82,8 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     function HandleSingleFileTagChange(aAudioFile: TAudioFile; TagToReplace: String; Out newTag: String; out IgnoreWarnings: Boolean): Boolean;
     function HandleIgnoreRule(aTag: String): Boolean;
     function HandleMergeRule(aTag: String; out newTag: String): Boolean;
-    // Select all files with the same path as MedienBib.CurrentAudioFile
-    function GetListOfAudioFileCopies(Original: TAudioFile; Target: TAudioFileList; NotifyDetailForm: Boolean = True): Boolean;
-    procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile; IncludeDetailForm: Boolean = True);
-    procedure SyncAudioFilesWith(aAudioFile: TAudioFile);
-    procedure DoSyncStuffAfterTagEdit(aAudioFile: TAudiofile; backupTag: UTF8String);
 
-    procedure CorrectVCLForABRepeat;
-    procedure RepositionABRepeatButtons;
-    procedure SwapABImagesIfNecessary(FixedImage: TImage);
+    procedure SyncExtendedTags(aAudioFile: TAudiofile; backupTag: UTF8String);
 
     // procedure ShowTagCloudSearch(DoShow: Boolean);
     procedure SetBrowseTabWarning(ShowWarning: Boolean);
@@ -121,59 +109,19 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
 
     procedure SetSkinRadioBox(aName: String);
 
-    procedure LoadStarGraphics(aRatingHelper: TRatingHelper);
-
 implementation
 
 uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     PlayListUnit, AuswahlUnit, MedienListeUnit, Details,
     NewPicture, NewStation, OptionsComplete, RandomPlaylist,
     Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow,
-    spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB,
+    PlayerClass, PlaylistClass, PartymodePassword, CloudEditor, PlaylistToUSB,
     ErrorForm, BasicSettingsWizard, DeleteSelect, CDSelection,
     CDOpenDialogs, LowBattery, PlayWebstream, Taghelper, MedienbibliothekClass,
     PlayerLog, progressUnit, Hilfsfunktionen, EffectsAndEqualizer, MainFormBuilderForm,
     ReplayGainProgress, NewMetaFrame, WebQRCodes, PlaylistEditor, NewFavoritePlaylist,
     AudioDisplayUtils, PlaylistDuplicates, LibraryOrganizer.Configuration.NewLayer,
-    fChangeFileCategory, fConfigErrorDlg, fExport, fUpdateCleaning;
-
-procedure CorrectVolButton;
-begin
-    with Nemp_MainForm do
-    begin
-        VolButton.Left := Round(NempPlayer.Volume/ (100/(VolShape.Width - VolButton.Width) )) + VolShape.Left;
-        VolButtonHeadset.Left := Round(NempPlayer.HeadsetVolume/ (100/(VolShapeHeadset.Width - VolButtonHeadset.Width) )) + VolShapeHeadset.Left;
-    end
-
-end;
-function VCLVolToPlayer: Integer;
-begin
-    with Nemp_MainForm do
-        result := Round(
-        (VolButton.Left - VolShape.Left)  * (100/(VolShape.Width - VolButton.Width))
-        );
-end;
-
-procedure SetProgressButtonPosition(aProgress: Double);
-var newLeft: Integer;
-begin
-    with Nemp_MainForm do begin
-        newLeft  := SlideBarShape.Left - (SlideBarButton.Width Div 2)  // initial position
-                + Round(SlideBarShape.Width * aProgress);
-        // Set position only, if there is a change. that wil reduce repaints and flickering
-        if newLeft <> SlideBarButton.Left then
-            SlideBarButton.Left := newLeft;
-    end;
-end;
-
-function ProgressButtonPositionToProgress: Double;
-begin
-    with Nemp_MainForm do
-    begin
-        result := (SlideBarButton.Left + (SlideBarButton.Width Div 2) - SlideBarShape.Left) / (SlideBarShape.Width);
-    end;
-
-end;
+    fChangeFileCategory, fConfigErrorDlg, fExport, fUpdateCleaning, fHeadsetControl, AudioFileManagement;
 
 
 function APIEQToPlayer(Value: Integer): Single;
@@ -387,6 +335,9 @@ function GetDropWindowSection(aControl: TWinControl): TWindowSection;
 begin
     result := ws_none;
 
+    if GetParentForm(aControl) = FormHeadsetControl  then
+      result := ws_HeadsetControls;
+
     while (result = ws_none) and assigned(aControl) and (aControl <> Nemp_MainForm) do
     begin
         if aControl = Nemp_MainForm._ControlPanel then
@@ -515,8 +466,7 @@ procedure SetTabStopsPlayer;
 begin
     with Nemp_MainForm do
     begin
-        VolButton           .TabStop := NempOptions.TabStopAtPlayerControls;
-        SlideBarButton      .TabStop := NempOptions.TabStopAtPlayerControls;
+        // SKIN_UMBAU_CHECK SlideBarButton      .TabStop := NempOptions.TabStopAtPlayerControls;
         SlideBackBTN        .TabStop := NempOptions.TabStopAtPlayerControls;
         PlayPrevBTN         .TabStop := NempOptions.TabStopAtPlayerControls;
         PlayPauseBTN        .TabStop := NempOptions.TabStopAtPlayerControls;
@@ -773,9 +723,9 @@ begin
                 end;
 
                 // TabButtons-Glyphs neu setzen
-                TabBtn_Browse0.GlyphLine := 1;
-                TabBtn_CoverFlow0.GlyphLine := 0;
-                TabBtn_TagCloud0.GlyphLine := 0;
+                // SKIN_UMBAU_CHECK TabBtn_Browse0.GlyphLine := 1;
+                // SKIN_UMBAU_CHECK TabBtn_CoverFlow0.GlyphLine := 0;
+                // SKIN_UMBAU_CHECK TabBtn_TagCloud0.GlyphLine := 0;
                 TabBtn_Browse0.Refresh;
                 TabBtn_CoverFlow0.Refresh;
                 TabBtn_CoverFlow0.Refresh;
@@ -792,9 +742,9 @@ begin
                   NempLayout.ReAlignMainForm;
 
                 // TabButtons-Glyphs neu setzen
-                TabBtn_Browse1.GlyphLine := 0;
-                TabBtn_CoverFlow1.GlyphLine := 1;
-                TabBtn_TagCloud1.GlyphLine := 0;
+                // SKIN_UMBAU_CHECK TabBtn_Browse1.GlyphLine := 0;
+                // SKIN_UMBAU_CHECK TabBtn_CoverFlow1.GlyphLine := 1;
+                // SKIN_UMBAU_CHECK TabBtn_TagCloud1.GlyphLine := 0;
                 TabBtn_Browse1.Refresh;
                 TabBtn_CoverFlow1.Refresh;
                 TabBtn_CoverFlow1.Refresh;
@@ -810,9 +760,9 @@ begin
                   NempLayout.ReAlignMainForm;
 
                 // TabButtons-Glyphs neu setzen
-                TabBtn_Browse2.GlyphLine := 0;
-                TabBtn_CoverFlow2.GlyphLine := 0;
-                TabBtn_TagCloud2.GlyphLine := 1;
+                // SKIN_UMBAU_CHECK TabBtn_Browse2.GlyphLine := 0;
+                // SKIN_UMBAU_CHECK TabBtn_CoverFlow2.GlyphLine := 0;
+                // SKIN_UMBAU_CHECK TabBtn_TagCloud2.GlyphLine := 1;
                 TabBtn_Browse2.Refresh;
                 TabBtn_CoverFlow2.Refresh;
                 TabBtn_CoverFlow2.Refresh;
@@ -892,8 +842,8 @@ begin
 
         //Nemp_MainForm.CBHeadSetControlInsertMode.ItemIndex := c;
 
-        DisplayPlayerMainTitleInformation(True);
-        DisplayHeadsetTitleInformation(True);
+        DisplayPlayerTitleInformation(True);
+
         ShowVSTDetails(NempPlayer.CurrentFile, SD_PLAYER);
 
         LblEmptyLibraryHint.Caption := MainForm_LibraryIsEmpty;
@@ -1344,82 +1294,7 @@ begin
 end;
 
 
-
-{
-    GetListOfAudioFileCopies
-    Collect all Files ithin the Nemp-Universe with the same filename.
-    These files must be updated when the user edits a file
-    ( in the tree, in the detail-listing within the mainform, in the detailform
-      or just the Player-rating )
-
-    !!! Important Note !!!
-    Use this function only in VCL-Thread and only after a test for
-     - Medienbib.status <= 1  (searching for new files or GetTags should be ok)
-       and MedienBib.CurrentThreadFilename
-}
-function GetListOfAudioFileCopies(Original: TAudioFile; Target: TAudioFileList; NotifyDetailForm: Boolean = True): Boolean;
-var bibFile: TAudioFile;
-    originalPath: String;
-
-      function NeededFile(af: TAudioFile): boolean;
-      begin
-          result := assigned(af) and (af.Pfad = originalPath);
-      end;
-
-begin
-    originalPath := Original.Pfad;
-
-    // 1. Add Original itself
-    Target.Add(Original);
-
-    // 2. The Player-File
-    if NeededFile(NempPlayer.MainAudioFile) then
-        Target.Add(NempPlayer.MainAudioFile);
-
-    // 3. The Detailform-File
-    // This is a special case: The DetailForm should only be notified when there was a change
-    if assigned(fDetails) and NotifyDetailForm then //and NeededFile(fDetails.CurrentAudioFile) then
-      fDetails.AudioFileEdited(Original);
-      // Target.Add(fDetails.CurrentAudioFile);
-
-    // 4. The "currentfile" from the library (this is the one displayed in the VST-Details)
-    if NeededFile(Nemp_MainForm.CurrentlySelectedFile) then
-        Target.Add(Nemp_MainForm.CurrentlySelectedFile);
-
-    // 5. Add files from the Playlist
-    NempPlaylist.CollectFilesWithSameFilename(Original.Pfad, Target);
-
-    // 4. Add File from the library (if possible)
-    // !!! this must be the last one in the list (see keymatching-test in the calling method)
-    //if (MedienBib.StatusBibUpdate > 0) then
-    //    MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0)
-    //else
-    //begin
-        bibFile := MedienBib.GetAudioFileWithFilename(Original.Pfad);
-        if assigned(bibFile) then
-        begin
-            Target.Add(bibFile);
-            result := True;
-        end else
-            result := False;
-    //end;
-end;
-
-procedure SyncAudioFilesWith(aAudioFile: TAudioFile);
-var i: Integer;
-    ListOfFiles: TAudioFileList;
-begin
-    ListOfFiles := TAudioFileList.Create(False);
-    try
-        GetListOfAudioFileCopies(aAudioFile, ListOfFiles);
-        for i := 0 to ListOfFiles.Count - 1 do
-            ListOfFiles[i].Assign(aAudioFile);
-    finally
-        ListOfFiles.Free;
-    end;
-end;
-
-procedure DoSyncStuffAfterTagEdit(aAudioFile: TAudiofile; backupTag: UTF8String);
+procedure SyncExtendedTags(aAudioFile: TAudiofile; backupTag: UTF8String);
 var aErr: TNempAudioError;
     newTags: UTF8String;
 begin
@@ -1428,14 +1303,10 @@ begin
     aAudioFile.GetAudioData(aAudioFile.Pfad);
     aAudioFile.RawTagLastFM := newTags;
     aErr := aAudioFile.WriteRawTagsToMetaData(aAudioFile.RawTagLastFM, NempOptions.AllowQuickAccessToMetadata);
-    //aErr := aAudioFile.SetAudioData(Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata);
     if aErr = AUDIOERR_None then
     begin
         aAudioFile.ID3TagNeedsUpdate := False;
-        SyncAudioFilesWith(aAudioFile);
-        // Correct GUI (player, Details, Detailform, VSTs))
-        CorrectVCLAfterAudioFileEdit(aAudioFile);
-
+        TAudioFileManager.SyncFilesAfterEdit(aAudioFile);
         if MedienBib.CollectionsAreDirty(ccTagCloud) then
           SetBrowseTabWarning(True);
     end else
@@ -1443,125 +1314,6 @@ begin
         aAudioFile.RawTagLastFM := backupTag;
         HandleError(afa_EditingDetails, aAudioFile, aErr);
         TranslateMessageDLG(NempAudioErrorString[aErr], mtWarning, [MBOK], 0);
-    end;
-end;
-
-{
-    CorrectVCLAfterAudioFileEdit
-    After a File has been edited (and all of its copies)
-    The GUI has to be updated:
-        Player (Rating)
-        VST-Details
-        VST
-        PlaylistVST
-        Detailform
-}
-procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile; IncludeDetailForm: Boolean = True);
-var OriginalPath: String;
-
-      function SameFile(af: TAudioFile): boolean;
-      begin
-          result := assigned(af) and (af.Pfad = originalPath);
-      end;
-
-begin
-    OriginalPath := aFile.Pfad;
-
-    Nemp_MainForm.PlaylistVST.Invalidate;
-    Nemp_MainForm.Vst.Invalidate;
-
-    // Actualise Player (Rating, Title, Taskbar)
-    if SameFile(NempPlayer.MainAudioFile) then
-    begin
-        //Nemp_MainForm.ShowPlayerDetails(NempPlayer.MainAudioFile);
-        Nemp_MainForm.DisplayPlayerMainTitleInformation(True);
-        Application.Title := NempPlayer.GenerateTaskbarTitel;
-        Spectrum.DrawRating(NempPlayer.MainAudioFile.Rating);
-        Nemp_MainForm.PaintFrame.Hint := NempDisplay.HintText(NempPlayer.MainAudioFile);
-    end;
-
-    // ... VST-Details
-    if SameFile(Nemp_MainForm.CurrentlySelectedFile) then
-        Nemp_MainForm.ShowVSTDetails(Nemp_MainForm.CurrentlySelectedFile, -1);  // -1: Do not change Source (playlist/medienbib)) of audiofile
-
-    // ... Detail-Form
-    if assigned(fDetails) and IncludeDetailForm then
-      fDetails.AudioFileEdited(aFile);
-end;
-
-procedure RepositionABRepeatButtons;
-begin
-    with Nemp_MainForm do
-    begin
-        ABRepeatStartImg.Left := Round(NempPlayer.ABRepeatA * (SlideBarShape.Width)) + SlideBarShape.Left;
-        ABRepeatEndImg.Left := Round(NempPlayer.ABRepeatB * (SlideBarShape.Width)) + SlideBarShape.Left - ab2.Width;
-    end;
-end;
-
-procedure CorrectVCLForABRepeat;
-var EnableControls: Boolean;
-begin
-    with Nemp_MainForm do
-    begin
-        ABRepeatStartImg.Left := Round(NempPlayer.ABRepeatA * (SlideBarShape.Width)) + SlideBarShape.Left;
-        ABRepeatEndImg.Left := Round(NempPlayer.ABRepeatB * (SlideBarShape.Width)) + SlideBarShape.Left - ab2.Width;
-
-        ABRepeatStartImg.Visible := NempPlayer.ABRepeatActive and Nemp_MainForm.MainPlayerControlsActive;
-        ABRepeatEndImg.Visible := NempPlayer.ABRepeatActive and Nemp_MainForm.MainPlayerControlsActive;
-        PM_ABRepeat.Checked := NempPlayer.ABRepeatActive;
-    end;
-
-    EnableControls   := Assigned(NempPlayer.MainAudioFile) and (not NempPlayer.MainAudioFile.isStream);
-    Nemp_MainForm.PM_ABRepeat      .Enabled := EnableControls;
-    Nemp_MainForm.PM_ABRepeatSetA  .Enabled := EnableControls;
-    Nemp_MainForm.PM_ABRepeatSetB  .Enabled := EnableControls;
-
-    if assigned(FormEffectsAndEqualizer) then
-    begin
-        // maybe to do, for later: Disbale Effect-Controls when Headset-Controls are enabled
-        FormEffectsAndEqualizer.grpBoxABRepeat   .Enabled := EnableControls;
-        FormEffectsAndEqualizer.BtnABRepeatUnSet .Enabled := NempPlayer.ABRepeatActive and EnableControls;
-        FormEffectsAndEqualizer.BtnABRepeatSetA  .Enabled := EnableControls;
-        FormEffectsAndEqualizer.BtnABRepeatSetB  .Enabled := EnableControls;
-    end;
-end;
-
-procedure SwapABImagesIfNecessary(FixedImage: TImage);
-var swapImg: TImage;
-    ProgressStart, ProgressEnd: double;
-begin
-    /// The Snyc-Positions for the two buttons are different
-    ///  We cannot work just with left/right here
-    /// Start:    (ABRepeatStartImg.Left - SlideBarShape.Left) / (SlideBarShape.Width),
-    /// End:      (ABRepeatEndImg.Left + ABRepeatEndImg.Width - SlideBarShape.Left) / (SlideBarShape.Width)
-
-    with Nemp_MainForm do
-    begin
-        ProgressStart := (ABRepeatStartImg.Left - SlideBarShape.Left) / (SlideBarShape.Width);
-        ProgressEnd   := (ABRepeatEndImg.Left + ABRepeatEndImg.Width - SlideBarShape.Left) / (SlideBarShape.Width);
-
-        if ProgressStart > ProgressEnd then
-        begin
-
-            if FixedImage = ABRepeatStartImg then
-                // we are dragging the (old, current) StartImage beyond the EndImage
-                // => EndImage becomes the new StartImage
-                ABRepeatEndImg.Left := ABRepeatEndImg.Left + ABRepeatEndImg.Width
-            else
-                //we are dragging the (old, current) EndImage before the StartImage
-                ABRepeatStartImg.Left := ABRepeatStartImg.Left - ABRepeatStartImg.Width;
-
-            // swap AB-Images
-            swapImg := ABRepeatStartImg;
-            ABRepeatStartImg := ABRepeatEndImg;
-            ABRepeatEndImg := swapImg;
-
-            ABRepeatStartImg.Picture.Assign(Nil);
-            ABRepeatEndImg.Picture.Assign(Nil);
-
-            ABRepeatStartImg.Picture.Assign(NempSkin.ABRepeatBitmapA);
-            ABRepeatEndImg.Picture.Assign(NempSkin.ABRepeatBitmapB);
-        end;
     end;
 end;
 
@@ -1624,11 +1376,11 @@ begin
         TabBtn_TagCloud2.Hint := TabBtnTagCloud_OriginalHint;
 
         if ShowWarning then begin
-          aBtn.GlyphLine := 2;
+          // SKIN_UMBAU_CHECK aBtn.GlyphLine := 2;
           aBtn.Hint := MedienBib.TabBtnBrowse_InconsistencyHint;
         end
         else
-          aBtn.GlyphLine := 1;
+          ;// SKIN_UMBAU_CHECK aBtn.GlyphLine := 1;
 
         aBtn.Refresh;
     end;
@@ -1644,7 +1396,7 @@ begin
             if Medienbib.BrowseMode = 2 then
             begin
                 // Browsing by tagcloud activated
-                TabBtn_TagCloud2.GlyphLine := 2;
+                // SKIN_UMBAU_CHECK TabBtn_TagCloud2.GlyphLine := 2;
             end else
                 // Browsing by cover (or something else) activated
                ;// TabBtn_TagCloud.GlyphLine := 0;
@@ -1655,7 +1407,7 @@ begin
             if Medienbib.BrowseMode = 2 then
             begin
                 // Browsing by artist-album activated
-                TabBtn_TagCloud2.GlyphLine := 1;
+                // SKIN_UMBAU_CHECK TabBtn_TagCloud2.GlyphLine := 1;
             end else
                 // Browsing by cover (or something else) activated
                 ;//TabBtn_TagCloud.GlyphLine := 0;
@@ -1708,7 +1460,6 @@ begin
         NempPlaylist.stop;
         if NempPlayer.BassStatus <> BASS_ACTIVE_PLAYING then
         begin
-          Spectrum.DrawClear;
           //Spectrum.DrawText(NempPlayer.PlayingTitel,False);
           PlaylistCueChanged(NempPlaylist);
           PlayerTimeLbl.Caption := '00:00'; //Spectrum.DrawTime('00:00');
@@ -1717,8 +1468,7 @@ begin
         end;
         Application.Title := NempPlayer.GenerateTaskbarTitel;
         PlaylistVST.Invalidate;
-        CorrectVCLForABRepeat;
-        Basstimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
+        // Basstimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
     end;
 end;
 
@@ -1963,49 +1713,6 @@ begin
             end;
         end;
     end;
-end;
-
-procedure LoadStarGraphics(aRatingHelper: TRatingHelper);
-var s,h,u,c: TBitmap;
-    baseDir: String;
-
-begin
-  // exit;
-  s := TBitmap.Create;
-  h := TBitmap.Create;
-  u := TBitmap.Create;
-  c := TBitmap.Create;
-
-
-
-  if Nemp_MainForm.NempSkin.isActive
-      and (not Nemp_MainForm.NempSkin.UseDefaultStarBitmaps)
-      and Nemp_MainForm.NempSkin.UseAdvancedSkin
-      and NempOptions.GlobalUseAdvancedSkin
-  then
-      BaseDir := Nemp_MainForm.NempSkin.Path + '\'
-  else
-      // Detail-Form is not skinned, use default images
-      BaseDir := ExtractFilePath(ParamStr(0)) + 'Images\';
-
-  try
-      s.Transparent := True;
-      h.Transparent := True;
-      u.Transparent := True;
-      c.Transparent := True;
-
-      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(s, BaseDir + 'starset')    ;
-      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(h, BaseDir + 'starhalfset');
-      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(u, BaseDir + 'starunset')  ;
-      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(c, BaseDir + 'starcount')  ;
-
-      aRatingHelper.SetStars(s,h,u,c);
-  finally
-      s.Free;
-      h.Free;
-      u.Free;
-      c.Free;
-  end;
 end;
 
 procedure CollectionDblClick(ac: TAudioCollection; Node: PVirtualNode; aVST: TVirtualStringTree);

@@ -70,7 +70,7 @@ var
 
 implementation
 
-uses Hilfsfunktionen, NempMainUnit, Nemp_RessourceStrings, Nemp_ConstantsAndTypes,
+uses Hilfsfunktionen, NempMainUnit, PlaylistClass, Nemp_RessourceStrings, Nemp_ConstantsAndTypes,
     NempApi, MyDialogs;
 
 {$R *.dfm}

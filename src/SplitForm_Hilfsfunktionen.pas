@@ -72,7 +72,7 @@ var
 implementation
 
 uses NempMainUnit, PlaylistUnit, MedienlisteUnit, AuswahlUnit, ExtendedControlsUnit,
-     SystemHelper, Inifiles, MainFormBuilderForm;
+     SystemHelper, Inifiles, MainFormBuilderForm, FHeadsetControl, MedienbibliothekClass;
 
 procedure SetRegion(GrpBox: TPanel; aForm: TForm; var NempRegionsDistance: TNempRegionsDistance; aHandle: hWnd);
 begin
@@ -674,11 +674,11 @@ procedure FixScrollbar;
 begin
     with Nemp_MainForm do
     begin
-        SlidebarShape.Left := 95;
-        SlidebarShape.Width := NewPlayerPanel.Width - 95 - 58;
+        // // SKIN_UMBAU_CHECK SlidebarShape.Left := 95;
+        // // SKIN_UMBAU_CHECK SlidebarShape.Width := NewPlayerPanel.Width - 95 - 58;
         BtnClose.Left      := NewPlayerPanel.Width - 18;
         BtnMinimize.Left   := BtnClose.Left - 18;
-        PaintFrame.Left    := NewPlayerPanel.Width - 84;
+        //PaintFrame.Left    := NewPlayerPanel.Width - PaintFrame.Width - 20; // 84;
         PlayerTimeLbl.Left := NewPlayerPanel.Width - 43;
     end;
 end;
@@ -1102,6 +1102,7 @@ begin
   RegisterDragDrop(Nemp_MainForm.TreePanel.Handle, Nemp_MainForm.fDropManager as IDropTarget);
   RegisterDragDrop(Nemp_MainForm.CloudPanel.Handle, Nemp_MainForm.fDropManager as IDropTarget);
   RegisterDragDrop(Nemp_MainForm.CoverflowPanel.Handle, Nemp_MainForm.fDropManager as IDropTarget);
+  RegisterDragDrop(FormHeadsetControl.Handle, Nemp_MainForm.fDropManager as IDropTarget);
 end;
 
 procedure PositionCloseImage(CloseBtn: TSkinButton; ParentPanel: TPanel);

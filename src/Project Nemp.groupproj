@@ -6,6 +6,9 @@
         <Projects Include="nemp.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\Components\NempComponents\NempKomponenten.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -23,14 +26,23 @@
     <Target Name="nemp:Make">
         <MSBuild Projects="nemp.dproj" Targets="Make"/>
     </Target>
+    <Target Name="NempKomponenten">
+        <MSBuild Projects="..\Components\NempComponents\NempKomponenten.dproj"/>
+    </Target>
+    <Target Name="NempKomponenten:Clean">
+        <MSBuild Projects="..\Components\NempComponents\NempKomponenten.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="NempKomponenten:Make">
+        <MSBuild Projects="..\Components\NempComponents\NempKomponenten.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="nemp"/>
+        <CallTarget Targets="nemp;NempKomponenten"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="nemp:Clean"/>
+        <CallTarget Targets="nemp:Clean;NempKomponenten:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="nemp:Make"/>
+        <CallTarget Targets="nemp:Make;NempKomponenten:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

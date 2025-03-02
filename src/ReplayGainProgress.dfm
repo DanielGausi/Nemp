@@ -31,7 +31,7 @@ object ReplayGainProgressForm: TReplayGainProgressForm
   object LblMain: TLabel
     Left = 88
     Top = 8
-    Width = 398
+    Width = 394
     Height = 56
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
@@ -39,29 +39,32 @@ object ReplayGainProgressForm: TReplayGainProgressForm
       'Nemp is calculating ReplayGain values right now. This may take a' +
       ' while. '#13#10#13#10
     WordWrap = True
+    ExplicitWidth = 398
   end
   object LblStatus: TLabel
     Left = 88
     Top = 73
-    Width = 398
+    Width = 394
     Height = 13
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 'Current item ... reading ....'
     ShowAccelChar = False
     WordWrap = True
+    ExplicitWidth = 398
   end
   object pbTrack: TProgressBar
     Left = 8
     Top = 72
-    Width = 64
+    Width = 60
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 0
+    ExplicitWidth = 64
   end
   object BtnCancel: TButton
-    Left = 411
-    Top = 177
+    Left = 407
+    Top = 176
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -69,35 +72,42 @@ object ReplayGainProgressForm: TReplayGainProgressForm
     Caption = 'Cancel'
     TabOrder = 1
     OnClick = BtnCancelClick
+    ExplicitLeft = 411
+    ExplicitTop = 177
   end
   object pbComplete: TProgressBar
     Left = 8
-    Top = 208
-    Width = 478
+    Top = 207
+    Width = 474
     Height = 25
     Anchors = [akLeft, akRight, akBottom]
     TabOrder = 2
+    ExplicitTop = 208
+    ExplicitWidth = 478
   end
   object LogMemo: TMemo
     Left = 8
     Top = 94
-    Width = 478
-    Height = 77
+    Width = 474
+    Height = 76
     Anchors = [akLeft, akTop, akRight, akBottom]
     ReadOnly = True
     ScrollBars = ssVertical
     TabOrder = 3
     WordWrap = False
+    ExplicitWidth = 478
+    ExplicitHeight = 77
   end
   object cbAutoClose: TCheckBox
     Left = 8
-    Top = 181
+    Top = 180
     Width = 337
     Height = 17
     Anchors = [akLeft, akBottom]
     Caption = 'Close window after completion'
     TabOrder = 4
     OnClick = cbAutoCloseClick
+    ExplicitTop = 181
   end
   object CloseTimer: TTimer
     Enabled = False

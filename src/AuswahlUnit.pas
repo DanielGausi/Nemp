@@ -99,7 +99,7 @@ implementation
 {$R *.dfm}
 
 uses NempMainUnit, SplitForm_Hilfsfunktionen, MedienlisteUnit,
-  PlaylistUnit, MessageHelper, ExtendedControlsUnit;
+  PlaylistUnit, MessageHelper, ExtendedControlsUnit, MedienbibliothekClass;
 
 
 // Zur Zeit wird das nicht automatisch aufgerufen!!!!

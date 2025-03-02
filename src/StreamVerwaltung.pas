@@ -122,14 +122,13 @@ type
 
   end;
 
-
-
 var
   FormStreamVerwaltung: TFormStreamVerwaltung;
 
 implementation
 
-uses NempMainUnit, NewStation, LibraryOrganizer.Webradio;
+uses
+  MedienbibliothekClass, NewStation, LibraryOrganizer.Webradio, PlaylistClass;
 
 {$R *.dfm}
 

@@ -38,8 +38,8 @@ uses
   Dialogs, StdCtrls, Spin, CheckLst,  iniFiles, ContNrs, MyDialogs,
   Menus,   Hilfsfunktionen, NempAudioFiles, BibHelper, math,
   Nemp_ConstantsAndTypes, LibraryOrganizer.Base, LibraryOrganizer.Files,
-  gnuGettext, Nemp_RessourceStrings, ExtCtrls, ImgList, RatingCtrls, System.UITypes,
-  System.Generics.Collections, System.Generics.Defaults;
+  gnuGettext, Nemp_RessourceStrings, ExtCtrls, ImgList, System.UITypes,
+  System.Generics.Collections, System.Generics.Defaults, SkinButtons;
 
 type
   TTagSetting = class
@@ -76,7 +76,6 @@ type
     CBInsertMode: TComboBox;
     GrpBox_Rating: TGroupBox;
     CBRating: TComboBox;
-    RatingImage: TImage;
     GrpBox_Duration: TGroupBox;
     CBMinLength: TCheckBox;
     CBMaxLength: TCheckBox;
@@ -89,6 +88,7 @@ type
     cbTagMatchType: TComboBox;
     LblTagMatchType: TLabel;
     BtnRefreshTags: TButton;
+    RatingButton: TRatingButton;
     procedure FormCreate(Sender: TObject);
     procedure cbRestrictTimeClick(Sender: TObject);
     procedure cbRestrictTagsClick(Sender: TObject);
@@ -98,11 +98,6 @@ type
     Procedure SaveSettings;
     procedure cb_PreselectionChange(Sender: TObject);
     procedure Btn_SaveClick(Sender: TObject);
-    procedure RatingImageMouseMove(Sender: TObject; Shift: TShiftState; X,
-      Y: Integer);
-    procedure RatingImageMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure RatingImageMouseLeave(Sender: TObject);
     procedure CBMinLengthClick(Sender: TObject);
     procedure CBMaxLengthClick(Sender: TObject);
     procedure SE_MinLengthChange(Sender: TObject);
@@ -113,6 +108,8 @@ type
     procedure Btn_CancelClick(Sender: TObject);
     procedure CBWholeBibChange(Sender: TObject);
     procedure BtnRefreshTagsClick(Sender: TObject);
+    procedure RatingButtonRatingChanged(Sender: TRatingButton;
+      aRating: Integer);
   private
     { Private-Deklarationen }
     //GenreSettings: Array [0..9] of TGenreSetting;
@@ -121,7 +118,6 @@ type
     LastCheckedTags: TStringList;
 
     ActualRating: Integer;
-    RandomRatingHelper : TRatingHelper;
 
     TagRoot: TRootCollection;
 
@@ -130,15 +126,12 @@ type
 
     procedure FillTagList;
     procedure RefillTagList;
+    procedure SetRatingImageList(const Value: TCustomImageList);
 
   public
     { Public-Deklarationen }
-    //procedure ShowRating(Value: Integer);
-    // procedure LoadStarGraphics;
-    procedure RefreshStarGraphics;
-
-
     procedure RefillTagListFromMainWindow;
+    property RatingImageList: TCustomImageList write SetRatingImageList;
   end;
 
 
@@ -164,7 +157,7 @@ implementation
 
 {$R *.dfm}
 
-Uses NempMainUnit, TagClouds, MainFormHelper;
+Uses NempMainUnit, TagClouds, MainFormHelper, MedienbibliothekClass;
 
 
 Constructor TTagSetting.Create;
@@ -190,50 +183,6 @@ begin
     CheckList.Add(aString);
 end;
 
-(*
-procedure TRandomPlaylistForm.LoadStarGraphics;
-var s,h,u: TBitmap;
-    baseDir: String;
-begin
-    s := TBitmap.Create;
-    h := TBitmap.Create;
-    u := TBitmap.Create;
-
-    if Nemp_MainForm.NempSkin.isActive
-        and (not Nemp_MainForm.NempSkin.UseDefaultStarBitmaps)
-        and Nemp_MainForm.NempSkin.UseAdvancedSkin
-        and NempOptions.GlobalUseAdvancedSkin
-    then
-        BaseDir := Nemp_MainForm.NempSkin.Path + '\'
-    else
-        // this Form is not skinned, use default images
-        BaseDir := ExtractFilePath(ParamStr(0)) + 'Images\';
-
-    try
-        s.Transparent := True;
-        h.Transparent := True;
-        u.Transparent := True;
-
-        Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(s, BaseDir + 'starset')    ;
-        Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(h, BaseDir + 'starhalfset');
-        Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(u, BaseDir + 'starunset')  ;
-
-        RandomRatingHelper.SetStars(s,h,u);
-    finally
-        s.Free;
-        h.Free;
-        u.Free;
-    end;
-end;
-*)
-
-procedure TRandomPlaylistForm.RefreshStarGraphics;
-begin
-    LoadStarGraphics(RandomRatingHelper);
-    RandomRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImage.Picture.Bitmap, RatingImage.Width, RatingImage.Height);
-end;
-
-
 procedure TRandomPlaylistForm.FormCreate(Sender: TObject);
 var ini: TMemIniFile;
     genresCount, i, j, idx, rat: Integer;
@@ -246,13 +195,10 @@ begin
   RestoreComboboxes(self);
   cbGenres.Items.Clear;
 
-  RandomRatingHelper := TRatingHelper.Create;
   LastCheckedTags := TStringList.Create;
 
   TagRoot := TRootCollection.Create(Nil);
   TagRoot.AddSubCollectionType(ccTagCloud, csCount, sd_Descending);
-
-  LoadStarGraphics(RandomRatingHelper);
 
   ini := TMeminiFile.Create(SavePath + 'RandomPlaylist.ini', TEncoding.UTF8);
   try
@@ -285,11 +231,7 @@ begin
         ActualRating := Rat
     else
         ActualRating := 128;
-
-    RandomRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImage.Picture.Bitmap, RatingImage.Width, RatingImage.Height);
-
-    //ShowRating(ActualRating);
-    //--
+    RatingButton.Rating := ActualRating;
 
     // Duration-settings
     CBMinLength.Checked := Ini.ReadBool('Duration', 'UseMinLength', True);
@@ -391,7 +333,6 @@ begin
   for i := 0 to length(TagSettings) - 1 do
       TagSettings[i].Free;
 
-  RandomRatingHelper.Free;
   TagRoot.Free;
   LastCheckedTags.Free;
 end;
@@ -408,6 +349,11 @@ begin
     for i := 0 to cbGenres.Count - 1 do
         if cbGenres.Checked[i] then
             LastCheckedTags.Add(TAudioCollection(cbGenres.Items.Objects[i]).Key);
+end;
+
+procedure TRandomPlaylistForm.SetRatingImageList(const Value: TCustomImageList);
+begin
+  RatingButton.Images := Value;
 end;
 
 procedure TRandomPlaylistForm.RecheckLastCheckedTags;
@@ -785,44 +731,10 @@ begin
     RecheckLastCheckedTags;
 end;
 
-(*
-procedure TRandomPlaylistForm.ShowRating(Value: Integer);
-var aBmp: TBitmap;
+procedure TRandomPlaylistForm.RatingButtonRatingChanged(Sender: TRatingButton;
+  aRating: Integer);
 begin
-    if Value = 0 then
-        Value := 128;
-    aBmp := TBitmap.Create;
-    try
-        aBmp.Width := RatingImage.Width;
-        aBmp.Height := RatingImage.Height;
-        RandomRatingHelper.DrawRatingInStars(value, aBmp.canvas, RatingImage.Height);
-         aBmp.Transparent := True;
-        RatingImage.Picture.Bitmap.Assign(aBmp);
-    finally
-        aBmp.Free;
-    end;
-end;*)
-
-
-procedure TRandomPlaylistForm.RatingImageMouseMove(Sender: TObject;
-  Shift: TShiftState; X, Y: Integer);
-var rat: Integer;
-begin
-    rat := RandomRatingHelper.MousePosToRating(x, 70);//((x div 8)) * 8;
-    RandomRatingHelper.DrawRatingInStarsOnBitmap(rat, RatingImage.Picture.Bitmap, RatingImage.Width, RatingImage.Height);
-    //ShowRating(rat);
-end;
-
-procedure TRandomPlaylistForm.RatingImageMouseDown(Sender: TObject;
-  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-    ActualRating := RandomRatingHelper.MousePosToRating(x, 70);
-end;
-
-procedure TRandomPlaylistForm.RatingImageMouseLeave(Sender: TObject);
-begin
-//  ShowRating(ActualRating);
-    RandomRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImage.Picture.Bitmap, RatingImage.Width, RatingImage.Height);
+  ActualRating := aRating;
 end;
 
 initialization
@@ -839,15 +751,6 @@ DefaultGenreSettings[8] := tStringlist.Create;
 DefaultGenreSettings[9] := tStringlist.Create;
 
 // Rock & Pop
-
-
-
-
-
-
-
-
-
 
 DefaultGenreSettings[0].Add('Rock, Pop, ...');
 DefaultGenreSettings[0].Add('Rock');

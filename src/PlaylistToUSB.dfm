@@ -3,8 +3,8 @@ object PlaylistCopyForm: TPlaylistCopyForm
   Top = 0
   BorderStyle = bsSingle
   Caption = 'Nemp: Copy playlist to USB'
-  ClientHeight = 374
-  ClientWidth = 415
+  ClientHeight = 368
+  ClientWidth = 391
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,21 +17,20 @@ object PlaylistCopyForm: TPlaylistCopyForm
   OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
-    415
-    374)
+    391
+    368)
   TextHeight = 13
   object GrpboxSettings: TGroupBox
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 409
+    Width = 385
     Height = 185
     Align = alTop
     Caption = 'Settings'
     TabOrder = 0
-    ExplicitWidth = 405
     DesignSize = (
-      409
+      385
       185)
     object LblRenameSetting: TLabel
       Left = 16
@@ -41,7 +40,7 @@ object PlaylistCopyForm: TPlaylistCopyForm
       Caption = 'Rename files'
     end
     object BtnSelectDirectory: TButton
-      Left = 361
+      Left = 333
       Top = 38
       Width = 26
       Height = 21
@@ -52,6 +51,7 @@ object PlaylistCopyForm: TPlaylistCopyForm
       ShowHint = True
       TabOrder = 0
       OnClick = BtnSelectDirectoryClick
+      ExplicitLeft = 361
     end
     object cbRenameSetting: TComboBox
       Left = 16
@@ -126,7 +126,7 @@ object PlaylistCopyForm: TPlaylistCopyForm
     AlignWithMargins = True
     Left = 3
     Top = 194
-    Width = 409
+    Width = 385
     Height = 122
     Align = alTop
     Caption = 'Status'
@@ -163,19 +163,17 @@ object PlaylistCopyForm: TPlaylistCopyForm
   end
   object pnlButtons: TPanel
     Left = 0
-    Top = 339
-    Width = 415
+    Top = 333
+    Width = 391
     Height = 35
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitTop = 136
-    ExplicitWidth = 375
     DesignSize = (
-      415
+      391
       35)
     object BtnCopyFiles: TButton
-      Left = 302
+      Left = 274
       Top = 6
       Width = 97
       Height = 21
@@ -184,13 +182,14 @@ object PlaylistCopyForm: TPlaylistCopyForm
       Default = True
       TabOrder = 0
       OnClick = BtnCopyFilesClick
+      ExplicitLeft = 302
     end
   end
   object cbCloseWindow: TCheckBox
     AlignWithMargins = True
     Left = 19
     Top = 322
-    Width = 370
+    Width = 342
     Height = 17
     Hint = 'Close this window when the copy process is completed'
     Anchors = [akLeft, akTop, akRight]
@@ -198,5 +197,6 @@ object PlaylistCopyForm: TPlaylistCopyForm
     ParentShowHint = False
     ShowHint = True
     TabOrder = 3
+    ExplicitWidth = 370
   end
 end

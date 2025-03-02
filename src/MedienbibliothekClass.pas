@@ -362,6 +362,9 @@ type
 
         procedure FinishCategories;
 
+        // for the new TAudioFileManager
+        procedure OnPrepareAudioFileChange(Sender: TObject);
+
     public
         CloseAfterUpdate: Boolean; // flag used in OnCloseQuery
         // Some Beta-Options
@@ -767,13 +770,15 @@ type
   function GetProperMenuString(aIdx: Integer): UnicodeString;
 
   var //CSStatusChange: RTL_CRITICAL_SECTION;
-      CSUpdate: RTL_CRITICAL_SECTION;
-      CSAccessDriveList: RTL_CRITICAL_SECTION;
-      CSAccessBackupCoverList: RTL_CRITICAL_SECTION;
+    CSUpdate: RTL_CRITICAL_SECTION;
+    CSAccessDriveList: RTL_CRITICAL_SECTION;
+    CSAccessBackupCoverList: RTL_CRITICAL_SECTION;
+    // The Main Object
+    MedienBib: TMedienbibliothek;
 
 implementation
 
-uses System.Win.TaskbarCore, AudioDisplayUtils, Math, fExport, VCL.Forms;
+uses System.Win.TaskbarCore, AudioDisplayUtils, Math, fExport, VCL.Forms, AudioFileManagement;
 
 function GetProperMenuString(aIdx: Integer): UnicodeString;
 begin
@@ -884,6 +889,8 @@ begin
   fAudioExport := Nil;
   fChangeCategory := Nil;
   // CurrentAudioFile := Nil;
+
+  TAudioFileManager.OnPrepareAudioFileChange.Add(OnPrepareAudioFileChange);
 end;
 
 destructor TMedienBibliothek.Destroy;
@@ -3933,6 +3940,18 @@ end;
     - Check, whether fa file is already in the library
     --------------------------------------------------------
 }
+
+procedure TMedienBibliothek.OnPrepareAudioFileChange(Sender: TObject);
+var
+  bibFile: TAudioFile;
+begin
+  if (Sender is TAudioFile) then begin
+    bibFile := GetAudioFileWithFilename(TAudioFile(Sender).Pfad);
+    if assigned(bibFile) then
+      TAudioFileManager.FilesToChange.Add(bibFile)
+  end;
+end;
+
 function TMedienBibliothek.AudioFileExists(const aFilename: UnicodeString): Boolean;
 begin
     result := binaersuche(Mp3ListePfadSort, ExtractFileDir(aFilename), ExtractFileName(aFilename), 0,Mp3ListePfadSort.Count-1) > -1;

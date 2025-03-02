@@ -5,29 +5,27 @@ object BirthdayForm: TBirthdayForm
   Margins.Right = 10
   BorderStyle = bsSingle
   Caption = 'Nemp: Congratulations!'
-  ClientHeight = 350
-  ClientWidth = 418
+  ClientHeight = 349
+  ClientWidth = 414
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
-    418
-    350)
-  PixelsPerInch = 96
+    414
+    349)
   TextHeight = 13
   object Label1: TLabel
     AlignWithMargins = True
     Left = 3
     Top = 167
-    Width = 412
+    Width = 408
     Height = 98
     Align = alTop
     Alignment = taCenter
@@ -43,12 +41,13 @@ object BirthdayForm: TBirthdayForm
     Font.Style = []
     ParentFont = False
     WordWrap = True
+    ExplicitWidth = 412
   end
   object Label2: TLabel
     AlignWithMargins = True
     Left = 3
     Top = 271
-    Width = 412
+    Width = 408
     Height = 26
     Align = alTop
     Alignment = taCenter
@@ -63,7 +62,7 @@ object BirthdayForm: TBirthdayForm
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 412
+    Width = 408
     Height = 158
     Align = alTop
     Center = True
@@ -78,7 +77,7 @@ object BirthdayForm: TBirthdayForm
     Height = 18
   end
   object BtnClose: TButton
-    Left = 277
+    Left = 269
     Top = 313
     Width = 128
     Height = 25
@@ -86,6 +85,7 @@ object BirthdayForm: TBirthdayForm
     Caption = 'Close'
     TabOrder = 0
     OnClick = BtnCloseClick
+    ExplicitLeft = 277
   end
   object tbVolume: TNempTrackBar
     Left = 34

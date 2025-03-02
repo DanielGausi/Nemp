@@ -4,22 +4,20 @@ object ShutDownEditForm: TShutDownEditForm
   BorderIcons = []
   BorderStyle = bsSingle
   Caption = 'Nemp: Countdown'
-  ClientHeight = 182
-  ClientWidth = 473
+  ClientHeight = 181
+  ClientWidth = 469
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
-    473
-    182)
-  PixelsPerInch = 96
+    469
+    181)
   TextHeight = 13
   object ImgShutDown: TImage
     AlignWithMargins = True
@@ -42,7 +40,7 @@ object ShutDownEditForm: TShutDownEditForm
   object lblCurrentStatus: TLabel
     AlignWithMargins = True
     Left = 8
-    Top = 149
+    Top = 148
     Width = 265
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -53,8 +51,8 @@ object ShutDownEditForm: TShutDownEditForm
   end
   object BtnOk: TButton
     AlignWithMargins = True
-    Left = 296
-    Top = 149
+    Left = 288
+    Top = 148
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -63,11 +61,13 @@ object ShutDownEditForm: TShutDownEditForm
     ModalResult = 1
     TabOrder = 1
     OnClick = BtnOkClick
+    ExplicitLeft = 296
+    ExplicitTop = 149
   end
   object BtnCancel: TButton
     AlignWithMargins = True
-    Left = 377
-    Top = 149
+    Left = 369
+    Top = 148
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -75,16 +75,20 @@ object ShutDownEditForm: TShutDownEditForm
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 2
+    ExplicitLeft = 377
+    ExplicitTop = 149
   end
   object grpBoxSettings: TGroupBox
     AlignWithMargins = True
     Left = 128
     Top = 8
-    Width = 331
-    Height = 130
+    Width = 323
+    Height = 129
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Settings'
     TabOrder = 0
+    ExplicitWidth = 331
+    ExplicitHeight = 130
     object lblIntendedAction: TLabel
       Left = 16
       Top = 76

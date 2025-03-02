@@ -4,8 +4,8 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
   Top = 0
   BorderStyle = bsSingle
   Caption = 'Nemp: Equalizer and effects'
-  ClientHeight = 348
-  ClientWidth = 819
+  ClientHeight = 345
+  ClientWidth = 807
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

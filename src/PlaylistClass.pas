@@ -34,7 +34,7 @@ unit PlaylistClass;
 interface
 
 uses Windows, Forms, Contnrs, SysUtils,  VirtualTrees, IniFiles, Classes, 
-    Dialogs, MMSystem, oneinst, math, RatingCtrls,
+    Dialogs, MMSystem, oneinst, math,
     Hilfsfunktionen, Nemp_ConstantsAndTypes,
 
     NempAudioFiles, AudioFileHelper, PlayerClass, Playlistmanagement,
@@ -171,6 +171,8 @@ type
 
       function GetRandomPlaylistIndex: Integer;
 
+      // for the new TAudioFileManager
+      procedure OnPrepareAudioFileChange(Sender: TObject);
 
     public
       Playlist: TAudioFileList;              // the list with the audiofiles
@@ -352,12 +354,6 @@ type
       // Reinit Bass-Engine. Needed sometimes after suspending the system.
       procedure RepairBassEngine(StartPlay: Boolean);
 
-      // when the user change the rating of a audiofile-object, it should be
-      // changed in the whole playlist. (It could be multiply times in the playlist!)
-      procedure UnifyRating(aFilename: String; aRating: Byte; aCounter: Integer);
-
-      procedure CollectFilesWithSameFilename(aFilename: String; Target: TAudioFileList);
-
       // Search the Playlist for an ID. Used by Nemp Webserver
       // The links in the html-code will contain these IDs, so they will be valid
       // until the "real" Nemp-User deletes a file from the playlist.
@@ -375,15 +371,70 @@ type
       procedure SynchFilesWithCDDrive(CDDADrive: TCDDADrive);
   end;
 
+  procedure HandleInsertHeadsetToPlaylist(aAction: Integer);
+
+var
+  NempPlayList: TNempPlaylist;
+
 implementation
 
-uses NempMainUnit, spectrum_vis, BibSearchClass, StringHelper, LibraryOrganizer.Base, LibraryOrganizer.Files;
+uses myDialogs, BibSearchClass, StringHelper, LibraryOrganizer.Base, LibraryOrganizer.Files, AudioFileManagement;
 
 var tid      : Cardinal;
 
 procedure APM(TimerID, Msg: Uint; dwUser, dw1, dw2: DWORD); pascal;
 begin
   SendMessage(dwUser, WM_PlayerAcceptInput, 0, 0);
+end;
+
+procedure HandleInsertHeadsetToPlaylist(aAction: Integer);
+var
+  newPlaylistFile: TAudioFile;
+begin
+  if assigned(NempPlayer.HeadSetAudioFile) then begin
+    case aAction of
+      0: begin
+          // enqueue (at the end)
+          //NempPlaylist.InsertNode := NIL;
+          NempPlaylist.ResetInsertIndex;
+          newPlaylistFile := TAudioFile.Create;
+          newPlaylistFile.Assign(NempPlayer.HeadSetAudioFile);
+          NempPlaylist.InsertFileToPlayList(newPlaylistFile);
+      end;
+      1: begin
+          // play (and clear current list)
+          if (NempPlaylist.Count > 20) then begin
+            if TranslateMessageDLG(Format((Playlist_QueryReallyDelete), [NempPlaylist.Count, 1]), mtWarning, [mbYes, mbNo], 0) = mrYes then
+              // yes, user really wants tor delete the Playlist
+              NempPlayList.ClearPlaylist;
+          end else
+            // just clear it without asking
+            NempPlayList.ClearPlaylist;
+
+          // add the Headset-Track into the playlist
+          //NempPlaylist.InsertNode := NIL;
+          NempPlaylist.ResetInsertIndex;
+          newPlaylistFile := TAudioFile.Create;
+          newPlaylistFile.Assign(NempPlayer.HeadSetAudioFile);
+          NempPlaylist.InsertFileToPlayList(newPlaylistFile);
+      end;
+      2: begin
+          // enqueue after the current track
+          //NempPlaylist.GetInsertNodeFromPlayPosition;
+          NempPlaylist.InitInsertIndexFromPlayPosition(True);
+          newPlaylistFile := TAudioFile.Create;
+          newPlaylistFile.Assign(NempPlayer.HeadSetAudioFile);
+          NempPlaylist.InsertFileToPlayList(newPlaylistFile);
+      end;
+      3: begin
+          // just play
+          NempPlaylist.PlayBibFile(NempPlayer.HeadSetAudioFile, NempPlayer.FadingInterval);
+      end;
+    end;
+  end;
+
+  if NempPlaylist.AutoStopHeadsetAddToPlayist then
+    NempPlayer.PauseHeadset;
 end;
 
 
@@ -410,6 +461,7 @@ begin
   BufferStringList := TStringList.Create;
   ProcessingBufferlist := False;
   fFirstAction := True;
+  TAudioFileManager.OnPrepareAudioFileChange.Add(OnPrepareAudioFileChange);
 end;
 
 destructor TNempPlaylist.Destroy;
@@ -2372,41 +2424,15 @@ begin
     fOnPropertiesChanged(self);
 end;
 
-{
-    --------------------------------------------------------
-    Unify the rating for a given Audiofile (identified by its filename)
-    Used when the user changes the rating of a file
-    --------------------------------------------------------
-}
-procedure TNempPlaylist.UnifyRating(aFilename: String; aRating: Byte; aCounter: Integer);
-var i: Integer;
-    af: TAudioFile;
-begin
-    for i := 0 to Playlist.Count - 1 do
-    begin
-        af := Playlist[i];
-        if af.Pfad = aFilename then
-        begin
-            af.Rating := aRating;
-            af.PlayCounter := aCounter;
-        end;
-        if af = Player.MainAudioFile then
-            Spectrum.DrawRating(af.Rating);
-    end;
-end;
 
-procedure TNempPlaylist.CollectFilesWithSameFilename(aFilename: String;
-  Target: TAudioFileList);
-var i: Integer;
-    af: TAudioFile;
+procedure TNempPlaylist.OnPrepareAudioFileChange(Sender: TObject);
+var
+  i: Integer;
 begin
+  if (Sender is TAudioFile) then begin
     for i := 0 to Playlist.Count - 1 do
-    begin
-        af := Playlist[i];
-        if af.Pfad = aFilename then
-            Target.Add(af);
-    end;
+      TAudioFileManager.AddFileIfNeeded(TAudioFile(Sender), Playlist[i]);
+  end;
 end;
-
 
 end.

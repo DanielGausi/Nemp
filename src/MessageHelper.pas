@@ -64,11 +64,11 @@ uses NempMainUnit, Nemp_ConstantsAndTypes, NempAPI, Details,
     MainFormHelper, CoverHelper, AudioFileHelper, CreateHelper, TreeHelper,
     Nemp_RessourceStrings, ShoutCastUtils, WebServerClass,
     UpdateUtils, SystemHelper, ScrobblerUtils, OptionsComplete,
-    DriveRepairTools, ShutDown, Spectrum_Vis, PlayerClass, BirthdayShow,
+    DriveRepairTools, ShutDown, PlayerClass, PlaylistClass, BirthdayShow,
     SearchTool, MMSystem, BibHelper, CloudEditor, SplitForm_Hilfsfunktionen,
     DeleteSelect, GnuGetText, MedienbibliothekClass, PlayerLog,
     PostProcessorUtils, ProgressUnit, EffectsAndEqualizer,
-    AudioDisplayUtils, System.Win.TaskbarCore, cddaUtils;
+    AudioDisplayUtils, System.Win.TaskbarCore, cddaUtils, AudioFileManagement;
 
 var NEMP_API_InfoString: Array[0..500] of AnsiChar;
     NEMP_API_InfoStringW: Array[0..500] of WideChar;
@@ -166,7 +166,6 @@ begin
                       //if tmp < 0  then tmp := 0;
                       //if tmp > 100 then tmp := 100;
                       NempPlayer.Volume := Round(aMsg.WParam / 2.55);
-                      CorrectVolButton;
                    end;
 
         IPC_GETVOLUME: aMsg.Result := Round(NempPlayer.Volume * 2.55);
@@ -790,12 +789,15 @@ begin
             SendMessage(Nemp_MainForm.Handle, WM_MedienBib, MB_CheckForStartJobs, 0);
         end;
         MB_UnifyPlaylistRating: begin
-            // im Lparam steckt ein AudioFile drin
             af := TAudioFile(aMsg.LParam);
-            NempPlaylist.UnifyRating(af.Pfad, af.Rating, af.PlayCounter);
-
-            if assigned(fDetails) then
-              fDetails.AudioFileEdited(af);
+            // Sync other copies of this file
+            // Writing the MetaData into the file was done by the PostProcessor
+            TAudioFileManager.PrepareAudioFileChange(af);
+            for i := 0 to TAudioFileManager.FilesToChange.Count - 1 do begin
+              TAudioFileManager.FilesToChange.Items[i].Rating := af.Rating;
+              TAudioFileManager.FilesToChange.Items[i].PlayCounter := af.PlayCounter;
+            end;
+            TAudioFileManager.FinalizeAudioFileChange(af);
         end;
 
         MB_ErrorLog: begin
@@ -1255,18 +1257,15 @@ begin
         WS_IPC_SETVOLUME:  if AcceptAPICommands then
                            begin
                                 NempPlayer.Volume := aMsg.LParam;
-                                CorrectVolButton;
                            end;
 
         WS_IPC_INCVOLUME: if AcceptAPICommands then
                           begin
                                 NempPlayer.Volume := NempPlayer.Volume + 5;
-                                CorrectVolButton;
                           end;
         WS_IPC_DECVOLUME: if AcceptAPICommands then
                           begin
                                 NempPlayer.Volume := NempPlayer.Volume - 5;
-                                CorrectVolButton;
                           end;
 
         WS_VoteID: begin
@@ -1618,13 +1617,13 @@ begin
                       case NempPlaylist.WiedergabeMode of
                           0,2: begin
                                   NempPlaylist.PreparePlayNext;
-                                  RefreshPaintFrameHint(True);
+                                  RefreshSpectrumHint(True);
                                   NempPlayer.StartPauseBetweenTracksTimer;
                                   PlayerScrollIntoView;
                           end;
                           1: begin
                                   NempPlaylist.PreparePlayAgain;
-                                  RefreshPaintFrameHint(True);
+                                  RefreshSpectrumHint(True);
                                   NempPlayer.StartPauseBetweenTracksTimer;
                                   PlayerScrollIntoView;
                           end;
@@ -1632,7 +1631,7 @@ begin
                               if (NempPlaylist.PlayingIndex <> NempPlaylist.Count -1) then
                               begin
                                   NempPlaylist.PreparePlayNext;
-                                  RefreshPaintFrameHint(True);
+                                  RefreshSpectrumHint(True);
                                   NempPlayer.StartPauseBetweenTracksTimer;
                                   PlayerScrollIntoView;
                               end
@@ -1650,10 +1649,13 @@ begin
                       end;
     end;
 
-    WM_PlayerDelayedPlayNext: NempPlayer.ProgressDelayedPlayNext;
+    WM_PlayerDelayedPlayNext: begin
+           NempSpectrum.DelayComplete := NempPlayer.PauseBetweenTracksDuration;
+           NempSpectrum.DelayElapsed := NempPlayer.ProgressDelayedPlayNext;    // replace:
+    end;
 
     WM_PlayerDelayCompleted: begin
-      RefreshPaintFrameHint(False);
+      RefreshSpectrumHint(False);
       PlaylistVST.Invalidate; // to refresh the Play/Stop-Image in the Treeview
     end;
 
@@ -1665,12 +1667,12 @@ begin
                           case Message.WParam of
                              0: begin
                                         // Normales Stop-Bild anzeigen
-                                        StopBtn.GlyphLine := 0;
+                                        // SKIN_UMBAU_CHECK StopBtn.GlyphLine := 0;
                                         StopBTN.Hint    := MainForm_StopBtn_NormalHint;
                              end;
                              1: begin
                                         // Aktiviertes Stop-Nach-Titel-Bild anzeigen
-                                        StopBtn.GlyphLine := 1;
+                                        // SKIN_UMBAU_CHECK StopBtn.GlyphLine := 1;
                                         StopBTN.Hint    := MainForm_StopBtn_StopAfterTitleHint;
                              end;
                           end;
@@ -1680,7 +1682,6 @@ begin
                    BassTimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
                    if NempPlayer.Status <> PLAYER_ISPLAYING then
                    begin
-                       spectrum.DrawClear;
                        PlaylistCueChanged(NempPlaylist);
                        if NempPlayer.Status = PLAYER_ISSTOPPED_MANUALLY then
                             PlayerTimeLbl.Caption := '00:00';
@@ -1694,7 +1695,7 @@ begin
                                 0: begin
                                       case Message.WParam of
                                           NEMP_API_STOPPED, NEMP_API_PAUSED: begin
-                                                PlayPauseBTN.GlyphLine := 0;
+                                                // SKIN_UMBAU_CHECK PlayPauseBTN.GlyphLine := 0;
                                                 //xxxNempTaskbarManager.ThumbButtons.Items[1].ImageIndex := 1;
                                                 AssignTaskbarIcon(1,1);
                                                 PM_TNA_PlayPause.Caption := PlayerBtn_Play;
@@ -1703,7 +1704,7 @@ begin
 
 
                                           NEMP_API_PLAYING : begin
-                                            PlayPauseBTN.GlyphLine := 1;
+                                            // SKIN_UMBAU_CHECK PlayPauseBTN.GlyphLine := 1;
                                             //xxxNempTaskbarManager.ThumbButtons.Items[1].ImageIndex := 2;
                                             AssignTaskbarIcon(1,2);
                                             PM_TNA_PlayPause.Caption := PlayerBtn_Pause;
@@ -1714,18 +1715,18 @@ begin
                                 1: begin
                                       case Message.WParam of
                                           NEMP_API_STOPPED: begin
-                                                PlayPauseHeadSetBtn.GlyphLine := 0;
-                                                HeadSetTimer.Enabled := False;
-                                                if NOT MainPlayerControlsActive then
-                                                    SetProgressButtonPosition(0);
+                                                // SKIN_UMBAU_CHECK PlayPauseHeadSetBtn.GlyphLine := 0;
+                                                //HeadSetTimer.Enabled := False;
+                                                //if NOT MainPlayerControlsActive then
+                                                //    SetProgressButtonPosition(0);
                                           end;
                                           NEMP_API_PAUSED: begin
-                                                PlayPauseHeadSetBtn.GlyphLine := 0;
-                                                HeadSetTimer.Enabled := False;
+                                                // SKIN_UMBAU_CHECK PlayPauseHeadSetBtn.GlyphLine := 0;
+                                                //HeadSetTimer.Enabled := False;
                                           end;
                                           NEMP_API_PLAYING : begin
-                                                PlayPauseHeadSetBtn.GlyphLine := 1;
-                                                HeadSetTimer.Enabled := True;
+                                                // SKIN_UMBAU_CHECK PlayPauseHeadSetBtn.GlyphLine := 1;
+                                                //HeadSetTimer.Enabled := True;
                                           end;
                                       end;
                                 end;
@@ -1771,22 +1772,18 @@ begin
                                     if  Message.Msg = WM_PlayerStop then
                                     begin
                                       // Set the SlideBtn to its initial position
-                                      if  MainPlayerControlsActive then
-                                      begin
-                                          SetProgressButtonPosition(0);
-                                          SlidebarShape.Progress := 0;
-                                      end;
+                                      rbTrackProgress.Progress := 0;
                                     end;
 
                                   end;
     WM_PlayerHeadSetEnd : begin
-          if NOT MainPlayerControlsActive then
-              SetProgressButtonPosition(0);
-          PlayPauseHeadsetBtn.GlyphLine := 0;
+          //if NOT MainPlayerControlsActive then
+          //    SetProgressButtonPosition(0);
+          // SKIN_UMBAU_CHECK PlayPauseHeadsetBtn.GlyphLine := 0;
     end;
     WM_PlayerStopRecord : begin
                                  // Aufnahme wurde beendet
-                                RecordBtn.GlyphLine := 0;
+                                // SKIN_UMBAU_CHECK RecordBtn.GlyphLine := 0;
                                 RecordBtn.Hint := (MainForm_RecordBtnHint_Start);
     end;
 
@@ -2004,10 +2001,9 @@ begin
       // Play new song in headset
       NempPlayer.PlayInHeadset(AudioFile);
       // Show Headset Controls and File Details
-      Nemp_MainForm.TabBtn_Headset.GlyphLine := 1; // (TabBtn_Headset.GlyphLine + 1) mod 2;
-      Nemp_MainForm.TabBtn_MainPlayerControl.GlyphLine := 0;
-      Nemp_MainForm.MainPlayerControlsActive := False;
-      Nemp_MainForm.ShowMatchingControls;//(0);
+      // SKIN_UMBAU_CHECK Nemp_MainForm.TabBtn_Headset.GlyphLine := 1; // (TabBtn_Headset.GlyphLine + 1) mod 2;
+      // SKIN_UMBAU_CHECK Nemp_MainForm.TabBtn_MainPlayerControl.GlyphLine := 0;
+      // Nemp_MainForm.MainPlayerControlsActive := False;
   finally
       AudioFile.Free
   end;

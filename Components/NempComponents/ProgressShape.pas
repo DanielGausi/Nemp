@@ -84,7 +84,7 @@ end;
 
 procedure Register;
 begin
-  RegisterComponents('Beispiele', [TProgressShape]);
+  RegisterComponents('Nemp Components', [TProgressShape]);
 end;
 
 { TProgressShape }

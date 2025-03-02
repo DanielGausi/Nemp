@@ -23,7 +23,7 @@ implementation
 
 procedure Register;
 begin
-  RegisterComponents('Beispiele', [TNempTrackBar]);
+  RegisterComponents('Nemp Components', [TNempTrackBar]);
 end;
 
 

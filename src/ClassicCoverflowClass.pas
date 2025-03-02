@@ -81,7 +81,7 @@ type
 
 implementation
 
-uses NempMainUnit, Nemp_ConstantsAndTypes, gnuGettext, Nemp_RessourceStrings;
+uses NempMainUnit, MedienbibliothekClass, Nemp_ConstantsAndTypes, gnuGettext, Nemp_RessourceStrings;
 
 { TClassicCoverFlow }
 

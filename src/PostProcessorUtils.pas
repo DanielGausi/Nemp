@@ -296,7 +296,7 @@ type
 
 implementation
 
-uses NempMainUnit, Hilfsfunktionen;
+uses NempMainUnit, MedienbibliothekClass, Hilfsfunktionen;
 
 
 { TNempLogEntry }
@@ -827,9 +827,7 @@ begin
                         finally
                             ErrorLog.Free;
                         end;
-
                     end;
-
 
                     // ok. We have processed the file in the library so far.
                     // Now we should unify the ratings for this file in the playlist.

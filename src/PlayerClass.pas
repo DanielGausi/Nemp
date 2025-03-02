@@ -36,7 +36,7 @@ interface
 
 uses  Windows, Classes,  Controls, StdCtrls, ExtCtrls, Buttons, SysUtils, Contnrs, System.StrUtils,
       System.Types, System.IOUtils, ShellApi, IniFiles, Dialogs, Graphics, cddaUtils, math, CoverHelper,
-      bass, bass_fx, basscd, bass_wadsp, spectrum_vis, DateUtils, bassmidi,
+      bass, bass_fx, basscd, bass_wadsp, DateUtils, bassmidi,
       NempAudioFiles,  Nemp_ConstantsAndTypes, NempAPI, ShoutCastUtils, PostProcessorUtils,
       Hilfsfunktionen, gnuGettext, Nemp_RessourceStrings, OneINst,
       Easteregg, ScrobblerUtils, CustomizedScrobbler, SilenceDetection, System.UITypes,
@@ -180,6 +180,25 @@ type
       fdspHandle: Cardinal;
       fActivePluginIndex: Integer;
 
+      // 2025: adding some more events
+      fOnHeadSetPlay: TNotifyEvent;
+      fOnHeadSetPause: TNotifyEvent;
+      fOnHeadSetResume: TNotifyEvent;
+      fOnHeadSetStop: TNotifyEvent;
+      fOnSetVolume: TNotifyEvent;
+      fOnABRepeatChange: TNotifyEvent;
+
+      fHeadSetCoverSize: Integer;
+    FPreviewTitleColor: TColor;
+    FPreviewTimeColor: TColor;
+    fPreviewShapeProgressBrushColor: TColor;
+    fPreviewShapePenColor: TColor;
+    FPreviewArtistColor: TColor;
+    fPreviewShapeBrushColor: TColor;
+    fPreviewShapeProgressPenColor: TColor;
+
+
+
       // Basic method for creating a stream from a given file   //filename
       function NEMP_CreateStream(aFile: TAudioFile; //UnicodeString;
                            aNoMickyMaus: boolean;
@@ -244,6 +263,8 @@ type
       procedure ActualizePlayPauseBtn(wParam, lParam: Integer);
 
       procedure StartPrescanThread;
+      function TimeToString(aTime, aDuration: Double): String;
+
       function GetTimeString: String;
       function GetTimeStringHeadset: String;
 
@@ -254,7 +275,11 @@ type
       function GetCurrentAudioFile: TPlaylistFile;
       procedure SetMainStream(const Value: DWord);
       function GetActivePluginName: AnsiString;
-    function GetDSPPluginActive: Boolean;
+      function GetDSPPluginActive: Boolean;
+      procedure SetHeadSetCoverSize(const Value: Integer);
+
+      // for the new TAudioFileManager
+      procedure OnBeforeAudioFileChange(Sender: TObject);
 
     public
         MainAudioFile: TPlaylistFile;
@@ -365,11 +390,6 @@ type
 
         NempBirthdayTimer: TNempBirthdayTimer;
 
-        // when holding the hotkey for volume +/-
-        // the "speed" of changing the volume is increased. This value
-        // is saved in VolStep
-        VolStep: DWord;
-
         ReadyForRecord: Boolean;   // i.e. we are playing a webstream
         StreamRecording: Boolean;  // recording is active
         RecordStream: TFileStream;
@@ -453,12 +473,29 @@ type
 
         property OnPlayerStopped: TNotifyEvent read fOnPlayerStopped write fOnPlayerStopped;
         property OnMessage: TPlayerMessageEvent read fOnMessage write fOnMessage;
+        property OnHeadSetPlay   : TNotifyEvent read fOnHeadSetPlay    write fOnHeadSetPlay   ;
+        property OnHeadSetPause  : TNotifyEvent read fOnHeadSetPause   write fOnHeadSetPause  ;
+        property OnHeadSetResume : TNotifyEvent read fOnHeadSetResume  write fOnHeadSetResume ;
+        property OnHeadSetStop   : TNotifyEvent read fOnHeadSetStop    write fOnHeadSetStop   ;
+        property OnSetVolume: TNotifyEvent read fOnSetVolume write fOnSetVolume;
+        property OnABRepeatChange: TNotifyEvent read fOnABRepeatChange write fOnABRepeatChange;
 
         property DSPPluginFilenames: TStringList read fDSPPluginFilenames;
         property DSPPlugin: Cardinal read fdspPlugin;
         property DSPPluginActive: Boolean read GetDSPPluginActive;
         property ActivePluginIndex: Integer read fActivePluginIndex;
         property ActivePluginName: AnsiString read GetActivePluginName;
+
+        property HeadSetCoverSize: Integer read fHeadSetCoverSize write SetHeadSetCoverSize;
+
+        // for the TaskBar Preview
+        property PreviewArtistColor: TColor read FPreviewArtistColor write FPreviewArtistColor;
+        property PreviewTitleColor: TColor read FPreviewTitleColor write FPreviewTitleColor;
+        property PreviewTimeColor: TColor read FPreviewTimeColor write FPreviewTimeColor;
+        property PreviewShapePenColor          : TColor read fPreviewShapePenColor           write fPreviewShapePenColor           ;
+        property PreviewShapeBrushColor        : TColor read fPreviewShapeBrushColor         write fPreviewShapeBrushColor         ;
+        property PreviewShapeProgressPenColor  : TColor read fPreviewShapeProgressPenColor   write fPreviewShapeProgressPenColor   ;
+        property PreviewShapeProgressBrushColor: TColor read fPreviewShapeProgressBrushColor write fPreviewShapeProgressBrushColor ;
 
         constructor Create(AHnd: HWND);
         destructor Destroy; override;
@@ -527,8 +564,9 @@ type
         function GenerateTaskbarTitel: UnicodeString;
 
         // Aktualisiert den Text, die Zeit und das Spectrum in der Anzeige
-        procedure DrawMainPlayerVisualisation; //(IncludingTime: Boolean = True);
-        procedure DrawHeadsetVisualisation; //(IncludingTime: Boolean = True);
+        function GetFFTData(buffer: Pointer): Boolean; // DrawMainPlayerVisualisation(buffer: Pointer);
+
+        // procedure DrawHeadsetVisualisation; //(IncludingTime: Boolean = True);
         //procedure DrawTimeFromProgress(aProgress: Single);
         function GetTimeStringFromProgress(aProgress: Single): String;
 
@@ -538,11 +576,8 @@ type
         function RefreshCoverBitmap: Boolean;
         function RefreshHeadsetCoverBitmap: Boolean;
 
-        function DrawPreview( DestWidth : Integer; DestHeight : Integer;
-                            SkinActive : Boolean = True) : HBITMAP;
-
-        procedure DrawPreviewNew(DestHeight : Integer; DestWidth : Integer;
-                            destBitmap: TBitmap; SkinActive : Boolean = True);
+        //function DrawPreview( DestWidth : Integer; DestHeight : Integer; SkinActive : Boolean = True) : HBITMAP;
+        procedure DrawPreviewNew(DestHeight : Integer; DestWidth : Integer; destBitmap: TBitmap; SkinActive : Boolean = True);
 
         procedure SetCueSyncs;
 
@@ -588,7 +623,7 @@ type
         procedure StartSilenceDetection;
         procedure ProcessSilenceDetection(aSilenceDetector: TSilenceDetector);
 
-        procedure ProgressDelayedPlayNext;
+        function ProgressDelayedPlayNext: Integer;
         procedure StopPauseBetweenTracksTimer;
         function StartPauseBetweenTracksTimer: Boolean;
 
@@ -600,6 +635,8 @@ type
   end;
 
 var
+
+  NempPlayer: TNempPlayer;
   CSPrescanList: RTL_CRITICAL_SECTION;
   FBufferTimerId: DWORD = 0;
 
@@ -616,7 +653,7 @@ Const
 
 implementation
 
-Uses NempMainUnit, AudioFileHelper, ID3v2Tags, AudioDisplayUtils;
+Uses NempMainUnit, AudioFileHelper, ID3v2Tags, AudioDisplayUtils, AudioFileManagement;
 
 
 procedure EndFileProc(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
@@ -812,6 +849,10 @@ begin
     CoverArtSearcher := TCoverArtSearcher.create;
     fTrackDelayTimer := 0;
     fActivePluginIndex := -1;
+
+    fHeadSetCoverSize := NEMP_PLAYER_COVERSIZE;
+
+    TAudioFileManager.OnPrepareAudioFileChange.Add(OnBeforeAudioFileChange);
 end;
 
 procedure DelayedPlayNext(lpParameter: Pointer; TimerOrWaitFired: Boolean); stdcall;
@@ -820,20 +861,24 @@ begin
   SendMessage(Integer(lpParameter), WM_PlayerDelayedPlayNext, 0, 0);
 end;
 
-procedure TNempPlayer.ProgressDelayedPlayNext;
+function TNempPlayer.ProgressDelayedPlayNext: Integer;
 var
   timeElapsed: Integer;
 begin
   timeElapsed := getTickCount - fTrackDelayStartTime;
+
+  // result := max(0, getTickCount - fTrackDelayStartTime);
+
   if (PauseBetweenTracksDuration = 0) or (timeElapsed > PauseBetweenTracksDuration) then
   begin
+    result := PauseBetweenTracksDuration;
     resume(True);
     SendMessage(MainWindowHandle, WM_PlayerPlay, 0, 0);
     SendMessage(MainWindowHandle, WM_PlayerDelayCompleted, 0, 0);
   end
   else
   begin
-     Spectrum.DrawWaitingProgress(round(timeElapsed/PauseBetweenTracksDuration * 100));
+     result := timeElapsed; //PauseBetweenTracksDuration - timeElapsed;
   end;
 end;
 
@@ -870,6 +915,7 @@ destructor TNempPlayer.Destroy;
 var i: Integer;
     BassInfo: BASS_DEVICEINFO;
 begin
+    TAudioFileManager.OnPrepareAudioFileChange.Delete(OnBeforeAudioFileChange);
     MainPlayerPicture.Free;
     HeadsetPicture.Free;
     PreviewBackGround.Free;
@@ -1230,8 +1276,8 @@ var i: Integer;
 begin
   MainDevice := NempSettingsManager.ReadInteger('Player','MainDevice',1);
   HeadsetDevice := NempSettingsManager.ReadInteger('Player','HeadsetDevice',2);
-  fMainVolume := NempSettingsManager.ReadInteger('Player','MainVolume',50);
-  fMainVolume := fMainVolume / 100;
+  Volume := NempSettingsManager.ReadInteger('Player','MainVolume',50);
+
   fHeadsetVolume := NempSettingsManager.ReadInteger('Player','HeadsetVolume',50);
   fHeadsetVolume := fHeadsetVolume / 100;
 
@@ -1561,6 +1607,14 @@ begin
   end;
 end;
 
+
+procedure TNempPlayer.OnBeforeAudioFileChange(Sender: TObject);
+begin
+  if (Sender is TAudioFile) then begin
+    TAudioFileManager.AddFileIfNeeded(TAudioFile(Sender), MainAudioFile);
+    TAudioFileManager.AddFileIfNeeded(TAudioFile(Sender), HeadSetAudioFile);
+  end;
+end;
 
 {
     --------------------------------------------------------
@@ -2245,16 +2299,16 @@ begin
                     BASS_SYNC_END, 0,
                     @EndHeadSetFileProc, Self);
 
-
       Bass_SetDevice(MainDevice);
       ActualizePlayPauseBtn(NEMP_API_PLAYING, 1);
   end;
 
   // get the cover for the current Headset-File
   RefreshHeadsetCoverBitmap;
+
+  if assigned(fOnHeadSetPlay) then
+    fOnHeadSetPlay(self);
 end;
-
-
 
 procedure TNempPlayer.PauseHeadset;
 begin
@@ -2264,6 +2318,8 @@ begin
   Bass_SetDevice(MainDevice);
 
   ActualizePlayPauseBtn(NEMP_API_PAUSED, 1);
+  if assigned(fOnHeadSetPause) then
+    fOnHeadSetPause(self);
 end;
 
 procedure TNempPlayer.ResumeHeadset;
@@ -2273,6 +2329,8 @@ begin
   BASS_ChannelPlay(HeadsetStream, False);
   Bass_SetDevice(MainDevice);
   ActualizePlayPauseBtn(NEMP_API_PLAYING, 1);
+  if assigned(fOnHeadSetResume) then
+    fOnHeadSetResume(self);
 end;
 
 procedure TNempPlayer.StopHeadset;
@@ -2282,6 +2340,8 @@ begin
   Bass_ChannelStop(HeadsetStream);
   Bass_SetDevice(MainDevice);
   ActualizePlayPauseBtn(NEMP_API_STOPPED, 1);
+  if assigned(fOnHeadSetStop) then
+    fOnHeadSetStop(self);
 end;
 
 
@@ -2301,6 +2361,8 @@ begin
   if Value > 1 then Value := 1;
   fMainVolume := Value;
   BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
+  if assigned(fOnSetVolume) then
+    fOnSetVolume(self);
 end;
 
 function TNempPlayer.GetHeadsetVolume: Single;
@@ -2411,12 +2473,22 @@ begin
   else
     result := 0;
 end;
+
+function TNempPlayer.TimeToString(aTime, aDuration: Double): String;
+begin
+  case TimeMode of
+    0: result := SecToStr(aTime);
+    1: result := '-' + SecToStr(aDuration - aTime);
+  end;
+end;
+
 function TNempPlayer.GetTimeString: String;
 begin
-    Case TimeMode of
+  result := TimeToString(Time, Dauer);
+  {  case TimeMode of
         0: result := SecToStr(Time);
         1: result := '-' + SecToStr(Dauer - Time );
-    end;
+    end;}
 end;
 
 function TNempPlayer.fGetSeconds;
@@ -2431,10 +2503,34 @@ end;
 
 function TNempPlayer.GetTimeStringHeadset: String;
 begin
-    Case TimeMode of
+  result := TimeToString(HeadsetTime, HeadsetDauer);
+  {  Case TimeMode of
         0: result := SecToStr(HeadsetTime);
         1: result := '-' + SecToStr(HeadsetDauer - HeadsetTime );
-    end;
+    end;}
+end;
+
+
+function TNempPlayer.GetTimeStringFromProgress(aProgress: Single) : String;
+var tmpTime: Integer;
+begin
+    tmpTime :=  Round(Dauer * aProgress);
+    result := TimeToString(tmpTime, Dauer);
+    {case TimeMode of
+        0: result := SecToStr(tmpTime);
+        1: result := '-' + SecToStr(Dauer - tmpTime )
+    end;}
+end;
+
+function TNempPlayer.GetHeadsetTimeStringFromProgress(aProgress: Single) : String;
+var tmpTime: Integer;
+begin
+    tmpTime :=  Round(HeadsetDauer * aProgress);
+    result := TimeToString(tmpTime, HeadsetDauer);
+    {case TimeMode of
+        0: result := SecToStr(tmpTime);
+        1: result := '-' + SecToStr(Dauer - tmpTime );
+    end;}
 end;
 
 (*
@@ -2537,6 +2633,7 @@ begin
   else
     result := 0;
 end;
+
 procedure TNempPlayer.SetProgress(Value: Double);
 begin
   if fIsURLStream then exit;
@@ -2581,6 +2678,7 @@ begin
         result := 0;
   end;
 end;
+
 procedure TNempPlayer.SetHeadsetProgress(Value: Double);
 begin
   if fHeadsetIsURLStream then exit;
@@ -3161,6 +3259,9 @@ begin
                     BASS_SYNC_POS, SyncPos,
                     @ABRepeatProc, Self);
     end;
+
+    if assigned(fOnABRepeatChange) then
+      fOnABRepeatChange(self);
 end;
 
 procedure TNempPlayer.SetASync(p1: Double);
@@ -3195,6 +3296,8 @@ begin
         fABRepeatEndPosition := 0;
         fABRepeatActive := False;
     end;
+    if assigned(fOnABRepeatChange) then
+      fOnABRepeatChange(self);
 end;
 
 
@@ -3216,8 +3319,6 @@ begin
             //SetASync(0);
             fABRepeatStartPosition := 0;
             //(sync hier auch neu setzen???)
-
-
             //ClearABSyncs;
             //fABRepeatStartPosition := p1;
         end else
@@ -3247,6 +3348,8 @@ begin
         fABRepeatEndPosition := 0;
         fABRepeatActive := False;
     end;
+    if assigned(fOnABRepeatChange) then
+      fOnABRepeatChange(self);
 end;
 
 procedure TNempPlayer.ClearABSyncs;
@@ -3265,6 +3368,8 @@ begin
     fABRepeatActive := False;
     fABRepeatEndPosition := 0;
     fABRepeatStartPosition := 0;
+    if assigned(fOnABRepeatChange) then
+      fOnABRepeatChange(self);
 end;
 
 procedure TNempPlayer.RemoveEndSyncs;
@@ -3465,7 +3570,7 @@ end;
 
 
 
-procedure TNempPlayer.DrawHeadsetVisualisation;
+(*procedure TNempPlayer.DrawHeadsetVisualisation;
 var FFTFata : TFFTData;
 begin
     if UseVisualization then
@@ -3473,27 +3578,17 @@ begin
         if BassHeadSetStatus = BASS_ACTIVE_PLAYING then
         begin
             BASS_ChannelGetData(HeadsetStream, @FFTFata, BASS_DATA_FFT1024);
-            Spectrum.Draw (FFTFata);
+            // Spectrum.Draw (FFTFata);
         end else
-            Spectrum.DrawClear;
+            ;//Spectrum.DrawClear;
     end;
-end;
+end;  *)
 
-procedure TNempPlayer.DrawMainPlayerVisualisation; //(IncludingTime: Boolean = True);
-var FFTFata : TFFTData;
+function TNempPlayer.GetFFTData(buffer: Pointer): Boolean;
 begin
-
-    if UseVisualization then
-    begin
-        if BassStatus = BASS_ACTIVE_PLAYING then
-        begin
-            BASS_ChannelGetData(MainStream, @FFTFata, BASS_DATA_FFT1024);
-            Spectrum.Draw (FFTFata);
-        end else
-        begin
-            Spectrum.DrawClear;
-        end;
-    end;
+  result := UseVisualization and (BassStatus = BASS_ACTIVE_PLAYING);
+  if result then
+    BASS_ChannelGetData(MainStream, buffer {@FFTFata}, BASS_DATA_FFT1024);
 end;
 
 (*
@@ -3518,27 +3613,14 @@ begin
 end;
 *)
 
-function TNempPlayer.GetTimeStringFromProgress(aProgress: Single) : String;
-var tmpTime: Integer;
+
+procedure TNempPlayer.SetHeadSetCoverSize(const Value: Integer);
 begin
-    tmpTime :=  Round(Dauer * aProgress);
-    case TimeMode of
-        0: result := SecToStr(tmpTime);
-        1: result := '-' + SecToStr(Dauer - tmpTime )
-    end;
-
+  if fHeadSetCoverSize <> Value then begin
+    fHeadSetCoverSize := Value;
+    RefreshHeadsetCoverBitmap;
+  end;
 end;
-
-function TNempPlayer.GetHeadsetTimeStringFromProgress(aProgress: Single) : String;
-var tmpTime: Integer;
-begin
-    tmpTime :=  Round(HeadsetDauer * aProgress);
-    case TimeMode of
-        0: result := SecToStr(tmpTime);
-        1: result := '-' + SecToStr(Dauer - tmpTime );
-    end;
-end;
-
 
 function TNempPlayer.RefreshCoverBitmap: Boolean;
 begin
@@ -3566,17 +3648,17 @@ function TNempPlayer.RefreshHeadsetCoverBitmap: Boolean;
         end;
 begin
     result := True;
-    HeadsetPicture.Bitmap.Width := NEMP_PLAYER_COVERSIZE;
-    HeadsetPicture.Bitmap.Height := NEMP_PLAYER_COVERSIZE;
+    HeadsetPicture.Bitmap.Width := fHeadSetCoverSize; //NEMP_PLAYER_COVERSIZE;
+    HeadsetPicture.Bitmap.Height := fHeadSetCoverSize; //NEMP_PLAYER_COVERSIZE;
 
-    LoadHeadSetGraphic;
+    //LoadHeadSetGraphic;
+    //exit;
 
-    exit;
-
-    { // note, do not show proper Cover in HeadsetControls? or do it?
+     // note, do not show proper Cover in HeadsetControls? or do it?
+     // 2025: Yes, we DO
     if assigned(HeadSetAudioFile) then
     begin
-        result := GetCover(HeadSetAudioFile, HeadsetPicture, True);
+        result := CoverArtSearcher.GetCover_Complete(HeadSetAudioFile, HeadsetPicture);
         if not result then
             LoadHeadSetGraphic;
     end else
@@ -3584,31 +3666,25 @@ begin
         LoadHeadSetGraphic;
         result := False;
     end;
-    }
+
 end;
 
 procedure TNempPlayer.DrawPreviewNew(DestHeight : Integer; DestWidth : Integer;
-                            destBitmap: TBitmap; SkinActive : Boolean = True);
+  destBitmap: TBitmap; SkinActive : Boolean = True);
 var
-  h,pw  : Integer;
+  h, pw  : Integer;
   s: String;
   r: TRect;
 begin
-
         destBitmap.Width := DestWidth; // 200;
         destBitmap.Height := DestHeight; // 100;
-
         destBitmap.PixelFormat := pf32bit;
-
         destBitmap.Canvas.Pen.Color := clBtnFace;
         destBitmap.Canvas.Brush.Style := bsSolid;
         destBitmap.Canvas.Brush.Color := clBtnFace;
         destBitmap.Canvas.Rectangle(0, 0, destBitmap.Width, destBitmap.Height);
 
-        if SkinActive then
-        begin
-            //destBitmap.Canvas.Draw(0,0, PreviewBackGround);
-
+        if SkinActive then begin
             SetStretchBltMode(destBitmap.Canvas.Handle, HALFTONE);
             StretchBlt(destBitmap.Canvas.Handle, 0, 0, //5 + 45 - (MainPlayerPicture.Height Div 4),
                   //MainPlayerPicture.Width Div 2, MainPlayerPicture.Height Div 2,
@@ -3618,15 +3694,13 @@ begin
                   SRCCOPY);
         end;
 
-        if (not assigned(MainAudioFile)) and (not fDefaultCoverIsLoaded) then
-        begin
+        if (not assigned(MainAudioFile)) and (not fDefaultCoverIsLoaded) then begin
             fDefaultCoverIsLoaded := True;
             RefreshCoverBitmap;
         end;
 
         SetStretchBltMode(destBitmap.Canvas.Handle, HALFTONE);
         StretchBlt(destBitmap.Canvas.Handle, 6, 6, //5 + 45 - (MainPlayerPicture.Height Div 4),
-                  //MainPlayerPicture.Width Div 2, MainPlayerPicture.Height Div 2,
                   MainPlayerPicture.Bitmap.Width , MainPlayerPicture.Bitmap.Height ,
                   MainPlayerPicture.Bitmap.Canvas.Handle, 0,0 ,
                   MainPlayerPicture.Bitmap.Width, MainPlayerPicture.Bitmap.Height,
@@ -3650,30 +3724,28 @@ begin
                     h := 39;
 
                 // but draw 3 lines maximum
-                destBitmap.Canvas.Font.Color := Spectrum.PreviewTitleColor;
+                destBitmap.Canvas.Font.Color := fPreviewTitleColor;
                 r := Rect(102, 4, 198, 43);
                 destBitmap.Canvas.TextRect(r, s, [tfWordBreak]);
 
                 s := StringReplace(MainAudioFile.Artist,'&','&&',[rfReplaceAll]);
-                destBitmap.Canvas.Font.Color := Spectrum.PreviewArtistColor;
+                destBitmap.Canvas.Font.Color := fPreviewArtistColor;
                 r := Rect(102, 4 + h, 198, 70);
                 destBitmap.Canvas.TextRect(r, s, [tfWordBreak]);
-               // b.Canvas.TextOut(102,6, MainAudioFile.Artist);
-               // b.Canvas.TextOut(102,20, MainAudioFile.Titel);
-               destBitmap.Canvas.Font.Color := Spectrum.PreviewTimeColor;
-               if MainAudioFile.isStream then
+                destBitmap.Canvas.Font.Color := fPreviewTimeColor;
+                if MainAudioFile.isStream then
                   destBitmap.Canvas.TextOut(102,72, '(Webradio)')
-               else
-                   destBitmap.Canvas.TextOut(102,72, SecToStr(Time) + ' (' + SecToStr(MainAudioFile.Duration) + ')'   );
+                else
+                  destBitmap.Canvas.TextOut(102,72, SecToStr(Time) + ' (' + SecToStr(MainAudioFile.Duration) + ')'   );
 
             end else
             begin
                 // just the title
                 s := StringReplace(NempDisplay.GetNonEmptyTitle(MainAudioFile),'&','&&',[rfReplaceAll]);
-                destBitmap.Canvas.Font.Color := Spectrum.PreviewTitleColor;
+                destBitmap.Canvas.Font.Color := fPreviewTitleColor;
                 r := Rect(102, 4, 198, 70);
                 destBitmap.Canvas.TextRect(r, s, [tfWordBreak]);
-                destBitmap.Canvas.Font.Color := Spectrum.PreviewTimeColor;
+                destBitmap.Canvas.Font.Color := fPreviewTimeColor;
                 if MainAudioFile.isStream then
                     destBitmap.Canvas.TextOut(102,72, '(Webradio)')
                 else
@@ -3693,27 +3765,23 @@ begin
                 }
             end else
             begin
-
-                destBitmap.canvas.Pen.color := Spectrum.PreviewShapePenColor;
+                destBitmap.canvas.Pen.color := fPreviewShapePenColor;
                 destBitmap.Canvas.Pen.Width := 1;
-                destBitmap.Canvas.Brush.Color := Spectrum.PreviewShapeBrushColor;
+                destBitmap.Canvas.Brush.Color := fPreviewShapeBrushColor;
                 destBitmap.Canvas.Brush.Style := bsSolid;
                 pw := 88;
                 destBitmap.Canvas.Rectangle(102, 87, 102+pw, 93 );
-                destBitmap.canvas.Pen.color :=   Spectrum.PreviewShapeProgressPenColor;
-                destBitmap.Canvas.Brush.Color := Spectrum.PreviewShapeProgressBrushColor;
+                destBitmap.canvas.Pen.color :=   fPreviewShapeProgressPenColor;
+                destBitmap.Canvas.Brush.Color := fPreviewShapeProgressBrushColor;
                 destBitmap.Canvas.Rectangle(102, 87, 102 + round(Progress*pw), 93 );
-
             end;
-
         end else
         begin
 
         end;
-
 end;
 
-
+(*
 function TNempPlayer.DrawPreview( DestWidth : Integer; DestHeight : Integer;
                             SkinActive : Boolean = True) : HBITMAP;
 var
@@ -3864,6 +3932,7 @@ begin
 
     DeleteDC(ddc);
 end;
+*)
 
 
 procedure TNempPlayer.ResetPlayerVCL(GetCoverWasSuccessful: boolean);

@@ -49,7 +49,6 @@ uses
   Details in 'Details.pas' {FDetails},
   NempAudioFiles in 'NempAudioFiles.pas',
   NewPicture in 'NewPicture.pas' {FNewPicture},
-  spectrum_vis in 'spectrum_vis.pas',
   Hilfsfunktionen in 'Hilfsfunktionen.pas',
   TreeHelper in 'TreeHelper.pas',
   About in 'About.pas' {AboutForm},
@@ -87,7 +86,6 @@ uses
   NempCoverFlowClass in 'NempCoverFlowClass.pas',
   PartyModeClass in 'PartyModeClass.pas',
   PostProcessorUtils in 'PostProcessorUtils.pas',
-  RatingCtrls in 'RatingCtrls.pas',
   TagClouds in 'TagClouds.pas' {/,  classes;},
   CloudEditor in 'CloudEditor.pas' {CloudEditorForm},
   Taghelper in 'Taghelper.pas',
@@ -145,8 +143,10 @@ uses
   fExport in 'fExport.pas' {FormExport},
   UpdateCleaning in 'UpdateCleaning.pas',
   fUpdateCleaning in 'fUpdateCleaning.pas' {FormUpdateCleaning},
-  OKCANCL1 in 'c:\program files (x86)\embarcadero\studio\22.0\ObjRepos\DE\DelphiWin32\OKCANCL1.PAS' {OKBottomDlg},
-  bass_wadsp in '3rd Party Units\bass_wadsp.pas';
+  bass_wadsp in '3rd Party Units\bass_wadsp.pas',
+  dmGUI in 'dmGUI.pas' {DataModuleGui: TDataModule},
+  FHeadsetControl in 'FHeadsetControl.pas' {FormHeadsetControl},
+  AudioFileManagement in 'AudioFileManagement.pas';
 
 {$R *.res}
 
@@ -170,6 +170,8 @@ begin
   Application.CreateForm(TProgressForm, ProgressFormPlaylist);
   Application.CreateForm(TProgressForm, ProgressFormLibrary);
   Application.CreateForm(TReplayGainProgressForm, ReplayGainProgressForm);
+  Application.CreateForm(TDataModuleGui, DataModuleGui);
+  Application.CreateForm(TFormHeadsetControl, FormHeadsetControl);
   Graphics.DefFontData.Name := 'Tahoma';
 
   Application.Title := NEMP_NAME_TASK;
@@ -186,7 +188,6 @@ begin
     Application.CreateForm(TAuswahlForm    , AuswahlForm    );
     Application.CreateForm(TMedienlisteForm, MedienlisteForm);
     Application.CreateForm(TExtendedControlForm, ExtendedControlForm);
-
 
     StuffToDoAfterCreate ;
 
@@ -209,9 +210,6 @@ begin
 
     FSplash.Visible := False;
 
-
     RunWizard;
-
     Application.Run;
-
 end.

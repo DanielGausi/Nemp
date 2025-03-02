@@ -164,7 +164,7 @@ var
 
 implementation
 
-Uses NempMainUnit, Hilfsfunktionen, Nemp_ConstantsAndTypes, TreeHelper, Nemp_RessourceStrings,
+Uses NempMainUnit, MedienbibliothekClass, Hilfsfunktionen, Nemp_ConstantsAndTypes, TreeHelper, Nemp_RessourceStrings,
   NewFavoritePlaylist, MainFormHelper, SystemHelper, gnuGettext, AudioDisplayUtils;
 
 {$R *.dfm}
@@ -906,7 +906,6 @@ begin
             begin
                 buffer[0] := #0;
                 DragQueryFile(f, i, buffer, SizeOf(buffer));
-                clipCursor(Nil);
                 if (FileGetAttr((buffer)) AND faDirectory <> faDirectory) then
                 begin
                     extension := AnsiLowerCase(ExtractFileExt(buffer));

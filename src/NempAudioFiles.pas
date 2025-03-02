@@ -42,7 +42,7 @@ uses windows, classes, SysUtils, math, Contnrs, ComCtrls, forms,
   VorbisComments, cddaUtils, System.Types, unFastFileStream,
   ComObj, graphics, variants, WmaFiles, WavFiles, Apev2Tags, ApeTagItem, MusePackFiles,
   strUtils, md5, U_CharCode, Nemp_ConstantsAndTypes, Hilfsfunktionen, Inifiles,
-  DateUtils, RatingCtrls, Generics.Collections;
+  DateUtils, Generics.Collections;
 
 var
     NempCharCodeOptions: TConvertOptions;
@@ -1100,7 +1100,6 @@ end;
 
 function TAudioFile.fGetRoundedRating: Double;
 begin
-    // unit RatingCtrls
     result := GetRoundedRating(fRating);
 end;
 

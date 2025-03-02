@@ -93,7 +93,9 @@ var
 
 implementation
 
-uses NempMainUnit, MainFormHelper, ReplayGain, gnugettext, Nemp_RessourceStrings, Nemp_ConstantsAndTypes;
+uses
+  NempMainUnit, MedienbibliothekClass, MainFormHelper, ReplayGain, gnugettext, Nemp_RessourceStrings,
+  Nemp_ConstantsAndTypes, AudioFileManagement;
 
 {$R *.dfm}
 
@@ -337,32 +339,23 @@ end;
 
 procedure TReplayGainProgressForm.OnAudioFileSynch(aFile: TAudioFile; aTrackGain,
   aAlbumGain, aTrackPeak, aAlbumPeak: Double);
-var ListOfFiles : TAudioFileList;
-    i: Integer;
-    listFile: TAudioFile;
+var
+  i: Integer;
 begin
     aFile.TrackGain := aTrackGain;
     aFile.AlbumGain := aAlbumGain;
     aFile.TrackPeak := aTrackPeak;
     aFile.AlbumPeak := aAlbumPeak;
-    MedienBib.Changed := True;
 
-    ListOfFiles := TAudioFileList.Create(False);
-    try
-        // get List of this AudioFile
-        GetListOfAudioFileCopies(aFile, ListOfFiles);
-        // edit all these files
-        for i := 0 to ListOfFiles.Count - 1 do
-        begin
-            listFile := ListOfFiles[i];
-            listFile.TrackGain := aTrackGain;
-            listFile.AlbumGain := aAlbumGain;
-            listFile.TrackPeak := aTrackPeak;
-            listFile.AlbumPeak := aAlbumPeak;
-        end;
-    finally
-        ListOfFiles.Free;
+    TAudioFileManager.PrepareAudioFileChange(aFile);
+    for i := 0 to TAudioFileManager.FilesToChange.Count - 1 do begin
+      TAudioFileManager.FilesToChange.Items[i].TrackGain := aTrackGain;
+      TAudioFileManager.FilesToChange.Items[i].AlbumGain := aAlbumGain;
+      TAudioFileManager.FilesToChange.Items[i].TrackPeak := aTrackPeak;
+      TAudioFileManager.FilesToChange.Items[i].AlbumPeak := aAlbumPeak;
     end;
+    TAudioFileManager.FinalizeAudioFileChange(aFile);
+    MedienBib.Changed := True;
 end;
 
 

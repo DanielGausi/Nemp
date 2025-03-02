@@ -756,7 +756,7 @@ end;
 
 procedure Register;
 begin
-  RegisterComponents('Beispiele', [TNempPanel, TNempContainerPanel]);
+  RegisterComponents('Nemp Components', [TNempPanel, TNempContainerPanel]);
 end;
 
 end.

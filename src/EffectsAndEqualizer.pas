@@ -164,7 +164,8 @@ implementation
 
 {$R *.dfm}
 
-uses NempMainUnit, Nemp_ConstantsAndTypes, gnugettext, MainFormHelper;
+uses PlayerClass, Nemp_ConstantsAndTypes, gnugettext, MainFormHelper,
+  NempMainUnit;
 
 
 
@@ -275,23 +276,20 @@ end;
 
 procedure TFormEffectsAndEqualizer.BtnABRepeatSetAClick(Sender: TObject);
 begin
-    NempPlayer.SetASync(NempPlayer.Progress);
-    CorrectVCLForABRepeat;
+  NempPlayer.SetASync(NempPlayer.Progress);
 end;
 
 procedure TFormEffectsAndEqualizer.BtnABRepeatSetBClick(Sender: TObject);
 begin
-    NempPlayer.SetBSync(NempPlayer.Progress);
-    CorrectVCLForABRepeat;
+  NempPlayer.SetBSync(NempPlayer.Progress);
 end;
 
 procedure TFormEffectsAndEqualizer.BtnABRepeatUnsetClick(Sender: TObject);
 begin
-    if NempPlayer.ABRepeatActive then
-        NempPlayer.RemoveABSyncs
-    else
-        NempPlayer.SetABSyncs(NempPlayer.Progress, -1);
-    CorrectVCLForABRepeat;
+  if NempPlayer.ABRepeatActive then
+    NempPlayer.RemoveABSyncs
+  else
+    NempPlayer.SetABSyncs(NempPlayer.Progress, -1);
 end;
 
 procedure TFormEffectsAndEqualizer.BtnCloseClick(Sender: TObject);

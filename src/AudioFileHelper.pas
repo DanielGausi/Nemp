@@ -119,7 +119,7 @@ var MainSort: IComparer<TAudioFile>;
 
 implementation
 
-uses NempMainUnit, CoverHelper, MedienbibliothekClass;
+uses NempMainUnit, PlayerClass, CoverHelper, MedienbibliothekClass;
 // MainUnit is needed because
 //    - some of the binary searches
 // need some properties from the MedienBib, from where

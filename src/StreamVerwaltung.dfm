@@ -2,8 +2,8 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
   Left = 885
   Top = 308
   Caption = 'Nemp - Internet radio'
-  ClientHeight = 481
-  ClientWidth = 718
+  ClientHeight = 479
+  ClientWidth = 710
   Color = clBtnFace
   Constraints.MinHeight = 420
   Constraints.MinWidth = 712
@@ -27,8 +27,8 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 712
-    Height = 431
+    Width = 704
+    Height = 429
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
@@ -93,14 +93,16 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
   object pnlButtons: TPanel
     AlignWithMargins = True
     Left = 3
-    Top = 440
-    Width = 712
+    Top = 438
+    Width = 704
     Height = 38
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
+    ExplicitTop = 440
+    ExplicitWidth = 712
     DesignSize = (
-      712
+      704
       38)
     object Btn_Icecast: TButton
       AlignWithMargins = True
@@ -114,7 +116,7 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     end
     object Btn_Ok: TButton
       AlignWithMargins = True
-      Left = 634
+      Left = 618
       Top = 6
       Width = 75
       Height = 25

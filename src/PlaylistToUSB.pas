@@ -92,7 +92,7 @@ var
 
 implementation
 
-uses NempMainUnit, Nemp_ConstantsAndTypes, math, DuplicateFilesDialogs;
+uses NempMainUnit, PlaylistClass, Nemp_ConstantsAndTypes, math, DuplicateFilesDialogs;
 
 {$R *.dfm}
 

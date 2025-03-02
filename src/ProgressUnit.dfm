@@ -4,7 +4,7 @@ object ProgressForm: TProgressForm
   BorderIcons = [biSystemMenu, biMinimize]
   Caption = 'Nemp: Work in progress ...'
   ClientHeight = 241
-  ClientWidth = 503
+  ClientWidth = 494
   Color = clBtnFace
   Constraints.MinHeight = 280
   Constraints.MinWidth = 510
@@ -17,7 +17,7 @@ object ProgressForm: TProgressForm
   OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
-    503
+    494
     241)
   TextHeight = 13
   object MainImage: TImage
@@ -32,8 +32,8 @@ object ProgressForm: TProgressForm
   object LblMain: TLabel
     Left = 88
     Top = 8
-    Width = 407
-    Height = 106
+    Width = 394
+    Height = 105
     Anchors = [akLeft, akTop, akRight, akBottom]
     AutoSize = False
     Caption = 
@@ -46,7 +46,7 @@ object ProgressForm: TProgressForm
   end
   object ImgFail: TImage
     Left = 166
-    Top = 154
+    Top = 153
     Width = 16
     Height = 16
     Anchors = [akLeft, akBottom]
@@ -54,7 +54,7 @@ object ProgressForm: TProgressForm
   end
   object ImgOk: TImage
     Left = 88
-    Top = 154
+    Top = 153
     Width = 16
     Height = 16
     Anchors = [akLeft, akBottom]
@@ -62,8 +62,8 @@ object ProgressForm: TProgressForm
   end
   object lblCurrentItem: TLabel
     Left = 88
-    Top = 120
-    Width = 407
+    Top = 119
+    Width = 394
     Height = 28
     Anchors = [akLeft, akRight, akBottom]
     AutoSize = False
@@ -75,7 +75,7 @@ object ProgressForm: TProgressForm
   end
   object LblSuccessCount: TLabel
     Left = 110
-    Top = 154
+    Top = 153
     Width = 6
     Height = 13
     Anchors = [akLeft, akBottom]
@@ -84,7 +84,7 @@ object ProgressForm: TProgressForm
   end
   object lblFailCount: TLabel
     Left = 188
-    Top = 154
+    Top = 153
     Width = 6
     Height = 13
     Anchors = [akLeft, akBottom]
@@ -93,8 +93,8 @@ object ProgressForm: TProgressForm
   end
   object MainProgressBar: TProgressBar
     Left = 5
-    Top = 207
-    Width = 490
+    Top = 206
+    Width = 477
     Height = 25
     Anchors = [akLeft, akRight, akBottom]
     Position = 50
@@ -102,10 +102,12 @@ object ProgressForm: TProgressForm
     Step = 1
     TabOrder = 0
     TabStop = True
+    ExplicitTop = 207
+    ExplicitWidth = 490
   end
   object BtnCancel: TButton
-    Left = 420
-    Top = 176
+    Left = 407
+    Top = 175
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -113,16 +115,19 @@ object ProgressForm: TProgressForm
     Caption = 'Cancel'
     TabOrder = 1
     OnClick = BtnCancelClick
+    ExplicitLeft = 420
+    ExplicitTop = 176
   end
   object cbAutoClose: TCheckBox
     Left = 8
-    Top = 184
+    Top = 183
     Width = 329
     Height = 17
     Anchors = [akLeft, akBottom]
     Caption = 'Close window after completion'
     TabOrder = 2
     OnClick = cbAutoCloseClick
+    ExplicitTop = 184
   end
   object CloseTimer: TTimer
     Enabled = False

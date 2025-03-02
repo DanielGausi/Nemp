@@ -56,13 +56,13 @@ interface
 implementation
 
 uses NempMainUnit, Splash, gnugettext, PlaylistClass, PlayerClass,
-    MedienbibliothekClass, Nemp_SkinSystem, Spectrum_vis,
+    MedienbibliothekClass, Nemp_SkinSystem,
     Nemp_ConstantsAndTypes, NempApi, NempAudioFiles, Nemp_RessourceStrings,
     MainFormHelper, UpdateUtils, SystemHelper, TreeHelper, languagecodes,
     SplitForm_Hilfsfunktionen, DriveRepairTools, NempCoverFlowClass,
 
-    MedienListeUnit, AuswahlUnit, ExtendedControlsUnit, PlaylistUnit,
-    WindowsVersionInfo, AudioDisplayUtils, MyDialogs, NempHelp,
+    MedienListeUnit, AuswahlUnit, ExtendedControlsUnit, PlaylistUnit, FHeadsetControl,
+    WindowsVersionInfo, AudioDisplayUtils, MyDialogs, NempHelp, NempSpectrum,
     Cover.ViewCache, fConfigErrorDlg;
 
 
@@ -408,8 +408,6 @@ begin
 
     with Nemp_MainForm do
     begin
-        CorrectVolButton;
-
         // TabStops setzen
         SetTabStopsPlayer;
         SetTabStopsTabs;
@@ -475,7 +473,6 @@ begin
                 RandomBtn.Hint := (MainForm_RepeatBtnHint_NoRepeat);
         end;
         BassTimer.Interval := NempPlayer.VisualizationInterval;
-        HeadsetTimer.Interval := NempPlayer.VisualizationInterval;
         AutoSavePlaylistTimer.Enabled := True; // NempPlaylist.AutoSave;
         AutoSavePlaylistTimer.Interval := 5 * 60000;
 
@@ -484,14 +481,22 @@ begin
         if NempOptions.RegisterMediaHotkeys then
             NempOptions.InstallMediakeyHotkeys(NempOptions.IgnoreVolumeUpDownKeys);
 
-        Spectrum.Mode := 1;
-        Spectrum.LineFallOff := 7;
+        NempSpectrum.DrawMode := sdmGradientBars;
+        NempSpectrum.FallSpeedBars := 3;
+        NempSpectrum.FallSpeedPeaks := 1;
+        NempSpectrum.ColorPeak := clBackground;
+        NempSpectrum.ColorBar1 := clBackground;
+        NempSpectrum.ColorBar2 := clActiveCaption;
+
+        // Spectrum.Mode := 1;
+        (*Spectrum.LineFallOff := 7;
         Spectrum.PeakFallOff := 1;
         Spectrum.Pen := clActiveCaption;
         Spectrum.Peak := clBackground;
         Spectrum.BackColor := clBtnFace;
         // Spectrum.ScrollDelay := NempPlayer.ScrollAnzeigeDelay;
         Spectrum.DrawClear;
+        *)
         // moved to CreateHelper.InitializeCoverflow
         // MedienBib.NewCoverFlow.ApplySettings;
     end;
@@ -510,19 +515,19 @@ begin
             SetSkinRadioBox(NempOptions.SkinName);
             Nempskin.LoadFromDir(GetSkinDirFromSkinName(NempOptions.SkinName));
             NempSkin.ActivateSkin(False);
-            RandomBtn.GlyphLine := NempPlaylist.WiedergabeMode;
+            RandomBtn.ImageIndex := NempSkin.RepeatBtnImageIndex(NempPlaylist.WiedergabeMode);   // SKIN_UMBAU_CHECK
         end else
         begin
             SetSkinRadioBox('');
             NempSkin.DeActivateSkin(False);
-            TabBtn_Equalizer.ResetGlyph;
+            // TabBtn_Equalizer.ResetGlyph;  // SKIN_UMBAU_CHECK
         end;
 
         // Anzeige oben links initialisieren
         SwitchBrowsePanel(MedienBib.BrowseMode, True);
 
         TabBtn_SummaryLock.Tag       := NempOptions.VSTDetailsLock;
-        TabBtn_SummaryLock.GlyphLine := NempOptions.VSTDetailsLock;
+        // TabBtn_SummaryLock.GlyphLine := NempOptions.VSTDetailsLock;  // SKIN_UMBAU_CHECK
 
         NempOptions.StartMinimizedByParameter := False;
 
@@ -637,6 +642,8 @@ begin
         AcceptApiCommands := True;
         EditFastSearch.OnChange := EDITFastSearchChange;
         PlaylistPropertiesChanged(NempPlaylist);
+
+        FormHeadsetControl.DropManager := fDropManager;
 
         //LockWindowUpdate(0);
         {$IFDEF USESTYLES}

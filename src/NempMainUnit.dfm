@@ -3,8 +3,8 @@ object Nemp_MainForm: TNemp_MainForm
   Top = 0
   HelpContext = 10000
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 755
-  ClientWidth = 1084
+  ClientHeight = 605
+  ClientWidth = 1076
   Color = clBtnFace
   Constraints.MinHeight = 300
   Constraints.MinWidth = 400
@@ -17,7 +17,6 @@ object Nemp_MainForm: TNemp_MainForm
   KeyPreview = True
   Menu = Nemp_MainMenu
   Position = poDesigned
-  Scaled = False
   ShowHint = True
   OnActivate = FormActivate
   OnClose = TntFormClose
@@ -34,8 +33,8 @@ object Nemp_MainForm: TNemp_MainForm
     Tag = 2
     Left = 0
     Top = 0
-    Width = 1084
-    Height = 755
+    Width = 1076
+    Height = 605
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
@@ -46,12 +45,12 @@ object Nemp_MainForm: TNemp_MainForm
     OwnerDraw = False
     HierarchyLevel = 0
     SplitterMinSize = 110
-    ExplicitWidth = 1080
-    ExplicitHeight = 734
+    ExplicitWidth = 1072
+    ExplicitHeight = 604
     object _ControlPanel: TNempPanel
       Left = 0
-      Top = 655
-      Width = 1084
+      Top = 505
+      Width = 1076
       Height = 100
       Align = alBottom
       BevelOuter = bvNone
@@ -64,300 +63,14 @@ object Nemp_MainForm: TNemp_MainForm
       Ratio = 0
       FixedHeight = True
       OwnerDraw = False
-      ExplicitTop = 634
-      ExplicitWidth = 1080
-      object ControlContainer2: TNempPanel
-        Left = 481
-        Top = 0
-        Width = 603
-        Height = 100
-        Align = alClient
-        BevelOuter = bvNone
-        TabOrder = 1
-        Ratio = 0
-        OwnerDraw = False
-        ExplicitWidth = 599
-        object NewPlayerPanel: TNempPanel
-          Tag = 4
-          Left = 0
-          Top = 0
-          Width = 603
-          Height = 100
-          Align = alClient
-          BevelInner = bvRaised
-          BevelOuter = bvLowered
-          PopupMenu = Player_PopupMenu
-          TabOrder = 0
-          OnDragOver = GRPBOXControlDragOver
-          OnMouseDown = PaintFrameMouseDown
-          OnMouseMove = PaintFrameMouseMove
-          OnMouseUp = PaintFrameMouseUp
-          OnResize = NewPlayerPanelResize
-          Ratio = 0
-          OnPaint = ControlPanelPaint
-          OwnerDraw = False
-          ExplicitWidth = 599
-          DesignSize = (
-            603
-            100)
-          object SlideBarShape: TProgressShape
-            Left = 100
-            Top = 78
-            Width = 445
-            Height = 6
-            Anchors = [akLeft, akTop, akRight]
-            Brush.Color = clGradientActiveCaption
-            DragCursor = crSizeWE
-            Shape = stRoundRect
-            OnDragOver = GRPBOXControlDragOver
-            OnMouseDown = SlideBarShapeMouseDown
-            OnMouseEnter = SlideBarShapeMouseEnter
-            OnMouseLeave = SlideBarShapeMouseLeave
-            ProgressPen.Color = 12678971
-            ProgressBrush.Color = clMaroon
-            Progress = 0.500000000000000000
-            ExplicitWidth = 451
-          end
-          object RatingImage: TImage
-            Left = 11
-            Top = 45
-            Width = 70
-            Height = 14
-            OnDragOver = GRPBOXControlDragOver
-            OnMouseDown = RatingImageMouseDown
-            OnMouseLeave = RatingImageMouseLeave
-            OnMouseMove = RatingImageMouseMove
-          end
-          object ab2: TImage
-            Left = 200
-            Top = 57
-            Width = 20
-            Height = 22
-            Hint = 'A-B Repeat'
-            DragCursor = crSizeWE
-            DragMode = dmAutomatic
-            PopupMenu = PopupRepeatAB
-            Proportional = True
-            Stretch = True
-            Visible = False
-            OnDragOver = GRPBOXControlDragOver
-            OnEndDrag = ab1EndDrag
-            OnStartDrag = ab1StartDrag
-          end
-          object PlayerTimeLbl: TLabel
-            Left = 560
-            Top = 74
-            Width = 34
-            Height = 13
-            Alignment = taRightJustify
-            Anchors = [akTop, akRight]
-            AutoSize = False
-            Caption = '00:00'
-            StyleElements = [seClient, seBorder]
-            OnClick = BassTimeLBLClick
-            OnDragOver = GRPBOXControlDragOver
-            ExplicitLeft = 767
-          end
-          object ab1: TImage
-            Left = 156
-            Top = 57
-            Width = 20
-            Height = 22
-            Hint = 'A-B Repeat'
-            DragCursor = crSizeWE
-            DragMode = dmAutomatic
-            PopupMenu = PopupRepeatAB
-            Proportional = True
-            Stretch = True
-            Visible = False
-            OnDragOver = GRPBOXControlDragOver
-            OnEndDrag = ab1EndDrag
-            OnStartDrag = ab1StartDrag
-          end
-          object PaintFrame: TImage
-            Left = 519
-            Top = 34
-            Width = 75
-            Height = 25
-            Anchors = [akRight]
-            OnClick = NewPlayerPanelClick
-            OnDblClick = PaintFrameDblClick
-            OnDragOver = GRPBOXControlDragOver
-            OnMouseDown = PaintFrameMouseDown
-            OnMouseMove = PaintFrameMouseMove
-            OnMouseUp = PaintFrameMouseUp
-            ExplicitLeft = 386
-          end
-          object PlayerTitleLabel: TLabel
-            Left = 11
-            Top = 26
-            Width = 9
-            Height = 13
-            Caption = '...'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = [fsBold]
-            ParentFont = False
-            ShowAccelChar = False
-            StyleElements = [seClient, seBorder]
-            OnDblClick = PlayerArtistLabelDblClick
-            OnDragOver = GRPBOXControlDragOver
-          end
-          object PlayerArtistLabel: TLabel
-            Left = 11
-            Top = 6
-            Width = 12
-            Height = 13
-            Caption = '...'
-            ShowAccelChar = False
-            StyleElements = [seClient, seBorder]
-            OnDblClick = PlayerArtistLabelDblClick
-            OnDragOver = GRPBOXControlDragOver
-          end
-          object SlideBarButton: TSkinButton
-            Left = 303
-            Top = 76
-            Width = 25
-            Height = 10
-            DragCursor = crSizeWE
-            DragMode = dmAutomatic
-            TabOrder = 3
-            Visible = False
-            OnDragOver = GRPBOXControlDragOver
-            OnEndDrag = SlideBarButtonEndDrag
-            OnKeyDown = SlideBarButtonKeyDown
-            OnStartDrag = SlideBarButtonStartDrag
-            DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = True
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
-            AcceptArrowKeys = True
-          end
-          object SlideForwardBTN: TSkinButton
-            Tag = 1
-            Left = 58
-            Top = 69
-            Width = 22
-            Height = 22
-            Hint = 'Slide forward'
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 2
-            OnClick = SlideForwardBTNIMGClick
-            OnDragOver = GRPBOXControlDragOver
-            DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
-          end
-          object SlideBackBTN: TSkinButton
-            Tag = -1
-            Left = 37
-            Top = 69
-            Width = 22
-            Height = 22
-            Hint = 'Slide backward'
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 1
-            OnClick = SlideBackBTNIMGClick
-            OnDragOver = GRPBOXControlDragOver
-            DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
-          end
-          object RecordBtn: TSkinButton
-            Left = 11
-            Top = 69
-            Width = 20
-            Height = 20
-            Enabled = False
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 0
-            Visible = False
-            OnClick = RecordBtnIMGClick
-            OnDragOver = GRPBOXControlDragOver
-            DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 2
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
-          end
-          object BtnClose: TSkinButton
-            Left = 585
-            Top = 4
-            Width = 12
-            Height = 12
-            Hint = 'Close Nemp'
-            Anchors = [akTop, akRight]
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 4
-            TabStop = False
-            Visible = False
-            OnClick = BtnCloseClick
-            OnDragOver = GRPBOXControlDragOver
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
-            ExplicitLeft = 581
-          end
-          object BtnMinimize: TSkinButton
-            Left = 570
-            Top = 4
-            Width = 12
-            Height = 12
-            Hint = 'Minimize Nemp'
-            Anchors = [akTop, akRight]
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 5
-            TabStop = False
-            Visible = False
-            OnClick = BtnMinimizeClick
-            OnDragOver = GRPBOXControlDragOver
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
-            ExplicitLeft = 566
-          end
-        end
-      end
+      ExplicitTop = 504
+      ExplicitWidth = 1072
       object ControlContainer1: TNempPanel
         Left = 0
         Top = 0
-        Width = 481
+        Width = 1076
         Height = 100
-        Align = alLeft
+        Align = alClient
         BevelOuter = bvNone
         PopupMenu = Player_PopupMenu
         TabOrder = 0
@@ -366,165 +79,7 @@ object Nemp_MainForm: TNemp_MainForm
         OnMouseUp = PaintFrameMouseUp
         Ratio = 0
         OwnerDraw = False
-        object HeadsetControlPanel: TNempPanel
-          Tag = 3
-          Left = 305
-          Top = 0
-          Width = 165
-          Height = 100
-          Align = alLeft
-          BevelInner = bvRaised
-          BevelOuter = bvLowered
-          TabOrder = 3
-          OnClick = HeadsetControlPanelClick
-          OnDragOver = GRPBOXControlDragOver
-          Ratio = 0
-          OnPaint = ControlPanelPaint
-          OwnerDraw = False
-          OnMouseWheelUp = HeadsetControlPanelMouseWheelUp
-          OnMouseWheelDown = HeadsetControlPanelMouseWheelDown
-          object VolShapeHeadset: TShape
-            Left = 37
-            Top = 78
-            Width = 117
-            Height = 6
-            Brush.Color = clGradientActiveCaption
-            DragCursor = crSizeNS
-            Shape = stRoundRect
-            OnDragOver = GRPBOXControlDragOver
-          end
-          object VolumeImageHeadset: TImage
-            Left = 9
-            Top = 73
-            Width = 20
-            Height = 18
-            OnDragOver = GRPBOXControlDragOver
-          end
-          object lblHeadphoneControl: TLabel
-            Left = 8
-            Top = 6
-            Width = 98
-            Height = 13
-            Caption = 'Headphone Controls'
-            StyleElements = [seClient, seBorder]
-            OnDragOver = GRPBOXControlDragOver
-          end
-          object VolButtonHeadset: TSkinButton
-            Left = 47
-            Top = 76
-            Width = 25
-            Height = 10
-            Hint = 'Volume'
-            DragCursor = crSizeWE
-            DragMode = dmAutomatic
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 0
-            OnDragOver = GRPBOXControlDragOver
-            OnEndDrag = VolButtonEndDrag
-            OnKeyDown = VolButtonHeadsetKeyDown
-            OnStartDrag = VolButton_HeadsetStartDrag
-            DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = True
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
-            AcceptArrowKeys = True
-          end
-          object PlayPauseHeadSetBtn: TSkinButton
-            Left = 5
-            Top = 25
-            Width = 32
-            Height = 32
-            TabOrder = 1
-            OnClick = PLayPauseBtnHeadsetClick
-            OnDragOver = GRPBOXControlDragOver
-            DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 2
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
-          end
-          object StopHeadSetBtn: TSkinButton
-            Left = 37
-            Top = 31
-            Width = 20
-            Height = 20
-            TabOrder = 2
-            OnClick = StopHeadSetBtnClick
-            OnDragOver = GRPBOXControlDragOver
-            DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
-          end
-          object BtnLoadHeadset: TSkinButton
-            Left = 74
-            Top = 48
-            Width = 24
-            Height = 24
-            Hint = 'Load selected file into headset (Ctrl+H)'
-            TabOrder = 3
-            Visible = False
-            OnClick = BtnLoadHeadsetClick
-            OnDragOver = GRPBOXControlDragOver
-            DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
-          end
-          object BtnHeadsetToPlaylist: TSkinButton
-            Left = 131
-            Top = 29
-            Width = 24
-            Height = 24
-            Hint = 'Add current file to playlist (Right click for options)'
-            PopupMenu = PopupHeadset
-            TabOrder = 4
-            OnClick = BtnHeadsetToPlaylistClick
-            OnDragOver = GRPBOXControlDragOver
-            DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
-          end
-          object BtnHeadsetPlaynow: TSkinButton
-            Left = 104
-            Top = 29
-            Width = 24
-            Height = 24
-            Hint = 'Add file to playlist and begin playback from current position'
-            TabOrder = 5
-            OnClick = BtnHeadsetPlaynowClick
-            OnDragOver = GRPBOXControlDragOver
-            DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
-          end
-        end
+        ExplicitWidth = 1072
         object PlayerControlCoverPanel: TNempPanel
           Tag = 2
           Left = 40
@@ -573,20 +128,14 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Show main player controls'
+            DrawMode = dm_Skin
             ParentShowHint = False
             PopupMenu = Player_PopupMenu
             ShowHint = True
             TabOrder = 0
+            StyleElements = [seFont, seBorder]
             OnClick = TabBtn_MainPlayerControlClick
             OnMouseMove = TabBtn_CoverMouseMove
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 2
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
           object TabBtn_Equalizer: TSkinButton
             Tag = 3
@@ -595,20 +144,13 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Show equalizer and effect controls'
+            DrawMode = dm_Windows
             ParentShowHint = False
             PopupMenu = Player_PopupMenu
             ShowHint = True
             TabOrder = 2
             OnClick = TabBtn_EqualizerClick
             OnMouseMove = TabBtn_CoverMouseMove
-            DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 2
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
           object TabBtn_Headset: TSkinButton
             Tag = 5
@@ -617,20 +159,14 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Show headset controls'
+            DrawMode = dm_Skin
             ParentShowHint = False
             PopupMenu = Player_PopupMenu
             ShowHint = True
             TabOrder = 1
+            StyleElements = [seFont, seBorder]
             OnClick = TabBtn_HeadsetClick
             OnMouseMove = TabBtn_CoverMouseMove
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 2
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
         end
         object PlayerControlPanel: TNempPanel
@@ -643,29 +179,14 @@ object Nemp_MainForm: TNemp_MainForm
           BevelInner = bvRaised
           BevelOuter = bvLowered
           TabOrder = 2
-          OnClick = PlayerControlPanelClick
-          OnDragOver = GRPBOXControlDragOver
           Ratio = 0
           OnPaint = ControlPanelPaint
           OwnerDraw = False
-          OnMouseWheelUp = PlayerControlPanelMouseWheelUp
-          OnMouseWheelDown = PlayerControlPanelMouseWheelDown
-          object VolShape: TShape
-            Left = 37
-            Top = 78
-            Width = 117
-            Height = 6
-            Brush.Color = clGradientActiveCaption
-            DragCursor = crSizeNS
-            Shape = stRoundRect
-            OnDragOver = GRPBOXControlDragOver
-          end
           object VolumeImage: TImage
-            Left = 9
+            Left = 6
             Top = 73
             Width = 20
             Height = 18
-            OnDragOver = GRPBOXControlDragOver
           end
           object WalkmanImage: TImage
             Left = 110
@@ -707,7 +228,6 @@ object Nemp_MainForm: TNemp_MainForm
             Stretch = True
             Visible = False
             OnClick = WalkmanImageClick
-            OnDragOver = GRPBOXControlDragOver
           end
           object WebserverImage: TImage
             Left = 66
@@ -749,7 +269,6 @@ object Nemp_MainForm: TNemp_MainForm
             Stretch = True
             OnClick = ToolImageClick
             OnDblClick = MM_T_WebServerOptionsClick
-            OnDragOver = GRPBOXControlDragOver
           end
           object SleepImage: TImage
             Left = 44
@@ -789,7 +308,6 @@ object Nemp_MainForm: TNemp_MainForm
             ShowHint = True
             Stretch = True
             OnClick = ToolImageClick
-            OnDragOver = GRPBOXControlDragOver
           end
           object BirthdayImage: TImage
             Left = 22
@@ -830,7 +348,6 @@ object Nemp_MainForm: TNemp_MainForm
             Stretch = True
             OnClick = ToolImageClick
             OnDblClick = PM_P_BirthdayOptionsClick
-            OnDragOver = GRPBOXControlDragOver
           end
           object ScrobblerImage: TImage
             Left = 9
@@ -872,7 +389,6 @@ object Nemp_MainForm: TNemp_MainForm
             Stretch = True
             OnClick = ToolImageClick
             OnDblClick = PM_P_ScrobblerOptionsClick
-            OnDragOver = GRPBOXControlDragOver
           end
           object DSPPluginImage: TImage
             Left = 88
@@ -908,7 +424,6 @@ object Nemp_MainForm: TNemp_MainForm
               000000000000}
             Visible = False
             OnClick = ToolImageClick
-            OnDragOver = GRPBOXControlDragOver
           end
           object PlayPauseBTN: TSkinButton
             Left = 5
@@ -916,18 +431,10 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 32
             Height = 32
             Hint = 'Play/Pause'
+            DrawMode = dm_Windows
             PopupMenu = PopupPlayPause
             TabOrder = 0
             OnClick = PlayPauseBTNIMGClick
-            OnDragOver = GRPBOXControlDragOver
-            DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 2
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
           object StopBTN: TSkinButton
             Left = 37
@@ -935,18 +442,10 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 20
             Height = 20
             Hint = 'Stop'
+            DrawMode = dm_Windows
             PopupMenu = PopupStop
             TabOrder = 1
             OnClick = StopBTNIMGClick
-            OnDragOver = GRPBOXControlDragOver
-            DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 2
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
           object PlayPrevBTN: TSkinButton
             Left = 72
@@ -954,18 +453,9 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 22
             Height = 22
             Hint = 'Previous title'
-            Spacing = 14
+            DrawMode = dm_Windows
             TabOrder = 2
             OnClick = PlayPrevBTNIMGClick
-            OnDragOver = GRPBOXControlDragOver
-            DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
           object PlayNextBTN: TSkinButton
             Left = 93
@@ -973,64 +463,388 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 22
             Height = 22
             Hint = 'Next title'
+            DrawMode = dm_Windows
             ParentShowHint = False
             ShowHint = True
             TabOrder = 3
             OnClick = PlayNextBTNIMGClick
-            OnDragOver = GRPBOXControlDragOver
-            DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
           object RandomBtn: TSkinButton
             Left = 126
             Top = 28
             Width = 28
             Height = 28
+            DrawMode = dm_Windows
             ParentShowHint = False
             PopupMenu = PopupRepeat
             ShowHint = True
             TabOrder = 4
             OnClick = RepeatBitBTNIMGClick
-            OnDragOver = GRPBOXControlDragOver
-            DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 4
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
-          object VolButton: TSkinButton
-            Left = 74
-            Top = 76
-            Width = 25
-            Height = 10
-            Hint = 'Volume'
-            DragCursor = crSizeWE
-            DragMode = dmAutomatic
+          object rbVolume: TProgressRangeBar
+            AlignWithMargins = True
+            Left = 49
+            Top = 68
+            Width = 101
+            Height = 28
+            Margins.Left = 0
+            Margins.Top = 6
+            Margins.Right = 12
+            Margins.Bottom = 6
+            OnScroll = rbVolumeScroll
+            OnStep = rbVolumeStep
+            OnMouseWheelDown = rbVolumeMouseWheelDown
+            OnMouseWheelUp = rbVolumeMouseWheelUp
+            RangeMin = 0
+            RangeMax = 100
+            RangeMaxNorm = 1.000000000000000000
+            Orientation = trHorizontal
+            ButtonMode = bmNested
+            Style = nsbStyleWindows
+            TrackBarMargin = 4
+            Position = 0
+            DefaultPosition = 0
+            AllowRange = False
+            RangeActive = False
+            TrackButton.Colors.FrameColor = clActiveBorder
+            TrackButton.Colors.FrameHighlightColor = clActiveBorder
+            TrackButton.Colors.FrameDisabledColor = clInactiveBorder
+            TrackButton.Colors.BrushColor = clBtnFace
+            TrackButton.Colors.BrushHighlightColor = clBtnHighlight
+            TrackButton.Colors.BrushDisabledColor = clBtnShadow
+            TrackButton.Colors.FocusRectColor = clHighlight
+            TrackButton.FrameWidth = 1
+            TrackButton.Radius = 4
+            TrackButton.VisibleMode = vAlways
+            TrackButton.Thickness = 12
+            TrackButton.Length = 20
+            RangeButtonMin.Colors.FrameColor = clActiveBorder
+            RangeButtonMin.Colors.FrameHighlightColor = clActiveBorder
+            RangeButtonMin.Colors.FrameDisabledColor = clInactiveBorder
+            RangeButtonMin.Colors.BrushColor = clBtnFace
+            RangeButtonMin.Colors.BrushHighlightColor = clBtnHighlight
+            RangeButtonMin.Colors.BrushDisabledColor = clBtnShadow
+            RangeButtonMin.Colors.FocusRectColor = clHighlight
+            RangeButtonMin.FrameWidth = 1
+            RangeButtonMin.Radius = 4
+            RangeButtonMin.VisibleMode = vAlways
+            RangeButtonMin.Thickness = 12
+            RangeButtonMin.Length = 18
+            RangeButtonMax.Colors.FrameColor = clActiveBorder
+            RangeButtonMax.Colors.FrameHighlightColor = clActiveBorder
+            RangeButtonMax.Colors.FrameDisabledColor = clInactiveBorder
+            RangeButtonMax.Colors.BrushColor = clBtnFace
+            RangeButtonMax.Colors.BrushHighlightColor = clBtnHighlight
+            RangeButtonMax.Colors.BrushDisabledColor = clBtnShadow
+            RangeButtonMax.Colors.FocusRectColor = clHighlight
+            RangeButtonMax.FrameWidth = 1
+            RangeButtonMax.Radius = 4
+            RangeButtonMax.VisibleMode = vAlways
+            RangeButtonMax.Thickness = 12
+            RangeButtonMax.Length = 18
+            TrackBar.Colors.FrameColor = clActiveBorder
+            TrackBar.Colors.FrameHighlightColor = clActiveBorder
+            TrackBar.Colors.FrameDisabledColor = clInactiveBorder
+            TrackBar.Colors.BrushColor = clBtnFace
+            TrackBar.Colors.BrushHighlightColor = clBtnHighlight
+            TrackBar.Colors.BrushDisabledColor = clBtnShadow
+            TrackBar.Colors.FocusRectColor = clHighlight
+            TrackBar.FrameWidth = 1
+            TrackBar.Radius = 4
+            TrackBar.VisibleMode = vAlways
+            TrackBar.Thickness = 8
+            ProgressBar.Colors.FrameColor = clActiveBorder
+            ProgressBar.Colors.FrameHighlightColor = clActiveBorder
+            ProgressBar.Colors.FrameDisabledColor = clInactiveBorder
+            ProgressBar.Colors.BrushColor = clHighlight
+            ProgressBar.Colors.BrushHighlightColor = clBtnHighlight
+            ProgressBar.Colors.BrushDisabledColor = clBtnShadow
+            ProgressBar.Colors.FocusRectColor = clHighlight
+            ProgressBar.FrameWidth = 1
+            ProgressBar.Radius = 4
+            ProgressBar.VisibleMode = vAlways
+            ProgressBar.Thickness = 8
+            RangeBar.Colors.FrameColor = clActiveBorder
+            RangeBar.Colors.FrameHighlightColor = clActiveBorder
+            RangeBar.Colors.FrameDisabledColor = clInactiveBorder
+            RangeBar.Colors.BrushColor = clBtnFace
+            RangeBar.Colors.BrushHighlightColor = clBtnHighlight
+            RangeBar.Colors.BrushDisabledColor = clBtnShadow
+            RangeBar.Colors.FocusRectColor = clHighlight
+            RangeBar.FrameWidth = 1
+            RangeBar.Radius = 4
+            RangeBar.VisibleMode = vAlways
+            RangeBar.Thickness = 4
+          end
+        end
+        object NewPlayerPanel: TNempPanel
+          Tag = 4
+          Left = 305
+          Top = 0
+          Width = 771
+          Height = 100
+          Align = alClient
+          BevelInner = bvRaised
+          BevelOuter = bvLowered
+          PopupMenu = Player_PopupMenu
+          TabOrder = 3
+          OnMouseDown = PaintFrameMouseDown
+          OnMouseMove = PaintFrameMouseMove
+          OnMouseUp = PaintFrameMouseUp
+          OnResize = NewPlayerPanelResize
+          Ratio = 0
+          OnPaint = ControlPanelPaint
+          OwnerDraw = False
+          ExplicitWidth = 767
+          DesignSize = (
+            771
+            100)
+          object PlayerTimeLbl: TLabel
+            Left = 704
+            Top = 74
+            Width = 34
+            Height = 13
+            Alignment = taRightJustify
+            Anchors = [akTop, akRight]
+            AutoSize = False
+            Caption = '00:00'
+            StyleElements = [seClient, seBorder]
+            OnClick = BassTimeLBLClick
+            ExplicitLeft = 767
+          end
+          object PlayerTitleLabel: TLabel
+            Left = 11
+            Top = 26
+            Width = 9
+            Height = 13
+            Caption = '...'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+            ShowAccelChar = False
+            StyleElements = [seClient, seBorder]
+            OnDblClick = PlayerArtistLabelDblClick
+          end
+          object PlayerArtistLabel: TLabel
+            Left = 11
+            Top = 6
+            Width = 12
+            Height = 13
+            Caption = '...'
+            ShowAccelChar = False
+            StyleElements = [seClient, seBorder]
+            OnDblClick = PlayerArtistLabelDblClick
+          end
+          object NempSpectrum: TNempSpectrum
+            Left = 631
+            Top = 22
+            Width = 120
+            Height = 41
+            BarCount = 30
+            BarWidth = 4
+            FallSpeedBars = 3
+            FallSpeedPeaks = 1
+            DrawMode = sdmGradientBars
+            DrawPeaks = True
+            ColorPeak = clBlack
+            ColorBar1 = clBlack
+            ColorBar2 = clBlack
+            OnDblClick = PaintFrameDblClick
+            OnMouseDown = PaintFrameMouseDown
+            OnMouseMove = PaintFrameMouseMove
+            OnMouseUp = PaintFrameMouseUp
+            Anchors = [akTop, akRight]
+            ExplicitLeft = 627
+          end
+          object SlideForwardBTN: TSkinButton
+            Tag = 1
+            Left = 58
+            Top = 69
+            Width = 22
+            Height = 22
+            Hint = 'Slide forward'
+            DrawMode = dm_Windows
             ParentShowHint = False
             ShowHint = True
-            TabOrder = 5
-            OnDragOver = GRPBOXControlDragOver
-            OnEndDrag = VolButtonEndDrag
-            OnKeyDown = VolButtonKeyDown
-            OnStartDrag = VolButtonStartDrag
+            TabOrder = 2
+            OnClick = SlideForwardBTNIMGClick
+          end
+          object SlideBackBTN: TSkinButton
+            Tag = -1
+            Left = 37
+            Top = 69
+            Width = 22
+            Height = 22
+            Hint = 'Slide backward'
             DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = True
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
-            AcceptArrowKeys = True
+            ParentShowHint = False
+            ShowHint = True
+            TabOrder = 1
+            OnClick = SlideBackBTNIMGClick
+          end
+          object RecordBtn: TSkinButton
+            Left = 11
+            Top = 69
+            Width = 20
+            Height = 20
+            DrawMode = dm_Windows
+            Enabled = False
+            ParentShowHint = False
+            ShowHint = True
+            TabOrder = 0
+            Visible = False
+            OnClick = RecordBtnIMGClick
+          end
+          object BtnClose: TSkinButton
+            Left = 729
+            Top = 4
+            Width = 12
+            Height = 12
+            Hint = 'Close Nemp'
+            Anchors = [akTop, akRight]
+            DrawMode = dm_Skin
+            ParentShowHint = False
+            ShowHint = True
+            TabOrder = 3
+            TabStop = False
+            Visible = False
+            StyleElements = [seFont, seBorder]
+            OnClick = BtnCloseClick
+            ExplicitLeft = 725
+          end
+          object BtnMinimize: TSkinButton
+            Left = 714
+            Top = 4
+            Width = 12
+            Height = 12
+            Hint = 'Minimize Nemp'
+            Anchors = [akTop, akRight]
+            DrawMode = dm_Skin
+            ParentShowHint = False
+            ShowHint = True
+            TabOrder = 4
+            TabStop = False
+            Visible = False
+            StyleElements = [seFont, seBorder]
+            OnClick = BtnMinimizeClick
+            ExplicitLeft = 710
+          end
+          object rbTrackProgress: TProgressRangeBar
+            AlignWithMargins = True
+            Left = 89
+            Top = 68
+            Width = 593
+            Height = 28
+            Margins.Left = 0
+            Margins.Top = 6
+            Margins.Right = 0
+            Margins.Bottom = 6
+            OnScroll = rbTrackProgressScroll
+            OnStep = rbTrackProgressStep
+            OnEndScroll = rbTrackProgressEndScroll
+            PopupMenu = PopupRepeatAB
+            RangeMin = 0
+            RangeMax = 100
+            RangeMaxNorm = 1.000000000000000000
+            Orientation = trHorizontal
+            ButtonMode = bmCentered
+            Style = nsbStyleWindows
+            TrackBarMargin = 8
+            Position = 0
+            DefaultPosition = 0
+            AllowRange = True
+            RangeActive = False
+            TrackButton.Colors.FrameColor = clActiveBorder
+            TrackButton.Colors.FrameHighlightColor = clActiveBorder
+            TrackButton.Colors.FrameDisabledColor = clInactiveBorder
+            TrackButton.Colors.BrushColor = clBtnFace
+            TrackButton.Colors.BrushHighlightColor = clBtnHighlight
+            TrackButton.Colors.BrushDisabledColor = clBtnShadow
+            TrackButton.Colors.FocusRectColor = clHighlight
+            TrackButton.FrameWidth = 1
+            TrackButton.Radius = 4
+            TrackButton.VisibleMode = vHover
+            TrackButton.Thickness = 12
+            TrackButton.Length = 20
+            RangeButtonMin.Colors.FrameColor = clActiveBorder
+            RangeButtonMin.Colors.FrameHighlightColor = clActiveBorder
+            RangeButtonMin.Colors.FrameDisabledColor = clInactiveBorder
+            RangeButtonMin.Colors.BrushColor = clBtnFace
+            RangeButtonMin.Colors.BrushHighlightColor = clBtnHighlight
+            RangeButtonMin.Colors.BrushDisabledColor = clBtnShadow
+            RangeButtonMin.Colors.FocusRectColor = clHighlight
+            RangeButtonMin.FrameWidth = 1
+            RangeButtonMin.Radius = 4
+            RangeButtonMin.VisibleMode = vAlways
+            RangeButtonMin.Thickness = 12
+            RangeButtonMin.Length = 18
+            RangeButtonMax.Colors.FrameColor = clActiveBorder
+            RangeButtonMax.Colors.FrameHighlightColor = clActiveBorder
+            RangeButtonMax.Colors.FrameDisabledColor = clInactiveBorder
+            RangeButtonMax.Colors.BrushColor = clBtnFace
+            RangeButtonMax.Colors.BrushHighlightColor = clBtnHighlight
+            RangeButtonMax.Colors.BrushDisabledColor = clBtnShadow
+            RangeButtonMax.Colors.FocusRectColor = clHighlight
+            RangeButtonMax.FrameWidth = 1
+            RangeButtonMax.Radius = 4
+            RangeButtonMax.VisibleMode = vAlways
+            RangeButtonMax.Thickness = 12
+            RangeButtonMax.Length = 18
+            TrackBar.Colors.FrameColor = clActiveBorder
+            TrackBar.Colors.FrameHighlightColor = clActiveBorder
+            TrackBar.Colors.FrameDisabledColor = clInactiveBorder
+            TrackBar.Colors.BrushColor = clBtnFace
+            TrackBar.Colors.BrushHighlightColor = clBtnHighlight
+            TrackBar.Colors.BrushDisabledColor = clBtnShadow
+            TrackBar.Colors.FocusRectColor = clHighlight
+            TrackBar.FrameWidth = 1
+            TrackBar.Radius = 4
+            TrackBar.VisibleMode = vAlways
+            TrackBar.Thickness = 8
+            ProgressBar.Colors.FrameColor = clActiveBorder
+            ProgressBar.Colors.FrameHighlightColor = clActiveBorder
+            ProgressBar.Colors.FrameDisabledColor = clInactiveBorder
+            ProgressBar.Colors.BrushColor = clHighlight
+            ProgressBar.Colors.BrushHighlightColor = clBtnHighlight
+            ProgressBar.Colors.BrushDisabledColor = clBtnShadow
+            ProgressBar.Colors.FocusRectColor = clHighlight
+            ProgressBar.FrameWidth = 1
+            ProgressBar.Radius = 4
+            ProgressBar.VisibleMode = vAlways
+            ProgressBar.Thickness = 8
+            RangeBar.Colors.FrameColor = clActiveBorder
+            RangeBar.Colors.FrameHighlightColor = clActiveBorder
+            RangeBar.Colors.FrameDisabledColor = clInactiveBorder
+            RangeBar.Colors.BrushColor = clBtnFace
+            RangeBar.Colors.BrushHighlightColor = clBtnHighlight
+            RangeBar.Colors.BrushDisabledColor = clBtnShadow
+            RangeBar.Colors.FocusRectColor = clHighlight
+            RangeBar.FrameWidth = 1
+            RangeBar.Radius = 4
+            RangeBar.VisibleMode = vAlways
+            RangeBar.Thickness = 4
+            Anchors = [akLeft, akTop, akRight]
+          end
+          object BtnMainAudioFileRating: TRatingButton
+            Left = 6
+            Top = 43
+            Width = 80
+            Height = 16
+            Hint = 'Click to change rating'
+            DrawMode = dm_Windows
+            Images = vilIconsWindows
+            TabOrder = 6
+            TransparentBackground = True
+            StyleElements = [seFont, seBorder]
+            Rating = 120
+            AllowChangeRating = True
+            OnRatingChanged = BtnMainAudioFileRatingRatingChanged
+            StarFullImageIndex = 0
+            StarHalfImageIndex = 1
+            StarEmptyImageIndex = 2
           end
         end
       end
@@ -1217,18 +1031,12 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Show context menu'
+            DrawMode = dm_Skin
             ParentShowHint = False
             ShowHint = True
             TabOrder = 0
+            StyleElements = [seFont, seBorder]
             OnClick = TabPanelPlaylistClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
           object TabBtn_Favorites: TSkinButton
             Left = 26
@@ -1236,16 +1044,10 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Favorite playlists'
-            TabOrder = 1
-            OnClick = TabBtn_FavoritesClick
             DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
+            TabOrder = 1
+            StyleElements = [seFont, seBorder]
+            OnClick = TabBtn_FavoritesClick
           end
           object EditPlaylistSearch: TEdit
             Left = 56
@@ -1271,9 +1073,9 @@ object Nemp_MainForm: TNemp_MainForm
     end
     object MedienBibDetailPanel: TNempPanel
       Left = 728
-      Top = 224
+      Top = 210
       Width = 352
-      Height = 249
+      Height = 231
       BevelOuter = bvNone
       TabOrder = 2
       OnResize = MedienBibDetailPanelResize
@@ -1283,7 +1085,7 @@ object Nemp_MainForm: TNemp_MainForm
         Left = 0
         Top = 28
         Width = 352
-        Height = 221
+        Height = 203
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
@@ -1293,7 +1095,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 129
           Top = 0
           Width = 4
-          Height = 221
+          Height = 203
           ResizeStyle = rsUpdate
           StyleElements = [seFont, seBorder]
           OnCanResize = SplitterFileOverviewCanResize
@@ -1307,7 +1109,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 129
-          Height = 221
+          Height = 203
           Align = alLeft
           BevelInner = bvRaised
           BevelOuter = bvLowered
@@ -1319,12 +1121,12 @@ object Nemp_MainForm: TNemp_MainForm
           OwnerDraw = False
           DesignSize = (
             129
-            221)
+            203)
           object ImgDetailCover: TImage
             Left = 4
             Top = 8
             Width = 121
-            Height = 203
+            Height = 185
             Anchors = [akLeft, akTop, akRight, akBottom]
             Center = True
             Proportional = True
@@ -1339,7 +1141,7 @@ object Nemp_MainForm: TNemp_MainForm
             Left = 4
             Top = 6
             Width = 119
-            Height = 203
+            Height = 185
             Anchors = [akLeft, akTop, akRight, akBottom]
             BevelInner = bvNone
             BevelOuter = bvNone
@@ -1357,7 +1159,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 133
           Top = 0
           Width = 219
-          Height = 221
+          Height = 203
           Align = alClient
           BevelInner = bvRaised
           BevelOuter = bvLowered
@@ -1369,18 +1171,7 @@ object Nemp_MainForm: TNemp_MainForm
           OwnerDraw = False
           DesignSize = (
             219
-            221)
-          object ImgBibRating: TImage
-            Left = 8
-            Top = 129
-            Width = 70
-            Height = 14
-            Hint = 'Click to change rating'
-            Visible = False
-            OnMouseDown = ImgBibRatingMouseDown
-            OnMouseLeave = ImgBibRatingMouseLeave
-            OnMouseMove = ImgBibRatingMouseMove
-          end
+            203)
           object LblBibAlbum: TLabel
             Tag = 2
             Left = 8
@@ -1435,8 +1226,8 @@ object Nemp_MainForm: TNemp_MainForm
             OnMouseLeave = DetailLabelMouseLeave
           end
           object LblBibPlayCounter: TLabel
-            Left = 84
-            Top = 129
+            Left = 94
+            Top = 130
             Width = 54
             Height = 13
             Caption = '                  '
@@ -1528,6 +1319,24 @@ object Nemp_MainForm: TNemp_MainForm
             Shape = bsBottomLine
             ExplicitWidth = 209
           end
+          object BtnBibRating: TRatingButton
+            Left = 8
+            Top = 129
+            Width = 80
+            Height = 16
+            Hint = 'Click to change rating'
+            DrawMode = dm_Windows
+            Images = vilIconsWindows
+            TabOrder = 0
+            TransparentBackground = True
+            StyleElements = [seFont, seBorder]
+            Rating = 120
+            AllowChangeRating = True
+            OnRatingChanged = BtnBibRatingRatingChanged
+            StarFullImageIndex = 0
+            StarHalfImageIndex = 1
+            StarEmptyImageIndex = 2
+          end
         end
       end
       object MedienBibDetailHeaderPanel: TNempPanel
@@ -1597,20 +1406,14 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Toggle Cover/Lyrics'
+            DrawMode = dm_Skin
             ParentShowHint = False
             PopupMenu = Player_PopupMenu
             ShowHint = True
             TabOrder = 0
+            StyleElements = [seFont, seBorder]
             OnClick = PlayerTabsClick
             OnMouseMove = TabBtn_CoverMouseMove
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 2
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
           object TabBtn_SummaryLock: TSkinButton
             Tag = 2
@@ -1619,29 +1422,22 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Toggle File Overview (player only vs. selected file)'
+            DrawMode = dm_Windows
             ParentShowHint = False
             PopupMenu = Player_PopupMenu
             ShowHint = True
             TabOrder = 1
             OnClick = TabBtn_SummaryLockClick
             OnMouseMove = TabBtn_CoverMouseMove
-            DrawMode = dm_Windows
-            NumGlyphsX = 5
-            NumGlyphsY = 2
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
         end
       end
     end
     object MedialistPanel: TNempPanel
       Left = 8
-      Top = 306
+      Top = 263
       Width = 553
-      Height = 151
+      Height = 145
       BevelOuter = bvNone
       TabOrder = 3
       OnResize = MedialistPanelResize
@@ -1733,20 +1529,14 @@ object Nemp_MainForm: TNemp_MainForm
             Top = 2
             Width = 24
             Height = 24
+            DrawMode = dm_Skin
             ParentShowHint = False
             ShowHint = True
             TabOrder = 1
+            StyleElements = [seFont, seBorder]
             OnClick = TabBtn_MarkerClick
             OnKeyPress = TabBtn_MarkerKeyPress
             OnMouseDown = TabBtn_MarkerMouseDown
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 5
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
           object TabBtn_Medialib: TSkinButton
             Left = 2
@@ -1754,18 +1544,12 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Show context menu'
+            DrawMode = dm_Skin
             ParentShowHint = False
             ShowHint = True
             TabOrder = 0
+            StyleElements = [seFont, seBorder]
             OnClick = TabPanelMedienlisteClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
         end
       end
@@ -1774,7 +1558,7 @@ object Nemp_MainForm: TNemp_MainForm
         Left = 0
         Top = 28
         Width = 553
-        Height = 123
+        Height = 117
         Align = alClient
         BevelInner = bvRaised
         BevelOuter = bvLowered
@@ -1789,7 +1573,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 2
           Top = 2
           Width = 549
-          Height = 119
+          Height = 113
           AccessibleName = 'Harmonic key'
           Align = alClient
           BevelInner = bvNone
@@ -1864,7 +1648,7 @@ object Nemp_MainForm: TNemp_MainForm
             item
               Position = 0
               Text = 'Artist'
-              Width = 10
+              Width = 69
             end
             item
               Position = 1
@@ -2079,19 +1863,13 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Treeview'
+            DrawMode = dm_Skin
             ParentShowHint = False
             PopupMenu = Medialist_Collection_PopupMenu
             ShowHint = True
             TabOrder = 1
+            StyleElements = [seFont, seBorder]
             OnClick = TABPanelAuswahlClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 3
-            GlyphLine = 1
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clPurple
-            Color2 = clGreen
           end
           object TabBtn_CoverFlow0: TSkinButton
             Tag = 1
@@ -2100,19 +1878,13 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Coverflow'
+            DrawMode = dm_Skin
             ParentShowHint = False
             PopupMenu = Medialist_Collection_PopupMenu
             ShowHint = True
             TabOrder = 2
+            StyleElements = [seFont, seBorder]
             OnClick = TABPanelAuswahlClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 3
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
           object TabBtn_Preselection0: TSkinButton
             Tag = 1
@@ -2121,19 +1893,13 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Show context menu'
+            DrawMode = dm_Skin
             ParentShowHint = False
             PopupMenu = Medialist_Collection_PopupMenu
             ShowHint = True
             TabOrder = 0
+            StyleElements = [seFont, seBorder]
             OnClick = TabBtn_Preselection0Click
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
           object TabBtn_TagCloud0: TSkinButton
             Tag = 2
@@ -2142,19 +1908,13 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Tag cloud'
+            DrawMode = dm_Skin
             ParentShowHint = False
             PopupMenu = Medialist_Collection_PopupMenu
             ShowHint = True
             TabOrder = 3
+            StyleElements = [seFont, seBorder]
             OnClick = TABPanelAuswahlClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 3
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
         end
       end
@@ -2396,19 +2156,13 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Treeview'
+            DrawMode = dm_Skin
             ParentShowHint = False
             PopupMenu = Medialist_Collection_PopupMenu
             ShowHint = True
             TabOrder = 1
+            StyleElements = [seFont, seBorder]
             OnClick = TABPanelAuswahlClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 3
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clPurple
-            Color2 = clGreen
           end
           object TabBtn_CoverFlow1: TSkinButton
             Tag = 1
@@ -2417,19 +2171,13 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Coverflow'
+            DrawMode = dm_Skin
             ParentShowHint = False
             PopupMenu = Medialist_Collection_PopupMenu
             ShowHint = True
             TabOrder = 2
+            StyleElements = [seFont, seBorder]
             OnClick = TABPanelAuswahlClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 3
-            GlyphLine = 1
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
           object TabBtn_Preselection1: TSkinButton
             Tag = 1
@@ -2438,19 +2186,13 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Show context menu'
+            DrawMode = dm_Skin
             ParentShowHint = False
             PopupMenu = Medialist_Collection_PopupMenu
             ShowHint = True
             TabOrder = 0
+            StyleElements = [seFont, seBorder]
             OnClick = TabBtn_Preselection0Click
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
           object TabBtn_TagCloud1: TSkinButton
             Tag = 2
@@ -2459,19 +2201,13 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Tag cloud'
+            DrawMode = dm_Skin
             ParentShowHint = False
             PopupMenu = Medialist_Collection_PopupMenu
             ShowHint = True
             TabOrder = 3
+            StyleElements = [seFont, seBorder]
             OnClick = TABPanelAuswahlClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 3
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
         end
       end
@@ -2585,20 +2321,14 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Select category'
+            DrawMode = dm_Skin
             ParentShowHint = False
             PopupMenu = Medialist_Browse_Categories_PopupMenu
             ShowHint = True
             TabOrder = 0
             TabStop = False
+            StyleElements = [seFont, seBorder]
             OnClick = TabBtnCoverCategoryClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
         end
       end
@@ -2699,19 +2429,13 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Treeview'
+            DrawMode = dm_Skin
             ParentShowHint = False
             PopupMenu = Medialist_Collection_PopupMenu
             ShowHint = True
             TabOrder = 1
+            StyleElements = [seFont, seBorder]
             OnClick = TABPanelAuswahlClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 3
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clPurple
-            Color2 = clGreen
           end
           object TabBtn_CoverFlow2: TSkinButton
             Tag = 1
@@ -2720,19 +2444,13 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Coverflow'
+            DrawMode = dm_Skin
             ParentShowHint = False
             PopupMenu = Medialist_Collection_PopupMenu
             ShowHint = True
             TabOrder = 2
+            StyleElements = [seFont, seBorder]
             OnClick = TABPanelAuswahlClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 3
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
           object TabBtn_Preselection2: TSkinButton
             Tag = 1
@@ -2741,19 +2459,13 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Show context menu'
+            DrawMode = dm_Skin
             ParentShowHint = False
             PopupMenu = Medialist_Collection_PopupMenu
             ShowHint = True
             TabOrder = 0
+            StyleElements = [seFont, seBorder]
             OnClick = TabBtn_Preselection0Click
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 1
-            GlyphLine = 0
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
           object TabBtn_TagCloud2: TSkinButton
             Tag = 2
@@ -2762,19 +2474,13 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Tag cloud'
+            DrawMode = dm_Skin
             ParentShowHint = False
             PopupMenu = Medialist_Collection_PopupMenu
             ShowHint = True
             TabOrder = 3
+            StyleElements = [seFont, seBorder]
             OnClick = TABPanelAuswahlClick
-            DrawMode = dm_Skin
-            NumGlyphsX = 5
-            NumGlyphsY = 3
-            GlyphLine = 1
-            CustomRegion = False
-            FocusDrawMode = fdm_Windows
-            Color1 = clBlack
-            Color2 = clBlack
           end
         end
       end
@@ -2801,20 +2507,14 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 24
           Height = 24
           Hint = 'Select category'
+          DrawMode = dm_Skin
           ParentShowHint = False
           PopupMenu = Medialist_Browse_Categories_PopupMenu
           ShowHint = True
           TabOrder = 0
           TabStop = False
+          StyleElements = [seFont, seBorder]
           OnClick = TabBtnCoverCategoryClick
-          DrawMode = dm_Skin
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
         end
       end
     end
@@ -2853,8 +2553,8 @@ object Nemp_MainForm: TNemp_MainForm
     Enabled = False
     Interval = 20
     OnTimer = BassTimerTimer
-    Left = 416
-    Top = 552
+    Left = 424
+    Top = 456
   end
   object Nemp_MainMenu: TMainMenu
     AutoHotkeys = maManual
@@ -4068,15 +3768,15 @@ object Nemp_MainForm: TNemp_MainForm
     Enabled = False
     Interval = 10000
     OnTimer = SleepTimerTimer
-    Left = 24
-    Top = 544
+    Left = 32
+    Top = 448
   end
   object BirthdayTimer: TTimer
     Enabled = False
     Interval = 60000
     OnTimer = BirthdayTimerTimer
-    Left = 96
-    Top = 544
+    Left = 104
+    Top = 448
   end
   object MenuImages: TImageList
     DrawingStyle = dsTransparent
@@ -5748,7 +5448,7 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Play in headset'
       ImageIndex = 7
       ShortCut = 16456
-      OnClick = PM_PL_PlayInHeadsetClick
+      OnClick = PM_ML_PlayInHeadsetClick
     end
     object N2: TMenuItem
       Caption = '-'
@@ -6695,8 +6395,8 @@ object Nemp_MainForm: TNemp_MainForm
     Top = 388
   end
   object PopupPlayPause: TPopupMenu
-    Left = 187
-    Top = 610
+    Left = 195
+    Top = 514
     object PM_PlayFiles: TMenuItem
       Caption = 'Play files'
       OnClick = PM_PlayFilesClick
@@ -6712,8 +6412,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object PopupStop: TPopupMenu
     OnPopup = PopupStopPopup
-    Left = 267
-    Top = 610
+    Left = 275
+    Top = 514
     object PM_StopNow: TMenuItem
       Caption = 'Stop'
       OnClick = PM_StopNowClick
@@ -6725,8 +6425,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object PopupRepeat: TPopupMenu
     OnPopup = PopupRepeatPopup
-    Left = 338
-    Top = 610
+    Left = 346
+    Top = 514
     object PM_RepeatAll: TMenuItem
       Caption = 'Repeat all'
       RadioItem = True
@@ -7191,23 +6891,16 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Close this menu'
     end
   end
-  object HeadSetTimer: TTimer
-    Enabled = False
-    Interval = 250
-    OnTimer = HeadSetTimerTimer
-    Left = 344
-    Top = 552
-  end
   object RefreshCoverFlowTimer: TTimer
     Enabled = False
     Interval = 300
     OnTimer = RefreshCoverFlowTimerTimer
-    Left = 872
-    Top = 560
+    Left = 840
+    Top = 456
   end
   object PopupRepeatAB: TPopupMenu
-    Left = 422
-    Top = 610
+    Left = 430
+    Top = 514
     object PM_SetA: TMenuItem
       Caption = 'Set start point (A)'
       OnClick = PM_ABRepeatSetAClick
@@ -7227,20 +6920,20 @@ object Nemp_MainForm: TNemp_MainForm
   object WalkmanModeTimer: TTimer
     Interval = 60000
     OnTimer = WalkmanModeTimerTimer
-    Left = 194
-    Top = 544
+    Left = 202
+    Top = 448
   end
   object CoverFlowRefreshViewTimer: TTimer
     Enabled = False
     Interval = 50
     OnTimer = CoverFlowRefreshViewTimerTimer
-    Left = 872
-    Top = 608
+    Left = 840
+    Top = 504
   end
   object PopupEditExtendedTags: TPopupMenu
     OnPopup = PopupEditExtendedTagsPopup
-    Left = 744
-    Top = 496
+    Left = 816
+    Top = 280
     object PM_TagAudiofile: TMenuItem
       Caption = 'This audio file'
       Enabled = False
@@ -7617,8 +7310,8 @@ object Nemp_MainForm: TNemp_MainForm
     AutoHotkeys = maManual
     Images = MenuImages
     OnPopup = Player_PopupMenuPopup
-    Left = 24
-    Top = 610
+    Left = 32
+    Top = 514
     object PM_T_ShutDown: TMenuItem
       Caption = 'Shutdown'
       ImageIndex = 16
@@ -7695,29 +7388,6 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = 'Open plugin directory'
         OnClick = MM_T_PluginOpenFolderClick
       end
-    end
-  end
-  object PopupHeadset: TPopupMenu
-    Left = 99
-    Top = 610
-    object PM_H_EnqueueEndOfPlaylist: TMenuItem
-      Caption = 'Enqueue (at the end of the playlist)'
-      OnClick = InsertHeadsetToPlaylistClick
-    end
-    object PM_H_PlayAndClearPlaylist: TMenuItem
-      Tag = 1
-      Caption = 'Play (and clear current playlist)'
-      OnClick = InsertHeadsetToPlaylistClick
-    end
-    object PM_H_EnqueueAfterCurrentTitle: TMenuItem
-      Tag = 2
-      Caption = 'Enqueue (after the current title)'
-      OnClick = InsertHeadsetToPlaylistClick
-    end
-    object PM_H_JustPlay: TMenuItem
-      Tag = 3
-      Caption = 'Just play the track (don'#39't change the playlist)'
-      OnClick = InsertHeadsetToPlaylistClick
     end
   end
   object PlaylistManagerPopup: TPopupMenu
@@ -7873,8 +7543,8 @@ object Nemp_MainForm: TNemp_MainForm
     Enabled = False
     Interval = 250
     OnTimer = SplitWindowTimerTimer
-    Left = 720
-    Top = 608
+    Left = 688
+    Top = 504
   end
   object ApplicationEvents1: TApplicationEvents
     OnHelp = ApplicationEvents1Help
@@ -7907,5 +7577,59 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Show webradio category'
       OnClick = PM_ML_ShowWebradioCategoryClick
     end
+  end
+  object vilIconsWindows: TVirtualImageList
+    AutoFill = True
+    Images = <
+      item
+        CollectionIndex = 0
+        CollectionName = 'StarFull'
+        Name = 'StarFull'
+      end
+      item
+        CollectionIndex = 1
+        CollectionName = 'StarHalf'
+        Name = 'StarHalf'
+      end
+      item
+        CollectionIndex = 2
+        CollectionName = 'StarEmpty'
+        Name = 'StarEmpty'
+      end
+      item
+        CollectionIndex = 3
+        CollectionName = 'PlayCount'
+        Name = 'PlayCount'
+      end>
+    ImageCollection = DataModuleGui.ICIcons
+    Left = 505
+    Top = 457
+  end
+  object vilIconsSkin: TVirtualImageList
+    AutoFill = True
+    Images = <
+      item
+        CollectionIndex = 0
+        CollectionName = 'StarFull'
+        Name = 'StarFull'
+      end
+      item
+        CollectionIndex = 1
+        CollectionName = 'StarHalf'
+        Name = 'StarHalf'
+      end
+      item
+        CollectionIndex = 2
+        CollectionName = 'StarEmpty'
+        Name = 'StarEmpty'
+      end
+      item
+        CollectionIndex = 3
+        CollectionName = 'SkinPlayCount'
+        Name = 'SkinPlayCount'
+      end>
+    ImageCollection = DataModuleGui.ICSkinIcons
+    Left = 577
+    Top = 457
   end
 end

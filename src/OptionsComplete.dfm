@@ -5,8 +5,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsDialog
   Caption = 'Preferences'
-  ClientHeight = 674
-  ClientWidth = 676
+  ClientHeight = 665
+  ClientWidth = 675
   Color = clWindow
   Constraints.MinHeight = 520
   Constraints.MinWidth = 594
@@ -29,21 +29,19 @@ object OptionsCompleteForm: TOptionsCompleteForm
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 670
-    Height = 630
+    Width = 669
+    Height = 621
     Align = alClient
     BevelEdges = []
     BevelOuter = bvNone
     Caption = 'Panel1'
     TabOrder = 0
-    ExplicitWidth = 666
-    ExplicitHeight = 629
     object OptionsVST: TVirtualStringTree
       AlignWithMargins = True
       Left = 3
       Top = 3
       Width = 203
-      Height = 624
+      Height = 615
       Align = alLeft
       BevelInner = bvNone
       BevelOuter = bvNone
@@ -74,32 +72,30 @@ object OptionsCompleteForm: TOptionsCompleteForm
       OnMeasureTextWidth = OptionsVSTMeasureTextWidth
       Touch.InteractiveGestures = [igPan, igPressAndTap]
       Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-      ExplicitHeight = 623
+      ExplicitHeight = 617
       Columns = <
         item
           Position = 0
-          Width = 201
+          Width = 203
         end>
     end
     object PageControl1: TPageControl
       Left = 209
       Top = 0
-      Width = 461
-      Height = 630
-      ActivePage = tabPlayer
+      Width = 460
+      Height = 621
+      ActivePage = tabPlaylist
       Align = alClient
       MultiLine = True
       TabOrder = 1
       TabStop = False
-      ExplicitWidth = 457
-      ExplicitHeight = 629
       object tabGeneral: TTabSheet
         Caption = 'General'
         object cpgMainOptions: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 453
-          Height = 566
+          Width = 452
+          Height = 557
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -115,6 +111,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Caption = 'Failsafe'
             TabOrder = 4
             Visible = False
+            ExplicitWidth = 452
             object XXX_CB_BetaDontUseThreadedUpdate: TCheckBox
               Left = 16
               Top = 16
@@ -130,6 +127,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 128
             Caption = 'Hibernate/standby'
             TabOrder = 3
+            ExplicitWidth = 452
             object Btn_ReinitPlayerEngine: TButton
               Left = 16
               Top = 59
@@ -143,7 +141,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cbPauseOnSuspend: TCheckBox
               Left = 16
               Top = 13
-              Width = 397
+              Width = 432
               Height = 17
               Hint = 
                 'Stop the player when the system hibernates, so the playback is s' +
@@ -153,11 +151,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Checked = True
               State = cbChecked
               TabOrder = 0
+              ExplicitWidth = 397
             end
             object cbReInitAfterSuspend: TCheckBox
               Left = 16
               Top = 36
-              Width = 397
+              Width = 432
               Height = 17
               Hint = 
                 'Use this, if the playback don'#39't work after hibernating the syste' +
@@ -165,6 +164,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Reinitialize player engine on wakeup'
               TabOrder = 1
+              ExplicitWidth = 397
             end
           end
           object cpNempUpdates: TCategoryPanel
@@ -226,6 +226,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 180
             Caption = 'Nemp portable'
             TabOrder = 1
+            ExplicitWidth = 452
             object lblNempPortable: TLabel
               Left = 16
               Top = 113
@@ -241,7 +242,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object lblNempPortable1: TLabel
               Left = 16
               Top = 16
-              Width = 410
+              Width = 445
               Height = 57
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -256,7 +257,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cb_EnableCloudMode: TCheckBox
               Left = 16
               Top = 84
-              Width = 378
+              Width = 413
               Height = 17
               Hint = 
                 'Use relative paths in the library, if you use Nemp in a cloud dr' +
@@ -264,11 +265,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Enable cloud mode'
               TabOrder = 1
+              ExplicitWidth = 378
             end
             object cb_EnableUSBMode: TCheckBox
               Left = 16
               Top = 61
-              Width = 378
+              Width = 413
               Height = 17
               Hint = 
                 'Nemp will try to adjust drive letters, when USB drives with your' +
@@ -276,6 +278,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Enable USB mode'
               TabOrder = 0
+              ExplicitWidth = 378
             end
           end
           object cpStarting: TCategoryPanel
@@ -283,6 +286,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 340
             Caption = 'Starting Nemp'
             TabOrder = 0
+            ExplicitWidth = 452
             object lblNempStartPlayer: TLabel
               Left = 16
               Top = 16
@@ -325,17 +329,18 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object CB_AllowMultipleInstances: TCheckBox
               Left = 16
               Top = 240
-              Width = 397
+              Width = 432
               Height = 17
               Hint = 'Allow multiple instances of Nemp.'
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Allow multiple instances'
               TabOrder = 7
+              ExplicitWidth = 397
             end
             object CB_AutoPlayEnqueueTitle: TCheckBox
               Left = 16
               Top = 96
-              Width = 390
+              Width = 425
               Height = 17
               Hint = 
                 'Stop playback of the current file, when the user double-clicks a' +
@@ -347,11 +352,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
               ParentShowHint = False
               ShowHint = True
               TabOrder = 3
+              ExplicitWidth = 390
             end
             object CB_AutoPlayNewTitle: TCheckBox
               Left = 16
               Top = 76
-              Width = 390
+              Width = 425
               Height = 17
               Hint = 
                 'When starting Nemp by double-clicking a file in the Windows-Expl' +
@@ -359,75 +365,83 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Anchors = [akLeft, akTop, akRight]
               Caption = 'If applicable: Start playback with new file'
               TabOrder = 2
+              ExplicitWidth = 390
             end
             object CB_AutoPlayOnStart: TCheckBox
               Left = 16
               Top = 36
-              Width = 390
+              Width = 425
               Height = 17
               Hint = 'Automatically begin playback when Nemp starts'
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Begin playback on start'
               TabOrder = 0
               OnClick = CB_AutoPlayOnStartClick
+              ExplicitWidth = 390
             end
             object CB_SavePositionInTrack: TCheckBox
               Left = 16
               Top = 56
-              Width = 390
+              Width = 425
               Height = 17
               Hint = 'Begin playback at the last known position within the track'
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Remember last track position'
               TabOrder = 1
+              ExplicitWidth = 390
             end
             object CBAutoLoadMediaList: TCheckBox
               Left = 16
               Top = 149
-              Width = 397
+              Width = 432
               Height = 17
               Hint = 'Automatically load the Nemp medialibrary.'
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Load media library on start'
               TabOrder = 4
+              ExplicitWidth = 397
             end
             object CBAutoSaveMediaList: TCheckBox
               Left = 16
               Top = 169
-              Width = 397
+              Width = 432
               Height = 17
               Hint = 'Automatically save the Nemp medialibrary.'
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Save media library on close'
               TabOrder = 5
+              ExplicitWidth = 397
             end
             object CB_StartMinimized: TCheckBox
               Left = 16
               Top = 260
-              Width = 397
+              Width = 432
               Height = 17
               Hint = 'Do not show Nemp window on start - directly minimize it.'
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Start minimized (you can also use the parameter "/minimized")'
               TabOrder = 8
+              ExplicitWidth = 397
             end
             object cb_ShowSplashScreen: TCheckBox
               Left = 16
               Top = 220
-              Width = 397
+              Width = 432
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Show splash screen'
               TabOrder = 6
+              ExplicitWidth = 397
             end
             object cbShowTrayIcon: TCheckBox
               Left = 16
               Top = 280
-              Width = 397
+              Width = 432
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Show tray icon'
               TabOrder = 9
+              ExplicitWidth = 397
             end
           end
         end
@@ -438,8 +452,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgControlSettings: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 453
-          Height = 566
+          Width = 452
+          Height = 557
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -454,6 +468,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 100
             Caption = 'Tabulator key'
             TabOrder = 2
+            ExplicitWidth = 452
             object CB_TabStopAtPlayerControls: TCheckBox
               Left = 16
               Top = 13
@@ -1268,6 +1283,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 120
             Caption = 'Media keys'
             TabOrder = 0
+            ExplicitWidth = 452
             object CB_IgnoreVolume: TCheckBox
               Left = 16
               Top = 36
@@ -1308,8 +1324,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgViewingSettings: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 453
-          Height = 566
+          Width = 452
+          Height = 557
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -1319,14 +1335,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
           HeaderFont.Style = []
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
-          ExplicitWidth = 449
-          ExplicitHeight = 565
           object cpExtendedViewingSettings: TCategoryPanel
             Top = 940
             Height = 175
             Caption = 'Extended viewing settings'
             TabOrder = 0
-            ExplicitWidth = 428
+            ExplicitWidth = 452
             object cb_limitMarkerToCurrentFiles: TCheckBox
               Left = 16
               Top = 56
@@ -1388,7 +1402,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 190
             Caption = 'Playlist formatting'
             TabOrder = 1
-            ExplicitWidth = 428
             object lblPlaylistTitle: TLabel
               Left = 16
               Top = 16
@@ -1546,7 +1559,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 422
             Caption = 'Not available metadata'
             TabOrder = 2
-            ExplicitWidth = 428
             object LblReplaceAlbumBy: TLabel
               Left = 16
               Top = 126
@@ -1686,7 +1698,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 128
             Caption = 'Display of Albums, Directories, ...'
             TabOrder = 3
-            ExplicitWidth = 428
+            ExplicitWidth = 452
             object cbShowCoverForAlbum: TCheckBox
               Left = 16
               Top = 16
@@ -1726,11 +1738,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Top = 0
             Caption = 'Visible columns in the medialist'
             TabOrder = 4
-            ExplicitWidth = 428
             object clbViewMainColumns: TCheckListBox
               Left = 0
               Top = 0
-              Width = 430
+              Width = 429
               Height = 174
               Align = alClient
               Columns = 3
@@ -1738,7 +1749,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Style = lbOwnerDrawFixed
               TabOrder = 0
               OnDrawItem = clbViewMainColumnsDrawItem
-              ExplicitWidth = 426
             end
           end
         end
@@ -1749,8 +1759,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgDisplaySettings: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 453
-          Height = 566
+          Width = 452
+          Height = 557
           VertScrollBar.Tracking = True
           Align = alClient
           ChevronColor = clWindowText
@@ -2073,8 +2083,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgFileManagement: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 453
-          Height = 566
+          Width = 452
+          Height = 557
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -2241,7 +2251,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object cbIncludeFiles: TCheckListBox
               Left = 16
               Top = 54
-              Width = 410
+              Width = 445
               Height = 111
               Hint = 'List of supported audio files.'
               Anchors = [akLeft, akTop, akRight]
@@ -2259,7 +2269,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             TabOrder = 2
             object BtnAutoScanAdd: TButton
               AlignWithMargins = True
-              Left = 311
+              Left = 346
               Top = 39
               Width = 125
               Height = 21
@@ -2267,10 +2277,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Caption = 'Add'
               TabOrder = 2
               OnClick = BtnAutoScanAddClick
+              ExplicitLeft = 311
             end
             object BtnAutoScanDelete: TButton
               AlignWithMargins = True
-              Left = 311
+              Left = 346
               Top = 64
               Width = 125
               Height = 21
@@ -2278,10 +2289,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Caption = 'Delete'
               TabOrder = 3
               OnClick = BtnAutoScanDeleteClick
+              ExplicitLeft = 311
             end
             object BtnAutoScanNow: TButton
               AlignWithMargins = True
-              Left = 311
+              Left = 346
               Top = 88
               Width = 125
               Height = 21
@@ -2290,6 +2302,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Caption = 'Scan now'
               TabOrder = 4
               OnClick = BtnAutoScanNowClick
+              ExplicitLeft = 311
             end
             object cb_AutoDeleteFiles: TCheckBox
               Left = 16
@@ -2347,7 +2360,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object LBAutoscan: TListBox
               Left = 28
               Top = 39
-              Width = 269
+              Width = 304
               Height = 70
               Style = lbOwnerDrawVariable
               Anchors = [akLeft, akTop, akRight]
@@ -2376,8 +2389,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgCategories: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 453
-          Height = 566
+          Width = 452
+          Height = 557
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -2555,7 +2568,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object editCDNames: TLabeledEdit
               Left = 16
               Top = 123
-              Width = 0
+              Width = -53
               Height = 21
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -2564,6 +2577,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               EditLabel.Caption = 'Folder names not forming an album of their own (comma separated)'
               TabOrder = 2
               Text = ''
+              ExplicitWidth = 0
             end
           end
           object cpCategoryCoverflow: TCategoryPanel
@@ -2673,7 +2687,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Columns = <
                 item
                   Position = 0
-                  Width = 192
+                  Width = 196
                 end>
             end
             object btnCategoryEdit: TButton
@@ -2746,7 +2760,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Columns = <
                 item
                   Position = 0
-                  Width = 192
+                  Width = 196
                 end>
             end
             object cbLibConfigShowPlaylistCategories: TCheckBox
@@ -2776,8 +2790,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgMetadata: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 453
-          Height = 566
+          Width = 456
+          Height = 558
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -2792,6 +2806,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 445
             Caption = 'Meta data (e.g. ID3-Tags)'
             TabOrder = 0
+            ExplicitWidth = 452
             object lblQuickAccess: TLabel
               Left = 16
               Top = 16
@@ -2967,6 +2982,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 290
             Caption = 'CDDB settings'
             TabOrder = 1
+            ExplicitWidth = 452
             object lblInvalidCDDBMail: TLabel
               Left = 16
               Top = 167
@@ -3058,8 +3074,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgSearchSettings: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 453
-          Height = 566
+          Width = 456
+          Height = 558
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -3076,7 +3092,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object lblSearchSettingsHint: TLabel
               Left = 16
               Top = 16
-              Width = 418
+              Width = 435
               Height = 33
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -3084,7 +3100,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
                 'Nemp can increase the speed of the quick search, but this also i' +
                 'ncreases the memory usage.'
               WordWrap = True
-              ExplicitWidth = 441
+              ExplicitWidth = 400
             end
             object Label2: TLabel
               Left = 16
@@ -3214,9 +3230,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgPlayerMain: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 453
-          Height = 566
-          VertScrollBar.Position = 550
+          Width = 452
+          Height = 557
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -3227,10 +3242,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpAdvanced: TCategoryPanel
-            Top = 462
+            Top = 1012
             Height = 100
             Caption = 'Advanced'
             TabOrder = 0
+            ExplicitWidth = 452
             object cb_SafePlayback: TCheckBox
               Left = 16
               Top = 16
@@ -3249,7 +3265,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpVisualisation: TCategoryPanel
-            Top = 300
+            Top = 850
             Height = 162
             Caption = 'Visualization'
             TabOrder = 1
@@ -3307,10 +3323,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpSilenceDetection: TCategoryPanel
-            Top = 113
+            Top = 663
             Height = 187
             Caption = 'Pause between tracks'
             TabOrder = 2
+            ExplicitWidth = 452
             object Lbl_SilenceDB: TLabel
               Left = 95
               Top = 59
@@ -3382,10 +3399,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpFading: TCategoryPanel
-            Top = -200
+            Top = 350
             Height = 313
             Caption = 'Fading'
             TabOrder = 3
+            ExplicitWidth = 452
             object LblConst_ms1: TLabel
               Left = 90
               Top = 64
@@ -3530,7 +3548,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpOutputDevices: TCategoryPanel
-            Top = -550
+            Top = 0
             Height = 350
             Caption = 'Output devices'
             TabOrder = 4
@@ -3696,8 +3714,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgPlaylistSettings: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 453
-          Height = 566
+          Width = 452
+          Height = 557
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -3711,7 +3729,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Top = 818
             Height = 120
             Caption = 'Playlist log'
-            TabOrder = 3
+            TabOrder = 0
+            ExplicitWidth = 452
             object LblLogDuration: TLabel
               Left = 36
               Top = 39
@@ -3750,7 +3769,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Top = 468
             Height = 350
             Caption = 'Random playback'
-            TabOrder = 2
+            TabOrder = 1
+            ExplicitWidth = 452
             object lbl_WeightedRandom: TLabel
               Left = 34
               Top = 100
@@ -3759,8 +3779,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Caption = 'Indivdual weights, based on rating.'
             end
             object lblCount00: TLabel
-              Left = 34
-              Top = 261
+              Left = 24
+              Top = 251
               Width = 383
               Height = 13
               AutoSize = False
@@ -3769,7 +3789,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object lblCount05: TLabel
               Left = 159
-              Top = 124
+              Top = 123
               Width = 38
               Height = 13
               Caption = '(99999)'
@@ -3777,7 +3797,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object lblCount10: TLabel
               Left = 159
-              Top = 151
+              Top = 149
               Width = 38
               Height = 13
               Caption = '(99999)'
@@ -3785,7 +3805,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object lblCount15: TLabel
               Left = 159
-              Top = 180
+              Top = 175
               Width = 38
               Height = 13
               Caption = '(99999)'
@@ -3793,7 +3813,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object lblCount20: TLabel
               Left = 159
-              Top = 208
+              Top = 201
               Width = 38
               Height = 13
               Caption = '(99999)'
@@ -3801,7 +3821,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object lblCount25: TLabel
               Left = 159
-              Top = 235
+              Top = 227
               Width = 38
               Height = 13
               Caption = '(99999)'
@@ -3809,7 +3829,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object lblCount30: TLabel
               Left = 350
-              Top = 124
+              Top = 123
               Width = 38
               Height = 13
               Caption = '(99999)'
@@ -3817,7 +3837,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object lblCount35: TLabel
               Left = 350
-              Top = 151
+              Top = 147
               Width = 38
               Height = 13
               Caption = '(99999)'
@@ -3825,7 +3845,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object lblCount40: TLabel
               Left = 350
-              Top = 180
+              Top = 175
               Width = 38
               Height = 13
               Caption = '(99999)'
@@ -3833,7 +3853,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object lblCount45: TLabel
               Left = 350
-              Top = 208
+              Top = 201
               Width = 38
               Height = 13
               Caption = '(99999)'
@@ -3841,110 +3861,22 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object lblCount50: TLabel
               Left = 350
-              Top = 235
+              Top = 228
               Width = 38
               Height = 13
               Caption = '(99999)'
               Visible = False
             end
-            object RatingImage05: TImage
-              Left = 34
-              Top = 124
-              Width = 70
-              Height = 14
-              ParentShowHint = False
-              ShowHint = False
-              Transparent = True
-            end
-            object RatingImage10: TImage
-              Left = 34
-              Top = 152
-              Width = 70
-              Height = 14
-              ParentShowHint = False
-              ShowHint = False
-              Transparent = True
-            end
-            object RatingImage15: TImage
-              Left = 34
-              Top = 180
-              Width = 70
-              Height = 14
-              ParentShowHint = False
-              ShowHint = False
-              Transparent = True
-            end
-            object RatingImage20: TImage
-              Left = 34
-              Top = 208
-              Width = 70
-              Height = 14
-              ParentShowHint = False
-              ShowHint = False
-              Transparent = True
-            end
-            object RatingImage25: TImage
-              Left = 34
-              Top = 236
-              Width = 70
-              Height = 14
-              ParentShowHint = False
-              ShowHint = False
-              Transparent = True
-            end
-            object RatingImage30: TImage
-              Left = 224
-              Top = 124
-              Width = 70
-              Height = 14
-              ParentShowHint = False
-              ShowHint = False
-              Transparent = True
-            end
-            object RatingImage35: TImage
-              Left = 224
-              Top = 152
-              Width = 70
-              Height = 14
-              ParentShowHint = False
-              ShowHint = False
-              Transparent = True
-            end
-            object RatingImage40: TImage
-              Left = 224
-              Top = 180
-              Width = 70
-              Height = 14
-              ParentShowHint = False
-              ShowHint = False
-              Transparent = True
-            end
-            object RatingImage45: TImage
-              Left = 224
-              Top = 208
-              Width = 70
-              Height = 14
-              ParentShowHint = False
-              ShowHint = False
-              Transparent = True
-            end
-            object RatingImage50: TImage
-              Left = 224
-              Top = 236
-              Width = 70
-              Height = 14
-              ParentShowHint = False
-              ShowHint = False
-              Transparent = True
-            end
             object LblConst_AvoidRepetitions: TLabel
-              Left = 252
+              Left = 261
               Top = 16
               Width = 162
               Height = 13
               Alignment = taRightJustify
+              Anchors = [akTop, akRight]
               AutoSize = False
               Caption = 'Avoid repetitions'
+              ExplicitLeft = 218
             end
             object LblConst_ReallyRandom: TLabel
               Left = 16
@@ -3985,7 +3917,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object RandomWeight05: TEdit
               Left = 110
-              Top = 121
+              Top = 120
               Width = 43
               Height = 21
               NumbersOnly = True
@@ -3995,7 +3927,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object RandomWeight10: TEdit
               Left = 110
-              Top = 148
+              Top = 146
               Width = 43
               Height = 21
               NumbersOnly = True
@@ -4005,7 +3937,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object RandomWeight15: TEdit
               Left = 110
-              Top = 177
+              Top = 172
               Width = 43
               Height = 21
               NumbersOnly = True
@@ -4015,7 +3947,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object RandomWeight20: TEdit
               Left = 110
-              Top = 205
+              Top = 198
               Width = 43
               Height = 21
               NumbersOnly = True
@@ -4025,7 +3957,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object RandomWeight25: TEdit
               Left = 110
-              Top = 232
+              Top = 224
               Width = 43
               Height = 21
               NumbersOnly = True
@@ -4035,7 +3967,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object RandomWeight30: TEdit
               Left = 300
-              Top = 121
+              Top = 120
               Width = 43
               Height = 21
               NumbersOnly = True
@@ -4045,7 +3977,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object RandomWeight35: TEdit
               Left = 301
-              Top = 150
+              Top = 146
               Width = 43
               Height = 21
               NumbersOnly = True
@@ -4055,7 +3987,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object RandomWeight40: TEdit
               Left = 300
-              Top = 177
+              Top = 172
               Width = 43
               Height = 21
               NumbersOnly = True
@@ -4065,7 +3997,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object RandomWeight45: TEdit
               Left = 300
-              Top = 205
+              Top = 198
               Width = 43
               Height = 21
               NumbersOnly = True
@@ -4075,7 +4007,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object RandomWeight50: TEdit
               Left = 301
-              Top = 232
+              Top = 224
               Width = 43
               Height = 21
               NumbersOnly = True
@@ -4086,19 +4018,172 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object TBRandomRepeat: TTrackBar
               Left = 12
               Top = 32
-              Width = 409
+              Width = 416
               Height = 33
+              Anchors = [akLeft, akTop, akRight]
               Max = 75
               Frequency = 5
               Position = 23
               TabOrder = 0
+              ExplicitWidth = 412
+            end
+            object BtnRating05: TRatingButton
+              Left = 24
+              Top = 122
+              Width = 80
+              Height = 16
+              DrawMode = dm_Windows
+              TabOrder = 14
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 1
+              AllowChangeRating = False
+              StarFullImageIndex = 0
+              StarHalfImageIndex = 1
+              StarEmptyImageIndex = 2
+            end
+            object BtnRating10: TRatingButton
+              Left = 24
+              Top = 148
+              Width = 80
+              Height = 16
+              DrawMode = dm_Windows
+              TabOrder = 15
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 37
+              AllowChangeRating = False
+              StarFullImageIndex = 0
+              StarHalfImageIndex = 1
+              StarEmptyImageIndex = 2
+            end
+            object BtnRating15: TRatingButton
+              Left = 24
+              Top = 174
+              Width = 80
+              Height = 16
+              DrawMode = dm_Windows
+              TabOrder = 16
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 52
+              AllowChangeRating = False
+              StarFullImageIndex = 0
+              StarHalfImageIndex = 1
+              StarEmptyImageIndex = 2
+            end
+            object BtnRating20: TRatingButton
+              Left = 24
+              Top = 200
+              Width = 80
+              Height = 16
+              DrawMode = dm_Windows
+              TabOrder = 17
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 78
+              AllowChangeRating = False
+              StarFullImageIndex = 0
+              StarHalfImageIndex = 1
+              StarEmptyImageIndex = 2
+            end
+            object BtnRating25: TRatingButton
+              Left = 24
+              Top = 225
+              Width = 80
+              Height = 16
+              DrawMode = dm_Windows
+              TabOrder = 18
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 102
+              AllowChangeRating = False
+              StarFullImageIndex = 0
+              StarHalfImageIndex = 1
+              StarEmptyImageIndex = 2
+            end
+            object BtnRating30: TRatingButton
+              Left = 214
+              Top = 122
+              Width = 80
+              Height = 16
+              DrawMode = dm_Windows
+              TabOrder = 19
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 128
+              AllowChangeRating = False
+              StarFullImageIndex = 0
+              StarHalfImageIndex = 1
+              StarEmptyImageIndex = 2
+            end
+            object BtnRating35: TRatingButton
+              Left = 214
+              Top = 148
+              Width = 80
+              Height = 16
+              DrawMode = dm_Windows
+              TabOrder = 20
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 153
+              AllowChangeRating = False
+              StarFullImageIndex = 0
+              StarHalfImageIndex = 1
+              StarEmptyImageIndex = 2
+            end
+            object BtnRating40: TRatingButton
+              Left = 214
+              Top = 174
+              Width = 80
+              Height = 16
+              DrawMode = dm_Windows
+              TabOrder = 21
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 179
+              AllowChangeRating = False
+              StarFullImageIndex = 0
+              StarHalfImageIndex = 1
+              StarEmptyImageIndex = 2
+            end
+            object BtnRating45: TRatingButton
+              Left = 214
+              Top = 200
+              Width = 80
+              Height = 16
+              DrawMode = dm_Windows
+              TabOrder = 22
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 205
+              AllowChangeRating = False
+              StarFullImageIndex = 0
+              StarHalfImageIndex = 1
+              StarEmptyImageIndex = 2
+            end
+            object BtnRating50: TRatingButton
+              Left = 214
+              Top = 225
+              Width = 80
+              Height = 16
+              DrawMode = dm_Windows
+              TabOrder = 23
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 230
+              AllowChangeRating = False
+              StarFullImageIndex = 0
+              StarHalfImageIndex = 1
+              StarEmptyImageIndex = 2
             end
           end
           object cpPlaylistBehaviour: TCategoryPanel
             Top = 233
             Height = 235
             Caption = 'General playlist settings'
-            TabOrder = 1
+            TabOrder = 2
+            ExplicitWidth = 452
             object CB_AutoScanPlaylist: TCheckBox
               Left = 16
               Top = 16
@@ -4191,7 +4276,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Top = 0
             Height = 233
             Caption = 'Default actions'
-            TabOrder = 0
+            TabOrder = 3
             object LblPlaylistDefaultAction: TLabel
               Left = 16
               Top = 16
@@ -4280,8 +4365,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgWebstreams: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 453
-          Height = 566
+          Width = 452
+          Height = 557
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -4296,6 +4381,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 121
             Caption = 'Playlist parsing'
             TabOrder = 1
+            ExplicitWidth = 452
             object Label1: TLabel
               Left = 16
               Top = 16
@@ -4306,22 +4392,24 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object rbWebRadioParseFile: TRadioButton
               Left = 16
               Top = 37
-              Width = 418
+              Width = 453
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Parse stream playlist and add all contained streams to playlist'
               TabOrder = 0
+              ExplicitWidth = 418
             end
             object rbWebRadioHandledByBass: TRadioButton
               Left = 16
               Top = 60
-              Width = 418
+              Width = 453
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Just add playlist URL to the playlist (recommended)'
               Checked = True
               TabOrder = 1
               TabStop = True
+              ExplicitWidth = 418
             end
           end
           object cpWebstremRecording: TCategoryPanel
@@ -4367,7 +4455,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object LblConst_WebradioHint: TLabel
               Left = 16
               Top = 288
-              Width = 394
+              Width = 389
               Height = 33
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -4491,8 +4579,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgEffects: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 453
-          Height = 566
+          Width = 456
+          Height = 558
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -4728,8 +4816,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgBirthday: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 453
-          Height = 566
+          Width = 456
+          Height = 558
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -4761,7 +4849,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Caption = 'Happy Birthday song'
             end
             object LblEventWarning: TLabel
-              Left = 333
+              Left = 368
               Top = 111
               Width = 76
               Height = 13
@@ -4784,7 +4872,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Caption = 'Countdown title'
             end
             object LBlCountDownWarning: TLabel
-              Left = 333
+              Left = 368
               Top = 218
               Width = 76
               Height = 13
@@ -4802,7 +4890,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object lblHappyBirthday: TLabel
               Left = 16
               Top = 16
-              Width = 430
+              Width = 465
               Height = 55
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -4816,7 +4904,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object BtnActivateBirthdayMode: TButton
               AlignWithMargins = True
-              Left = 320
+              Left = 355
               Top = 337
               Width = 131
               Height = 25
@@ -4824,9 +4912,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Caption = 'Activate'
               TabOrder = 9
               OnClick = BtnActivateBirthdayModeClick
+              ExplicitLeft = 320
             end
             object BtnBirthdaySong: TButton
-              Left = 418
+              Left = 453
               Top = 127
               Width = 25
               Height = 21
@@ -4835,6 +4924,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Caption = '...'
               TabOrder = 2
               OnClick = BtnBirthdaySongClick
+              ExplicitLeft = 418
             end
             object BtnGetBirthdayTitel: TButton
               Left = 16
@@ -4858,11 +4948,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object EditBirthdaySong: TEdit
               Left = 16
               Top = 127
-              Width = 396
+              Width = 431
               Height = 21
               Anchors = [akLeft, akTop, akRight]
               TabOrder = 1
               OnChange = EditBirthdaySongChange
+              ExplicitWidth = 396
             end
             object mskEdt_BirthdayTime: TMaskEdit
               Left = 64
@@ -4876,7 +4967,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               OnExit = mskEdt_BirthdayTimeExit
             end
             object BtnCountDownSong: TButton
-              Left = 418
+              Left = 453
               Top = 234
               Width = 25
               Height = 21
@@ -4885,6 +4976,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Caption = '...'
               TabOrder = 6
               OnClick = BtnCountDownSongClick
+              ExplicitLeft = 418
             end
             object BtnGetCountDownTitel: TButton
               Left = 16
@@ -4909,11 +5001,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object EditCountdownSong: TEdit
               Left = 16
               Top = 234
-              Width = 396
+              Width = 431
               Height = 21
               Anchors = [akLeft, akTop, akRight]
               TabOrder = 5
               OnChange = EditCountdownSongChange
+              ExplicitWidth = 396
             end
           end
         end
@@ -4924,8 +5017,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgScrobble: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 453
-          Height = 566
+          Width = 452
+          Height = 557
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -4942,7 +5035,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object MemoScrobbleLog: TMemo
               Left = 0
               Top = 0
-              Width = 447
+              Width = 446
               Height = 214
               Align = alClient
               Lines.Strings = (
@@ -4957,6 +5050,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 160
             Caption = 'Scrobble settings'
             TabOrder = 1
+            ExplicitWidth = 452
             object Label5: TLabel
               Left = 32
               Top = 72
@@ -5013,9 +5107,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 153
             Caption = 'last.fm Scrobbler setup'
             TabOrder = 0
+            ExplicitWidth = 452
             object Image2: TImage
               AlignWithMargins = True
-              Left = 364
+              Left = 399
               Top = 73
               Width = 80
               Height = 28
@@ -5241,7 +5336,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             object LblScrobble1: TLabel
               Left = 16
               Top = 16
-              Width = 426
+              Width = 461
               Height = 57
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
@@ -5254,7 +5349,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object LblVisitLastFM: TLabel
               AlignWithMargins = True
-              Left = 188
+              Left = 223
               Top = 80
               Width = 172
               Height = 13
@@ -5282,8 +5377,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgWebserverConfiguration: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 453
-          Height = 566
+          Width = 452
+          Height = 557
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -5404,6 +5499,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Top = 209
             Caption = 'User rights'
             TabOrder = 1
+            ExplicitWidth = 452
             object LblConst_Password2: TLabel
               Left = 224
               Top = 16
@@ -5620,18 +5716,18 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 8
         object PnlCoverFlowControl: TPanel
           Left = 0
-          Top = 536
-          Width = 453
+          Top = 527
+          Width = 452
           Height = 30
           Align = alBottom
           BevelOuter = bvNone
           TabOrder = 1
           DesignSize = (
-            453
+            452
             30)
           object BtnUndoCoverFlowSettings: TButton
             AlignWithMargins = True
-            Left = 324
+            Left = 307
             Top = 3
             Width = 123
             Height = 25
@@ -5639,10 +5735,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Caption = 'Undo'
             TabOrder = 0
             OnClick = BtnUndoCoverFlowSettingsClick
+            ExplicitLeft = 288
           end
           object BtnCoverFlowDefault: TButton
             AlignWithMargins = True
-            Left = 185
+            Left = 168
             Top = 3
             Width = 123
             Height = 25
@@ -5650,13 +5747,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Caption = 'Default'
             TabOrder = 1
             OnClick = BtnCoverFlowDefaultClick
+            ExplicitLeft = 149
           end
         end
         object cpgCoverFlowView: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 453
-          Height = 536
+          Width = 452
+          Height = 527
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -5665,11 +5763,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
           HeaderFont.Name = 'Segoe UI'
           HeaderFont.Style = []
           TabOrder = 0
+          ExplicitWidth = 456
+          ExplicitHeight = 528
           object cpCoverflowMixedSettings: TCategoryPanel
             Top = 570
             Height = 150
             Caption = 'Mixed settings'
             TabOrder = 5
+            ExplicitWidth = 452
             object lblCoverflowTextures: TLabel
               Left = 92
               Top = 19
@@ -5732,6 +5833,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 125
             Caption = 'Reflection'
             TabOrder = 4
+            ExplicitWidth = 452
             object lblCoverFlowIntensity: TLabel
               Left = 16
               Top = 37
@@ -5740,7 +5842,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Caption = 'Intenisty'
             end
             object lblCoverflowReflexionGap: TLabel
-              Left = 248
+              Left = 283
               Top = 37
               Width = 56
               Height = 13
@@ -5759,7 +5861,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object tbCoverReflexionGap: TNempTrackBar
               AlignWithMargins = True
-              Left = 253
+              Left = 288
               Top = 56
               Width = 185
               Height = 22
@@ -5771,6 +5873,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               TabOrder = 2
               ThumbLength = 15
               OnChange = tbCoverZMainChange
+              ExplicitLeft = 253
             end
             object tbCoverReflexionIntensity: TNempTrackBar
               AlignWithMargins = True
@@ -5792,6 +5895,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 100
             Caption = 'Angles'
             TabOrder = 3
+            ExplicitWidth = 452
             object lblCoverFlowAngleLeft: TLabel
               Left = 16
               Top = 16
@@ -5807,7 +5911,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Caption = 'Current cover'
             end
             object lblCoverFlowAngleRight: TLabel
-              Left = 296
+              Left = 331
               Top = 16
               Width = 25
               Height = 13
@@ -5846,7 +5950,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object tbCoverAngleRight: TNempTrackBar
               AlignWithMargins = True
-              Left = 301
+              Left = 336
               Top = 30
               Width = 137
               Height = 22
@@ -5859,6 +5963,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               TabOrder = 2
               ThumbLength = 15
               OnChange = tbCoverZMainChange
+              ExplicitLeft = 301
             end
           end
           object cpCoverflowSpacing: TCategoryPanel
@@ -5866,6 +5971,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 130
             Caption = 'Spacing between cover art'
             TabOrder = 2
+            ExplicitWidth = 452
             object lblCoverFlowGapLeft: TLabel
               Left = 16
               Top = 16
@@ -5874,7 +5980,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Caption = 'Left'
             end
             object lblCoverFlowGapRight: TLabel
-              Left = 248
+              Left = 283
               Top = 16
               Width = 25
               Height = 13
@@ -5899,7 +6005,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object tbCoverGapFirstRight: TNempTrackBar
               AlignWithMargins = True
-              Left = 253
+              Left = 288
               Top = 30
               Width = 185
               Height = 22
@@ -5912,6 +6018,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               TabOrder = 1
               ThumbLength = 15
               OnChange = tbCoverZMainChange
+              ExplicitLeft = 253
             end
             object tbCoverGapLeft: TNempTrackBar
               AlignWithMargins = True
@@ -5930,7 +6037,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
             object tbCoverGapRight: TNempTrackBar
               AlignWithMargins = True
-              Left = 253
+              Left = 288
               Top = 58
               Width = 185
               Height = 22
@@ -5943,6 +6050,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               TabOrder = 3
               ThumbLength = 15
               OnChange = tbCoverZMainChange
+              ExplicitLeft = 253
             end
           end
           object cpCoverflowViewPosition: TCategoryPanel
@@ -5950,11 +6058,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 80
             Caption = 'Viewing position (x-axis)'
             TabOrder = 1
+            ExplicitWidth = 452
             object tbCoverViewPosition: TNempTrackBar
               AlignWithMargins = True
               Left = 16
               Top = 16
-              Width = 427
+              Width = 462
               Height = 22
               Anchors = [akLeft, akTop, akRight]
               Max = 180
@@ -5965,6 +6074,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               TabOrder = 0
               ThumbLength = 15
               OnChange = tbCoverZMainChange
+              ExplicitWidth = 427
             end
           end
           object cpCoverflowPosition: TCategoryPanel
@@ -5972,6 +6082,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 135
             Caption = 'Position of cover art (z-axis)'
             TabOrder = 0
+            ExplicitWidth = 452
             object LblCoverZLeft: TLabel
               Left = 16
               Top = 41
@@ -5997,7 +6108,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               AlignWithMargins = True
               Left = 88
               Top = 42
-              Width = 350
+              Width = 385
               Height = 22
               Anchors = [akLeft, akTop, akRight]
               Max = 150
@@ -6008,12 +6119,13 @@ object OptionsCompleteForm: TOptionsCompleteForm
               TabOrder = 1
               ThumbLength = 15
               OnChange = tbCoverZMainChange
+              ExplicitWidth = 350
             end
             object tbCoverZMain: TNempTrackBar
               AlignWithMargins = True
               Left = 88
               Top = 16
-              Width = 350
+              Width = 385
               Height = 22
               Anchors = [akLeft, akTop, akRight]
               Max = 150
@@ -6024,12 +6136,13 @@ object OptionsCompleteForm: TOptionsCompleteForm
               TabOrder = 0
               ThumbLength = 15
               OnChange = tbCoverZMainChange
+              ExplicitWidth = 350
             end
             object tbCoverZRight: TNempTrackBar
               AlignWithMargins = True
               Left = 88
               Top = 68
-              Width = 350
+              Width = 385
               Height = 22
               Anchors = [akLeft, akTop, akRight]
               Max = 150
@@ -6040,6 +6153,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               TabOrder = 2
               ThumbLength = 15
               OnChange = tbCoverZMainChange
+              ExplicitWidth = 350
             end
           end
         end
@@ -6050,8 +6164,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cpgFileTypesRegistration: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 453
-          Height = 566
+          Width = 452
+          Height = 557
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -6196,16 +6310,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
   end
   object Panel2: TPanel
     Left = 0
-    Top = 636
-    Width = 676
+    Top = 627
+    Width = 675
     Height = 38
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitTop = 635
-    ExplicitWidth = 672
     DesignSize = (
-      676
+      675
       38)
     object ImgHelp: TImage
       Left = 6
@@ -6291,7 +6403,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       OnClick = BtnHelpClick
     end
     object BTNok: TButton
-      Left = 429
+      Left = 408
       Top = 4
       Width = 75
       Height = 25
@@ -6300,10 +6412,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Default = True
       TabOrder = 0
       OnClick = BTNokClick
-      ExplicitLeft = 425
+      ExplicitLeft = 420
     end
     object BTNCancel: TButton
-      Left = 510
+      Left = 489
       Top = 4
       Width = 75
       Height = 25
@@ -6312,10 +6424,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Caption = 'Cancel'
       TabOrder = 1
       OnClick = BTNCancelClick
-      ExplicitLeft = 506
+      ExplicitLeft = 501
     end
     object BTNApply: TButton
-      Left = 591
+      Left = 570
       Top = 4
       Width = 77
       Height = 25
@@ -6323,7 +6435,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Caption = 'Apply'
       TabOrder = 2
       OnClick = BTNApplyClick
-      ExplicitLeft = 587
+      ExplicitLeft = 582
     end
     object BtnHelp: TButton
       AlignWithMargins = True

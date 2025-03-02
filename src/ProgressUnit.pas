@@ -92,7 +92,7 @@ implementation
 
 {$R *.dfm}
 
-uses NempMainUnit;
+uses NempMainUnit, MedienbibliothekClass, PlaylistClass;
 
 const BTN_TAG_CANCEL = 10;
       BTN_TAG_CLOSE = 11;

@@ -66,7 +66,7 @@ var
 
 implementation
 
-uses Systemhelper, NempMainUnit, MainFormHelper;
+uses Systemhelper, MainFormHelper, PlayerClass, NempMainUnit;
 
 {$R *.dfm}
 

@@ -3,8 +3,8 @@ object ShutDownForm: TShutDownForm
   Top = 125
   BorderIcons = []
   BorderStyle = bsToolWindow
-  ClientHeight = 134
-  ClientWidth = 381
+  ClientHeight = 122
+  ClientWidth = 373
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

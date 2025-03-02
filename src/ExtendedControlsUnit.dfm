@@ -50,19 +50,13 @@ object ExtendedControlForm: TExtendedControlForm
       Height = 12
       Hint = 'Close'
       Anchors = [akTop, akRight]
+      DrawMode = dm_Skin
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0
       TabStop = False
+      StyleElements = [seFont, seBorder]
       OnClick = CloseImageEClick
-      DrawMode = dm_Skin
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
     end
     object pnlSplit: TPanel
       AlignWithMargins = True

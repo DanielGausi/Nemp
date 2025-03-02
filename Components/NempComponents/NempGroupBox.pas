@@ -47,7 +47,7 @@ end;
 
 procedure Register;
 begin
-  RegisterComponents('Beispiele', [TNempGroupBox]);
+  RegisterComponents('Nemp Components', [TNempGroupBox]);
 end;
 
 end.

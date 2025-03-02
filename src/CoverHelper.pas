@@ -232,7 +232,7 @@ type
 
 implementation
 
-uses NempMainUnit, StringHelper, AudioFileHelper, GnuGetText, Nemp_RessourceStrings;
+uses NempMainUnit, MedienbibliothekClass, StringHelper, AudioFileHelper, GnuGetText, Nemp_RessourceStrings;
 // NempMainUnitm is used, as some settings from the MediaLibrary are used here.
 
 var

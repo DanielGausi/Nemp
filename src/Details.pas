@@ -50,8 +50,8 @@ uses
 
   CoverHelper, Buttons, ExtDlgs, ImgList,  Hilfsfunktionen, Systemhelper, HtmlHelper,
   Nemp_ConstantsAndTypes, gnuGettext, Lyrics, TagClouds, LibraryOrganizer.Base,
-  Nemp_RessourceStrings, Menus, RatingCtrls, Spin, VirtualTrees, Vcl.Themes, vcl.styles,
-  System.ImageList, System.Actions, Vcl.ActnList;
+  Nemp_RessourceStrings, Menus, Spin, VirtualTrees, Vcl.Themes, vcl.styles,
+  System.ImageList, System.Actions, Vcl.ActnList, SkinButtons;
 
 type
 
@@ -177,7 +177,6 @@ type
     LblConst_Comment: TLabel;
     LblConst_Track: TLabel;
     LblConst_Rating: TLabel;
-    IMG_LibraryRating: TImage;
     LblConst_CD: TLabel;
     LblPlayCounter: TLabel;
     lblConst_ReplayGain: TLabel;
@@ -294,6 +293,7 @@ type
     Synchronizerating1: TMenuItem;
     Refresh1: TMenuItem;
     cbQuickRefresh: TCheckBox;
+    Btn_LibraryRating: TRatingButton;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -307,13 +307,6 @@ type
     procedure BtnApplyClick(Sender: TObject);
     procedure BtnUndoClick(Sender: TObject);
     procedure Btn_CloseClick(Sender: TObject);
-
-    // Procedures for editing the rating of the current file
-    procedure IMG_LibraryRatingMouseMove(Sender: TObject; Shift: TShiftState; X,
-      Y: Integer);
-    procedure IMG_LibraryRatingMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure IMG_LibraryRatingMouseLeave(Sender: TObject);
     procedure CoverIMAGEDblClick(Sender: TObject);
     // Load an image from Pfad and shows it on page 1
     procedure ShowSelectedImage_Files(PicItem: TPictureItem; Dest: TImage);
@@ -398,6 +391,8 @@ type
     procedure Edit_LibraryExit(Sender: TObject);
     procedure cbQuickRefreshClick(Sender: TObject);
     procedure edtID3v1Change(Sender: TObject);
+    procedure Btn_LibraryRatingRatingChanged(Sender: TRatingButton;
+      aRating: Integer);
   protected
 
   private
@@ -421,7 +416,6 @@ type
     NewLibraryCoverID,
     NewLibraryCoverID_FileSave: String;
 
-    DetailRatingHelper: TRatingHelper;
     CoverArtSearcher: TCoverArtSearcher;
 
     procedure LoadPictureIntoImage(aFilename: String; aImage: TImage);
@@ -482,11 +476,16 @@ type
 
     procedure SwitchToTab(aTab: TTabSheet);
 
+    // for the TAudioFileManager
+    procedure OnPrepareAudioFileChange(Sender: TObject);
+    procedure OnAfterAudioFileChanged(Sender: TObject);
+    procedure SetRatingImageList(const Value: TCustomImageList);
+
   public
+    property RatingImageList: TCustomImageList write SetRatingImageList;
 
     procedure AudioFileEdited(AudioFile: TAudioFile);
     procedure NewAudioFileSelected(AudioFile: TAudioFile; UserDoWantShow: Boolean);
-    procedure RefreshStarGraphics;
   end;
 
 
@@ -496,8 +495,8 @@ var
 
 implementation
 
-Uses NempMainUnit, NewPicture, Clipbrd, MedienbibliothekClass, MainFormHelper, TagHelper,
-    AudioFileHelper, CloudEditor, NewMetaFrame, MetaTagSorting, math, AudioDisplayUtils;
+Uses NempMainUnit, PlayerClass, PlaylistClass, NewPicture, Clipbrd, MedienbibliothekClass, MainFormHelper, TagHelper,
+    AudioFileHelper, CloudEditor, NewMetaFrame, MetaTagSorting, math, AudioDisplayUtils, AudioFileManagement;
 
 {$R *.dfm}
 
@@ -679,9 +678,6 @@ begin
   for i := 0 to ID3Genres.Count - 1 do
       CB_LibraryGenre.Items.Add(ID3Genres[i]);
 
-  DetailRatingHelper := TRatingHelper.Create;
-  LoadStarGraphics(DetailRatingHelper);
-
   VST_MetaData.NodeDataSize := sizeOf(TTagEditItem);
   VSTCover.NodeDataSize := SizeOf(TPictureItem);
   CoverArtSearcher := TCoverArtSearcher.Create;
@@ -691,14 +687,19 @@ begin
 
   MainPageControl.ActivePageIndex := 0;
   MainPageControl.ActivePage := Tab_General;
+
+  TAudioFileManager.OnPrepareAudioFileChange.Add(OnPrepareAudioFileChange);
+  TAudioFileManager.OnAudioFileChanged.Add(OnAfterAudioFileChanged);
 end;
 
 
 procedure TFDetails.FormDestroy(Sender: TObject);
 begin
+    // TAudioFileManager.OnPrepareAudioFileChange.Delete(OnPrepareAudioFileChange); // should be done automatically
+    // TAudioFileManager.OnAudioFileChanged.Delete(OnAfterAudioFileChanged);
+
     if assigned(fEditTag) then
-        FreeAndNil(fEditTag);
-    DetailRatingHelper.Free;
+      FreeAndNil(fEditTag);
     fOriginalFileCopy.Free;
     fEditFile.Free;
     CoverArtSearcher.Free;
@@ -724,6 +725,11 @@ begin
     end;
 end;
 {$ENDREGION}
+
+procedure TFDetails.SetRatingImageList(const Value: TCustomImageList);
+begin
+  Btn_LibraryRating.Images := Value;
+end;
 
 
 procedure TFDetails.cbQuickRefreshClick(Sender: TObject);
@@ -1193,7 +1199,7 @@ end;
 }
 procedure TFDetails.UpdateRatingGUI(ValuesAreSynched: Boolean = False);
 begin
-  DetailRatingHelper.DrawRatingInStarsOnBitmap(fEditFile.Rating, IMG_LibraryRating.Picture.Bitmap, IMG_LibraryRating.Width, IMG_LibraryRating.Height);
+  Btn_LibraryRating.Rating := fEditFile.Rating;
   LblPlayCounter.Caption := Format(DetailForm_PlayCounter, [fEditFile.PlayCounter]);
 
   if ValuesAreSynched then begin
@@ -1246,7 +1252,7 @@ begin
           lb_Tags.Items.Text := '';
           // Rating and PlayCounter
           LblPlayCounter.Caption := '';
-          DetailRatingHelper.DrawRatingInStarsOnBitmap(0, IMG_LibraryRating.Picture.Bitmap, IMG_LibraryRating.Width, IMG_LibraryRating.Height);
+          Btn_LibraryRating.Rating := 0;
           // ReplayGain
           LblReplayGainTitle  .Caption := 'N/A';
           LblReplayGainAlbum  .Caption := 'N/A';
@@ -1268,7 +1274,7 @@ begin
         CB_LibraryGenre      .Text := '';
         // Rating and PlayCounter
         LblPlayCounter.Caption := '';
-        DetailRatingHelper.DrawRatingInStarsOnBitmap(0, IMG_LibraryRating.Picture.Bitmap, IMG_LibraryRating.Width, IMG_LibraryRating.Height);
+        Btn_LibraryRating.Rating := 0;
         // ReplayGain
         LblReplayGainTitle  .Caption := 'N/A';
         LblReplayGainAlbum  .Caption := 'N/A';
@@ -1422,9 +1428,34 @@ begin
 
     // Mark Collections in MainWindow as "dirty", if needed
     CheckForChangedData(fOriginalFileCopy);
+
     // Synch other files
     SyncFilesAfterEdit;
 end;
+
+procedure TFDetails.OnPrepareAudioFileChange(Sender: TObject);
+begin
+  if (Sender is TAudioFile) then
+    TAudioFileManager.AddFileIfNeeded(TAudioFile(Sender), fEditFile);
+end;
+
+procedure TFDetails.OnAfterAudioFileChanged(Sender: TObject);
+begin
+  if not visible then exit;
+  if not (Sender is TAudioFile) then exit;
+
+  //if not assigned(AudioFile) then exit;
+
+  if TAudioFile(Sender).pfad = fEditFile.Pfad then begin
+    //ReloadTimer.Enabled := False;
+    fReloadFile := TAudioFile(Sender);
+
+    ReloadTimerTimer(Nil); // quick$Dirty: bisherige Timer-Funktion direkt aufrufen
+    //ReloadTimer.Enabled := True;
+  end;
+
+end;
+
 
 procedure TFDetails.BtnUndoClick(Sender: TObject);
 begin
@@ -1464,12 +1495,6 @@ end;
 
 
 {$REGION 'Small Supporting methods, little QoL-Features'}
-
-procedure TFDetails.RefreshStarGraphics;
-begin
-  LoadStarGraphics(DetailRatingHelper);
-  UpdateRatingGUI;
-end;
 
 {
     --------------------------------------------------------
@@ -1742,6 +1767,7 @@ begin
   btnSearchLyrics.Click;
 end;
 
+
 procedure TFDetails.btnSearchLyricsClick(Sender: TObject);
 var
   SearchURL: String;
@@ -1812,27 +1838,11 @@ begin
 end;
 
 procedure TFDetails.SyncFilesAfterEdit;
-var
-  ListOfFiles: TAudioFileList;
-  i: Integer;
 begin
-    fOriginalFileCopy.Assign(fEditFile);
-
-    // Update other copies of this file
-    ListOfFiles := TAudioFileList.Create(False);
-    try
-      GetListOfAudioFileCopies(fEditFile, ListOfFiles, False);
-      for i := 0 to ListOfFiles.Count - 1 do
-        ListOfFiles[i].Assign(fEditFile);
-    finally
-      ListOfFiles.Free;
-    end;
-
-    MedienBib.Changed := True;
-    // Correct GUI, but do NOT include the Detailform (we already applied the cahnges here)
-    CorrectVCLAfterAudioFileEdit(fEditFile, False);
+  fOriginalFileCopy.Assign(fEditFile);
+  TAudioFileManager.SyncFilesAfterEdit(fEditFile);
+  MedienBib.Changed := True;
 end;
-
 
 procedure TFDetails.CheckForChangedData(BackupFile: TAudioFile);
 var
@@ -2082,7 +2092,7 @@ begin
     Edit_LibraryComposer .Enabled := EditsAndButtonsEnable;
     Edit_LibraryTrack    .Enabled := EditsAndButtonsEnable;
     Edit_LibraryCD       .Enabled := EditsAndButtonsEnable;
-    IMG_LibraryRating    .Enabled := EditsAndButtonsEnable;
+    Btn_LibraryRating    .Enabled := EditsAndButtonsEnable;
     CB_LibraryGenre      .Enabled := EditsAndButtonsEnable;
 
     lblConst_ReplayGain.Enabled := EditsAndButtonsEnable;
@@ -2210,38 +2220,18 @@ end;
 
 {
     --------------------------------------------------------
-    RatingImageMouseMove
-    RatingImageMouseDown
-    RatingImageMouseLeave
+    Btn_LibraryRatingRatingChanged
     BtnResetRatingClick
     - Edit the rating of the current audiofile
     --------------------------------------------------------
 }
-procedure TFDetails.IMG_LibraryRatingMouseMove(Sender: TObject; Shift: TShiftState; X,
-  Y: Integer);
-var rat: Integer;
+procedure TFDetails.Btn_LibraryRatingRatingChanged(Sender: TRatingButton;
+  aRating: Integer);
 begin
-    if (Sender as TImage).Enabled then
-    begin
-        rat := DetailRatingHelper.MousePosToRating(x, 70);//((x div 8)) * 8;
-        DetailRatingHelper.DrawRatingInStarsOnBitmap(rat, IMG_LibraryRating.Picture.Bitmap, IMG_LibraryRating.Width, IMG_LibraryRating.Height);
-    end;
-end;
-
-procedure TFDetails.IMG_LibraryRatingMouseDown(Sender: TObject;
-  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  ApplyRatingToAudioFile(DetailRatingHelper.MousePosToRating(x, 70));
-
+  ApplyRatingToAudioFile(aRating);
   // Update GUI
   UpdateRatingGUI(True);
   fDataChanged := True;
-end;
-
-procedure TFDetails.IMG_LibraryRatingMouseLeave(Sender: TObject);
-begin
-  if IMG_LibraryRating.Enabled then
-    DetailRatingHelper.DrawRatingInStarsOnBitmap(fEditFile.Rating, (Sender as TImage).Picture.Bitmap, (Sender as TImage).Width, (Sender as TImage).Height);
 end;
 
 procedure TFDetails.ActionResetRatingExecute(Sender: TObject);
@@ -2891,9 +2881,6 @@ end;
 
 
 procedure TFDetails.ActionRefreshFileExecute(Sender: TObject);
-var ListOfFiles: TAudioFileList;
-    listFile: TAudioFile;
-    i: Integer;
 begin
     if assigned(fEditFile)
         and (MedienBib.StatusBibUpdate <= 1)
@@ -2901,38 +2888,22 @@ begin
     then
     begin
         NempPlayer.CoverArtSearcher.StartNewSearch;
-
         case fEditFile.AudioType of
-
             at_File: begin
                 SynchAFileWithDisc(fEditFile, True);
-
-                // Generate a List of Files which should be updated now
-                ListOfFiles := TAudioFileList.Create(False);
-                try
-                    GetListOfAudioFileCopies(fEditFile, ListOfFiles);
-                    for i := 0 to ListOfFiles.Count - 1 do
-                    begin
-                        listFile := ListOfFiles[i];
-                        // copy Data from CurrentAudioFile to the files in the list.
-                        listFile.Assign(fEditFile);
-                    end;
-                finally
-                    ListOfFiles.Free;
-                end;
+                TAudioFileManager.SyncFilesAfterEdit(fEditFile);
                 MedienBib.Changed := True;
             end;
 
             at_CDDA: begin
                 // ClearCDDBCache;
-                 if NempOptions.UseCDDB then
-                     fEditFile.GetAudioData(fEditFile.Pfad, gad_CDDB)
-                 else
-                    fEditFile.GetAudioData(fEditFile.Pfad, 0);
+                if NempOptions.UseCDDB then
+                  fEditFile.GetAudioData(fEditFile.Pfad, gad_CDDB)
+                else
+                  fEditFile.GetAudioData(fEditFile.Pfad, 0);
+                TAudioFileManager.SyncFilesAfterEdit(fEditFile);
             end;
         end;
-        // Correct GUI
-        CorrectVCLAfterAudioFileEdit(fEditFile);
     end else
         TranslateMessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
 end;

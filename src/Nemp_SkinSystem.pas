@@ -45,6 +45,21 @@ Nemp_ConstantsAndTypes, PartyModeClass{$IFDEF USESTYLES}, vcl.themes, vcl.styles
 const MAX_MENUIMAGE_INDEX = 43;
       MAX_PLAYLIST_IMAGE_INDEX = 24;
 
+const
+  IconIDX_Play = 0;
+  IconIDX_Pause = 1;
+  IconIDX_Next = 2;
+  IconIDX_Prev = 3;
+  IconIDX_Stop = 4;
+  IconIDX_RepeatAll = 5;
+  IconIDX_RepeatTitle = 6;
+  IconIDX_RepeatOff = 7;
+  IconIDX_RepeatRandom = 8;
+  IconIDX_SkipForward = 9;
+  IconIDX_SkipBackward = 10;
+
+
+
 type
   // Achtung: Reihenfolge hier jetzt so lassen!!
 
@@ -56,10 +71,10 @@ type
                      ctrlSlidebackwardBtn,
                      ctrlRandomBtn,
                      ctrlRecordBtn,
-                     ctrlHeadsetPlayBtn,
-                     ctrlHeadsetStopBtn,
-                     ctrlHeadsetPlayNowBtn,
-                     ctrlHeadsetInsertToPlaylistBtn,
+                     // SKIN_UMBAU_CHECK ctrlHeadsetPlayBtn,
+                     // SKIN_UMBAU_CHECK ctrlHeadsetStopBtn,
+                     // SKIN_UMBAU_CHECK ctrlHeadsetPlayNowBtn,
+                     // SKIN_UMBAU_CHECK ctrlHeadsetInsertToPlaylistBtn,
                      ctrlMinimizeBtn,
                      ctrlCloseBtn
                      //ctrlMenuBtn
@@ -148,10 +163,10 @@ type
         (Name: 'BtnRandom'       ; Visible: True; Left: 126; Top: 30; Width: 24; Height: 24),  // 'RandomBtn',
     		(Name: 'BtnRecord'       ; Visible: True; Left: 8; Top: 68; Width: 24; Height: 24),  // 'RecordBtn',
 
-        (Name: 'BtnPlayPauseHeadset'   ; Visible: True; Left: 8; Top: 30; Width: 24; Height: 24),  // '',
-        (Name: 'BtnStopHeadSet'        ; Visible: True; Left: 32; Top: 30; Width: 24; Height: 24),  // '',
-        (Name: 'BtnHeadsetPlaynow'     ; Visible: True; Left: 100; Top: 30; Width: 24; Height: 24),  // '',
-        (Name: 'BtnHeadsetToPlaylist'  ; Visible: True; Left: 124; Top: 30; Width: 24; Height: 24),  // '',
+        // SKIN_UMBAU_CHECK(Name: 'BtnPlayPauseHeadset'   ; Visible: True; Left: 8; Top: 30; Width: 24; Height: 24),  // '',
+        // SKIN_UMBAU_CHECK(Name: 'BtnStopHeadSet'        ; Visible: True; Left: 32; Top: 30; Width: 24; Height: 24),  // '',
+        // SKIN_UMBAU_CHECK(Name: 'BtnHeadsetPlaynow'     ; Visible: True; Left: 100; Top: 30; Width: 24; Height: 24),  // '',
+        // SKIN_UMBAU_CHECK(Name: 'BtnHeadsetToPlaylist'  ; Visible: True; Left: 124; Top: 30; Width: 24; Height: 24),  // '',
 
         (Name: 'BtnMinimize'     ; Visible: False; Left: 196; Top: 1; Width: 12; Height: 12),  // 'MinimizeBtn',
         (Name: 'BtnClose'        ; Visible: False; Left: 214; Top: 1; Width: 12; Height: 12)  // 'CloseBtn',
@@ -362,7 +377,7 @@ type
         ControlButtons : Array[TControlButtons] of TSkinButton;
 
         TabButtons: Array [0..22] of SkinButtonRec;
-        SlideButtons: Array [0..2] of SkinButtonRec;
+        // SKIN_UMBAU_CHECK SlideButtons: Array [0..0] of SkinButtonRec;
 
         NempPartyMode: TNempPartyMode;
 
@@ -398,6 +413,8 @@ type
         procedure DrawArtistAlbumPanel(aPanel: TNempPanel; aBibCount: Integer; UseBackground: Boolean = True);
 
         //procedure DrawGroupboxFrame(aGroupbox: TNempGroupbox);
+
+        function RepeatBtnImageIndex(aMode: Integer): Integer;
 
 
         Procedure UpdateSpectrumGraphics;
@@ -440,7 +457,7 @@ const CustomColorNames : Array [0..15] of string = ('ColorA','ColorB','ColorC','
 implementation
 
 
-uses NempMainUnit, Details, OptionsComplete, Hilfsfunktionen, spectrum_vis, System.StrUtils,
+uses NempMainUnit, PlayerClass, Details, OptionsComplete, Hilfsfunktionen, System.StrUtils,
     SplitForm_Hilfsfunktionen, PlaylistUnit, AuswahlUnit, MedienlisteUnit, ExtendedControlsUnit,
     VSTEditControls, MedienBibliothekClass, TagClouds, Systemhelper, DeleteSelect;
 
@@ -523,10 +540,10 @@ begin
   ControlButtons[ctrlRandomBtn       ] :=  Nemp_MainForm.RandomBtn       ;
   ControlButtons[ctrlRecordBtn       ] :=  Nemp_MainForm.RecordBtn       ;
 
-  ControlButtons[ctrlHeadsetPlayBtn            ] := Nemp_MainForm.PlayPauseHeadSetBtn  ;
-  ControlButtons[ctrlHeadsetStopBtn            ] := Nemp_MainForm.StopHeadSetBtn       ;
-  ControlButtons[ctrlHeadsetPlayNowBtn         ] := Nemp_MainForm.BtnHeadsetPlaynow    ;
-  ControlButtons[ctrlHeadsetInsertToPlaylistBtn] := Nemp_MainForm.BtnHeadsetToPlaylist ;
+  // SKIN_UMBAU_CHECKControlButtons[ctrlHeadsetPlayBtn            ] := Nemp_MainForm.PlayPauseHeadSetBtn  ;
+  // SKIN_UMBAU_CHECKControlButtons[ctrlHeadsetStopBtn            ] := Nemp_MainForm.StopHeadSetBtn       ;
+  // SKIN_UMBAU_CHECKControlButtons[ctrlHeadsetPlayNowBtn         ] := Nemp_MainForm.BtnHeadsetPlaynow    ;
+  // SKIN_UMBAU_CHECKControlButtons[ctrlHeadsetInsertToPlaylistBtn] := Nemp_MainForm.BtnHeadsetToPlaylist ;
 
   ControlButtons[ctrlMinimizeBtn     ] :=  Nemp_MainForm.BtnMinimize     ;
   ControlButtons[ctrlCloseBtn        ] :=  Nemp_MainForm.BtnClose        ;
@@ -583,14 +600,10 @@ begin
   TabButtons[21].GlyphFile := 'TabBtnTagCloud'    ;
   TabButtons[22].GlyphFile := 'TabBtnNemp'        ;
 
-  SlideButtons[0].Button  := Nemp_MainForm.VolButton           ;
-  SlideButtons[1].Button  := Nemp_MainForm.SlideBarButton      ;
-  SlideButtons[2].Button := Nemp_MainForm.VolButtonHeadset    ;
-
-  SlideButtons[0].GlyphFile := 'SlideBtnLeftRight'; //'SlideBtnVolume';
-  SlideButtons[1].GlyphFile := 'SlideBtnLeftRight';
-  SlideButtons[2].GlyphFile := 'SlideBtnLeftRight';//'SlideBtnVolume';
-
+  // SKIN_UMBAU_CHECK SlideButtons[0].Button  := Nemp_MainForm.SlideBarButton      ;
+  // SKIN_UMBAU_CHECK SlideButtons[2].Button := Nemp_MainForm.VolButtonHeadset    ;
+  // SKIN_UMBAU_CHECK SlideButtons[0].GlyphFile := 'SlideBtnLeftRight'; //'SlideBtnVolume';
+  // SKIN_UMBAU_CHECK SlideButtons[2].GlyphFile := 'SlideBtnLeftRight';//'SlideBtnVolume';
 
   RegisteredStyles := TStringList.Create;
 end;
@@ -881,15 +894,15 @@ begin
         end;
 
         // correct the positions for "old skins" (< 4.11), as butto positions wouldn't probaly make much sense now
-        if SkinVersion < 4 then
-        begin
-            for j := low(TControlbuttons) to ctrlHeadsetInsertToPlaylistBtn do //High(TControlButtons) - 1 do
-            begin
-              ControlButtonData[j].Left        := DefaultButtonData[j].Left   ;
-              ControlButtonData[j].Top         := DefaultButtonData[j].Top    ;
-              // Width/Height are ok
-            end;
-        end;
+        // SKIN_UMBAU_CHECKif SkinVersion < 4 then
+        // SKIN_UMBAU_CHECKbegin
+        // SKIN_UMBAU_CHECK    for j := low(TControlbuttons) to ctrlHeadsetInsertToPlaylistBtn do //High(TControlButtons) - 1 do
+        // SKIN_UMBAU_CHECK    begin
+        // SKIN_UMBAU_CHECK      ControlButtonData[j].Left        := DefaultButtonData[j].Left   ;
+        // SKIN_UMBAU_CHECK      ControlButtonData[j].Top         := DefaultButtonData[j].Top    ;
+        // SKIN_UMBAU_CHECK      // Width/Height are ok
+        // SKIN_UMBAU_CHECK    end;
+        // SKIN_UMBAU_CHECK end;
 
   finally
         ini.free;
@@ -1223,22 +1236,20 @@ begin
      if FormLayout.BuildInProcess then
         exit;
 
-
     if fMedialistBitmapLoaded then
         fSetTreeLocalOffsetPoint(Nemp_MainForm.VST, self.AlignBackgroundMedialist, self.TileBackgroundMedialist, self.MedialistBitmap)
     else
         fSetATreeOffset(Nemp_MainForm.VST);
 
-    ImgPoint := Nemp_MainForm.ImgBibRating.ClientToScreen(Point(0,0));
+    // SKIN_UMBAU_CHECK ImgPoint := Nemp_MainForm.ImgBibRating.ClientToScreen(Point(0,0));
     // The "FileOverview"-RatingImage
-    Nemp_MainForm.BibRatingHelper.BackGroundBitmap.Width := Nemp_MainForm.ImgBibRating.Width;
-    Nemp_MainForm.BibRatingHelper.BackGroundBitmap.Height := Nemp_MainForm.ImgBibRating.Height;
-    TileGraphic(CompleteBitmap, TileBackground,
-          Nemp_MainForm.BibRatingHelper.BackGroundBitmap.Canvas,
-           + ImgPoint.X -  PlayerPageOffsetX,
-           + ImgPoint.Y -  PlayerPageOffsetY );
-
-    Nemp_MainForm.BibRatingHelper.ReDrawRatingInStarsOnBitmap(Nemp_MainForm.ImgBibRating.Picture.Bitmap);
+    // SKIN_UMBAU_CHECK Nemp_MainForm.BibRatingHelper.BackGroundBitmap.Width := Nemp_MainForm.ImgBibRating.Width;
+    // SKIN_UMBAU_CHECK Nemp_MainForm.BibRatingHelper.BackGroundBitmap.Height := Nemp_MainForm.ImgBibRating.Height;
+    // SKIN_UMBAU_CHECK TileGraphic(CompleteBitmap, TileBackground,
+    // SKIN_UMBAU_CHECK       Nemp_MainForm.BibRatingHelper.BackGroundBitmap.Canvas,
+    // SKIN_UMBAU_CHECK        + ImgPoint.X -  PlayerPageOffsetX,
+    // SKIN_UMBAU_CHECK        + ImgPoint.Y -  PlayerPageOffsetY );
+    // SKIN_UMBAU_CHECK Nemp_MainForm.BibRatingHelper.ReDrawRatingInStarsOnBitmap(Nemp_MainForm.ImgBibRating.Picture.Bitmap);
 end;
 
 Procedure TNempSkin.SetPlaylistOffsets;
@@ -1327,13 +1338,14 @@ begin
         if assigned(DeleteSelection) then
             DeleteSelection.ReloadScheckBoxImages(path, true);
 
-        case SlideButtonMode of
+        // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK  // SKIN_UMBAU_CHECK  // SKIN_UMBAU_CHECK
+        (*case SlideButtonMode of
            0,1: begin
                   for i := 0 to High(SlideButtons) do
                   begin
                       SlideButtons[i].Button.DrawMode := dm_Windows;
-                      SlideButtons[i].Button.CustomRegion := False;
-                      SlideButtons[i].Button.Glyph.Assign(Nil);
+                      // SKIN_UMBAU_CHECK SlideButtons[i].Button.CustomRegion := False;
+                      // SKIN_UMBAU_CHECK SlideButtons[i].Button.Glyph.Assign(Nil);
                       SlideButtons[i].Button.Refresh;
                   end;
            end;
@@ -1351,11 +1363,13 @@ begin
                       SlideButtons[i].Button.StyleElements := [];
                       {$ENDIF}
 
-                      SlideButtons[i].Button.CustomRegion := True;
-                      SlideButtons[i].Button.Refresh;
+                      // SKIN_UMBAU_CHECK SlideButtons[i].Button.CustomRegion := True;
+                      // SKIN_UMBAU_CHECK SlideButtons[i].Button.Refresh;
                   end;
            end;
         end;
+        // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK
+        *)
 
         
         // Buttons / Images konfigurieren.
@@ -1386,52 +1400,52 @@ begin
                         ControlButtons[j],
                         Path + '\' + ControlButtonData[j].Name,
                         True);
-                    ControlButtons[j].GlyphLine := ControlButtons[j].GlyphLine;
+                    // SKIN_UMBAU_CHECK ControlButtons[j].GlyphLine := ControlButtons[j].GlyphLine;
                 end;
 
                 AssignNemp3Glyph(
                         AuswahlForm.CloseImageA,
                         Path + '\' + ControlButtonData[ctrlCloseBtn].Name,
                         True);
-                    AuswahlForm.CloseImageA.GlyphLine := AuswahlForm.CloseImageA.GlyphLine;
+                    // SKIN_UMBAU_CHECK AuswahlForm.CloseImageA.GlyphLine := AuswahlForm.CloseImageA.GlyphLine;
                 AssignNemp3Glyph(
                         MedienListeForm.CloseImageM,
                         Path + '\' + ControlButtonData[ctrlCloseBtn].Name,
                         True);
-                    MedienListeForm.CloseImageM.GlyphLine := MedienListeForm.CloseImageM.GlyphLine;
+                    // SKIN_UMBAU_CHECK MedienListeForm.CloseImageM.GlyphLine := MedienListeForm.CloseImageM.GlyphLine;
                 AssignNemp3Glyph(
                         PlaylistForm.CloseImageP,
                         Path + '\' + ControlButtonData[ctrlCloseBtn].Name,
                         True);
-                    PlaylistForm.CloseImageP.GlyphLine := PlaylistForm.CloseImageP.GlyphLine;
+                    // SKIN_UMBAU_CHECK PlaylistForm.CloseImageP.GlyphLine := PlaylistForm.CloseImageP.GlyphLine;
 
                 AssignNemp3Glyph(
                         ExtendedControlForm.CloseImageE,
                         Path + '\' + ControlButtonData[ctrlCloseBtn].Name,
                         True);
-                    ExtendedControlForm.CloseImageE.GlyphLine := ExtendedControlForm.CloseImageE.GlyphLine;
+                    // SKIN_UMBAU_CHECK ExtendedControlForm.CloseImageE.GlyphLine := ExtendedControlForm.CloseImageE.GlyphLine;
 
-                AssignNemp3Glyph(BtnLoadHeadset,  Path + '\BtnLoadHeadset', True);
-                BtnLoadHeadset.GlyphLine := BtnLoadHeadset.GlyphLine;
+                // SKIN_UMBAU_CHECKAssignNemp3Glyph(BtnLoadHeadset,  Path + '\BtnLoadHeadset', True);
+                // SKIN_UMBAU_CHECK BtnLoadHeadset.GlyphLine := BtnLoadHeadset.GlyphLine;
 
-                AssignNemp3Glyph(BtnHeadsetToPlaylist,  Path + '\BtnHeadsetToPlaylist', True);
-                BtnHeadsetToPlaylist.GlyphLine := BtnHeadsetToPlaylist.GlyphLine;
+                // SKIN_UMBAU_CHECKAssignNemp3Glyph(BtnHeadsetToPlaylist,  Path + '\BtnHeadsetToPlaylist', True);
+                // SKIN_UMBAU_CHECK BtnHeadsetToPlaylist.GlyphLine := BtnHeadsetToPlaylist.GlyphLine;
 
-                if FileExists(Path + '\BtnHeadsetPlaynow.bmp')
-                or FileExists(Path + '\BtnHeadsetPlaynow.png')
-                or FileExists(Path + '\BtnHeadsetPlaynow.jpg')
-                then
-                    AssignNemp3Glyph(BtnHeadsetPlaynow,  Path + '\BtnHeadsetPlaynow', True)
-                else
-                    AssignNemp3Glyph(BtnHeadsetPlaynow,  Path + '\BtnPlayPauseHeadset', True);
-                BtnHeadsetPlaynow.GlyphLine := BtnHeadsetPlaynow.GlyphLine;
+                // SKIN_UMBAU_CHECKif FileExists(Path + '\BtnHeadsetPlaynow.bmp')
+                // SKIN_UMBAU_CHECKor FileExists(Path + '\BtnHeadsetPlaynow.png')
+                // SKIN_UMBAU_CHECKor FileExists(Path + '\BtnHeadsetPlaynow.jpg')
+                // SKIN_UMBAU_CHECKthen
+                // SKIN_UMBAU_CHECK    AssignNemp3Glyph(BtnHeadsetPlaynow,  Path + '\BtnHeadsetPlaynow', True)
+                // SKIN_UMBAU_CHECKelse
+                // SKIN_UMBAU_CHECK    AssignNemp3Glyph(BtnHeadsetPlaynow,  Path + '\BtnPlayPauseHeadset', True);
+                // SKIN_UMBAU_CHECK BtnHeadsetPlaynow.GlyphLine := BtnHeadsetPlaynow.GlyphLine;
 
                 //AssignNemp3Glyph(PlayPauseHeadSetBtn,  Path + '\BtnPlayPauseHeadset', True);
-                AssignNemp3Glyph(PlayPauseHeadSetBtn,  Path + '\BtnPlayPause', True);
-                PlayPauseHeadSetBtn.GlyphLine := PlayPauseHeadSetBtn.GlyphLine;
+                // SKIN_UMBAU_CHECKAssignNemp3Glyph(PlayPauseHeadSetBtn,  Path + '\BtnPlayPause', True);
+                // SKIN_UMBAU_CHECK PlayPauseHeadSetBtn.GlyphLine := PlayPauseHeadSetBtn.GlyphLine;
 
-                AssignNemp3Glyph(StopHeadSetBtn,  Path + '\BtnStop', True);
-                StopHeadSetBtn.GlyphLine := StopHeadSetBtn.GlyphLine;
+                // SKIN_UMBAU_CHECKAssignNemp3Glyph(StopHeadSetBtn,  Path + '\BtnStop', True);
+                // SKIN_UMBAU_CHECK StopHeadSetBtn.GlyphLine := StopHeadSetBtn.GlyphLine;
 
                 AssignSkinTabGlyphs;
             end;
@@ -1460,7 +1474,7 @@ begin
       }
 
 
-      Nemp_MainForm.BibRatingHelper.UsebackGround := True;
+      // SKIN_UMBAU_CHECK Nemp_MainForm.BibRatingHelper.UsebackGround := True;
 
       if (UseBackGroundImageVorauswahl)  then
       begin
@@ -1636,22 +1650,25 @@ begin
     LyricsMemo.Color := SkinColorScheme.MemoBackGroundCL;
     LyricsMemo.Font.Color := SkinColorScheme.MemoTextCL;
 
-    Spectrum.PreviewArtistColor := SkinColorScheme.PreviewArtistColor ;
-    Spectrum.PreviewTitleColor  := SkinColorScheme.PreviewTitleColor  ;
-    Spectrum.PreviewTimeColor   := SkinColorScheme.PreviewTimeColor   ;
+    NempPlayer.PreviewArtistColor := SkinColorScheme.PreviewArtistColor ;
+    NempPlayer.PreviewTitleColor  := SkinColorScheme.PreviewTitleColor  ;
+    NempPlayer.PreviewTimeColor   := SkinColorScheme.PreviewTimeColor   ;
 
     PlayerTimeLbl.Font.Color       := SkinColorScheme.SpecTimeCL;;
     PlayerArtistLabel.Font.Color   := SkinColorScheme.SpecArtistCL;
     PlayerTitleLabel.Font.Color    := SkinColorScheme.SpecTitelCL;
 
-    Spectrum.PreviewShapePenColor           := SkinColorScheme.PreviewShapePenColor           ;
-    Spectrum.PreviewShapeBrushColor         := SkinColorScheme.PreviewShapeBrushColor         ;
-    Spectrum.PreviewShapeProgressPenColor   := SkinColorScheme.PreviewShapeProgressPenColor   ;
-    Spectrum.PreviewShapeProgressBrushColor := SkinColorScheme.PreviewShapeProgressBrushColor ;
+    NempPlayer.PreviewShapePenColor           := SkinColorScheme.PreviewShapePenColor           ;
+    NempPlayer.PreviewShapeBrushColor         := SkinColorScheme.PreviewShapeBrushColor         ;
+    NempPlayer.PreviewShapeProgressPenColor   := SkinColorScheme.PreviewShapeProgressPenColor   ;
+    NempPlayer.PreviewShapeProgressBrushColor := SkinColorScheme.PreviewShapeProgressBrushColor ;
 
-    Spectrum.Pen := SkinColorScheme.SpecPenCL;
-    Spectrum.Pen2 := SkinColorScheme.SpecPen2CL;
-    Spectrum.Peak := SkinColorScheme.SpecPeakCL;
+    // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK
+    NempSpectrum.ColorPeak := SkinColorScheme.SpecPeakCL;
+    NempSpectrum.ColorBar1 := SkinColorScheme.SpecPenCL;
+    NempSpectrum.ColorBar2 := SkinColorScheme.SpecPen2CL;
+    // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK
+
 
     if (HideMainMenu) or (NempOptions.AnzeigeMode = 1) then
       Menu := NIL
@@ -1665,14 +1682,14 @@ begin
   SetVSTOffsets;
   SetPlaylistOffsets;
 
-  if NempPartyMode.Active then
-      Spectrum.SetScale(NempPartyMode.ResizeFactor)
-  else
-      Spectrum.SetScale(1);
+  // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK
+  //if NempPartyMode.Active then
+  //    Spectrum.SetScale(NempPartyMode.ResizeFactor)
+  //else
+  //    Spectrum.SetScale(1);
 
   // Spectrum-Hintergrund setzen
   UpdateSpectrumGraphics;
-  Nemp_MainForm.RepaintVisOnPause;
 
   {$IFDEF USESTYLES}
   if UseAdvancedSkin and NempOptions.GlobalUseAdvancedSkin then
@@ -1705,40 +1722,42 @@ begin
         if NempOptions.AnzeigeMode = 1 then
             UpdateSmallMainForm;
 
-        case SlideButtonMode of
+        // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK
+        {case SlideButtonMode of
            2: begin
                   for i := 0 to High(SlideButtons) do
                   begin
-                      SlideButtons[i].Button.CustomRegion := True;
+                      // SKIN_UMBAU_CHECK SlideButtons[i].Button.CustomRegion := True;
                       SlideButtons[i].Button.Refresh;
                   end;
            end;
-        end;
+        end;}
+        // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK
 
         for j := low(Controlbuttons) to High(Controlbuttons) do
                 begin
-                        ControlButtons[j].CustomRegion := True;
+                        // SKIN_UMBAU_CHECK ControlButtons[j].CustomRegion := True;
                         ControlButtons[j].Refresh;
                 end;
 
         for i := Low(TabButtons) to High(TabButtons) do
         begin
-              TabButtons[i].Button.CustomRegion := True;
+              // SKIN_UMBAU_CHECK TabButtons[i].Button.CustomRegion := True;
               TabButtons[i].Button.Refresh;
         end;
 
 
-        BtnHeadsetPlaynow     .CustomRegion := True;
-        BtnHeadsetToPlaylist  .CustomRegion := True;
-        BtnLoadHeadset        .CustomRegion := True;
-        PlayPauseHeadSetBtn   .CustomRegion := True;
-        StopHeadSetBtn        .CustomRegion := True;
+        // SKIN_UMBAU_CHECK BtnHeadsetPlaynow     .CustomRegion := True;
+        // SKIN_UMBAU_CHECK BtnHeadsetToPlaylist  .CustomRegion := True;
+        // SKIN_UMBAU_CHECK BtnLoadHeadset        .CustomRegion := True;
+        // SKIN_UMBAU_CHECK PlayPauseHeadSetBtn   .CustomRegion := True;
+        // SKIN_UMBAU_CHECK StopHeadSetBtn        .CustomRegion := True;
 
-        BtnHeadsetPlaynow      .Refresh;
-        BtnHeadsetToPlaylist   .Refresh;
-        BtnLoadHeadset         .Refresh;
-        PlayPauseHeadSetBtn    .Refresh;
-        StopHeadSetBtn         .Refresh;
+        // SKIN_UMBAU_CHECKBtnHeadsetPlaynow      .Refresh;
+        // SKIN_UMBAU_CHECKBtnHeadsetToPlaylist   .Refresh;
+        // SKIN_UMBAU_CHECKBtnLoadHeadset         .Refresh;
+        // SKIN_UMBAU_CHECKPlayPauseHeadSetBtn    .Refresh;
+        // SKIN_UMBAU_CHECKStopHeadSetBtn         .Refresh;
 
     end;
 
@@ -1795,13 +1814,15 @@ begin
         AssignOtherGraphics;
         RefreshStarGraphicsAllForms;
 
-        for i := 0 to High(SlideButtons) do
+        // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK
+        {for i := 0 to High(SlideButtons) do
         begin
             SlideButtons[i].Button.DrawMode := dm_Windows;
-            SlideButtons[i].Button.CustomRegion := False;
-            SlideButtons[i].Button.Glyph.Assign(Nil);
+            // SKIN_UMBAU_CHECK SlideButtons[i].Button.CustomRegion := False;
+            // SKIN_UMBAU_CHECK SlideButtons[i].Button.Glyph.Assign(Nil);
             SlideButtons[i].Button.Refresh;
-        end;
+        end;}
+        // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK
 
   end;
 
@@ -1821,9 +1842,9 @@ begin
       AlbenVST.Background.Assign(Nil);
       PlaylistVST.Background.Assign(Nil);
       VST.Background.Assign(Nil);
-      BibRatingHelper.UsebackGround := False;
 
-      BibRatingHelper.ReDrawRatingInStarsOnBitmap(ImgBibRating.Picture.Bitmap);
+      // SKIN_UMBAU_CHECK  BibRatingHelper.UsebackGround := False;
+      // SKIN_UMBAU_CHECK BibRatingHelper.ReDrawRatingInStarsOnBitmap(ImgBibRating.Picture.Bitmap);
 
       TagCustomizer.UseBackGround := False;
       TagCustomizer.TileBackGround:= False;
@@ -1946,26 +1967,24 @@ begin
     LyricsMemo.Color := clWindow;
     LyricsMemo.Font.Color := clWindowText;
 
-    Spectrum.PreviewArtistColor := clGrayText;
-    Spectrum.PreviewTitleColor  := clWindowText;
-    Spectrum.PreviewTimeColor   := clWindowText;
+    NempPlayer.PreviewArtistColor := clGrayText;
+    NempPlayer.PreviewTitleColor  := clWindowText;
+    NempPlayer.PreviewTimeColor   := clWindowText;
 
     PlayerTimeLbl.Font.Color       := clWindowText;
     PlayerArtistLabel.Font.Color   := clWindowText;
     PlayerTitleLabel.Font.Color    := clWindowText;
 
-    Spectrum.PreviewShapePenColor           := cl3DDkShadow ;
-    Spectrum.PreviewShapeBrushColor         := clBtnFace    ;
-    Spectrum.PreviewShapeProgressPenColor   := clHighLight  ;
-    Spectrum.PreviewShapeProgressBrushColor := clHotLight   ;
+    NempPlayer.PreviewShapePenColor           := cl3DDkShadow ;
+    NempPlayer.PreviewShapeBrushColor         := clBtnFace    ;
+    NempPlayer.PreviewShapeProgressPenColor   := clHighLight  ;
+    NempPlayer.PreviewShapeProgressBrushColor := clHotLight   ;
 
-    Spectrum.Pen := clBackground;
-    Spectrum.Pen2 := clActiveCaption;
-    Spectrum.Peak := clBackground;
-    Spectrum.UseBackGround := False;
-    Spectrum.SetGradientBitmap;
-    Spectrum.DrawRating(RatingImage.Tag);
-    RepaintVisOnPause;
+    // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK
+    NempSpectrum.ColorPeak := clBackground;
+    NempSpectrum.ColorBar1 := clBackground;
+    NempSpectrum.ColorBar2 := clActiveCaption;
+
 
     if NempOptions.AnzeigeMode = 0 then
         Menu := Nemp_MainMenu;
@@ -2058,14 +2077,13 @@ begin
                 2: begin
                     // align to main control, use also AlignControlGenericOffset
                     // !!!!!!!!!!! Check with Headset
-                    if Nemp_MainForm.MainPlayerControlsActive then
-                        SourceOffsetPoint := Nemp_MainForm.PlayerControlPanel.ClientToParent(Point(0,0), Nemp_MainForm._ControlPanel)
-                    else
-                        SourceOffsetPoint := Nemp_MainForm.HeadsetControlPanel.ClientToParent(Point(0,0), Nemp_MainForm._ControlPanel);
+                    //if Nemp_MainForm.MainPlayerControlsActive then
+                    SourceOffsetPoint := Nemp_MainForm.PlayerControlPanel.ClientToParent(Point(0,0), Nemp_MainForm._ControlPanel);
+                    //else
+                    //    SourceOffsetPoint := Nemp_MainForm.HeadsetControlPanel.ClientToParent(Point(0,0), Nemp_MainForm._ControlPanel);
                     SourceOffsetPoint.X := SourceOffsetPoint.X - AlignControlGenericOffset;
                 end;
             end;
-
 
 
             pnlPoint := aPanel.ClientToParent(Point(0,0), Nemp_MainForm._ControlPanel);
@@ -2262,10 +2280,10 @@ begin
         // redraw the playerpanel, but only on the internal bitmap, not on the actual panel
         DrawAControlPanel(NewPlayerPanel, True, True);
 
-        Spectrum.SetBackGround(True);
-        Spectrum.SetStarBackGround(True);
-        Spectrum.DrawRating(RatingImage.Tag);
-        Spectrum.SetGradientBitmap;
+        // Spectrum.SetBackGround(True);
+        // Spectrum.SetStarBackGround(True);
+        // Spectrum.DrawRating(RatingImage.Tag);
+        // Spectrum.SetGradientBitmap;
     end;
 end;
 
@@ -2470,16 +2488,17 @@ begin
     r := NempPartyMode.ResizeProc;
     with Nemp_MainForm do
     begin
-        for b := Low(TControlButtons) to ctrlHeadsetInsertToPlaylistBtn do // ctrlHeadsetInsertToPlaylistBtn do //High(TControlButtons) - 1 do
-        begin
-            ControlButtons[b].Left   := r(ControlButtonData[b].Left)  ;
-            ControlButtons[b].Top    := r(ControlButtonData[b].Top) ;
-            ControlButtons[b].Width  := r(ControlButtonData[b].Width) ;
-            ControlButtons[b].Height := r(ControlButtonData[b].Height);
+
+        // SKIN_UMBAU_CHECKfor b := Low(TControlButtons) to ctrlHeadsetInsertToPlaylistBtn do // ctrlHeadsetInsertToPlaylistBtn do //High(TControlButtons) - 1 do
+        // SKIN_UMBAU_CHECKbegin
+        // SKIN_UMBAU_CHECK    ControlButtons[b].Left   := r(ControlButtonData[b].Left)  ;
+        // SKIN_UMBAU_CHECK    ControlButtons[b].Top    := r(ControlButtonData[b].Top) ;
+        // SKIN_UMBAU_CHECK    ControlButtons[b].Width  := r(ControlButtonData[b].Width) ;
+        // SKIN_UMBAU_CHECK    ControlButtons[b].Height := r(ControlButtonData[b].Height);
 
             // if b <= ctrlRecordBtn  then
-                ControlButtons[b].Visible:= ControlButtonData[b].Visible or (ButtonMode <> 2);
-        end;
+        // SKIN_UMBAU_CHECK        ControlButtons[b].Visible:= ControlButtonData[b].Visible or (ButtonMode <> 2);
+        // SKIN_UMBAU_CHECKend;
 
         BtnArray[0] := PlayPauseBTN        ;
         BtnArray[1] := StopBTN             ;
@@ -2487,6 +2506,7 @@ begin
         BtnArray[3] := PlayNextBTN         ;
         BtnArray[4] := RandomBTN           ;
         //Bubblesort für TabOrder
+        // SKIN_UMBAU_CHECK   noch nötig mit festen controls, nicht mehr konfigurierbar per Skin in Größe und Position?
         for i := 0 to 3 do
         begin
             for j := 0 to 3 - i do
@@ -2501,28 +2521,7 @@ begin
         //SlideBarButton.TabOrder := 0;
         for i := 0 to 4 do
             BtnArray[i].TabOrder := i;
-        VolButton.TabOrder := 5;
 
-        // the same for HeadsetControls
-        BtnArray[0] := PlayPauseHeadSetBtn        ;
-        BtnArray[1] := StopHeadSetBtn             ;
-        BtnArray[2] := BtnHeadsetPlaynow         ;
-        BtnArray[3] := BtnHeadsetToPlaylist         ;
-        //Bubblesort für TabOrder
-        for i := 0 to 2 do
-        begin
-            for j := 0 to 2 - i do
-            begin
-                if (BtnArray[j].Left > BtnArray[j+1].Left) or
-                   ((BtnArray[j].Left = BtnArray[j+1].Left) and
-                    ((BtnArray[j].Top > BtnArray[j+1].Top))) then
-                SwapButtons(j, j+1);
-            end;
-        end;
-
-        for i := 0 to 3 do
-            BtnArray[i].TabOrder := i;
-        VolButtonHeadset.TabOrder := 4;
     end;
 end;
 
@@ -2545,11 +2544,6 @@ begin
         PlayPrevBTN  .TabOrder := 2;
         PlayNextBTN  .TabOrder := 3;
         RandomBTN    .TabOrder := 4;
-
-        PlayPauseHeadSetBtn  .TabOrder := 0;
-        StopHeadSetBtn       .TabOrder := 0;
-        BtnHeadsetPlaynow    .TabOrder := 0;
-        BtnHeadsetToPlaylist .TabOrder := 0;
     end;
 end;
 
@@ -2600,6 +2594,8 @@ end;
 procedure TNempSkin.AssignABGraphics;
 var BaseDir: String;
 begin
+  // SKIN_UMBAU_CHECK// SKIN_UMBAU_CHECK// SKIN_UMBAU_CHECK// SKIN_UMBAU_CHECK
+  {
     if isActive and (not UseDefaultStarBitmaps) then
         BaseDir := path + '\'
     else
@@ -2620,6 +2616,7 @@ begin
         ab1.Picture.Assign(ABRepeatBitmapA);
         ab2.Picture.Assign(ABRepeatBitmapB);
     end;
+  }
 end;
 
 
@@ -2644,7 +2641,7 @@ begin
         Nemp_MainForm.VolumeImage.Picture.Bitmap.Assign(Nil);
         Nemp_MainForm.VolumeImage.Refresh;
         Nemp_MainForm.VolumeImage.Picture.Bitmap.Assign(tmpbmp);
-        Nemp_MainForm.VolumeImageHeadset.Picture.Bitmap.Assign(tmpbmp);
+        // SKIN_UMBAU_CHECK Nemp_MainForm.VolumeImageHeadset.Picture.Bitmap.Assign(tmpbmp);
     finally
         tmpbmp.Free;
     end;
@@ -2654,6 +2651,7 @@ end;
 procedure TNempSkin.AssignStarGraphics;
 var BaseDir: String;
 begin
+    // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK
     if isActive and (not UseDefaultStarBitmaps) then
         BaseDir := path + '\'
     else
@@ -2669,11 +2667,11 @@ begin
     UnSetStarBitmap.Transparent := True;
     HalfStarBitmap.Transparent := True;
     CountStarBitmap.Transparent := True;
-    RatingGraphics.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap, CountStarBitmap);
+    // SKIN_UMBAU_CHECK RatingGraphics.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap, CountStarBitmap);
 
-    Nemp_MainForm.BibRatingHelper.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap, CountStarBitmap);
+    // SKIN_UMBAU_CHECK Nemp_MainForm.BibRatingHelper.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap, CountStarBitmap);
     //if Assigned(MedienBib.CurrentAudioFile) then
-        Nemp_MainForm.BibRatingHelper.DrawRatingInStarsOnBitmap(Nemp_MainForm.CurrentlySelectedFile.Rating, Nemp_MainForm.ImgBibRating.Picture.Bitmap, Nemp_MainForm.ImgBibRating.Width, Nemp_MainForm.ImgBibRating.Height);
+    // SKIN_UMBAU_CHECK     Nemp_MainForm.BibRatingHelper.DrawRatingInStarsOnBitmap(Nemp_MainForm.CurrentlySelectedFile.Rating, Nemp_MainForm.ImgBibRating.Picture.Bitmap, Nemp_MainForm.ImgBibRating.Width, Nemp_MainForm.ImgBibRating.Height);
     //else
     //    Nemp_MainForm.BibRatingHelper.DrawRatingInStarsOnBitmap(128, Nemp_MainForm.ImgBibRating.Picture.Bitmap, Nemp_MainForm.ImgBibRating.Width, Nemp_MainForm.ImgBibRating.Height);
 
@@ -2686,10 +2684,8 @@ begin
     HalfStarBitmap.Transparent := True;
     CountStarBitmap.Transparent := True;
 
-    PlayerRatingGraphics.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap, CountStarBitmap);
+    // SKIN_UMBAU_CHECK PlayerRatingGraphics.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap, CountStarBitmap);
 
-    //if assigned(FDetails) then
-    //    FDetails.LoadStarGraphics;
 end;
 
 procedure TNempSkin.AssignWindowsGlyphs(UseSkinGraphics: Boolean);
@@ -2709,76 +2705,76 @@ begin
             for b := Low(TControlButtons) to High(TControlButtons) do
             begin
                 ControlButtons[b].DrawMode := dm_Windows;
-                ControlButtons[b].NumGlyphs := 1;
-                ControlButtons[b].Glyph.Assign(Nil);
+                // SKIN_UMBAU_CHECK ControlButtons[b].NumGlyphs := 1;
+                // SKIN_UMBAU_CHECK ControlButtons[b].Glyph.Assign(Nil);
                 ControlButtons[b].Refresh;
                 LoadGraphicFromBaseName(tmpBitmap, BaseDir + DefaultButtonData[b].Name, True);
 
-                ControlButtons[b].NempGlyph.Assign(tmpBitmap);
-                ControlButtons[b].GlyphLine := ControlButtons[b].GlyphLine;
+                // SKIN_UMBAU_CHECK ControlButtons[b].NempGlyph.Assign(tmpBitmap);
+                // SKIN_UMBAU_CHECK ControlButtons[b].GlyphLine := ControlButtons[b].GlyphLine;
                 ControlButtons[b].RePaint;
             end;
 
-            BtnLoadHeadset .drawMode := dm_Windows;
-            BtnLoadHeadset .NumGlyphs := 1;
-            BtnLoadHeadset .NempGlyph.Assign(Nil);
-            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnLoadHeadset', True);
-            BtnLoadHeadset.NempGlyph.Assign(tmpBitmap);
-            BtnLoadHeadset.GlyphLine := BtnLoadHeadset.GlyphLine;
-            BtnLoadHeadset.Refresh;
+            // SKIN_UMBAU_CHECKBtnLoadHeadset .drawMode := dm_Windows;
+            // SKIN_UMBAU_CHECK BtnLoadHeadset .NumGlyphs := 1;
+            // SKIN_UMBAU_CHECK BtnLoadHeadset .NempGlyph.Assign(Nil);
+            // SKIN_UMBAU_CHECKLoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnLoadHeadset', True);
+            // SKIN_UMBAU_CHECK BtnLoadHeadset.NempGlyph.Assign(tmpBitmap);
+            // SKIN_UMBAU_CHECK BtnLoadHeadset.GlyphLine := BtnLoadHeadset.GlyphLine;
+            // SKIN_UMBAU_CHECKBtnLoadHeadset.Refresh;
 
-            BtnHeadsetToPlaylist .drawMode := dm_Windows;
-            BtnHeadsetToPlaylist .NumGlyphs := 1;
-            BtnHeadsetToPlaylist .NempGlyph.Assign(Nil);
-            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnHeadsetToPlaylist', True);
-            BtnHeadsetToPlaylist.NempGlyph.Assign(tmpBitmap);
-            BtnHeadsetToPlaylist.GlyphLine := BtnHeadsetToPlaylist.GlyphLine;
-            BtnHeadsetToPlaylist.Refresh;
+            // SKIN_UMBAU_CHECKBtnHeadsetToPlaylist .drawMode := dm_Windows;
+            // SKIN_UMBAU_CHECK BtnHeadsetToPlaylist .NumGlyphs := 1;
+            // SKIN_UMBAU_CHECK BtnHeadsetToPlaylist .NempGlyph.Assign(Nil);
+            // SKIN_UMBAU_CHECKLoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnHeadsetToPlaylist', True);
+            // SKIN_UMBAU_CHECK BtnHeadsetToPlaylist.NempGlyph.Assign(tmpBitmap);
+            // SKIN_UMBAU_CHECK BtnHeadsetToPlaylist.GlyphLine := BtnHeadsetToPlaylist.GlyphLine;
+            // SKIN_UMBAU_CHECKBtnHeadsetToPlaylist.Refresh;
 
-            BtnHeadsetPlaynow .drawMode := dm_Windows;
-            BtnHeadsetPlaynow .NumGlyphs := 1;
-            BtnHeadsetPlaynow .NempGlyph.Assign(Nil);
-            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnHeadsetPlaynow', True);
-            BtnHeadsetPlaynow.NempGlyph.Assign(tmpBitmap);
-            BtnHeadsetPlaynow.GlyphLine := BtnHeadsetPlaynow.GlyphLine;
-            BtnHeadsetPlaynow.Refresh;
+            // SKIN_UMBAU_CHECKBtnHeadsetPlaynow .drawMode := dm_Windows;
+            // SKIN_UMBAU_CHECK BtnHeadsetPlaynow .NumGlyphs := 1;
+            // SKIN_UMBAU_CHECK BtnHeadsetPlaynow .NempGlyph.Assign(Nil);
+            // SKIN_UMBAU_CHECKLoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnHeadsetPlaynow', True);
+            // SKIN_UMBAU_CHECK BtnHeadsetPlaynow.NempGlyph.Assign(tmpBitmap);
+            // SKIN_UMBAU_CHECK BtnHeadsetPlaynow.GlyphLine := BtnHeadsetPlaynow.GlyphLine;
+            // SKIN_UMBAU_CHECKBtnHeadsetPlaynow.Refresh;
 
-            PlayPauseHeadSetBtn .drawMode := dm_Windows;
-            PlayPauseHeadSetBtn .NumGlyphs := 1;
-            PlayPauseHeadSetBtn .NempGlyph.Assign(Nil);
-            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnPlayPauseHeadset', True);
-            PlayPauseHeadSetBtn.NempGlyph.Assign(tmpBitmap);
-            PlayPauseHeadSetBtn.GlyphLine := PlayPauseHeadSetBtn.GlyphLine;
-            PlayPauseHeadSetBtn.Refresh;
+            // SKIN_UMBAU_CHECKPlayPauseHeadSetBtn .drawMode := dm_Windows;
+            // SKIN_UMBAU_CHECK PlayPauseHeadSetBtn .NumGlyphs := 1;
+           // SKIN_UMBAU_CHECK  PlayPauseHeadSetBtn .NempGlyph.Assign(Nil);
+            // SKIN_UMBAU_CHECKLoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnPlayPauseHeadset', True);
+            // SKIN_UMBAU_CHECK PlayPauseHeadSetBtn.NempGlyph.Assign(tmpBitmap);
+            // SKIN_UMBAU_CHECK PlayPauseHeadSetBtn.GlyphLine := PlayPauseHeadSetBtn.GlyphLine;
+            // SKIN_UMBAU_CHECKPlayPauseHeadSetBtn.Refresh;
 
-            StopHeadSetBtn .drawMode := dm_Windows;
-            StopHeadSetBtn .NumGlyphs := 1;
-            StopHeadSetBtn .NempGlyph.Assign(Nil);
-            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnStopHeadSet', True);
-            StopHeadSetBtn.NempGlyph.Assign(tmpBitmap);
-            StopHeadSetBtn.GlyphLine := StopHeadSetBtn.GlyphLine;
-            StopHeadSetBtn.Refresh;
+            // SKIN_UMBAU_CHECKStopHeadSetBtn .drawMode := dm_Windows;
+           // SKIN_UMBAU_CHECK  StopHeadSetBtn .NumGlyphs := 1;
+            // SKIN_UMBAU_CHECK StopHeadSetBtn .NempGlyph.Assign(Nil);
+            // SKIN_UMBAU_CHECKLoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnStopHeadSet', True);
+            // SKIN_UMBAU_CHECK StopHeadSetBtn.NempGlyph.Assign(tmpBitmap);
+            // SKIN_UMBAU_CHECK StopHeadSetBtn.GlyphLine := StopHeadSetBtn.GlyphLine;
+            // SKIN_UMBAU_CHECKStopHeadSetBtn.Refresh;
 
 
             LoadGraphicFromBaseName(tmpBitmap, BaseDir + DefaultButtonData[ctrlCloseBtn].Name, True);
-            AuswahlForm.CloseImageA.NempGlyph.Assign(tmpBitmap);
+            // SKIN_UMBAU_CHECK AuswahlForm.CloseImageA.NempGlyph.Assign(tmpBitmap);
             //Buttons12ImageList.GetBitmap(1,AuswahlForm.CloseImage.NempGlyph);
-            AuswahlForm.CloseImageA.NumGlyphsX := 1;
-            AuswahlForm.CloseImageA.NumGlyphs := 1;
+            // SKIN_UMBAU_CHECK AuswahlForm.CloseImageA.NumGlyphsX := 1;
+            // SKIN_UMBAU_CHECK AuswahlForm.CloseImageA.NumGlyphs := 1;
 
             //Buttons12ImageList.GetBitmap(1,MedienlisteForm.CloseImage.NempGlyph);
-            MedienlisteForm.CloseImageM.NempGlyph.Assign(tmpBitmap);
-            MedienlisteForm.CloseImageM.NumGlyphsX := 1;
-            MedienlisteForm.CloseImageM.NumGlyphs := 1;
+            // SKIN_UMBAU_CHECK MedienlisteForm.CloseImageM.NempGlyph.Assign(tmpBitmap);
+            // SKIN_UMBAU_CHECK MedienlisteForm.CloseImageM.NumGlyphsX := 1;
+            // SKIN_UMBAU_CHECK MedienlisteForm.CloseImageM.NumGlyphs := 1;
 
             //Buttons12ImageList.GetBitmap(1,PlaylistForm.CloseImage.NempGlyph);
-            PlaylistForm.CloseImageP.NempGlyph.Assign(tmpBitmap);
-            PlaylistForm.CloseImageP.NumGlyphsX := 1;
-            PlaylistForm.CloseImageP.NumGlyphs := 1;
+            // SKIN_UMBAU_CHECK PlaylistForm.CloseImageP.NempGlyph.Assign(tmpBitmap);
+            // SKIN_UMBAU_CHECK PlaylistForm.CloseImageP.NumGlyphsX := 1;
+            // SKIN_UMBAU_CHECK PlaylistForm.CloseImageP.NumGlyphs := 1;
 
-            ExtendedControlForm.CloseImageE.NempGlyph.Assign(tmpBitmap);
-            ExtendedControlForm.CloseImageE.NumGlyphsX := 1;
-            ExtendedControlForm.CloseImageE.NumGlyphs := 1;
+            // SKIN_UMBAU_CHECK ExtendedControlForm.CloseImageE.NempGlyph.Assign(tmpBitmap);
+            // SKIN_UMBAU_CHECK ExtendedControlForm.CloseImageE.NumGlyphsX := 1;
+            // SKIN_UMBAU_CHECK ExtendedControlForm.CloseImageE.NumGlyphs := 1;
 
         finally
             tmpBitmap.Free;
@@ -2794,12 +2790,12 @@ begin
     {$IFDEF USESTYLES}
      aButton.StyleElements := [];
     {$ENDIF}
-    aButton.NumGlyphsX := 5;
+    // SKIN_UMBAU_CHECK aButton.NumGlyphsX := 5;
     tmpBitmap := TBitmap.Create;
     try
         result := LoadGraphicFromBaseName(tmpBitmap, aFilename, Scaled);
-        aButton.NempGlyph.Assign(tmpBitmap);
-        aButton.GlyphLine := aButton.GlyphLine;
+        // SKIN_UMBAU_CHECK aButton.NempGlyph.Assign(tmpBitmap);
+        // SKIN_UMBAU_CHECK aButton.GlyphLine := aButton.GlyphLine;
     finally
         tmpBitmap.Free;
     end;
@@ -2812,18 +2808,30 @@ begin
     tmpBitmap := TBitmap.Create;
     try
         aButton.DrawMode := dm_Windows;
-        aButton.NumGlyphsX := 1;
-        aButton.NumGlyphs  := 1;
-        aButton.Glyph.Assign(Nil);
+        // SKIN_UMBAU_CHECK aButton.NumGlyphsX := 1;
+        // SKIN_UMBAU_CHECK aButton.NumGlyphs  := 1;
+        // SKIN_UMBAU_CHECK aButton.Glyph.Assign(Nil);
         LoadGraphicFromBaseName(tmpBitmap, aFilename, Scaled);
-        aButton.NempGlyph.Assign(tmpBitmap);
-        aButton.CustomRegion := False;
-        aButton.GlyphLine := aButton.GlyphLine;
+        // SKIN_UMBAU_CHECK aButton.NempGlyph.Assign(tmpBitmap);
+        // SKIN_UMBAU_CHECK aButton.CustomRegion := False;
+        // SKIN_UMBAU_CHECK aButton.GlyphLine := aButton.GlyphLine;
     finally
         tmpBitmap.Free;
     end;
 end;
 
+
+function TNempSkin.RepeatBtnImageIndex(aMode: Integer): Integer;
+begin
+  case aMode of
+    0: result := IconIDX_RepeatAll;
+    1: result := IconIDX_RepeatTitle;
+    2: result := IconIDX_RepeatRandom;
+    3: result := IconIDX_RepeatOff;
+  else
+    result := IconIDX_RepeatOff;
+  end;
+end;
 
 
 
