@@ -34,7 +34,7 @@ unit TagClouds;
 interface
 
 uses windows, classes, Forms, SysUtils, Controls, Contnrs, NempAudioFiles, Math, stdCtrls,
-    ComCtrls, Graphics, Messages, NempPanel,  StrUtils, System.Types,
+    ComCtrls, Graphics, Messages, NempPanel, NempControls.Common, StrUtils, System.Types,
     System.Generics.Collections, System.Generics.Defaults,
     LibraryOrganizer.Base, LibraryOrganizer.Files;
 
@@ -59,37 +59,37 @@ type
   // can be changed by NempSkin
   // used by every single tag to get its colors.
   TTagCustomizer = class(TObject)
-      public
-          FontColor: TColor;         // Default Font color
-          HoverFontColor: TColor;    // Hover (MouseOver)
-          FocusFontColor: TColor;    // Focus
-          FocusBorderColor: TColor;  // Focus Border
-          FocusBackgroundColor: TColor; // FocusBackground;
-          BackgroundColor: TColor;
+    public
+      FontColor: TColor;         // Default Font color
+      HoverFontColor: TColor;    // Hover (MouseOver)
+      FocusFontColor: TColor;    // Focus
+      FocusBorderColor: TColor;  // Focus Border
+      FocusBackgroundColor: TColor; // FocusBackground;
+      BackgroundColor: TColor;
 
-          // Alphablend for whole cloud
-          CloudUseAlphaBlend: Boolean;
-          CloudBlendColor: TColor;
-          CloudBlendIntensity: Integer;
+      // Alphablend for whole cloud
+      CloudUseAlphaBlend: Boolean;
+      CloudBlendColor: TColor;
+      CloudBlendIntensity: Integer;
 
-          // Alphablend for SelectedTags
-          TagUseAlphablend: Boolean;
-          TagBlendColor: TColor;
-          TagBlendIntensity: Integer;
+      // Alphablend for SelectedTags
+      TagUseAlphablend: Boolean;
+      TagBlendColor: TColor;
+      TagBlendIntensity: Integer;
 
-          BackgroundImage: TBitmap;
-          UseBackGround: Boolean;
-          TileBackGround: Boolean;
-          OffSetX: Integer;
-          OffSetY: Integer;
-          constructor Create;
-          destructor Destroy; override;
-          procedure TileGraphic(const ATarget: TCanvas; X, Y: Integer);
-          procedure AlphaBlendCloud(TargetCanvas: TCanvas; Width, Height, Left, Top: Integer; Mode: TBlendMode);
+      CurrentBackgroundImage: TBitmap;
+      UseBackGround: Boolean;
+      TileBackGround: Boolean;
+      BackgroundOffset: TPoint;
+      constructor Create;
+      destructor Destroy; override;
+      procedure TileGraphic(const ASource: TBitmap; const ATarget: TCanvas; X, Y: Integer);
+      procedure AlphaBlendCloud(TargetCanvas: TCanvas; Width, Height, Left, Top: Integer; Mode: TBlendMode);
   end;
 
   TTagLine = class;
   TPaintTag = class;
+  TCloudView = class;
   TPaintTagList = class(TObjectList<TPaintTag>);
   TTagLineList = class(TObjectList<TTagLine>);
 
@@ -104,10 +104,11 @@ type
 
         fHover: Boolean;
         fFocussed: Boolean;
-
         fParentLine: TTagLine;
         fIsBreadCrumb: Boolean;
         fCollection: TAudioFileCollection;
+
+        fParentPanel: TCloudView;
 
         procedure PaintNormal(aCanvas: TCanvas);
         procedure PaintHover(aCanvas: TCanvas);
@@ -127,7 +128,7 @@ type
         // Tags in the Breadcrumb-Line are painted differently
         property IsBreadCrumb: Boolean read fIsBreadCrumb write fIsBreadCrumb;
 
-        constructor Create(aCollection: TAudioFileCollection);
+        constructor Create(aParentPanel: TCloudView; aCollection: TAudioFileCollection);
         procedure MeasureOutput(aCanvas: TCanvas);
         procedure SetPosition(x, y: Integer);
         procedure Paint(aCanvas: TCanvas);
@@ -156,7 +157,6 @@ type
           procedure Paint(aCanvas: TCanvas);
   end;
 
-  TCloudView = class;
   TCloudGetHintEvent = procedure(Sender: TCloudView; ac: TAudioFileCollection; var HintText: String) of object;
 
   TCloudView = class(TNempPanel)
@@ -199,7 +199,8 @@ type
           // second Stage: Paint tags String-Sorted, adjust amount of Tags if needed
           procedure RawPaint2(SearchTerm: String);
           // finally: Actually do paint the Tags on the Canvas
-          procedure DoPaint;
+          procedure AlphaBlandCloud(aCanvas: TCanvas);
+          procedure DoPaintTags(aCanvas: TCanvas);
 
           function GetOverLap(TagA, TagB: TPaintTag): Integer;
           function GetRootTag: TPainttag;
@@ -229,6 +230,8 @@ type
           procedure CMHintShow(var Message: TCMHintShow); message CM_HINTSHOW;
           procedure CMHintShowPause(var Message: TCMHintShowPause); message CM_HINTSHOWPAUSE;
 
+          procedure Paint; override;
+
       public
           property Collection: TAudioFileCollection read GetCollection write SetCollection;
           property MouseOverTag: TPaintTag read fMouseOverTag write SetMouseOverTag;
@@ -249,7 +252,6 @@ type
           // (but, maybe todo: a part of the Collections which matches a search term)
           procedure PaintCloud(SearchTerm: String = '');
           procedure ResizePaint(SearchTerm: String = '');
-          procedure PaintAgain;
 
           // Navigate through the Cloud
           procedure NavigateCloud(aKey: Word; Shift: TShiftState);
@@ -351,12 +353,13 @@ end;
 
 { TPaintTag }
 
-constructor TPaintTag.Create(aCollection: TAudioFileCollection);
+constructor TPaintTag.Create(aParentPanel: TCloudView; aCollection: TAudioFileCollection);
 begin
   inherited create;
   fHover := False;
   fFocussed := False;
   fCollection := aCollection;
+  fParentPanel := aParentPanel;
 end;
 
 function TPaintTag.GetCaption: String;
@@ -406,7 +409,8 @@ begin
     try
       tmp.Width := fWidth;
       tmp.Height := fHeight;
-      TagCustomizer.TileGraphic(tmp.Canvas, TagCustomizer.OffSetX + fLeft, TagCustomizer.OffSetY + fTop );
+      // TagCustomizer.TileGraphic(tmp.Canvas, TagCustomizer.OffSetX + fLeft, TagCustomizer.OffSetY + fTop );
+      TagCustomizer.TileGraphic(TagCustomizer.CurrentBackgroundImage, tmp.Canvas, - fLeft + TagCustomizer.BackgroundOffset.X, - fTop + TagCustomizer.BackgroundOffset.Y);
       aCanvas.Draw(fLeft, fTop, tmp);
     finally
       tmp.Free;
@@ -624,58 +628,76 @@ begin
     result := Nil;
 end;
 
-
-procedure TCloudView.DoPaint;
-var y, i: Integer;
-  Buffer: TBitmap;
+procedure TCloudView.Paint;
 begin
+  Color := TagCustomizer.BackgroundColor;
+  if OwnerDraw AND Assigned(OnPaint) then
+    OnPaint(Self)
+  else begin
+    case DrawMode of
+      dm_Windows: begin
+        inherited;
+        // paint Tags
+        fBackgroundOffset := Point(0,0);
+        fDoTileBackground := False;
+        DoPaintTags(Canvas);
+      end;
+      dm_Skin: begin
+        if DrawBackgroundBitmap then begin
+          PaintBitmapBackground;
+          AlphaBlandCloud(Canvas);
+        end
+        else
+          PaintSimpleBackground(Canvas);
 
-//    Canvas.Brush.Color := TagCustomizer.BackgroundColor;
-//    Canvas.Brush.Style := bsSolid;
-//    Canvas.FillRect(Rect(0,0,width, Height));
+        // paint Tags
+        DoPaintTags(Canvas);
 
-    Buffer := TBitmap.Create;
-    try
-        Buffer.Width := Width;
-        Buffer.Height := Height;
-
-        Buffer.Canvas.Font.Assign(Canvas.Font); // !! important, TPanel and TBitmap seem to use a different Default-Font!
-
-          if TagCustomizer.UseBackGround and assigned(TagCustomizer.BackgroundImage) then
-          begin
-              TagCustomizer.TileGraphic(Buffer.Canvas,
-                    TagCustomizer.OffSetX, TagCustomizer.OffSetY);
-              // Height of the actual Cloud
-              y := fTotalBreadCrumbHeight;
-              for i := 0 to fTagLines.Count - 1 do
-                y := y + fTaglines[i].Height;
-
-              TagCustomizer.AlphaBlendCloud(Buffer.Canvas, Width, y, 0, 0, bm_Cloud);
-          end else
-          begin
-              Buffer.Canvas.Brush.Color := TagCustomizer.BackgroundColor;
-              Buffer.Canvas.FillRect(Buffer.Canvas.ClipRect);
-          end;
-
-          // Paint BreadCrumbs
-          for i := 0 to fPaintBreadCrumbs.Count - 1 do
-            fPaintBreadCrumbs[i].Paint(Buffer.Canvas);
-
-          // Paint other tags
-          y := fTotalBreadCrumbHeight;
-          for i := 0 to fTagLines.Count - 1 do
-          begin
-              fTaglines[i].Top := y;
-              fTaglines[i].Paint(Buffer.Canvas);
-              y := y + fTaglines[i].Height;
-          end;
-
-          Canvas.Draw(0,0, Buffer);
-    finally
-      Buffer.Free;
+        if DrawFrame then
+          PaintFrame(Canvas);
+      end;
     end;
+  end;
+
+  // OnAfterPaint: always, also in dm_Windows
+  // Needed for the Nemp Coverflow, and maybe to add some individual features
+  if Assigned(OnAfterPaint) then
+    OnAfterPaint(Self);
+
 end;
 
+procedure TCloudView.AlphaBlandCloud(aCanvas: TCanvas);
+var
+  i, y: Integer;
+begin
+  // Height of the actual Cloud
+  y := fTotalBreadCrumbHeight;
+  for i := 0 to fTagLines.Count - 1 do
+    y := y + fTaglines[i].Height;
+  TagCustomizer.AlphaBlendCloud(aCanvas, Width, y, 0, 0, bm_Cloud);
+end;
+
+procedure TCloudView.DoPaintTags(aCanvas: TCanvas);
+var
+  i, y: Integer;
+begin
+  TagCustomizer.CurrentBackgroundImage := fCurrentBackgroundBitmap;
+  TagCustomizer.UseBackGround := assigned(TagCustomizer.CurrentBackgroundImage);
+  TagCustomizer.TileBackground := fDoTileBackground;
+  TagCustomizer.BackgroundOffset := fBackgroundOffset;
+
+  // Paint BreadCrumbs
+  for i := 0 to fPaintBreadCrumbs.Count - 1 do
+    fPaintBreadCrumbs[i].Paint(aCanvas);
+
+  // Paint other tags
+  y := fTotalBreadCrumbHeight;
+  for i := 0 to fTagLines.Count - 1 do begin
+    fTaglines[i].Top := y;
+    fTaglines[i].Paint(aCanvas);
+    y := y + fTaglines[i].Height;
+  end;
+end;
 
 procedure TCloudView.PaintCloud(SearchTerm: String = '');
 begin
@@ -683,7 +705,7 @@ begin
   RawPaint1(SearchTerm);
   RawPaint2(SearchTerm);
 
-  DoPaint;
+  Invalidate;
 end;
 
 procedure TCloudView.ResizePaint(SearchTerm: String = '');
@@ -706,12 +728,7 @@ begin
       reFocus.fFocussed := True;
     end;
 
-  DoPaint;
-end;
-
-procedure TCloudView.PaintAgain;
-begin
-  DoPaint;
+  Invalidate;
 end;
 
 function TCloudView.CalcBreadCrumbMargin: Integer;
@@ -849,7 +866,7 @@ begin
     newLine.Top := TOP_MARGIN;
     fBreadCrumbLines.Add(newLine);
 
-    newTag := TPaintTag.Create(colList[colList.Count - 1]);
+    newTag := TPaintTag.Create(self, colList[colList.Count - 1]);
     newTag.IsBreadCrumb := True;
     newTag.FontSize := FONTSIZE_BREADCRUMB;
     newTag.MeasureOutput(Canvas);
@@ -861,7 +878,7 @@ begin
     lineHeight := newTag.Height;
 
     for i := colList.Count - 2 downto 0 do begin
-      newTag := TPaintTag.Create(colList[i]);
+      newTag := TPaintTag.Create(self, colList[i]);
       newTag.IsBreadCrumb := True;
       newTag.FontSize := FONTSIZE_BREADCRUMB;
       newTag.MeasureOutput(Canvas);
@@ -953,7 +970,7 @@ begin
         continue;
       end;
 
-      newTag := TPaintTag.Create(TAudioFileCollection(fCollection.Collection[i]));
+      newTag := TPaintTag.Create(self, TAudioFileCollection(fCollection.Collection[i]));
       inc(i);
 
       // Set the FontSize used to display the tag
@@ -1655,43 +1672,23 @@ end;
 // This is (almost) a copy of NempSkin.TileGraphic,
 // but without the Stretch-stuff
 procedure TTagCustomizer.TileGraphic(
-  const ATarget: TCanvas; X, Y: Integer);
+  const ASource: TBitmap; const ATarget: TCanvas; X, Y: Integer);
 var
   xstart, xloop, yloop: Integer;
 begin
-  if BackgroundImage.Width * BackgroundImage.Height = 0 then exit;
+  if (not assigned(ASource)) or (ASource.Width * ASource.Height = 0) then exit;
 
   if TileBackground then
-  begin
-      xloop := X Mod BackgroundImage.Width;
-      if xloop < 0 then xloop := xloop + BackgroundImage.Width;
-
-      xloop := -xloop;
-      xstart := xloop;
-
-      Yloop := Y Mod BackgroundImage.Height;
-      if yloop < 0 then yloop := yloop + BackgroundImage.Height;
-
-      yloop := - yloop;
-
-      while Yloop < ATarget.ClipRect.Bottom  do
-      begin
-        Xloop := xstart;
-        while Xloop < ATarget.ClipRect.Right do
-        begin
-            ATarget.StretchDraw(Rect(XLoop, YLoop, XLoop + Round(BackgroundImage.Width), yLoop + Round(BackgroundImage.Height) ), BackgroundImage);
-            Inc(Xloop, Round(BackgroundImage.Width));
-        end;
-        Inc(Yloop, Round(BackgroundImage.Height));
-      end;
-  end else
+    NempControls.Common.TileGraphic(ASource, aTarget, Point(x, y))
+  else
   begin
     ATarget.Brush.Style := bsSolid;
     ATarget.Brush.Color := BackgroundColor;
     ATarget.FillRect(ATarget.ClipRect);
-    ATarget.Draw(-x, -y, BackgroundImage);
+    ATarget.Draw(x, y, ASource);
   end;
 end;
+
 
 procedure TTagCustomizer.AlphaBlendCloud(TargetCanvas: TCanvas; Width, Height, Left, Top: Integer; Mode: TBlendMode);
 var lBlendParams: TBlendFunction;
@@ -1700,8 +1697,6 @@ var lBlendParams: TBlendFunction;
     localBlendColor: TColor;
     localDoBlend: Boolean;
 begin
-
-
     case Mode of
         bm_Cloud: begin
             localIntensity  := CloudBlendIntensity;

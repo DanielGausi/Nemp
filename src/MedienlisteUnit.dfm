@@ -38,6 +38,9 @@ object MedienlisteForm: TMedienlisteForm
     OnMouseMove = ContainerPanelMedienBibFormMouseMove
     OnMouseUp = ContainerPanelMedienBibFormMouseUp
     Ratio = 0
+    DrawMode = dm_Windows
+    DrawFrame = False
+    OnPaintBackground = ContainerPanelMedienBibFormPaintBackground
     OnPaint = ContainerPanelMedienBibFormPaint
     OwnerDraw = False
     DesignSize = (

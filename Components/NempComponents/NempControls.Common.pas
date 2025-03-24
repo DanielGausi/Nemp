@@ -5,15 +5,17 @@ interface
 uses
   Windows, Messages, Vcl.Controls, Vcl.Forms, System.Types, System.Classes, Vcl.Graphics;
 
+type
+  TNempDrawMode = (dm_Windows, dm_Skin);
+
   procedure DrawParentImage(Control: TControl; Dest: TCanvas; InvalidateParent: Boolean = False); overload;
   procedure DrawParentImage(Control: TControl; DC: HDC; InvalidateParent: Boolean = False); overload;
+  function TileGraphic(const Source: TBitmap; const Target: TCanvas; Offset: TPoint): Boolean;
 
 implementation
 
 procedure DrawParentImage(Control: TControl; Dest: TCanvas; InvalidateParent: Boolean = False);
 begin
-  //Dest.Canvas.Brush.Color := clred;
-  //dest.Canvas.FillRect(Rect(0,0, dest.Width, dest.Height ));
   DrawParentImage(Control, Dest.Handle, InvalidateParent );
 end;
 
@@ -69,6 +71,36 @@ begin
     begin
       Control.Parent.Invalidate;
     end;
+  end;
+end;
+
+// procedure TileGraphic(const ATile: TBitmap; aDoTile: Boolean; const ATarget: TCanvas; X, Y: Integer; Stretch: Boolean = False);
+function TileGraphic(const Source: TBitmap; const Target: TCanvas; Offset: TPoint): Boolean;
+var
+  xstart, xLoop, yLoop: Integer;
+begin
+  if (not assigned(Source)) or (Source.Width * Source.Height = 0) then begin
+    result := False;
+    exit;
+  end;
+
+  result := True;
+  xLoop := Offset.X mod Source.Width;
+  if xLoop > 0 then
+    xLoop := xLoop - Source.Width;
+  xstart := xLoop;
+
+  yloop := Offset.Y mod Source.Height;
+  if yLoop > 0 then
+    yLoop := yLoop - Source.Height;
+
+  while yLoop < Target.ClipRect.Bottom do begin
+    xLoop := xstart;
+    while xLoop < Target.ClipRect.Right do begin
+      Target.Draw(xLoop, yLoop, Source);
+      Inc(xLoop, Source.Width);
+    end;
+    inc(yLoop, Source.Height);
   end;
 end;
 

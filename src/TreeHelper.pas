@@ -68,8 +68,8 @@ uses Windows, Graphics, SysUtils, VirtualTrees, Forms, Controls, NempAudioFiles,
   function InitiateFocussedPlay(aTree: TVirtualStringTree): Boolean;
 
   // Methods for TreeView-Hint with Coverart
-  procedure VSTDrawCoverHint(Sender: TVirtualStringTree; HintCanvas: TCanvas; af: TAudioFile; R: TRect; RatingPainter: TRatingPainter);
-  procedure VSTGetCoverHintSize(Sender: TVirtualStringTree; af: TAudioFile; var R: TRect; RatingPainter: TRatingPainter);
+  procedure VSTDrawCoverHint(Sender: TControl; HintCanvas: TCanvas; af: TAudioFile; R: TRect; RatingPainter: TRatingPainter);
+  procedure VSTGetCoverHintSize(Sender: TControl; af: TAudioFile; var R: TRect; RatingPainter: TRatingPainter);
 
   function GetFocussedAudioFile(Sender: TVirtualStringTree; IsPlayListTree: Boolean): TAudioFile;
 
@@ -449,7 +449,7 @@ begin
     end;
 end;
 
-procedure VSTGetCoverHintSize(Sender: TVirtualStringTree; af: TAudioFile; var R: TRect; RatingPainter: TRatingPainter);
+procedure VSTGetCoverHintSize(Sender: TControl; af: TAudioFile; var R: TRect; RatingPainter: TRatingPainter);
 var
   Bitmap: TBitmap;
   TM: TTextMetric;
@@ -457,11 +457,18 @@ var
   fTextHeight, minHeight: Integer;
   HintText: String;
   DrawFormat: Cardinal;
+
+  function ScaledPixels(pPixels: Integer): Integer;
+   /// Returns the given pixels scaled to the current dpi assuming that we designed at 96dpi (100%)
+  begin
+    Result := MulDiv(pPixels, {$if CompilerVersion > 31}Sender.CurrentPPI{$else}Screen.PixelsPerInch{$ifend}, 96);
+  end;
+
 begin
   Bitmap := TBitmap.Create;
   try
     Bitmap.Canvas.Font := Screen.HintFont;
-    Bitmap.Canvas.Font.Height := MulDiv(Bitmap.Canvas.Font.Height, Sender.ScaledPixels(96), Screen.PixelsPerInch);
+    Bitmap.Canvas.Font.Height := MulDiv(Bitmap.Canvas.Font.Height, ScaledPixels(96), Screen.PixelsPerInch);
 
     GetTextMetrics(Bitmap.Canvas.Handle, TM);
     fTextHeight := TM.tmHeight;
@@ -479,7 +486,7 @@ begin
       R.Width := max(R.Width, tmpR.Width);
     end;
 
-    R.Width := R.Width + CoverManagerHint.CoverSize + 4 * CoverManagerHint.HorizontalMargin;
+    R.Width := R.Width + Sender.ScaleValue(CoverManagerHint.CoverSize) + 4 * CoverManagerHint.HorizontalMargin;
     if R.Width > 1000 then
       R.Width := 1000;
 
@@ -490,7 +497,7 @@ begin
     if af.AudioType in [at_File, at_Cue] then
       R.Height := R.Height + 2 * RatingPainter.Height + 1 * CoverManagerHint.VerticalMargin + TM.tmHeight Div 2;
 
-    minHeight := 5 + CoverManagerHint.CoverSize + 3 * CoverManagerHint.VerticalMargin;
+    minHeight := 5 + Sender.ScaleValue(CoverManagerHint.CoverSize) + 3 * CoverManagerHint.VerticalMargin;
     if R.Height <  minHeight then
       R.Height := minHeight;
 
@@ -503,7 +510,7 @@ end;
   VSTDrawCoverHint: Draw the AudioFile Information on the Canvas of the generated Hint Window.
   Several things copied from the VST code
 }
-procedure VSTDrawCoverHint(Sender: TVirtualStringTree; HintCanvas: TCanvas; af: TAudioFile; R: TRect; RatingPainter: TRatingPainter);
+procedure VSTDrawCoverHint(Sender: TControl; HintCanvas: TCanvas; af: TAudioFile; R: TRect; RatingPainter: TRatingPainter);
 var
   HintText: String;
   rating: Integer;
@@ -548,25 +555,26 @@ begin
           Font.Color := clInfoText;
           Pen.Color := clBlack;
           Brush.Color := clInfoBk;
-          if IsWinVistaOrAbove and StyleServices.Enabled and ((toThemeAware in Sender.TreeOptions.PaintOptions) or
-             (toUseExplorerTheme in Sender.TreeOptions.PaintOptions)) then
-          begin
-            if toUseExplorerTheme in Sender.TreeOptions.PaintOptions then // ToolTip style
-              StyleServices.DrawElement(HintCanvas.Handle, StyleServices.GetElementDetails(tttStandardNormal), R {$IF CompilerVersion >= 34}, nil, Sender.CurrentPPI{$IFEND})
-            else
-              begin // Hint style
+          //if IsWinVistaOrAbove and StyleServices.Enabled and ((toThemeAware in Sender.TreeOptions.PaintOptions) or
+          //   (toUseExplorerTheme in Sender.TreeOptions.PaintOptions)) then
+          //begin
+          //  if toUseExplorerTheme in Sender.TreeOptions.PaintOptions then // ToolTip style
+          //    StyleServices.DrawElement(HintCanvas.Handle, StyleServices.GetElementDetails(tttStandardNormal), R {$IF CompilerVersion >= 34}, nil, Sender.CurrentPPI{$IFEND})
+          //  else
+          //    begin // Hint style
+                // this code is executed in Nemp
                 LClipRect := R;
                 InflateRect(R, 4, 4);
                 StyleServices.DrawElement(Handle, StyleServices.GetElementDetails(tttStandardNormal), R, @LClipRect{$IF CompilerVersion >= 34}, Sender.CurrentPPI{$IFEND});
                 R := LClipRect;
                 StyleServices.DrawEdge(Handle, StyleServices.GetElementDetails(twWindowRoot), R, [eeRaisedOuter], [efRect]);
-              end;
-          end
-          else
-            if VclStyleEnabled then
-              StyleServices.DrawElement(Handle, StyleServices.GetElementDetails(tttStandardNormal), R {$IF CompilerVersion >= 34}, nil, Sender.CurrentPPI{$IFEND})
-            else
-              Rectangle(R);
+          //    end;
+          //end
+          //else
+          //  if VclStyleEnabled then
+          //    StyleServices.DrawElement(Handle, StyleServices.GetElementDetails(tttStandardNormal), R {$IF CompilerVersion >= 34}, nil, Sender.CurrentPPI{$IFEND})
+          //  else
+          //    Rectangle(R);
         end;
         // Determine text position and don't forget the border.
         InflateRect(R, -1, -1);
@@ -576,7 +584,7 @@ begin
         GetTextMetrics(HintCanvas.Handle, TM);
         tmpRect := R;
         tmpRect.Top := tmpRect.Top + 1;
-        tmpRect.Left := tmpRect.Left + CoverManagerHint.CoverSize + 2*CoverManagerHint.HorizontalMargin;
+        tmpRect.Left := tmpRect.Left + Sender.ScaleValue(CoverManagerHint.CoverSize) + 2*CoverManagerHint.HorizontalMargin;
         txtRect := tmpRect;
         tmpRect.Height := TM.tmHeight;
         HintCanvas.Pen.Color := HintCanvas.Font.Color;
@@ -593,13 +601,13 @@ begin
         case af.AudioType of
           at_Undef: ;
           at_File,
-          at_CDDA: HintCanvas.Draw(5, 5, CoverManagerHint.GetCachedCover(af.CoverID, success).Graphic);
-          at_Stream: HintCanvas.Draw(5, 5, CoverManagerHint.GetCachedCover(cWebGenericWebRadioID, success).Graphic);
+          at_CDDA: HintCanvas.Draw(5, 5, CoverManagerHint.GetCachedCover(Sender, af.CoverID, success).Graphic);
+          at_Stream: HintCanvas.Draw(5, 5, CoverManagerHint.GetCachedCover(Sender, cWebGenericWebRadioID, success).Graphic);
           at_CUE: begin
               if assigned(af.Parent) then
-                HintCanvas.Draw(5, 5, CoverManagerHint.GetCachedCover(af.Parent.CoverID, success).Graphic)
+                HintCanvas.Draw(5, 5, CoverManagerHint.GetCachedCover(Sender, af.Parent.CoverID, success).Graphic)
               else
-                HintCanvas.Draw(5, 5, CoverManagerHint.GetCachedCover(af.CoverID, success).Graphic)
+                HintCanvas.Draw(5, 5, CoverManagerHint.GetCachedCover(Sender, af.CoverID, success).Graphic)
           end;
         end;
 

@@ -38,6 +38,9 @@ object ExtendedControlForm: TExtendedControlForm
     OnMouseMove = ContainerPanelExtendedControlsFormMouseMove
     OnMouseUp = ContainerPanelExtendedControlsFormMouseUp
     Ratio = 0
+    DrawMode = dm_Windows
+    DrawFrame = False
+    OnPaintBackground = ContainerPanelExtendedControlsFormPaintBackground
     OnPaint = ContainerPanelExtendedControlsFormPaint
     OwnerDraw = False
     DesignSize = (

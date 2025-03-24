@@ -111,6 +111,7 @@ type
             // Setpreview is only needed by FlyingCow.
             // In ClassicMode this will do nothing
             procedure SetPreview (index : Integer; width, height : Integer; pixels : PByteArray);
+            procedure SetBackgroundPreview (width, height : Integer; pixels : PByteArray);
 
             procedure SetMainPickCoverPreview(width, height : Integer; pixels : PByteArray);
 
@@ -578,9 +579,7 @@ begin
               fFlyingCow.DoSomeDrawing(10);
         end;
     end;
-
 end;
-
 
 procedure TNempCoverFlow.SetPreview(index, width, height: Integer;
   pixels: PByteArray);
@@ -596,6 +595,14 @@ begin
   case fMode of
     cm_Classic : ; // Nothing to do here.
     cm_OpenGL  : fFlyingCow.SetMainPickCoverPreview(width, height, pixels);
+  end;
+end;
+
+procedure TNempCoverFlow.SetBackgroundPreview (width, height : Integer; pixels : PByteArray);
+begin
+  case fMode of
+    cm_Classic : ; // Nothing to do here.
+    cm_OpenGL  : fFlyingCow.SetBackgroundPreview(width, height, pixels);
   end;
 end;
 

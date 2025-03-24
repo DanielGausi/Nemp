@@ -34,7 +34,7 @@ interface
 
 uses
   Windows, System.Classes, System.SysUtils, System.Generics.Collections, System.Generics.Defaults,
-  VCL.Graphics;
+  VCL.Graphics, VCL.Controls;
 
 
 type
@@ -43,6 +43,8 @@ type
     private
       fPicture: TPicture;
       fAge: Integer;
+      fOriginalHeight: Integer;
+      fOriginalWidth: Integer;
       // fID: String;
     public
       constructor Create(aWidth, aHeight: Integer);
@@ -69,6 +71,8 @@ type
       procedure SetVerticalMargin(aValue: Integer);
       procedure SetHorizontalMargin(aValue: Integer);
 
+      function CreateCover(Sender: TControl; aID: String; out success: Boolean): TPicture;
+
     public
       property CoverOffset: Integer read fCoverOffset;
       property CoverSize: Integer read fCoverSize write SetCoverSize;
@@ -82,7 +86,7 @@ type
       procedure LoadSettingsHintCover;
       procedure SaveSettings;
 
-      function GetCachedCover(aID: String; out success: Boolean): TPicture;
+      function GetCachedCover(Sender: TControl; aID: String; out success: Boolean): TPicture;
   end;
 
 function CoverManager: TCoverManager;
@@ -122,6 +126,8 @@ begin
   fPicture := TPicture.Create;
   fPicture.Bitmap.Width := aWidth;
   fPicture.Bitmap.Height := aHeight;
+  fOriginalHeight := aHeight;
+  fOriginalWidth := aWidth;
   fAge := 0;
 end;
 
@@ -196,30 +202,44 @@ begin
   fVerticalMargin := aValue;
 end;
 
-function TCoverManager.GetCachedCover(aID: String; out success: Boolean): TPicture;
-var aCachedCover, newCachedCover: TCachedCover;
+function TCoverManager.CreateCover(Sender: TControl; aID: String; out success: Boolean): TPicture;
+var
+  newCachedCover: TCachedCover;
 begin
-  if fCoverDict.TryGetValue(aID, aCachedCover) then begin
+  newCachedCover := TCachedCover.Create(Sender.ScaleValue(fCoverSize), Sender.ScaleValue(fCoverSize));
+  if TCoverArtSearcher.GetCover_Fast(aID, newCachedCover.fPicture) then begin
     IncCoverAges;
-    aCachedCover.fAge := 0;
-    result := aCachedCover.fPicture;
+    CheckMaxCapacity;
+    fCoverDict.Add(aID, newCachedCover);
+    result := newCachedCover.fPicture;
     success := True;
-    //FormOrganizerTest.Caption := aID + 'Count = ' + IntToStr(fCoverDict.Count);
   end
   else begin
-    newCachedCover := TCachedCover.Create(fCoverSize, fCoverSize);
-    if TCoverArtSearcher.GetCover_Fast(aID, newCachedCover.fPicture) then begin
+    newCachedCover.Free;
+    result := fDefaultCover;
+    success := False;
+  end;
+end;
+
+function TCoverManager.GetCachedCover(Sender: TControl; aID: String; out success: Boolean): TPicture;
+var aCachedCover, newCachedCover: TCachedCover;
+begin
+  if not fCoverDict.TryGetValue(aID, aCachedCover) then
+    result := CreateCover(Sender, aID, success)
+  else begin
+    if (aCachedCover.fOriginalHeight <> Sender.ScaleValue(fCoverSize)) then begin
+      // the DPI has changed since the cover was created - recreate it
+      fCoverDict.Remove(aID);
+      aCachedCover.Free;
+      result := CreateCover(Sender, aID, success);
+    end else begin
+      // return the cached cover
       IncCoverAges;
-      CheckMaxCapacity;
-      fCoverDict.Add(aID, newCachedCover);
-      result := newCachedCover.fPicture;
+      aCachedCover.fAge := 0;
+      result := aCachedCover.fPicture;
       success := True;
-    end
-    else begin
-      newCachedCover.Free;
-      result := fDefaultCover;
-      success := False;
     end;
+    //FormOrganizerTest.Caption := aID + 'Count = ' + IntToStr(fCoverDict.Count);
   end;
 end;
 

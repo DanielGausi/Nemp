@@ -36,6 +36,9 @@ object PlaylistForm: TPlaylistForm
     OnMouseMove = ContainerPanelPlaylistFormMouseMove
     OnMouseUp = ContainerPanelPlaylistFormMouseUp
     Ratio = 0
+    DrawMode = dm_Windows
+    DrawFrame = False
+    OnPaintBackground = ContainerPanelPlaylistFormPaintBackground
     OnPaint = ContainerPanelPlaylistFormPaint
     OwnerDraw = False
     DesignSize = (

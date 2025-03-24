@@ -3,7 +3,8 @@ unit NempSkinnedTrackbar;
 interface
 
 uses
-  Windows, Classes, System.Types, System.SysUtils, Messages, Graphics, Forms, Controls, Vcl.ComCtrls, Vcl.Themes, uNempHintWindow;
+  Windows, Classes, System.Types, System.SysUtils, Messages, Graphics, Forms, Controls, Vcl.ComCtrls, Vcl.Themes,
+  uNempHintWindow, NempControls.Common;
 
 const
 
@@ -26,7 +27,8 @@ type
 
   teNSBVisibleMode = (vNever, vAlways, vHover);
   teNSBButtonProgressMode = (bmNested, bmCentered);
-  teNSBStyle = (nsbStyleWindows, nsbStyleSkinned);
+  // teNSBStyle = (nsbStyleWindows, nsbStyleSkinned);           // DrawMode
+
   {
       bmNested
       [-xxxxxxxxxxxxxxoooooooo-]       // visible Trackbar
@@ -224,7 +226,7 @@ type
     fTrackBarMargin: Integer;
 
     FButtonMode: teNSBButtonProgressMode; // How the Button is painted in relation to the Track
-    FStyle: teNSBStyle; // Default-Windows or Skinned
+    FStyle: TNempDrawMode; // Default-Windows or Skinned
 
     FTrackBtnGlyph: TPicture;
     FMinBtnGlyphh: TPicture;
@@ -278,7 +280,7 @@ type
     procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
     procedure CMHintShow(var Message: TCMHintShow); message CM_HINTSHOW;
-    procedure SetStyle(const Value: teNSBStyle);
+    procedure SetStyle(const Value: TNempDrawMode);
 
     procedure UpdateSize;
     procedure SwapCanvas;
@@ -390,7 +392,7 @@ type
 
     property Orientation: TTrackBarOrientation read FOrientation write SetOrientation;
     property ButtonMode: teNSBButtonProgressMode read FButtonMode write SetButtonMode;
-    property Style: teNSBStyle read fStyle write SetStyle;
+    property Style: TNempDrawMode read fStyle write SetStyle;
     property TrackBarMargin: Integer read fTrackBarMargin write SetTrackBarMargin;
 
     property Position: Integer read FPosition write SetPosition;
@@ -425,7 +427,7 @@ type
 implementation
 
 uses
-  math, NempControls.Common;
+  math;
 
 
 { TCustomNempSkinnedTrackBar }
@@ -461,7 +463,7 @@ begin
   ProgressBar.Colors.BrushColor := clHighlight;
   RangeBar.Thickness := cDefaultRangeThickNess;
 
-  FStyle := nsbStyleWindows;
+  FStyle := dm_Windows;
   fMin := 0;
   fMax := 100;
   FRangeMin := 0;
@@ -531,12 +533,6 @@ procedure TProgressRangeBar.CMHintShow(var Message: TCMHintShow);
 var
   doOwnerDraw, ShowOwnHint: Boolean;
 
-  function GetHintWindowClass: THintWindowClass;
-  begin
-    if doOwnerDraw then result := TNempHintWindow
-    else result := THintWindow;
-  end;
-
   function LimitCursorRect(): TRect;
   begin
 
@@ -572,13 +568,12 @@ begin
         // Set our own hint window class and prepare structure to be passed to the hint window.
         if ShowOwnHint and (Result = 0) then
         begin
-          HintWindowClass := GetHintWindowClass; // GetHintWindowClass;
+          HintWindowClass := GetHintWindowClass(doOwnerDraw); // GetHintWindowClass;
           FHintData.HintText := HintStr;
           FHintData.OnDrawHint := FOnDrawHint;
           FHintData.OnGetHintSize := FOnGetHintSize;
           FHintData.Control := Self;
           FHintData.Tag := Integer(FCurrentHintArea);
-
 
           {
           je nach aktivem Element das Rect anders setzen ...
@@ -1027,11 +1022,11 @@ var
 begin
   TrackRect := GetRectTrackbar;
   case Style of
-    nsbStyleWindows: begin
+    dm_Windows: begin
           TrackDetails := GetThemeTrack;
           StyleServices(Self).DrawElement(aCanvas.Handle, TrackDetails, TrackRect, nil, CurrentPPI );
     end;
-    nsbStyleSkinned: begin
+    dm_Skin: begin
           PrepareCanvas(aCanvas, TrackBar, 0);
           aCanvas.RoundRect(TrackRect.Left, TrackRect.Top, TrackRect.Right, TrackRect.Bottom, TrackBar.Radius, TrackBar.Radius);
     end;
@@ -1046,11 +1041,11 @@ begin
   ProgressRect := GetRectProgress;
 
   case Style of
-    nsbStyleWindows: begin
+    dm_Windows: begin
           prgDetails := GetThemeProgress;
           StyleServices(Self).DrawElement(aCanvas.Handle, prgDetails, ProgressRect, nil, CurrentPPI );
     end;
-    nsbStyleSkinned:  begin
+    dm_Skin:  begin
           PrepareCanvas(aCanvas, ProgressBar, 0);
           aCanvas.RoundRect(ProgressRect.Left, ProgressRect.Top, ProgressRect.Right, ProgressRect.Bottom, ProgressBar.Radius, ProgressBar.Radius);
     end;
@@ -1064,11 +1059,11 @@ var
 begin
   BarRect := GetRectRangebar;
   case Style of
-    nsbStyleWindows: begin
+    dm_Windows: begin
         BarDetails := GetThemeProgress; //GetThemeTrack;
         StyleServices(Self).DrawElement(aCanvas.Handle, BarDetails, BarRect, nil, CurrentPPI );
     end;
-    nsbStyleSkinned: begin
+    dm_Skin: begin
 
     end;
   end;
@@ -1082,12 +1077,12 @@ var
 begin
   ButtonRect := GetRectTrackButton;
   case Style of
-    nsbStyleWindows: begin
+    dm_Windows: begin
         BtnDetails := GetThemeTrackButton;//(TrackButton);
         StyleServices(Self).DrawElement(aCanvas.Handle, BtnDetails, ButtonRect, nil, CurrentPPI );
         CheckFocusAndDrawIt(TrackButton, aCanvas, ButtonRect);
     end;
-    nsbStyleSkinned: begin
+    dm_Skin: begin
         PrepareCanvas(aCanvas, TrackButton, 1);
         aCanvas.RoundRect(ButtonRect.Left, ButtonRect.Top, ButtonRect.Right, ButtonRect.Bottom, TrackButton.Radius, TrackButton.Radius);
         CheckFocusAndDrawIt(TrackButton, aCanvas, ButtonRect);
@@ -1102,7 +1097,7 @@ var
   copyDiff: Integer;
 begin
   case Style of
-    nsbStyleWindows: begin
+    dm_Windows: begin
         ButtonRect := GetRectMinButton;
         BtnDetails := GetThemeMinButton;
         // GetThemeButton(RangeButtonMin);
@@ -1127,7 +1122,7 @@ begin
         //end;
         CheckFocusAndDrawIt(RangeButtonMax, aCanvas, ButtonRect);
     end;
-    nsbStyleSkinned: begin
+    dm_Skin: begin
         ButtonRect := GetRectMinButton;
         PrepareCanvas(aCanvas, RangeButtonMin, 2);
         aCanvas.RoundRect(ButtonRect.Left, ButtonRect.Top, ButtonRect.Right, ButtonRect.Bottom, RangeButtonMin.Radius, RangeButtonMin.Radius);
@@ -1419,7 +1414,7 @@ begin
     FSmallStep := Value;
 end;
 
-procedure TProgressRangeBar.SetStyle(const Value: teNSBStyle);
+procedure TProgressRangeBar.SetStyle(const Value: TNempDrawMode);
 begin
   if fStyle <> Value then begin
     fStyle := Value;

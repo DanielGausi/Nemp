@@ -37,10 +37,11 @@ unit Nemp_SkinSystem;
 
 interface
 
-uses Windows, Graphics, ExtCtrls, Controls, Types, Forms, dialogs, SysUtils, VirtualTrees,  StdCtrls,
-iniFiles, jpeg, NempPanel, Classes, oneinst, SkinButtons, PNGImage, ProgressShape, MainFormLayout,
-
-Nemp_ConstantsAndTypes, PartyModeClass{$IFDEF USESTYLES}, vcl.themes, vcl.styles, Vcl.CheckLst {$ENDIF};
+uses
+  Windows, Graphics, ExtCtrls, Controls, Types, Forms, dialogs, SysUtils, VirtualTrees,  StdCtrls,
+  System.Generics.Defaults, System.Generics.Collections,
+  iniFiles, jpeg, NempPanel, NempControls.Common, Classes, oneinst, SkinButtons, PNGImage, ProgressShape, MainFormLayout,
+  Nemp_ConstantsAndTypes, PartyModeClass{$IFDEF USESTYLES}, vcl.themes, vcl.styles, Vcl.CheckLst {$ENDIF};
 
 const MAX_MENUIMAGE_INDEX = 43;
       MAX_PLAYLIST_IMAGE_INDEX = 24;
@@ -61,8 +62,10 @@ const
 
 
 type
-  // Achtung: Reihenfolge hier jetzt so lassen!!
+    TPanelList = TList<TNempPanel>;
 
+
+  // Achtung: Reihenfolge hier jetzt so lassen!!
   TControlButtons = (ctrlPlayPauseBtn,
                      ctrlStopBtn,
                      ctrlNextBtn,
@@ -83,6 +86,57 @@ type
 
   type
 
+  TTreeColors = record
+    Color,
+    Font,
+    FontSelected,
+    HeaderBackground,
+    HeaderFont,
+    Border,
+    Disabled,
+    DropMark,
+    DropTargetBorder,
+    DropTarget,
+    FocussedSelectionBorder,
+    FocussedSelection,
+    GridLine,
+    HeaderHot,
+    Hot,
+    SelectionRectangleBlend,
+    SelectionRectangleBorder,
+    TreeLine,
+    UnfocusedSelectionBorder,
+    UnfocusedSelection,
+    Unfocused: TColor;
+  end;
+
+const
+  cDefaultTreeColors: TTreeColors = (
+    Color                          : clWindow;
+    Font                           : clWindowText;
+    FontSelected                   : clWindowText;
+    HeaderBackground               : clWindow;
+    HeaderFont                     : clWindowText;
+    Border                         : clBtnFace;
+    Disabled                       : clBtnShadow;
+    DropMark                       : clHighlight;
+    DropTargetBorder               : clHighlight;
+    DropTarget                     : clHighlight;
+    FocussedSelectionBorder        : clHighlight;
+    FocussedSelection              : clHighlight;
+    GridLine                       : clBtnFace;
+    HeaderHot                      : clBtnShadow;
+    Hot                            : clWindowText;
+    SelectionRectangleBlend        : clHighlight;
+    SelectionRectangleBorder       : clHighlight;
+    TreeLine                       : clBtnShadow;
+    UnfocusedSelectionBorder       : clInactiveCaption;
+    UnfocusedSelection             : clInactiveCaption;
+    Unfocused                      : clInactiveCaptionText;
+  );
+
+
+type
   // Typ Zur Farbverwaltung des Skins
   TNempColorScheme = record
       FormCL: TColor;
@@ -127,29 +181,11 @@ type
       MiddleToMinComputing: Byte;
       MiddleToMaxComputing: Byte;
 
-      Tree_Color                         : Array[1..4] of TColor;
-      Tree_FontColor                     : Array[1..4] of TColor;
-      Tree_FontSelectedColor             : Array[1..4] of TColor;
-      Tree_HeaderBackgroundColor         : Array[1..4] of TColor;
-      Tree_HeaderFontColor               : Array[1..4] of TColor;
-      Tree_BorderColor                   : Array[1..4] of TColor;
-      Tree_DisabledColor                 : Array[1..4] of TColor;
-      Tree_DropMarkColor                 : Array[1..4] of TColor;
-      Tree_DropTargetBorderColor         : Array[1..4] of TColor;
-      Tree_DropTargetColor               : Array[1..4] of TColor;
-      Tree_FocussedSelectionBorder       : Array[1..4] of TColor;
-      Tree_FocussedSelectionColor        : Array[1..4] of TColor;
-      Tree_GridLineColor                 : Array[1..4] of TColor;
-      Tree_HeaderHotColor                : Array[1..4] of TColor;
-      Tree_HotColor                      : Array[1..4] of TColor;
-      Tree_SelectionRectangleBlendColor  : Array[1..4] of TColor;
-      Tree_SelectionRectangleBorderColor : Array[1..4] of TColor;
-      Tree_TreeLineColor                 : Array[1..4] of TColor;
-      Tree_UnfocusedSelectionBorderColor : Array[1..4] of TColor;
-      Tree_UnfocusedSelectionColor       : Array[1..4] of TColor;
-      Tree_UnfocusedColor                : Array[1..4] of TColor;
+      TreeColorsArtist,
+      TreeColorsAlbum,
+      TreeColorsMain,
+      TreeColorsPlaylist: TTreeColors;
   end;
-
 
   const
     DefaultButtonData : Array[TControlButtons] of TNempButtonData =
@@ -183,6 +219,9 @@ type
   // Eigentliche Skinklasse
   TNempSkin = class
       private
+        fNempMainForm: TForm;
+        fCompleteBitmapLoaded,
+        fControlGenericLoaded,
         fControlSelectionLoaded,
         fControCoverLoaded,
         fControlPlayerLoaded,
@@ -191,7 +230,21 @@ type
 
         fBrowseBitmapLoaded,
         fMedialistBitmapLoaded,
+        fDetailBitmapLoaded,
         fPlaylistBitmapLoaded   : Boolean;
+
+        fPanelList: TPanelList;
+
+        fCompleteBitmap: TBitmap;
+        fBrowseBitmap: TBitmap;
+        fMedialistBitmap: TBitmap;
+        fPlaylistBitmap: TBitmap;
+        fDetailBitmap: TBitmap;
+        fMainVST: TVirtualStringTree;
+        fPlaylistVST: TVirtualStringTree;
+        fAlbenVST: TVirtualStringTree;
+        fArtistsVST: TVirtualStringTree;
+
 
         function LoadListGraphic(aTargetBmp: TBitmap; aBaseFilename: UnicodeString): Boolean;
 
@@ -200,13 +253,33 @@ type
         procedure AssignWindowsTabGlyphs(UseSkinGraphics: Boolean);
 
         // bitmap offsets of the trees (global, align with CompleteBitmap)
-        procedure fSetATreeOffset(aVST: TVirtualStringTree);
+        // procedure fSetATreeOffset(aVST: TVirtualStringTree);
         // bitmap offsets of the trees (align to local Tree-Bitmap)
-        procedure fSetTreeLocalOffsetPoint(aTree: TVirtualStringTree; aAlignment: Integer; DoTile: Boolean; aBitmap: TBitmap; aParent: TWinControl = Nil);
 
-        function fGetControlLocalOffsetPoint(aControl: TWinControl; aBitmap: TBitmap; aAlignment: Integer): TPoint;
+
+        // procedure fSetTreeLocalOffsetPoint(aTree: TVirtualStringTree; aAlignment: Integer; DoTile: Boolean; aBitmap: TBitmap; aParent: TWinControl = Nil);
+
+        function GetBackgroundBitmap(aPanel: TNempPanel): TBitmap;
+        function GetBackgroundAlignment(aPanel: TNempPanel): Integer;
+        function GetTileByTag(aTag: Integer): Boolean;
+
+        function GetBackgroundBasePanel(aControl: TControl): TNempPanel;
+
+        // GetDefaultOffset
+        // Get the offset based to PlayerPageOffsetX/PlayerPageOffsetY
+        function GetDefaultOffset(aControl: TWinControl): TPoint;
+        // GetControlOffset
+        // Get the Offset needed for AControl based on the size of the Bitmap and the Alignment
+        function GetBaseControlOffset(aBaseControl: TWinControl; aBitmap: TBitmap; aAlignment: Integer): TPoint;
+        // GetBackgroundOffset
+        function GetBackgroundOffset(aControl: TWinControl; aBitmap: TBitmap; aAlignment: Integer): TPoint;
+        // SetTreeBackgroundOffset
+        // Set the Offsets of the TVirtualStringTree
+        procedure SetTreeBackgroundOffset(aTree: TVirtualStringTree);
 
 //        procedure AssignDefaultSystemButtons;
+
+        procedure SetTreeColors(aTree: TVirtualStringTree; aTreeColors: TTreeColors);
 
         procedure AssignSkinTabGlyphs;
 
@@ -221,16 +294,21 @@ type
         procedure AssignStarGraphics;
         procedure AssignABGraphics;
 
+        function GetBrowseBitmap: TBitmap;
+        function GetMedialistBitmap: TBitmap;
+        function GetDetailBitmap: TBitmap;
+        function GetPlaylistbitmap: TBitmap;
+
       public
         Name: UnicodeString;
         Path: UnicodeString;
         isActive: Boolean;
 
-        // Bild für das Gesamte Ding
-        CompleteBitmap: TBitmap;
-        BrowseBitmap,
-        MedialistBitmap,
-        Playlistbitmap: TBitmap;
+        PlayerBitmap: TBitmap;
+        ControlSelectionBmp,
+        ControlCoverBmp,
+        ControlProgressBmp,
+        ControlGenericBmp: TBitmap;
 
         // Bild für den Mittelteil (den eigentlichen Player)
         // Kann leer sein - Aber wenn vorhanden, dann ist hier der Offset klar. Nämlich 0/0
@@ -259,18 +337,14 @@ type
 
         AlignBackgroundBrowse,
         AlignBackgroundMedialist,
-        AlignBackgroundPlaylist : Integer;
+        AlignBackgroundDetail,
+        AlignBackgroundPlaylist: Integer;
 
-        PlayerBitmap: TBitmap;
-        ControlSelectionBmp,
-        ControlCoverBmp,
-        ControlProgressBmp,
-        // ControlVisBmp,
-        ControlGenericBmp: TBitmap;
+
 
         // a copy of the Bitmap painted on the Progress-Panel
         // used for painting the backgrounds of Rating-Stars and Visualisation later
-        PaintedProgressBitmap: TBitmap;
+        // PaintedProgressBitmap: TBitmap;
 
         //ExtendedPlayerBitmap: TBitmap;
         SetStarBitmap: TBitmap;
@@ -293,8 +367,10 @@ type
         UseBackGroundImageVorauswahl  : boolean;
         UseBackgroundImagePlaylist    : boolean;
         UseBackgroundImageMedienliste : boolean;
+        UseBackgroundImageDetails     : boolean;
         UseBackgroundTagCloud         : boolean;
-        UseBackgroundImages: Array[0..3] of boolean;
+
+        UseBackgroundImages: Array[0..4] of boolean;
 
         TileControlBackground: Boolean;
         TileBackground: Boolean;  // Hintergrund kacheln
@@ -305,7 +381,8 @@ type
         //Tile yes/no if a special background-image for these part is Loaded
         TileBackgroundBrowse,
         TileBackgroundMedialist,
-        TileBackgroundPlaylist: Boolean;
+        TileBackgroundPlaylist,
+        TileBackgroundDetails: Boolean;
 
         //DrawGroupboxFrames: Boolean;
         //DrawGroupboxFramesMain: Boolean;
@@ -384,8 +461,22 @@ type
         FormLayout: TNempLayout;
 
         property ControlProgressLoaded: Boolean read fControlProgressLoaded;
+        property PanelList: TPanelList read fPanelList;
 
-        constructor create;
+        property CompleteBitmap  : TBitmap read  fCompleteBitmap;
+        property BrowseBitmap    : TBitmap read  GetBrowseBitmap;
+        property MedialistBitmap : TBitmap read  GetMedialistBitmap;
+        property DetailBitmap    : TBitmap read  GetDetailBitmap;
+        property PlaylistBitmap  : TBitmap read  GetPlaylistBitmap;
+
+        property ArtistsVST : TVirtualStringTree read fArtistsVST  write fArtistsVST ;
+        property AlbenVST   : TVirtualStringTree read fAlbenVST    write fAlbenVST   ;
+        property MainVST    : TVirtualStringTree read fMainVST     write fMainVST    ;
+        property PlaylistVST: TVirtualStringTree read fPlaylistVST write fPlaylistVST;
+
+
+
+        constructor create(aMainForm: TForm);
         destructor Destroy;  override;         //Complete:: Für die Optionen-Vorschau. Da z.B. nicht die SkinButtons ändern
         procedure LoadFromDir(DirName: UnicodeString; Complete: Boolean = True);
         procedure Reload;
@@ -396,9 +487,12 @@ type
         Procedure FitSkinToNewWindow;  // Setz den ganzen Skin bei Bedarf um
         Procedure FitPlayerToNewWindow; // Setzt nur den Player-Teil um
         procedure RepairSkinOffset;
-        Procedure SetArtistAlbumOffsets;
-        procedure SetVSTOffsets;
-        Procedure SetPlaylistOffsets;
+
+        procedure RefreshTreeOffsets(aTree: TVirtualStringTree = Nil);
+
+        //Procedure SetArtistAlbumOffsets;
+        //procedure SetVSTOffsets;
+        //Procedure SetPlaylistOffsets;
 
         procedure SetDefaultMenuImages;
 
@@ -408,21 +502,25 @@ type
 
         //procedure DrawAPanel(aPanel: TNempPanel; UseBackground: Boolean = True);
 
-        procedure DrawARegularPanel(aPanel: TNempPanel; UseBackground: Boolean = True);
-        procedure DrawAControlPanel(aPanel: TNempPanel; UseBackground: Boolean; JustInternal: Boolean);
-        procedure DrawArtistAlbumPanel(aPanel: TNempPanel; aBibCount: Integer; UseBackground: Boolean = True);
+        procedure OnPaintBackgroundControlPanel(Sender: TNempPanel; var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
+        procedure OnPaintBackgroundRegularPanel(Sender: TNempPanel; var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
+        // procedure OnPaintEmptyLibraryPanel(Sender: TNempPanel; var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
+
+        //procedure DrawARegularPanel(aPanel: TNempPanel; UseBackground: Boolean = True);
+        // procedure DrawAControlPanel(aPanel: TNempPanel; UseBackground: Boolean; JustInternal: Boolean);
+        // Special case: Empty Library - Draw BrowseBitmap on Panel, not on the Tree/whatever
+        // procedure DrawArtistAlbumPanel(aPanel: TNempPanel; aBibCount: Integer; UseBackground: Boolean = True);
 
         //procedure DrawGroupboxFrame(aGroupbox: TNempGroupbox);
 
         function RepeatBtnImageIndex(aMode: Integer): Integer;
 
-
-        Procedure UpdateSpectrumGraphics;
+        // Procedure UpdateSpectrumGraphics;
         procedure ActivateSkin(NotTheFirstActivation: Boolean = True);
         procedure DeActivateSkin(NotTheFirstActivation: Boolean = True);
         procedure SetRegionsAgain;
 
-        procedure TileGraphic(const ATile: TBitmap; aDoTile: Boolean; const ATarget: TCanvas; X, Y: Integer; Stretch: Boolean = False);
+        // procedure TileGraphic(const ATile: TBitmap; aDoTile: Boolean; const ATarget: TCanvas; X, Y: Integer; Stretch: Boolean = False);
 
         //function CreatePlayerBitmap: boolean;
 
@@ -436,7 +534,7 @@ type
         // and <Ext> is png, bmp or jpg
         function LoadGraphicFromBaseName(aBmp: TBitmap; aFilename: UnicodeString; Scaled: Boolean=False): Boolean;
 
-        procedure PaintFallbackImage(var aBitmap: TBitmap);
+        // procedure PaintFallbackImage(var aBitmap: TBitmap);
 
         procedure AssignOtherGraphics; // Volume etc.
 
@@ -473,15 +571,20 @@ begin
     }
 end;
 
-constructor TNempSkin.create;
+constructor TNempSkin.create(aMainForm: TForm);
 begin
   inherited create;
-  CompleteBitmap := TBitmap.Create;
+  fNempMainForm := aMainForm;
+
+  fPanelList := TPanelList.Create;
+
+  fCompleteBitmap := TBitmap.Create;
   PlayerBitmap := TBitmap.Create;
 
-  MedialistBitmap := TBitmap.Create;
-  BrowseBitmap := TBitmap.Create;
-  Playlistbitmap := TBitmap.Create;
+  fMedialistBitmap := TBitmap.Create;
+  fBrowseBitmap := TBitmap.Create;
+  fPlaylistbitmap := TBitmap.Create;
+  fDetailBitmap := TBitmap.Create;
 
 
   ControlSelectionBmp := TBitmap.Create;
@@ -489,7 +592,7 @@ begin
   ControlProgressBmp  := TBitmap.Create;
   // ControlVisBmp       := TBitmap.Create;
   ControlGenericBmp   := TBitmap.Create;
-  PaintedProgressBitmap := TBitmap.Create;
+  // PaintedProgressBitmap := TBitmap.Create;
 
   NempPartyMode := TNempPartyMode.Create;
   NempPartymode.BackupOriginalPositions;
@@ -611,11 +714,13 @@ end;
 destructor TNempSkin.Destroy;
 begin
   RegisteredStyles.Free;
+  fPanelList.Free;
 
-  CompleteBitmap.Free;
-  MedialistBitmap.Free;
-  Playlistbitmap.Free;
-  BrowseBitmap.Free;
+  fCompleteBitmap.Free;
+  fMedialistBitmap.Free;
+  fPlaylistbitmap.Free;
+  fDetailBitmap.Free;
+  fBrowseBitmap.Free;
 
 
   PlayerBitmap.Free;
@@ -623,7 +728,7 @@ begin
   ControlCoverBmp      .Free;
   ControlProgressBmp   .Free;
   ControlGenericBmp    .Free;
-  PaintedProgressBitmap.Free;
+  // PaintedProgressBitmap.Free;
 
   SetStarBitmap.Free;
   HalfStarBitmap.Free;
@@ -643,15 +748,40 @@ begin
 end;
 
 procedure TNempSkin.LoadFromDir(DirName: UnicodeString; Complete: Boolean = True);
-var i,idx: integer;
+var i: integer;
   ini: TMemIniFile;
-  SectionStr, n {$IFDEF USESTYLES}, StyleFilename{$ENDIF}: String;
+   n {$IFDEF USESTYLES}, StyleFilename{$ENDIF}: String;
   Buttontmp, ListenCompletebmp: TBitmap;
   aPoint: TPoint;
   j: TControlButtons;
   SkinVersion: Integer;
 
   {$IFDEF USESTYLES}StyleInfo: TStyleInfo;{$ENDIF}
+
+  function ReadTreeColors(const aSection: String): TTreeColors;
+  begin
+    result.Color                    := StringToColor(Ini.ReadString(aSection, 'Tree_Color'                             , 'clWindow' ));
+    result.Font                     := StringToColor(Ini.ReadString(aSection, 'Tree_FontColor'                         , 'clWindowText' ));
+    result.FontSelected             := StringToColor(Ini.ReadString(aSection, 'Tree_FontColorSelected'                 , 'clWindow' ));
+    result.HeaderBackground         := StringToColor(Ini.ReadString(aSection, 'Tree_HeaderBackgroundColor'             , 'clGradientActiveCaption'     ));
+    result.HeaderFont               := StringToColor(Ini.ReadString(aSection, 'Tree_HeaderFontColor'                   , 'clWindowText' ));
+    result.Border                   := StringToColor(Ini.ReadString(aSection, 'Tree_BorderColor'                       , 'clBtnFace'    ));
+    result.Disabled                 := StringToColor(Ini.ReadString(aSection, 'Tree_DisabledColor'                     , 'clBtnShadow'  ));
+    result.DropMark                 := StringToColor(Ini.ReadString(aSection, 'Tree_DropMarkColor'                     , 'clHighlight'  ));
+    result.DropTargetBorder         := StringToColor(Ini.ReadString(aSection, 'Tree_DropTargetBorderColor'             , 'clHighlight'  ));
+    result.DropTarget               := StringToColor(Ini.ReadString(aSection, 'Tree_DropTargetColor'                   , 'clHighlight'  ));
+    result.FocussedSelectionBorder  := StringToColor(Ini.ReadString(aSection, 'Tree_FocussedSelectionBorder'           , 'clHighlight'  ));
+    result.FocussedSelection        := StringToColor(Ini.ReadString(aSection, 'Tree_FocussedSelectionColor'            , 'clHighlight'  ));
+    result.GridLine                 := StringToColor(Ini.ReadString(aSection, 'Tree_GridLineColor'                     , 'clBtnFace'    ));
+    result.HeaderHot                := StringToColor(Ini.ReadString(aSection, 'Tree_HeaderHotColor'                    , 'clBtnShadow'  ));
+    result.Hot                      := StringToColor(Ini.ReadString(aSection, 'Tree_HotColor'                          , 'clWindowText' ));
+    result.SelectionRectangleBlend  := StringToColor(Ini.ReadString(aSection, 'Tree_SelectionRectangleBlendColor'      , 'clHighlight'  ));
+    result.SelectionRectangleBorder := StringToColor(Ini.ReadString(aSection, 'Tree_SelectionRectangleBorderColor'     , 'clHighlight'  ));
+    result.TreeLine                 := StringToColor(Ini.ReadString(aSection, 'Tree_TreeLineColor'                     , 'clBtnShadow'  ));
+    result.UnfocusedSelectionBorder := StringToColor(Ini.ReadString(aSection, 'Tree_UnfocusedSelectionBorderColor'     , 'clBtnFace'    ));
+    result.UnfocusedSelection       := StringToColor(Ini.ReadString(aSection, 'Tree_UnfocusedSelectionColor'           , 'clBtnFace'    ));
+    result.Unfocused                := StringToColor(Ini.ReadString(aSection, 'Tree_UnfocusedColor'                    , 'clBtnFace'    ));
+  end;
 
 begin
   name := ExtractFileName(DirName);
@@ -668,11 +798,13 @@ begin
         UseBackgroundImagePlaylist      := Not Ini.ReadBool('BackGround','HideBackgroundImagePlaylist'     , False);
         UseBackgroundImageMedienliste   := Not Ini.ReadBool('BackGround','HideBackgroundImageMedienliste'  , False);
         UseBackgroundTagCloud           := Not Ini.ReadBool('BackGround','HideBackgroundTagCloud'          , False);
+        UseBackgroundImageDetails       := Not Ini.ReadBool('BackGround','HideBackgroundImageDetails'      , False);
 
         UseBackgroundImages[0] := True; // Player immer!
         UseBackgroundImages[1] := UseBackgroundImagePlaylist;
         UseBackgroundImages[2] := UseBackGroundImageVorauswahl;
         UseBackgroundImages[3] := UseBackgroundImageMedienliste;
+        UseBackgroundImages[4] := UseBackgroundImageDetails;
         TileBackground                   := ini.ReadBool('BackGround','TileBackground'       , True);
         TileControlBackground            := ini.ReadBool('BackGround','TileControlBackground', True);
         FixedBackGround                  := ini.ReadBool('BackGround','FixedBackGround'      , True);
@@ -750,7 +882,6 @@ begin
             AdvancedStyleName := '';
         {$ENDIF}
 
-
         AlignControlProgressDisplay   := Ini.ReadInteger('BackGround','AlignControlProgressDisplay'         , 1);
         AlignControlGenericBackground := Ini.ReadInteger('BackGround','AlignControlGenericBackground'       , 2);
         AlignCompleteBackground       := Ini.ReadInteger('BackGround','AlignCompleteBackground'             , 2);
@@ -758,11 +889,13 @@ begin
 
         AlignBackgroundBrowse         := Ini.ReadInteger('BackGround','AlignBackgroundBrowse'      , 5);
         AlignBackgroundMedialist      := Ini.ReadInteger('BackGround','AlignBackgroundMedialist'   , 5);
+        AlignBackgroundDetail         := Ini.ReadInteger('BackGround','AlignBackgroundDetail'      , 5);
         AlignBackgroundPlaylist       := Ini.ReadInteger('BackGround','AlignBackgroundPlaylist'    , 5);
 
         TileBackgroundBrowse      := Ini.ReadBool('BackGround','TileBackgroundBrowse'      , False);
         TileBackgroundMedialist   := Ini.ReadBool('BackGround','TileBackgroundMedialist'   , False);
         TileBackgroundPlaylist    := Ini.ReadBool('BackGround','TileBackgroundPlaylist'    , False);
+        TileBackgroundDetails     := Ini.ReadBool('BackGround','TileBackgroundDetails'     , False);
 
 
         ButtonMode                       := Ini.ReadInteger('Options', 'ButtonMode', 0);
@@ -848,39 +981,13 @@ begin
         for i:= 0 to 15 do
           DialogCustomColors[i] := StringToColor(Ini.ReadString('DialogColors', CustomColorNames[i]         , '$00FFFFFF'    ));
 
-        // Farben für die Trees
-        for idx := 1 to 4 do
-        begin
-            case idx of
-                1: SectionStr := 'ArtistColors';
-                2: SectionStr := 'AlbenColors';
-                3: SectionStr := 'PlaylistColors';
-               else SectionStr := 'MedienlisteColors';
-            end;
-            SkinColorScheme.Tree_Color[idx]                        := StringToColor(Ini.ReadString(SectionStr, 'Tree_Color'                             , 'clWindow' ));
-            SkinColorScheme.Tree_FontColor[idx]                    := StringToColor(Ini.ReadString(SectionStr, 'Tree_FontColor'                         , 'clWindowText' ));
-            SkinColorScheme.Tree_FontSelectedColor[idx]            := StringToColor(Ini.ReadString(SectionStr, 'Tree_FontColorSelected'                 , 'clWindow' ));
-            SkinColorScheme.Tree_HeaderBackgroundColor[idx]        := StringToColor(Ini.ReadString(SectionStr, 'Tree_HeaderBackgroundColor'             , 'clGradientActiveCaption'     ));
-            SkinColorScheme.Tree_HeaderFontColor[idx]              := StringToColor(Ini.ReadString(SectionStr, 'Tree_HeaderFontColor'                   , 'clWindowText' ));
-            SkinColorScheme.Tree_BorderColor[idx]                  := StringToColor(Ini.ReadString(SectionStr, 'Tree_BorderColor'                       , 'clBtnFace'    ));
-            SkinColorScheme.Tree_DisabledColor[idx]                := StringToColor(Ini.ReadString(SectionStr, 'Tree_DisabledColor'                     , 'clBtnShadow'  ));
-            SkinColorScheme.Tree_DropMarkColor[idx]                := StringToColor(Ini.ReadString(SectionStr, 'Tree_DropMarkColor'                     , 'clHighlight'  ));
-            SkinColorScheme.Tree_DropTargetBorderColor[idx]        := StringToColor(Ini.ReadString(SectionStr, 'Tree_DropTargetBorderColor'             , 'clHighlight'  ));
-            SkinColorScheme.Tree_DropTargetColor[idx]              := StringToColor(Ini.ReadString(SectionStr, 'Tree_DropTargetColor'                   , 'clHighlight'  ));
-            SkinColorScheme.Tree_FocussedSelectionBorder[idx]      := StringToColor(Ini.ReadString(SectionStr, 'Tree_FocussedSelectionBorder'           , 'clHighlight'  ));
-            SkinColorScheme.Tree_FocussedSelectionColor[idx]       := StringToColor(Ini.ReadString(SectionStr, 'Tree_FocussedSelectionColor'            , 'clHighlight'  ));
-            SkinColorScheme.Tree_GridLineColor[idx]                := StringToColor(Ini.ReadString(SectionStr, 'Tree_GridLineColor'                     , 'clBtnFace'    ));
-            SkinColorScheme.Tree_HeaderHotColor[idx]               := StringToColor(Ini.ReadString(SectionStr, 'Tree_HeaderHotColor'                    , 'clBtnShadow'  ));
-            SkinColorScheme.Tree_HotColor[idx]                     := StringToColor(Ini.ReadString(SectionStr, 'Tree_HotColor'                          , 'clWindowText' ));
-            SkinColorScheme.Tree_SelectionRectangleBlendColor[idx] := StringToColor(Ini.ReadString(SectionStr, 'Tree_SelectionRectangleBlendColor'      , 'clHighlight'  ));
-            SkinColorScheme.Tree_SelectionRectangleBorderColor[idx]:= StringToColor(Ini.ReadString(SectionStr, 'Tree_SelectionRectangleBorderColor'     , 'clHighlight'  ));
-            SkinColorScheme.Tree_TreeLineColor[idx]                := StringToColor(Ini.ReadString(SectionStr, 'Tree_TreeLineColor'                     , 'clBtnShadow'  ));
-            SkinColorScheme.Tree_UnfocusedSelectionBorderColor[idx]:= StringToColor(Ini.ReadString(SectionStr, 'Tree_UnfocusedSelectionBorderColor'     , 'clBtnFace'    ));
-            SkinColorScheme.Tree_UnfocusedSelectionColor[idx]      := StringToColor(Ini.ReadString(SectionStr, 'Tree_UnfocusedSelectionColor'           , 'clBtnFace'    ));
-            SkinColorScheme.Tree_UnfocusedColor[idx]               := StringToColor(Ini.ReadString(SectionStr, 'Tree_UnfocusedColor'                    , 'clBtnFace'    ));
-        end;
+        // Colors for the Trees
+        SkinColorScheme.TreeColorsArtist  := ReadTreeColors('ArtistColors');
+        SkinColorScheme.TreeColorsAlbum   := ReadTreeColors('AlbenColors');
+        SkinColorScheme.TreeColorsMain    := ReadTreeColors('MedienlisteColors');
+        SkinColorScheme.TreeColorsPlaylist:= ReadTreeColors('PlaylistColors');
 
-        // Button-Eigenschaften
+               // Button-Eigenschaften
         for j := low(TControlbuttons) to High(TControlButtons)  do
         begin
             // "High - 1": do not reposition the CloseBtn
@@ -908,12 +1015,14 @@ begin
         ini.free;
   end;
 
-  if Not LoadGraphicFromBaseName(CompleteBitmap, DirName + '\main', false) then
-      PaintFallbackImage(CompleteBitmap);
+  //if Not LoadGraphicFromBaseName(CompleteBitmap, DirName + '\main', false) then
+  //    PaintFallbackImage(CompleteBitmap);
+  fCompleteBitmapLoaded := LoadGraphicFromBaseName(fCompleteBitmap, DirName + '\main', false) ;
 
-  fBrowseBitmapLoaded     := LoadGraphicFromBaseName(BrowseBitmap    , DirName + '\BackgroundBrowse'   , False);
-  fMedialistBitmapLoaded  := LoadGraphicFromBaseName(MedialistBitmap , DirName + '\BackgroundMedialist', False);
-  fPlaylistBitmapLoaded   := LoadGraphicFromBaseName(Playlistbitmap  , DirName + '\BackgroundPlaylist' , False);
+  fBrowseBitmapLoaded     := LoadGraphicFromBaseName(fBrowseBitmap    , DirName + '\BackgroundBrowse'   , False);
+  fMedialistBitmapLoaded  := LoadGraphicFromBaseName(fMedialistBitmap , DirName + '\BackgroundMedialist', False);
+  fPlaylistBitmapLoaded   := LoadGraphicFromBaseName(fPlaylistbitmap  , DirName + '\BackgroundPlaylist' , False);
+  fDetailBitmapLoaded     := LoadGraphicFromBaseName(fDetailBitmap    , DirName + '\BackgroundDetails'  , False);
 
   if UseSeparatePlayerBitmap then
   begin
@@ -923,16 +1032,16 @@ begin
       fControlProgressLoaded   := LoadGraphicFromBaseName(ControlProgressBmp  , DirName + '\ControlProgress' , True);
       // fControlVisLoaded        := LoadGraphicFromBaseName(ControlVisBmp       , DirName + '\ControlVis'      , True);
 
-      if not fControlPlayerLoaded    then PaintFallbackImage(PlayerBitmap);
-      if not fControlSelectionLoaded then PaintFallbackImage(ControlSelectionBmp);
-      if not fControCoverLoaded      then PaintFallbackImage(ControlCoverBmp);
-      if not fControlProgressLoaded  then PaintFallbackImage(ControlProgressBmp);
+      //if not fControlPlayerLoaded    then PaintFallbackImage(PlayerBitmap);
+      //if not fControlSelectionLoaded then PaintFallbackImage(ControlSelectionBmp);
+      //if not fControCoverLoaded      then PaintFallbackImage(ControlCoverBmp);
+      //if not fControlProgressLoaded  then PaintFallbackImage(ControlProgressBmp);
       // if not fControlVisLoaded       then PaintFallbackImage(ControlVisBmp);
 
       // this one will be always used in some way
-      if not LoadGraphicFromBaseName(ControlGenericBmp, DirName + '\ControlGeneric', True) then
-          PaintFallbackImage(ControlGenericBmp);
-
+      //if not LoadGraphicFromBaseName(ControlGenericBmp, DirName + '\ControlGeneric', True) then
+      //    PaintFallbackImage(ControlGenericBmp);
+      fControlGenericLoaded := LoadGraphicFromBaseName(ControlGenericBmp, DirName + '\ControlGeneric', True);
   end;
 
   if Not Complete then exit;
@@ -1038,42 +1147,40 @@ end;
 Procedure TNempSkin.FitSkinToNewWindow;
 begin
   RepairSkinOffset;
-  SetArtistAlbumOffsets;
-  SetPlaylistOffsets;
-  SetVSTOffsets;
-  UpdateSpectrumGraphics;
+  RefreshTreeOffsets;
+  //UpdateSpectrumGraphics;
 end;
 
 Procedure TNempSkin.FitPlayerToNewWindow;
 begin
   RepairSkinOffset;
-  UpdateSpectrumGraphics;
+  //UpdateSpectrumGraphics;
 end;
 
 
 procedure TNempSkin.RepairSkinOffset;
 var aPoint: TPoint;
-    aForm: TForm;
+    // aForm: TForm;
 begin
     if FormLayout.BuildInProcess then
         exit;
 
     // todo: get a matching sub-Form in separate window mode (i.e. the top left one, the bottom right one, ...)
-    aForm := Nemp_MainForm;
+    // aForm := Nemp_MainForm;
 
     if FixedBackGround then
     begin
         case AlignCompleteBackground of
 
             0: begin // left-center
-                  aPoint :=  aForm.ClientToScreen(Point(0, aForm.ClientHeight Div 2));
+                  aPoint :=  fNempMainForm.ClientToScreen(Point(0, fNempMainForm.ClientHeight Div 2));
                   PlayerPageOffsetX := aPoint.X ;
-                  PlayerPageOffsetY := aPoint.Y - (CompleteBitmap.Height Div 2);
+                  PlayerPageOffsetY := aPoint.Y - (fCompleteBitmap.Height Div 2);
             end;
             1: begin // right-center
-                  aPoint := aForm.ClientToScreen(Point(aForm.ClientWidth, aForm.ClientHeight Div 2));
-                  PlayerPageOffsetX := aPoint.X - CompleteBitmap.Width;
-                  PlayerPageOffsetY := aPoint.Y - (CompleteBitmap.Height Div 2);
+                  aPoint := fNempMainForm.ClientToScreen(Point(fNempMainForm.ClientWidth, fNempMainForm.ClientHeight Div 2));
+                  PlayerPageOffsetX := aPoint.X - fCompleteBitmap.Width;
+                  PlayerPageOffsetY := aPoint.Y - (fCompleteBitmap.Height Div 2);
             end;
             2: begin // align to MainControls (use PlayerPageOffset<X/Y>Orig in that case)
                   // PlayerPageOffsetX/Y is some point in the image, "where the painting should start with"
@@ -1084,27 +1191,27 @@ begin
                   PlayerPageOffsetY := aPoint.Y - PlayerPageOffsetYOrig;
             end;
             3: begin // left-top
-                  aPoint := aForm.ClientToScreen(Point(0,0)); //Nemp_MainForm.ClientToScreen(Point(0,0));
+                  aPoint := fNempMainForm.ClientToScreen(Point(0,0)); //Nemp_MainForm.ClientToScreen(Point(0,0));
                   PlayerPageOffsetX := aPoint.X ;
                   PlayerPageOffsetY := aPoint.Y ;
             end;
             4: begin //right-top
                   //aPoint := Nemp_MainForm.ClientToScreen(Point(Nemp_MainForm.Width, 0));
-                  aPoint := aForm.ClientToScreen(Point(aForm.ClientWidth, 0));
+                  aPoint := fNempMainForm.ClientToScreen(Point(fNempMainForm.ClientWidth, 0));
 
-                  PlayerPageOffsetX := aPoint.X - CompleteBitmap.Width;
+                  PlayerPageOffsetX := aPoint.X - fCompleteBitmap.Width;
                   PlayerPageOffsetY := aPoint.Y ;
             end;
 
             5: begin //left-bottom
-                  aPoint := aForm.ClientToScreen(Point(0, aForm.ClientHeight));
+                  aPoint := fNempMainForm.ClientToScreen(Point(0, fNempMainForm.ClientHeight));
                   PlayerPageOffsetX := aPoint.X ;
-                  PlayerPageOffsetY := aPoint.Y - CompleteBitmap.Height;
+                  PlayerPageOffsetY := aPoint.Y - fCompleteBitmap.Height;
             end;
             6: begin //right-bottom
-                  aPoint := aForm.ClientToScreen(Point(aForm.ClientWidth, aForm.ClientHeight));
-                  PlayerPageOffsetX := aPoint.X - CompleteBitmap.Width;
-                  PlayerPageOffsetY := aPoint.Y - CompleteBitmap.Height;
+                  aPoint := fNempMainForm.ClientToScreen(Point(fNempMainForm.ClientWidth, fNempMainForm.ClientHeight));
+                  PlayerPageOffsetX := aPoint.X - fCompleteBitmap.Width;
+                  PlayerPageOffsetY := aPoint.Y - fCompleteBitmap.Height;
             end;
         end;
 
@@ -1118,102 +1225,40 @@ begin
 end;
 
 
-procedure TNempSkin.fSetTreeLocalOffsetPoint(aTree: TVirtualStringTree; aAlignment: Integer; DoTile: Boolean; aBitmap: TBitmap; aParent: TWinControl = Nil);
-var aPoint: TPoint;
+
+procedure TNempSkin.RefreshTreeOffsets(aTree: TVirtualStringTree = Nil);
 begin
+  if FormLayout.BuildInProcess then
+    exit;
 
-// noch eine Option mit Parent-control. das dann clientToParent nutzen für weiteren offset point, den dann mit dem aPoint verrechnen
-// oder so ähnlich ----
-
-    if assigned(aParent) then
-    begin
-        case aAlignment of
-            // left-center
-            0: aPoint :=  Point(0 - aTree.Left, - aTree.Top + (aParent.ClientHeight Div 2) - (aBitmap.Height Div 2) );
-            // right-center
-            1: aPoint := Point(- aTree.Left + aParent.ClientWidth - aBitmap.Width, - aTree.Top + (aParent.ClientHeight Div 2) - (aBitmap.Height Div 2) );
-            // align to MainControls (use PlayerPageOffset<X/Y>Orig in that case), doesnt make sense here - use "center-center"
-            2: aPoint := Point(aTree.Left + (aParent.ClientWidth Div 2) - (aBitmap.Width Div 2), - aTree.Top + (aParent.ClientHeight Div 2) - (aBitmap.Height Div 2) );
-            // left-top
-            3: aPoint := Point(0 - aTree.Left, 0 - aTree.Top);
-            //right-top
-            4: aPoint := Point(-aTree.Left + aParent.ClientWidth - aBitmap.Width, 0 - aTree.Top);
-            //left-bottom
-            5: aPoint := Point (0 - aTree.Left, 0 - aTree.Top + aParent.ClientHeight - aBitmap.Height);
-            //right-bottom
-            6: aPoint :=  Point (-aTree.Left + aParent.ClientWidth - aBitmap.Width, 0 - aTree.Top + aParent.ClientHeight - aBitmap.Height);
-        end;
-    end else
-    begin
-         aPoint := fGetControlLocalOffsetPoint(aTree, aBitmap, aAlignment);
-        {
-        case aAlignment of
-            // left-center
-            0: aPoint :=  Point(0, (aTree.Height Div 2) - (aBitmap.Height Div 2) );
-            // right-center
-            1: aPoint := Point(aTree.Width - aBitmap.Width, (aTree.Height Div 2) - (aBitmap.Height Div 2) );
-            // align to MainControls (use PlayerPageOffset<X/Y>Orig in that case), doesnt make sense here - use "center-center"
-            2: aPoint := Point((aTree.Width Div 2) - (aBitmap.Width Div 2), (aTree.Height Div 2) - (aBitmap.Height Div 2) );
-            // left-top
-            3: aPoint := Point(0,0);
-            //right-top
-            4: aPoint := Point(aTree.Width - aBitmap.Width, 0);
-            //left-bottom
-            5: aPoint := Point (0, aTree.Height - aBitmap.Height);
-            //right-bottom
-            6: aPoint :=  Point (aTree.Width - aBitmap.Width, aTree.Height - aBitmap.Height);
-        end;
-         }
-    end;
-
-    if DoTile then
-    begin
-        aTree.TreeOptions.PaintOptions := aTree.TreeOptions.PaintOptions - [toStaticbackground];
-        aTree.BackgroundOffsetX := - aPoint.X;
-        aTree.BackgroundOffsetY := - aPoint.Y;
-    end
-    else begin
-        aTree.TreeOptions.PaintOptions := aTree.TreeOptions.PaintOptions + [toStaticbackground];
-        aTree.BackgroundOffsetX :=  aPoint.X;
-        aTree.BackgroundOffsetY :=  aPoint.Y;
-    end;
-
+  if assigned(aTree) then
+    SetTreeBackgroundOffset(aTree)
+  else begin
+    // update all Trees
+    SetTreeBackgroundOffset(ArtistsVST);
+    SetTreeBackgroundOffset(AlbenVST);
+    SetTreeBackgroundOffset(MainVST);
+    SetTreeBackgroundOffset(PlaylistVST);
+  end;
 end;
 
-procedure TNempSkin.fSetATreeOffset(aVST: TVirtualStringTree);
-var pnlPoint: TPoint;
-begin
-    pnlPoint := aVST.ClientToScreen(Point(0,0));
-
-    if TileBackground then
-    begin
-        aVST.TreeOptions.PaintOptions := aVST.TreeOptions.PaintOptions - [toStaticbackground];
-        aVST.BackgroundOffsetX :=  pnlPoint.X - PlayerPageOffsetX;
-        aVST.BackgroundOffsetY :=  pnlPoint.Y - PlayerPageOffsetY;
-
-    end
-    else begin
-        aVST.TreeOptions.PaintOptions := aVST.TreeOptions.PaintOptions + [toStaticbackground];
-        aVST.BackgroundOffsetX := - pnlPoint.X + PlayerPageOffsetX;
-        aVST.BackgroundOffsetY := - pnlPoint.Y + PlayerPageOffsetY;
-    end;
-end;
-
-
+     (*
 Procedure TNempSkin.SetArtistAlbumOffsets;
 var pnlPoint: TPoint;
 begin
      if FormLayout.BuildInProcess then
         exit;
 
-    if self.fBrowseBitmapLoaded then
+     SetTreeBackgroundOffset(Nemp_MainForm.ArtistsVST);
+     SetTreeBackgroundOffset(Nemp_MainForm.AlbenVST);
+
+    if fBrowseBitmapLoaded then
     begin
         // Todo....a little bit more complicated. 1 Bitmap, but 2 trees
-        fSetTreeLocalOffsetPoint(Nemp_MainForm.ArtistsVST, AlignBackgroundBrowse, TileBackgroundBrowse, BrowseBitmap, Nemp_MainForm.PanelStandardBrowse);
-        fSetTreeLocalOffsetPoint(Nemp_MainForm.AlbenVST, AlignBackgroundBrowse, TileBackgroundBrowse, BrowseBitmap, Nemp_MainForm.PanelStandardBrowse);
+        fSetTreeLocalOffsetPoint(Nemp_MainForm.ArtistsVST, AlignBackgroundBrowse, TileBackgroundBrowse, fBrowseBitmap, Nemp_MainForm.PanelStandardBrowse);
+        fSetTreeLocalOffsetPoint(Nemp_MainForm.AlbenVST, AlignBackgroundBrowse, TileBackgroundBrowse, fBrowseBitmap, Nemp_MainForm.PanelStandardBrowse);
 
-
-        pnlPoint := fGetControlLocalOffsetPoint(Nemp_MainForm.PanelTagCloudBrowse, BrowseBitmap, AlignBackgroundBrowse);
+        pnlPoint := GetBaseControlOffset(Nemp_MainForm.PanelTagCloudBrowse, fBrowseBitmap, AlignBackgroundBrowse);
 
         // Nemp_MainForm.PanelTagCloudBrowse.ClientToScreen(Point(0,0));
         TagCustomizer.OffsetX :=  - pnlPoint.X;
@@ -1224,81 +1269,72 @@ begin
         fSetATreeOffset(Nemp_MainForm.AlbenVST);
 
         pnlPoint := Nemp_MainForm.PanelTagCloudBrowse.ClientToScreen(Point(0,0));
-        TagCustomizer.OffsetX :=  pnlPoint.X - PlayerPageOffsetX;
-        TagCustomizer.OffsetY :=  pnlPoint.Y - PlayerPageOffsetY;
+        TagCustomizer.OffsetX := PlayerPageOffsetX - pnlPoint.X ;
+        TagCustomizer.OffsetY := PlayerPageOffsetY - pnlPoint.Y ;
     end;
 
 end;
+    *)
 
-procedure TNempSkin.SetVSTOffsets;
-var ImgPoint: TPoint;
+procedure TNempSkin.SetTreeColors(aTree: TVirtualStringTree; aTreeColors: TTreeColors);
 begin
-     if FormLayout.BuildInProcess then
-        exit;
-
-    if fMedialistBitmapLoaded then
-        fSetTreeLocalOffsetPoint(Nemp_MainForm.VST, self.AlignBackgroundMedialist, self.TileBackgroundMedialist, self.MedialistBitmap)
-    else
-        fSetATreeOffset(Nemp_MainForm.VST);
-
-    // SKIN_UMBAU_CHECK ImgPoint := Nemp_MainForm.ImgBibRating.ClientToScreen(Point(0,0));
-    // The "FileOverview"-RatingImage
-    // SKIN_UMBAU_CHECK Nemp_MainForm.BibRatingHelper.BackGroundBitmap.Width := Nemp_MainForm.ImgBibRating.Width;
-    // SKIN_UMBAU_CHECK Nemp_MainForm.BibRatingHelper.BackGroundBitmap.Height := Nemp_MainForm.ImgBibRating.Height;
-    // SKIN_UMBAU_CHECK TileGraphic(CompleteBitmap, TileBackground,
-    // SKIN_UMBAU_CHECK       Nemp_MainForm.BibRatingHelper.BackGroundBitmap.Canvas,
-    // SKIN_UMBAU_CHECK        + ImgPoint.X -  PlayerPageOffsetX,
-    // SKIN_UMBAU_CHECK        + ImgPoint.Y -  PlayerPageOffsetY );
-    // SKIN_UMBAU_CHECK Nemp_MainForm.BibRatingHelper.ReDrawRatingInStarsOnBitmap(Nemp_MainForm.ImgBibRating.Picture.Bitmap);
-end;
-
-Procedure TNempSkin.SetPlaylistOffsets;
-begin
-     if FormLayout.BuildInProcess then
-        exit;
-
-    if fPlaylistBitmapLoaded then
-        fSetTreeLocalOffsetPoint(Nemp_MainForm.PlaylistVST, AlignBackgroundPlaylist, TileBackgroundPlaylist, PlaylistBitmap)
-    else
-        fSetATreeOffset(Nemp_MainForm.PlayListVST);
+  aTree.Color                                  := aTreeColors.Color;
+  aTree.Font.Color                             := aTreeColors.Font;
+  aTree.Header.Background                      := aTreeColors.HeaderBackground;
+  aTree.Header.Font.Color                      := aTreeColors.HeaderFont;
+  aTree.Colors.BorderColor                     := aTreeColors.Border;
+  aTree.Colors.DisabledColor                   := aTreeColors.Disabled;
+  aTree.Colors.DropMarkColor                   := aTreeColors.DropMark;
+  aTree.Colors.DropTargetBorderColor           := aTreeColors.DropTargetBorder;
+  aTree.Colors.DropTargetColor                 := aTreeColors.DropTarget;
+  aTree.Colors.FocusedSelectionBorderColor     := aTreeColors.FocussedSelectionBorder;
+  aTree.Colors.FocusedSelectionColor           := aTreeColors.FocussedSelection;
+  aTree.Colors.GridLineColor                   := aTreeColors.GridLine;
+  aTree.Colors.HeaderHotColor                  := aTreeColors.HeaderHot;
+  aTree.Colors.HotColor                        := aTreeColors.Hot;
+  aTree.Colors.SelectionRectangleBlendColor    := aTreeColors.SelectionRectangleBlend;
+  aTree.Colors.SelectionRectangleBorderColor   := aTreeColors.SelectionRectangleBorder;
+  aTree.Colors.TreeLineColor                   := aTreeColors.TreeLine;
+  aTree.Colors.UnfocusedSelectionBorderColor   := aTreeColors.UnfocusedSelectionBorder;
+  aTree.Colors.UnfocusedSelectionColor         := aTreeColors.UnfocusedSelection;
+  aTree.Colors.UnfocusedColor                  := aTreeColors.Unfocused;
+  aTree.Colors.SelectionTextColor              := aTreeColors.FontSelected;
 end;
 
 procedure TNempSkin.SetVSTHeaderSettings;
 begin
       if UseAdvancedSkin and NempOptions.GlobalUseAdvancedSkin and not (TreeClientPaintedBySkin) then
       begin
-          Nemp_MainForm.ArtistsVST.Header.Options  := Nemp_MainForm.ArtistsVST.Header.Options - [hoOwnerDraw];
-          Nemp_MainForm.AlbenVST.Header.Options    := Nemp_MainForm.AlbenVST.Header.Options - [hoOwnerDraw];
-          Nemp_MainForm.PlaylistVST.Header.Options := Nemp_MainForm.PlaylistVST.Header.Options - [hoOwnerDraw];
-          Nemp_MainForm.VST.Header.Options         := Nemp_MainForm.VST.Header.Options - [hoOwnerDraw];
+          ArtistsVST.Header.Options  := ArtistsVST.Header.Options - [hoOwnerDraw];
+          AlbenVST.Header.Options    := AlbenVST.Header.Options - [hoOwnerDraw];
+          PlaylistVST.Header.Options := PlaylistVST.Header.Options - [hoOwnerDraw];
+          MainVST.Header.Options     := MainVST.Header.Options - [hoOwnerDraw];
       end else
       begin
-          Nemp_MainForm.ArtistsVST.Header.Options  := Nemp_MainForm.ArtistsVST.Header.Options + [hoOwnerDraw];
-          Nemp_MainForm.AlbenVST.Header.Options    := Nemp_MainForm.AlbenVST.Header.Options + [hoOwnerDraw];
-          Nemp_MainForm.PlaylistVST.Header.Options := Nemp_MainForm.PlaylistVST.Header.Options + [hoOwnerDraw];
-          Nemp_MainForm.VST.Header.Options         := Nemp_MainForm.VST.Header.Options + [hoOwnerDraw];
+          ArtistsVST.Header.Options  := ArtistsVST.Header.Options + [hoOwnerDraw];
+          AlbenVST.Header.Options    := AlbenVST.Header.Options + [hoOwnerDraw];
+          PlaylistVST.Header.Options := PlaylistVST.Header.Options + [hoOwnerDraw];
+          MainVST.Header.Options     := MainVST.Header.Options + [hoOwnerDraw];
       end;
 
       if UseAdvancedSkin and (TreeClientPaintedBySkin or (not NempOptions.GlobalUseAdvancedSkin))  then
       begin
-          Nemp_MainForm.PlaylistVST.StyleElements := [seBorder];
-          Nemp_MainForm.VST.StyleElements         := [seBorder];
-          Nemp_MainForm.ArtistsVST.StyleElements  := [seBorder];
-          Nemp_MainForm.AlbenVST.StyleElements    := [seBorder];
+          PlaylistVST.StyleElements := [seBorder];
+          MainVST.StyleElements     := [seBorder];
+          ArtistsVST.StyleElements  := [seBorder];
+          AlbenVST.StyleElements    := [seBorder];
       end else
       begin
-          Nemp_MainForm.PlaylistVST.StyleElements := [seClient, seBorder];
-          Nemp_MainForm.VST.StyleElements         := [seClient, seBorder];
-          Nemp_MainForm.ArtistsVST.StyleElements  := [seClient, seBorder];
-          Nemp_MainForm.AlbenVST.StyleElements    := [seClient, seBorder];
+          PlaylistVST.StyleElements := [seClient, seBorder];
+          MainVST.StyleElements     := [seClient, seBorder];
+          ArtistsVST.StyleElements  := [seClient, seBorder];
+          AlbenVST.StyleElements    := [seClient, seBorder];
       end;
 end;
 
 
-
 procedure TNempSkin.ActivateSkin(NotTheFirstActivation: Boolean = True);
-var i, idx: integer;
-  DestVST: TVirtualStringTree;
+var i: integer;
   j: TControlButtons;
 
 begin
@@ -1306,11 +1342,18 @@ begin
   RevokeDragFiles;
 
   //zunächst: Ownerdraw der Boxen/Panels setzen
-  for i := 0 to Nemp_MainForm.ComponentCount - 1 do
+  for i := 0 to fPanelList.Count - 1 do begin
+    fPanelList[i].DrawMode := dm_Skin;
+    fPanelList[i].BackgroundColor := SkinColorScheme.FormCL;
+    fPanelList[i].FrameColor := SkinColorScheme.GroupboxFrameCL;
+  end;
+
+  (*for i := 0 to Nemp_MainForm.ComponentCount - 1 do
   begin
     if Nemp_MainForm.Components[i] is TNempPanel then
     begin
-      TNempPanel(Nemp_MainForm.Components[i]).OwnerDraw := True;
+      // TNempPanel(Nemp_MainForm.Components[i]).OwnerDraw := True;
+      TNempPanel(Nemp_MainForm.Components[i]).DrawMode := dm_skin;
     end;
     // No Groupboxes any longer
     //if Nemp_MainForm.Components[i] is TNempGroupbox then
@@ -1319,7 +1362,7 @@ begin
   AuswahlForm.ContainerPanelAuswahlform.OwnerDraw := True;
   MedienListeForm.ContainerPanelMedienBibForm.OwnerDraw := True;
   PlaylistForm.ContainerPanelPlaylistForm.OwnerDraw := True;
-  ExtendedControlForm.ContainerPanelExtendedControlsForm.OwnerDraw := True;
+  ExtendedControlForm.ContainerPanelExtendedControlsForm.OwnerDraw := True;*)
 
   LoadGraphicFromBaseName(NempPlayer.PreviewBackGround, path + '\Win7PreviewBackground', false);
   // Grafiken für die Buttons setzem
@@ -1452,6 +1495,52 @@ begin
         end;
   end;
 
+  if (UseBackGroundImageVorauswahl)  then begin
+        ArtistsVST.Background.Assign(BrowseBitmap);
+        AlbenVST.Background.Assign(BrowseBitmap)
+      end else begin
+        ArtistsVST.Background.Assign(Nil);
+        AlbenVST.Background.Assign(Nil)
+      end;
+
+      if (UseBackgroundImagePlaylist) then
+        PlaylistVST.Background.Assign(Playlistbitmap)
+      else
+        PlaylistVST.Background.Assign(Nil);
+
+      if (UseBackgroundImageMedienliste) then
+        MainVST.Background.Assign(MedialistBitmap)
+      else
+        MainVST.Background.Assign(Nil);
+
+      // Scrollbars
+      if DisableArtistScrollbar then ArtistsVST.ScrollBarOptions.ScrollBars := ssNone
+        else ArtistsVST.ScrollBarOptions.ScrollBars := ssVertical;
+      if DisableAlbenScrollbar then AlbenVST.ScrollBarOptions.ScrollBars := ssNone
+        else AlbenVST.ScrollBarOptions.ScrollBars := ssVertical;
+      if DisablePlaylistScrollbar then PlaylistVST.ScrollBarOptions.ScrollBars := ssNone
+        else PlaylistVST.ScrollBarOptions.ScrollBars := ssVertical;
+      if DisableMedienListeScrollbar then MainVST.ScrollBarOptions.ScrollBars := ssNone
+        else MainVST.ScrollBarOptions.ScrollBars := ssBoth;
+      // Alphablending
+      if UseBlendedSelectionArtists then
+        ArtistsVST.TreeOptions.PaintOptions := ArtistsVST.TreeOptions.PaintOptions + [toUseBlendedSelection]
+      else ArtistsVST.TreeOptions.PaintOptions := ArtistsVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
+      if UseBlendedSelectionAlben then
+        AlbenVST.TreeOptions.PaintOptions := AlbenVST.TreeOptions.PaintOptions + [toUseBlendedSelection]
+      else AlbenVST.TreeOptions.PaintOptions := AlbenVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
+      if UseBlendedSelectionPlaylist then
+        PlaylistVST.TreeOptions.PaintOptions := PlaylistVST.TreeOptions.PaintOptions + [toUseBlendedSelection]
+      else PlaylistVST.TreeOptions.PaintOptions := PlaylistVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
+      if UseBlendedSelectionMedienliste then
+        MainVST.TreeOptions.PaintOptions := MainVST.TreeOptions.PaintOptions + [toUseBlendedSelection]
+      else MainVST.TreeOptions.PaintOptions := MainVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
+
+      ArtistsVST.SelectionBlendFactor  := BlendFaktorArtists     ;
+      AlbenVST.SelectionBlendFactor    := BlendFaktorAlben       ;
+      PlaylistVST.SelectionBlendFactor := BlendFaktorPlaylist    ;
+      MainVST.SelectionBlendFactor         := BlendFaktorMedienliste ;
+
   // Eigenschaften der Bäume
   with Nemp_MainForm do
   begin
@@ -1473,165 +1562,61 @@ begin
       end;
       }
 
-
       // SKIN_UMBAU_CHECK Nemp_MainForm.BibRatingHelper.UsebackGround := True;
 
-      if (UseBackGroundImageVorauswahl)  then
-      begin
-            if self.fBrowseBitmapLoaded then
-            begin
-                ArtistsVST.Background.Assign(BrowseBitmap);
-                AlbenVST.Background.Assign(BrowseBitmap)
-            end else
-            begin
-                ArtistsVST.Background.Assign(CompleteBitmap);
-                AlbenVST.Background.Assign(CompleteBitmap);
-            end;
-      end else
-      begin
-          ArtistsVST.Background.Assign(Nil);
-          AlbenVST.Background.Assign(Nil)
-      end;
-
-      if (UseBackgroundImagePlaylist) then
-      begin
-          if self.fPlaylistBitmapLoaded then
-              PlaylistVST.Background.Assign(PlaylistBitmap)
-          else
-              PlaylistVST.Background.Assign(CompleteBitmap);
-      end else
-          PlaylistVST.Background.Assign(Nil);
-
-
-      if (UseBackgroundImageMedienliste) then
-      begin
-          if self.fMedialistBitmapLoaded then
-              VST.Background.Assign(MedialistBitmap)
-          else
-              VST.Background.Assign(CompleteBitmap)
-      end else
-          VST.Background.Assign(Nil);
-
-      // Scrollbars
-      if DisableArtistScrollbar then ArtistsVST.ScrollBarOptions.ScrollBars := ssNone
-        else ArtistsVST.ScrollBarOptions.ScrollBars := ssVertical;
-      if DisableAlbenScrollbar then AlbenVST.ScrollBarOptions.ScrollBars := ssNone
-        else AlbenVST.ScrollBarOptions.ScrollBars := ssVertical;
-      if DisablePlaylistScrollbar then PlaylistVST.ScrollBarOptions.ScrollBars := ssNone
-        else PlaylistVST.ScrollBarOptions.ScrollBars := ssVertical;
-      if DisableMedienListeScrollbar then VST.ScrollBarOptions.ScrollBars := ssNone
-        else VST.ScrollBarOptions.ScrollBars := ssBoth;
-      // Alphablending
-      if UseBlendedSelectionArtists then
-        ArtistsVST.TreeOptions.PaintOptions := ArtistsVST.TreeOptions.PaintOptions + [toUseBlendedSelection]
-      else ArtistsVST.TreeOptions.PaintOptions := ArtistsVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
-      if UseBlendedSelectionAlben then
-        AlbenVST.TreeOptions.PaintOptions := AlbenVST.TreeOptions.PaintOptions + [toUseBlendedSelection]
-      else AlbenVST.TreeOptions.PaintOptions := AlbenVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
-      if UseBlendedSelectionPlaylist then
-        PlaylistVST.TreeOptions.PaintOptions := PlaylistVST.TreeOptions.PaintOptions + [toUseBlendedSelection]
-      else PlaylistVST.TreeOptions.PaintOptions := PlaylistVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
-      if UseBlendedSelectionMedienliste then
-        VST.TreeOptions.PaintOptions := VST.TreeOptions.PaintOptions + [toUseBlendedSelection]
-      else VST.TreeOptions.PaintOptions := VST.TreeOptions.PaintOptions - [toUseBlendedSelection];
-
-      ArtistsVST.SelectionBlendFactor  := BlendFaktorArtists     ;
-      AlbenVST.SelectionBlendFactor    := BlendFaktorAlben       ;
-      PlaylistVST.SelectionBlendFactor := BlendFaktorPlaylist    ;
-      VST.SelectionBlendFactor         := BlendFaktorMedienliste ;
+      RefreshCoverflowBackground;
 
       // TagCloud-Settings
-      TagCustomizer.UseBackGround    := UseBackgroundTagCloud;
+      {TagCustomizer.UseBackGround    := UseBackgroundTagCloud;
       if UseBackgroundTagCloud then
       begin
-          if self.fBrowseBitmapLoaded then
-              TagCustomizer.BackgroundImage := BrowseBitmap
-          else
-              TagCustomizer.BackgroundImage := CompleteBitmap
+          if self.fBrowseBitmapLoaded then begin
+              // TagCustomizer.BackgroundImage := fBrowseBitmap;
+              TagCustomizer.TileBackGround := TileBackgroundBrowse
+          end
+          else begin
+              // TagCustomizer.BackgroundImage := fCompleteBitmap;
+              TagCustomizer.TileBackGround := TileBackground;
+          end;
       end
-      else
-          TagCustomizer.BackgroundImage := Nil;
-      TagCustomizer.TileBackGround   := TileBackground;
-      TagCustomizer.BackgroundColor  := SkinColorScheme.Tree_Color[1];
-      TagCustomizer.FontColor        := SkinColorScheme.Tree_FontColor[1];
-      TagCustomizer.FocusFontColor   := SkinColorScheme.Tree_FontSelectedColor[1];
-      TagCustomizer.FocusBorderColor := SkinColorScheme.Tree_FocussedSelectionBorder[1];
-      TagCustomizer.FocusBackgroundColor := SkinColorScheme.Tree_FocussedSelectionColor[1];
-      TagCustomizer.HoverFontColor  := SkinColorScheme.Tree_FontSelectedColor[1];
+      else begin
+          // TagCustomizer.BackgroundImage := Nil;
+          TileBackgroundBrowse := False;
+      end;}
+
+      TagCustomizer.BackgroundColor  := SkinColorScheme.TreeColorsArtist.Color;
+      TagCustomizer.FontColor        := SkinColorScheme.TreeColorsArtist.Font;
+      TagCustomizer.FocusFontColor   := SkinColorScheme.TreeColorsArtist.FontSelected;
+      TagCustomizer.FocusBorderColor := SkinColorScheme.TreeColorsArtist.FocussedSelectionBorder;
+      TagCustomizer.FocusBackgroundColor := SkinColorScheme.TreeColorsArtist.FocussedSelection;
+      TagCustomizer.HoverFontColor  := SkinColorScheme.TreeColorsArtist.FontSelected;
 
           TagCustomizer.CloudUseAlphaBlend := UseBlendedTagCloud ;
-          TagCustomizer.CloudBlendColor := SkinColorScheme.Tree_Color[1];
+          TagCustomizer.CloudBlendColor := SkinColorScheme.TreeColorsArtist.Color;
           TagCustomizer.CloudBlendIntensity := BlendFaktorTagCloud2;
 
           TagCustomizer.TagUseAlphaBlend := self.UseBlendedSelectionTagCloud ;
-          TagCustomizer.TagBlendColor := SkinColorScheme.Tree_SelectionRectangleBlendColor[1];
+          TagCustomizer.TagBlendColor := SkinColorScheme.TreeColorsArtist.SelectionRectangleBlend;
           TagCustomizer.TagBlendIntensity := BlendFaktorTagCloud; // as in the Trees (set in the Object-Inspector)
 
       // VST-Header
       SetVSTHeaderSettings;
 
-      // Farben
-      for idx := 1 to 4 do
-      begin
-        case idx of
-          1: DestVST := ArtistsVST;
-          2: DestVST := AlbenVST;
-          3: DestVST := PlaylistVST;
-          else DestVST := VST;
-        end;
-        DestVST.Color                                  := SkinColorScheme.Tree_Color[idx]                        ;
-        DestVST.Font.Color                             := SkinColorScheme.Tree_FontColor[idx]                    ;
-        DestVST.Header.Background                      := SkinColorScheme.Tree_HeaderBackgroundColor[idx]        ;
-        DestVST.Header.Font.Color                      := SkinColorScheme.Tree_HeaderFontColor[idx]              ;
-        DestVST.Colors.BorderColor                     := SkinColorScheme.Tree_BorderColor[idx]                  ;
-        DestVST.Colors.DisabledColor                   := SkinColorScheme.Tree_DisabledColor[idx]                ;
-        DestVST.Colors.DropMarkColor                   := SkinColorScheme.Tree_DropMarkColor[idx]                ;
-        DestVST.Colors.DropTargetBorderColor           := SkinColorScheme.Tree_DropTargetBorderColor[idx]        ;
-        DestVST.Colors.DropTargetColor                 := SkinColorScheme.Tree_DropTargetColor[idx]              ;
-        DestVST.Colors.FocusedSelectionBorderColor     := SkinColorScheme.Tree_FocussedSelectionBorder[idx]      ;
-        DestVST.Colors.FocusedSelectionColor           := SkinColorScheme.Tree_FocussedSelectionColor[idx]       ;
-        DestVST.Colors.GridLineColor                   := SkinColorScheme.Tree_GridLineColor[idx]                ;
-        DestVST.Colors.HeaderHotColor                  := SkinColorScheme.Tree_HeaderHotColor[idx]               ;
-        DestVST.Colors.HotColor                        := SkinColorScheme.Tree_HotColor[idx]                     ;
-        DestVST.Colors.SelectionRectangleBlendColor    := SkinColorScheme.Tree_SelectionRectangleBlendColor[idx] ;
-        DestVST.Colors.SelectionRectangleBorderColor   := SkinColorScheme.Tree_SelectionRectangleBorderColor[idx];
-        DestVST.Colors.TreeLineColor                   := SkinColorScheme.Tree_TreeLineColor[idx]                ;
-        DestVST.Colors.UnfocusedSelectionBorderColor   := SkinColorScheme.Tree_UnfocusedSelectionBorderColor[idx];
-        DestVST.Colors.UnfocusedSelectionColor         := SkinColorScheme.Tree_UnfocusedSelectionColor[idx]      ;
-
-        DestVST.Colors.UnfocusedColor                  := SkinColorScheme.Tree_UnfocusedColor[idx]      ;
-        DestVST.Colors.SelectionTextColor              := SkinColorScheme.Tree_FontSelectedColor[idx];
-        // activate Skin
-
-      end;
+      //Colors
+      SetTreeColors(ArtistsVST, SkinColorScheme.TreeColorsArtist);
+      SetTreeColors(AlbenVST, SkinColorScheme.TreeColorsAlbum);
+      SetTreeColors(MainVST, SkinColorScheme.TreeColorsMain);
+      SetTreeColors(PlaylistVST, SkinColorScheme.TreeColorsPlaylist);
   end;
 
   // Eigenschaften der Massenhaft auftretenden Sachen setzen
   // Hier jetzt auch in einer Schleife. Sollte leichter zu lesen sein.
-  for i := 0 to Nemp_MainForm.ComponentCount - 1 do
-  begin
-      if Nemp_MainForm.Components[i] is TLabel then
-      begin
-          TLabel(Nemp_MainForm.Components[i]).Color := SkinColorScheme.LabelBackGroundCL;
-          TLabel(Nemp_MainForm.Components[i]).Font.Color := SkinColorScheme.LabelCL;
-          TLabel(Nemp_MainForm.Components[i]).Transparent := DrawTransparentLabel;
-      end else
-      {if Nemp_MainForm.Components[i] is TLabel then
-      begin
-        TLabel(Nemp_MainForm.Components[i]).Color := SkinColorScheme.LabelBackGroundCL;
-        TLabel(Nemp_MainForm.Components[i]).Font.Color := SkinColorScheme.LabelCL;
-        TLabel(Nemp_MainForm.Components[i]).Transparent := DrawTransparentLabel;
-      end else   }
-      if Nemp_MainForm.Components[i] is TShape then
-      begin
-          TShape(Nemp_MainForm.Components[i]).Brush.Color := SkinColorScheme.ShapeBrushCL;
-          TShape(Nemp_MainForm.Components[i]).Pen.Color := SkinColorScheme.ShapePenCL;
-          if Nemp_MainForm.Components[i] is TProgressShape then
-          begin
-              TProgressShape(Nemp_MainForm.Components[i]).ProgressBrush.Color := SkinColorScheme.ShapeBrushProgressCL;
-              TProgressShape(Nemp_MainForm.Components[i]).ProgressPen.Color := SkinColorScheme.ShapePenProgressCL;
-          end;
-      end
+  for i := 0 to fNempMainForm.ComponentCount - 1 do begin
+    if fNempMainForm.Components[i] is TLabel then begin
+      TLabel(fNempMainForm.Components[i]).Color := SkinColorScheme.LabelBackGroundCL;
+      TLabel(fNempMainForm.Components[i]).Font.Color := SkinColorScheme.LabelCL;
+      TLabel(fNempMainForm.Components[i]).Transparent := DrawTransparentLabel;
+    end;
   end;
 
   // Weitere Eigenschaften der Form setzen
@@ -1678,9 +1663,7 @@ begin
 
   // Dann: Hintergrundgrafiken-Offsets für die Trees initialisieren
   RepairSkinOffset;
-  SetArtistAlbumOffsets;
-  SetVSTOffsets;
-  SetPlaylistOffsets;
+  RefreshTreeOffsets;
 
   // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK
   //if NempPartyMode.Active then
@@ -1689,7 +1672,7 @@ begin
   //    Spectrum.SetScale(1);
 
   // Spectrum-Hintergrund setzen
-  UpdateSpectrumGraphics;
+  // UpdateSpectrumGraphics;
 
   {$IFDEF USESTYLES}
   if UseAdvancedSkin and NempOptions.GlobalUseAdvancedSkin then
@@ -1763,31 +1746,33 @@ begin
 
 end;
 
-
 procedure TNempSkin.DeActivateSkin(NotTheFirstActivation: Boolean = True);
-var i, idx: integer;
-  DestVST: TVirtualStringTree;
+var
+  i: integer;
 
 begin
   isActive := False;
   RevokeDragFiles;
   //zunächst: Ownerdraw der Boxen/Panels setzen
-  with Nemp_MainForm do
+  for i := 0 to fPanelList.Count - 1 do
+    fPanelList[i].DrawMode := dm_Windows;
+
+  (*with Nemp_MainForm do
   begin
       for i := 0 to Nemp_MainForm.ComponentCount - 1 do
       begin
           if Nemp_MainForm.Components[i] is TNempPanel then
             TNempPanel(Nemp_MainForm.Components[i]).OwnerDraw := False;
       end;
-  end;
+  end;*)
 
   if assigned(DeleteSelection) then
       DeleteSelection.ReloadScheckBoxImages(ExtractFilePath(ParamStr(0)) + 'Images\', false);
 
-  AuswahlForm.ContainerPanelAuswahlform.OwnerDraw := False;
+  (*AuswahlForm.ContainerPanelAuswahlform.OwnerDraw := False;
   MedienListeForm.ContainerPanelMedienBibForm.OwnerDraw := False;
   PlaylistForm.ContainerPanelPlaylistForm.OwnerDraw := False;
-  ExtendedControlForm.ContainerPanelExtendedControlsForm.OwnerDraw := False;
+  ExtendedControlForm.ContainerPanelExtendedControlsForm.OwnerDraw := False;*)
 
   // Grafiken für die Buttons setzen
   with Nemp_MainForm do
@@ -1826,10 +1811,40 @@ begin
 
   end;
 
+  ArtistsVST.Background.Assign(Nil);
+  AlbenVST.Background.Assign(Nil);
+  PlaylistVST.Background.Assign(Nil);
+  MainVST.Background.Assign(Nil);
+  // AlphaBlending
+  ArtistsVST.TreeOptions.PaintOptions := ArtistsVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
+  AlbenVST.TreeOptions.PaintOptions := AlbenVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
+  PlaylistVST.TreeOptions.PaintOptions := PlaylistVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
+  MainVST.TreeOptions.PaintOptions := MainVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
+  // Scrollbars
+  ArtistsVST.ScrollBarOptions.ScrollBars := ssVertical;
+  AlbenVST.ScrollBarOptions.ScrollBars := ssVertical;
+  PlaylistVST.ScrollBarOptions.ScrollBars := ssVertical;
+  MainVST.ScrollBarOptions.ScrollBars := ssBoth;
+  // Header
+  ArtistsVST.Header.Options := ArtistsVST.Header.Options - [hoOwnerDraw];
+  AlbenVST.Header.Options := AlbenVST.Header.Options - [hoOwnerDraw];
+  PlaylistVST.Header.Options := PlaylistVST.Header.Options - [hoOwnerDraw];
+  MainVST.Header.Options := MainVST.Header.Options - [hoOwnerDraw];
+
+  ArtistsVST.SelectionBlendFactor  := 75 ;
+  AlbenVST.SelectionBlendFactor    := 75 ;
+  PlaylistVST.SelectionBlendFactor := 75 ;
+  MainVST.SelectionBlendFactor         := 75 ;
+
+  // Farben
+  SetTreeColors(ArtistsVST, cDefaultTreeColors);
+  SetTreeColors(AlbenVST, cDefaultTreeColors);
+  SetTreeColors(MainVST, cDefaultTreeColors);
+  SetTreeColors(PlaylistVST, cDefaultTreeColors);
 
   // Eigenschaften der Bäume
-  with Nemp_MainForm do
-  begin
+  //with Nemp_MainForm do
+  //begin
       {
       // for skinning the [+] and [-] Buttons in teh Treeview
       Nemp_MainForm.ArtistsVST.OnAfterCellPaint := Nil;
@@ -1838,40 +1853,13 @@ begin
       Nemp_MainForm.AlbenVST.TreeOptions.PaintOptions := Nemp_MainForm.AlbenVST.TreeOptions.PaintOptions + [toShowButtons];
       }
 
-      ArtistsVST.Background.Assign(Nil);
-      AlbenVST.Background.Assign(Nil);
-      PlaylistVST.Background.Assign(Nil);
-      VST.Background.Assign(Nil);
-
       // SKIN_UMBAU_CHECK  BibRatingHelper.UsebackGround := False;
       // SKIN_UMBAU_CHECK BibRatingHelper.ReDrawRatingInStarsOnBitmap(ImgBibRating.Picture.Bitmap);
 
-      TagCustomizer.UseBackGround := False;
-      TagCustomizer.TileBackGround:= False;
-      TagCustomizer.BackgroundImage := Nil;
+      //TagCustomizer.UseBackGround := False;
+      //TagCustomizer.TileBackGround:= False;
+      // TagCustomizer.BackgroundImage := Nil;
 
-      // AlphaBlending
-      ArtistsVST.TreeOptions.PaintOptions := ArtistsVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
-      AlbenVST.TreeOptions.PaintOptions := AlbenVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
-      PlaylistVST.TreeOptions.PaintOptions := PlaylistVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
-      VST.TreeOptions.PaintOptions := VST.TreeOptions.PaintOptions - [toUseBlendedSelection];
-      // Scrollbars
-      ArtistsVST.ScrollBarOptions.ScrollBars := ssVertical;
-      AlbenVST.ScrollBarOptions.ScrollBars := ssVertical;
-      PlaylistVST.ScrollBarOptions.ScrollBars := ssVertical;
-      VST.ScrollBarOptions.ScrollBars := ssBoth;
-      // Header
-      ArtistsVST.Header.Options := ArtistsVST.Header.Options - [hoOwnerDraw];
-      AlbenVST.Header.Options := AlbenVST.Header.Options - [hoOwnerDraw];
-      PlaylistVST.Header.Options := PlaylistVST.Header.Options - [hoOwnerDraw];
-      VST.Header.Options := VST.Header.Options - [hoOwnerDraw];
-
-      ArtistsVST.SelectionBlendFactor  := 75 ;
-      AlbenVST.SelectionBlendFactor    := 75 ;
-      PlaylistVST.SelectionBlendFactor := 75 ;
-      VST.SelectionBlendFactor         := 75 ;
-
-      TagCustomizer.UseBackGround    := False;
       TagCustomizer.BackgroundColor  := clWindow;
       TagCustomizer.FontColor        := clWindowText;
       TagCustomizer.FocusFontColor   := clWindowText;
@@ -1887,69 +1875,16 @@ begin
       TagCustomizer.TagBlendColor := clHighlight;
       TagCustomizer.TagBlendIntensity := 0;
 
-
-      // Farben
-      for idx := 1 to 5 do
-      begin
-        case idx of
-          1: DestVST := ArtistsVST;
-          2: DestVST := AlbenVST;
-          3: DestVST := PlaylistVST;
-          else DestVST := VST;
-        end;
-        DestVST.Color                                  := clWindow;
-        DestVST.Font.Color                             := clWindowText;
-        DestVST.Header.Background                      := clWindow;
-        DestVST.Header.Font.Color                      := clWindowText;
-        DestVST.Colors.BorderColor                     := clBtnFace;
-        DestVST.Colors.DisabledColor                   := clBtnShadow;
-        DestVST.Colors.DropMarkColor                   := clHighlight;
-        DestVST.Colors.DropTargetBorderColor           := clHighlight;
-        DestVST.Colors.DropTargetColor                 := clHighlight;
-        DestVST.Colors.FocusedSelectionBorderColor     := clHighlight;
-        DestVST.Colors.FocusedSelectionColor           := clHighlight;
-        DestVST.Colors.GridLineColor                   := clBtnFace;
-        DestVST.Colors.HeaderHotColor                  := clBtnShadow;
-        DestVST.Colors.HotColor                        := clWindowText;
-        DestVST.Colors.SelectionRectangleBlendColor    := clHighlight;
-        DestVST.Colors.SelectionRectangleBorderColor   := clHighlight;
-        DestVST.Colors.TreeLineColor                   := clBtnShadow;
-        DestVST.Colors.UnfocusedSelectionBorderColor   := clInactiveCaption;
-        DestVST.Colors.UnfocusedSelectionColor         := clInactiveCaption;
-
-        DestVST.Colors.UnfocusedColor                  := clInactiveCaptionText;
-        DestVST.Colors.SelectionTextColor              := clWindowText;
-        // windows default skin
-
-      end;
-  end;
+  //end;
 
   // Eigenschaften der Massenhaft auftretenden Sachen setzen
   // Hier jetzt auch in einer Schleife. Sollte leichter zu lesen sein.
-  for i := 0 to Nemp_MainForm.ComponentCount - 1 do
-  begin
-      if Nemp_MainForm.Components[i] is TLabel then
-      begin
-          TLabel(Nemp_MainForm.Components[i]).Color := clBtnFace;
-          TLabel(Nemp_MainForm.Components[i]).Font.Color := clWindowText;
-          TLabel(Nemp_MainForm.Components[i]).Transparent := True;
-      end else
-      if Nemp_MainForm.Components[i] is TLabel then
-      begin
-          TLabel(Nemp_MainForm.Components[i]).Color := clBtnFace;
-          TLabel(Nemp_MainForm.Components[i]).Font.Color := clWindowText;
-          TLabel(Nemp_MainForm.Components[i]).Transparent := True;
-      end else
-      if Nemp_MainForm.Components[i] is TShape then
-      begin
-          TShape(Nemp_MainForm.Components[i]).Brush.Color := clGradientActiveCaption;
-          TShape(Nemp_MainForm.Components[i]).Pen.Color := clBlack;
-          if Nemp_MainForm.Components[i] is TProgressShape then
-          begin
-              TProgressShape(Nemp_MainForm.Components[i]).ProgressBrush.Color := clHighlight;
-              TProgressShape(Nemp_MainForm.Components[i]).ProgressPen.Color := clHotlight;
-          end;
-      end
+  for i := 0 to fNempMainForm.ComponentCount - 1 do begin
+    if fNempMainForm.Components[i] is TLabel then begin
+      TLabel(fNempMainForm.Components[i]).Color := clBtnFace;
+      TLabel(fNempMainForm.Components[i]).Font.Color := clWindowText;
+      TLabel(fNempMainForm.Components[i]).Transparent := True;
+    end
   end;
 
   if NotTheFirstActivation then
@@ -1985,7 +1920,6 @@ begin
     NempSpectrum.ColorBar1 := clBackground;
     NempSpectrum.ColorBar2 := clActiveCaption;
 
-
     if NempOptions.AnzeigeMode = 0 then
         Menu := Nemp_MainMenu;
 
@@ -2001,56 +1935,93 @@ begin
 end;
 
 
-procedure TNempskin.TileGraphic(const ATile: TBitmap; aDoTile: Boolean; const ATarget: TCanvas; X, Y: Integer; Stretch: Boolean = False);
+procedure TNempSkin.OnPaintBackgroundControlPanel(Sender: TNempPanel; var Bitmap: TBitmap;
+  var Offset: TPoint; var Tile: Boolean);
 var
-  xstart, xloop, yloop: Integer;
-  f: Single;
+  pnlPoint: TPoint;
 begin
-  if ATile.Width * ATile.Height = 0 then exit;
+  if not UseSeparatePlayerBitmap then begin
+    OnPaintBackgroundRegularPanel(Sender, Bitmap, Offset, Tile)
+  end else begin
 
-  // Stretch is used only for the player-part, if a seperate bitmap is used there
-  if Stretch then
-      f := NempPartyMode.ResizeFactor
-  else
-      f := 1;
+            // fallback-Bitmap:
+            case AlignControlGenericBackground of
+                0: Offset := Point(0,0); //align left
+                1: Offset := Point (Nemp_MainForm._ControlPanel.ClientWidth - ControlGenericBmp.Width, 0); // align right
+                2: begin
+                    // align to main control, use also AlignControlGenericOffset
+                    Offset := Nemp_MainForm.PlayerControlPanel.ClientToParent(Point(0,0), Nemp_MainForm._ControlPanel);
+                    Offset.X := Offset.X - AlignControlGenericOffset;
+                end;
+            end;
+            pnlPoint := Sender.ClientToParent(Point(0,0), Nemp_MainForm._ControlPanel);
+            if fControlGenericLoaded then
+              Bitmap := ControlGenericBmp;
 
-  if aDoTile{ AND UseBitmap} then
-  begin
-      xloop := X Mod aTile.Width;
+            case Sender.Tag of
+                1: begin //selection
+                    if fControlSelectionLoaded then begin
+                        Bitmap := ControlSelectionBmp;
+                        pnlPoint := Point(0,0);
+                        Offset := Point(0,0);
+                    end;
+                end;
 
-      if xloop < 0 then xloop := xloop + aTile.Width;
-      xloop := -xloop;
+                2: begin // cover
+                    if fControCoverLoaded then begin
+                        Bitmap := ControlCoverBmp;
+                        pnlPoint := Point(0,0);
+                        Offset := Point(0,0);
+                    end;
+                end;
 
-      xstart := xloop;
+                3: begin // MainPlayer/Headset
+                    if fControlPlayerLoaded then begin
+                        Bitmap := PlayerBitmap;
+                        pnlPoint := Point(0,0);
+                        Offset := Point(0,0);
+                    end;
+                end;
 
-      Yloop := Y Mod aTile.Height;
+                4: begin // SlideControl, Title-Display
+                    if fControlProgressLoaded then begin
+                        Bitmap := ControlProgressBmp;
+                        pnlPoint := Point(0,0);
+                        case AlignControlProgressDisplay of
+                            0: Offset := Point(0,0);
+                            1: Offset := Point (Nemp_MainForm.NewPlayerPanel.ClientWidth - ControlProgressBmp.Width, 0)
+                        end;
+                    end;
+                end;
+            end;
 
-      if yloop < 0 then yloop := yloop + aTile.Height;
-      yloop := - yloop;
+            (*with Nemp_MainForm do
+            begin
+                if UseBackground then
+                    TileGraphic(sourceBmp, TileControlBackground, tmp.Canvas,
+                          pnlPoint.X - SourceOffsetPoint.X,
+                          pnlPoint.Y - SourceOffsetPoint.Y,
+                          false)
+                else
+                begin
+                    tmp.Canvas.Brush.Style := bsSolid;
+                    tmp.Canvas.Pen.Color :=  SkinColorScheme.FormCL;
+                    tmp.Canvas.Brush.Color := SkinColorScheme.FormCL;
+                    tmp.Canvas.FillRect(tmp.Canvas.ClipRect);
+                end;
+            end;
 
-      while Yloop < ATarget.ClipRect.Bottom  do
-      begin
-        Xloop := xstart;
-        while Xloop < ATarget.ClipRect.Right do
-        begin
-            if f=1 then
-                ATarget.Draw(XLoop, YLoop, ATile)
+
+            if JustInternal then
+                PaintedProgressBitmap.Assign(tmp)
             else
-                ATarget.StretchDraw(Rect(XLoop, YLoop, XLoop + Round(ATile.Width * f), yLoop + Round(ATile.Height * f) ), ATile);
+                BitBlt(aPanel.Canvas.Handle, 0,   0, tmp.Width, tmp.Height, tmp.Canvas.Handle, 0,  0, srccopy);
+                *)
+    end;
 
-            Inc(Xloop, Round(ATile.Width * f));
-        end;
-        Inc(Yloop, Round(ATile.Height * f));
-      end;
-  end else
-  begin
-    ATarget.Brush.Color := SkinColorScheme.FormCL;
-    ATarget.FillRect(ATarget.ClipRect);
-   { if UseBitmap then}
-      ATarget.Draw(-x, -y, ATile);
-  end;
 end;
 
+(*
 procedure TNempSkin.DrawAControlPanel(aPanel: TNempPanel; UseBackground: Boolean; JustInternal: Boolean);
 var pnlPoint, SourceOffsetPoint: TPoint;
     tmp: TBitmap;
@@ -2163,79 +2134,252 @@ begin
             end;
 
 
-            if JustInternal then
-                PaintedProgressBitmap.Assign(tmp)
-            else
+            //if JustInternal then
+            //    PaintedProgressBitmap.Assign(tmp)
+            // else
                 BitBlt(aPanel.Canvas.Handle, 0,   0, tmp.Width, tmp.Height, tmp.Canvas.Handle, 0,  0, srccopy);
         finally
             tmp.Free;
         end;
     end else
         DrawARegularPanel(aPanel, UseBackground);
-end;
+end;   *)
 
-
-function TNempSkin.fGetControlLocalOffsetPoint(aControl: TWinControl; aBitmap: TBitmap; aAlignment: Integer): TPoint;
+function TNempSkin.GetBrowseBitmap: TBitmap;
 begin
-    case aAlignment of
-        // left-center
-        0: result :=  Point(0, (aControl.ClientHeight Div 2) - (aBitmap.Height Div 2) );
-        // right-center
-        1: result := Point(aControl.ClientWidth - aBitmap.Width, (aControl.ClientHeight Div 2) - (aBitmap.Height Div 2) );
-        // align to MainControls (use PlayerPageOffset<X/Y>Orig in that case), doesnt make sense here - use "center-center"
-        2: result := Point((aControl.ClientWidth Div 2) - (aBitmap.Width Div 2), (aControl.ClientHeight Div 2) - (aBitmap.Height Div 2) );
-        // left-top
-        3: result := Point(0,0);
-        //right-top
-        4: result := Point(aControl.ClientWidth - aBitmap.Width, 0);
-        //left-bottom
-        5: result := Point (0, aControl.ClientHeight - aBitmap.Height);
-        //right-bottom
-        6: result :=  Point (aControl.ClientWidth - aBitmap.Width, aControl.ClientHeight - aBitmap.Height);
-    end;
+  if fBrowseBitmapLoaded then
+    result := fBrowseBitmap
+  else
+    result := fCompleteBitmap;
 end;
 
-
-
-procedure TNempSkin.DrawArtistAlbumPanel(aPanel: TNempPanel; aBibCount: Integer; UseBackground: Boolean = True);
-var pnlPoint: TPoint;
-    tmp: TBitmap;
-    sourceBmp: TBitmap;
+function TNempSkin.GetMedialistBitmap: TBitmap;
 begin
-    if (aBibCount > 0) or (not self.fBrowseBitmapLoaded) then
-        DrawARegularPanel(aPanel, UseBackground)
-    else
-    begin
-        // draw the special BrowseBitmap, according to BrwoseAlignments
-        tmp := TBitmap.Create;
-        try
-            tmp.Width := aPanel.Width;
-            tmp.Height := aPanel.Height;
-            sourceBmp := BrowseBitmap;
-            pnlPoint := fGetControlLocalOffsetPoint(aPanel, sourceBmp, AlignBackgroundBrowse);
+  if fMedialistBitmapLoaded then
+    result := fMedialistBitmap
+  else
+    result := fCompleteBitmap;
+end;
 
-            with Nemp_MainForm do
-            begin
-                if UseBackground then
-                    TileGraphic(sourceBmp, self.TileBackgroundBrowse, tmp.Canvas,
-                          - pnlPoint.X, - pnlPoint.Y, False)
-                else
-                begin
-                    tmp.Canvas.Brush.Style := bsSolid;
-                    tmp.Canvas.Pen.Color :=  SkinColorScheme.FormCL;
-                    tmp.Canvas.Brush.Color := SkinColorScheme.FormCL;
-                    tmp.Canvas.FillRect(tmp.Canvas.ClipRect);
-                end;
-            end;
+function TNempSkin.GetDetailBitmap: TBitmap;
+begin
+  if fDetailBitmapLoaded then
+    result := fDetailBitmap
+  else
+    result := fCompleteBitmap;
+end;
 
-            BitBlt(aPanel.Canvas.Handle, 0,   0, tmp.Width, tmp.Height, tmp.Canvas.Handle, 0,  0, srccopy);
-        finally
-            tmp.Free;
-        end;
+function TNempSkin.GetPlaylistBitmap: TBitmap;
+begin
+  if fPlaylistBitmapLoaded then
+    result := fPlaylistBitmap
+  else
+    result := fCompleteBitmap;
+end;
+
+function TNempSkin.GetBackgroundBasePanel(aControl: TControl): TNempPanel;
+var
+  aParent: TWinControl;
+begin
+  result := Nil;
+
+  if (aControl is TNempPanel) and TNempPanel(aControl).BackgroundBasePanel then
+    result := TNempPanel(aControl)
+  else begin
+    aParent := aControl.Parent;
+    while assigned(aParent) do begin
+      if (aParent is TNempPanel) and TNempPanel(aParent).BackgroundBasePanel then begin
+        result := TNempPanel(aParent);
+        break;
+      end else
+        aParent := aParent.Parent;
     end;
+  end;
+end;
+
+function TNempSkin.GetBackgroundBitmap(aPanel: TNempPanel): TBitmap;
+begin
+  case aPanel.Tag of
+    1: result := Playlistbitmap;   // Playlist
+    2: result := BrowseBitmap;     // Browse (Tree, Coverflow, TagCloud)
+    3: result := MedialistBitmap;  // MediaList
+    4: result := DetailBitmap;     // Details (new in 5.3)
+  else
+    result := CompleteBitmap;
+  end;
+end;
+
+function TNempSkin.GetBackgroundAlignment(aPanel: TNempPanel): Integer;
+begin
+  case aPanel.Tag of
+    1: result := AlignBackgroundPlaylist;   // Playlist
+    2: result := AlignBackgroundBrowse;     // Browse (Tree, Coverflow, TagCloud)
+    3: result := AlignBackgroundMedialist;  // MediaList
+    4: result := AlignBackgroundDetail;     // Details (new in 5.3)
+  else
+    result := AlignCompleteBackground;
+  end;
+end;
+
+function TNempSkin.GetTileByTag(aTag: Integer): Boolean;
+begin
+  case aTag of
+    1: result := TileBackgroundPlaylist;   // Playlist
+    2: result := TileBackgroundBrowse;     // Browse (Tree, Coverflow, TagCloud)
+    3: result := TileBackgroundMedialist;  // MediaList
+    4: result := TileBackgroundDetails;     // Details (new in 5.3)
+  else
+    result := false;
+  end;
+end;
+
+function TNempSkin.GetDefaultOffset(aControl: TWinControl): TPoint;
+begin
+  result := Point(PlayerPageOffsetX, PlayerPageOffsetY)- aControl.ClientToScreen(Point(0,0));
+end;
+
+function TNempSkin.GetBaseControlOffset(aBaseControl: TWinControl; aBitmap: TBitmap; aAlignment: Integer): TPoint;
+begin
+  case aAlignment of
+    // left-center
+    0: result :=  Point(0, (aBaseControl.ClientHeight Div 2) - (aBitmap.Height Div 2) );
+    // right-center
+    1: result := Point(aBaseControl.ClientWidth - aBitmap.Width, (aBaseControl.ClientHeight Div 2) - (aBitmap.Height Div 2) );
+    // align to MainControls (use PlayerPageOffset<X/Y>Orig in that case), doesnt make sense here - use "center-center"
+    2: result := Point((aBaseControl.ClientWidth Div 2) - (aBitmap.Width Div 2), (aBaseControl.ClientHeight Div 2) - (aBitmap.Height Div 2) );
+    // left-top
+    3: result := Point(0,0);
+    //right-top
+    4: result := Point(aBaseControl.ClientWidth - aBitmap.Width, 0);
+    //left-bottom
+    5: result := Point (0, aBaseControl.ClientHeight - aBitmap.Height);
+    //right-bottom
+    6: result :=  Point (aBaseControl.ClientWidth - aBitmap.Width, aBaseControl.ClientHeight - aBitmap.Height);
+  end;
+end;
+
+function TNempSkin.GetBackgroundOffset(aControl: TWinControl; aBitmap: TBitmap; aAlignment: Integer): TPoint;
+var
+  BasePanel: TNempPanel;
+begin
+  BasePanel := GetBackgroundBasePanel(aControl);
+
+  if not assigned(BasePanel) then
+    // Fallback: treat aControl as a BasePanel
+    result := GetBaseControlOffset(aControl, aBitmap, aAlignment)
+  else
+    result := GetBaseControlOffset(BasePanel, aBitmap, aAlignment)
+        + BasePanel.ClientToScreen(Point(0,0)) - aControl.ClientToScreen(Point(0,0));
+end;
+
+procedure TNempSkin.SetTreeBackgroundOffset(aTree: TVirtualStringTree);
+var
+  Bitmap: TBitmap;
+  OffSet: TPoint;
+  Alignment: Integer;
+  BasePanel: TNempPanel;
+
+  function DoTileTree(useDefaultTile: Boolean): Boolean;
+  begin
+    if useDefaultTile then
+      result := TileBackground
+    else begin
+      case BasePanel.Tag of
+        1: result := TileBackgroundPlaylist;
+        2: result := TileBackgroundBrowse;
+        3: result := TileBackgroundMedialist;
+      else
+        result := false;
+      end;
+    end;
+  end;
+
+begin
+  if (aTree.Tag < 0) or (aTree.Tag > 3) then begin
+    // invalid Tag, should not happen
+    aTree.TreeOptions.PaintOptions := aTree.TreeOptions.PaintOptions - [toStaticbackground];
+    exit;
+  end;
+
+  BasePanel := GetBackgroundBasePanel(aTree);
+  if not assigned(BasePanel) then
+    // no BasePanel found (should not happen)
+    aTree.TreeOptions.PaintOptions := aTree.TreeOptions.PaintOptions - [toStaticbackground]
+  else begin
+    if UseBackgroundImages[BasePanel.Tag] then begin
+      // get a proper Background Bitmap for the Tree, based on the BasePanel it is located on
+      Bitmap := GetBackgroundBitmap(BasePanel);
+      if Bitmap = fCompleteBitmap then
+        // if it's the MainBitmap:
+        // Set Offset in relation to the MainControl
+        OffSet := GetDefaultOffset(aTree)
+      else begin
+        // if it's a seperate Bitmap:
+        // Set Offset in relation to the BasePanel, using it's Alignment setting
+        Alignment := GetBackgroundAlignment(BasePanel);
+        Offset := GetBackgroundOffset(aTree, Bitmap, Alignment);
+      end;
+
+      if DoTileTree(Bitmap = fCompleteBitmap) then begin
+        aTree.TreeOptions.PaintOptions := aTree.TreeOptions.PaintOptions - [toStaticbackground];
+        aTree.BackgroundOffsetX := - Offset.X;
+        aTree.BackgroundOffsetY := - Offset.Y;
+      end else begin
+        aTree.TreeOptions.PaintOptions := aTree.TreeOptions.PaintOptions + [toStaticbackground];
+        aTree.BackgroundOffsetX := Offset.X;
+        aTree.BackgroundOffsetY := Offset.Y;
+      end;
+    end;
+  end;
 end;
 
 
+
+(*procedure TNempSkin.OnPaintEmptyLibraryPanel(Sender: TNempPanel; var Bitmap: TBitmap;
+  var Offset: TPoint; var Tile: Boolean);
+begin
+  if not fBrowseBitmapLoaded then
+    OnPaintBackgroundRegularPanel(Sender, Bitmap, Offset, Tile)
+  else
+  begin
+    if UseBackGroundImageVorauswahl then begin
+      Bitmap := fBrowseBitmap;
+      Offset := GetBaseControlOffset(Sender, fBrowseBitmap, AlignBackgroundBrowse);
+    end;
+  end;
+end;*)
+
+procedure TNempSkin.OnPaintBackgroundRegularPanel(Sender: TNempPanel; var Bitmap: TBitmap;
+  var Offset: TPoint; var Tile: Boolean);
+var
+  Align: Integer;
+begin
+  //if not fCompleteBitmapLoaded then
+  //  exit;
+
+  if (Sender.Tag >= 0) and (Sender.Tag <= 4) then begin
+    if UseBackgroundImages[Sender.Tag] then begin
+      Bitmap := GetBackgroundBitmap(Sender); // Bitmap := fCompleteBitmap;
+
+      if Bitmap = fCompleteBitmap then begin
+        Tile := TileBackground;
+        OffSet := GetDefaultOffset(Sender);
+      end
+      else begin
+        Tile := GetTileByTag(Sender.Tag);
+        Align := GetBackgroundAlignment(Sender);
+        Offset := GetBackgroundOffset(Sender, Bitmap, Align); // OffSet := Point(PlayerPageOffsetX, PlayerPageOffsetY) - Sender.ClientToScreen(Point(0,0));
+      end;
+    end;
+  end else begin
+    Tile := TileBackground;
+    Bitmap := fCompleteBitmap;
+    OffSet := GetDefaultOffset(Sender);
+      // Sender.ClientToScreen(Point(0,0)) - Point(PlayerPageOffsetX, PlayerPageOffsetY);
+  end;
+end;
+
+(*
 procedure TNempSkin.DrawARegularPanel(aPanel: TNempPanel; UseBackground: Boolean = True);
 var pnlPoint: TPoint;
     tmp: TBitmap;
@@ -2249,7 +2393,7 @@ begin
         pnlPoint := aPanel.ClientToScreen(Point(0,0));
 
         sourceBmp := CompleteBitmap;
-        with Nemp_MainForm do
+        //with Nemp_MainForm do
         begin
             if UseBackground then
                 TileGraphic(sourceBmp, TileBackground, tmp.Canvas,
@@ -2271,21 +2415,7 @@ begin
     end;
 end;
 
-
-
-Procedure TNempSkin.UpdateSpectrumGraphics;
-begin
-    with Nemp_MainForm do
-    begin
-        // redraw the playerpanel, but only on the internal bitmap, not on the actual panel
-        DrawAControlPanel(NewPlayerPanel, True, True);
-
-        // Spectrum.SetBackGround(True);
-        // Spectrum.SetStarBackGround(True);
-        // Spectrum.DrawRating(RatingImage.Tag);
-        // Spectrum.SetGradientBitmap;
-    end;
-end;
+*)
 
 function TNempSkin.LoadListGraphic(aTargetBmp: TBitmap;
   aBaseFilename: UnicodeString): Boolean;
@@ -2319,6 +2449,7 @@ begin
                 result := False;
 end;
 
+(*
 procedure TNempSkin.PaintFallbackImage(var aBitmap: TBitmap);
 begin
     aBitmap.Width := 10;
@@ -2326,7 +2457,7 @@ begin
     aBitmap.Canvas.Brush.Color := SkinColorScheme.FormCL;
     aBitmap.Canvas.Pen.Color := SkinColorScheme.LabelCL;
     aBitmap.Canvas.FillRect(CompleteBitmap.Canvas.ClipRect);
-end;
+end;*)
 
 
 function TNempSkin.LoadGraphicFromBaseName(aBmp: TBitmap; aFilename: UnicodeString; Scaled: Boolean=False): Boolean;
@@ -2852,113 +2983,5 @@ begin
 end; }
 {$ENDIF}
 
-
-
-(*    // Dont delete yet - i may need some parts for drawing the new Panels!
-procedure TNempSkin.DrawGroupboxFrame(aGroupbox: TNempGroupbox);
-begin
-  aGroupbox.Canvas.Pen.Width := 1;
-  aGroupbox.Canvas.Pen.Color := SkinColorScheme.GroupboxFrameCL;
-  aGroupbox.Canvas.Brush.style := bsclear;
-  aGroupbox.Canvas.Roundrect(1,1, aGroupbox.Width-1, aGroupbox.Height-1,6,6);
-end;
-
-
-procedure TNempSkin.DrawAGroupbox(aGroupbox: TNempGroupbox; UseBackground: Boolean = True);
-var grpPoint, OffsetPoint: TPoint;
-    sourceBmp: TBitmap;
-    localOffsetX, localOffsetY: Integer;
-    localdrawFrame: Boolean;
-begin
-  grpPoint := aGroupbox.ClientToScreen(Point(0,0));
-  OffsetPoint := Nemp_MainForm.PlayerPanel.ClientToScreen(Point(0,0));
-
-  if (aGroupbox.Tag = 0) and UseSeparatePlayerBitmap then
-  begin
-      // Player-Teil gesondert behandelr
-      localOffsetX := 0;
-      localOffsetY := 0;
-      sourceBmp := PlayerBitmap;
-  end else
-      {  // there are no groupboxes in ExControls
-      if (aGroupbox.Tag = 5) and UseSeparateExControlsBitmap then
-      begin
-          // Player-Teil gesondert behandelr
-          localOffsetX := - grpPoint.X + OffsetPoint.X;
-          localOffsetY := - grpPoint.Y + OffsetPoint.Y;
-          sourceBmp := ExControlsBitmap;
-      end
-      else  }
-      begin
-          localOffsetX := PlayerPageOffsetX;
-          localOffsetY := PlayerPageOffsetY;
-          sourceBmp := CompleteBitmap;
-      end;
-
-  if (aGroupbox.Tag = 0) then
-    localDrawFrame := DrawGroupboxFramesMain
-  else
-    localDrawFrame := DrawGroupboxFrames;
-
-  with Nemp_MainForm do
-  begin
-    if UseBackground then
-          TileGraphic(sourceBmp, aGroupbox.Canvas,
-                localOffsetX + (grpPoint.X - OffsetPoint.X) ,
-                localOffsetY + (grpPoint.Y - OffsetPoint.Y))
-    else
-    begin
-          aGroupbox.Canvas.Brush.Style := bsSolid;
-          aGroupbox.Canvas.Brush.Color := SkinColorScheme.FormCL;
-          aGroupbox.Canvas.FillRect(aGroupbox.ClientRect);
-    end;
-    if localDrawFrame then
-      DrawGroupboxFrame(aGroupbox);
-  end;
-end;
-
-
-procedure TNempSkin.DrawAOptionsGroupbox(aGroupbox: TNempGroupbox; UseBackground: Boolean = True);
-var grpPoint, OffsetPoint: TPoint;
-    sourceBmp: TBitmap;
-    localOffsetX, localOffsetY: Integer;
-    localdrawFrame: Boolean;
-begin
-  grpPoint := aGroupbox.ClientToScreen(Point(0,0));
-  OffsetPoint := OptionsCompleteForm.GRPBOXTextAnzeige.ClientToScreen(Point(0,0));
-
-  if UseSeparatePlayerBitmap then
-  begin
-      // Player-Teil gesondert behandelr
-      localOffsetX := 0;
-      localOffsetY := 0;
-      sourceBmp := PlayerBitmap;
-      localDrawFrame := DrawGroupboxFramesMain;
-  end else
-  begin
-      localOffsetX := PlayerPageOffsetX;
-      localOffsetY := PlayerPageOffsetY;
-      sourceBmp := CompleteBitmap;
-      localDrawFrame := DrawGroupboxFrames;
-  end;
-
-  with OptionsCompleteForm do
-  begin
-    if UseBackground then
-          TileGraphic(sourceBmp, aGroupbox.Canvas,
-                localOffsetX + (grpPoint.X - OffsetPoint.X+8) ,
-                localOffsetY + (grpPoint.Y - OffsetPoint.Y+28))
-    else
-    begin
-          aGroupbox.Canvas.Brush.Style := bsSolid;
-          aGroupbox.Canvas.Brush.Color := SkinColorScheme.FormCL;
-          aGroupbox.Canvas.FillRect(aGroupbox.ClientRect);
-    end;
-    if localDrawFrame then
-      DrawGroupboxFrame(aGroupbox);
-  end;
-end;
-
-*)
 
 end.

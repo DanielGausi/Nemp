@@ -17,7 +17,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls,
-  Vcl.StdCtrls, Vcl.ImgList, System.UITypes, Winapi.CommCtrl, VCL.Themes;
+  Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ImgList, System.UITypes, Winapi.CommCtrl, VCL.Themes,
+  NempControls.Common, uNempHintWindow;
 
 const
   cRatingStarCount = 5;
@@ -30,11 +31,9 @@ type
 
   TChangeRatingEvent = procedure(Sender: TRatingButton; aRating: Integer) of object;
 
-  TDrawMode = (dm_Windows, dm_Skin);
-
   TCustomSkinButton = class(TCustomButton)
   private
-    FDrawMode: TDrawMode;
+    FDrawMode: TNempDrawMode;
     FCanvas: TCanvas;
     FIsDown: Boolean;
     FIsDefault: Boolean;
@@ -52,7 +51,6 @@ type
     FStarHalfImageName: TImageName;
     FStarEmptyImageName: TImageName;
 
-
     FBackgroundImages: TCustomImageList;
     FBackgroundImageChangeLink: TChangeLink;
 
@@ -63,13 +61,12 @@ type
     procedure DrawWindowsBackground(const DrawItemStruct: TDrawItemStruct);
     procedure DrawSkinBackground(const DrawItemStruct: TDrawItemStruct);
 
-
     procedure DrawImage(aCanvas: TCanvas);
     procedure DrawOverlayImage(aCanvas: TCanvas);
     procedure DrawButtonFocusRect(aCanvas: TCanvas);
     procedure DrawItem(const DrawItemStruct: TDrawItemStruct);
 
-    procedure SetDrawMode(Value: TDrawMode);
+    procedure SetDrawMode(Value: TNempDrawMode);
     procedure UpdateImageName(Index: TImageIndex; var Name: TImageName);
     procedure UpdateImageIndex(Name: TImageName; var Index: TImageIndex);
     procedure CNMeasureItem(var Message: TWMMeasureItem); message CN_MEASUREITEM;
@@ -111,7 +108,6 @@ type
     property StarHalfImageName  : TImageName  read FStarHalfImageName   write SetStarHalfImageName   ;
     property StarEmptyImageName : TImageName  read FStarEmptyImageName  write SetStarEmptyImageName  ;
 
-
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -128,7 +124,7 @@ type
     property DragCursor;
     property DragKind;
     property DragMode;
-    property DrawMode: TDrawMode read FDrawMode write SetDrawMode;
+    property DrawMode: TNempDrawMode read FDrawMode write SetDrawMode;
     property Enabled;
     property Font;
     //property HotImageIndex;
@@ -249,6 +245,21 @@ type
     property StarEmptyImageName;
   end;
 
+  TAudioCoverImage = class(TImage)
+  private
+    FHintData: TNempHintData; // used while preparing the hint window
+    procedure CMHintShow(var Message: TCMHintShow); message CM_HINTSHOW;
+  protected
+    FOnShowHint: TNempShowSimpleHintEvent;
+    FOnDrawHint: TNempDrawHintEvent;
+    FOnGetHintSize: TNempCalcHintEvent;
+
+  published
+    property OnShowHint: TNempShowSimpleHintEvent read FOnShowHint write FOnShowHint;
+    property OnDrawHint: TNempDrawHintEvent       read FOnDrawHint write FOnDrawHint;
+    property OnGetHintSize: TNempCalcHintEvent    read FOnGetHintSize write FOnGetHintSize;
+  end;
+
   {
     TRatingPainter:
       Draw a rating like in TRatingButton on a Canvas (e.g. in the Rating-Column in the main VST, or in VST Hints)
@@ -260,8 +271,8 @@ type
       fStarHalfIdx: Integer;
       fStarEmptyIdx: Integer;
       fCountIconIdx: Integer;
-    function GetHeight: Integer;
-    function GetWidth: Integer;
+      function GetHeight: Integer;
+      function GetWidth: Integer;
 
     public
       property Images: TCustomImageList read fImages write fImages;
@@ -282,13 +293,7 @@ type
     procedure DrawButton(ACanvas: TCanvas; AMouseInControl: Boolean); override;
   end;
 
-  //procedure PaintRating(aRating: Integer;
-  //    aCanvas: TCanvas; x, y: Integer; Enabled: Boolean;
-  //    Images: TCustomImageList;
-  //    StarFullIdx, StarHalfIdx, StarEmptyIdx: Integer);
-
   procedure Register;
-
 
 implementation
 
@@ -297,6 +302,7 @@ procedure Register;
 begin
   RegisterComponents('Nemp Components', [TSkinButton]);
   RegisterComponents('Nemp Components', [TRatingButton]);
+  RegisterComponents('Nemp Components', [TAudioCoverImage]);
 end;
 
 procedure InternalPaintRating(aRating: Integer;
@@ -459,7 +465,7 @@ begin
   end;
 end;
 
-procedure TCustomSkinButton.SetDrawMode(Value: TDrawMode);
+procedure TCustomSkinButton.SetDrawMode(Value: TNempDrawMode);
 begin
   if Value <> FDrawMode then begin
     FDrawMode := Value;
@@ -1026,6 +1032,40 @@ procedure TRatingPainter.PaintCountIcon(aCanvas: TCanvas; x, y: Integer; Enabled
 begin
   if assigned(Images) then
     Images.Draw(aCanvas, X, Y, fCountIconIdx, Enabled);
+end;
+
+{ TAudioCoverImage }
+
+procedure TAudioCoverImage.CMHintShow(var Message: TCMHintShow);
+var
+  doOwnerDraw, ShowOwnHint: Boolean;
+begin
+
+  with Message do begin
+    Result := 0;
+    with HintInfo^ do begin
+      doOwnerDraw := False;
+      ShowOwnHint := True;
+
+      if assigned(FOnShowHint) then begin
+        HintStr := GetShortHint(Hint);
+        FOnShowHint(Self, HintStr, doOwnerDraw);
+      end else begin
+        HintStr := GetShortHint(Hint);
+      end;
+      // Set our own hint window class and prepare structure to be passed to the hint window.
+      if ShowOwnHint and (Result = 0) then
+      begin
+        HintWindowClass := GetHintWindowClass(doOwnerDraw); // GetHintWindowClass;
+        FHintData.HintText := HintStr;
+        FHintData.OnDrawHint := FOnDrawHint;
+        FHintData.OnGetHintSize := FOnGetHintSize;
+        FHintData.Control := Self;
+        FHintData.Tag := 0;  // not used here
+        HintData := @FHintData;
+      end;
+    end;
+  end;
 end;
 
 end.

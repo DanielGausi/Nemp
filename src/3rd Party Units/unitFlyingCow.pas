@@ -57,12 +57,25 @@ const
  // WM_FC_NEEDMORE = WM_FLYINGCOW + 2;
   WM_FLYINGCOWTEST = WM_FLYINGCOW + 3;
 
+  FC_KIND_COVER = 0;
+  FC_KIND_BACKGROUND = 1;
+
+  cTextureDiff = 0.005;
+
 type
-  TWMFCMessage = packed record
+  {TWMFCMessage = packed record
     Msg : Cardinal;
     index : Integer;
     Unused : Longint;
     Result : Longint;
+  end;}
+
+  TWMFCMessage = record
+    Msg: Cardinal;
+    MsgFiller: TDWordFiller;
+    Index: WPARAM;
+    Kind: LPARAM;
+    Result: LRESULT;
   end;
 
   TCoverFlowSettings = record
@@ -129,6 +142,7 @@ type
       nx, nr, nz : Single;
       texture : record
         handle : Integer;
+        pickHandle : Integer;
         w, h : Single;
         su, sv : Single;
         tu, tv : Single;
@@ -155,6 +169,7 @@ type
     fFrameDone : Boolean;
     fTimer : Cardinal;
     fMainPickItem: TRenderItem;
+    fBackGroundItem: TRenderItem;
     fItem : array of TRenderItem;
     fCurrentItem : Integer;
     fSelectedItem : Integer;
@@ -165,6 +180,11 @@ type
     fQueryUpdateTexture_width : Integer;
     fQueryUpdateTexture_height : Integer;
 
+    fQueryUpdateBackground : Integer;
+    fQueryUpdateBackground_pixels : PByteArray;
+    fQueryUpdateBackground_width : Integer;
+    fQueryUpdateBackground_height : Integer;
+
     fQueryUpdateTexturePick : Integer;
     fQueryUpdateTexturePick_pixels : PByteArray;
     fQueryUpdateTexturePick_width : Integer;
@@ -173,7 +193,8 @@ type
     fQueryUpdateItemCount: Integer;
     fQueryUpdateItems: Boolean;
 
-    fPendingPreview : Boolean;
+    fPendingPreview: Boolean;
+    fPendingPreviewBackground: Boolean;
     fEventsWindow : HWND;
     fr: single;
     fg: single;
@@ -186,10 +207,17 @@ type
     // fBlendTextureHandle: GLuint;
     Settings: TCoverFlowSettings;
 
+    procedure DrawTexturedBackground;
+
     procedure DrawScene;
     function DrawHitScene(x,y: Integer): Cardinal;
 
+    procedure CreateSolidColorTexture(ItemIndex: Integer);
+
+    procedure PrepareTexture(var aRenderItem: TRenderItem; aPixels : PByteArray; aWidth, aHeight : Integer; diff: Single);
+
     procedure PrepareMainCoverPickTexture;
+    procedure PrepareBackgroundTexture;
     procedure PrepareCoverTexture;
     procedure ClearTextures;
 
@@ -214,17 +242,13 @@ type
     procedure UpdateItems;
     procedure QueryToClearTextures;
     procedure SetPreview (index : Integer; width, height : Integer; pixels : PByteArray);
+
+    procedure SetBackgroundPreview(aWidth, aHeight : Integer; pixels : PByteArray);
     procedure SetMainPickCoverPreview(aWidth, aHeight : Integer; pixels : PByteArray);
+
     procedure RenderPass (check_missings : Boolean; rc : TRect; RenderReflexion: Boolean);
     procedure RenderClick(check_missings : Boolean; rc: TRect);
   end;
-  (*
-  TFlyingCowItem = class
-  public
-    Name, Kind, Tag : String;
-    constructor Create (name, kind, tag : String);
-  end;
-  *)
 
   TFlyingCowOnPreview = procedure (index : Integer) of object;
 
@@ -254,7 +278,7 @@ type
 
     procedure DoSomeDrawing(value: Integer);
     procedure SetPreview (index : Integer; width, height : Integer; pixels : PByteArray);
-
+    procedure SetBackgroundPreview(aWidth, aHeight : Integer; pixels : PByteArray);
     procedure SetMainPickCoverPreview(width, height : Integer; pixels : PByteArray);
     procedure SelectItemAt(X,Y: Integer);
 
@@ -316,9 +340,7 @@ procedure TFlyingCow.Cleartextures;
 begin
   If Not fBeginUpdate Then
     fThread.PauseRender;
-
   fThread.QueryToClearTextures;
-
   If Not fBeginUpdate Then
     fThread.ResumeRender;
 end;
@@ -390,11 +412,9 @@ begin
     fThread.PauseRender;
     // Clear Textures
     fThread.QueryToClearTextures;
-
     fThread.fr := r / 255;
     fThread.fg := g / 255;
     fThread.fb := b / 255;
-
     fThread.fNewHandleNeeded := True;
     fThread.ResumeRender;
     DoSomeDrawing(20);
@@ -422,6 +442,10 @@ begin
   fThread.SetMainPickCoverPreview(width, height, pixels);
 end;
 
+procedure TFlyingCow.SetBackgroundPreview(aWidth, aHeight : Integer; pixels : PByteArray);
+begin
+  fThread.SetBackgroundPreview(aWidth, aHeight, pixels);
+end;
 
 { TRenderThread }
 
@@ -440,10 +464,12 @@ begin
   fSelectedItem := -1;
   fQueryDeleteTexture := -1;
   fQueryUpdateTexture := -1;
+  fQueryUpdateBackground := -1;
   fQueryUpdateTexturePick := -1;
   fQueryUpdateItemCount := -1;
   fQueryUpdateItems := False;
   fPendingPreview := False;
+  fPendingPreviewBackground := False;
   fEventsWindow := events_window;
   fXClicked := -1;
   fYClicked := -1;
@@ -480,37 +506,42 @@ begin
   if fMainPickItem.texture.handle <> 0 then
   begin
     glDeleteTextures (1, @fMainPickItem.texture.handle);
+    glDeleteTextures (1, @fMainPickItem.texture.PickHandle);
     fMainPickItem.texture.handle := 0;
+    fMainPickItem.texture.PickHandle := 0;
   end;
+
+  if fBackGroundItem.texture.handle <> 0 then
+  begin
+    glDeleteTextures (1, @fBackGroundItem.texture.handle);
+    glDeleteTextures (1, @fBackGroundItem.texture.PickHandle);
+    fBackGroundItem.texture.handle := 0;
+    fBackGroundItem.texture.PickHandle := 0;
+  end;
+
   for i := 0 to Length(fItem) - 1 do
   begin
     if fItem[i].texture.handle <> 0 then
     begin
       glDeleteTextures (1, @fItem[i].texture.handle);
+      glDeleteTextures (1, @fItem[i].texture.PickHandle);
       fItem[i].texture.handle := 0;
+      fItem[i].texture.PickHandle := 0;
     end;
   end;
   fQueryDeleteTexture := -1;
-end;
-
-
-
-function Pow2 (x : Integer) : Integer;
-begin
-  Result := 1;
-  While Result < x do
-    Result := Result * 2;
-end;
-
-function Align4 (x : Integer) : Integer;
-begin
-  Result := (x + 3) div 4 * 4;
 end;
 
 procedure previewCallback (hwnd : HWND; uMsg : UINT; var fPendingPreview : Boolean; lResult : LRESULT); stdcall;
 begin
   fPendingPreview := False;
 end;
+
+procedure previewBackgroundCallback (hwnd : HWND; uMsg : UINT; var fPendingPreviewBackground : Boolean; lResult : LRESULT); stdcall;
+begin
+  fPendingPreviewBackground := False;
+end;
+
 
 procedure TRenderThread.Execute;
 var
@@ -521,7 +552,6 @@ var
   MoreNeeded: Boolean;
   NewSelectedItem: Cardinal;
   localDoRender: Boolean;
-
   RenderCount: Integer;
 begin
   // Iniciar OpenGL
@@ -529,6 +559,9 @@ begin
   localDoRender := True;
 
   glGenTextures (1, @fMainPickItem.texture.handle);
+  glGenTextures (1, @fMainPickItem.texture.PickHandle);
+  glGenTextures (1, @fBackGroundItem.texture.handle);
+  glGenTextures (1, @fBackGroundItem.texture.PickHandle);
 
   RenderCount := 0;
   // Cargar fuente de letras
@@ -576,6 +609,9 @@ begin
                 if fQueryUpdateTexturePick >= 0 then
                   PrepareMainCoverPickTexture;
 
+                if fQueryUpdateBackground >= 0 then
+                  PrepareBackgroundTexture;
+
                 // Petición de actualizar una textura
                 If fQueryUpdateTexture >= 0 Then
                 begin
@@ -604,7 +640,9 @@ begin
                     If texture_count > settings.MaxTextures Then
                     begin
                         glDeleteTextures (1, @fItem[oldest_index].texture.handle);
+                        glDeleteTextures (1, @fItem[oldest_index].texture.PickHandle);
                         fItem[oldest_index].texture.handle := 0;
+                        fItem[oldest_index].texture.PickHandle := 0;
                     end;
                 end;
 
@@ -622,7 +660,6 @@ begin
 
                     StepItemsNew(max(delta_t - 10, 1));
                     fTimer := GetTickCount - 10;
-
 
                     // Mostrar las imágenes
                     //glClear (GL_DEPTH_BUFFER_BIT);
@@ -650,11 +687,13 @@ begin
                             fCurrentItem := High(fItem);
                           if not Terminated then
                             PostMessage (fEventsWindow, WM_FC_SELECT, fCurrentItem, 0);
+
                         end;
                         fSelectedItem := -1;
                         UpdateItems;
                         fXClicked := -1;
                         fYClicked := -1;
+
                     end else
                     begin
                       if localDoRender then
@@ -704,8 +743,6 @@ begin
                     if (fSelectedItem <> fCurrentItem) or (MoreNeeded) then
                       ReleaseSemaphore(fSemaphore, 1, Nil);
                   end;
-
-
                 end;
 
                 fFrameDone := True;
@@ -715,6 +752,46 @@ begin
   wglMakeCurrent (0, 0);
   wglDeleteContext (glrc);
   ReleaseDC (fWindow, fDC);
+end;
+
+procedure TRenderThread.DrawTexturedBackground;
+var
+  PanelWidth, PanelHeight: Integer;
+  TextureID: Integer;
+begin
+  PanelWidth := fRC.Width;
+  PanelHeight := fRC.Height;
+  TextureID := fBackGroundItem.texture.handle;
+  if TextureID = 0 then begin
+    if terminated or fPendingPreviewBackground then
+      exit
+    else begin
+      fPendingPreviewBackground := True;
+      SendMessageCallback (fEventsWindow, WM_FC_NEEDPREVIEW, 0, FC_KIND_BACKGROUND, @previewBackgroundCallback, Cardinal(@fPendingPreviewBackground));
+    end;
+  end;
+  glDisable(GL_DEPTH_TEST);
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, TextureID);
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix;
+  glLoadIdentity;
+  glOrtho(0, PanelWidth, 0, PanelHeight, -1, 1);
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix;
+  glLoadIdentity;
+  glBegin(GL_QUADS);
+    glTexCoord2f(fBackGroundItem.texture.su, fBackGroundItem.texture.tv);     glVertex2f(0, PanelHeight);
+    glTexCoord2f(fBackGroundItem.texture.tu, fBackGroundItem.texture.tv);     glVertex2f(PanelWidth, PanelHeight);
+    glTexCoord2f(fBackGroundItem.texture.tu, fBackGroundItem.texture.sv);     glVertex2f(PanelWidth, 0);
+    glTexCoord2f(fBackGroundItem.texture.su, fBackGroundItem.texture.sv);     glVertex2f(0, 0);
+  glEnd;
+  glPopMatrix;
+  glMatrixMode(GL_PROJECTION);
+  glPopMatrix;
+  glMatrixMode(GL_MODELVIEW);
+  glDisable(GL_TEXTURE_2D);
+  glEnable(GL_DEPTH_TEST);
 end;
 
 procedure TRenderThread.DrawScene;
@@ -731,14 +808,13 @@ begin
     glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
     glEnable (GL_Blend);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     glEnable (GL_POLYGON_OFFSET_FILL);
     glPolygonOffset (1.0, 1.0);
+
     RenderPass (True, fRC, True);
+
     glDisable (GL_BLEND);
-
     glDisable (GL_POLYGON_OFFSET_FILL);
-
     // Antialiasing
     glEnable (GL_BLEND);
     glHint (GL_LINE_SMOOTH_HINT, GL_NICEST);
@@ -776,7 +852,6 @@ begin
   glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, @PixelData);
 
   PixelData := PixelData and  $00FFFFFF;
-
   if (PixelData < $00FFFFFF) and FirstItemIsCollage then
   begin
     if ((PixelData shr 23) and 1 ) = 1 then
@@ -947,6 +1022,9 @@ var
   end;
 
 begin
+
+  DrawTexturedBackground;
+
   glGetDoublev (GL_MODELVIEW_MATRIX, @modelMatrix);
   glGetDoublev (GL_PROJECTION_MATRIX, @projMatrix);
   glGetIntegerv (GL_VIEWPORT, @viewport);
@@ -967,7 +1045,7 @@ begin
     If (vx_index >= 0) And (Not fPendingPreview) Then
     begin
       fPendingPreview := True;
-      SendMessageCallback (fEventsWindow, WM_FC_NEEDPREVIEW, vx_index, 0, @previewCallback, Cardinal(@self.fPendingPreview));
+      SendMessageCallback (fEventsWindow, WM_FC_NEEDPREVIEW, vx_index, FC_KIND_COVER, @previewCallback, Cardinal(@self.fPendingPreview));
     end
     else
     begin
@@ -975,6 +1053,23 @@ begin
       PeekMessage (msg, 0, 0, 0, PM_REMOVE);
     end;
   end;
+end;
+
+
+procedure TRenderThread.CreateSolidColorTexture(ItemIndex: Integer);
+var
+  Pixel: array[0..2] of Byte;
+begin
+  Pixel[0] := ItemIndex and $000000FF;
+  Pixel[1] := (ItemIndex and $0000FF00) shr 8;
+  Pixel[2] := (ItemIndex and $00FF0000) shr 16;
+  if fItem[ItemIndex].texture.PickHandle = 0 then
+    glGenTextures(1, @fItem[ItemIndex].texture.PickHandle);
+  glBindTexture(GL_TEXTURE_2D, fItem[ItemIndex].texture.PickHandle);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  // create 1x1 Pixel Texture with RGB-Color
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, @Pixel);
 end;
 
 procedure TRenderThread.RenderClick(check_missings : Boolean; rc: TRect);
@@ -985,13 +1080,14 @@ var
   vx, vy, vz : GLDouble;
   w, h : Single;
   aRenderItem: TRenderItem;
-
 begin
   glGetDoublev (GL_MODELVIEW_MATRIX, @modelMatrix);
   glGetDoublev (GL_PROJECTION_MATRIX, @projMatrix);
   glGetIntegerv (GL_VIEWPORT, @viewport);
-
-  For i := 0 To High(fItem) do
+  glEnable(GL_Blend);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_TEXTURE_2D);
+  For i := High(fItem) downTo 0 do
   begin
     // Determinar si el item cae dentro de la pantalla
     If fItem[i].x > -2.0 Then
@@ -1008,30 +1104,17 @@ begin
         begin
           // the first cover art needs a texture, filled with the matching colors
           // of the displayed sub cover art on it.
-          glEnable(GL_Blend);
-          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
           aRenderItem := fMainPickItem;
-          glEnable(GL_TEXTURE_2D);
-          glBindTexture (GL_TEXTURE_2D, aRenderItem.texture.handle);
-
-          glColor3f(1,1,1);
+          glBindTexture (GL_TEXTURE_2D, aRenderItem.texture.Handle);
         end else
         begin
+          CreateSolidColorTexture(i);
           aRenderItem := fItem[i];
-          glDisable(GL_TEXTURE_2D);
-          glDisable(GL_Blend);
-
-          glColor3f(
-            (i and $000000FF) / 255,
-            ((i and $0000FF00) shr 8) / 255,
-            ((i and $00FF0000) shr 16) / 255 );
+          glBindTexture (GL_TEXTURE_2D, aRenderItem.texture.PickHandle);
         end;
-
         aRenderItem.texture.age := 0;
         w := aRenderItem.texture.w;
         h := aRenderItem.texture.h;
-
         if check_missings then
           glLoadName(i);
 
@@ -1104,57 +1187,37 @@ begin
     Sleep (1);
 end;
 
-procedure TRenderThread.PrepareCoverTexture;
-var
-  pw, ph : Integer;
-  px, py : Integer;
-  ps, pd : PByteArray;
-  temp : PByteArray;
-  diff: single;
+procedure TRenderThread.PrepareTexture(var aRenderItem: TRenderItem; aPixels : PByteArray; aWidth, aHeight : Integer; diff: Single);
 begin
-  If fItem[fQueryUpdateTexture].texture.handle = 0 Then
-      glGenTextures (1, @fItem[fQueryUpdateTexture].texture.handle);
-  glBindTexture (GL_TEXTURE_2D, fItem[fQueryUpdateTexture].texture.handle);
-  If fQueryUpdateTexture_width > fQueryUpdateTexture_height Then
-  begin
-      fItem[fQueryUpdateTexture].texture.w := 1.0;
-      fItem[fQueryUpdateTexture].texture.h := fQueryUpdateTexture_height / fQueryUpdateTexture_width;
-  end
-  else
-  begin
-      fItem[fQueryUpdateTexture].texture.w := fQueryUpdateTexture_width / fQueryUpdateTexture_height;
-      fItem[fQueryUpdateTexture].texture.h := 1.0;
+  if aRenderItem.texture.handle = 0 then begin
+    glGenTextures(1, @aRenderItem.texture.handle);
+    glGenTextures(1, @aRenderItem.texture.PickHandle);
   end;
-  diff := 0.005;
-  pw := Pow2(fQueryUpdateTexture_width);
-  ph := Pow2(fQueryUpdateTexture_height);
-  fItem[fQueryupdateTexture].texture.su :=  0.5/pw + diff;
-  fItem[fQueryupdateTexture].texture.sv := (1.0 - fQueryUpdateTexture_height/ph) + 0.5/ph + diff;
-  fItem[fQueryupdateTexture].texture.tu := fQueryUpdateTexture_width/pw - 0.5/pw - diff;
-  fItem[fQueryupdateTexture].texture.tv := 1.0 - 0.5/ph - diff;
-  fItem[fQueryupdateTexture].texture.age := 0;
-  GetMem (temp, pw*ph*4);
-  ps := @fQueryUpdateTexture_pixels[(fQueryUpdateTexture_height-1)*Align4(fQueryUpdateTexture_width*3)];
-  pd := @temp[pw*ph*4-pw*4];
-  FillChar (temp^, pw*ph*4, $FF);
-  For py := 0 To fQueryUpdateTexture_height-1 do
-  begin
-      For px := 0 To fQueryUpdateTexture_width-1 do
-      begin
-          pd[px*4+0] := ps[px*3+2];
-          pd[px*4+1] := ps[px*3+1];
-          pd[px*4+2] := ps[px*3+0];
-      end;
-      ps := @ps[-Align4(fQueryUpdateTexture_width*3)];
-      pd := @pd[-pw*4];
+  glBindTexture(GL_TEXTURE_2D, aRenderItem.texture.handle);
+  if aWidth > aHeight then begin
+      aRenderItem.texture.w := 1.0;
+      aRenderItem.texture.h := aHeight / aWidth;
+  end else begin
+      aRenderItem.texture.w := aWidth / aHeight;
+      aRenderItem.texture.h := 1.0;
   end;
-  glTexImage2D (GL_TEXTURE_2D, 0, 4, pw, ph, 0, GL_RGBA, GL_UNSIGNED_BYTE, temp);
-  FreeMem (temp);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  fQueryUpdateTexture := -1;
+  aRenderItem.texture.su := 0 + diff;
+  aRenderItem.texture.sv := 0 + diff;
+  aRenderItem.texture.tu := 1.0 - diff;
+  aRenderItem.texture.tv := 1.0 - diff;
+  aRenderItem.texture.age := 0;
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, aWidth, aHeight, 0, GL_BGR, GL_UNSIGNED_BYTE, aPixels);
 end;
 
+procedure TRenderThread.PrepareCoverTexture;
+begin
+  PrepareTexture(fItem[fQueryUpdateTexture], fQueryUpdateTexture_pixels, fQueryUpdateTexture_width, fQueryUpdateTexture_height, cTextureDiff);
+  fQueryUpdateTexture := -1;
+end;
 
 procedure TRenderThread.SetMainPickCoverPreview(aWidth, aHeight : Integer; pixels : PByteArray);
 var index: Integer;
@@ -1179,54 +1242,37 @@ begin
 end;
 
 procedure TRenderThread.PrepareMainCoverPickTexture;
-var
-  pw, ph : Integer;
-  px, py : Integer;
-  ps, pd : PByteArray;
-  temp : PByteArray;
 begin
-  glBindTexture (GL_TEXTURE_2D, fMainPickItem.texture.handle);
-  // prepare Pixeldata for TextureData
-  If fQueryUpdateTexturePick_Width > fQueryUpdateTexturePick_Height Then
-  begin
-      fMainPickItem.texture.w := 1.0;
-      fMainPickItem.texture.h := fQueryUpdateTexturePick_Height / fQueryUpdateTexturePick_Width;
-  end
-  else
-  begin
-      fMainPickItem.texture.w := fQueryUpdateTexturePick_Width / fQueryUpdateTexturePick_Height;
-      fMainPickItem.texture.h := 1.0;
-  end;
-
-  pw := Pow2(fQueryUpdateTexturePick_Width);
-  ph := Pow2(fQueryUpdateTexturePick_Height);
-  fMainPickItem.texture.su :=  0.5/pw ;
-  fMainPickItem.texture.sv := (1.0 - fQueryUpdateTexturePick_Height/ph) + 0.5/ph ;
-  fMainPickItem.texture.tu := fQueryUpdateTexturePick_Width/pw - 0.5/pw;
-  fMainPickItem.texture.tv := 1.0 - 0.5/ph ;
-  fMainPickItem.texture.age := 0;
-
-  GetMem (temp, pw*ph*4);
-  ps := @fQueryUpdateTexturePick_pixels[(fQueryUpdateTexturePick_Height-1)*Align4(fQueryUpdateTexturePick_Width*3)];
-  pd := @temp[pw*ph*4-pw*4];
-  FillChar (temp^, pw*ph*4, $FF);
-  For py := 0 To fQueryUpdateTexturePick_Height-1 do
-  begin
-      For px := 0 To fQueryUpdateTexturePick_Width-1 do
-      begin
-          pd[px*4+0] := ps[px*3+2];
-          pd[px*4+1] := ps[px*3+1];
-          pd[px*4+2] := ps[px*3+0];
-      end;
-      ps := @ps[-Align4(fQueryUpdateTexturePick_Width*3)];
-      pd := @pd[-pw*4];
-  end;
-  glTexImage2D (GL_TEXTURE_2D, 0, 4, pw, ph, 0, GL_RGBA, GL_UNSIGNED_BYTE, temp);
-  FreeMem (temp);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
+  PrepareTexture(fMainPickItem, fQueryUpdateTexturePick_pixels, fQueryUpdateTexturePick_Width, fQueryUpdateTexturePick_Height, cTextureDiff);
   fQueryUpdateTexturePick := -1;
+end;
+
+procedure TRenderThread.SetBackgroundPreview(aWidth, aHeight : Integer; pixels : PByteArray);
+var index: Integer;
+begin
+  ReleaseSemaphore(fSemaphore, 1, Nil);
+  index := 0;
+  While fQueryUpdateBackground <> index do
+   {$IF CompilerVersion > 15.0}
+    InterlockedCompareExchange (Longint(fQueryUpdateBackground), index, -1);
+   {$ELSE}
+    InterlockedCompareExchange (Pointer(fQueryUpdateBackground), Pointer(index), Pointer(-1));
+   {$IFEND}
+
+  fQueryUpdateBackground_Width := aWidth;
+  fQueryUpdateBackground_Height := aHeight;
+  fQueryUpdateBackground_Pixels := pixels;
+  fQueryUpdateBackground := index;
+
+  ReleaseSemaphore(fSemaphore, 1, Nil);
+  While fQueryUpdateBackground >= 0 do
+    Sleep (1);
+end;
+
+procedure TRenderThread.PrepareBackgroundTexture;
+begin
+  PrepareTexture(fBackGroundItem, fQueryUpdateBackground_Pixels, fQueryUpdateBackground_Width, fQueryUpdateBackground_Height, 0);
+  fQueryUpdateBackground := -1;
 end;
 
 function TRenderThread.GetFirstItemIsCollage: LongBool;
@@ -1238,7 +1284,6 @@ procedure TRenderThread.SetFirstItemIsCollage(Value: LongBool);
 begin
   InterLockedExchange(Integer(fFirstItemIsCollage), Integer(Value));
 end;
-
 
 // The number of items in the coverflow has been changed
 // reinit Textures, Positions etc. of the fItem-Array
@@ -1259,6 +1304,7 @@ begin
     fItem[i].r := fItem[i].nr;
     fItem[i].z := fItem[i].nz;
     fItem[i].texture.handle := 0;  // ?? ggf. doppelt gemacht
+    fItem[i].texture.PickHandle := 0;
   end;
   fSelectedItem := 0;
   // the following lines are needed for swapping Categories

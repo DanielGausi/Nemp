@@ -76,6 +76,8 @@ type
     procedure ContainerPanelAuswahlformMouseUp(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure FormHide(Sender: TObject);
+    procedure ContainerPanelAuswahlformPaintBackground(Sender: TNempPanel;
+      var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
 
   private
     { Private-Deklarationen }
@@ -152,8 +154,14 @@ end;
 
 procedure TAuswahlForm.ContainerPanelAuswahlformPaint(Sender: TObject);
 begin
-    Nemp_MainForm.NempSkin.DrawARegularPanel((Sender as TNempPanel),
-    Nemp_MainForm.NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
+//    Nemp_MainForm.NempSkin.DrawARegularPanel((Sender as TNempPanel),
+//    Nemp_MainForm.NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
+end;
+
+procedure TAuswahlForm.ContainerPanelAuswahlformPaintBackground(
+  Sender: TNempPanel; var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
+begin
+  Nemp_MainForm.NempSkin.OnPaintBackgroundRegularPanel(Sender, Bitmap, Offset, Tile);
 end;
 
 procedure TAuswahlForm.FormActivate(Sender: TObject);
@@ -200,7 +208,9 @@ begin
   SetRegion(ContainerPanelAuswahlForm, self, NempRegionsDistance, handle);
   If Nemp_MainForm.NempSkin.isActive then
   begin
-      Nemp_MainForm.NempSkin.SetArtistAlbumOffsets;
+      // Nemp_MainForm.NempSkin.SetArtistAlbumOffsets;
+      Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.ArtistsVST);
+      Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.AlbenVST);
       Repaint;
   end;
 end;
@@ -226,7 +236,8 @@ begin
     NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.Top;
     If Nemp_MainForm.NempSkin.isActive then
     begin
-        Nemp_MainForm.NempSkin.SetArtistAlbumOffsets;
+        Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.ArtistsVST);
+      Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.AlbenVST);
       //Repaint;
     end;
   end;
@@ -254,7 +265,8 @@ begin
     if (Nemp_MainForm.NempSkin.isActive) and (NOT Nemp_MainForm.NempSkin.FixedBackGround) then
     begin
         Nemp_MainForm.NempSkin.RepairSkinOffset;
-        Nemp_MainForm.NempSkin.SetArtistAlbumOffsets;
+        Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.ArtistsVST);
+        Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.AlbenVST);
         RepaintForm;
     end;
 end;
@@ -275,8 +287,10 @@ begin
 
       if MedienBib.BrowseMode = 2 then
       begin
-          Nemp_MainForm.PanelTagCloudBrowse.Repaint;
-          Nemp_MainForm.CloudViewer.PaintAgain;
+          //Nemp_MainForm.PanelTagCloudBrowse.Repaint;
+          //Nemp_MainForm.CloudViewer.PaintAgain;
+          Nemp_MainForm.PanelTagCloudBrowse.Invalidate;
+          Nemp_MainForm.CloudViewer.Invalidate;
           //  ShowTags(False);
       end;
 end;

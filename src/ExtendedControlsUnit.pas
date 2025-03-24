@@ -74,6 +74,8 @@ type
     procedure ContainerPanelExtendedControlsFormMouseDown(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure FormResize(Sender: TObject);
+    procedure ContainerPanelExtendedControlsFormPaintBackground(
+      Sender: TNempPanel; var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
   private
     { Private-Deklarationen }
 
@@ -134,8 +136,14 @@ end;
 procedure TExtendedControlForm.ContainerPanelExtendedControlsFormPaint(
   Sender: TObject);
 begin
-    Nemp_MainForm.NempSkin.DrawARegularPanel((Sender as TNempPanel),
-    Nemp_MainForm.NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
+  //  Nemp_MainForm.NempSkin.DrawARegularPanel((Sender as TNempPanel),
+  //  Nemp_MainForm.NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
+end;
+
+procedure TExtendedControlForm.ContainerPanelExtendedControlsFormPaintBackground(
+  Sender: TNempPanel; var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
+begin
+  Nemp_MainForm.NempSkin.OnPaintBackgroundRegularPanel(Sender, Bitmap, Offset, Tile);
 end;
 
 procedure TExtendedControlForm.FormActivate(Sender: TObject);
@@ -235,7 +243,7 @@ begin
 
     If Nemp_MainForm.NempSkin.isActive then
     begin
-        Nemp_MainForm.NempSkin.SetVSTOffsets;
+        Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.VST);
         //Repaint;
     end;
 end;

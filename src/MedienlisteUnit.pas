@@ -76,6 +76,8 @@ type
     procedure ContainerPanelMedienBibFormMouseUp(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure FormHide(Sender: TObject);
+    procedure ContainerPanelMedienBibFormPaintBackground(Sender: TNempPanel;
+      var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
   private
     { Private-Deklarationen }
 
@@ -152,8 +154,14 @@ end;
 
 procedure TMedienlisteForm.ContainerPanelMedienBibFormPaint(Sender: TObject);
 begin
-    Nemp_MainForm.NempSkin.DrawARegularPanel((Sender as TNempPanel),
-    Nemp_MainForm.NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
+//    Nemp_MainForm.NempSkin.DrawARegularPanel((Sender as TNempPanel),
+//    Nemp_MainForm.NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
+end;
+
+procedure TMedienlisteForm.ContainerPanelMedienBibFormPaintBackground(
+  Sender: TNempPanel; var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
+begin
+  Nemp_MainForm.NempSkin.OnPaintBackgroundRegularPanel(Sender, Bitmap, Offset, Tile);
 end;
 
 procedure TMedienlisteForm.FormActivate(Sender: TObject);
@@ -203,7 +211,7 @@ begin
   SetRegion(ContainerPanelMedienBibForm, self, NempRegionsDistance, handle);
   If Nemp_MainForm.NempSkin.isActive then
   begin
-      Nemp_MainForm.NempSkin.SetVSTOffsets;
+      Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.VST);
       //Repaint;
   end;
 end;
@@ -220,7 +228,7 @@ begin
 
     If Nemp_MainForm.NempSkin.isActive then
     begin
-      Nemp_MainForm.NempSkin.SetVSTOffsets;
+      Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.VST);
       //Repaint;
     end;
   end;
@@ -248,7 +256,7 @@ begin
     if (Nemp_MainForm.NempSkin.isActive) and (NOT Nemp_MainForm.NempSkin.FixedBackGround) then
     begin
         Nemp_MainForm.NempSkin.RepairSkinOffset;
-        Nemp_MainForm.NempSkin.SetVSTOffsets;
+        Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.VST);
         RepaintForm;
     end;
 

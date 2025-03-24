@@ -9,6 +9,7 @@ uses
 type
   PNempHintData = ^TNempHintData;
 
+  TNempShowSimpleHintEvent = procedure(Sender: TObject; var HintText: String; var OwnerDraw: Boolean) of object;
   TNempDrawHintEvent = procedure(Sender: TObject; HintCanvas: TCanvas; R: TRect; AData: PNempHintData) of object;
   TNempCalcHintEvent = procedure(var Rect: TRect; MaxWidth: Integer; const AHint: string; AData: PNempHintData) of object;
 
@@ -36,7 +37,17 @@ type
     function CalcHintRect(MaxWidth: Integer; const AHint: string; AData: Pointer): TRect; override;
   end;
 
+  function GetHintWindowClass(doOwnerDraw: Boolean): THintWindowClass;
+
 implementation
+
+function GetHintWindowClass(doOwnerDraw: Boolean): THintWindowClass;
+begin
+  if doOwnerDraw then
+    result := TNempHintWindow
+  else
+    result := THintWindow;
+end;
 
 { TNempHintWindow }
 

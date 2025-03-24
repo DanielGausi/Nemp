@@ -42,11 +42,11 @@ object Nemp_MainForm: TNemp_MainForm
     OnMouseMove = __MainContainerPanelMouseMove
     OnMouseUp = __MainContainerPanelMouseUp
     Ratio = 0
+    DrawMode = dm_Windows
+    DrawFrame = False
     OwnerDraw = False
     HierarchyLevel = 0
     SplitterMinSize = 110
-    ExplicitWidth = 1072
-    ExplicitHeight = 604
     object _ControlPanel: TNempPanel
       Left = 0
       Top = 505
@@ -62,9 +62,9 @@ object Nemp_MainForm: TNemp_MainForm
       OnResize = _ControlPanelResize
       Ratio = 0
       FixedHeight = True
+      DrawMode = dm_Windows
+      DrawFrame = False
       OwnerDraw = False
-      ExplicitTop = 504
-      ExplicitWidth = 1072
       object ControlContainer1: TNempPanel
         Left = 0
         Top = 0
@@ -78,8 +78,9 @@ object Nemp_MainForm: TNemp_MainForm
         OnMouseMove = PaintFrameMouseMove
         OnMouseUp = PaintFrameMouseUp
         Ratio = 0
+        DrawMode = dm_Windows
+        DrawFrame = False
         OwnerDraw = False
-        ExplicitWidth = 1072
         object PlayerControlCoverPanel: TNempPanel
           Tag = 2
           Left = 40
@@ -91,9 +92,11 @@ object Nemp_MainForm: TNemp_MainForm
           BevelOuter = bvLowered
           TabOrder = 1
           Ratio = 0
-          OnPaint = ControlPanelPaint
+          DrawMode = dm_Windows
+          DrawFrame = True
+          OnPaintBackground = ControlPanelPaintBackground
           OwnerDraw = False
-          object CoverImage: TImage
+          object CoverImage: TAudioCoverImage
             Left = 6
             Top = 6
             Width = 88
@@ -105,6 +108,9 @@ object Nemp_MainForm: TNemp_MainForm
             OnDblClick = CoverImageDblClick
             OnMouseDown = ImgDetailCoverMouseDown
             OnMouseMove = ImgDetailCoverMouseMove
+            OnShowHint = CoverImageShowHint
+            OnDrawHint = CoverImageDrawHint
+            OnGetHintSize = CoverImageGetHintSize
           end
         end
         object OutputControlPanel: TNempPanel
@@ -119,11 +125,13 @@ object Nemp_MainForm: TNemp_MainForm
           PopupMenu = PlayListPOPUP
           TabOrder = 0
           Ratio = 0
-          OnPaint = ControlPanelPaint
+          DrawMode = dm_Windows
+          DrawFrame = False
+          OnPaintBackground = ControlPanelPaintBackground
           OwnerDraw = False
           object TabBtn_MainPlayerControl: TSkinButton
             Tag = 4
-            Left = 8
+            Left = 10
             Top = 8
             Width = 24
             Height = 24
@@ -180,7 +188,9 @@ object Nemp_MainForm: TNemp_MainForm
           BevelOuter = bvLowered
           TabOrder = 2
           Ratio = 0
-          OnPaint = ControlPanelPaint
+          DrawMode = dm_Windows
+          DrawFrame = True
+          OnPaintBackground = ControlPanelPaintBackground
           OwnerDraw = False
           object VolumeImage: TImage
             Left = 6
@@ -500,7 +510,7 @@ object Nemp_MainForm: TNemp_MainForm
             RangeMaxNorm = 1.000000000000000000
             Orientation = trHorizontal
             ButtonMode = bmNested
-            Style = nsbStyleWindows
+            Style = dm_Windows
             TrackBarMargin = 4
             Position = 0
             DefaultPosition = 0
@@ -586,6 +596,8 @@ object Nemp_MainForm: TNemp_MainForm
           Align = alClient
           BevelInner = bvRaised
           BevelOuter = bvLowered
+          DoubleBuffered = False
+          ParentDoubleBuffered = False
           PopupMenu = Player_PopupMenu
           TabOrder = 3
           OnMouseDown = PaintFrameMouseDown
@@ -593,14 +605,15 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseUp = PaintFrameMouseUp
           OnResize = NewPlayerPanelResize
           Ratio = 0
-          OnPaint = ControlPanelPaint
+          DrawMode = dm_Windows
+          DrawFrame = True
+          OnPaintBackground = ControlPanelPaintBackground
           OwnerDraw = False
-          ExplicitWidth = 767
           DesignSize = (
             771
             100)
           object PlayerTimeLbl: TLabel
-            Left = 704
+            Left = 724
             Top = 74
             Width = 34
             Height = 13
@@ -610,7 +623,6 @@ object Nemp_MainForm: TNemp_MainForm
             Caption = '00:00'
             StyleElements = [seClient, seBorder]
             OnClick = BassTimeLBLClick
-            ExplicitLeft = 767
           end
           object PlayerTitleLabel: TLabel
             Left = 11
@@ -639,7 +651,7 @@ object Nemp_MainForm: TNemp_MainForm
             OnDblClick = PlayerArtistLabelDblClick
           end
           object NempSpectrum: TNempSpectrum
-            Left = 631
+            Left = 638
             Top = 22
             Width = 120
             Height = 41
@@ -652,12 +664,14 @@ object Nemp_MainForm: TNemp_MainForm
             ColorPeak = clBlack
             ColorBar1 = clBlack
             ColorBar2 = clBlack
+            OnShowHint = CoverImageShowHint
+            OnDrawHint = CoverImageDrawHint
+            OnGetHintSize = CoverImageGetHintSize
             OnDblClick = PaintFrameDblClick
             OnMouseDown = PaintFrameMouseDown
             OnMouseMove = PaintFrameMouseMove
             OnMouseUp = PaintFrameMouseUp
             Anchors = [akTop, akRight]
-            ExplicitLeft = 627
           end
           object SlideForwardBTN: TSkinButton
             Tag = 1
@@ -699,7 +713,7 @@ object Nemp_MainForm: TNemp_MainForm
             OnClick = RecordBtnIMGClick
           end
           object BtnClose: TSkinButton
-            Left = 729
+            Left = 736
             Top = 4
             Width = 12
             Height = 12
@@ -713,10 +727,9 @@ object Nemp_MainForm: TNemp_MainForm
             Visible = False
             StyleElements = [seFont, seBorder]
             OnClick = BtnCloseClick
-            ExplicitLeft = 725
           end
           object BtnMinimize: TSkinButton
-            Left = 714
+            Left = 721
             Top = 4
             Width = 12
             Height = 12
@@ -730,13 +743,12 @@ object Nemp_MainForm: TNemp_MainForm
             Visible = False
             StyleElements = [seFont, seBorder]
             OnClick = BtnMinimizeClick
-            ExplicitLeft = 710
           end
           object rbTrackProgress: TProgressRangeBar
             AlignWithMargins = True
             Left = 89
             Top = 68
-            Width = 593
+            Width = 632
             Height = 28
             Margins.Left = 0
             Margins.Top = 6
@@ -751,7 +763,7 @@ object Nemp_MainForm: TNemp_MainForm
             RangeMaxNorm = 1.000000000000000000
             Orientation = trHorizontal
             ButtonMode = bmCentered
-            Style = nsbStyleWindows
+            Style = dm_Windows
             TrackBarMargin = 8
             Position = 0
             DefaultPosition = 0
@@ -829,7 +841,7 @@ object Nemp_MainForm: TNemp_MainForm
             Anchors = [akLeft, akTop, akRight]
           end
           object BtnMainAudioFileRating: TRatingButton
-            Left = 6
+            Left = 11
             Top = 43
             Width = 80
             Height = 16
@@ -856,9 +868,15 @@ object Nemp_MainForm: TNemp_MainForm
       Width = 196
       Height = 158
       BevelOuter = bvNone
+      DoubleBuffered = True
+      ParentDoubleBuffered = False
       TabOrder = 1
       OnResize = PlaylistPanelResize
       Ratio = 0
+      DrawMode = dm_Windows
+      DrawFrame = False
+      BackgroundBasePanel = True
+      OnPaintBackground = PanelPaintBackground
       OwnerDraw = False
       object GRPBOXPlaylist: TNempPanel
         Tag = 1
@@ -872,7 +890,9 @@ object Nemp_MainForm: TNemp_MainForm
         PopupMenu = PlayListPOPUP
         TabOrder = 1
         Ratio = 0
-        OnPaint = NewPanelPaint
+        DrawMode = dm_Windows
+        DrawFrame = False
+        OnPaintBackground = PanelPaintBackground
         OwnerDraw = False
         object PlaylistVST: TVirtualStringTree
           Left = 2
@@ -895,7 +915,6 @@ object Nemp_MainForm: TNemp_MainForm
           Font.Style = []
           Header.AutoSizeIndex = 1
           Header.Background = clWindow
-          Header.Height = 17
           Header.MainColumn = 1
           Header.Options = [hoAutoResize, hoDrag, hoVisible]
           Header.PopupMenu = PlaylistVST_HeaderPopup
@@ -911,7 +930,7 @@ object Nemp_MainForm: TNemp_MainForm
           StyleElements = [seClient, seBorder]
           TabOrder = 0
           TextMargin = 0
-          TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking]
+          TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoChangeScale]
           TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
           TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toMultiSelect, toRightClickSelect]
           OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
@@ -972,9 +991,13 @@ object Nemp_MainForm: TNemp_MainForm
         Height = 28
         Align = alTop
         BevelOuter = bvNone
+        DoubleBuffered = True
+        ParentDoubleBuffered = False
         TabOrder = 0
         Ratio = 0
-        OnPaint = PanelPaint
+        DrawMode = dm_Windows
+        DrawFrame = False
+        OnPaintBackground = PanelPaintBackground
         OwnerDraw = False
         object PlaylistFillPanel: TNempPanel
           Tag = 1
@@ -995,14 +1018,16 @@ object Nemp_MainForm: TNemp_MainForm
           PopupMenu = PlayListPOPUP
           TabOrder = 0
           Ratio = 0
-          OnPaint = TABPanelPaint
+          DrawMode = dm_Windows
+          DrawFrame = True
+          OnPaintBackground = PanelPaintBackground
           OwnerDraw = False
           DesignSize = (
             69
             24)
           object PlayListStatusLBL: TLabel
-            Left = 10
-            Top = 5
+            Left = 6
+            Top = 7
             Width = 52
             Height = 13
             Anchors = [akLeft, akTop, akRight]
@@ -1010,7 +1035,6 @@ object Nemp_MainForm: TNemp_MainForm
             ShowAccelChar = False
             Transparent = True
             StyleElements = [seClient, seBorder]
-            ExplicitWidth = 426
           end
         end
         object PlaylistControlPanel: TNempPanel
@@ -1023,7 +1047,9 @@ object Nemp_MainForm: TNemp_MainForm
           BevelOuter = bvNone
           TabOrder = 1
           Ratio = 0
-          OnPaint = PanelPaint
+          DrawMode = dm_Windows
+          DrawFrame = False
+          OnPaintBackground = PanelPaintBackground
           OwnerDraw = False
           object TabBtn_Playlist: TSkinButton
             Left = 0
@@ -1072,24 +1098,35 @@ object Nemp_MainForm: TNemp_MainForm
       end
     end
     object MedienBibDetailPanel: TNempPanel
+      Tag = 4
       Left = 728
       Top = 210
       Width = 352
       Height = 231
       BevelOuter = bvNone
+      DoubleBuffered = True
+      ParentDoubleBuffered = False
       TabOrder = 2
       OnResize = MedienBibDetailPanelResize
       Ratio = 0
+      DrawMode = dm_Windows
+      DrawFrame = False
+      BackgroundBasePanel = True
       OwnerDraw = False
       object ContainerPanelMedienBibDetails: TNempPanel
+        Tag = 4
         Left = 0
         Top = 28
         Width = 352
         Height = 203
         Align = alClient
         BevelOuter = bvNone
+        DoubleBuffered = True
+        ParentDoubleBuffered = False
         TabOrder = 0
         Ratio = 0
+        DrawMode = dm_Windows
+        DrawFrame = False
         OwnerDraw = False
         object SplitterFileOverview: TSplitter
           Left = 129
@@ -1105,7 +1142,7 @@ object Nemp_MainForm: TNemp_MainForm
           ExplicitHeight = 377
         end
         object DetailCoverLyricsPanel: TNempPanel
-          Tag = 3
+          Tag = 4
           Left = 0
           Top = 0
           Width = 129
@@ -1117,7 +1154,9 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 0
           OnResize = DetailID3TagPanelResize
           Ratio = 0
-          OnPaint = NewPanelPaint
+          DrawMode = dm_Windows
+          DrawFrame = True
+          OnPaintBackground = PanelPaintBackground
           OwnerDraw = False
           DesignSize = (
             129
@@ -1155,7 +1194,7 @@ object Nemp_MainForm: TNemp_MainForm
           end
         end
         object DetailID3TagPanel: TNempPanel
-          Tag = 3
+          Tag = 4
           Left = 133
           Top = 0
           Width = 219
@@ -1163,11 +1202,15 @@ object Nemp_MainForm: TNemp_MainForm
           Align = alClient
           BevelInner = bvRaised
           BevelOuter = bvLowered
+          DoubleBuffered = False
+          ParentDoubleBuffered = False
           PopupMenu = PopupEditExtendedTags
           TabOrder = 1
           OnResize = DetailID3TagPanelResize
           Ratio = 0
-          OnPaint = NewPanelPaint
+          DrawMode = dm_Windows
+          DrawFrame = True
+          OnPaintBackground = PanelPaintBackground
           OwnerDraw = False
           DesignSize = (
             219
@@ -1340,7 +1383,7 @@ object Nemp_MainForm: TNemp_MainForm
         end
       end
       object MedienBibDetailHeaderPanel: TNempPanel
-        Tag = 3
+        Tag = 4
         Left = 0
         Top = 0
         Width = 352
@@ -1351,10 +1394,12 @@ object Nemp_MainForm: TNemp_MainForm
         ParentDoubleBuffered = False
         TabOrder = 1
         Ratio = 0
-        OnPaint = PanelPaint
+        DrawMode = dm_Windows
+        DrawFrame = False
+        OnPaintBackground = PanelPaintBackground
         OwnerDraw = False
         object MedienBibDetailFillPanel: TNempPanel
-          Tag = 3
+          Tag = 4
           AlignWithMargins = True
           Left = 56
           Top = 2
@@ -1371,7 +1416,9 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 0
           StyleElements = [seClient, seBorder]
           Ratio = 0
-          OnPaint = TABPanelPaint
+          DrawMode = dm_Windows
+          DrawFrame = True
+          OnPaintBackground = PanelPaintBackground
           OwnerDraw = False
           DesignSize = (
             296
@@ -1389,7 +1436,7 @@ object Nemp_MainForm: TNemp_MainForm
           end
         end
         object MedienBibDetailControlPanel: TNempPanel
-          Tag = 3
+          Tag = 4
           Left = 0
           Top = 0
           Width = 56
@@ -1398,7 +1445,9 @@ object Nemp_MainForm: TNemp_MainForm
           BevelOuter = bvNone
           TabOrder = 1
           Ratio = 0
-          OnPaint = PanelPaint
+          DrawMode = dm_Windows
+          DrawFrame = False
+          OnPaintBackground = PanelPaintBackground
           OwnerDraw = False
           object TabBtn_Cover: TSkinButton
             Left = 2
@@ -1434,14 +1483,20 @@ object Nemp_MainForm: TNemp_MainForm
       end
     end
     object MedialistPanel: TNempPanel
+      Tag = 3
       Left = 8
       Top = 263
       Width = 553
       Height = 145
       BevelOuter = bvNone
+      DoubleBuffered = True
+      ParentDoubleBuffered = False
       TabOrder = 3
       OnResize = MedialistPanelResize
       Ratio = 0
+      DrawMode = dm_Windows
+      DrawFrame = False
+      BackgroundBasePanel = True
       OwnerDraw = False
       object MedienBibHeaderPanel: TNempPanel
         Tag = 3
@@ -1455,7 +1510,9 @@ object Nemp_MainForm: TNemp_MainForm
         ParentDoubleBuffered = False
         TabOrder = 0
         Ratio = 0
-        OnPaint = PanelPaint
+        DrawMode = dm_Windows
+        DrawFrame = False
+        OnPaintBackground = PanelPaintBackground
         OwnerDraw = False
         object MedienlisteFillPanel: TNempPanel
           Tag = 3
@@ -1474,7 +1531,9 @@ object Nemp_MainForm: TNemp_MainForm
           PopupMenu = Medialist_View_PopupMenu
           TabOrder = 1
           Ratio = 0
-          OnPaint = TABPanelPaint
+          DrawMode = dm_Windows
+          DrawFrame = True
+          OnPaintBackground = PanelPaintBackground
           OwnerDraw = False
           DesignSize = (
             317
@@ -1502,7 +1561,9 @@ object Nemp_MainForm: TNemp_MainForm
           BevelOuter = bvNone
           TabOrder = 0
           Ratio = 0
-          OnPaint = PanelPaint
+          DrawMode = dm_Windows
+          DrawFrame = False
+          OnPaintBackground = PanelPaintBackground
           OwnerDraw = False
           object EDITFastSearch: TEdit
             Left = 58
@@ -1567,7 +1628,9 @@ object Nemp_MainForm: TNemp_MainForm
         PopupMenu = Medialist_View_PopupMenu
         TabOrder = 1
         Ratio = 0
-        OnPaint = NewPanelPaint
+        DrawMode = dm_Windows
+        DrawFrame = False
+        OnPaintBackground = PanelPaintBackground
         OwnerDraw = False
         object VST: TVirtualStringTree
           Left = 2
@@ -1593,6 +1656,7 @@ object Nemp_MainForm: TNemp_MainForm
           Font.Style = []
           Header.AutoSizeIndex = -1
           Header.Background = clWindow
+          Header.Height = 21
           Header.Options = [hoColumnResize, hoDblClickResize, hoDrag, hoRestrictDrag, hoShowSortGlyphs, hoVisible]
           Header.SortColumn = 0
           HintMode = hmHint
@@ -1605,7 +1669,7 @@ object Nemp_MainForm: TNemp_MainForm
           ShowHint = True
           StyleElements = [seClient, seBorder]
           TabOrder = 0
-          TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSpanColumns, toAutoTristateTracking]
+          TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSpanColumns, toAutoTristateTracking, toAutoChangeScale]
           TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick]
           TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
           TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toMultiSelect, toRightClickSelect]
@@ -1787,7 +1851,10 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 4
       OnMouseDown = TreePanelMouseDown
       Ratio = 0
-      OnPaint = NewPanelPaint
+      DrawMode = dm_Windows
+      DrawFrame = False
+      BackgroundBasePanel = True
+      OnPaintBackground = PanelPaintBackground
       OwnerDraw = False
       object AuswahlHeaderPanel0: TNempPanel
         Tag = 2
@@ -1797,10 +1864,14 @@ object Nemp_MainForm: TNemp_MainForm
         Height = 28
         Align = alTop
         BevelOuter = bvNone
+        DoubleBuffered = True
         ParentBackground = False
+        ParentDoubleBuffered = False
         TabOrder = 0
         Ratio = 0
-        OnPaint = PanelPaint
+        DrawMode = dm_Windows
+        DrawFrame = False
+        OnPaintBackground = PanelPaintBackground
         OwnerDraw = False
         object AuswahlFillPanel0: TNempPanel
           Tag = 2
@@ -1816,12 +1887,16 @@ object Nemp_MainForm: TNemp_MainForm
           Align = alClient
           BevelInner = bvRaised
           BevelOuter = bvLowered
+          DoubleBuffered = True
           Padding.Top = 2
           Padding.Bottom = 2
+          ParentDoubleBuffered = False
           PopupMenu = Medialist_Collection_PopupMenu
           TabOrder = 0
           Ratio = 0
-          OnPaint = TABPanelPaint
+          DrawMode = dm_Windows
+          DrawFrame = True
+          OnPaintBackground = PanelPaintBackground
           OwnerDraw = False
           DesignSize = (
             79
@@ -1855,7 +1930,9 @@ object Nemp_MainForm: TNemp_MainForm
           BevelOuter = bvNone
           TabOrder = 1
           Ratio = 0
-          OnPaint = PanelPaint
+          DrawMode = dm_Windows
+          DrawFrame = False
+          OnPaintBackground = PanelPaintBackground
           OwnerDraw = False
           object TabBtn_Browse0: TSkinButton
             Left = 30
@@ -1929,7 +2006,9 @@ object Nemp_MainForm: TNemp_MainForm
         BevelOuter = bvLowered
         TabOrder = 1
         Ratio = 0
-        OnPaint = NewPanelPaint
+        DrawMode = dm_Windows
+        DrawFrame = False
+        OnPaintBackground = PanelPaintBackground
         OwnerDraw = False
         object SplitterBrowse: TSplitter
           Left = 2
@@ -2081,6 +2160,10 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 5
       OnMouseDown = TreePanelMouseDown
       Ratio = 0
+      DrawMode = dm_Windows
+      DrawFrame = False
+      BackgroundBasePanel = True
+      OnPaintBackground = PanelPaintBackground
       OwnerDraw = False
       object AuswahlHeaderPanel1: TNempPanel
         Tag = 2
@@ -2090,10 +2173,14 @@ object Nemp_MainForm: TNemp_MainForm
         Height = 28
         Align = alTop
         BevelOuter = bvNone
+        DoubleBuffered = True
         ParentBackground = False
+        ParentDoubleBuffered = False
         TabOrder = 0
         Ratio = 0
-        OnPaint = PanelPaint
+        DrawMode = dm_Windows
+        DrawFrame = False
+        OnPaintBackground = PanelPaintBackground
         OwnerDraw = False
         object AuswahlFillPanel1: TNempPanel
           Tag = 2
@@ -2109,12 +2196,16 @@ object Nemp_MainForm: TNemp_MainForm
           Align = alClient
           BevelInner = bvRaised
           BevelOuter = bvLowered
+          DoubleBuffered = True
           Padding.Top = 2
           Padding.Bottom = 2
+          ParentDoubleBuffered = False
           PopupMenu = Medialist_Collection_PopupMenu
           TabOrder = 0
           Ratio = 0
-          OnPaint = TABPanelPaint
+          DrawMode = dm_Windows
+          DrawFrame = True
+          OnPaintBackground = PanelPaintBackground
           OwnerDraw = False
           DesignSize = (
             68
@@ -2148,7 +2239,9 @@ object Nemp_MainForm: TNemp_MainForm
           BevelOuter = bvNone
           TabOrder = 1
           Ratio = 0
-          OnPaint = PanelPaint
+          DrawMode = dm_Windows
+          DrawFrame = False
+          OnPaintBackground = PanelPaintBackground
           OwnerDraw = False
           object TabBtn_Browse1: TSkinButton
             Left = 30
@@ -2220,6 +2313,8 @@ object Nemp_MainForm: TNemp_MainForm
         Align = alClient
         BevelInner = bvRaised
         BevelOuter = bvLowered
+        DoubleBuffered = True
+        ParentDoubleBuffered = False
         PopupMenu = Medialist_Collection_PopupMenu
         TabOrder = 1
         OnDblClick = PanelCoverBrowseDblClick
@@ -2228,7 +2323,10 @@ object Nemp_MainForm: TNemp_MainForm
         OnMouseUp = IMGMedienBibCoverMouseUp
         OnResize = PanelCoverBrowseResize
         Ratio = 0
-        OnPaint = PanelCoverBrowsePaint
+        DrawMode = dm_Windows
+        DrawFrame = False
+        TileBackgroundBitmap = False
+        OnPaintBackground = LibraryPanelPaintBackground
         OnAfterPaint = PanelCoverBrowseAfterPaint
         OwnerDraw = False
         OnMouseWheelUp = PanelCoverBrowseMouseWheelUp
@@ -2263,11 +2361,16 @@ object Nemp_MainForm: TNemp_MainForm
           ExplicitWidth = 297
         end
         object CoverScrollbar: TScrollBar
-          Left = 8
-          Top = 170
-          Width = 181
+          AlignWithMargins = True
+          Left = 18
+          Top = 166
+          Width = 153
           Height = 17
-          Anchors = [akLeft, akRight, akBottom]
+          Margins.Left = 16
+          Margins.Top = 4
+          Margins.Right = 16
+          Margins.Bottom = 4
+          Align = alBottom
           LargeChange = 3
           Max = 3
           PageSize = 3
@@ -2278,32 +2381,39 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object Pnl_CoverFlowLabel: TNempPanel
           Tag = 2
-          Left = 30
-          Top = 131
-          Width = 122
+          AlignWithMargins = True
+          Left = 18
+          Top = 129
+          Width = 153
           Height = 33
-          Anchors = [akLeft, akRight, akBottom]
+          Margins.Left = 16
+          Margins.Right = 16
+          Margins.Bottom = 0
+          Align = alBottom
           BevelOuter = bvNone
           Caption = 'Pnl_CoverFlowLabel'
+          DoubleBuffered = True
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindow
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
+          ParentDoubleBuffered = False
           ParentFont = False
           ShowCaption = False
           TabOrder = 1
           OnMouseDown = Lbl_CoverFlowMouseDown
           Ratio = 0
-          OnPaint = Pnl_CoverFlowLabelPaint
+          DrawMode = dm_Windows
+          DrawFrame = True
           OwnerDraw = False
           DesignSize = (
-            122
+            153
             33)
           object Lbl_CoverFlow: TLabel
             Left = 38
             Top = 10
-            Width = 84
+            Width = 115
             Height = 13
             Alignment = taCenter
             Anchors = [akLeft, akTop, akRight]
@@ -2343,6 +2453,9 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 6
       OnMouseDown = TreePanelMouseDown
       Ratio = 0
+      DrawMode = dm_Windows
+      DrawFrame = False
+      BackgroundBasePanel = True
       OwnerDraw = False
       object AuswahlHeaderPanel2: TNempPanel
         Tag = 2
@@ -2352,10 +2465,14 @@ object Nemp_MainForm: TNemp_MainForm
         Height = 28
         Align = alTop
         BevelOuter = bvNone
+        DoubleBuffered = True
         ParentBackground = False
+        ParentDoubleBuffered = False
         TabOrder = 0
         Ratio = 0
-        OnPaint = PanelPaint
+        DrawMode = dm_Windows
+        DrawFrame = False
+        OnPaintBackground = PanelPaintBackground
         OwnerDraw = False
         object AuswahlFillPanel2: TNempPanel
           Tag = 2
@@ -2376,7 +2493,9 @@ object Nemp_MainForm: TNemp_MainForm
           PopupMenu = Medialist_Collection_PopupMenu
           TabOrder = 0
           Ratio = 0
-          OnPaint = TABPanelPaint
+          DrawMode = dm_Windows
+          DrawFrame = True
+          OnPaintBackground = PanelPaintBackground
           OwnerDraw = False
           DesignSize = (
             49
@@ -2410,7 +2529,9 @@ object Nemp_MainForm: TNemp_MainForm
           BevelOuter = bvNone
           TabOrder = 1
           Ratio = 0
-          OnPaint = PanelPaint
+          DrawMode = dm_Windows
+          DrawFrame = False
+          OnPaintBackground = PanelPaintBackground
           OwnerDraw = False
           object edtCloudSearch: TEdit
             Left = 116
@@ -2493,12 +2614,17 @@ object Nemp_MainForm: TNemp_MainForm
         Align = alClient
         BevelInner = bvRaised
         BevelOuter = bvLowered
+        DoubleBuffered = True
+        ParentDoubleBuffered = False
         TabOrder = 1
         OnClick = PanelTagCloudBrowseClick
         OnMouseDown = PanelTagCloudBrowseMouseDown
         OnResize = PanelTagCloudBrowseResize
         Ratio = 0
-        OnPaint = NewPanelPaint
+        DrawMode = dm_Windows
+        DrawFrame = False
+        OnPaintBackground = PanelPaintBackground
+        OnAfterPaint = PanelTagCloudBrowseAfterPaint
         OwnerDraw = False
         object TabBtnTagCloudCategory: TSkinButton
           Tag = 1
@@ -2525,10 +2651,15 @@ object Nemp_MainForm: TNemp_MainForm
       Width = 185
       Height = 171
       BevelOuter = bvNone
+      DoubleBuffered = True
+      ParentDoubleBuffered = False
       TabOrder = 7
       OnResize = EmptyLibraryPanelResize
       Ratio = 0
-      OnPaint = EmptyLibraryPanelPaint
+      DrawMode = dm_Windows
+      DrawFrame = False
+      TileBackgroundBitmap = False
+      OnPaintBackground = LibraryPanelPaintBackground
       OwnerDraw = False
       object LblEmptyLibraryHint: TLabel
         Left = 24

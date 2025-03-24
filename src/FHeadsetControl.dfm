@@ -2,7 +2,7 @@ object FormHeadsetControl: TFormHeadsetControl
   Left = 0
   Top = 0
   Caption = 'Nemp: Headset control'
-  ClientHeight = 149
+  ClientHeight = 150
   ClientWidth = 418
   Color = clBtnFace
   Constraints.MaxHeight = 188
@@ -21,12 +21,13 @@ object FormHeadsetControl: TFormHeadsetControl
   TextHeight = 15
   object pnlBars: TPanel
     Left = 0
-    Top = 117
+    Top = 118
     Width = 418
     Height = 32
     Align = alBottom
     TabOrder = 0
-    ExplicitWidth = 434
+    ExplicitTop = 117
+    ExplicitWidth = 414
     object HeadsetTimeLbl: TLabel
       AlignWithMargins = True
       Left = 9
@@ -49,7 +50,7 @@ object FormHeadsetControl: TFormHeadsetControl
       AlignWithMargins = True
       Left = 43
       Top = 7
-      Width = 265
+      Width = 245
       Height = 18
       Margins.Left = 0
       Margins.Top = 6
@@ -63,7 +64,7 @@ object FormHeadsetControl: TFormHeadsetControl
       RangeMaxNorm = 1.000000000000000000
       Orientation = trHorizontal
       ButtonMode = bmCentered
-      Style = nsbStyleWindows
+      Style = dm_Windows
       TrackBarMargin = 8
       Position = 0
       DefaultPosition = 0
@@ -139,11 +140,11 @@ object FormHeadsetControl: TFormHeadsetControl
       RangeBar.VisibleMode = vAlways
       RangeBar.Thickness = 4
       Align = alClient
-      ExplicitWidth = 261
+      ExplicitWidth = 241
     end
     object BtnMute: TSkinButton
       AlignWithMargins = True
-      Left = 312
+      Left = 292
       Top = 4
       Width = 24
       Height = 24
@@ -153,11 +154,11 @@ object FormHeadsetControl: TFormHeadsetControl
       DrawMode = dm_Windows
       TabOrder = 1
       Caption = 'SkinButton1'
-      ExplicitLeft = 308
+      ExplicitLeft = 288
     end
     object rbVolume: TProgressRangeBar
       AlignWithMargins = True
-      Left = 336
+      Left = 316
       Top = 7
       Width = 89
       Height = 18
@@ -171,7 +172,7 @@ object FormHeadsetControl: TFormHeadsetControl
       RangeMaxNorm = 1.000000000000000000
       Orientation = trHorizontal
       ButtonMode = bmNested
-      Style = nsbStyleWindows
+      Style = dm_Windows
       TrackBarMargin = 4
       Position = 0
       DefaultPosition = 0
@@ -247,7 +248,7 @@ object FormHeadsetControl: TFormHeadsetControl
       RangeBar.VisibleMode = vAlways
       RangeBar.Thickness = 4
       Align = alRight
-      ExplicitLeft = 332
+      ExplicitLeft = 312
     end
   end
   object pnlContainer: TPanel
@@ -255,14 +256,15 @@ object FormHeadsetControl: TFormHeadsetControl
     Left = 0
     Top = 0
     Width = 418
-    Height = 117
+    Height = 118
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
     Margins.Bottom = 0
     Align = alClient
     TabOrder = 1
-    ExplicitWidth = 434
+    ExplicitWidth = 414
+    ExplicitHeight = 117
     object imgCover: TImage
       AlignWithMargins = True
       Left = 9
@@ -282,13 +284,13 @@ object FormHeadsetControl: TFormHeadsetControl
     object pnlInfo: TPanel
       Left = 117
       Top = 1
-      Width = 320
+      Width = 300
       Height = 116
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 0
       OnMouseDown = pnlInfoMouseDown
-      ExplicitWidth = 316
+      ExplicitWidth = 296
       ExplicitHeight = 115
       object PlayerTitleLabel: TLabel
         Left = 8

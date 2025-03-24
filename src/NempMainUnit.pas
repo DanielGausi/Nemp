@@ -41,7 +41,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, NempAudioFiles, AudioFileHelper, ComCtrls, Grids, Contnrs, ShellApi,
   Menus, ImgList, ExtCtrls, StrUtils, Inifiles, CheckLst, //madexcept,
-  Buttons,  VirtualTrees, VSTEditControls,
+  Buttons,  VirtualTrees, VSTEditControls, uNempHintWindow,
   jpeg, activeX, DateUtils, cddaUtils, MyDialogs,
   Hilfsfunktionen, Systemhelper, CoverHelper, TreeHelper, NempDragFiles,
   ComObj, ShlObj, clipbrd, Spin,  U_CharCode,
@@ -476,7 +476,7 @@ type
     __MainContainerPanel: TNempContainerPanel;
     ControlContainer1: TNempPanel;
     PlayerControlCoverPanel: TNempPanel;
-    CoverImage: TImage;
+    CoverImage: TAudioCoverImage;
     OutputControlPanel: TNempPanel;
     TabBtn_MainPlayerControl: TSkinButton;
     TabBtn_Equalizer: TSkinButton;
@@ -955,12 +955,10 @@ type
     procedure RepairZOrder;
 
     procedure PM_ML_FilesPlayNowClick(Sender: TObject);
-    procedure PanelPaint(Sender: TObject);
     Procedure RepaintPanels;
     Procedure RepaintPlayerPanel;
     Procedure RepaintOtherForms;
     procedure RepaintAll;
-    procedure TABPanelPaint(Sender: TObject);
 
     procedure ShowDetailForm(aAudioFile: TAudioFile; DoShow: Boolean);
     procedure TNAMenuPopup(Sender: TObject);
@@ -1038,7 +1036,6 @@ type
       Node: PVirtualNode; const SearchText: string; var Result: Integer);
     procedure VSTIncrementalSearch(Sender: TBaseVirtualTree; Node: PVirtualNode;
       const SearchText: string; var Result: Integer);
-    procedure NewPanelPaint(Sender: TObject);
     procedure MM_ML_SearchClick(Sender: TObject);
     procedure VSTEditing(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; var Allowed: Boolean);
@@ -1051,7 +1048,6 @@ type
     procedure VSTEditCancelled(Sender: TBaseVirtualTree; Column: TColumnIndex);
     procedure PanelCoverBrowseMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure PanelCoverBrowsePaint(Sender: TObject);
     procedure PM_P_PartyModeClick(Sender: TObject);
     procedure PanelCoverBrowseAfterPaint(Sender: TObject);
     procedure VSTHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
@@ -1075,12 +1071,8 @@ type
     // procedure DoResetCloud(ac: TAudioFileCollection);
     procedure PanelTagCloudBrowseDblClick(Sender: TObject);
     procedure CloudTestKey(Sender: TObject; var Key: Char);
-
     procedure CloudTestKeyDown(Sender: TObject; var Key: Word;
     Shift: TShiftState);
-
-    procedure CloudPaint(Sender: TObject);
-    procedure CloudAfterPaint(Sender: TObject);
     procedure OnGetCloudHint(Sender: TCloudView; ac: TAudioFileCollection; var HintText: String);
 
     procedure PanelTagCloudBrowseMouseDown(Sender: TObject;
@@ -1182,9 +1174,7 @@ type
       var Accept: Boolean);
     procedure AfterLayoutBuild(Sender: TObject);
     // procedure __MainContainerPanelResize(Sender: TObject);
-    procedure Pnl_CoverFlowLabelPaint(Sender: TObject);
-    procedure ControlPanelPaint(Sender: TObject);
-    procedure EmptyLibraryPanelPaint(Sender: TObject);
+    // procedure EmptyLibraryPanelPaint(Sender: TObject);
     procedure _ControlPanelMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
     procedure _ControlPanelResize(Sender: TObject);
@@ -1278,7 +1268,7 @@ type
     procedure TreesGetUserClipboardFormats(Sender: TBaseVirtualTree;
       var Formats: TFormatEtcArray);
     procedure TreesRenderOLEData(Sender: TBaseVirtualTree;
-      const FormatEtcIn: tagFORMATETC; out Medium: tagSTGMEDIUM;
+      const FormatEtcIn: tFORMATETC; out Medium: tSTGMEDIUM;
       ForClipboard: Boolean; var Result: HRESULT);
     procedure LibraryVSTEndDrag(Sender, Target: TObject; X, Y: Integer);
     procedure VSTDragAllowed(Sender: TBaseVirtualTree; Node: PVirtualNode;
@@ -1361,6 +1351,19 @@ type
       aRating: Integer);
     procedure BtnBibRatingRatingChanged(Sender: TRatingButton;
       aRating: Integer);
+    procedure PanelTagCloudBrowseAfterPaint(Sender: TObject);
+    procedure PanelPaintBackground(Sender: TNempPanel;
+      var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
+    procedure ControlPanelPaintBackground(Sender: TNempPanel;
+      var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
+    procedure LibraryPanelPaintBackground(Sender: TNempPanel;
+      var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
+    procedure CoverImageShowHint(Sender: TObject; var HintText: string;
+      var OwnerDraw: Boolean);
+    procedure CoverImageGetHintSize(var Rect: TRect; MaxWidth: Integer;
+      const AHint: string; AData: PNempHintData);
+    procedure CoverImageDrawHint(Sender: TObject; HintCanvas: TCanvas; R: TRect;
+      AData: PNempHintData);
 
   private
     { Private declarations }
@@ -1419,13 +1422,9 @@ type
 
     procedure HandleLibraryDragOver(lc: TLibraryCategory; DataObject: IDataObject; Shift: TShiftState; State: TDragState;
         detailedInternalDrop: Boolean; var Effect: Integer; var Accept: Boolean; var HintStr: String);
-
     procedure SearchDirectoryForNewFiles(TargetCategory: TLibraryCategory);
-
     procedure CDDBConsistencyCheck(af: TAudioFile);
-
     procedure ChangeAndSyncRating(aAudioFile: TAudioFile; newRating: Integer);
-
     procedure RefreshTimeLabel(aProgress: Double; aSeconds: Integer);
 
     // for the TAudioFileManager
@@ -1531,6 +1530,7 @@ type
     procedure ReAlignControlCover;
     procedure RefreshActionLayoutCheckedStatus;
     procedure RefreshCategorySelectionVisibility;
+    procedure RefreshCoverflowBackground;
   protected
     procedure MediaKey (Var aMSG: tMessage); message WM_APPCOMMAND;
 
@@ -1706,6 +1706,11 @@ begin
 end;
 
 
+procedure TNemp_MainForm.PanelTagCloudBrowseAfterPaint(Sender: TObject);
+begin
+//   CloudViewer.PaintAgain;
+end;
+
 procedure TNemp_MainForm.PanelTagCloudBrowseClick(Sender: TObject);
 var
   ac: TAudioFileCollection;
@@ -1811,17 +1816,6 @@ begin
           MedienBib.GenerateAnzeigeListe(ac);
       end;
     end;
-end;
-
-procedure TNemp_MainForm.CloudAfterPaint(Sender: TObject);
-begin
-    if Not NempSkin.isActive then
-        CloudViewer.PaintAgain;
-end;
-
-procedure TNemp_MainForm.CloudPaint(Sender: TObject);
-begin
-  CloudViewer.PaintAgain;
 end;
 
 procedure TNemp_MainForm.OnGetCloudHint(Sender: TCloudView; ac: TAudioFileCollection; var HintText: String);
@@ -2037,6 +2031,9 @@ begin
     CloudViewer           := TCloudView.Create(self);
     CloudViewer.Parent    := PanelTagCloudBrowse;
     CloudViewer.Name      := 'CloudViewer';
+    CloudViewer.DoubleBuffered := True;
+    CloudViewer.Caption   := '';
+    CloudViewer.Tag       := 2;
     CloudViewer.Align     := alClient;
     CloudViewer.TabStop   := True;
     CloudViewer.PopupMenu := Medialist_Collection_PopupMenu;
@@ -2048,8 +2045,7 @@ begin
     CloudViewer.OnMouseDown  := PanelTagCloudBrowseMouseDown;
     CloudViewer.OnMouseUp    := PanelTagCloudBrowseMouseUp;
     CloudViewer.OnResize     := PanelTagCloudBrowseResize;
-    CloudViewer.OnPaint      := CloudPaint;
-    CloudViewer.OnAfterPaint := CloudAfterPaint;
+    CloudViewer.OnPaintBackground := PanelPaintBackground;
     CloudViewer.OnGetHint := OnGetCloudHint;
     CloudViewer.StyleElements := [];
 
@@ -2130,7 +2126,7 @@ begin
     MedienBib.NewCoverFlow.DownloadThread := CoverDownloadThread;
 
     // Create Skin-System
-    NempSkin := TNempSkin.create;
+    NempSkin := TNempSkin.create(self);
     PlayListSkinImageList := TImageList.Create(Nemp_MainForm);
     PlayListSkinImageList.Height := 14;
     PlayListSkinImageList.Width := 14;
@@ -2516,6 +2512,7 @@ begin
           qtCoverFlow: begin
             if DownloadItemStillMatchesCoverFlow then
             begin
+                Bitmap.PixelFormat := pf24bit;
                 Medienbib.NewCoverFlow.SetPreview (DownloadItem.Index, Bitmap.Width, Bitmap.Height, Bitmap.Scanline[Bitmap.Height-1]);
                 MedienBib.NewCoverFlow.Paint(1);
             end;
@@ -2608,58 +2605,87 @@ begin
   if MedienBib.BrowseMode <> 1 then exit;
   if (not NempLayout.ShowBibSelection) then exit;
 
-  pic := TPicture.Create;
-  bmp := TBitmap.Create;
-  try
-      bmp.PixelFormat := pf24bit;
-
-      if MedienBib.NewCoverFlow.CoverCount > msg.index then
-      begin
-          aCollection := MedienBib.NewCoverFlow.Collection[msg.Index];
-
-          case MedienBib.NewCoverFlow.Mode of
-              cm_Classic: success := False; // we already failed during the painting process
-              cm_OpenGL : begin
-                  // if (aCover.ID = 'all') or (aCover.ID = 'searchresult') then
-                  if aCollection is TRootCollection then
-                    NeedPreviewMainPicker(TRootCollection(aCollection));
-                  success := MedienBib.CoverArtSearcher.GetCoverBitmapFromCollection(aCollection, pic);
-              end
-          else
-              success := True; // we are not in CoverflowMode at all, should not happen
-          end;
-
-          if (not success) and PreviewGraphicShouldExist(aCollection.CoverID) then
+  case msg.Kind of
+    FC_KIND_BACKGROUND: RefreshCoverflowBackground;
+    FC_KIND_COVER: begin
+      pic := TPicture.Create;
+      bmp := TBitmap.Create;
+      try
+          bmp.PixelFormat := pf24bit;
+          if MedienBib.NewCoverFlow.CoverCount > msg.index then
           begin
-              // file \coverSavepath\<id>.jpg is missing, even if it should exist (= it was manually deleted?)
-              // try to recreate it from the image files already existing on the disc/id3Tag
-              success := RepairCoverFileVCL(aCollection.CoverID, Nil, pic, newID);
-              if success and (aCollection.CoverID <> newID) then
-                aCollection.ApplyNewCoverID(newID);
+              aCollection := MedienBib.NewCoverFlow.Collection[msg.Index];
+
+              case MedienBib.NewCoverFlow.Mode of
+                  cm_Classic: success := False; // we already failed during the painting process
+                  cm_OpenGL : begin
+                      // if (aCover.ID = 'all') or (aCover.ID = 'searchresult') then
+                      if aCollection is TRootCollection then
+                        NeedPreviewMainPicker(TRootCollection(aCollection));
+                      success := MedienBib.CoverArtSearcher.GetCoverBitmapFromCollection(aCollection, pic);
+                  end
+              else
+                  success := True; // we are not in CoverflowMode at all, should not happen
+              end;
+
+              if (not success) and PreviewGraphicShouldExist(aCollection.CoverID) then
+              begin
+                  // file \coverSavepath\<id>.jpg is missing, even if it should exist (= it was manually deleted?)
+                  // try to recreate it from the image files already existing on the disc/id3Tag
+                  success := RepairCoverFileVCL(aCollection.CoverID, Nil, pic, newID);
+                  if success and (aCollection.CoverID <> newID) then
+                    aCollection.ApplyNewCoverID(newID);
+              end;
+
+              bmp.Height := TCoverArtSearcher.CoverSize;
+              bmp.Width := TCoverArtSearcher.CoverSize;
+              FitBitmapIn(bmp, pic.Graphic);
+
+              bmp.PixelFormat := pf24bit;
+              Medienbib.NewCoverFlow.SetPreview (msg.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
+
+              if (not success) and (MedienBib.CoverSearchLastFM) then
+                CoverDownloadThread.AddJob(aCollection, msg.index, qtCoverFlow);
           end;
 
-          bmp.Height := TCoverArtSearcher.CoverSize;
-          bmp.Width := TCoverArtSearcher.CoverSize;
-          FitBitmapIn(bmp, pic.Graphic);
-
-          Medienbib.NewCoverFlow.SetPreview (msg.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
-
-          if (not success) and (MedienBib.CoverSearchLastFM) then
-            CoverDownloadThread.AddJob(aCollection, msg.index, qtCoverFlow);
+      finally
+          pic.free;
+          bmp.Free;
       end;
-  finally
-      pic.free;
-      bmp.Free;
+    end;
   end;
 end;
 
+procedure TNemp_MainForm.RefreshCoverflowBackground;
+var
+  bmp: TBitmap;
+begin
+    if not FormReadyAndActivated then
+        exit;
+    if PanelCoverBrowse.Visible then begin
+      bmp := TBitmap.Create;
+      try
+        bmp.PixelFormat := pf24bit;
+        bmp.Width := PanelCoverBrowse.Width;
+        bmp.Height := PanelCoverBrowse.Height;
+        PanelCoverBrowse.PaintBackgroundTo(bmp.Canvas);
+        MedienBib.NewCoverFlow.SetBackgroundPreview(bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
+      finally
+        bmp.Free;
+      end;
+      MedienBib.NewCoverFlow.Paint;
+    end;
+end;
+
+procedure TNemp_MainForm.PanelCoverBrowseResize(Sender: TObject);
+begin
+  RefreshCoverflowBackground;
+end;
 
 procedure TNemp_MainForm.MinimizeNemp(Sender: TObject);
 begin
   MinimizedIndicator := True;
 end;
-
-
 
 procedure TNemp_MainForm.NewScrollBarWndProc(var Message: TMessage);
 var z: smallint;
@@ -3326,11 +3352,20 @@ begin
   LblEmptyLibraryHint.Width := (EmptyLibraryPanel.Width - 50);
   LblEmptyLibraryHint.Left := 25;
   LblEmptyLibraryHint.Top := (EmptyLibraryPanel.Height - LblEmptyLibraryHint.Height) Div 2;
+  if NempSkin.isActive and (NempOptions.AnzeigeMode = 0) then
+  begin
+    NempSkin.RepairSkinOffset;
+    NempSkin.RefreshTreeOffsets;
+  end;
 end;
 
-procedure TNemp_MainForm.EmptyLibraryPanelPaint(Sender: TObject);
+procedure TNemp_MainForm.LibraryPanelPaintBackground(Sender: TNempPanel;
+  var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
 begin
-  NempSkin.DrawArtistAlbumPanel((Sender as TNempPanel), MedienBib.Count, NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
+  //if MedienBib.Count = 0 then
+    NempSkin.OnPaintBackgroundRegularPanel(Sender, Bitmap, Offset, Tile)
+  //else
+  //  NempSkin.OnPaintEmptyLibraryPanel(Sender, Bitmap, Offset, Tile);
 end;
 
 Procedure TNemp_MainForm.AnzeigeSortMENUClick(Sender: TObject);
@@ -4236,7 +4271,7 @@ begin
     end;
     PM_ML_EnqueueBrowse.Caption := enqueueCaption;
 
-    PM_ML_CollectionShowPlaylistInExplorer.Visible := LibraryNotBlockedByPartymode and (ac.CollectionClass = ccPlaylists);
+    PM_ML_CollectionShowPlaylistInExplorer.Visible := LibraryNotBlockedByPartymode and assigned(ac) and (ac.CollectionClass = ccPlaylists);
 
     isSortable := assigned(lc) and (MedienBib.BrowseMode <> 2);
     PM_ML_SortLayerBy.Visible := isSortable and (lc.CategoryType = ccFiles);
@@ -5047,6 +5082,7 @@ begin
     AudioFile := VST.GetNodeData<TAudioFile>(Node);
     With TargetCanvas Do
     begin
+        (*
         if Not NempSkin.NempPartyMode.Active then
         begin
             if NempOptions.ChangeFontSizeOnLength AND (AudioFile.AudioType <> at_Stream) AND (Sender.GetNodeLevel(Node)=0)  then
@@ -5054,6 +5090,7 @@ begin
             else
                 font.Size := NempOptions.DefaultFontSize;
         end;
+        *)
 
         if AllowColorChange AND
               ( (NempOptions.ChangeFontColorOnBitrate AND (Not (vsSelected in Node.States)))
@@ -5073,9 +5110,9 @@ begin
             else
             begin
                   if Sender = PlaylistVST then
-                    font.color := NempSkin.SkinColorScheme.Tree_FontColor[3]
+                    font.color := NempSkin.SkinColorScheme.TreeColorsPlaylist.Font
                   else
-                    font.color := NempSkin.SkinColorScheme.Tree_FontColor[4]
+                    font.color := NempSkin.SkinColorScheme.TreeColorsMain.Font;
             end;
           end
           else
@@ -5092,16 +5129,16 @@ begin
           if Sender = PlaylistVST then
           begin
               if Sender.Focused then
-                  font.color := NempSkin.SkinColorScheme.Tree_FontSelectedColor[3]
+                  font.color := NempSkin.SkinColorScheme.TreeColorsPlaylist.FontSelected
               else
-                  font.color := NempSkin.SkinColorScheme.Tree_UnfocusedColor[3]
+                  font.color := NempSkin.SkinColorScheme.TreeColorsPlaylist.Unfocused
           end
           else
             if Sender = VST then begin
                 if Sender.Focused then
-                    font.color := NempSkin.SkinColorScheme.Tree_FontSelectedColor[4]
+                    font.color := NempSkin.SkinColorScheme.TreeColorsMain.FontSelected
                 else
-                    font.color := NempSkin.SkinColorScheme.Tree_UnfocusedColor[4]
+                    font.color := NempSkin.SkinColorScheme.TreeColorsMain.Unfocused;
             end;
         end;
 
@@ -5850,9 +5887,10 @@ var CoverFileFound: Boolean;
 begin
     if assigned(aAudioFile) then
     begin
-        // clear current image  (needed because of Transparencies)
-        ImgDetailCover.Picture.Assign(Nil);
-        ImgDetailCover.Refresh;
+        // clear current image  (needed because of Transparencies) - not anymore (2025, Delphi 12.1?)
+        // ImgDetailCover.Picture.Assign(Nil);
+        // ImgDetailCover.Refresh;
+
         if (ImgDetailCover.Width * ImgDetailCover.Height) > 0 then
         begin
             ImgDetailCover.Picture.Bitmap.Width := ImgDetailCover.Width;
@@ -6750,17 +6788,17 @@ begin
           if Sender = ArtistsVST then
           begin
               if Sender.Focused then
-                  font.color := NempSkin.SkinColorScheme.Tree_FontSelectedColor[1]
+                  font.color := NempSkin.SkinColorScheme.TreeColorsArtist.FontSelected
               else
-                  font.color := NempSkin.SkinColorScheme.Tree_UnfocusedColor[1]
+                  font.color := NempSkin.SkinColorScheme.TreeColorsArtist.Unfocused;
           end else
           begin
               if Sender = AlbenVST then
               begin
                   if Sender.Focused then
-                      font.color := NempSkin.SkinColorScheme.Tree_FontSelectedColor[2]
+                      font.color := NempSkin.SkinColorScheme.TreeColorsAlbum.FontSelected
                   else
-                      font.color := NempSkin.SkinColorScheme.Tree_UnfocusedColor[2]
+                      font.color := NempSkin.SkinColorScheme.TreeColorsAlbum.Unfocused;
               end
           end;
       end;
@@ -6851,13 +6889,13 @@ begin
   ac := AlbenVST.GetNodeData<TAudioCollection>(Node);
 
   if assigned(ac) and (ac.CoverID <> '') then begin
-      aGraphic := CoverManager.GetCachedCover(ac.CoverID, success).Graphic;
+      aGraphic := CoverManager.GetCachedCover(Sender, ac.CoverID, success).Graphic;
       if (not success) and PreviewGraphicShouldExist(ac.CoverID) then
       begin
         if RepairCoverFileVCL(ac.CoverID, Nil, Nil, newID) and (ac.CoverID <> newID) then
           ac.ApplyNewCoverID(newID);
         // try again after repair
-        aGraphic := CoverManager.GetCachedCover(ac.CoverID, success).Graphic;
+        aGraphic := CoverManager.GetCachedCover(Sender, ac.CoverID, success).Graphic;
       end;
       y := Max((Cellrect.Height - aGraphic.Height) Div 2, 0);
       TargetCanvas.Draw(CellRect.Left - CoverManager.CoverOffset, y, aGraphic);
@@ -8228,6 +8266,29 @@ begin
     ShowDetailForm(af, True);
 end;
 
+procedure TNemp_MainForm.CoverImageShowHint(Sender: TObject;
+  var HintText: string; var OwnerDraw: Boolean);
+begin
+  OwnerDraw := MedienBib.ShowAdvancedHints;
+  if assigned(NempPlayer.MainAudioFile) then begin
+    HintText := NempDisplay.HintText(NempPlayer.MainAudioFile);
+  end;
+end;
+
+procedure TNemp_MainForm.CoverImageGetHintSize(var Rect: TRect;
+  MaxWidth: Integer; const AHint: string; AData: PNempHintData);
+begin
+  if assigned(NempPlayer.MainAudioFile) then
+    VSTGetCoverHintSize(AData.Control, NempPlayer.MainAudioFile, Rect, DefaultRatingPainter);
+end;
+
+procedure TNemp_MainForm.CoverImageDrawHint(Sender: TObject;
+  HintCanvas: TCanvas; R: TRect; AData: PNempHintData);
+begin
+  if assigned(NempPlayer.MainAudioFile) then
+    VSTDrawCoverHint(AData.Control, HintCanvas, NempPlayer.MainAudioFile, R, DefaultRatingPainter);
+end;
+
 procedure TNemp_MainForm.PlaylistVSTKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 var Node: PVirtualNode;
@@ -9012,13 +9073,14 @@ end;
 
 procedure TNemp_MainForm.VSTAdvancedHeaderDraw(Sender: TVTHeader;
   var PaintInfo: THeaderPaintInfo; const Elements: THeaderPaintElements);
-var  idx: integer;
+var
+  TreeColors: TTreeColors;
 begin
-  if Sender = ArtistsVST.Header then idx := 1
-  else if Sender = AlbenVST.Header then idx := 2
-  else if Sender = PlaylistVST.Header then idx := 3
-  else {if Sender = VST.Header then} idx := 4;
 
+  if Sender = ArtistsVST.Header then TreeColors := NempSkin.SkinColorScheme.TreeColorsArtist
+  else if Sender = AlbenVST.Header then TreeColors := NempSkin.SkinColorScheme.TreeColorsAlbum
+  else if Sender = PlaylistVST.Header then TreeColors := NempSkin.SkinColorScheme.TreeColorsPlaylist
+  else {if Sender = VST.Header then} TreeColors := NempSkin.SkinColorScheme.TreeColorsMain;
 
   with PaintInfo do
   begin
@@ -9027,23 +9089,23 @@ begin
     begin
       if hpeBackground in Elements then
       begin
-        TargetCanvas.Brush.Color := NempSkin.SkinColorScheme.Tree_HeaderBackgroundColor[idx];
+        TargetCanvas.Brush.Color :=TreeColors.HeaderBackground;
         TargetCanvas.FillRect(PaintRectangle);
 
-        if (idx = 4) and paintinfo.ShowRightBorder then
+        if (Sender = VST.Header) and paintinfo.ShowRightBorder then
         begin
-            TargetCanvas.Pen.Color :=  NempSkin.SkinColorScheme.Tree_BorderColor[idx];
+            TargetCanvas.Pen.Color := TreeColors.Border;
             TargetCanvas.MoveTo(PaintRectangle.Right-1, PaintRectangle.Top+1);
             TargetCanvas.LineTo(PaintRectangle.Right-1, PaintRectangle.Bottom-1);
         end;
       end;
     end else
     begin
-        TargetCanvas.Brush.Color := NempSkin.SkinColorScheme.Tree_HeaderBackgroundColor[idx];
+        TargetCanvas.Brush.Color := TreeColors.HeaderBackground;
         TargetCanvas.FillRect(PaintRectangle);
-        if (idx = 4) and paintinfo.ShowRightBorder then
+        if (Sender = VST.Header) and paintinfo.ShowRightBorder then
         begin
-            TargetCanvas.Pen.Color :=  NempSkin.SkinColorScheme.Tree_BorderColor[idx];
+            TargetCanvas.Pen.Color := TreeColors.Border;
             TargetCanvas.MoveTo(PaintRectangle.Right-1, PaintRectangle.Top+1);
             TargetCanvas.LineTo(PaintRectangle.Right-1, PaintRectangle.Bottom-1);
         end
@@ -9058,6 +9120,7 @@ begin
     ArtistsVST.Header.Columns[0].Width := ArtistsVST.Width;
 end;
 
+
 procedure TNemp_MainForm.AlbenVSTResize(Sender: TObject);
 begin
   if not FormReadyAndActivated then exit;
@@ -9067,9 +9130,7 @@ begin
   if NempSkin.isActive and (NempOptions.AnzeigeMode = 0) then
   begin
     NempSkin.RepairSkinOffset;
-    NempSkin.SetArtistAlbumOffsets;
-    NempSkin.SetVSTOffsets;
-    NempSkin.SetPlaylistOffsets;
+    NempSkin.RefreshTreeOffsets;
 
     // 2022 No repaint. This causes some flickering, and it's probably not needed any more (?)
     //  RepaintPanels;
@@ -9789,25 +9850,25 @@ begin
   begin
     DoIt := NempSkin.UseBlendedMedienliste;
     BlendIntensity := Nempskin.BlendFaktorMedienliste2;
-    BlendColor := Nempskin.SkinColorScheme.Tree_Color[4];
+    BlendColor := Nempskin.SkinColorScheme.TreeColorsMain.Color;
   end else
     if Sender = PlaylistVST then
     begin
       DoIt := NempSkin.UseBlendedPlaylist;
       BlendIntensity := Nempskin.BlendFaktorPlaylist2;
-      BlendColor := Nempskin.SkinColorScheme.Tree_Color[3];
+      BlendColor := Nempskin.SkinColorScheme.TreeColorsPlaylist.Color;
     end else
       if Sender = ArtistsVST then
       begin
         DoIt := NempSkin.UseBlendedArtists;
         BlendIntensity := Nempskin.BlendFaktorArtists2;
-        BlendColor := Nempskin.SkinColorScheme.Tree_Color[1];
+        BlendColor := Nempskin.SkinColorScheme.TreeColorsArtist.Color;
       end else
         //if Sender = AlbenVST then
         begin
           DoIt := NempSkin.UseBlendedAlben;
           BlendIntensity := Nempskin.BlendFaktorAlben2;
-          BlendColor := Nempskin.SkinColorScheme.Tree_Color[2];
+          BlendColor := Nempskin.SkinColorScheme.TreeColorsAlbum.Color;
         end;
 
   if Not DoIt then exit;
@@ -11056,22 +11117,10 @@ begin
 end;
 
 
-procedure TNemp_MainForm.PanelCoverBrowsePaint(Sender: TObject);
-begin
-    NempSkin.DrawARegularPanel((Sender as TNempPanel), NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
-    MedienBib.NewCoverFlow.Paint;
-end;
-
 procedure TNemp_MainForm.PanelCoverBrowseAfterPaint(Sender: TObject);
 begin
-    // The AfterPaint-Event is needed for the Coverflow.
-    // On WindowsXP the Coverflow on the Panel will not be repainted automatically.
-    if Not NempSkin.isActive then
-        MedienBib.NewCoverFlow.Paint;
-    // Otherwise the Paint-Event has been fired, where the Coverflow was already painted.
+  MedienBib.NewCoverFlow.Paint;
 end;
-
-
 
 
 Procedure TNemp_MainForm.RepaintPanels;
@@ -11139,81 +11188,15 @@ begin
   end;
 end;
 
-procedure TNemp_MainForm.TABPanelPaint(Sender: TObject);
-var aPanel: TNempPanel;
+procedure TNemp_MainForm.PanelPaintBackground(Sender: TNempPanel; var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
 begin
-  aPanel := (Sender as TNempPanel);
-
-  if aPanel.Tag <= 3 then
-      NempSkin.DrawARegularPanel(aPanel, NempSkin.UseBackgroundImages[aPanel.Tag])
-  else
-      NempSkin.DrawARegularPanel(aPanel, True);
-
-  aPanel.Canvas.Brush.Style := bsclear;
-  aPanel.Canvas.Pen.Color := Nempskin.SkinColorScheme.GroupboxFrameCL;  //TabTextCL;
-  begin
-    aPanel.Canvas.Pen.Width := 1;
-    aPanel.Canvas.Pen.Style := psSolid;
-    aPanel.Canvas.RoundRect(0,0, aPanel.Width, aPanel.Height, 6, 6);
-  //  Polyline([Point(1,1), Point(1,aPanel.Height-2), Point(aPanel.Width - 2, aPanel.Height - 2), Point(aPanel.Width - 2,1), Point(1,1)]);
-  end;
+  NempSkin.OnPaintBackgroundRegularPanel(Sender, Bitmap, Offset, Tile);
 end;
 
-procedure TNemp_MainForm.PanelPaint(Sender: TObject);
+procedure TNemp_MainForm.ControlPanelPaintBackground(Sender: TNempPanel;
+  var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
 begin
-    if (Sender as TNempPanel).Tag <= 3 then
-        NempSkin.DrawARegularPanel((Sender as TNempPanel), NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag])
-    else
-        NempSkin.DrawARegularPanel((Sender as TNempPanel), True);
-end;
-
-
-procedure TNemp_MainForm.NewPanelPaint(Sender: TObject);
-var aPanel: TNempPanel;
-begin
-  aPanel := (Sender as TNempPanel);
-
-  if aPanel.Tag <= 3 then
-      NempSkin.DrawARegularPanel(aPanel, NempSkin.UseBackgroundImages[aPanel.Tag])
-  else
-      NempSkin.DrawARegularPanel(aPanel, true);
-
-  aPanel.Canvas.Brush.Style := bsclear;
-  aPanel.Canvas.Pen.Color := Nempskin.SkinColorScheme.GroupboxFrameCL;  //TabTextCL;
-  aPanel.Canvas.Pen.Width := 1;
-  aPanel.Canvas.Pen.Style := psSolid;
-  aPanel.Canvas.RoundRect(0,0, aPanel.Width-0, aPanel.Height-0, 6, 6);
-end;
-
-// Special case: the CoverFlow-Label-Panel
-// nEver use background here
-procedure TNemp_MainForm.Pnl_CoverFlowLabelPaint(Sender: TObject);
-var aPanel: TNempPanel;
-begin
-    aPanel := (Sender as TNempPanel);
-
-    NempSkin.DrawARegularPanel(aPanel, false);
-
-  aPanel.Canvas.Brush.Style := bsclear;
-  aPanel.Canvas.Pen.Color := Nempskin.SkinColorScheme.GroupboxFrameCL;  //TabTextCL;
-  aPanel.Canvas.Pen.Width := 1;
-  aPanel.Canvas.Pen.Style := psSolid;
-  aPanel.Canvas.RoundRect(0,0, aPanel.Width-0, aPanel.Height-0, 6, 6);
-end;
-
-
-procedure TNemp_MainForm.ControlPanelPaint(Sender: TObject);
-var aPanel: TNempPanel;
-begin
-    aPanel := (Sender as TNempPanel);
-
-    NempSkin.DrawAControlPanel(aPanel, True, False);
-
-    aPanel.Canvas.Brush.Style := bsclear;
-    aPanel.Canvas.Pen.Color := Nempskin.SkinColorScheme.GroupboxFrameCL;  //TabTextCL;
-    aPanel.Canvas.Pen.Width := 1;
-    aPanel.Canvas.Pen.Style := psSolid;
-    aPanel.Canvas.RoundRect(0,0, aPanel.Width-0, aPanel.Height-0, 6, 6);
+  NempSkin.OnPaintBackgroundControlPanel(Sender, Bitmap, Offset, Tile);
 end;
 
 procedure TNemp_MainForm.rbTrackProgressEndScroll(Sender: TProgressRangeBar;
@@ -11440,7 +11423,7 @@ procedure TNemp_MainForm.MedialistPanelResize(Sender: TObject);
 begin
   if not FormReadyAndActivated then exit;
   if NempLayout_Ready then
-    NempSkin.SetVSTOffsets;
+    NempSkin.RefreshTreeOffsets;
 end;
 
 procedure TNemp_MainForm.MedienBibDetailPanelResize(Sender: TObject);
@@ -11468,7 +11451,8 @@ begin
       exit;
 
   if NempLayout_Ready then
-      NempSkin.SetPlaylistOffsets;
+      // NempSkin.SetPlaylistOffsets;
+      NempSkin.RefreshTreeOffsets;
 end;
 
 
@@ -11570,7 +11554,6 @@ begin
     CoverImgDownX := X;
     CoverImgDownY := Y;
     CoverScrollbar.SetFocus;
-
     MedienBib.NewCoverFlow.Paint(2);
 end;
 
@@ -11605,16 +11588,6 @@ begin
     else
       Lbl_CoverFlow.Caption := '';
 end;
-
-
-procedure TNemp_MainForm.PanelCoverBrowseResize(Sender: TObject);
-begin
-    if not FormReadyAndActivated then
-        exit;
-    if PanelCoverBrowse.Visible then
-        MedienBib.NewCoverFlow.Paint;
-end;
-
 
 procedure TNemp_MainForm.CoverScrollbarKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
@@ -12403,12 +12376,13 @@ end;
 ///  -------------------------------------------------
 ///  * For all Trees the same: Convert the Filenames remembered in StartDrag (the VCL-Operation)
 ///    into the OLE-Dataformat in the CF_HDROP section
-procedure TNemp_MainForm.TreesRenderOLEData(Sender: TBaseVirtualTree; const FormatEtcIn: tagFORMATETC;
-  out Medium: tagSTGMEDIUM; ForClipboard: Boolean; var Result: HRESULT);
+procedure TNemp_MainForm.TreesRenderOLEData(Sender: TBaseVirtualTree; const FormatEtcIn: tFORMATETC;
+  out Medium: tSTGMEDIUM; ForClipboard: Boolean; var Result: HRESULT);
 begin
   if FormatEtcIn.cfFormat = CF_HDROP then
     result := OLERenderFilenames(fDropManager.Files, Medium);
 end;
+
 
 ///  5. During Dragging: DragOver (many different options ...)
 ///  -------------------------------------------------
@@ -13094,9 +13068,7 @@ begin
   if NempSkin.isActive and (NempOptions.AnzeigeMode = 0) then
   begin
     NempSkin.RepairSkinOffset;
-    NempSkin.SetArtistAlbumOffsets;
-    NempSkin.SetVSTOffsets;
-    NempSkin.SetPlaylistOffsets;
+    NempSkin.RefreshTreeOffsets;
   end;
 end;
 

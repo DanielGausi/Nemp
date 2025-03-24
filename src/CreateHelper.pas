@@ -53,10 +53,12 @@ interface
 
     procedure InitializeCoverflow;
 
+    procedure InitializeNempSkin;
+
 implementation
 
 uses NempMainUnit, Splash, gnugettext, PlaylistClass, PlayerClass,
-    MedienbibliothekClass, Nemp_SkinSystem,
+    MedienbibliothekClass, Nemp_SkinSystem, NempPanel,
     Nemp_ConstantsAndTypes, NempApi, NempAudioFiles, Nemp_RessourceStrings,
     MainFormHelper, UpdateUtils, SystemHelper, TreeHelper, languagecodes,
     SplitForm_Hilfsfunktionen, DriveRepairTools, NempCoverFlowClass,
@@ -502,6 +504,28 @@ begin
     end;
 end;
 
+procedure InitializeNempSkin;
+var
+  i: Integer;
+begin
+
+  Nemp_MainForm.NempSkin.ArtistsVST   := Nemp_MainForm.ArtistsVST ;
+  Nemp_MainForm.NempSkin.AlbenVST     := Nemp_MainForm.AlbenVST   ;
+  Nemp_MainForm.NempSkin.MainVST      := Nemp_MainForm.VST        ;
+  Nemp_MainForm.NempSkin.PlaylistVST  := Nemp_MainForm.PlaylistVST;
+
+  Nemp_MainForm.NempSkin.PanelList.Clear;
+  for i := 0 to Nemp_MainForm.ComponentCount - 1 do
+  begin
+    if Nemp_MainForm.Components[i] is TNempPanel then
+      Nemp_MainForm.NempSkin.PanelList.Add(TNempPanel(Nemp_MainForm.Components[i]))
+  end;
+  Nemp_MainForm.NempSkin.PanelList.Add(AuswahlForm.ContainerPanelAuswahlform);
+  Nemp_MainForm.NempSkin.PanelList.Add(MedienListeForm.ContainerPanelMedienBibForm);
+  Nemp_MainForm.NempSkin.PanelList.Add(PlaylistForm.ContainerPanelPlaylistForm);
+  Nemp_MainForm.NempSkin.PanelList.Add(ExtendedControlForm.ContainerPanelExtendedControlsForm);
+end;
+
 procedure ApplyLayout;
 begin
     NempLayout.BuildMainForm(nil);
@@ -510,6 +534,7 @@ begin
         // Ggf. Tray-Icon erzeugen und das erzeugen in TrayIconAdded merken
         NempTrayIcon.Visible := NempOptions.ShowTrayIcon;
 
+        InitializeNempSkin;
         if NempOptions.Useskin then
         begin
             SetSkinRadioBox(NempOptions.SkinName);
@@ -635,7 +660,7 @@ begin
 
         if NempSkin.isActive then
         begin
-            NempSkin.SetVSTOffsets;
+            NempSkin.RefreshTreeOffsets;
         end;
 
         ReadyForgetFileApiCommands := True;

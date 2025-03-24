@@ -39,6 +39,9 @@ object AuswahlForm: TAuswahlForm
     OnMouseMove = ContainerPanelAuswahlformMouseMove
     OnMouseUp = ContainerPanelAuswahlformMouseUp
     Ratio = 0
+    DrawMode = dm_Windows
+    DrawFrame = False
+    OnPaintBackground = ContainerPanelAuswahlformPaintBackground
     OnPaint = ContainerPanelAuswahlformPaint
     OwnerDraw = False
     DesignSize = (

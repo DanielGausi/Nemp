@@ -74,6 +74,8 @@ type
     procedure ContainerPanelPlaylistFormMouseUp(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure FormHide(Sender: TObject);
+    procedure ContainerPanelPlaylistFormPaintBackground(Sender: TNempPanel;
+      var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
   private
     { Private-Deklarationen }
 
@@ -152,8 +154,14 @@ end;
 
 procedure TPlaylistForm.ContainerPanelPlaylistFormPaint(Sender: TObject);
 begin
-    Nemp_MainForm.NempSkin.DrawARegularPanel((Sender as TNempPanel),
-    Nemp_MainForm.NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
+//    Nemp_MainForm.NempSkin.DrawARegularPanel((Sender as TNempPanel),
+//    Nemp_MainForm.NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
+end;
+
+procedure TPlaylistForm.ContainerPanelPlaylistFormPaintBackground(
+  Sender: TNempPanel; var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
+begin
+  Nemp_MainForm.NempSkin.OnPaintBackgroundRegularPanel(Sender, Bitmap, Offset, Tile);
 end;
 
 procedure TPlaylistForm.FormActivate(Sender: TObject);
@@ -210,7 +218,7 @@ begin
   SetRegion(ContainerPanelPlaylistForm, self, NempRegionsDistance, handle);
   If Nemp_MainForm.NempSkin.isActive then
   begin
-      Nemp_MainForm.NempSkin.SetPlaylistOffsets;
+      Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.PlaylistVST);
       Repaint;
   end;
 end;
@@ -229,7 +237,7 @@ begin
 
     If Nemp_MainForm.NempSkin.isActive then
     begin
-      Nemp_MainForm.NempSkin.SetPlaylistOffsets;
+      Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.PlaylistVST);
       Repaint;
     end;
 
@@ -258,7 +266,7 @@ begin
     if (Nemp_MainForm.NempSkin.isActive) and (NOT Nemp_MainForm.NempSkin.FixedBackGround) then
     begin
         Nemp_MainForm.NempSkin.RepairSkinOffset;
-        Nemp_MainForm.NempSkin.SetPlaylistOffsets;
+        Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.PlaylistVST);
         RepaintForm;
     end;
 end;

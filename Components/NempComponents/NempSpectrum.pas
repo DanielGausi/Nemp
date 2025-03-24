@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, WinApi.Messages, System.SysUtils, System.Classes,
-  VCL.Graphics, VCL.Controls, VCL.GraphUtil;
+  VCL.Graphics, VCL.Controls, VCL.GraphUtil, uNempHintWindow;
 
 const
   cValueCount = 512;
@@ -45,6 +45,7 @@ type
     fColorBar1: TColor;
     fColorPeak: TColor;
     fDelayComplete: Integer;
+    FHintData: TNempHintData; // used while preparing the hint window
 
     procedure SetPaddings(const Value: TPadding);
     procedure SetData(const Value: TFFTData);
@@ -59,7 +60,12 @@ type
 
     procedure UpdateSize;
     procedure WMEraseBkgnd(var Msg: TWMEraseBkgnd); message WM_ERASEBKGND;
+    procedure CMHintShow(var Message: TCMHintShow); message CM_HINTSHOW;
   protected
+    FOnShowHint: TNempShowSimpleHintEvent;
+    FOnDrawHint: TNempDrawHintEvent;
+    FOnGetHintSize: TNempCalcHintEvent;
+
     procedure ChangeScale(M, D: Integer; isDpiChange: Boolean); override;
     procedure WndProc(var Message: TMessage); override;
 
@@ -95,6 +101,10 @@ type
     property ColorPeak: TColor read fColorPeak write SetColorPeak;
     property ColorBar1: TColor read fColorBar1 write SetColorBar1;
     property ColorBar2: TColor read fColorBar2 write SetColorBar2;
+
+    property OnShowHint: TNempShowSimpleHintEvent read FOnShowHint write FOnShowHint;
+    property OnDrawHint: TNempDrawHintEvent       read FOnDrawHint write FOnDrawHint;
+    property OnGetHintSize: TNempCalcHintEvent    read FOnGetHintSize write FOnGetHintSize;
 
     // publish inherited properties
     property Visible;
@@ -352,6 +362,36 @@ end;
 procedure TNempSpectrum.WMEraseBkgnd(var Msg: TWMEraseBkgnd);
 begin
   msg.result := 1;
+end;
+
+procedure TNempSpectrum.CMHintShow(var Message: TCMHintShow);
+var
+  doOwnerDraw, ShowOwnHint: Boolean;
+begin
+  with Message do begin
+    Result := 0;
+    with HintInfo^ do begin
+      doOwnerDraw := False;
+      ShowOwnHint := True;
+      if assigned(FOnShowHint) then begin
+        HintStr := GetShortHint(Hint);
+        FOnShowHint(Self, HintStr, doOwnerDraw);
+      end else begin
+        HintStr := GetShortHint(Hint);
+      end;
+      // Set our own hint window class and prepare structure to be passed to the hint window.
+      if ShowOwnHint and (Result = 0) then
+      begin
+        HintWindowClass := GetHintWindowClass(doOwnerDraw); // GetHintWindowClass;
+        FHintData.HintText := HintStr;
+        FHintData.OnDrawHint := FOnDrawHint;
+        FHintData.OnGetHintSize := FOnGetHintSize;
+        FHintData.Control := Self;
+        FHintData.Tag := 0;  // not used here
+        HintData := @FHintData;
+      end;
+    end;
+  end;
 end;
 
 procedure TNempSpectrum.WndProc(var Message: TMessage);

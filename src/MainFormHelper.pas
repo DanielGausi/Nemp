@@ -667,7 +667,7 @@ begin
             end;
 
             if NempSkin.isActive then
-                NempSkin.SetArtistAlbumOffsets;
+              NempSkin.RefreshTreeOffsets;
             ResetBrowsePanels;
 
         FSplash.Close;
