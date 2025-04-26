@@ -430,8 +430,8 @@ procedure TFlyingCow.ApplySettings(aSettings: TCoverFlowSettings);
 begin
   fThread.PauseRender;
   fThread.Settings := aSettings;
-  fThread.BL_Cover := -0.75;
-  fThread.BL_Reflexion := -0.75 - (aSettings.GapReflexion / 100);
+  fThread.BL_Cover := -0.90;
+  fThread.BL_Reflexion := -0.90 - (aSettings.GapReflexion / 100);
   fThread.fQueryUpdateItems := True;
   fThread.ResumeRender;
   DoSomeDrawing(50);

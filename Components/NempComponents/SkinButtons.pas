@@ -16,7 +16,7 @@ unit SkinButtons;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls,
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, System.Types,
   Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ImgList, System.UITypes, Winapi.CommCtrl, VCL.Themes,
   NempControls.Common, uNempHintWindow;
 
@@ -50,11 +50,19 @@ type
     FStarFullImageName: TImageName;
     FStarHalfImageName: TImageName;
     FStarEmptyImageName: TImageName;
+    fBackgroundIndexHighlight: TImageIndex;
+    fBackgroundNameDisabled: TImageName;
+    fBackgroundIndexPressed: TImageIndex;
+    fBackgroundName: TImageName;
+    fBackgroundNameHighlight: TImageName;
+    fBackgroundIndexDisabled: TImageIndex;
+    fBackgroundNamePressed: TImageName;
+    fBackgroundIndex: TImageIndex;
+    fDrawFocus: Boolean;
 
-    FBackgroundImages: TCustomImageList;
-    FBackgroundImageChangeLink: TChangeLink;
-
-    procedure BackgroundImageListChange(Sender: TObject);
+    //FBackgroundImages: TCustomImageList;
+    //FBackgroundImageChangeLink: TChangeLink;
+    //procedure BackgroundImageListChange(Sender: TObject);
 
     procedure PreparePainting(const DrawItemStruct: TDrawItemStruct);
     procedure FinishPainting;
@@ -75,7 +83,7 @@ type
     procedure CMMouseEnter(var Message: TMessage); message CM_MOUSEENTER;
     procedure CMMouseLeave(var Message: TMessage); message CM_MOUSELEAVE;
     procedure WMLButtonDblClk(var Message: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
-    procedure SetBackgroundImages(const Value: TCustomImageList);
+    // procedure SetBackgroundImages(const Value: TCustomImageList);
     procedure SetOverlayImageIndex(const Value: TImageIndex);
     procedure SetOverlayImageName(const Value: TImageName);
     procedure SetTransparentBackground(const Value: Boolean);
@@ -85,6 +93,15 @@ type
     procedure SetStarFullImageName(const Value: TImageName);
     procedure SetStarHalfImageIndex(const Value: TImageIndex);
     procedure SetStarHalfImageName(const Value: TImageName);
+    procedure SetBackgroundIndex(const Value: TImageIndex);
+    procedure SetBackgroundIndexDisabled(const Value: TImageIndex);
+    procedure SetBackgroundIndexHighlight(const Value: TImageIndex);
+    procedure SetBackgroundIndexPressed(const Value: TImageIndex);
+    procedure SetBackgroundName(const Value: TImageName);
+    procedure SetBackgroundNameDisabled(const Value: TImageName);
+    procedure SetBackgroundNameHighlight(const Value: TImageName);
+    procedure SetBackgroundNamePressed(const Value: TImageName);
+    procedure SetDrawFocus(const Value: Boolean);
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure CreateParams(var Params: TCreateParams); override;
@@ -96,6 +113,7 @@ type
     procedure SetButtonStyle(ADefault: Boolean); override;
 
     procedure DrawBackground(const DrawItemStruct: TDrawItemStruct); virtual;
+    procedure DrawParentBackground(const DrawItemStruct: TDrawItemStruct); virtual;
     procedure DrawContent(aCanvas: TCanvas); virtual;
 
     property OverlayImageIndex: TImageIndex read FOverlayImageIndex write SetOverlayImageIndex default -1;
@@ -107,6 +125,18 @@ type
     property StarFullImageName  : TImageName  read FStarFullImageName   write SetStarFullImageName   ;
     property StarHalfImageName  : TImageName  read FStarHalfImageName   write SetStarHalfImageName   ;
     property StarEmptyImageName : TImageName  read FStarEmptyImageName  write SetStarEmptyImageName  ;
+
+    // normal, highlight, Pressed, Disabled
+    property BackgroundIndex          : TImageIndex read fBackgroundIndex          write SetBackgroundIndex          default -1;
+    property BackgroundIndexHighlight : TImageIndex read fBackgroundIndexHighlight write SetBackgroundIndexHighlight default -1;
+    property BackgroundIndexPressed   : TImageIndex read fBackgroundIndexPressed   write SetBackgroundIndexPressed   default -1;
+    property BackgroundIndexDisabled  : TImageIndex read fBackgroundIndexDisabled  write SetBackgroundIndexDisabled  default -1;
+
+    property BackgroundName          : TImageName read fBackgroundName          write SetBackgroundName          ;
+    property BackgroundNameHighlight : TImageName read fBackgroundNameHighlight write SetBackgroundNameHighlight ;
+    property BackgroundNamePressed   : TImageName read fBackgroundNamePressed   write SetBackgroundNamePressed   ;
+    property BackgroundNameDisabled  : TImageName read fBackgroundNameDisabled  write SetBackgroundNameDisabled  ;
+
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -120,11 +150,13 @@ type
     property Constraints;
     //property DisabledImageIndex;
     //property DisabledImageName;
-    property DoubleBuffered default True;
+    property DoubleBuffered;
+    property DoubleBufferedMode;
     property DragCursor;
     property DragKind;
     property DragMode;
     property DrawMode: TNempDrawMode read FDrawMode write SetDrawMode;
+    property DrawFocus: Boolean read fDrawFocus write SetDrawFocus default True;
     property Enabled;
     property Font;
     //property HotImageIndex;
@@ -132,9 +164,9 @@ type
     //property ImageIndex;
     //property ImageName;
     property Images;
-    property BackgroundImages: TCustomImageList read FBackgroundImages write SetBackgroundImages;
+    // property BackgroundImages: TCustomImageList read FBackgroundImages write SetBackgroundImages;
     property ParentBiDiMode;
-    property ParentDoubleBuffered default False;
+    property ParentDoubleBuffered;
     property ParentFont;
     property ParentShowHint;
     //property PressedImageIndex;
@@ -193,6 +225,16 @@ type
 
     property SelectedImageIndex;
     property SelectedImageName;
+
+    property BackgroundIndex;
+    property BackgroundIndexHighlight;
+    property BackgroundIndexPressed;
+    property BackgroundIndexDisabled;
+    property BackgroundName;
+    property BackgroundNameHighlight;
+    property BackgroundNamePressed;
+    property BackgroundNameDisabled;
+
   end;
 
   TRatingButton = class(TCustomSkinButton)
@@ -267,19 +309,41 @@ type
   TRatingPainter = class
     private
       fImages: TCustomImageList;
-      fStarFullIdx: Integer;
-      fStarHalfIdx: Integer;
-      fStarEmptyIdx: Integer;
-      fCountIconIdx: Integer;
+      fStarFullIdx: TImageIndex;
+      fStarHalfIdx: TImageIndex;
+      fStarEmptyIdx: TImageIndex;
+      fCountIconIdx: TImageIndex;
+    fStarFullName: TImageName;
+    fStarHalfName: TImageName;
+    fStarEmptyName: TImageName;
+    fCountIconName: TImageName;
       function GetHeight: Integer;
       function GetWidth: Integer;
+      procedure SetImages(const Value: TCustomImageList);
+
+      procedure UpdateImageName(Index: TImageIndex; var Name: TImageName);
+      procedure UpdateImageIndex(Name: TImageName; var Index: TImageIndex);
+    procedure SetCountIconIdx(const Value: TImageIndex);
+    procedure SetStarEmptyIdx(const Value: TImageIndex);
+    procedure SetStarFullIdx(const Value: TImageIndex);
+    procedure SetStarHalfIdx(const Value: TImageIndex);
+    procedure SetCountIconName(const Value: TImageName);
+    procedure SetStarEmptyName(const Value: TImageName);
+    procedure SetStarFullName(const Value: TImageName);
+    procedure SetStarHalfName(const Value: TImageName);
 
     public
-      property Images: TCustomImageList read fImages write fImages;
-      property StarFullIdx : Integer read fStarFullIdx  write fStarFullIdx ;
-      property StarHalfIdx : Integer read fStarHalfIdx  write fStarHalfIdx ;
-      property StarEmptyIdx: Integer read fStarEmptyIdx write fStarEmptyIdx;
-      property CountIconIdx: Integer read fCountIconIdx write fCountIconIdx;
+      property Images: TCustomImageList read fImages write SetImages;
+      property StarFullIdx : TImageIndex read fStarFullIdx  write SetStarFullIdx ;
+      property StarHalfIdx : TImageIndex read fStarHalfIdx  write SetStarHalfIdx ;
+      property StarEmptyIdx: TImageIndex read fStarEmptyIdx write SetStarEmptyIdx;
+      property CountIconIdx: TImageIndex read fCountIconIdx write SetCountIconIdx;
+
+      property StarFullName  : TImageName read fStarFullName  write SetStarFullName ;
+      property StarHalfName  : TImageName read fStarHalfName  write SetStarHalfName ;
+      property StarEmptyName : TImageName read fStarEmptyName write SetStarEmptyName;
+      property CountIconName : TImageName read fCountIconName write SetCountIconName;
+
       property Width: Integer read GetWidth;
       property Height: Integer read GetHeight;
 
@@ -371,13 +435,18 @@ begin
   FStarHalfImageIndex := -1;
   FStarEmptyImageIndex := -1;
 
+  fBackgroundIndexHighlight := -1;
+  fBackgroundIndexPressed := -1;
+  fBackgroundIndexDisabled := -1;
+  fBackgroundIndex := -1;
 
-  FBackgroundImageChangeLink := TChangeLink.Create;
-  FBackgroundImageChangeLink.OnChange := BackgroundImageListChange;
+  // FBackgroundImageChangeLink := TChangeLink.Create;
+  // FBackgroundImageChangeLink.OnChange := BackgroundImageListChange;
   FCanvas := TCanvas.Create;
   ControlStyle := ControlStyle + [csReflector, csPaintBlackOpaqueOnGlass];
   DoubleBuffered := True;
   fTransparentBackground := False;
+  fDrawFocus := True;
 end;
 
 procedure TCustomSkinButton.CreateParams(var Params: TCreateParams);
@@ -388,7 +457,7 @@ end;
 
 destructor TCustomSkinButton.Destroy;
 begin
-  FreeAndNil(FBackgroundImageChangeLink);
+  // FreeAndNil(FBackgroundImageChangeLink);
   FCanvas.Free;
   inherited;
 end;
@@ -439,13 +508,13 @@ begin
   Perform(WM_LBUTTONDOWN, Message.Keys, LPARAM(Word(Message.XPos) or (Word(Message.YPos) shl 16)));
 end;
 
-procedure TCustomSkinButton.BackgroundImageListChange(Sender: TObject);
-begin
-  if HandleAllocated then
-    UpdateImage;
-end;
+//procedure TCustomSkinButton.BackgroundImageListChange(Sender: TObject);
+//begin
+//  if HandleAllocated then
+//    UpdateImage;
+//end;
 
-procedure TCustomSkinButton.SetBackgroundImages(const Value: TCustomImageList);
+(*procedure TCustomSkinButton.SetBackgroundImages(const Value: TCustomImageList);
 begin
   if Value <> FBackgroundImages then
   begin
@@ -463,7 +532,7 @@ begin
     UpdateImageList;
     UpdateImage;
   end;
-end;
+end;*)
 
 procedure TCustomSkinButton.SetDrawMode(Value: TNempDrawMode);
 begin
@@ -474,6 +543,81 @@ begin
     else
       StyleElements := [seFont, seClient, seBorder];
     Invalidate;
+  end;
+end;
+
+procedure TCustomSkinButton.SetDrawFocus(const Value: Boolean);
+begin
+  if fDrawFocus <> Value then begin
+    fDrawFocus := Value;
+    Invalidate;
+  end;
+end;
+
+
+procedure TCustomSkinButton.SetBackgroundIndex(const Value: TImageIndex);
+begin
+  if fBackgroundIndex <> Value then begin
+    fBackgroundIndex := Value;
+    UpdateImageName(Value, fBackgroundName);
+  end;
+end;
+
+procedure TCustomSkinButton.SetBackgroundIndexDisabled(
+  const Value: TImageIndex);
+begin
+  if fBackgroundIndexDisabled <> Value then begin
+    fBackgroundIndexDisabled := Value;
+    UpdateImageName(Value, fBackgroundNameDisabled);
+  end;
+end;
+
+procedure TCustomSkinButton.SetBackgroundIndexHighlight(
+  const Value: TImageIndex);
+begin
+  if fBackgroundIndexHighlight <> Value then begin
+    fBackgroundIndexHighlight := Value;
+    UpdateImageName(Value, fBackgroundNameHighlight);
+  end;
+end;
+
+procedure TCustomSkinButton.SetBackgroundIndexPressed(const Value: TImageIndex);
+begin
+  if fBackgroundIndexPressed <> Value then begin
+    fBackgroundIndexPressed := Value;
+    UpdateImageName(Value, fBackgroundNamePressed);
+  end;
+end;
+
+procedure TCustomSkinButton.SetBackgroundName(const Value: TImageName);
+begin
+  if fBackgroundName <> Value then begin
+    fBackgroundName := Value;
+    UpdateImageIndex(Value, fBackgroundIndex);
+  end;
+end;
+
+procedure TCustomSkinButton.SetBackgroundNameDisabled(const Value: TImageName);
+begin
+  if fBackgroundNameDisabled <> Value then begin
+    fBackgroundNameDisabled := Value;
+    UpdateImageIndex(Value, fBackgroundIndexDisabled);
+  end;
+end;
+
+procedure TCustomSkinButton.SetBackgroundNameHighlight(const Value: TImageName);
+begin
+  if fBackgroundNameHighlight <> Value then begin
+    fBackgroundNameHighlight := Value;
+    UpdateImageIndex(Value, fBackgroundIndexHighlight);
+  end;
+end;
+
+procedure TCustomSkinButton.SetBackgroundNamePressed(const Value: TImageName);
+begin
+  if fBackgroundNamePressed <> Value then begin
+    fBackgroundNamePressed := Value;
+    UpdateImageIndex(Value, fBackgroundIndexPressed);
   end;
 end;
 
@@ -615,8 +759,8 @@ procedure TCustomSkinButton.Notification(AComponent: TComponent;
   Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
-  if AComponent = BackGroundImages then
-    BackGroundImages := nil;
+  //if AComponent = BackGroundImages then
+  //  BackGroundImages := nil;
 end;
 
 procedure TCustomSkinButton.DrawWindowsBackground(const DrawItemStruct: TDrawItemStruct);
@@ -688,36 +832,48 @@ begin
     end
     else
       DrawFrameControl(DrawItemStruct.hDC, R, DFC_BUTTON, Flags);
-
-
   end;
-
 end;
 
 procedure TCustomSkinButton.DrawSkinBackground(const DrawItemStruct: TDrawItemStruct);
 var
   GlyphIdx: Integer;
+
+  procedure SetIndexIfGiven(aValue: TImageIndex);
+  begin
+    if (aValue >= 0) and (aValue <= Images.Count-1) then
+      GlyphIdx := aValue;
+  end;
+
 begin
-  if not assigned(BackgroundImages) or (BackgroundImages.Count = 0) then
+  GlyphIdx := -1;
+
+  if not assigned(Images) or (Images.Count = 0) then
     DrawWindowsBackground(DrawItemStruct)
   else begin
     if (csDesigning in ComponentState) then
-      GlyphIdx := 0
+      GlyphIdx := fBackgroundIndex
     else begin
-      GlyphIdx := 0; // Normal
+      SetIndexIfGiven(fBackgroundIndex);      // GlyphIdx := 0; // Normal
       if FMouseInControl then begin
-        if FIsDown then GlyphIdx := 2 // Pressed
-        else GlyphIdx := 1;           // Highlight
+        if FIsDown then SetIndexIfGiven(fBackgroundIndexPressed) // GlyphIdx := 2 // Pressed
+        else SetIndexIfGiven(fBackgroundIndexHighlight);  //GlyphIdx := 1;           // Highlight
       end;
-      if not Enabled then GlyphIdx := 3; // Disabled
+      if not Enabled then SetIndexIfGiven(fBackgroundIndexDisabled);  //GlyphIdx := 3; // Disabled
     end;
-    if GlyphIdx >= BackgroundImages.Count then
-      GlyphIdx := BackgroundImages.Count - 1;
 
-    BackgroundImages.Draw(FCanvas,
-        (Width Div 2) - (BackgroundImages.Width Div 2),
-        (Height Div 2) - (BackgroundImages.Height Div 2),
-        GlyphIdx, (Enabled) or (DisabledImageIndex <> -1));
+    //if GlyphIdx >= BackgroundImages.Count then
+    //  GlyphIdx := BackgroundImages.Count - 1;
+
+    if GlyphIdx = -1 then
+      DrawWindowsBackground(DrawItemStruct)
+    else begin
+      DrawParentBackground(DrawItemStruct);
+      Images.Draw(FCanvas,
+          (Width Div 2) - (Images.Width Div 2),
+          (Height Div 2) - (Images.Height Div 2),
+          GlyphIdx, (Enabled) or (fBackgroundIndexDisabled <> -1));
+    end;
   end;
 end;
 
@@ -727,6 +883,28 @@ begin
     dm_Windows: DrawWindowsBackground(DrawItemStruct);
     dm_Skin: DrawSkinBackground(DrawItemStruct);
   end;
+end;
+
+procedure TCustomSkinButton.DrawParentBackground(const DrawItemStruct: TDrawItemStruct);
+var
+  R: TRect;
+  Details: TThemedElementDetails;
+  Button: TThemedButton;
+  LStyle: TCustomStyleServices;
+begin
+  // shortend from DrawWindowsBackground
+  R := ClientRect;
+  if ThemeControl(Self) then
+  begin
+    LStyle := StyleServices(Self);
+    Button := tbPushButtonNormal;
+    Details := LStyle.GetElementDetails(Button);
+    // Parent background.
+    if not (csGlassPaint in ControlState) then
+      LStyle.DrawParentBackground(Handle, DrawItemStruct.hDC, Details, True)
+    else
+      FillRect(DrawItemStruct.hDC, R, GetStockObject(BLACK_BRUSH));
+  end
 end;
 
 procedure TCustomSkinButton.DrawContent(aCanvas: TCanvas);
@@ -777,7 +955,7 @@ procedure TCustomSkinButton.DrawButtonFocusRect(aCanvas: TCanvas);
 var
   R: TRect;
 begin
-  if IsFocused and FIsDefault then begin
+  if IsFocused and FIsDefault and fDrawFocus then begin
     R := ClientRect;
     InflateRect(R, -4, -4);
     FCanvas.Pen.Color := clWindowFrame;
@@ -790,7 +968,9 @@ procedure TCustomSkinButton.DrawItem(const DrawItemStruct: TDrawItemStruct);
 begin
   PreparePainting(DrawItemStruct);
   if (not fTransparentBackground) or (csDesigning in ComponentState) then
-    DrawBackground(DrawItemStruct);
+    DrawBackground(DrawItemStruct)
+  else
+    DrawParentBackground(DrawItemStruct);
   DrawContent(FCanvas);
   FinishPainting;
 end;
@@ -805,6 +985,7 @@ var
   DrawRect: TRect;
   LStyle: TCustomStyleServices;
 begin
+
   if not (Control is TSkinButton) then
   begin
     inherited;
@@ -906,8 +1087,8 @@ begin
 end;
 
 procedure TRatingButton.DrawRating(aCanvas: TCanvas);
-var i, p, posX, posY, imgIdx: Integer;
-     xxx: Integer;
+var posX, posY: Integer;
+
 begin
   if assigned(Images) then begin
     posX := RatingDrawOffset;
@@ -1000,10 +1181,16 @@ end;
 constructor TRatingPainter.Create;
 begin
   inherited;
-  fStarFullIdx  := 0;
-  fStarHalfIdx  := 1;
-  fStarEmptyIdx := 2;
-  fCountIconIdx := 3;
+  //fStarFullIdx  := 0;
+  //fStarHalfIdx  := 1;
+  //fStarEmptyIdx := 2;
+  //fCountIconIdx := 3;
+
+  fStarFullName  := 'MenuStarFull';
+  fStarHalfName  := 'MenuStarHalf';
+  fStarEmptyName := 'MenuStarEmpty';
+  fCountIconName := 'MenuPlay';
+
 end;
 
 procedure TRatingPainter.PaintRating(aRating: Integer; aCanvas: TCanvas; x, y: Integer; Enabled: Boolean);
@@ -1011,6 +1198,80 @@ begin
   if assigned(Images) then
     InternalPaintRating(aRating, aCanvas, x, y, Enabled, Images, StarFullIdx, StarHalfIdx, StarEmptyIdx);
 end;
+
+procedure TRatingPainter.SetImages(const Value: TCustomImageList);
+begin
+  fImages := Value;
+  if (fImages <> nil) and fImages.IsImageNameAvailable then begin
+    Images.CheckIndexAndName(fStarFullIdx   , fStarFullName  );
+    Images.CheckIndexAndName(fStarHalfIdx   , fStarHalfName  );
+    Images.CheckIndexAndName(fStarEmptyIdx  , fStarEmptyName );
+    Images.CheckIndexAndName(fCountIconIdx  , fCountIconName );
+  end;
+end;
+
+procedure TRatingPainter.SetStarEmptyIdx(const Value: TImageIndex);
+begin
+  fStarEmptyIdx := Value;
+  UpdateImageName(Value, fStarEmptyName);                  // xxxxxxxxxxxx
+end;
+
+procedure TRatingPainter.SetStarEmptyName(const Value: TImageName);
+begin
+  fStarEmptyName := Value;
+  UpdateImageIndex(Value, fStarEmptyIdx);
+end;
+
+procedure TRatingPainter.SetStarFullIdx(const Value: TImageIndex);
+begin
+  fStarFullIdx := Value;                                       // xxxxxxxxxxxx
+  UpdateImageName(Value, fStarFullName);
+end;
+
+procedure TRatingPainter.SetStarFullName(const Value: TImageName);
+begin
+  fStarFullName := Value;
+  UpdateImageIndex(Value, fStarFullIdx);
+end;
+
+procedure TRatingPainter.SetStarHalfIdx(const Value: TImageIndex);
+begin
+  fStarHalfIdx := Value;
+  UpdateImageName(Value, fStarHalfName);                                       // xxxxxxxxxxxx
+end;
+
+procedure TRatingPainter.SetStarHalfName(const Value: TImageName);
+begin
+  fStarHalfName := Value;
+  UpdateImageIndex(Value, fStarHalfIdx);
+end;
+
+procedure TRatingPainter.SetCountIconIdx(const Value: TImageIndex);
+begin
+  fCountIconIdx := Value;
+  UpdateImageName(Value, fCountIconName);              // xxxxxxxxxxxx
+end;
+
+procedure TRatingPainter.SetCountIconName(const Value: TImageName);
+begin
+  fCountIconName := Value;
+  UpdateImageIndex(Value, fCountIconIdx)
+end;
+
+procedure TRatingPainter.UpdateImageIndex(Name: TImageName;
+  var Index: TImageIndex);
+begin
+  if (fImages <> nil) and fImages.IsImageNameAvailable then
+    Index := Images.GetIndexByName(Name);
+end;
+
+procedure TRatingPainter.UpdateImageName(Index: TImageIndex;
+  var Name: TImageName);
+begin
+  if (Images <> nil) and Images.IsImageNameAvailable then
+    Name := Images.GetNameByIndex(Index);
+end;
+
 
 function TRatingPainter.GetHeight: Integer;
 begin

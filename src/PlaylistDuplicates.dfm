@@ -380,7 +380,9 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
         Top = 204
         Width = 80
         Height = 16
+        DoubleBuffered = True
         DrawMode = dm_Windows
+        ParentDoubleBuffered = False
         TabOrder = 0
         TransparentBackground = True
         StyleElements = [seFont, seBorder]
@@ -555,7 +557,9 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
         Top = 204
         Width = 80
         Height = 16
+        DoubleBuffered = True
         DrawMode = dm_Windows
+        ParentDoubleBuffered = False
         TabOrder = 0
         TransparentBackground = True
         StyleElements = [seFont, seBorder]

@@ -279,7 +279,7 @@ begin
     with Nemp_MainForm do begin
       TStyleManager.SystemHooks := [shMenus, shToolTips]; // no shDialogs, that will interfere with Plugin Forms
 
-      pluginPath := IncludeTrailingPathdelimiter(SavePath) + 'Plugins\';
+      pluginPath := IncludeTrailingPathdelimiter(NempSettingsManager.SavePath) + 'Plugins\';
 
       if not DirectoryExists(pluginPath) then
         ForceDirectories(pluginPath);
@@ -327,34 +327,34 @@ begin
     with Nemp_MainForm do
     begin
         if (NOT LastExitOK) AND
-           ( FileExists(SavePath + 'temp.npl') or
-             FileExists(SavePath + 'temp.m3u8') or
-             FileExists(SavePath + 'temp.m3u'))
+           ( FileExists(NempSettingsManager.SavePath + 'temp.npl') or
+             FileExists(NempSettingsManager.SavePath + 'temp.m3u8') or
+             FileExists(NempSettingsManager.SavePath + 'temp.m3u'))
         then begin
                 UpdateSplashScreen(SplashScreen_Loadingplaylist);
 
-                if FileExists(SavePath + 'temp.npl') then
-                    NempPlaylist.LoadFromFile(SavePath + 'temp.npl')
+                if FileExists(NempSettingsManager.SavePath + 'temp.npl') then
+                    NempPlaylist.LoadFromFile(NempSettingsManager.SavePath + 'temp.npl')
                 else
-                    if FileExists(SavePath + 'temp.m3u8') then
-                        NempPlaylist.LoadFromFile(SavePath + 'temp.m3u8')
+                    if FileExists(NempSettingsManager.SavePath + 'temp.m3u8') then
+                        NempPlaylist.LoadFromFile(NempSettingsManager.SavePath + 'temp.m3u8')
                     else
-                        NempPlaylist.LoadFromFile(SavePath + 'temp.m3u');
+                        NempPlaylist.LoadFromFile(NempSettingsManager.SavePath + 'temp.m3u');
         end else // backup existiert nicht oder tmplastexit war False
         begin
-            if   (FileExists(SavePath +  NEMP_NAME + '.npl')
-               or FileExists(SavePath +  NEMP_NAME + '.m3u8')
-               or FileExists(SavePath +  NEMP_NAME + '.m3u') ) then
+            if   (FileExists(NempSettingsManager.SavePath +  NEMP_NAME + '.npl')
+               or FileExists(NempSettingsManager.SavePath +  NEMP_NAME + '.m3u8')
+               or FileExists(NempSettingsManager.SavePath +  NEMP_NAME + '.m3u') ) then
             begin
                 UpdateSplashScreen(SplashScreen_Loadingplaylist);
 
-                if FileExists(SavePath +  NEMP_NAME + '.npl') then
-                    NempPlaylist.LoadFromFile(SavePath +  NEMP_NAME + '.npl')
+                if FileExists(NempSettingsManager.SavePath +  NEMP_NAME + '.npl') then
+                    NempPlaylist.LoadFromFile(NempSettingsManager.SavePath +  NEMP_NAME + '.npl')
                 else
-                    if FileExists(SavePath +  NEMP_NAME + '.m3u8') then
-                        NempPlaylist.LoadFromFile(SavePath +  NEMP_NAME + '.m3u8')
+                    if FileExists(NempSettingsManager.SavePath +  NEMP_NAME + '.m3u8') then
+                        NempPlaylist.LoadFromFile(NempSettingsManager.SavePath +  NEMP_NAME + '.m3u8')
                     else
-                        NempPlaylist.LoadFromFile(SavePath +  NEMP_NAME + '.m3u');
+                        NempPlaylist.LoadFromFile(NempSettingsManager.SavePath +  NEMP_NAME + '.m3u');
             end;
         end;
     end;
@@ -378,7 +378,7 @@ begin
             MedienBib.AddStartJob(JOB_Finish, '');
 
             LblEmptyLibraryHint.Caption := MainForm_LibraryIsLoading;
-            MedienBib.LoadFromFile(SavePath + NEMP_NAME + '.gmp', True);
+            MedienBib.LoadFromFile(NempSettingsManager.SavePath + NEMP_NAME + '.gmp', True);
         end
         else
         begin
@@ -387,8 +387,8 @@ begin
             if FileExists(ExtractFilePath(ParamStr(0)) + 'Data\default.nwl') then
                 MedienBib.ImportFavorites(ExtractFilePath(ParamStr(0)) + 'Data\default.nwl')
             else
-                if FileExists(SavePath + 'default.nwl') then
-                    MedienBib.ImportFavorites(SavePath + 'default.nwl');
+                if FileExists(NempSettingsManager.SavePath + 'default.nwl') then
+                    MedienBib.ImportFavorites(NempSettingsManager.SavePath + 'default.nwl');
 
             MedienBib.ReBuildCategories;
             ReFillBrowseTrees(False);
@@ -467,13 +467,7 @@ begin
             NempOptions.FontNameCBR := VST.Font.Name;
         VST.Header.SortColumn := MedienBib.Sortparams[0].Tag;
 
-        case NempPlaylist.WiedergabeMode of
-            0: RandomBtn.Hint := (MainForm_RepeatBtnHint_RepeatAll);
-            1: RandomBtn.Hint := (MainForm_RepeatBtnHint_RepeatTitle);
-            2: RandomBtn.Hint := (MainForm_RepeatBtnHint_RandomMode);
-            else
-                RandomBtn.Hint := (MainForm_RepeatBtnHint_NoRepeat);
-        end;
+        RandomBtn.Hint := NempPlaylist.WiedergabeModeHint;
         BassTimer.Interval := NempPlayer.VisualizationInterval;
         AutoSavePlaylistTimer.Enabled := True; // NempPlaylist.AutoSave;
         AutoSavePlaylistTimer.Interval := 5 * 60000;
@@ -514,16 +508,60 @@ begin
   Nemp_MainForm.NempSkin.MainVST      := Nemp_MainForm.VST        ;
   Nemp_MainForm.NempSkin.PlaylistVST  := Nemp_MainForm.PlaylistVST;
 
+  Nemp_MainForm.NempSkin.VclMenuImages  := Nemp_MainForm.vilIconsWindows;
+  Nemp_MainForm.NempSkin.SkinMenuImages := Nemp_MainForm.vilIconsSkin;
+
   Nemp_MainForm.NempSkin.PanelList.Clear;
+  Nemp_MainForm.NempSkin.MenuList.Clear;
+  Nemp_MainForm.NempSkin.ControlButtonList.Clear;
+
   for i := 0 to Nemp_MainForm.ComponentCount - 1 do
   begin
     if Nemp_MainForm.Components[i] is TNempPanel then
       Nemp_MainForm.NempSkin.PanelList.Add(TNempPanel(Nemp_MainForm.Components[i]))
+    else
+      if Nemp_MainForm.Components[i] is TMenu then
+        Nemp_MainForm.NempSkin.MenuList.Add(TMenu(Nemp_MainForm.Components[i]))
   end;
   Nemp_MainForm.NempSkin.PanelList.Add(AuswahlForm.ContainerPanelAuswahlform);
   Nemp_MainForm.NempSkin.PanelList.Add(MedienListeForm.ContainerPanelMedienBibForm);
   Nemp_MainForm.NempSkin.PanelList.Add(PlaylistForm.ContainerPanelPlaylistForm);
   Nemp_MainForm.NempSkin.PanelList.Add(ExtendedControlForm.ContainerPanelExtendedControlsForm);
+
+  // Player control Buttons
+  Nemp_MainForm.NempSkin.ControlButtonList.Add(Nemp_MainForm.PlayPauseBTN);
+  Nemp_MainForm.NempSkin.ControlButtonList.Add(Nemp_MainForm.StopBTN);
+  Nemp_MainForm.NempSkin.ControlButtonList.Add(Nemp_MainForm.PlayPrevBTN);
+  Nemp_MainForm.NempSkin.ControlButtonList.Add(Nemp_MainForm.PlayNextBTN);
+  Nemp_MainForm.NempSkin.ControlButtonList.Add(Nemp_MainForm.SlideBackBTN);
+  Nemp_MainForm.NempSkin.ControlButtonList.Add(Nemp_MainForm.SlideForwardBTN);
+  Nemp_MainForm.NempSkin.ControlButtonList.Add(Nemp_MainForm.RecordBtn);
+  Nemp_MainForm.NempSkin.ControlButtonList.Add(Nemp_MainForm.RandomBtn);
+
+  // Tab Buttons
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Cover);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_SummaryLock);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Equalizer);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Playlist);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Medialib);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Headset);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_mainForm.TabBtn_Marker);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_mainForm.TabBtn_Favorites);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_mainForm.TabBtnCoverCategory);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_mainForm.TabBtnTagCloudCategory);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Browse0);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_CoverFlow0);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_TagCloud0);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Preselection0);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Browse1);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_CoverFlow1);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_TagCloud1);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Preselection1);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Browse2);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_CoverFlow2);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_TagCloud2);
+  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Preselection2);
+
 end;
 
 procedure ApplyLayout;
@@ -535,24 +573,26 @@ begin
         NempTrayIcon.Visible := NempOptions.ShowTrayIcon;
 
         InitializeNempSkin;
-        if NempOptions.Useskin then
+        ActivateSkinAfterStart;
+       (* if NempOptions.Useskin then
         begin
             SetSkinRadioBox(NempOptions.SkinName);
             Nempskin.LoadFromDir(GetSkinDirFromSkinName(NempOptions.SkinName));
             NempSkin.ActivateSkin(False);
-            RandomBtn.ImageIndex := NempSkin.RepeatBtnImageIndex(NempPlaylist.WiedergabeMode);   // SKIN_UMBAU_CHECK
+            RandomBtn.ImageName := cBtnRepeatNames[NempPlaylist.WiedergabeMode];
         end else
         begin
             SetSkinRadioBox('');
             NempSkin.DeActivateSkin(False);
             // TabBtn_Equalizer.ResetGlyph;  // SKIN_UMBAU_CHECK
         end;
+        *)
 
         // Anzeige oben links initialisieren
         SwitchBrowsePanel(MedienBib.BrowseMode, True);
 
         TabBtn_SummaryLock.Tag       := NempOptions.VSTDetailsLock;
-        // TabBtn_SummaryLock.GlyphLine := NempOptions.VSTDetailsLock;  // SKIN_UMBAU_CHECK
+        TabBtn_SummaryLock.ImageName := cTabBtnLockViewImgNames[TabBtn_SummaryLock.Tag];
 
         NempOptions.StartMinimizedByParameter := False;
 
@@ -660,7 +700,7 @@ begin
 
         if NempSkin.isActive then
         begin
-            NempSkin.RefreshTreeOffsets;
+            NempSkin.RefreshTreeBackgrounds;
         end;
 
         ReadyForgetFileApiCommands := True;

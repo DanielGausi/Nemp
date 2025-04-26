@@ -508,115 +508,54 @@ begin
         // player
         TabBtn_Equalizer        .TabStop := NempOptions.TabStopAtTabs;
         TabBtn_Headset          .TabStop := NempOptions.TabStopAtTabs;
-        TabBtn_MainPlayerControl.TabStop := NempOptions.TabStopAtTabs;
     end;
 end;
 
 procedure ReArrangeToolImages;
-var currentLeft: Integer;
-    decvalue: Integer;
-    newtop: Integer;
-    MenuString: String;
+
+  function MenuItemString(aVisible: Boolean): String;
+  begin
+    if aVisible then
+      Result := MenuItem_Deactivate
+    else
+      Result := MenuItem_Activate;
+  end;
+
 begin
+  with Nemp_MainForm do begin
+    // Set Scrobble-Menu
+    viLastFM.Visible := NempPlayer.NempScrobbler.DoScrobble;
+    MM_T_ScrobblerActivate.Caption := MenuItemString(NempPlayer.NempScrobbler.DoScrobble);
+    PM_P_ScrobblerActivate.Caption := MenuItemString(NempPlayer.NempScrobbler.DoScrobble);
+    PM_T_ScrobblerActivate.Caption := MenuItemString(NempPlayer.NempScrobbler.DoScrobble);
 
-    with Nemp_MainForm do
-    begin
-        decvalue := ScrobblerImage.Width + 2;
-        currentLeft := 8; // RatingImage.Left;
+    // Set the Webserver-Menu
+    viWebserver.Visible := assigned(NempWebserver) and NempWebserver.Active;
+    MM_T_WebServerActivate.Caption := MenuItemString(assigned(NempWebserver) and NempWebserver.Active);
+    PM_P_WebServerActivate.Caption := MenuItemString(assigned(NempWebserver) and NempWebserver.Active);
+    PM_T_WebServerActivate.Caption := MenuItemString(assigned(NempWebserver) and NempWebserver.Active);
 
-        newTop := 3; // RatingImage.Top + RatingImage.Height + 2;//TextAnzeigeIMAGE.Top + TextAnzeigeIMAGE.Height + 16;
+    // Set the Birthday-Menu
+    viBirthdayTimer.Visible := BirthdayTimer.Enabled;
+    MM_T_BirthdayActivate.Caption := MenuItemString(BirthdayTimer.Enabled);
+    PM_P_BirthdayActivate.Caption := MenuItemString(BirthdayTimer.Enabled);
+    PM_T_BirthdayActivate.Caption := MenuItemString(BirthdayTimer.Enabled);
 
-        if NempPlayer.NempScrobbler.DoScrobble then
-        begin
-            ScrobblerImage.Top := newTop;
-            ScrobblerImage.Left := currentLeft;
-            ScrobblerImage.Visible := True;
-            inc(currentLeft, decvalue);
-            MenuString := MenuItem_Deactivate;
-        end else
-        begin
-            ScrobblerImage.Visible := False;
-            MenuString := MenuItem_Activate;
-        end;
-        // Set Scrobble-Menu
-        MM_T_ScrobblerActivate.Caption := MenuString;
-        PM_P_ScrobblerActivate.Caption := MenuString;
-        PM_T_ScrobblerActivate.Caption := MenuString;
+    if assigned(OptionsCompleteForm) then
+      OptionsCompleteForm.BtnActivateBirthdayMode.Caption := MenuItemString(BirthdayTimer.Enabled);
 
-        If assigned(NempWebserver) and NempWebserver.Active then
-        begin
-            WebserverImage.Top := newTop;
-            WebserverImage.Left := currentLeft;
-            WebserverImage.Visible := True;
-            inc(currentLeft, decvalue);
-            MenuString := MenuItem_Deactivate;
-        end else
-        begin
-            WebserverImage.Visible := False;
-            MenuString := MenuItem_Activate;
-        end;
-        // Set the Webserver-Menu
-        MM_T_WebServerActivate.Caption := MenuString;
-        PM_P_WebServerActivate.Caption := MenuString;
-        PM_T_WebServerActivate.Caption := MenuString;
+    // Sleep Timer
+    viSleepTimer.Visible := SleepTimer.Enabled or NempOptions.ShutDownAtEndOfPlaylist;
+    MM_T_ShutDownOff.Caption := MenuItemString(SleepTimer.Enabled or NempOptions.ShutDownAtEndOfPlaylist);
+    PM_P_ShutDownOff.Caption := MenuItemString(SleepTimer.Enabled or NempOptions.ShutDownAtEndOfPlaylist);
+    PM_T_ShutDownActivate.Caption := MenuItemString(SleepTimer.Enabled or NempOptions.ShutDownAtEndOfPlaylist);
 
-        if BirthdayTimer.Enabled then
-        begin
-            BirthdayImage.Top := newTop;
-            BirthdayImage.Left := currentLeft;
-            BirthdayImage.Visible := True;
-            inc(currentLeft, decvalue);
-            MenuString := MenuItem_Deactivate;
-        end else
-        begin
-            BirthdayImage.Visible := False;
-            MenuString := MenuItem_Activate;
-        end;
-        // Set the Birthday-Menu
-        MM_T_BirthdayActivate.Caption := MenuString;
-        PM_P_BirthdayActivate.Caption := MenuString;
-        PM_T_BirthdayActivate.Caption := MenuString;
+    // Winamp DSP
+    viWinamp.Visible := NempPlayer.DSPPluginActive;
 
-        if assigned(OptionsCompleteForm) then
-            OptionsCompleteForm.BtnActivateBirthdayMode.Caption := MenuString;
-
-        if (SleepTimer.Enabled) or (NempOptions.ShutDownAtEndOfPlaylist) then
-        begin
-            SleepImage.Top := newTop;
-            SleepImage.Left := currentLeft;
-            SleepImage.Visible := True;
-            inc(currentLeft, decvalue);
-            MenuString := MenuItem_Deactivate;
-        end else
-        begin
-            SleepImage.Visible := False;
-            MenuString := MenuItem_Activate;
-        end;
-
-        MM_T_ShutDownOff.Caption := MenuString;
-        PM_P_ShutDownOff.Caption := MenuString;
-        PM_T_ShutDownActivate.Caption := MenuString;
-
-        if NempPlayer.DSPPluginActive then begin
-          DSPPluginImage.Top := newTop;
-          DSPPluginImage.Left := currentLeft;
-          DSPPluginImage.Visible := True;
-          inc(currentLeft, decvalue);
-        end else begin
-          DSPPluginImage.Visible := False;
-        end;
-
-
-
-        if WalkmanModeTimer.Tag = 1 then
-        begin
-            WalkmanImage.Top := newTop;
-            WalkmanImage.Left := currentLeft;
-            WalkmanImage.Visible := True;
-        end else
-            WalkmanImage.Visible := False;
-
-    end;
+    // Easteregg Walkman
+    viWalkman.Visible := WalkmanModeTimer.Tag = 1;
+  end;
 end;
 
 procedure ResetBrowsePanels;
@@ -667,7 +606,7 @@ begin
             end;
 
             if NempSkin.isActive then
-              NempSkin.RefreshTreeOffsets;
+              NempSkin.RefreshTreeBackgrounds;
             ResetBrowsePanels;
 
         FSplash.Close;
@@ -856,13 +795,7 @@ begin
                                         //        EmptyListMessage  dummaudiofile
 
         // refresh Hints und sonstige Anzeigen
-        case NempPlaylist.WiedergabeMode of
-            0: RandomBtn.Hint := (MainForm_RepeatBtnHint_RepeatAll);
-            1: RandomBtn.Hint := (MainForm_RepeatBtnHint_RepeatTitle);
-            2: RandomBtn.Hint := (MainForm_RepeatBtnHint_RandomMode);
-            else
-               RandomBtn.Hint := (MainForm_RepeatBtnHint_NoRepeat);
-        end;
+        RandomBtn.Hint := NempPlaylist.WiedergabeModeHint;
 
         if NempPlayer.StopStatus = PLAYER_STOP_NORMAL then
             StopBTN.Hint    := MainForm_StopBtn_NormalHint
@@ -1377,10 +1310,12 @@ begin
 
         if ShowWarning then begin
           // SKIN_UMBAU_CHECK aBtn.GlyphLine := 2;
+          aBtn.OverlayImageName := cTabBtnOverlayAlert;
           aBtn.Hint := MedienBib.TabBtnBrowse_InconsistencyHint;
+
         end
         else
-          ;// SKIN_UMBAU_CHECK aBtn.GlyphLine := 1;
+          aBtn.OverlayImageName := ''; // SKIN_UMBAU_CHECK aBtn.GlyphLine := 1;
 
         aBtn.Refresh;
     end;
@@ -1539,12 +1474,12 @@ begin
         try
             if m3u8Needed then
             begin
-                fn := SavePath + '000-Playlist.m3u8';
+                fn := NempSettingsManager.SavePath + '000-Playlist.m3u8';
                 tmpPlaylist.SaveToFile(fn, TEncoding.UTF8);
             end
             else
             begin
-                fn := SavePath + '000-Playlist.m3u';
+                fn := NempSettingsManager.SavePath + '000-Playlist.m3u';
                 tmpPlaylist.SaveToFile(fn, TEncoding.Default);
             end;
         except
@@ -1657,24 +1592,19 @@ end;
 
 function GetSpecialPermissionToChangeMetaData:Boolean;
 begin
-    with Nemp_MainForm do
-    begin
-        if Not NempOptions.AllowQuickAccessToMetadata then
-        begin
-            // User dont want Files to be changed. But this is necessary here.
-            // so get a special permission (or cancel the process)
-            if TranslateMessageDLG((MediaLibrary_PermissionToChangeTagsRequired)
-               , mtConfirmation, [MBYes, MBNo], 0, mbNo) = mrYes
-            then
-                result := True
-            else
-            begin
-                result := False;
-                TranslateMessageDLG(MediaLibrary_OperationCancelled, mtInformation, [mbOK], 0);
-            end;
-        end else
-            result := True;
-    end;
+  if Not NempOptions.AllowQuickAccessToMetadata then begin
+      // User dont want Files to be changed. But this is necessary here.
+      // so get a special permission (or cancel the process)
+      if TranslateMessageDLG((MediaLibrary_PermissionToChangeTagsRequired)
+         , mtConfirmation, [MBYes, MBNo], 0, mbNo) = mrYes
+      then
+        result := True
+      else begin
+        result := False;
+          TranslateMessageDLG(MediaLibrary_OperationCancelled, mtInformation, [mbOK], 0);
+      end;
+  end else
+    result := True;
 end;
 
 

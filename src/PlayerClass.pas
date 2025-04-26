@@ -69,6 +69,8 @@ type
       fBirthdayVolume: Single;
       fSampleRateFaktor: Single;    // Factor to multiply the samplerate with (0.5 to 2)
 
+      fIsMute: Boolean;
+
       // values for Echo and Hall
       fEchoWetDryMix: single;
       fEchoTime: single;
@@ -196,6 +198,7 @@ type
     FPreviewArtistColor: TColor;
     fPreviewShapeBrushColor: TColor;
     fPreviewShapeProgressPenColor: TColor;
+    fMainCoverSize: Integer;
 
 
 
@@ -231,6 +234,7 @@ type
 
       procedure SetHeadsetVolume(Value: Single);    // the same stuff for the
       function GetHeadsetVolume: Single;
+      procedure SetMute(const Value: Boolean);
       function GetHeadsetTime: Double;              // secondary (headset) stream
       procedure SetHeadsetTime(Value: Double);
       function GetHeadsetProgress: Double;
@@ -280,6 +284,8 @@ type
 
       // for the new TAudioFileManager
       procedure OnBeforeAudioFileChange(Sender: TObject);
+      procedure SetMainCoverSize(const Value: Integer);
+
 
     public
         MainAudioFile: TPlaylistFile;
@@ -385,7 +391,6 @@ type
         Reverb_IsActive: Boolean;
         Echo_IsActive: Boolean;
 
-        IsMute: Boolean;
         StreamType: String;
 
         NempBirthdayTimer: TNempBirthdayTimer;
@@ -410,6 +415,7 @@ type
         property SlideStream: DWord read fSlideStream write fSlideStream;
 
         property Volume: Single read GetVolume write SetVolume;
+        property Mute: Boolean read fIsMute write SetMute;
         property HeadSetVolume: Single read GetHeadsetVolume write SetHeadsetVolume;
         property BirthdayVolume: Single read GetBirthdayVolume write SetBirthdayVolume;
         property Time: Double read GetTime write SetTime;              // time in seconds
@@ -487,6 +493,7 @@ type
         property ActivePluginName: AnsiString read GetActivePluginName;
 
         property HeadSetCoverSize: Integer read fHeadSetCoverSize write SetHeadSetCoverSize;
+        property MainCoverSize: Integer read fMainCoverSize write SetMainCoverSize;
 
         // for the TaskBar Preview
         property PreviewArtistColor: TColor read FPreviewArtistColor write FPreviewArtistColor;
@@ -543,8 +550,8 @@ type
         // change the property AvoidMickyMouseEffect and apllies it to the current playback
         procedure ChangeMickyMouseEffect(aValue: Boolean);
 
-        procedure Mute;
-        procedure UnMute;
+        // procedure Mute;
+        // procedure UnMute;
 
         // einen Jingle abspielen und wieder stoppen
         procedure PlayJingle(aAudioFile: TAudioFile); // kein PlaylistFile, weil auch aus der Medienliste ein Jingle gespielt werden kann
@@ -817,7 +824,7 @@ begin
     ValidExtensions.Add('.umx');
     ValidExtensions.Add('.cda');
 
-    isMute := False;
+    fIsMute := False;
     ReadyForRecord := False;
     StreamRecording := False;
     fActivateDSPPlugins := False;
@@ -839,7 +846,7 @@ begin
     HeadsetPicture    := TPicture.Create;
 
     PreviewBackGround := TBitmap.Create;
-    PreviewBackGround.Width :=200;
+    PreviewBackGround.Width := 200;
     PreviewBackGround.Height := 145;
     fABRepeatActive := False;
 
@@ -851,6 +858,7 @@ begin
     fActivePluginIndex := -1;
 
     fHeadSetCoverSize := NEMP_PLAYER_COVERSIZE;
+    fMainCoverSize := NEMP_PLAYER_COVERSIZE;
 
     TAudioFileManager.OnPrepareAudioFileChange.Add(OnBeforeAudioFileChange);
 end;
@@ -1337,7 +1345,7 @@ begin
   JingleVolume                  := NempSettingsManager.ReadInteger('Player','JingleVolume',100);
   UseWalkmanMode                := NempSettingsManager.ReadBool('Player','WalkmanMode',True);
 
-  DownloadDir    := (IncludeTrailingPathDelimiter(NempSettingsManager.ReadString('Player', 'WebradioDownloadDir', Savepath + 'Webradio\')));
+  DownloadDir    := (IncludeTrailingPathDelimiter(NempSettingsManager.ReadString('Player', 'WebradioDownloadDir', NempSettingsManager.Savepath + 'Webradio\')));
 
 
   FilenameFormat := NempSettingsManager.ReadString('Player', 'WebRadioFilenameFormat', '<date>, <time> - <title>');
@@ -2360,6 +2368,8 @@ begin
   if Value < 0 then Value := 0;
   if Value > 1 then Value := 1;
   fMainVolume := Value;
+  if fMainVolume >= 0.05 then
+    fIsMute := False;
   BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
   if assigned(fOnSetVolume) then
     fOnSetVolume(self);
@@ -2401,16 +2411,33 @@ begin
     BASS_ChannelSetAttribute(BirthdayStream, BASS_ATTRIB_VOL, fBirthdayVolume);
 end;
 
-procedure TNempPlayer.Mute;
+procedure TNempPlayer.SetMute(const Value: Boolean);
+begin
+  if fIsMute <> Value then begin
+    fIsMute := Value;
+    if fIsMute then
+      BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, 0)
+    else
+      BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
+    if assigned(fOnSetVolume) then
+      fOnSetVolume(self);
+  end;
+end;
+
+(*procedure TNempPlayer.Mute;
 begin
   BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, 0);
   isMute := True;
+  if assigned(fOnSetVolume) then
+    fOnSetVolume(self);
 end;
 procedure TNempPlayer.UnMute;
 begin
   BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
   isMute := False;
-end;
+  if assigned(fOnSetVolume) then
+    fOnSetVolume(self);
+end;*)
 
 
 
@@ -3622,11 +3649,19 @@ begin
   end;
 end;
 
+procedure TNempPlayer.SetMainCoverSize(const Value: Integer);
+begin
+  if fMainCoverSize <> Value then begin
+    fMainCoverSize := Value;
+    RefreshCoverBitmap
+  end;
+end;
+
 function TNempPlayer.RefreshCoverBitmap: Boolean;
 begin
     result := True;
-    MainPlayerPicture.Bitmap.Width := NEMP_PLAYER_COVERSIZE;
-    MainPlayerPicture.Bitmap.Height := NEMP_PLAYER_COVERSIZE;
+    MainPlayerPicture.Bitmap.Width := fMainCoverSize; //NEMP_PLAYER_COVERSIZE;
+    MainPlayerPicture.Bitmap.Height := fMainCoverSize; //NEMP_PLAYER_COVERSIZE;
 
     if assigned(MainAudioFile) then
     begin
@@ -4135,7 +4170,7 @@ begin
           ForceDirectories(localDir);
       except
           if Not DirectoryExists(localDir) then
-              localDir := Savepath;
+              localDir := NempSettingsManager.Savepath;
       end;
   end;
 

@@ -729,8 +729,8 @@ end;
 procedure TFDetails.SetRatingImageList(const Value: TCustomImageList);
 begin
   Btn_LibraryRating.Images := Value;
+  SetRatingImages(Btn_LibraryRating);
 end;
-
 
 procedure TFDetails.cbQuickRefreshClick(Sender: TObject);
 begin

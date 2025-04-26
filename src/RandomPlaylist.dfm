@@ -88,8 +88,6 @@ object RandomPlaylistForm: TRandomPlaylistForm
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Tags'
     TabOrder = 2
-    ExplicitWidth = 444
-    ExplicitHeight = 317
     DesignSize = (
       448
       318)
@@ -133,11 +131,9 @@ object RandomPlaylistForm: TRandomPlaylistForm
       Anchors = [akLeft, akTop, akRight, akBottom]
       Columns = 4
       Enabled = False
-      ItemHeight = 13
+      ItemHeight = 17
       Sorted = True
       TabOrder = 2
-      ExplicitWidth = 413
-      ExplicitHeight = 207
     end
     object Btn_Save: TButton
       Left = 130
@@ -148,7 +144,6 @@ object RandomPlaylistForm: TRandomPlaylistForm
       Caption = 'Save'
       TabOrder = 4
       OnClick = Btn_SaveClick
-      ExplicitTop = 283
     end
     object cb_Preselection: TComboBox
       Left = 16
@@ -159,7 +154,6 @@ object RandomPlaylistForm: TRandomPlaylistForm
       Anchors = [akLeft, akBottom]
       TabOrder = 3
       OnChange = cb_PreselectionChange
-      ExplicitTop = 285
     end
     object cbTagCountSelection: TComboBox
       Left = 368
@@ -184,8 +178,6 @@ object RandomPlaylistForm: TRandomPlaylistForm
         '300'
         '400'
         '500')
-      ExplicitLeft = 364
-      ExplicitTop = 283
     end
     object cbTagMatchType: TComboBox
       Left = 16
@@ -212,7 +204,6 @@ object RandomPlaylistForm: TRandomPlaylistForm
       Caption = 'Refresh'
       TabOrder = 6
       OnClick = BtnRefreshTagsClick
-      ExplicitLeft = 328
     end
   end
   object GrpBox_General: TGroupBox
@@ -273,8 +264,6 @@ object RandomPlaylistForm: TRandomPlaylistForm
     Default = True
     TabOrder = 3
     OnClick = Btn_OkClick
-    ExplicitLeft = 281
-    ExplicitTop = 514
   end
   object Btn_Cancel: TButton
     Left = 366
@@ -287,8 +276,6 @@ object RandomPlaylistForm: TRandomPlaylistForm
     ModalResult = 2
     TabOrder = 4
     OnClick = Btn_CancelClick
-    ExplicitLeft = 362
-    ExplicitTop = 514
   end
   object CBInsertMode: TComboBox
     Left = 8
@@ -304,7 +291,6 @@ object RandomPlaylistForm: TRandomPlaylistForm
       'Enqueue (at the end of the playlist)'
       'Play (and clear current playlist)'
       'Enqueue (at the end of the prebook-list)')
-    ExplicitTop = 514
   end
   object GrpBox_Rating: TGroupBox
     Left = 312
@@ -333,29 +319,15 @@ object RandomPlaylistForm: TRandomPlaylistForm
       Top = 51
       Width = 80
       Height = 16
+      DoubleBuffered = True
       DrawMode = dm_Windows
+      ParentDoubleBuffered = False
       TabOrder = 1
       TransparentBackground = True
       StyleElements = [seFont, seBorder]
       Rating = 128
       AllowChangeRating = True
       OnRatingChanged = RatingButtonRatingChanged
-      CustomBackground.Data = {
-        C6010000424DC60100000000000036000000280000000A0000000A0000000100
-        2000000000009001000000000000000000000000000000000000FFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFF}
       StarFullImageIndex = 0
       StarHalfImageIndex = 1
       StarEmptyImageIndex = 2

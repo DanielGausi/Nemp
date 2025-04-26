@@ -63,6 +63,8 @@ Nemp_ConstantsAndTypes ;
         procedure CreateParams(var Params: TCreateParams); override;
 
       public
+        property NempFormID: TENempFormIDs read fNempFormID;
+
         procedure InitForm(aID: TENempFormIDs; aMainForm: TNempForm);
         procedure SaveWindowPosition;
         procedure LoadWindowPosition;

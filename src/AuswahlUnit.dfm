@@ -14,9 +14,7 @@ object AuswahlForm: TAuswahlForm
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
-  OnActivate = FormActivate
   OnClose = FormClose
-  OnHide = FormHide
   OnKeyDown = FormKeyDown
   OnMouseDown = FormMouseDown
   OnMouseMove = FormMouseMove
@@ -41,40 +39,26 @@ object AuswahlForm: TAuswahlForm
     Ratio = 0
     DrawMode = dm_Windows
     DrawFrame = False
+    BackgroundBasePanel = True
     OnPaintBackground = ContainerPanelAuswahlformPaintBackground
-    OnPaint = ContainerPanelAuswahlformPaint
     OwnerDraw = False
-    DesignSize = (
-      411
-      422)
-    object CloseImageA: TSkinButton
-      Left = 399
-      Top = 0
-      Width = 12
-      Height = 12
-      Hint = 'Close browse window'
-      Anchors = [akTop, akRight]
-      DrawMode = dm_Skin
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 0
-      TabStop = False
-      StyleElements = [seFont, seBorder]
-      OnClick = CloseImageAClick
-    end
     object pnlSplit: TPanel
       AlignWithMargins = True
-      Left = 7
-      Top = 2
-      Width = 397
-      Height = 413
-      Margins.Left = 7
-      Margins.Top = 2
-      Margins.Right = 7
-      Margins.Bottom = 7
+      Left = 8
+      Top = 6
+      Width = 395
+      Height = 408
+      Margins.Left = 8
+      Margins.Top = 6
+      Margins.Right = 8
+      Margins.Bottom = 8
       Align = alClient
       BevelOuter = bvNone
-      TabOrder = 1
+      TabOrder = 0
+      ExplicitLeft = 7
+      ExplicitTop = 2
+      ExplicitWidth = 397
+      ExplicitHeight = 413
     end
   end
 end

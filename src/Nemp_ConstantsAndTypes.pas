@@ -39,7 +39,7 @@ uses Windows, Messages, Graphics, IniFiles, Forms,  Classes, Controls,
       Vcl.ExtCtrls, Generics.Collections, oneInst, SystemHelper,
      SysUtils, Contnrs, ShellApi, VirtualTrees,  Hilfsfunktionen,
      WindowsVersionInfo, System.StrUtils,
-     dialogs;
+     dialogs, SkinButtons;
 
 
 const // MAXCHILDS = 10;
@@ -60,6 +60,127 @@ const // MAXCHILDS = 10;
       // Formbuilder should adjust Constraints accoding to the Layout, especially the Height
       // CHILD_PANEL_MinWidth = 250;
       // CHILD_PANEL_MinHeight = 180;
+
+  // ItemNames for the Buttons. Used in the ImageCollections and VirtualImageLists
+  cBtnPlayerCount = 14;
+  cBtnPlayerPlay          = 'PlayerPlay';
+  cBtnPlayerPause         = 'PlayerPause';
+  cBtnPlayerStop          = 'PlayerStop'         ;
+  cBtnPlayerPrev          = 'PlayerPrev'         ;
+  cBtnPlayerNext          = 'PlayerNext'         ;
+  cBtnPlayerSlideForward  = 'PlayerSlideForward' ;
+  cBtnPlayerSlideBackward = 'PlayerSlideBackward';
+  cBtnPlayerRepeatAll     = 'PlayerRepeatAll'    ;
+  cBtnPlayerRepeatTitle   = 'PlayerRepeatTitle'  ;
+  cBtnPlayerRepeatRandom  = 'PlayerRepeatRandom' ;
+  cBtnPlayerRepeatOff     = 'PlayerRepeatOff'    ;
+  cBtnPlayerRecordOn      = 'PlayerRecordOn'     ;
+  cBtnPlayerRecordOff     = 'PlayerRecordOff'    ;
+  cBtnPlayerPlayReverse   = 'PlayerPlayReverse'  ;
+
+  cBtnVolumeMute        = 'BtnVolumeMute';
+  cBtnVolumeLow         = 'BtnVolumeLow';
+  cBtnVolumeHigh        = 'BtnVolumeHigh';
+
+  cTabBtnCover             = 'TabBtnCover';
+  cTabBtnLyrics            = 'TabBtnLyrics';
+  cTabBtnDetailsImgNames : Array[0..1] of String = (
+    cTabBtnCover, cTabBtnLyrics);
+
+  cTabBtnViewLocked        = 'TabBtnViewLocked';
+  cTabBtnViewUnLocked      = 'TabBtnViewUnLocked';
+  cTabBtnLockViewImgNames : Array[0..1] of String = (
+    cTabBtnViewUnLocked, cTabBtnViewLocked);
+
+  cTabBtnMarkAll           = 'TabBtnMarkAll';
+  cTabBtnMarkBlack         = 'TabBtnMarkBlack';
+  cTabBtnMarkRed           = 'TabBtnMarkRed';
+  cTabBtnMarkBlue          = 'TabBtnMarkBlue';
+  cTabBtnMarkGreen         = 'TabBtnMarkGreen';
+  cTabBtnMarkerImgNames: Array[0..4] of String = (
+    cTabBtnMarkBlack, cTabBtnMarkBlue, cTabBtnMarkRed, cTabBtnMarkGreen, cTabBtnMarkAll);
+
+  cTabBtnOverlayAlert = 'TabBtnOverlayAlert';
+
+  cMenuItemCount = 36;
+  cMenuAbout               = 'MenuAbout';
+  cMenuAddFolder           = 'MenuAddFolder';
+  cMenuBirthday            = 'MenuBirthday';
+  cMenuCleanUp             = 'MenuCleanUp';
+  cMenuCloseNemp           = 'MenuCloseNemp';
+  cenuConfigureLibrary     = 'MenuConfigureLibrary';
+  cMenuDelete              = 'MenuDelete';
+  cMenuEffects             = 'MenuEffects';
+  cMenuHeadphones          = 'MenuHeadphones';
+  cMenuHelp                = 'MenuHelp';
+  cenuKeyboard             = 'MenuKeyboard';
+  cMenuLastFM              = 'MenuLastFM';
+  cMenuMarkAll             = 'MenuMarkAll';
+  cMenuMarkBlack           = 'MenuMarkBlack';
+  cMenuMarkBlue            = 'MenuMarkBlue';
+  cMenuMarkGreen           = 'MenuMarkGreen';
+  cMenuMarkRed             = 'MenuMarkRed';
+  cMenuNempLogo            = 'MenuNempLogo';
+  cMenuOpen                = 'MenuOpen';
+  cMenuPlay                = 'MenuPlay';
+  cenuRefresh              = 'MenuRefresh';
+  cMenuReplayGain          = 'MenuReplayGain';
+  cMenuSave                = 'MenuSave';
+  cMenuSearch              = 'MenuSearch';
+  cMenuSettings            = 'MenuSettings';
+  cenuShutdown             = 'MenuShutdown';
+  cMenuSkins               = 'MenuSkins';
+  cMenuSort                = 'MenuSort';
+  cMenuStarEmpty           = 'MenuStarEmpty';
+  cMenuStarFull            = 'MenuStarFull';
+  cMenuStarHalf            = 'MenuStarHalf';
+  cMenuStream              = 'MenuStream';
+  cMenuTagCloud            = 'MenuTagCloud';
+  cMenuWarning             = 'MenuWarning';
+  cMenuwinamp              = 'Menuwinamp';
+  cMenuWizard              = 'MenuWizard';
+  cMenuEmpty               = 'MenuEmpty';
+
+  cMenuTreeCollapse        = 'MenuTreeCollapse';
+  cMenuTreeExpand          =  'MenuTreeExpand';
+
+  cMenuFileMissing = 'MenuFileMissing';
+  cMenuOk = 'MenuOk';
+  cMenuPause = 'MenuPause';
+  cMenuStop = 'MenuStop';
+  cMenuWarningRed = 'MenuWarningRed';
+  cMenuTimer = 'MenuTimer';
+  cMenuReplayGainDisabled = 'MenuReplayGainDisabled';
+  cMenuInfoReplace = 'MenuInfoReplace';
+
+  cBtnPlayerNames: Array[1..cBtnPlayerCount] of String = (
+      cBtnPlayerPlay, cBtnPlayerPause, cBtnPlayerStop, cBtnPlayerPlayReverse,
+      cBtnPlayerPrev, cBtnPlayerNext, cBtnPlayerSlideForward, cBtnPlayerSlideBackward,
+      cBtnPlayerRepeatAll, cBtnPlayerRepeatTitle, cBtnPlayerRepeatRandom, cBtnPlayerRepeatOff,
+      cBtnPlayerRecordOn, cBtnPlayerRecordOff);
+
+  cMenuItemNames: Array[1..cMenuItemCount] of String = (
+      cMenuAbout, cMenuAddFolder, cMenuBirthday, cMenuCleanUp, cMenuCloseNemp, cenuConfigureLibrary,
+      cMenuDelete, cMenuEffects, cMenuHeadphones, cMenuHelp, cenuKeyboard, cMenuLastFM, cMenuMarkAll,
+      cMenuMarkBlack, cMenuMarkBlue, cMenuMarkGreen, cMenuMarkRed, cMenuNempLogo, cMenuOpen,
+      cMenuPlay, cenuRefresh, cMenuReplayGain, cMenuSave, cMenuSearch, cMenuSettings, cenuShutdown,
+      cMenuSkins, cMenuSort, cMenuStarEmpty, cMenuStarFull, cMenuStarHalf, cMenuStream,
+      cMenuTagCloud, cMenuWarning, cMenuwinamp,cMenuWizard);
+
+  cBtnPlayerBGCount = 4;
+  cBtnPlayerBGNormal    = 'BtnBGNormal';
+  cBtnPlayerBGHighlight = 'BtnBGHighlight';
+  cBtnPlayerBGDown      = 'BtnBGDown';
+  cBtnPlayerBGDisabled  = 'BtnBGDisabled';
+
+  cBtnPlayerBGNames: Array[1..cBtnPlayerBGCount] of String = (
+      cBtnPlayerBGNormal, cBtnPlayerBGHighlight, cBtnPlayerBGDown, cBtnPlayerBGDisabled);
+
+  cBtnPlayPauseNames: Array[Boolean] of String = (cBtnPlayerPlay, cBtnPlayerPause);
+  // Index cBtnRepeatNames: consistent with NempPlaylist.WiedergabeMode
+  cBtnRepeatNames: Array[0..3] of String = (
+      cBtnPlayerRepeatAll, cBtnPlayerRepeatTitle, cBtnPlayerRepeatRandom, cBtnPlayerRepeatOff);
+
 
 type
 
@@ -144,14 +265,14 @@ type
       docked: boolean;
     end;
 
-    TNempButtonData = record
+   (* TNempButtonData = record
       Name        : String;
       Visible     : Boolean;
       Left        : Integer;
       Top         : Integer;
       Width       : Integer;
       Height      : Integer;
-    end;
+    end;*)
 
     TEHotKeyTypes = (hkPlay, hkStop, hkNext, hkPrev, hkSlideForward, hkSlideBack, hkIncVol, hkDecVol, hkMute);
     THotKeyInfo = record
@@ -836,6 +957,8 @@ const
       REPLAYGAIN_ALBUM_PEAK = 'REPLAYGAIN_ALBUM_PEAK';
 
 
+procedure SetRatingImages(aRatingButton: TRatingButton);
+
 function GetDefaultEqualizerIndex(aEQSettingsName: String): Integer;
 
 function NempOptions: TNempOptions;
@@ -861,6 +984,13 @@ begin
   if not assigned(fNempOptions) then
     fNempOptions := TNempOptions.create;
   result := fNempOptions;
+end;
+
+procedure SetRatingImages(aRatingButton: TRatingButton);
+begin
+  aRatingButton.StarFullImageName := cMenuStarFull;
+  aRatingButton.StarHalfImageName := cMenuStarHalf;
+  aRatingButton.StarEmptyImageName := cMenuStarEmpty;
 end;
 
 

@@ -139,7 +139,7 @@ begin
     case cbSessionSelect.ItemIndex of
         0: FillLogTreeView(NempPlayer.NempLogFile.LogList);
         1: begin
-              NempPlayer.NempLogFile.PreparePreviousLogList(SavePath + NEMP_NAME + '-PlayerLog.log');
+              NempPlayer.NempLogFile.PreparePreviousLogList(NempSettingsManager.SavePath + NEMP_NAME + '-PlayerLog.log');
               FillLogTreeView(NempPlayer.NempLogFile.PreviousSessionList);
         end;
     end;
@@ -166,7 +166,7 @@ begin
     case cbSessionSelect.ItemIndex of
         0: FillLogTreeView(NempPlayer.NempLogFile.LogList);
         1: begin
-              NempPlayer.NempLogFile.PreparePreviousLogList(SavePath + NEMP_NAME + '-PlayerLog.log');
+              NempPlayer.NempLogFile.PreparePreviousLogList(NempSettingsManager.SavePath + NEMP_NAME + '-PlayerLog.log');
               FillLogTreeView(NempPlayer.NempLogFile.PreviousSessionList);
         end;
     end;

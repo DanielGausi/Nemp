@@ -189,7 +189,8 @@ begin
     Application.CreateForm(TMedienlisteForm, MedienlisteForm);
     Application.CreateForm(TExtendedControlForm, ExtendedControlForm);
 
-    StuffToDoAfterCreate ;
+    StuffToDoAfterCreate;
+    Nemp_MainForm.ActivateSkinAfterStart;
 
     // TOP scheint hier ok zu sein, aber dann kommen irgendwelche Messages und machen Top wieder auf 10.000
     EVILHACKY := Nemp_MainForm.Top;

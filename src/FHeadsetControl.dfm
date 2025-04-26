@@ -2,7 +2,7 @@ object FormHeadsetControl: TFormHeadsetControl
   Left = 0
   Top = 0
   Caption = 'Nemp: Headset control'
-  ClientHeight = 150
+  ClientHeight = 149
   ClientWidth = 418
   Color = clBtnFace
   Constraints.MaxHeight = 188
@@ -21,13 +21,11 @@ object FormHeadsetControl: TFormHeadsetControl
   TextHeight = 15
   object pnlBars: TPanel
     Left = 0
-    Top = 118
+    Top = 117
     Width = 418
     Height = 32
     Align = alBottom
     TabOrder = 0
-    ExplicitTop = 117
-    ExplicitWidth = 414
     object HeadsetTimeLbl: TLabel
       AlignWithMargins = True
       Left = 9
@@ -140,7 +138,6 @@ object FormHeadsetControl: TFormHeadsetControl
       RangeBar.VisibleMode = vAlways
       RangeBar.Thickness = 4
       Align = alClient
-      ExplicitWidth = 241
     end
     object BtnMute: TSkinButton
       AlignWithMargins = True
@@ -151,10 +148,11 @@ object FormHeadsetControl: TFormHeadsetControl
       Margins.Left = 4
       Margins.Right = 0
       Align = alRight
+      DoubleBuffered = True
       DrawMode = dm_Windows
+      ParentDoubleBuffered = False
       TabOrder = 1
       Caption = 'SkinButton1'
-      ExplicitLeft = 288
     end
     object rbVolume: TProgressRangeBar
       AlignWithMargins = True
@@ -248,7 +246,6 @@ object FormHeadsetControl: TFormHeadsetControl
       RangeBar.VisibleMode = vAlways
       RangeBar.Thickness = 4
       Align = alRight
-      ExplicitLeft = 312
     end
   end
   object pnlContainer: TPanel
@@ -256,21 +253,19 @@ object FormHeadsetControl: TFormHeadsetControl
     Left = 0
     Top = 0
     Width = 418
-    Height = 118
+    Height = 117
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
     Margins.Bottom = 0
     Align = alClient
     TabOrder = 1
-    ExplicitWidth = 414
-    ExplicitHeight = 117
     object imgCover: TImage
       AlignWithMargins = True
       Left = 9
       Top = 9
-      Width = 100
-      Height = 100
+      Width = 99
+      Height = 99
       Margins.Left = 8
       Margins.Top = 8
       Margins.Right = 8
@@ -282,16 +277,18 @@ object FormHeadsetControl: TFormHeadsetControl
       OnMouseMove = imgCoverMouseMove
     end
     object pnlInfo: TPanel
-      Left = 117
+      Left = 116
       Top = 1
-      Width = 300
-      Height = 116
+      Width = 301
+      Height = 115
       Align = alClient
       BevelOuter = bvNone
+      DoubleBuffered = True
+      ParentDoubleBuffered = False
       TabOrder = 0
       OnMouseDown = pnlInfoMouseDown
-      ExplicitWidth = 296
-      ExplicitHeight = 115
+      ExplicitLeft = 117
+      ExplicitWidth = 300
       object PlayerTitleLabel: TLabel
         Left = 8
         Top = 28
@@ -320,7 +317,9 @@ object FormHeadsetControl: TFormHeadsetControl
         Width = 32
         Height = 32
         Hint = 'Add file to playlist and begin playback from current position'
+        DoubleBuffered = True
         DrawMode = dm_Windows
+        ParentDoubleBuffered = False
         TabOrder = 0
         OnClick = BtnHeadsetPlaynowClick
       end
@@ -330,7 +329,9 @@ object FormHeadsetControl: TFormHeadsetControl
         Width = 32
         Height = 32
         Hint = 'Add current file to playlist (Right click for options)'
+        DoubleBuffered = True
         DrawMode = dm_Windows
+        ParentDoubleBuffered = False
         PopupMenu = PopupHeadset
         TabOrder = 1
         OnClick = BtnHeadsetToPlaylistClick
@@ -341,7 +342,9 @@ object FormHeadsetControl: TFormHeadsetControl
         Width = 32
         Height = 32
         Hint = 'Load selected file into headset (Ctrl+H)'
+        DoubleBuffered = True
         DrawMode = dm_Windows
+        ParentDoubleBuffered = False
         TabOrder = 2
         Visible = False
       end
@@ -350,7 +353,9 @@ object FormHeadsetControl: TFormHeadsetControl
         Top = 75
         Width = 32
         Height = 32
+        DoubleBuffered = True
         DrawMode = dm_Windows
+        ParentDoubleBuffered = False
         TabOrder = 3
         OnClick = PlayPauseHeadSetBtnClick
       end
@@ -359,8 +364,10 @@ object FormHeadsetControl: TFormHeadsetControl
         Top = 75
         Width = 32
         Height = 32
+        DoubleBuffered = True
         DrawMode = dm_Windows
         Images = vilIcons
+        ParentDoubleBuffered = False
         TabOrder = 4
         OnClick = StopHeadSetBtnClick
       end
@@ -369,8 +376,10 @@ object FormHeadsetControl: TFormHeadsetControl
         Top = 51
         Width = 80
         Height = 16
+        DoubleBuffered = True
         DrawMode = dm_Windows
         Images = vilIcons
+        ParentDoubleBuffered = False
         TabOrder = 5
         TransparentBackground = True
         Visible = False
@@ -378,27 +387,12 @@ object FormHeadsetControl: TFormHeadsetControl
         Rating = 120
         AllowChangeRating = True
         OnRatingChanged = BtnHeadsetRatingRatingChanged
-        StarFullImageIndex = 0
-        StarHalfImageIndex = 1
-        StarEmptyImageIndex = 2
-      end
-      object Button1: TButton
-        Left = 248
-        Top = 40
-        Width = 75
-        Height = 25
-        Caption = 'Button1'
-        TabOrder = 6
-        OnClick = Button1Click
-      end
-      object Button2: TButton
-        Left = 240
-        Top = 71
-        Width = 75
-        Height = 25
-        Caption = 'Button2'
-        TabOrder = 7
-        OnClick = Button2Click
+        StarFullImageIndex = 29
+        StarHalfImageIndex = 30
+        StarEmptyImageIndex = 28
+        StarFullImageName = 'MenuStarFull'
+        StarHalfImageName = 'MenuStarHalf'
+        StarEmptyImageName = 'MenuStarEmpty'
       end
     end
   end
@@ -412,23 +406,333 @@ object FormHeadsetControl: TFormHeadsetControl
     Images = <
       item
         CollectionIndex = 0
-        CollectionName = 'StarFull'
-        Name = 'StarFull'
+        CollectionName = 'MenuInfo'
+        Name = 'MenuInfo'
       end
       item
         CollectionIndex = 1
-        CollectionName = 'StarHalf'
-        Name = 'StarHalf'
+        CollectionName = 'MenuAddFolder'
+        Name = 'MenuAddFolder'
       end
       item
         CollectionIndex = 2
-        CollectionName = 'StarEmpty'
-        Name = 'StarEmpty'
+        CollectionName = 'MenuBirthday'
+        Name = 'MenuBirthday'
       end
       item
         CollectionIndex = 3
-        CollectionName = 'PlayCount'
-        Name = 'PlayCount'
+        CollectionName = 'MenuCleanUp'
+        Name = 'MenuCleanUp'
+      end
+      item
+        CollectionIndex = 4
+        CollectionName = 'MenuCloseNemp'
+        Name = 'MenuCloseNemp'
+      end
+      item
+        CollectionIndex = 5
+        CollectionName = 'MenuConfigureLibrary'
+        Name = 'MenuConfigureLibrary'
+      end
+      item
+        CollectionIndex = 6
+        CollectionName = 'MenuDelete'
+        Name = 'MenuDelete'
+      end
+      item
+        CollectionIndex = 7
+        CollectionName = 'MenuEffects'
+        Name = 'MenuEffects'
+      end
+      item
+        CollectionIndex = 8
+        CollectionName = 'MenuHeadphones'
+        Name = 'MenuHeadphones'
+      end
+      item
+        CollectionIndex = 9
+        CollectionName = 'MenuHelp'
+        Name = 'MenuHelp'
+      end
+      item
+        CollectionIndex = 10
+        CollectionName = 'MenuKeyboard'
+        Name = 'MenuKeyboard'
+      end
+      item
+        CollectionIndex = 11
+        CollectionName = 'MenuLastFM'
+        Name = 'MenuLastFM'
+      end
+      item
+        CollectionIndex = 12
+        CollectionName = 'MenuMarkAll'
+        Name = 'MenuMarkAll'
+      end
+      item
+        CollectionIndex = 13
+        CollectionName = 'MenuMarkBlack'
+        Name = 'MenuMarkBlack'
+      end
+      item
+        CollectionIndex = 14
+        CollectionName = 'MenuMarkBlue'
+        Name = 'MenuMarkBlue'
+      end
+      item
+        CollectionIndex = 15
+        CollectionName = 'MenuMarkGreen'
+        Name = 'MenuMarkGreen'
+      end
+      item
+        CollectionIndex = 16
+        CollectionName = 'MenuMarkRed'
+        Name = 'MenuMarkRed'
+      end
+      item
+        CollectionIndex = 17
+        CollectionName = 'MenuNempLogo'
+        Name = 'MenuNempLogo'
+      end
+      item
+        CollectionIndex = 18
+        CollectionName = 'MenuOpen'
+        Name = 'MenuOpen'
+      end
+      item
+        CollectionIndex = 19
+        CollectionName = 'MenuPlay'
+        Name = 'MenuPlay'
+      end
+      item
+        CollectionIndex = 20
+        CollectionName = 'MenuRefresh'
+        Name = 'MenuRefresh'
+      end
+      item
+        CollectionIndex = 21
+        CollectionName = 'MenuReplayGain'
+        Name = 'MenuReplayGain'
+      end
+      item
+        CollectionIndex = 22
+        CollectionName = 'MenuSave'
+        Name = 'MenuSave'
+      end
+      item
+        CollectionIndex = 23
+        CollectionName = 'MenuSearch'
+        Name = 'MenuSearch'
+      end
+      item
+        CollectionIndex = 24
+        CollectionName = 'MenuSettings'
+        Name = 'MenuSettings'
+      end
+      item
+        CollectionIndex = 25
+        CollectionName = 'MenuShutdown'
+        Name = 'MenuShutdown'
+      end
+      item
+        CollectionIndex = 26
+        CollectionName = 'MenuSkins'
+        Name = 'MenuSkins'
+      end
+      item
+        CollectionIndex = 27
+        CollectionName = 'MenuSort'
+        Name = 'MenuSort'
+      end
+      item
+        CollectionIndex = 28
+        CollectionName = 'MenuStarEmpty'
+        Name = 'MenuStarEmpty'
+      end
+      item
+        CollectionIndex = 29
+        CollectionName = 'MenuStarFull'
+        Name = 'MenuStarFull'
+      end
+      item
+        CollectionIndex = 30
+        CollectionName = 'MenuStarHalf'
+        Name = 'MenuStarHalf'
+      end
+      item
+        CollectionIndex = 31
+        CollectionName = 'MenuStream'
+        Name = 'MenuStream'
+      end
+      item
+        CollectionIndex = 32
+        CollectionName = 'MenuTagCloud'
+        Name = 'MenuTagCloud'
+      end
+      item
+        CollectionIndex = 33
+        CollectionName = 'MenuWarning'
+        Name = 'MenuWarning'
+      end
+      item
+        CollectionIndex = 34
+        CollectionName = 'Menuwinamp'
+        Name = 'Menuwinamp'
+      end
+      item
+        CollectionIndex = 35
+        CollectionName = 'MenuWizard'
+        Name = 'MenuWizard'
+      end
+      item
+        CollectionIndex = 36
+        CollectionName = 'MenuAddMusic'
+        Name = 'MenuAddMusic'
+      end
+      item
+        CollectionIndex = 37
+        CollectionName = 'MenuCDDA'
+        Name = 'MenuCDDA'
+      end
+      item
+        CollectionIndex = 38
+        CollectionName = 'MenuAddToLibrary'
+        Name = 'MenuAddToLibrary'
+      end
+      item
+        CollectionIndex = 39
+        CollectionName = 'MenuUSB'
+        Name = 'MenuUSB'
+      end
+      item
+        CollectionIndex = 40
+        CollectionName = 'MenuFileMissing'
+        Name = 'MenuFileMissing'
+      end
+      item
+        CollectionIndex = 41
+        CollectionName = 'MenuInfoReplace'
+        Name = 'MenuInfoReplace'
+      end
+      item
+        CollectionIndex = 42
+        CollectionName = 'MenuOk'
+        Name = 'MenuOk'
+      end
+      item
+        CollectionIndex = 43
+        CollectionName = 'MenuPause'
+        Name = 'MenuPause'
+      end
+      item
+        CollectionIndex = 44
+        CollectionName = 'MenuReplayGainDisabled'
+        Name = 'MenuReplayGainDisabled'
+      end
+      item
+        CollectionIndex = 45
+        CollectionName = 'MenuStop'
+        Name = 'MenuStop'
+      end
+      item
+        CollectionIndex = 46
+        CollectionName = 'MenuTimer'
+        Name = 'MenuTimer'
+      end
+      item
+        CollectionIndex = 47
+        CollectionName = 'MenuWarningRed'
+        Name = 'MenuWarningRed'
+      end
+      item
+        CollectionIndex = 48
+        CollectionName = 'MenuNempUpdate'
+        Name = 'MenuNempUpdate'
+      end
+      item
+        CollectionIndex = 49
+        CollectionName = 'MenuEmpty'
+        Name = 'MenuEmpty'
+      end
+      item
+        CollectionIndex = 50
+        CollectionName = 'MenuTreeCollapse'
+        Name = 'MenuTreeCollapse'
+      end
+      item
+        CollectionIndex = 51
+        CollectionName = 'MenuTreeExpand'
+        Name = 'MenuTreeExpand'
+      end
+      item
+        CollectionIndex = 52
+        CollectionName = 'ToolBtnBGDisabled'
+        Name = 'ToolBtnBGDisabled'
+      end
+      item
+        CollectionIndex = 53
+        CollectionName = 'ToolBtnBGDown'
+        Name = 'ToolBtnBGDown'
+      end
+      item
+        CollectionIndex = 54
+        CollectionName = 'ToolBtnBGHighlight'
+        Name = 'ToolBtnBGHighlight'
+      end
+      item
+        CollectionIndex = 55
+        CollectionName = 'ToolBtnBGNormal'
+        Name = 'ToolBtnBGNormal'
+      end
+      item
+        CollectionIndex = 56
+        CollectionName = 'ToolBtnBirthday'
+        Name = 'ToolBtnBirthday'
+      end
+      item
+        CollectionIndex = 57
+        CollectionName = 'ToolBtnCloseNemp'
+        Name = 'ToolBtnCloseNemp'
+      end
+      item
+        CollectionIndex = 58
+        CollectionName = 'ToolBtnLastFM'
+        Name = 'ToolBtnLastFM'
+      end
+      item
+        CollectionIndex = 59
+        CollectionName = 'ToolBtnShutdown'
+        Name = 'ToolBtnShutdown'
+      end
+      item
+        CollectionIndex = 60
+        CollectionName = 'ToolBtnStream'
+        Name = 'ToolBtnStream'
+      end
+      item
+        CollectionIndex = 61
+        CollectionName = 'ToolBtnWarning'
+        Name = 'ToolBtnWarning'
+      end
+      item
+        CollectionIndex = 62
+        CollectionName = 'ToolBtnwinamp'
+        Name = 'ToolBtnwinamp'
+      end
+      item
+        CollectionIndex = 63
+        CollectionName = 'SysBtnCloseForm'
+        Name = 'SysBtnCloseForm'
+      end
+      item
+        CollectionIndex = 64
+        CollectionName = 'SysBtnCloseNemp'
+        Name = 'SysBtnCloseNemp'
+      end
+      item
+        CollectionIndex = 65
+        CollectionName = 'SysBtnMinimize'
+        Name = 'SysBtnMinimize'
       end>
     ImageCollection = DataModuleGui.ICIcons
     Left = 217

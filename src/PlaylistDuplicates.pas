@@ -645,6 +645,9 @@ procedure TFormPlaylistDuplicates.SetRatingImageList(
 begin
   BtnRatingPlaylist.Images := Value;
   BtnRatingDuplicate.Images := Value;
+
+  SetRatingImages(BtnRatingPlaylist);
+  SetRatingImages(BtnRatingDuplicate);
 end;
 
 procedure TFormPlaylistDuplicates.VstDuplicatesChange(Sender: TBaseVirtualTree;

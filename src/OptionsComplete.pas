@@ -1146,6 +1146,16 @@ begin
   BtnRating40.Images := Value;
   BtnRating45.Images := Value;
   BtnRating50.Images := Value;
+  SetRatingImages(BtnRating05);
+  SetRatingImages(BtnRating10);
+  SetRatingImages(BtnRating15);
+  SetRatingImages(BtnRating20);
+  SetRatingImages(BtnRating25);
+  SetRatingImages(BtnRating30);
+  SetRatingImages(BtnRating35);
+  SetRatingImages(BtnRating40);
+  SetRatingImages(BtnRating45);
+  SetRatingImages(BtnRating50);
 end;
 
 
@@ -2788,7 +2798,7 @@ begin
   TCoverArtSearcher.SubDirName := EDTCoverSubDirName.Text ;
   TCoverArtSearcher.SisterDirName := EDTCoverSisterDirName.Text;
   TCoverArtSearcher.CoverSizeIndex := cb_CoverSize.ItemIndex;
-  TCoverArtSearcher.InitCoverArtCache(Savepath, TCoverArtSearcher.CoverSizeIndex);
+  TCoverArtSearcher.InitCoverArtCache(NempSettingsManager.Savepath, TCoverArtSearcher.CoverSizeIndex);
   // clear coverflow, if setting is changed
   if MedienBib.CoverSearchLastFM <> CB_CoverSearch_LastFM.Checked then begin
     MedienBib.CoverSearchLastFM := CB_CoverSearch_LastFM.Checked;
@@ -3469,6 +3479,10 @@ begin
                 begin
                     NempPlayer.NempScrobbler.ProblemSolved;
 
+                    NempPlayer.NempScrobbler.SaveToIni(NempSettingsManager);
+                    NempSettingsManager.WriteToDisk;
+
+                    {
                     // Daten in Ini speichern. Die braucht man später wieder. ;-)
                     ini := TMeminiFile.Create(SavePath + NEMP_NAME + '.ini', TEncoding.UTF8);
                     try
@@ -3483,6 +3497,7 @@ begin
                     finally
                         Ini.Free;
                     end;
+                    }
                 end;
 
                 LblScrobble1.Caption := ScrobbleWizardComplete;

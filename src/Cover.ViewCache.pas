@@ -82,6 +82,8 @@ type
       constructor Create;
       destructor Destroy; override;
 
+      function ScaledCoverOffset(Sender: TControl): Integer;
+
       procedure LoadSettings;
       procedure LoadSettingsHintCover;
       procedure SaveSettings;
@@ -219,6 +221,11 @@ begin
     result := fDefaultCover;
     success := False;
   end;
+end;
+
+function TCoverManager.ScaledCoverOffset(Sender: TControl): Integer;
+begin
+  Result := Sender.ScaleValue(fCoverSize + fHorizontalMargin)
 end;
 
 function TCoverManager.GetCachedCover(Sender: TControl; aID: String; out success: Boolean): TPicture;

@@ -190,7 +190,7 @@ begin
     EqualizerTrackBars[8] := tbEQ8;
     EqualizerTrackBars[9] := tbEQ9;
 
-    ini := TMeminiFile.Create(SavePath + 'Nemp_EQ.ini');
+    ini := TMeminiFile.Create(NempSettingsManager.SavePath + 'Nemp_EQ.ini');
     try
         InitEqualizerMenuFormIni(ini);
         Btn_EqualizerPresets.Caption := NempPlayer.EQSettingName;
@@ -325,7 +325,7 @@ begin
     currentIdx := GetDefaultEqualizerIndex(NempPlayer.EQSettingName);
 
     // Get next Element
-    Ini := TMeminiFile.Create(SavePath + 'Nemp_EQ.ini');
+    Ini := TMeminiFile.Create(NempSettingsManager.SavePath + 'Nemp_EQ.ini');
     try
         maxIdx := Ini.ReadInteger('Summary', 'Max', 17);
 
@@ -376,7 +376,7 @@ begin
     DefIndex := GetDefaultEqualizerIndex(aSetting);
 
     // Daten aus Ini laden
-    ini := TMeminiFile.Create(SavePath + 'Nemp_EQ.ini');
+    ini := TMeminiFile.Create(NempSettingsManager.SavePath + 'Nemp_EQ.ini');
     try
         for i := 0 to 9 do
         begin
@@ -421,7 +421,7 @@ begin
             if TranslateMessageDLG(Format(MainForm_BtnEqualizerOverwriteQuery, [PresetName]), mtInformation, [mbYes, mbNo], 0) = mrYes then
             begin
                 // Daten aus Ini laden
-                ini := TMeminiFile.Create(SavePath + 'Nemp_EQ.ini');
+                ini := TMeminiFile.Create(NempSettingsManager.SavePath + 'Nemp_EQ.ini');
                 try
                     for i := 0 to 9 do
                     begin
@@ -466,7 +466,7 @@ begin
                   else
                   begin
                       // OK und Check ok => speichern!
-                      Ini := TMeminiFile.Create(SavePath + 'Nemp_EQ.ini');
+                      Ini := TMeminiFile.Create(NempSettingsManager.SavePath + 'Nemp_EQ.ini');
                       try
                           // zuerst NewName suchen - evtl. gibts die Section schon in der Auflistung!
                           NewNameExists := False;
@@ -535,7 +535,7 @@ begin
     PresetName := (Sender as TMenuItem).Caption;
     if TranslateMessageDLG(Format(MainForm_BtnEqualizerDeleteQuery, [PresetName]), mtInformation, [mbYes, mbNo], 0) = mrYes then
     begin
-          Ini := TMemIniFile.Create(SavePath + 'Nemp_EQ.ini');
+          Ini := TMemIniFile.Create(NempSettingsManager.SavePath + 'Nemp_EQ.ini');
           try
               c := Ini.ReadInteger('Summary', 'Max', 17);
               idx := c+1;
@@ -811,7 +811,7 @@ begin
   if TranslateMessageDLG((Player_RestoreDefaultEqualizer), mtInformation, [mbOK, mbABORT], 0) = mrAbort then
       exit;
 
-  Ini := TMemIniFile.Create(SavePath + 'Nemp_EQ.ini');
+  Ini := TMemIniFile.Create(NempSettingsManager.SavePath + 'Nemp_EQ.ini');
   try
       OldMax := Ini.ReadInteger('Summary', 'Max', 17);
 

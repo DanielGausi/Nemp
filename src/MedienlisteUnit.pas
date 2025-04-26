@@ -52,12 +52,10 @@ uses
 type
   TMedienlisteForm = class(TNempSubForm)
     ContainerPanelMedienBibForm: TNempPanel;
-    CloseImageM: TSkinButton;
     pnlSplit: TPanel;
     procedure FormShow(Sender: TObject);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure CloseImageMClick(Sender: TObject);
 
     procedure FormResize(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -67,17 +65,14 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure FormKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
-    procedure FormActivate(Sender: TObject);
-    procedure ContainerPanelMedienBibFormPaint(Sender: TObject);
     procedure ContainerPanelMedienBibFormMouseMove(Sender: TObject;
       Shift: TShiftState; X, Y: Integer);
     procedure ContainerPanelMedienBibFormMouseDown(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure ContainerPanelMedienBibFormMouseUp(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure FormHide(Sender: TObject);
     procedure ContainerPanelMedienBibFormPaintBackground(Sender: TNempPanel;
-      var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
+      var Bitmap: TGraphic; var Offset: TPoint; var Tile: Boolean);
   private
     { Private-Deklarationen }
 
@@ -113,7 +108,6 @@ begin
   Height := BHeight ;
   Width  := BWidth  ;
 
-  PositionCloseImage(CloseImageM, Nemp_MainForm.MedialistPanel);
   SetRegion(ContainerPanelMedienBibForm, self, NempRegionsDistance, handle);
 
   // Das ist nötig, um z.B. zu korrigieren, dass die Form komplett unter Form1 versteckt ist!!
@@ -152,21 +146,10 @@ begin
     Resizing := False;
 end;
 
-procedure TMedienlisteForm.ContainerPanelMedienBibFormPaint(Sender: TObject);
-begin
-//    Nemp_MainForm.NempSkin.DrawARegularPanel((Sender as TNempPanel),
-//    Nemp_MainForm.NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
-end;
-
 procedure TMedienlisteForm.ContainerPanelMedienBibFormPaintBackground(
-  Sender: TNempPanel; var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
+  Sender: TNempPanel; var Bitmap: TGraphic; var Offset: TPoint; var Tile: Boolean);
 begin
-  Nemp_MainForm.NempSkin.OnPaintBackgroundRegularPanel(Sender, Bitmap, Offset, Tile);
-end;
-
-procedure TMedienlisteForm.FormActivate(Sender: TObject);
-begin
-  PositionCloseImage(CloseImageM, Nemp_MainForm.MedialistPanel);
+  Nemp_MainForm.NempSkin.OnPaintControlBackground(Sender, Bitmap, Offset, Tile);
 end;
 
 procedure TMedienlisteForm.FormClose(Sender: TObject;
@@ -176,14 +159,8 @@ begin
   BTop    := Top   ;
   BHeight := Height;
   BWidth  := Width ;
-  CloseImageM.Parent := MedienlisteForm;
 end;
 
-
-procedure TMedienlisteForm.FormHide(Sender: TObject);
-begin
-    CloseImageM.Parent := MedienlisteForm;
-end;
 
 procedure TMedienlisteForm.FormMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -194,24 +171,13 @@ begin
   Resizing := False;
 end;
 
-procedure TMedienlisteForm.CloseImageMClick(Sender: TObject);
-begin
-  with Nemp_MainForm do
-  begin
-    NempOptions.FormPositions[fNempFormID].Visible := False;
-    actToggleTitleList.Checked := NempOptions.FormPositions[fNempFormID].Visible;
-  end;
-  close;
-end;
-
-
 procedure TMedienlisteForm.FormResize(Sender: TObject);
 begin
 
   SetRegion(ContainerPanelMedienBibForm, self, NempRegionsDistance, handle);
   If Nemp_MainForm.NempSkin.isActive then
   begin
-      Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.VST);
+      Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.VST);
       //Repaint;
   end;
 end;
@@ -228,7 +194,7 @@ begin
 
     If Nemp_MainForm.NempSkin.isActive then
     begin
-      Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.VST);
+      Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.VST);
       //Repaint;
     end;
   end;
@@ -253,10 +219,10 @@ begin
 
     NempRegionsDistance.docked := tmp;
 
-    if (Nemp_MainForm.NempSkin.isActive) and (NOT Nemp_MainForm.NempSkin.FixedBackGround) then
+    if (Nemp_MainForm.NempSkin.isActive) {and (NOT Nemp_MainForm.NempSkin.FixedBackGround) }then
     begin
         Nemp_MainForm.NempSkin.RepairSkinOffset;
-        Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.VST);
+        Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.VST);
         RepaintForm;
     end;
 

@@ -9,6 +9,9 @@
         <Projects Include="..\Components\NempComponents\NempKomponenten.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\Components\NewSkinnedTrackbar\DemoSkinnedTrackBar.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -35,14 +38,23 @@
     <Target Name="NempKomponenten:Make">
         <MSBuild Projects="..\Components\NempComponents\NempKomponenten.dproj" Targets="Make"/>
     </Target>
+    <Target Name="DemoSkinnedTrackBar">
+        <MSBuild Projects="..\Components\NewSkinnedTrackbar\DemoSkinnedTrackBar.dproj"/>
+    </Target>
+    <Target Name="DemoSkinnedTrackBar:Clean">
+        <MSBuild Projects="..\Components\NewSkinnedTrackbar\DemoSkinnedTrackBar.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DemoSkinnedTrackBar:Make">
+        <MSBuild Projects="..\Components\NewSkinnedTrackbar\DemoSkinnedTrackBar.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="nemp;NempKomponenten"/>
+        <CallTarget Targets="nemp;NempKomponenten;DemoSkinnedTrackBar"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="nemp:Clean;NempKomponenten:Clean"/>
+        <CallTarget Targets="nemp:Clean;NempKomponenten:Clean;DemoSkinnedTrackBar:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="nemp:Make;NempKomponenten:Make"/>
+        <CallTarget Targets="nemp:Make;NempKomponenten:Make;DemoSkinnedTrackBar:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

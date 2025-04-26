@@ -10,7 +10,7 @@ type
 
   procedure DrawParentImage(Control: TControl; Dest: TCanvas; InvalidateParent: Boolean = False); overload;
   procedure DrawParentImage(Control: TControl; DC: HDC; InvalidateParent: Boolean = False); overload;
-  function TileGraphic(const Source: TBitmap; const Target: TCanvas; Offset: TPoint): Boolean;
+  function TileGraphic(const Source: TGraphic; const Target: TCanvas; Offset: TPoint): Boolean;
 
 implementation
 
@@ -75,7 +75,7 @@ begin
 end;
 
 // procedure TileGraphic(const ATile: TBitmap; aDoTile: Boolean; const ATarget: TCanvas; X, Y: Integer; Stretch: Boolean = False);
-function TileGraphic(const Source: TBitmap; const Target: TCanvas; Offset: TPoint): Boolean;
+function TileGraphic(const Source: TGraphic; const Target: TCanvas; Offset: TPoint): Boolean;
 var
   xstart, xLoop, yLoop: Integer;
 begin

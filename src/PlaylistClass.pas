@@ -173,6 +173,7 @@ type
 
       // for the new TAudioFileManager
       procedure OnPrepareAudioFileChange(Sender: TObject);
+    function GetWiedergabeModeHint: String;
 
     public
       Playlist: TAudioFileList;              // the list with the audiofiles
@@ -241,6 +242,7 @@ type
 
       property PlayingFileUserInput: Boolean read fPlayingFileUserInput write fPlayingFileUserInput;
       property WiedergabeMode: Integer read fWiedergabeMode write fWiedergabeMode;
+      property WiedergabeModeHint: String read GetWiedergabeModeHint;
       property AutoMix: Boolean read fAutoMix write fAutoMix;
       property JumpToNextCueOnNextClick: Boolean read fJumpToNextCueOnNextClick write fJumpToNextCueOnNextClick;
       property RepeatCueOnRepeatTitle: Boolean read fRepeatCueOnRepeatTitle write fRepeatCueOnRepeatTitle;
@@ -1891,6 +1893,17 @@ function TNempPlaylist.GetTime: Double;
 begin
   result := Player.Time;
 end;
+function TNempPlaylist.GetWiedergabeModeHint: String;
+begin
+  case NempPlaylist.WiedergabeMode of
+    0: result := (MainForm_RepeatBtnHint_RepeatAll);
+    1: result := (MainForm_RepeatBtnHint_RepeatTitle);
+    2: result := (MainForm_RepeatBtnHint_RandomMode);
+    else
+       result := (MainForm_RepeatBtnHint_NoRepeat);
+  end;
+end;
+
 procedure TNempPlaylist.SetTime(Value: Double);
 begin
   Player.Time := Value;

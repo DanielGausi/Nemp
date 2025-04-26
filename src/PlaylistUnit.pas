@@ -51,12 +51,10 @@ uses
 type
   TPlaylistForm = class(TNempSubForm)
     ContainerPanelPlaylistForm: TNempPanel;
-    CloseImageP: TSkinButton;
     pnlSplit: TPanel;
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure FormShow(Sender: TObject);
-    procedure CloseImagePClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -65,17 +63,14 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure FormKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
-    procedure FormActivate(Sender: TObject);
     procedure ContainerPanelPlaylistFormMouseDown(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure ContainerPanelPlaylistFormMouseMove(Sender: TObject;
       Shift: TShiftState; X, Y: Integer);
-    procedure ContainerPanelPlaylistFormPaint(Sender: TObject);
     procedure ContainerPanelPlaylistFormMouseUp(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure FormHide(Sender: TObject);
     procedure ContainerPanelPlaylistFormPaintBackground(Sender: TNempPanel;
-      var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
+      var Bitmap: TGraphic; var Offset: TPoint; var Tile: Boolean);
   private
     { Private-Deklarationen }
 
@@ -106,13 +101,11 @@ uses NempMainUnit,  SplitForm_Hilfsfunktionen, MedienlisteUnit,
 // Zur Zeit wird das nicht automatisch aufgerufen!!!!
 procedure TPlaylistForm.FormShow(Sender: TObject);
 begin
-
   Left   := BLeft   ;
   Top    := BTop    ;
   Height := BHeight ;
   Width  := BWidth  ;
 
-  PositionCloseImage(CloseImageP, Nemp_MainForm.PlaylistPanel);
   SetRegion(ContainerPanelPlaylistForm, self, NempRegionsDistance, handle);
 
   // Das ist nötig, um z.B. zu korrigieren, dass die Form komplett unter Form1 versteckt ist!!
@@ -152,21 +145,10 @@ begin
     Resizing := False;
 end;
 
-procedure TPlaylistForm.ContainerPanelPlaylistFormPaint(Sender: TObject);
-begin
-//    Nemp_MainForm.NempSkin.DrawARegularPanel((Sender as TNempPanel),
-//    Nemp_MainForm.NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
-end;
-
 procedure TPlaylistForm.ContainerPanelPlaylistFormPaintBackground(
-  Sender: TNempPanel; var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
+  Sender: TNempPanel; var Bitmap: TGraphic; var Offset: TPoint; var Tile: Boolean);
 begin
-  Nemp_MainForm.NempSkin.OnPaintBackgroundRegularPanel(Sender, Bitmap, Offset, Tile);
-end;
-
-procedure TPlaylistForm.FormActivate(Sender: TObject);
-begin
-  PositionCloseImage(CloseImageP, Nemp_MainForm.PlaylistPanel);
+  Nemp_MainForm.NempSkin.OnPaintControlBackground(Sender, Bitmap, Offset, Tile);
 end;
 
 procedure TPlaylistForm.FormClose(Sender: TObject;
@@ -176,12 +158,6 @@ begin
   BTop    := Top   ;
   BHeight := Height;
   BWidth  := Width ;
-  CloseImageP.Parent := PlaylistForm;
-end;
-
-procedure TPlaylistForm.FormHide(Sender: TObject);
-begin
-    CloseImageP.Parent := PlaylistForm;
 end;
 
 (*
@@ -202,23 +178,12 @@ begin
   Resizing := False;
 end;
 
-procedure TPlaylistForm.CloseImagePClick(Sender: TObject);
-begin
-  with Nemp_MainForm do
-  begin
-    NempOptions.FormPositions[fNempFormID].Visible := False;
-    actTogglePlayList.Checked := NempOptions.FormPositions[fNempFormID].Visible;
-  end;
-  close;
-end;
-
-
 procedure TPlaylistForm.FormResize(Sender: TObject);
 begin
   SetRegion(ContainerPanelPlaylistForm, self, NempRegionsDistance, handle);
   If Nemp_MainForm.NempSkin.isActive then
   begin
-      Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.PlaylistVST);
+      Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.PlaylistVST);
       Repaint;
   end;
 end;
@@ -235,11 +200,8 @@ begin
     NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.Left;
     NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.Top;
 
-    If Nemp_MainForm.NempSkin.isActive then
-    begin
-      Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.PlaylistVST);
-      Repaint;
-    end;
+    if Nemp_MainForm.NempSkin.isActive then
+      Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.PlaylistVST);
 
   end;
 end;
@@ -263,10 +225,10 @@ begin
 
     NempRegionsDistance.docked := tmp;
 
-    if (Nemp_MainForm.NempSkin.isActive) and (NOT Nemp_MainForm.NempSkin.FixedBackGround) then
+    if (Nemp_MainForm.NempSkin.isActive) {and (NOT Nemp_MainForm.NempSkin.FixedBackGround)} then
     begin
         Nemp_MainForm.NempSkin.RepairSkinOffset;
-        Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.PlaylistVST);
+        Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.PlaylistVST);
         RepaintForm;
     end;
 end;

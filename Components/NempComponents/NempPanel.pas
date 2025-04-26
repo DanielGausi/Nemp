@@ -10,6 +10,7 @@ uses
 type
   //TMouseWheelEvent = procedure(Sender: TObject; delta: Word) of object;
 
+  teNempPanelType = (ptNormal, ptHeader, ptContainer);
   TNempPanel = class;
   TNempContainerPanel = class;
   TNempPanelList = TObjectList<TNempPanel>;
@@ -22,7 +23,7 @@ type
   teBackgroundAlignment = (baLeftCenter, baRightCenter, baCenterCenter, baLeftTop, baRightTop, baLeftBottom, baRightBottom);
 
   // TNempPanelOffsetEvent = procedure(Sender: TNempPanel; var Offset: TPoint) of object;
-  TNempPanelPaintBackgroundEvent = procedure(Sender: TNempPanel; var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean) of object;
+  TNempPanelPaintBackgroundEvent = procedure(Sender: TNempPanel; var Graphic: TGraphic; var Offset: TPoint; var Tile: Boolean) of object;
 
   TNempPanel = class(TPanel)
   private
@@ -34,31 +35,36 @@ type
 
     FOwnerDraw: Boolean;
     fDrawMode: TNempDrawMode;
-    fDrawBackgroundBitmap: Boolean;
+    fDrawBackground: Boolean;
     fDrawFrame: Boolean;
     fFrameColor: TColor;
-    fTileBackgroundBitmap: Boolean;
+    fTileBackground: Boolean;
     fBackgroundColor: TColor;
     fOnPaintBackground: TNempPanelPaintBackgroundEvent;
+    fOnPaintBackgroundEx: TNempPanelPaintBackgroundEvent;
     fBackgroundBasePanel: Boolean;
+    fPanelType: teNempPanelType;
+
+
     procedure WMEraseBkGnd(var Message: TWMEraseBkGnd); message WM_ERASEBKGND;
     procedure SetDrawMode(const Value: TNempDrawMode);
     procedure SetBackgroundColor(const Value: TColor);
-    procedure SetDrawBackgroundBitmap(const Value: Boolean);
+    procedure SetDrawBackground(const Value: Boolean);
     procedure SetDrawFrame(const Value: Boolean);
     procedure SetFrameColor(const Value: TColor);
-    procedure SetTileBackgroundBitmap(const Value: Boolean);
+    procedure SetTileBackground(const Value: Boolean);
   protected
     { Protected-Deklarationen }
     fUpdating: Boolean;
+    fCurrentBackground: TGraphic;
+    fCurrentBackgroundOverlay: TGraphic;
     fBackgroundOffset: TPoint;
+    fBackgroundOffsetOverlay: TPoint;
     fDoTileBackground: Boolean;
-    fCurrentBackgroundBitmap: TBitmap;
+    fDoTileBackgroundOverlay: Boolean;
 
     procedure PaintBitmapBackground;
-    procedure PaintSimpleBackground(Dest: TCanvas);
     procedure PaintFrame(Dest: TCanvas);
-
     procedure Paint; override;
   public
     { Public-Deklarationen }
@@ -72,17 +78,23 @@ type
     procedure HidePanel;
     procedure PaintBackgroundTo(Dest: TCanvas);
 
+    class procedure PaintSimpleBackground(Dest: TCanvas; aColor: TColor);
+    class procedure PaintGraphicBackground(aColor: TColor; aSource: TGraphic; aDest: TCanvas;
+      aOffset: TPoint; aTile, aResetCanvas: Boolean);
+
   published
     { Published-Deklarationen }
     property Ratio: Integer read fRatio write fRatio;
     property FixedHeight: Boolean read fFixedHeight write fFixedHeight default False;
     property DrawMode: TNempDrawMode read fDrawMode write SetDrawMode;
     property DrawFrame: Boolean read fDrawFrame write SetDrawFrame;
-    property DrawBackgroundBitmap: Boolean read fDrawBackgroundBitmap write SetDrawBackgroundBitmap default True; // if false: just use the BackGroundColor
-    property TileBackgroundBitmap: Boolean read fTileBackgroundBitmap write SetTileBackgroundBitmap default True;
+    property DrawBackground: Boolean read fDrawBackground write SetDrawBackground default True; // if false: just use the BackGroundColor
+    property TileBackground: Boolean read fTileBackground write SetTileBackground default True;
     property BackgroundBasePanel: Boolean read fBackgroundBasePanel write fBackgroundBasePanel default False;
+    property PanelType: teNempPanelType read fPanelType write fPanelType default ptNormal;
 
     property OnPaintBackground: TNempPanelPaintBackgroundEvent read fOnPaintBackground write fOnPaintBackground;
+    property OnPaintBackgroundEx: TNempPanelPaintBackgroundEvent read fOnPaintBackgroundEx write fOnPaintBackgroundEx;
     property OnPaint: TNotifyEvent read FOnPaint write FOnPaint;
     property OnAfterPaint: TNotifyEvent read FOnAfterPaint write FOnAfterPaint;
     property OwnerDraw: Boolean read FOwnerDraw write FOwnerDraw;
@@ -206,9 +218,10 @@ resourcestring
 constructor TNempPanel.Create(AOwner: TComponent);
 begin
   inherited;
-  fDrawBackgroundBitmap := True;
-  fTileBackgroundBitmap := True;
+  fDrawBackground := True;
+  fTileBackground := True;
   fBackgroundBasePanel := False;
+  fPanelType := ptNormal;
   fFixedHeight := False;
 end;
 
@@ -221,10 +234,10 @@ begin
   end;
 end;
 
-procedure TNempPanel.SetDrawBackgroundBitmap(const Value: Boolean);
+procedure TNempPanel.SetDrawBackground(const Value: Boolean);
 begin
-  if fDrawBackgroundBitmap <> Value then begin
-    fDrawBackgroundBitmap := Value;
+  if fDrawBackground <> Value then begin
+    fDrawBackground := Value;
     Invalidate;
   end;
 end;
@@ -253,10 +266,10 @@ begin
   end;
 end;
 
-procedure TNempPanel.SetTileBackgroundBitmap(const Value: Boolean);
+procedure TNempPanel.SetTileBackground(const Value: Boolean);
 begin
-  if fTileBackgroundBitmap <> Value then begin
-    fTileBackgroundBitmap := Value;
+  if fTileBackground <> Value then begin
+    fTileBackground := Value;
     Invalidate;
   end;
 end;
@@ -269,29 +282,46 @@ end;
 procedure TNempPanel.PaintBackgroundTo(Dest: TCanvas);
 begin
   fBackgroundOffset := Point(0,0);
-  fDoTileBackground := fTileBackgroundBitmap;
-  fCurrentBackgroundBitmap := Nil;
+  fDoTileBackground := fTileBackground;
+  fCurrentBackground := Nil;
 
+  // First round
   if assigned(fOnPaintBackground) then
-    fOnPaintBackground(self, fCurrentBackgroundBitmap, fBackgroundOffset, fDoTileBackground);
+    fOnPaintBackground(self, fCurrentBackground, fBackgroundOffset, fDoTileBackground);
+  if not Assigned(fCurrentBackground) then
+    PaintSimpleBackground(Dest, fBackgroundColor)
+  else
+    PaintGraphicBackground(fBackgroundColor, fCurrentBackground, Dest, fBackgroundOffset, fDoTileBackground, True);
 
-  if not Assigned(fCurrentBackgroundBitmap) then
-    PaintSimpleBackground(Dest)
-  else begin
-    if fDoTileBackground then
-      TileGraphic(fCurrentBackgroundBitmap, Dest, fBackgroundOffset)
-    else begin
-      PaintSimpleBackground(Dest);
-      Dest.Draw(fBackgroundOffset.x, fBackgroundOffset.y, fCurrentBackgroundBitmap);
-    end;
+  // Second round: Paint another Graphic, maybe an overlay symbol
+  if assigned(fOnPaintBackgroundEx) then begin
+    fBackgroundOffsetOverlay := Point(0,0);
+    fDoTileBackgroundOverlay := false;
+    fCurrentBackgroundOverlay := Nil;
+    fOnPaintBackgroundEx(self, fCurrentBackgroundOverlay, fBackgroundOffsetOverlay, fDoTileBackgroundOverlay);
+    if assigned(fCurrentBackgroundOverlay) then
+      PaintGraphicBackground(fBackgroundColor, fCurrentBackgroundOverlay, Dest, fBackgroundOffsetOverlay, fDoTileBackgroundOverlay, False);
+    // else: nothing to do here, no additional painting wanted
   end;
 end;
 
-procedure TNempPanel.PaintSimpleBackground(Dest: TCanvas);
+class procedure TNempPanel.PaintSimpleBackground(Dest: TCanvas; aColor: TColor);
 begin
   Dest.Brush.Style := bsSolid;
-  Dest.Brush.Color := fBackgroundColor;
+  Dest.Brush.Color := aColor;
   Dest.FillRect(Dest.ClipRect);
+end;
+
+class procedure TNempPanel.PaintGraphicBackground(aColor: TColor; aSource: TGraphic; aDest: TCanvas;
+  aOffset: TPoint; aTile, aResetCanvas: Boolean);
+begin
+    if aTile then
+      TileGraphic(aSource, aDest, aOffSet)
+    else begin
+      if aResetCanvas then
+        PaintSimpleBackground(aDest, aColor);
+      aDest.Draw(aOffset.x, aOffset.y, aSource);
+    end;
 end;
 
 procedure TNempPanel.PaintFrame(Dest: TCanvas);
@@ -310,14 +340,15 @@ begin
   else begin
     case fDrawMode of
       dm_Windows: begin
-        fCurrentBackgroundBitmap := Nil;
+        fCurrentBackground := Nil;
+        fCurrentBackgroundOverlay := Nil;
         inherited;
       end;
       dm_Skin: begin
-        if fDrawBackgroundBitmap then
+        if fDrawBackground then
           PaintBitmapBackground
         else
-          PaintSimpleBackground(Canvas);
+          PaintSimpleBackground(Canvas, fBackgroundColor);
         if fDrawFrame then
           PaintFrame(Canvas);
       end;
@@ -359,6 +390,7 @@ begin
     Message.Result := 1
   else
     inherited
+    // Message.Result := 1
 end;
 
 

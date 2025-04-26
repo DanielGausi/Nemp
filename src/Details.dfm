@@ -26,7 +26,7 @@ object FDetails: TFDetails
     Top = 3
     Width = 559
     Height = 489
-    ActivePage = Tab_General
+    ActivePage = Tab_MetaData
     Align = alClient
     MultiLine = True
     TabOrder = 0
@@ -721,16 +721,18 @@ object FDetails: TFDetails
               Top = 222
               Width = 80
               Height = 16
+              DoubleBuffered = True
               DrawMode = dm_Windows
+              ParentDoubleBuffered = False
               TabOrder = 10
               TransparentBackground = True
               StyleElements = [seFont, seBorder]
               Rating = 128
               AllowChangeRating = True
               OnRatingChanged = Btn_LibraryRatingRatingChanged
-              StarFullImageIndex = 0
-              StarHalfImageIndex = 1
-              StarEmptyImageIndex = 2
+              StarFullImageIndex = 29
+              StarHalfImageIndex = 30
+              StarEmptyImageIndex = 28
             end
           end
         end
@@ -742,8 +744,8 @@ object FDetails: TFDetails
       object GrpBox_Lyrics: TGroupBox
         Left = 0
         Top = 0
-        Width = 555
-        Height = 462
+        Width = 551
+        Height = 461
         Align = alClient
         Caption = 'Lyrics'
         TabOrder = 0
@@ -751,8 +753,8 @@ object FDetails: TFDetails
           AlignWithMargins = True
           Left = 5
           Top = 18
-          Width = 545
-          Height = 400
+          Width = 541
+          Height = 399
           Align = alClient
           ScrollBars = ssVertical
           TabOrder = 0
@@ -763,8 +765,8 @@ object FDetails: TFDetails
         object pnlSearchLyrics: TPanel
           AlignWithMargins = True
           Left = 5
-          Top = 424
-          Width = 545
+          Top = 423
+          Width = 541
           Height = 33
           Align = alBottom
           BevelOuter = bvNone
@@ -773,7 +775,7 @@ object FDetails: TFDetails
             AlignWithMargins = True
             Left = 8
             Top = 3
-            Width = 373
+            Width = 369
             Height = 27
             Margins.Left = 8
             Margins.Right = 8
@@ -789,7 +791,7 @@ object FDetails: TFDetails
           end
           object btnSearchLyrics: TButton
             AlignWithMargins = True
-            Left = 393
+            Left = 389
             Top = 4
             Width = 144
             Height = 25
@@ -860,12 +862,10 @@ object FDetails: TFDetails
             OnGetImageIndex = VSTCoverGetImageIndex
             Touch.InteractiveGestures = [igPan, igPressAndTap]
             Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-            ExplicitTop = 8
-            ExplicitWidth = 259
             Columns = <
               item
                 Position = 0
-                Width = 259
+                Width = 251
               end>
           end
           object pnlCoverCurrentSelection: TPanel
@@ -955,13 +955,11 @@ object FDetails: TFDetails
         Align = alClient
         Caption = 'Metadata frames'
         TabOrder = 0
-        ExplicitWidth = 555
-        ExplicitHeight = 273
         object VST_MetaData: TVirtualStringTree
           Left = 2
           Top = 15
-          Width = 551
-          Height = 256
+          Width = 547
+          Height = 255
           Align = alClient
           BorderStyle = bsNone
           BorderWidth = 1
@@ -1004,7 +1002,7 @@ object FDetails: TFDetails
             item
               Position = 3
               Text = 'Value'
-              Width = 331
+              Width = 325
             end>
         end
       end
@@ -1160,7 +1158,6 @@ object FDetails: TFDetails
             TabOrder = 2
             OnChange = edtID3v1Change
             OnExit = edtID3v1Exit
-            ExplicitWidth = 262
           end
           object Lblv1Artist: TEdit
             Tag = 1
@@ -1172,7 +1169,6 @@ object FDetails: TFDetails
             TabOrder = 0
             OnChange = edtID3v1Change
             OnExit = edtID3v1Exit
-            ExplicitWidth = 250
           end
           object Lblv1Titel: TEdit
             Tag = 2
@@ -1184,7 +1180,6 @@ object FDetails: TFDetails
             TabOrder = 1
             OnChange = edtID3v1Change
             OnExit = edtID3v1Exit
-            ExplicitWidth = 262
           end
           object Lblv1Year: TEdit
             Tag = 7
@@ -1197,7 +1192,6 @@ object FDetails: TFDetails
             TabOrder = 6
             OnChange = Lblv1YearChange
             OnExit = edtID3v1Exit
-            ExplicitLeft = 317
           end
           object Lblv1Comment: TEdit
             Tag = 4
@@ -1209,7 +1203,6 @@ object FDetails: TFDetails
             TabOrder = 3
             OnChange = edtID3v1Change
             OnExit = edtID3v1Exit
-            ExplicitWidth = 166
           end
           object Lblv1Track: TEdit
             Tag = 5
@@ -1222,7 +1215,6 @@ object FDetails: TFDetails
             TabOrder = 4
             OnChange = Lblv1TrackChange
             OnExit = edtID3v1Exit
-            ExplicitLeft = 317
           end
           object cbIDv1Genres: TComboBox
             Tag = 6
@@ -1251,7 +1243,6 @@ object FDetails: TFDetails
           Align = alRight
           Caption = 'MPEG'
           TabOrder = 1
-          ExplicitLeft = 371
           object LblConst_MpegBitrate: TLabel
             Left = 8
             Top = 48

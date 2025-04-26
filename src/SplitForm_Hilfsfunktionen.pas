@@ -63,11 +63,12 @@ uses Windows, forms, Classes, Controls, StdCtrls, ExtCtrls, Graphics, Nemp_Const
   procedure UpdateSmallMainForm;
   procedure UpdateFormDesignNeu(newMode: Integer; NempStarting: Boolean = False);
 
-  procedure PositionCloseImage(CloseBtn: TSkinButton; ParentPanel: TPanel);
-
 var
 
     SnapActive: Boolean;
+
+const
+  cSplitMainFormHeight = 108;
 
 implementation
 
@@ -676,10 +677,10 @@ begin
     begin
         // // SKIN_UMBAU_CHECK SlidebarShape.Left := 95;
         // // SKIN_UMBAU_CHECK SlidebarShape.Width := NewPlayerPanel.Width - 95 - 58;
-        BtnClose.Left      := NewPlayerPanel.Width - 18;
-        BtnMinimize.Left   := BtnClose.Left - 18;
+        //BtnClose.Left      := NewPlayerPanel.Width - 18;
+        //BtnMinimize.Left   := BtnClose.Left - 18;
         //PaintFrame.Left    := NewPlayerPanel.Width - PaintFrame.Width - 20; // 84;
-        PlayerTimeLbl.Left := NewPlayerPanel.Width - 43;
+        //PlayerTimeLbl.Left := NewPlayerPanel.Width - 43;
     end;
 end;
 
@@ -689,21 +690,25 @@ begin
     with Nemp_MainForm do
     begin
         __MainContainerPanel.Constraints.MinHeight := 10;
-
         Constraints.MinWidth := 0;
-        Constraints.MinHeight := 10;
-
+        Constraints.MinHeight := cSplitMainFormHeight;
+        Constraints.MaxHeight := cSplitMainFormHeight;
         NempLayout.PrepareSplitForm;
-        _ControlPanel.Align := alNone;
-        _ControlPanel.Parent := __MainContainerPanel;
 
+        Height := cSplitMainFormHeight;
+        _ControlPanel.Parent := __MainContainerPanel;
+        // _ControlPanel.Align := alClient;
+        _ControlPanel.AlignWithMargins := True;
+        _ControlPanel.Margins.SetBounds(4,4,4,4);
     end;
+
     // Set Size/position of the Mini-MainForm
     Nemp_MainForm.Borderstyle := bsNone;
     Nemp_MainForm.Top     := NempOptions.FormPositions[nfMainMini].Top;
     Nemp_MainForm.Left    := NempOptions.FormPositions[nfMainMini].Left;
     Nemp_MainForm.Width   := NempOptions.FormPositions[nfMainMini].Width;
-    Nemp_MainForm.Height  := Nemp_MainForm._ControlPanel.Height + 4;
+
+    //??Nemp_MainForm.Height  := Nemp_MainForm._ControlPanel.Height + 4;
 
     with Nemp_MainForm do
     begin
@@ -741,11 +746,10 @@ begin
           ExtendedControlForm.Show;
 
         // Set Size and Position of the ControlPanel
-        //_ControlPanel.Height := 100;
-        _ControlPanel.Left := 4;
-        _ControlPanel.Width := __MainContainerPanel.Width - 8;
-        _ControlPanel.Top  := 2;
-        _ControlPanel.Anchors := [akLeft, akRight, akTop];
+       // _ControlPanel.Left := 4;
+       // _ControlPanel.Width := __MainContainerPanel.Width - 8;
+       // _ControlPanel.Top  := 2;
+       // _ControlPanel.Anchors := [akLeft, akRight, akTop];
 
         // Set OnMouseEvents for Dragging the forms
         PlaylistFillPanel.OnMouseDown := PlaylistForm.OnMouseDown;
@@ -795,9 +799,10 @@ begin
         Top     := NempOptions.FormPositions[nfMainMini].Top;
         Left    := NempOptions.FormPositions[nfMainMini].Left;
         Width   := NempOptions.FormPositions[nfMainMini].Width;
-        Height  := _ControlPanel.Height + 4;
-        Constraints.MaxHeight := Height;
-        //Constraints.MinHeight := Height;
+        Height  :=  cSplitMainFormHeight; // _ControlPanel.Height + 4;
+        Constraints.MaxHeight := cSplitMainFormHeight;
+        Constraints.MinHeight := cSplitMainFormHeight;
+
         //if NempFormBuildOptions.ControlPanelTwoRows then
         //    Constraints.MinWidth := 214
         //else
@@ -815,6 +820,11 @@ begin
   with Nemp_MainForm do
   begin
 
+   _ControlPanel.Align := alBottom;
+   _ControlPanel.AlignWithMargins := False;
+   _ControlPanel.Height := 100;
+
+
     MedienListeControlPanel.Width := EditFastSearch.Left + EditFastSearch.Width + 6;
     MedienListeStatusLBL.Width := MedienlisteFillPanel.Width - 16;
 
@@ -827,16 +837,11 @@ begin
 
     FixScrollbar;
 
+
     if Medienlisteform.visible then Medienlisteform.Close;
     if Playlistform.visible then Playlistform.Close;
     if Auswahlform.Visible then Auswahlform.Close;
     if ExtendedControlForm.visible then ExtendedControlForm.Close;
-
-    // to be sure: set the Parent here as well
-    Auswahlform.CloseImageA.Parent := Auswahlform.ContainerPanelAuswahlform;
-    Medienlisteform.CloseImageM.Parent := Medienlisteform.ContainerPanelMedienBibForm;
-    Playlistform.CloseImageP.Parent := Playlistform.ContainerPanelPlaylistForm;
-    ExtendedControlForm.CloseImageE.Parent := ExtendedControlForm.ContainerPanelExtendedControlsForm;
 
     PlaylistFillPanel.OnMouseDown := NIL;
     PlayListStatusLBL.OnMouseDown := Nil;
@@ -906,11 +911,10 @@ begin
               + GetSystemMetrics(SM_CYFrame) - 1
               + aPoint.Y ;     }
 
-
         //xpleft   := GetSystemMetrics(SM_CXFrame) {+ - 2} + _ControlPanel.Left ;
         //xptop    := GetSystemMetrics(SM_CYCAPTION)  - 2 + GetSystemMetrics(SM_CYFrame) + _ControlPanel.Top ;
         xpright  := xpleft + width; //_ControlPanel.Width {+ 1} {+ 4};// - 1 + 4;
-        xpbottom := xptop + _ControlPanel.Height; //+ height; //_ControlPanel.Height  {+ 4};// - 1 + 3;
+        xpbottom := xptop + height; //  _ControlPanel.Height; //+ height; //_ControlPanel.Height  {+ 4};// - 1 + 3;
 
         //formRegion := CreateRectRgn (xpleft, xptop, xpright, xpbottom );
 
@@ -930,7 +934,7 @@ begin
   with Nemp_MainForm do
   begin
       RevokeDragFiles;
-//LockWindowUpdate (CoverScrollbar.Handle);
+      //LockWindowUpdate (CoverScrollbar.Handle);
 
       // one attempt to get rid of several AV with this scrollbar
       //CoverScrollbar.Visible := False;
@@ -972,8 +976,18 @@ begin
               Nemp_MainForm.Menu := Nemp_MainMenu;
       end;
 
-      BtnClose.Visible := newMode = 1;
-      BtnMinimize.Visible := newMode = 1;
+      pnlSysMediaList.Visible := newMode = 1;
+      pnlSysBrowse.Visible := newMode = 1;
+      pnlSysCoverflow.Visible := newMode = 1;
+      pnlSysCloud.Visible := newMode = 1;
+      pnlSysPlaylist.Visible := newMode = 1;
+      pnlSysDetails.Visible := newMode = 1;
+      pnlSysMain.Visible := newMode = 1;
+      if pnlSysMain.Visible then
+        pnlSysMain.Left := pnlSysMain.Parent.Width - pnlSysMain.Width;
+      // BtnClose.Visible := newMode = 1;
+      // BtnMinimize.Visible := newMode = 1;
+
       // temporary for this procedure
       PanelCoverBrowse.OnResize := Nil;
 
@@ -1104,16 +1118,6 @@ begin
   RegisterDragDrop(Nemp_MainForm.CoverflowPanel.Handle, Nemp_MainForm.fDropManager as IDropTarget);
   RegisterDragDrop(FormHeadsetControl.Handle, Nemp_MainForm.fDropManager as IDropTarget);
 end;
-
-procedure PositionCloseImage(CloseBtn: TSkinButton; ParentPanel: TPanel);
-begin
-  CloseBtn.Left := ParentPanel.Width - CloseBtn.Width - 2;
-  CloseBtn.Top := 4;
-  CloseBtn.Parent := ParentPanel;
-  CloseBtn.BringToFront;
-end;
-
-
 
 initialization
 

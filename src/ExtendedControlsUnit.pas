@@ -53,7 +53,6 @@ uses
 type
   TExtendedControlForm = class(TNempSubForm)
     ContainerPanelExtendedControlsForm: TNempPanel;
-    CloseImageE: TSkinButton;
     pnlSplit: TPanel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
@@ -63,10 +62,7 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure FormShow(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure ContainerPanelExtendedControlsFormPaint(Sender: TObject);
-    procedure FormHide(Sender: TObject);
     procedure CloseImageEClick(Sender: TObject);
-    procedure FormActivate(Sender: TObject);
     procedure ContainerPanelExtendedControlsFormMouseUp(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure ContainerPanelExtendedControlsFormMouseMove(Sender: TObject;
@@ -75,7 +71,7 @@ type
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure FormResize(Sender: TObject);
     procedure ContainerPanelExtendedControlsFormPaintBackground(
-      Sender: TNempPanel; var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
+      Sender: TNempPanel; var Bitmap: TGraphic; var Offset: TPoint; var Tile: Boolean);
   private
     { Private-Deklarationen }
 
@@ -133,22 +129,10 @@ begin
     Resizing := False;
 end;
 
-procedure TExtendedControlForm.ContainerPanelExtendedControlsFormPaint(
-  Sender: TObject);
-begin
-  //  Nemp_MainForm.NempSkin.DrawARegularPanel((Sender as TNempPanel),
-  //  Nemp_MainForm.NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
-end;
-
 procedure TExtendedControlForm.ContainerPanelExtendedControlsFormPaintBackground(
-  Sender: TNempPanel; var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
+  Sender: TNempPanel; var Bitmap: TGraphic; var Offset: TPoint; var Tile: Boolean);
 begin
-  Nemp_MainForm.NempSkin.OnPaintBackgroundRegularPanel(Sender, Bitmap, Offset, Tile);
-end;
-
-procedure TExtendedControlForm.FormActivate(Sender: TObject);
-begin
-  PositionCloseImage(CloseImageE, Nemp_MainForm.MedienBibDetailPanel);
+  Nemp_MainForm.NempSkin.OnPaintControlBackground(Sender, Bitmap, Offset, Tile);
 end;
 
 procedure TExtendedControlForm.FormClose(Sender: TObject;
@@ -158,14 +142,8 @@ begin
   BTop    := Top   ;
   BHeight := Height;
   BWidth  := Width ;
-  CloseImageE.Parent := ExtendedControlForm.ContainerPanelExtendedControlsForm;
 end;
 
-
-procedure TExtendedControlForm.FormHide(Sender: TObject);
-begin
-    CloseImageE.Parent := ExtendedControlForm.ContainerPanelExtendedControlsForm;
-end;
 
 procedure TExtendedControlForm.SetPartySize(w, h: Integer);
 begin
@@ -201,7 +179,7 @@ begin
         NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.Left;
         NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.Top;
 
-        if (Nemp_MainForm.NempSkin.isActive) and (NOT Nemp_MainForm.NempSkin.FixedBackGround) then
+        if (Nemp_MainForm.NempSkin.isActive) {and (NOT Nemp_MainForm.NempSkin.FixedBackGround)} then
         begin
             Nemp_MainForm.NempSkin.RepairSkinOffset;
             RepaintForm;
@@ -229,7 +207,7 @@ begin
 
     NempRegionsDistance.docked := tmp;
 
-    if (Nemp_MainForm.NempSkin.isActive) and (NOT Nemp_MainForm.NempSkin.FixedBackGround) then
+    if (Nemp_MainForm.NempSkin.isActive) {and (NOT Nemp_MainForm.NempSkin.FixedBackGround)} then
     begin
         Nemp_MainForm.NempSkin.RepairSkinOffset;
         RepaintForm;
@@ -243,7 +221,7 @@ begin
 
     If Nemp_MainForm.NempSkin.isActive then
     begin
-        Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.VST);
+        Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.VST);
         //Repaint;
     end;
 end;
@@ -260,7 +238,7 @@ begin
   Top    := BTop    ;
   Height := BHeight ;
   Width  := BWidth  ;
-  PositionCloseImage(CloseImageE, Nemp_MainForm.MedienBibDetailPanel);
+
   SetRegion(ContainerPanelExtendedControlsForm, self, NempRegionsDistance, handle);
 
   // Das ist nötig, um z.B. zu korrigieren, dass die Form komplett unter Form1 versteckt ist!!
@@ -311,8 +289,6 @@ begin
       NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.Left;
       NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.Top;
   end;
-
-
   Message.Result := 0;
 end;
 

@@ -112,7 +112,7 @@ type
 
           procedure BackupOriginalPositions;
 
-          procedure SetButtonPos(aButton: TNempButtonData; var aIndex: Integer); // used by Skin.SetButtonsizes
+          // procedure SetButtonPos(aButton: TNempButtonData; var aIndex: Integer); // used by Skin.SetButtonsizes
 
           function Bigger(value: Integer): Integer;
           function Smaller(value: Integer): Integer;
@@ -263,14 +263,14 @@ begin
 end;
 
 
-procedure TNempPartyMode.SetButtonPos(aButton: TNempButtonData; var aIndex: Integer);
+(*procedure TNempPartyMode.SetButtonPos(aButton: TNempButtonData; var aIndex: Integer);
 begin
     fPositionArray[aIndex].Left := aButton.Left;
     fPositionArray[aIndex].Top  := aButton.Top;
     fPositionArray[aIndex].Width := aButton.Width;
     fPositionArray[aIndex].Height := aButton.Height;
     inc(aIndex);
-end;
+end;*)
 
 
 procedure TNempPartyMode.BackupOriginalPositions;
@@ -305,7 +305,7 @@ begin
         // ==============================
         //SetOriginalPosition(VolButton           , i);
         inc(i);
-        SetOriginalPosition(VolumeImage         , i);
+        //SetOriginalPosition(VolumeImage         , i);
 
         // controls in Slide-part
         SetOriginalPosition(PlayerArtistLabel   , i);
@@ -331,7 +331,7 @@ begin
         SetOriginalPosition(TabBtn_Cover        , i);
         SetOriginalPosition(TabBtn_SummaryLock  , i);
         SetOriginalPosition(TabBtn_Equalizer    , i);
-        SetOriginalPosition(TabBtn_MainPlayerControl , i);
+        // SetOriginalPosition(TabBtn_MainPlayerControl , i);
         SetOriginalPosition(TabBtn_Headset      , i);
 
         SetOriginalPosition(TabBtn_Preselection0 , i);
@@ -399,7 +399,7 @@ begin
         // SKIN_UMBAU_CHECKSetAdditionalOriginalPosition(  HeadsetControlPanel      , i);
         // SKIN_UMBAU_CHECKSetAdditionalOriginalPosition(ControlContainer2          , i);
         inc(i,2); // möglicher fix für das löschen der beiden davor
-        SetAdditionalOriginalPosition(NewPlayerPanel             , i);
+        //SetAdditionalOriginalPosition(NewPlayerPanel             , i);
         // SKIN_UMBAU_CHECK SetAdditionalOriginalPosition(SlideBarShape   , i);
         // SKIN_UMBAU_CHECK SetAdditionalOriginalPosition(SlideBarButton  , i);
         SetAdditionalOriginalPosition(PlayerTimeLbl   , i);
@@ -426,7 +426,7 @@ end;
 
 procedure TNempPartyMode.CorrectMainForm;
 var ChangeProc: TChangeProc;
-    i, currentLeft, SlideBarDiff: Integer;
+    i, currentLeft: Integer;
     c: tControl;
 begin
     if fActive then
@@ -540,7 +540,7 @@ begin
         PlayerControlCoverPanel .Height := ChangeProc(fAdditionalPositionsArray[22].Height);
         PlayerControlPanel      .Height := ChangeProc(fAdditionalPositionsArray[23].Height);
         // SKIN_UMBAU_CHECK HeadsetControlPanel     .Height := ChangeProc(fAdditionalPositionsArray[24].Height);
-        NewPlayerPanel          .Height := ChangeProc(fAdditionalPositionsArray[26].Height);
+        //NewPlayerPanel          .Height := ChangeProc(fAdditionalPositionsArray[26].Height);
 
         //ControlContainer1.Width := ChangeProc(fAdditionalPositionsArray[20].Width);
         OutputControlPanel      .Width  := ChangeProc(fAdditionalPositionsArray[21].Width);
@@ -592,7 +592,7 @@ begin
         PlayerTimeLbl.Font.Size  := ChangeProc(fAdditionalPositionsArray[29].FontSize);
         PlayerTimeLbl.Left := PlayerTimeLbl.Left - (PlayerTimeLbl.Width - currentLeft);
 
-        SlideBarDiff := SlideBarDiff + (PlayerTimeLbl.Width - currentLeft);
+        // SlideBarDiff := SlideBarDiff + (PlayerTimeLbl.Width - currentLeft);
         // SKIN_UMBAU_CHECK SlideBarShape.Width := SlideBarShape.Width - SlideBarDiff;
 
         // =================================
@@ -757,10 +757,11 @@ begin
         end;
 
         // Images
-        ScrobblerImage    .Enabled := not DoBlockTools;
-        BirthdayImage     .Enabled := not DoBlockTools;
-        SleepImage        .Enabled := not DoBlockTools;
-        WebserverImage    .Enabled := not DoBlockTools;
+        viLastFM        .Enabled := not DoBlockTools;
+        viBirthdayTimer .Enabled := not DoBlockTools;
+        viSleepTimer    .Enabled := not DoBlockTools;
+        viWebserver     .Enabled := not DoBlockTools;
+        viWinamp        .Enabled := not DoBlockTools;
     end;
 
 end;

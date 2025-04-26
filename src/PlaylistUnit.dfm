@@ -13,9 +13,7 @@ object PlaylistForm: TPlaylistForm
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
-  OnActivate = FormActivate
   OnClose = FormClose
-  OnHide = FormHide
   OnKeyDown = FormKeyDown
   OnMouseDown = FormMouseDown
   OnMouseMove = FormMouseMove
@@ -38,40 +36,26 @@ object PlaylistForm: TPlaylistForm
     Ratio = 0
     DrawMode = dm_Windows
     DrawFrame = False
+    BackgroundBasePanel = True
     OnPaintBackground = ContainerPanelPlaylistFormPaintBackground
-    OnPaint = ContainerPanelPlaylistFormPaint
     OwnerDraw = False
-    DesignSize = (
-      420
-      303)
-    object CloseImageP: TSkinButton
-      Left = 408
-      Top = 0
-      Width = 12
-      Height = 12
-      Hint = 'Close playlist window'
-      Anchors = [akTop, akRight]
-      DrawMode = dm_Skin
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 0
-      TabStop = False
-      StyleElements = [seFont, seBorder]
-      OnClick = CloseImagePClick
-    end
     object pnlSplit: TPanel
       AlignWithMargins = True
-      Left = 7
-      Top = 2
-      Width = 406
-      Height = 294
-      Margins.Left = 7
-      Margins.Top = 2
-      Margins.Right = 7
-      Margins.Bottom = 7
+      Left = 8
+      Top = 6
+      Width = 404
+      Height = 289
+      Margins.Left = 8
+      Margins.Top = 6
+      Margins.Right = 8
+      Margins.Bottom = 8
       Align = alClient
       BevelOuter = bvNone
-      TabOrder = 1
+      TabOrder = 0
+      ExplicitLeft = 7
+      ExplicitTop = 2
+      ExplicitWidth = 406
+      ExplicitHeight = 294
     end
   end
 end

@@ -52,14 +52,12 @@ uses
 type
   TAuswahlForm = class(TNempSubForm)
     ContainerPanelAuswahlform: TNempPanel;
-    CloseImageA: TSkinButton;
     pnlSplit: TPanel;
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure FormShow(Sender: TObject);
 
     procedure FormResize(Sender: TObject);
-    procedure CloseImageAClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
@@ -67,17 +65,14 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure FormKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
-    procedure FormActivate(Sender: TObject);
-    procedure ContainerPanelAuswahlformPaint(Sender: TObject);
     procedure ContainerPanelAuswahlformMouseMove(Sender: TObject;
       Shift: TShiftState; X, Y: Integer);
     procedure ContainerPanelAuswahlformMouseDown(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure ContainerPanelAuswahlformMouseUp(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure FormHide(Sender: TObject);
     procedure ContainerPanelAuswahlformPaintBackground(Sender: TNempPanel;
-      var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
+      var Bitmap: TGraphic; var Offset: TPoint; var Tile: Boolean);
 
   private
     { Private-Deklarationen }
@@ -112,7 +107,6 @@ begin
   Height := BHeight ;
   Width  := BWidth  ;
 
-  PositionCloseImage(CloseImageA, Nemp_MainForm.TreePanel);
   SetRegion(ContainerPanelAuswahlForm, self, NempRegionsDistance, handle);
 
   // Das ist nötig, um z.B. zu korrigieren, dass die Form komplett unter Form1 versteckt ist!!
@@ -152,21 +146,10 @@ begin
     Resizing := False;
 end;
 
-procedure TAuswahlForm.ContainerPanelAuswahlformPaint(Sender: TObject);
-begin
-//    Nemp_MainForm.NempSkin.DrawARegularPanel((Sender as TNempPanel),
-//    Nemp_MainForm.NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
-end;
-
 procedure TAuswahlForm.ContainerPanelAuswahlformPaintBackground(
-  Sender: TNempPanel; var Bitmap: TBitmap; var Offset: TPoint; var Tile: Boolean);
+  Sender: TNempPanel; var Bitmap: TGraphic; var Offset: TPoint; var Tile: Boolean);
 begin
-  Nemp_MainForm.NempSkin.OnPaintBackgroundRegularPanel(Sender, Bitmap, Offset, Tile);
-end;
-
-procedure TAuswahlForm.FormActivate(Sender: TObject);
-begin
-  PositionCloseImage(CloseImageA, Nemp_MainForm.TreePanel);
+  Nemp_MainForm.NempSkin.OnPaintControlBackground(Sender, Bitmap, Offset, Tile);
 end;
 
 procedure TAuswahlForm.FormClose(Sender: TObject;
@@ -176,16 +159,10 @@ begin
   BTop    := Top   ;
   BHeight := Height;
   BWidth  := Width ;
-  CloseImageA.Parent := Auswahlform.ContainerPanelAuswahlform;
   if MedienlisteForm.Visible then
   begin
     MedienBib.GenerateAnzeigeListe(Nil);
   end;
-end;
-
-procedure TAuswahlForm.FormHide(Sender: TObject);
-begin
-    CloseImageA.Parent := Auswahlform.ContainerPanelAuswahlform;
 end;
 
 procedure TAuswahlForm.FormMouseDown(Sender: TObject; Button: TMouseButton;
@@ -209,20 +186,10 @@ begin
   If Nemp_MainForm.NempSkin.isActive then
   begin
       // Nemp_MainForm.NempSkin.SetArtistAlbumOffsets;
-      Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.ArtistsVST);
-      Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.AlbenVST);
+      Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.ArtistsVST);
+      Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.AlbenVST);
       Repaint;
   end;
-end;
-
-procedure TAuswahlForm.CloseImageAClick(Sender: TObject);
-begin
-  with Nemp_MainForm do
-  begin
-    NempOptions.FormPositions[fNempFormID].Visible := False;
-    actToggleBrowseList.Checked := NempOptions.FormPositions[fNempFormID].Visible;
-  end;
-  close;
 end;
 
 procedure TAuswahlForm.FormMouseMove(Sender: TObject; Shift: TShiftState;
@@ -236,8 +203,8 @@ begin
     NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.Top;
     If Nemp_MainForm.NempSkin.isActive then
     begin
-        Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.ArtistsVST);
-      Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.AlbenVST);
+      Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.ArtistsVST);
+      Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.AlbenVST);
       //Repaint;
     end;
   end;
@@ -262,11 +229,11 @@ begin
 
     NempRegionsDistance.docked := tmp;
 
-    if (Nemp_MainForm.NempSkin.isActive) and (NOT Nemp_MainForm.NempSkin.FixedBackGround) then
+    if (Nemp_MainForm.NempSkin.isActive) {and (NOT Nemp_MainForm.NempSkin.FixedBackGround)} then
     begin
         Nemp_MainForm.NempSkin.RepairSkinOffset;
-        Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.ArtistsVST);
-        Nemp_MainForm.NempSkin.RefreshTreeOffsets(Nemp_MainForm.AlbenVST);
+        Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.ArtistsVST);
+        Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.AlbenVST);
         RepaintForm;
     end;
 end;

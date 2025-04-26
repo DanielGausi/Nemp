@@ -1697,6 +1697,7 @@ begin
                                           NEMP_API_STOPPED, NEMP_API_PAUSED: begin
                                                 // SKIN_UMBAU_CHECK PlayPauseBTN.GlyphLine := 0;
                                                 //xxxNempTaskbarManager.ThumbButtons.Items[1].ImageIndex := 1;
+                                                PlayPauseBTN.ImageName := cBtnPlayerPlay;
                                                 AssignTaskbarIcon(1,1);
                                                 PM_TNA_PlayPause.Caption := PlayerBtn_Play;
                                                 PM_TNA_PlayPause.ImageIndex := 1;
@@ -1706,6 +1707,7 @@ begin
                                           NEMP_API_PLAYING : begin
                                             // SKIN_UMBAU_CHECK PlayPauseBTN.GlyphLine := 1;
                                             //xxxNempTaskbarManager.ThumbButtons.Items[1].ImageIndex := 2;
+                                            PlayPauseBTN.ImageName := cBtnPlayerPause;
                                             AssignTaskbarIcon(1,2);
                                             PM_TNA_PlayPause.Caption := PlayerBtn_Pause;
                                             PM_TNA_PlayPause.ImageIndex := 2;
@@ -1754,9 +1756,11 @@ begin
                                          and (NempPlayer.BassStatus = BASS_ACTIVE_PLAYING)
                                          and (NempPlayer.StreamType <> 'Ogg');
                           end
-                          else
+                          else begin
                             // monitor buffering progress
                             PlayerArtistLabel.Caption := 'Buffering ' + NempPlayer.GetBufferProgress.ToString + '%';
+                            RecordBtn.Enabled := False;
+                          end;
                       end;
                     end;
     end;
@@ -1764,10 +1768,17 @@ begin
     WM_PlayerStop, WM_PlayerPlay: begin
                                     BassTimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
 
+                                    RecordBtn.Visible := assigned(NempPlayer.MainAudioFile)
+                                         and NempPlayer.MainAudioFile.isStream;
+
                                     RecordBtn.Enabled := assigned(NempPlayer.MainAudioFile)
                                          and NempPlayer.MainAudioFile.isStream
                                          and (NempPlayer.BassStatus = BASS_ACTIVE_PLAYING)
+                                         and NempPlayer.FinishBuffering
                                          and (NempPlayer.StreamType <> 'Ogg');
+
+                                    if RecordBtn.Visible then
+                                      RecordBtn.Left := PlayNextBTN.Left + PlayNextBTN.Width;
 
                                     if  Message.Msg = WM_PlayerStop then
                                     begin
@@ -1784,6 +1795,7 @@ begin
     WM_PlayerStopRecord : begin
                                  // Aufnahme wurde beendet
                                 // SKIN_UMBAU_CHECK RecordBtn.GlyphLine := 0;
+                                RecordBtn.ImageName := cBtnPlayerRecordOff;
                                 RecordBtn.Hint := (MainForm_RecordBtnHint_Start);
     end;
 

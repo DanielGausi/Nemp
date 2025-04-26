@@ -77,13 +77,20 @@ type
       TagBlendColor: TColor;
       TagBlendIntensity: Integer;
 
-      CurrentBackgroundImage: TBitmap;
       UseBackGround: Boolean;
+
+      CurrentBackgroundImage: TGraphic;
+      CurrentBackgroundOverlay: TGraphic;
       TileBackGround: Boolean;
+      TileBackGroundOverlay: Boolean;
       BackgroundOffset: TPoint;
+      BackgroundOffsetOverlay: TPoint;
+
       constructor Create;
       destructor Destroy; override;
-      procedure TileGraphic(const ASource: TBitmap; const ATarget: TCanvas; X, Y: Integer);
+      procedure TileGraphic(const ASource: TGraphic; const ATarget: TCanvas; X, Y: Integer);
+      procedure TileOverlay(const ASource: TGraphic; const ATarget: TCanvas; X, Y: Integer);
+
       procedure AlphaBlendCloud(TargetCanvas: TCanvas; Width, Height, Left, Top: Integer; Mode: TBlendMode);
   end;
 
@@ -409,8 +416,13 @@ begin
     try
       tmp.Width := fWidth;
       tmp.Height := fHeight;
-      // TagCustomizer.TileGraphic(tmp.Canvas, TagCustomizer.OffSetX + fLeft, TagCustomizer.OffSetY + fTop );
-      TagCustomizer.TileGraphic(TagCustomizer.CurrentBackgroundImage, tmp.Canvas, - fLeft + TagCustomizer.BackgroundOffset.X, - fTop + TagCustomizer.BackgroundOffset.Y);
+      // Background
+      if assigned(TagCustomizer.CurrentBackgroundImage) then
+        TagCustomizer.TileGraphic(TagCustomizer.CurrentBackgroundImage, tmp.Canvas, - fLeft + TagCustomizer.BackgroundOffset.X, - fTop + TagCustomizer.BackgroundOffset.Y);
+      // optional overlay image
+      if assigned(TagCustomizer.CurrentBackgroundOverlay) then
+        TagCustomizer.TileOverlay(TagCustomizer.CurrentBackgroundOverlay, tmp.Canvas, - fLeft + TagCustomizer.BackgroundOffsetOverlay.X, - fTop + TagCustomizer.BackgroundOffsetOverlay.Y);
+      // actually draw it on the Canvas
       aCanvas.Draw(fLeft, fTop, tmp);
     finally
       tmp.Free;
@@ -643,12 +655,12 @@ begin
         DoPaintTags(Canvas);
       end;
       dm_Skin: begin
-        if DrawBackgroundBitmap then begin
+        if DrawBackground then begin
           PaintBitmapBackground;
           AlphaBlandCloud(Canvas);
         end
         else
-          PaintSimpleBackground(Canvas);
+          PaintSimpleBackground(Canvas, BackgroundColor);
 
         // paint Tags
         DoPaintTags(Canvas);
@@ -681,10 +693,14 @@ procedure TCloudView.DoPaintTags(aCanvas: TCanvas);
 var
   i, y: Integer;
 begin
-  TagCustomizer.CurrentBackgroundImage := fCurrentBackgroundBitmap;
-  TagCustomizer.UseBackGround := assigned(TagCustomizer.CurrentBackgroundImage);
+
+  TagCustomizer.CurrentBackgroundImage := fCurrentBackground;
+  TagCustomizer.CurrentBackgroundOverlay := fCurrentBackgroundOverlay;
   TagCustomizer.TileBackground := fDoTileBackground;
+  TagCustomizer.TileBackGroundOverlay := fDoTileBackgroundOverlay;
   TagCustomizer.BackgroundOffset := fBackgroundOffset;
+  TagCustomizer.BackgroundOffsetOverlay := fBackgroundOffsetOverlay;
+  TagCustomizer.UseBackGround := assigned(TagCustomizer.CurrentBackgroundImage) or assigned(TagCustomizer.CurrentBackgroundOverlay);
 
   // Paint BreadCrumbs
   for i := 0 to fPaintBreadCrumbs.Count - 1 do
@@ -1672,9 +1688,7 @@ end;
 // This is (almost) a copy of NempSkin.TileGraphic,
 // but without the Stretch-stuff
 procedure TTagCustomizer.TileGraphic(
-  const ASource: TBitmap; const ATarget: TCanvas; X, Y: Integer);
-var
-  xstart, xloop, yloop: Integer;
+  const ASource: TGraphic; const ATarget: TCanvas; X, Y: Integer);
 begin
   if (not assigned(ASource)) or (ASource.Width * ASource.Height = 0) then exit;
 
@@ -1687,6 +1701,16 @@ begin
     ATarget.FillRect(ATarget.ClipRect);
     ATarget.Draw(x, y, ASource);
   end;
+end;
+
+procedure TTagCustomizer.TileOverlay(const ASource: TGraphic; const ATarget: TCanvas; X, Y: Integer);
+begin
+  if (not assigned(ASource)) or (ASource.Width * ASource.Height = 0) then exit;
+
+  if TileBackgroundOverlay then
+    NempControls.Common.TileGraphic(ASource, aTarget, Point(x, y))
+  else
+    ATarget.Draw(x, y, ASource);
 end;
 
 

@@ -122,7 +122,7 @@ type
 
 implementation
 
-uses NempAudioFiles, NempMainUnit, math;
+uses NempAudioFiles, NempMainUnit, Nemp_ConstantsAndTypes, math;
 
 {
     --------------------------------------------------------
@@ -196,9 +196,8 @@ begin
   FEdit.TransparentBackground := False;
   FEdit.CustomBackground := fBackGroundImage;
   FEdit.Images := Images;
-  FEdit.StarFullImageIndex := StarFullImageIndex;
-  FEdit.StarHalfImageIndex := StarHalfImageIndex;
-  FEdit.StarEmptyImageIndex := StarEmptyImageIndex;
+  SetRatingImages(FEdit);
+
   FEdit.Alignment := taLeftJustify;
   FEdit.WantArrowButtons := True;
   FEdit.Visible := False;

@@ -157,7 +157,7 @@ implementation
 
 {$R *.dfm}
 
-Uses NempMainUnit, TagClouds, MainFormHelper, MedienbibliothekClass;
+uses NempMainUnit, TagClouds, MainFormHelper, MedienbibliothekClass;
 
 
 Constructor TTagSetting.Create;
@@ -200,7 +200,7 @@ begin
   TagRoot := TRootCollection.Create(Nil);
   TagRoot.AddSubCollectionType(ccTagCloud, csCount, sd_Descending);
 
-  ini := TMeminiFile.Create(SavePath + 'RandomPlaylist.ini', TEncoding.UTF8);
+  ini := TMeminiFile.Create(NempSettingsManager.SavePath + 'RandomPlaylist.ini', TEncoding.UTF8);
   try
     ini.Encoding := TEncoding.UTF8;
     LastSelection := Ini.ReadInteger('Allgemein', 'LastSelection', 0);
@@ -354,6 +354,7 @@ end;
 procedure TRandomPlaylistForm.SetRatingImageList(const Value: TCustomImageList);
 begin
   RatingButton.Images := Value;
+  SetRatingImages(RatingButton);
 end;
 
 procedure TRandomPlaylistForm.RecheckLastCheckedTags;
@@ -504,7 +505,7 @@ begin
   end;
 
 
-  ini := TMeminiFile.Create(SavePath + 'RandomPlaylist.ini', TEncoding.UTF8);
+  ini := TMeminiFile.Create(NempSettingsManager.SavePath + 'RandomPlaylist.ini', TEncoding.UTF8);
   try
     ini.Encoding := TEncoding.UTF8;
     if ini.SectionExists('GenreSetting' + IntToStr(idx)) then
@@ -560,7 +561,7 @@ procedure TRandomPlaylistForm.SaveSettings;
 var ini: TMemIniFile;
     i: Integer;
 begin
-  ini := TMeminiFile.Create(SavePath + 'RandomPlaylist.ini', TEncoding.UTF8);
+  ini := TMeminiFile.Create(NempSettingsManager.SavePath + 'RandomPlaylist.ini', TEncoding.UTF8);
   try
     ini.Encoding := TEncoding.UTF8;
     Ini.WriteInteger('Allgemein', 'LastSelection', LastSelection);

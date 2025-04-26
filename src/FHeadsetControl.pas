@@ -33,8 +33,6 @@ type
     PM_H_PlayAndClearPlaylist: TMenuItem;
     PM_H_EnqueueAfterCurrentTitle: TMenuItem;
     PM_H_JustPlay: TMenuItem;
-    Button1: TButton;
-    Button2: TButton;
     procedure FormCreate(Sender: TObject);
     procedure HeadsetTimerTimer(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -62,8 +60,6 @@ type
     procedure BtnHeadsetPlaynowClick(Sender: TObject);
     procedure BtnHeadsetToPlaylistClick(Sender: TObject);
     procedure InsertHeadsetToPlaylistClick(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
 
   private
     { Private-Deklarationen }
@@ -79,10 +75,6 @@ type
     procedure ShowHeadsetProgress(aProgress: Double; aSeconds: Integer);
     procedure OnHeadSetFileChanged(Sender: TObject);
 
-
-    procedure OnTest1(Sender: TObject);
-    procedure OnTest2(Sender: TObject);
-
   public
     { Public-Deklarationen }
     property DropManager : TNempDragManager read fDropManager write fDropManager;
@@ -95,7 +87,7 @@ var
 implementation
 
 uses
-  Nemp_RessourceStrings, PlayerClass, PlaylistClass, MedienBibliothekClass,
+  Nemp_RessourceStrings, Nemp_ConstantsAndTypes, PlayerClass, PlaylistClass, MedienBibliothekClass,
   AudioDisplayUtils, math, TreeHelper, AudioFileManagement;
 
 {$R *.dfm}
@@ -108,6 +100,8 @@ end;
 
 procedure TFormHeadsetControl.FormShow(Sender: TObject);
 begin
+  SetRatingImages(BtnHeadsetRating);
+
   rbVolume.Position := Round(NempPlayer.HeadSetVolume);
   NempPlayer.OnHeadSetPlay := OnHeadSetPlayChange;
   NempPlayer.OnHeadSetPause := OnHeadSetPlayChange;
@@ -302,21 +296,6 @@ begin
   HandleInsertHeadsetToPlaylist(NempPlaylist.HeadSetAction);
 end;
 
-procedure TFormHeadsetControl.Button1Click(Sender: TObject);
-begin
-  TAudioFileManager.OnAudioFileChanged.Add(OnTest1);
-  TAudioFileManager.OnAudioFileChanged.Add(OnTest2);
-
-  TAudioFileManager.FinalizeAudioFileChange(NempPlayer.HeadSetAudioFile)
-end;
-
-procedure TFormHeadsetControl.Button2Click(Sender: TObject);
-begin
-  TAudioFileManager.OnAudioFileChanged.Delete(OnTest2);
-
-  TAudioFileManager.FinalizeAudioFileChange(NempPlayer.HeadSetAudioFile)
-end;
-
 procedure TFormHeadsetControl.InsertHeadsetToPlaylistClick(Sender: TObject);
 begin
   HandleInsertHeadsetToPlaylist((Sender as TMenuItem).Tag);
@@ -331,17 +310,6 @@ begin
     if TAudioFileManager.SameFile(aFile, NempPlayer.HeadSetAudioFile) then
       RefreshHeadSetData;
   end;
-end;
-
-
-procedure TFormHeadsetControl.OnTest1(Sender: TObject);
-begin
-  ShowMEssage(TAudioFileManager.OnAudioFileChanged.Count.ToString +  ' Artist ' + TAudioFile(Sender).Artist);
-end;
-
-procedure TFormHeadsetControl.OnTest2(Sender: TObject);
-begin
-  ShowMEssage(TAudioFileManager.OnAudioFileChanged.Count.ToString + ' Titel ' + TAudioFile(Sender).Titel);
 end;
 
 end.

@@ -27,6 +27,8 @@ object FormBibSearch: TFormBibSearch
     Anchors = [akRight, akBottom]
     Caption = 'Search'
     Default = True
+    ImageIndex = 23
+    ImageName = 'imgSearch'
     TabOrder = 0
     OnClick = Btn_ExtendedSearchClick
   end
@@ -238,7 +240,7 @@ object FormBibSearch: TFormBibSearch
           Anchors = [akLeft, akTop, akRight, akBottom]
           Columns = 2
           Enabled = False
-          ItemHeight = 13
+          ItemHeight = 17
           Sorted = True
           TabOrder = 1
         end
