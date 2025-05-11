@@ -63,7 +63,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, System.UITypes, System.Types,
-  ExtCtrls, StrUtils, ShellAPI {$IFNDEF NO_UNICODE}, WideStrings{$ENDIF} {$IFNDEF NOPNGSUPPORT}, PNGImage{$ENDIF};
+  Vcl.ImgList, ExtCtrls, StrUtils, ShellAPI {$IFNDEF NO_UNICODE}, WideStrings{$ENDIF} {$IFNDEF NOPNGSUPPORT}, PNGImage{$ENDIF};
 
 type
   {$IFDEF NO_UNICODE}
@@ -272,7 +272,7 @@ type
     /// Can be used to redefine the width of a picture
     FCustomPicSizeEvent: TCustomPicSizeEvent;
     /// The image list which holds the images one can embed with [img=""]
-    FImageList: TImageList;
+    FImageList: TCustomImageList;
     /// Describes the visibility of the component.
     FVisible: Boolean;
     /// The index of the last shown credit
@@ -372,7 +372,7 @@ type
     procedure SetBounds(ALeft: Integer; ATop: Integer; AWidth: Integer;
       AHeight: Integer); override;
   published
-    property Images: TImageList read FImageList write FImageList;
+    property Images: TCustomImageList read FImageList write FImageList;
     {$IFDEF NO_UNICODE}
     property Credits: TStringList Read FCredits Write SetCredits;
     {$ELSE}

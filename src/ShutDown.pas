@@ -37,9 +37,9 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, StdCtrls, NempAudioFiles, StrUtils, NempHelp,
+  Dialogs, ExtCtrls, StdCtrls, NempAudioFiles, StrUtils, NempHelp, dmGui,
 
-  Nemp_ConstantsAndTypes, gnuGettext, Nemp_RessourceStrings;
+  Nemp_ConstantsAndTypes, gnuGettext, Nemp_RessourceStrings, Vcl.VirtualImage;
 
 type
   TShutDownForm = class(TForm)
@@ -47,8 +47,8 @@ type
     Btn_ShutDownNow: TButton;
     ShutDownLBL: TLabel;
     Timer1: TTimer;
+    ImgShutDown: TVirtualImage;
     LblHinweis: TLabel;
-    ImgShutDown: TImage;
     procedure Timer1Timer(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Btn_ShutDownNowClick(Sender: TObject);
@@ -71,10 +71,7 @@ uses Systemhelper, MainFormHelper, PlayerClass, NempMainUnit;
 {$R *.dfm}
 
 procedure TShutDownForm.FormShow(Sender: TObject);
-var Filename: String;
 begin
-
-
   ShutDownLBL.Caption := Format((NempShutDown_CountDownLbl),  [30] );
   Timer1.Tag := 30;
   Timer1.Enabled := True;
@@ -83,24 +80,28 @@ begin
   NempPlayer.FadeOut(30);
   // Bei Abbruch: Wieder Fade-In und Syncs wieder setzen
 
-    case NempOptions.ShutDownMode of
-        SHUTDOWNMODE_StopNemp  : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepStopNemp.png';
-        SHUTDOWNMODE_ExitNemp  : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepCloseNemp.png';
-        SHUTDOWNMODE_Suspend   : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepSuspend.png';
-        SHUTDOWNMODE_Hibernate : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepHibernate.png';
-        SHUTDOWNMODE_Shutdown  : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepShutdown.png';
-    end;
-    if FileExists(filename) then
-        ImgShutDown.Picture.LoadFromFile(filename);
-
-
   case NempOptions.ShutDownMode of
-        SHUTDOWNMODE_StopNemp  : LblHinweis.Caption := (NempShutDown_StopNemp  );
-        SHUTDOWNMODE_ExitNemp  : LblHinweis.Caption := (NempShutDown_CloseNemp );
-        SHUTDOWNMODE_Suspend   : LblHinweis.Caption := (NempShutdown_Suspend);
-        SHUTDOWNMODE_Hibernate : LblHinweis.Caption := (NempShutDown_Hibernate);
-        SHUTDOWNMODE_Shutdown  : LblHinweis.Caption := (NempShutDown_ShutDown);
+    SHUTDOWNMODE_StopNemp  : begin
+      ImgShutDown.ImageName := cImgSleepStopNemp;
+      LblHinweis.Caption := NempShutDown_StopNemp;
     end;
+    SHUTDOWNMODE_ExitNemp  : begin
+      ImgShutDown.ImageName := cImgSleepCloseNemp;
+      LblHinweis.Caption := NempShutDown_CloseNemp;
+    end;
+    SHUTDOWNMODE_Suspend   : begin
+      ImgShutDown.ImageName := cImgSleepSuspend;
+      LblHinweis.Caption := NempShutDown_Suspend;
+    end;
+    SHUTDOWNMODE_Hibernate : begin
+      ImgShutDown.ImageName := cImgSleepHibernate;
+      LblHinweis.Caption := NempShutDown_Hibernate;
+    end;
+    SHUTDOWNMODE_Shutdown  : begin
+      ImgShutDown.ImageName := cImgSleepShutdown;
+      LblHinweis.Caption := NempShutDown_ShutDown;
+    end;
+  end;
 
   SetWindowPos(ShutDownForm.Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
 end;

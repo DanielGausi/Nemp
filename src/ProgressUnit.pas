@@ -39,7 +39,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.StdCtrls, Vcl.ExtCtrls, VCL.Themes,
-  gnuGettext, Nemp_RessourceStrings, Nemp_ConstantsAndTypes;
+  gnuGettext, Nemp_RessourceStrings, Nemp_ConstantsAndTypes, Vcl.VirtualImage;
 
 type
 
@@ -54,48 +54,106 @@ type
     lblFailCount: TLabel;
 
     BtnCancel: TButton;
-    MainImage: TImage;
-    ImgFail: TImage;
-    ImgOk: TImage;
+    MainImage: TVirtualImage;
+    ImgFail: TVirtualImage;
+    ImgOk: TVirtualImage;
 
     cbAutoClose: TCheckBox;
     CloseTimer: TTimer;
+    pnlButtons: TPanel;
+    pnlProgress: TPanel;
+    pnlHeader: TPanel;
+    pnlImage: TPanel;
     procedure BtnCancelClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure cbAutoCloseClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure CloseTimerTimer(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
-
     fCurrentVisibleJobType: TJobType;
 
-    procedure LoadImage(aFilename: String);
   public
     { Public declarations }
     // can be set to TRUE to automatically close the window (like during AutoScan on startup)
     AutoClose: Boolean;
 
+    procedure ShowWarning;
     procedure FinishProcess(aJobType: TJobType);
     procedure InitiateProcess(ShowImages: Boolean; aAction: TEProgressActions);
-
-    procedure ShowWarning;
   end;
 
-var
-  ProgressFormLibrary: TProgressForm;
-  ProgressFormPlaylist: TProgressForm;
-
+  function ProgressFormLibrary: TProgressForm;
+  function ProgressFormPlaylist: TProgressForm;
 
 implementation
 
 {$R *.dfm}
 
-uses NempMainUnit, MedienbibliothekClass, PlaylistClass;
+uses NempMainUnit, MedienbibliothekClass, PlaylistClass, dmGui;
 
 const BTN_TAG_CANCEL = 10;
       BTN_TAG_CLOSE = 11;
+
+var
+  fProgressFormLibrary: TProgressForm;
+  fProgressFormPlaylist: TProgressForm;
+
+function ProgressFormLibrary: TProgressForm;
+begin
+  if not assigned(fProgressFormLibrary) then
+    Application.CreateForm(TProgressForm, fProgressFormLibrary);
+  result := fProgressFormLibrary
+end;
+
+function ProgressFormPlaylist: TProgressForm;
+begin
+  if not assigned(fProgressFormPlaylist) then
+    Application.CreateForm(TProgressForm, fProgressFormPlaylist);
+  result := fProgressFormPlaylist
+end;
+
+procedure TProgressForm.FormCreate(Sender: TObject);
+begin
+  TranslateComponent (self);
+  fCurrentVisibleJobType := jt_Idle;
+  //TStyleManager.Engine.RegisterStyleHook(TProgressBar, TStyleHook);
+end;
+
+procedure TProgressForm.FormDestroy(Sender: TObject);
+begin
+  if self = fProgressFormLibrary then
+    fProgressFormLibrary := Nil;
+
+  if self = fProgressFormPlaylist then
+    fProgressFormPlaylist := Nil;
+end;
+
+procedure TProgressForm.FormShow(Sender: TObject);
+var
+  MainMonitor: TMonitor;
+begin
+  MainMonitor := Screen.MonitorFromWindow(Nemp_MainForm.handle);
+  Top := MainMonitor.WorkareaRect.Height - height;
+  Left := MainMonitor.WorkareaRect.Right - width;
+
+  cbAutoClose.OnClick := Nil;
+  cbAutoClose.Checked := NempOptions.AutoCloseProgressWindow or AutoClose;
+  cbAutoClose.OnClick := cbAutoCloseClick;
+end;
+
+procedure TProgressForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Release;
+end;
+
+procedure TProgressForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  CanClose := (fCurrentVisibleJobType = jt_Idle) or (BtnCancel.Tag = BTN_TAG_CLOSE);
+end;
 
 procedure TProgressForm.BtnCancelClick(Sender: TObject);
 begin
@@ -123,40 +181,6 @@ begin
     end;
 end;
 
-procedure TProgressForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-begin
-    CanClose := (self.fCurrentVisibleJobType = jt_Idle) or (BtnCancel.Tag = BTN_TAG_CLOSE);
-end;
-
-procedure TProgressForm.FormCreate(Sender: TObject);
-var filename: String;
-begin
-    TranslateComponent (self);
-
-    filename := ExtractFilePath(ParamStr(0)) + 'Images\WizardOk.png';
-    if FileExists(filename) then
-        ImgOK.Picture.LoadFromFile(filename);
-    filename := ExtractFilePath(ParamStr(0)) + 'Images\WizardCancel.png';
-    if FileExists(filename) then
-        ImgFail.Picture.LoadFromFile(filename);
-
-    fCurrentVisibleJobType := jt_Idle;
-
-    //TStyleManager.Engine.RegisterStyleHook(TProgressBar, TStyleHook);
-end;
-
-procedure TProgressForm.FormShow(Sender: TObject);
-var MainMonitor: TMonitor;
-begin
-    MainMonitor := Screen.MonitorFromWindow(Nemp_MainForm.handle);
-    Top := MainMonitor.WorkareaRect.Height - height;
-    Left := MainMonitor.WorkareaRect.Right - width;
-
-
-    cbAutoClose.OnClick := Nil;
-    self.cbAutoClose.Checked := NempOptions.AutoCloseProgressWindow or AutoClose;
-    cbAutoClose.OnClick := cbAutoCloseClick;
-end;
 
 procedure TProgressForm.InitiateProcess(ShowImages: Boolean; aAction: TEProgressActions);
 
@@ -193,23 +217,23 @@ begin
 
     case aAction of
       pa_Default       : begin
-            LoadImage('NempLogo.png');
-            SetLabelWithHint(ProgressForm_DefaultAction);
+          MainImage.ImageName := cImgNempLogo;
+          SetLabelWithHint(ProgressForm_DefaultAction);
       end;
       pa_SearchFiles   : begin
-          LoadImage('SearchMusic.png');
+          MainImage.ImageName := cImgSearchMusic;
           SetLabelWithHint(ProgressForm_SearchFiles);
       end;
       pa_SearchFilesForPlaylist: begin
-          LoadImage('NempLogo.png');
+          MainImage.ImageName := cImgNempLogo;
           SetLabelWithHint(ProgressForm_SearchFilesPlaylist);
       end;
       pa_RefreshFiles  : begin
-          LoadImage('Refresh.png');
+          MainImage.ImageName := cImgRefresh;
           SetLabelWithHint(ProgressForm_RefreshFiles);
       end;
       pa_CleanUp       : begin
-          LoadImage('CleanUp.png');
+          MainImage.ImageName := cImgCleanUp;
           SetLabelWithHint(ProgressForm_CleanUp);
       end;
       {pa_Searchlyrics  : begin
@@ -217,34 +241,33 @@ begin
           SetLabelWithHint(ProgressForm_Searchlyrics);
       end;}
       pa_SearchTags    : begin
-          LoadImage('SearchTags.png');
+          MainImage.ImageName := cImgSearchTags;
           SetLabelWithHint(ProgressForm_SearchTags);
       end;
       pa_UpdateMetaData: begin
-          LoadImage('UpdateMetadata.png');
+          MainImage.ImageName := cImgWizardMetadata;
           SetLabelWithHint(ProgressForm_UpdateMetaData);
       end;
 
       pa_DeleteFiles: begin
-          LoadImage('CleanUp.png');
+          MainImage.ImageName := cImgCleanUp;
           SetLabelWithHint(ProgressForm_DeleteFiles);
       end;
 
       pa_ScanNewFiles: begin
-          LoadImage('scanFiles.png');
+          MainImage.ImageName := cImgScanFiles;
           SetLabelWithHint(ProgressForm_ScanNewFiles);
       end;
 
       pa_ScanNewPlaylistFiles: begin
-          LoadImage('scanFiles.png');
+          MainImage.ImageName := cImgScanFiles;
           SetLabelWithHint(ProgressForm_ScanNewPlaylistFiles);
       end;
 
       pa_RefreshPlaylistFiles: begin
-        LoadImage('Refresh.png');
+        MainImage.ImageName := cImgRefresh;
         SetLabelWithHint(ProgressForm_RefreshFiles);
       end;
-
 
     end;
 
@@ -279,23 +302,9 @@ begin
     end;
 end;
 
-procedure TProgressForm.LoadImage(aFilename: String);
-var aPath: String;
-begin
-    aPath := ExtractFilePath(ParamStr(0)) + 'Images\' + aFilename;
-    if FileExists(aPath) then
-        MainImage.Picture.LoadFromFile(aPath)
-    else
-        MainImage.Picture.Assign(Nil);
-end;
-
-
 procedure TProgressForm.ShowWarning;
-var filename: String;
 begin
-    filename := ExtractFilePath(ParamStr(0)) + 'Images\alert.png';
-    if FileExists(filename) then
-        MainImage.Picture.LoadFromFile(filename);
+  MainImage.ImageName := cImgAlert;
 end;
 
 procedure TProgressForm.cbAutoCloseClick(Sender: TObject);
@@ -319,7 +328,9 @@ begin
     end;
 end;
 
+initialization
 
-
+  fProgressFormLibrary  := Nil;
+  fProgressFormPlaylist := Nil;
 
 end.

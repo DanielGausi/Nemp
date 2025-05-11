@@ -36,8 +36,9 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, VCL.ImgList, Generics.Collections,
   NempAudioFiles, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, PlaylistClass,
-  AudioDisplayUtils, TreeHelper, gnuGetText, NempHelp,
-  VirtualTrees, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Menus, SkinButtons;
+  AudioDisplayUtils, TreeHelper, gnuGetText, NempHelp, dmGui,
+  VirtualTrees, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Menus, SkinButtons,
+  Vcl.VirtualImage, Vcl.Themes;
 
 type
 
@@ -163,8 +164,6 @@ type
     LblTitleDuplicate: TLabel;
     LblYearDuplicate: TLabel;
     Bevel1: TBevel;
-    imgDuplicateTitle: TImage;
-    imgDuplicatePath: TImage;
     Splitter2: TSplitter;
     grpBoxCompare: TGroupBox;
     PnlFooter: TPanel;
@@ -176,13 +175,13 @@ type
     lblTimeBetween: TLabel;
     LblPlaylistPositionDuplicate: TLabel;
     LblPlaylistPositionPlaylist: TLabel;
-    imgDuplicateInfo: TImage;
-    imgDuplicateReason: TImage;
+    imgDuplicateInfo: TVirtualImage;
+    imgDuplicateReason: TVirtualImage;
     lblDuplicateReason1: TLabel;
     lblDuplicateReason2: TLabel;
     PnlPlaylistSelect: TPanel;
     grpBoxPlaylist: TGroupBox;
-    imgPlaylist: TImage;
+    imgPlaylist: TVirtualImage;
     LblPlaylistTitle: TLabel;
     LblPlaylistTime: TLabel;
     lblPlaylistIndex: TLabel;
@@ -203,14 +202,16 @@ type
     procedure btnDeleteDuplicateClick(Sender: TObject);
     procedure VstDuplicatesColumnDblClick(Sender: TBaseVirtualTree;
       Column: TColumnIndex; Shift: TShiftState);
+    procedure VstDuplicatesPaintText(Sender: TBaseVirtualTree;
+      const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
+      TextType: TVSTTextType);
   private
     { Private declarations }
     currentPlaylistRating,
     currentDuplicateRating: Byte;
     fCurrentPlaylistFile: TAudioFile;
     fCurrentDuplicateFile: TAudioFile;
-    Warning1,
-    Warning2: TPicture;
+
     fPlaylistDuplicateCollector: TPlaylistDuplicateCollector;
     fOnDeleteAudioFile: TDuplicateNotifyEvent;
     fOnDeleteOriginalAudioFile: TDuplicateNotifyEvent;
@@ -221,7 +222,6 @@ type
     fPlaylistInfoLabel,
     fDuplicateInfoLabel: TInfoLabel;
 
-    procedure InitGraphics;
     procedure SetCollector(aValue: TPlaylistDuplicateCollector);
 
     function SetInfoString(aString: String; add: String = ''): String;
@@ -555,10 +555,6 @@ begin
     BtnRating      := BtnRatingDuplicate;
   end;
 
-  Warning1 := TPicture.Create;
-  Warning2 := TPicture.Create;
-  InitGraphics;
-
   VstDuplicates.NodeDataSize := SizeOf(TAudioFile);
   fPlaylistDuplicateCollector := Nil;
   fCurrentPlaylistFile := Nil;
@@ -570,8 +566,6 @@ end;
 procedure TFormPlaylistDuplicates.FormDestroy(Sender: TObject);
 begin
   TAudioFileManager.OnAudioFileChanged.Delete(OnAfterAudioFileChanged);
-  Warning1.Free;
-  Warning2.Free;
 end;
 
 procedure TFormPlaylistDuplicates.FormClose(Sender: TObject;
@@ -595,50 +589,6 @@ begin
     ShowAudioDetails(fDuplicateInfoLabel, fCurrentDuplicateFile);
 end;
 
-
-(*
-procedure TFDetails.OnAfterAudioFileChanged(Sender: TObject);
-begin
-  if not visible then exit;
-  if not (Sender is TAudioFile) then exit;
-
-  //if not assigned(AudioFile) then exit;
-
-  if TAudioFile(Sender).pfad = fEditFile.Pfad then begin
-    //ReloadTimer.Enabled := False;
-    fReloadFile := TAudioFile(Sender);
-
-    ReloadTimerTimer(Nil); // quick$Dirty: bisherige Timer-Funktion direkt aufrufen
-    //ReloadTimer.Enabled := True;
-  end;
-
-end;
-
-*)
-
-
-procedure TFormPlaylistDuplicates.InitGraphics;
-var
-  basePath, filename: String;
-begin
-  basePath := ExtractFilePath(ParamStr(0));
-
-  filename := basePath + 'Images\duplicate1.png';
-  if FileExists(filename) then
-    Warning1.LoadFromFile(filename);
-
-  filename := basePath + 'Images\duplicate2.png';
-  if FileExists(filename) then
-    Warning2.LoadFromFile(filename);
-
-  filename := basePath + 'Images\DuplicateInfo.png';
-  if FileExists(filename) then
-    imgDuplicateInfo.Picture.LoadFromFile(filename);
-
-  filename := basePath + 'Images\NempLogo_b.png';
-  if FileExists(filename) then
-    imgPlaylist.Picture.LoadFromFile(filename);
-end;
 
 procedure TFormPlaylistDuplicates.SetRatingImageList(
   const Value: TCustomImageList);
@@ -693,6 +643,13 @@ begin
     1: CellText := NempDisplay.PlaylistTitle(af);
     2: CellText := NempDisplay.TreeDuration(af)
   end;
+end;
+
+procedure TFormPlaylistDuplicates.VstDuplicatesPaintText(
+  Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode;
+  Column: TColumnIndex; TextType: TVSTTextType);
+begin
+  TargetCanvas.Font.Color := TStyleManager.ActiveStyle.GetSystemColor(clWindowText)
 end;
 
 procedure TFormPlaylistDuplicates.FillTreeWithDuplicates(
@@ -1031,52 +988,6 @@ begin
     else
       lblTimeBetween.Caption := Format(PlaylistDuplicates_TimeBetween, [timeStr]);
   end;
-
-  {
-  PlaylistDuplicates_TimeBetween = '%s between these two tracks.';
-  PlaylistDuplicates_TimeBetweenStream = 'At least %s between these two tracks (contains webstream).';
-  PlaylistDuplicates_TimeBetweenOnlyStream = 'Unknown play time between these tracks (only webstream).';
-  }
-
-
-  {
-  PlaylistDuplicates_TrackAfterOriginal  = 'The selected duplicate comes %d tracks after the original track.';
-PlaylistDuplicates_TrackBeforeOriginal = 'The selected duplicate comes %d tracks before the original track.';
-
-PlaylistDuplicates_TimeBetween = '%s between these two tracks.';
-PlaylistDuplicates_TimeBetweenStream = 'At least %s between these tracks, but there is also a webstream.';
-PlaylistDuplicates_TimeBetweenOnlyStream = 'Unknown play time between these tracks (only webstream)';
-  }
-
-  {
-  TracksBetween: Integer;
-    DurationBetween: Integer;
-    StreamFound: Boolean;
-    Valid: Boolean;
-
-  }
-
-  {PlaylistIdx  := fPlaylistDuplicateCollector.fPlaylist.IndexOf(PlaylistFile);
-  DuplicateIdx := fPlaylistDuplicateCollector.fPlaylist.IndexOf(DuplicateFile);
-
-  if (PlaylistIdx >= 0) and (DuplicateIdx >= 0)  then
-  begin
-    streamFound := False;
-    DurationBetween := 0;
-
-    for i := min(PlaylistIdx, DuplicateIdx) to max(PlaylistIdx, DuplicateIdx)-1 do
-    begin
-      iFile := fPlaylistDuplicateCollector.fPlaylist[i];
-      if not iFile.isStream then
-        DurationBetween := DurationBetween + iFile.Duration
-      else
-        streamFound := True;
-    end;
-  end else
-  begin
-    // mindestens ein File ist nicht (mehr) in der Playlist (sollte nicht vorkommen)
-  end;
-   }
 end;
 
 
@@ -1088,8 +999,6 @@ begin
   if (not assigned(af)) or
      (not assigned(fCurrentPlaylistFile)) then
   begin
-    imgDuplicateTitle.Visible := False;
-    imgDuplicatePath.Visible := False;
 
     lblDuplicateReason1.Visible := False;
     lblDuplicateReason2.Visible := False;
@@ -1105,10 +1014,10 @@ begin
   begin
     lblDuplicateReason2.Visible := False;
     lblDuplicateReason1.Caption := PlaylistDuplicates_WarningPath;
-    imgDuplicateReason.Picture.Assign(Warning2);
+    imgDuplicateReason.ImageName := cImgAlertRed;
   end else
   begin
-    imgDuplicateReason.Picture.Assign(Warning1);
+    imgDuplicateReason.ImageName := cImgAlert;
     rCount := 0;
     if TDuplicate.SameArtistTitle(fCurrentPlaylistFile, af) then //  (fCurrentPlaylistFile.Artist = af.Artist)  and (fCurrentPlaylistFile.Titel = af.Titel) then
     begin
@@ -1131,51 +1040,6 @@ begin
     end else
       lblDuplicateReason2.Visible := False;
   end;
-
-  {
-
-  if (fCurrentPlaylistFile.Artist = af.Artist)  and (fCurrentPlaylistFile.Titel = af.Titel) then
-  begin
-    LblArtistDuplicate.Left := 32;
-    LblTitleDuplicate.Left := 32;
-    imgDuplicateTitle.Hint := PlaylistDuplicates_WarningArtistTitle;
-    imgDuplicateTitle.Visible := True;
-    imgDuplicateTitle.Picture.Assign(Warning1);
-  end else
-  begin
-    imgDuplicateTitle.Visible := False;
-    LblArtistDuplicate.Left := 16;
-    LblTitleDuplicate.Left := 16;
-  end;
-
-  if (fCurrentPlaylistFile.Pfad = af.Pfad)  and (fCurrentPlaylistFile.Pfad = af.Pfad) then
-  begin
-    imgDuplicatePath.Top := 48 + 8;
-    imgDuplicatePath.Visible := True;
-    imgDuplicatePath.Picture.Assign(Warning2);
-    imgDuplicatePath.Hint := PlaylistDuplicates_WarningPath;
-    LblDirectoryDuplicate.Left := 32;
-    LblFilenameDuplicate.Left := 32;
-  end else
-  if (fCurrentPlaylistFile.Dateiname = af.Dateiname)  and (fCurrentPlaylistFile.Dateiname = af.Dateiname) then
-  begin
-    imgDuplicatePath.Top := 48;
-    imgDuplicatePath.Visible := True;
-    imgDuplicatePath.Picture.Assign(Warning1);
-    imgDuplicatePath.Hint := PlaylistDuplicates_WarningFilename;
-    LblDirectoryDuplicate.Left := 16;
-    LblFilenameDuplicate.Left := 32;
-  end else
-  begin
-    imgDuplicatePath.Visible := False;
-    LblDirectoryDuplicate.Left := 16;
-    LblFilenameDuplicate.Left := 16;
-  end;
-  }
 end;
-
-
-
-
 
 end.

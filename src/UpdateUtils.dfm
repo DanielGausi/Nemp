@@ -14,7 +14,7 @@ object UpdateForm: TUpdateForm
   Font.Name = 'Tahoma'
   Font.Style = []
   Position = poMainFormCenter
-  OnCreate = FormCreate
+  OnClose = FormClose
   OnShow = FormShow
   TextHeight = 13
   object RichEdit1: TRichEdit
@@ -45,16 +45,20 @@ object UpdateForm: TUpdateForm
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitWidth = 496
     DesignSize = (
       500
       89)
-    object ImgLogo: TImage
+    object ImgLogo: TVirtualImage
       AlignWithMargins = True
       Left = 9
       Top = 12
       Width = 64
       Height = 64
+      ImageCollection = DataModuleGui.ICGraphics
+      ImageWidth = 0
+      ImageHeight = 0
+      ImageIndex = 8
+      ImageName = 'imgNempLogo'
     end
     object LblNewVersion: TLabel
       Left = 86
@@ -92,15 +96,14 @@ object UpdateForm: TUpdateForm
       OnClick = BtnDownloadClick
     end
     object BtnClose: TButton
-      Left = 359
-      Top = 56
+      Left = 352
+      Top = 53
       Width = 129
       Height = 25
       Anchors = [akTop, akRight]
       Caption = 'Maybe later'
       TabOrder = 1
       OnClick = BtnCloseClick
-      ExplicitLeft = 355
     end
   end
 end

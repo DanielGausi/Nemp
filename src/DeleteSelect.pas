@@ -38,14 +38,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, CheckLst, ContNrs, NempAudioFiles, DeleteHelper,
   DriveRepairTools, ExtCtrls, ImgList, GnuGetText, System.UITypes, NempHelp,
-  System.ImageList, Generics.Collections, VirtualTrees, PNGImage,CommCtrl ;
-
-
-type
-    TDeleteTreeData = record
-        fDeleteData : TDeleteData;
-    end;
-    PDeleteTreeData = ^TDeleteTreeData;
+  System.ImageList, Generics.Collections, VirtualTrees, PNGImage, CommCtrl, dmGui,
+  Vcl.VirtualImageList, Vcl.VirtualImage ;
 
 type
   TDeleteSelection = class(TForm)
@@ -59,15 +53,18 @@ type
     VSTFiles: TVirtualStringTree;
     lblMainExplanation: TLabel;
     grpBoxDrives: TGroupBox;
-    DriveImage: TImage;
+    DriveImage: TVirtualImage;
     LblExplaination: TLabel;
     LblWhatToDo: TLabel;
     LblExplaination2: TLabel;
-    ImageList1: TImageList;
-    HintImage: TImage;
+    HintImage: TVirtualImage;
     VSTDrives: TVirtualStringTree;
-    checkImages: TImageList;
-    ImgHelp: TImage;
+    ImgHelp: TVirtualImage;
+    checkImages: TVirtualImageList;
+    pnlHeader: TPanel;
+    Splitter2: TSplitter;
+    pnlFiles: TPanel;
+    pnlButtons: TPanel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
     procedure BtnHelpClick(Sender: TObject);
@@ -83,26 +80,22 @@ type
     procedure VSTDrivesChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
   private
     { Private-Deklarationen }
-
     procedure FillTreeViews(currentData: TDeleteData);
-    procedure AddPngToImageList(aFilename: String; aImageList: TImageList);
 
   public
     { Public-Deklarationen }
     DataFromMedienBib: TObjectList;
-
-    procedure ReloadScheckBoxImages(aBaseDir: String; TryDefaultAgain: Boolean=False);
-
+    procedure ReloadScheckBoxImages(UseSkin: Boolean);
   end;
 
-var
-  DeleteSelection: TDeleteSelection;
+//var
+//  DeleteSelection: TDeleteSelection;
 
 implementation
 
 {$R *.dfm}
 
-uses Nemp_RessourceStrings, NempMainUnit, BibHelper, TreeHelper, Nemp_SkinSystem, NempFileUtils;
+uses Nemp_RessourceStrings, Nemp_ConstantsAndTypes, NempMainUnit, BibHelper, TreeHelper, Nemp_SkinSystem, NempFileUtils;
 
 
 procedure TDeleteSelection.FormCreate(Sender: TObject);
@@ -113,32 +106,19 @@ begin
 
     VSTPlaylistFiles.NodeDataSize  := SizeOf(TLibraryPlaylist);
     VSTFiles.NodeDataSize  := SizeOf(TAudioFile);
-    VSTDrives.NodeDataSize := SizeOf(TDeleteTreeData);
+    VSTDrives.NodeDataSize := SizeOf(TDeleteData);
 
-    filename := ExtractFilePath(ParamStr(0)) + 'Images\alert.png';
-    if FileExists(filename) then
-        HintImage.Picture.LoadFromFile(filename);
-
-    // Load CheckBoxImages for the DriveVST
-    if Nemp_MainForm.NempSkin.IsACtive then
-        self.ReloadScheckBoxImages(Nemp_MainForm.NempSkin.Path, True)
-    else
-        self.ReloadScheckBoxImages(ExtractFilePath(ParamStr(0)) + 'Images\');
+    ReloadScheckBoxImages(Nemp_MainForm.NempSkin.isActive);
 end;
 
 function AddVSTDrive(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aDeleteData: TDeleteData): PVirtualNode;
-var Data: PDeleteTreeData;
 begin
-  Result:= AVST.AddChild(aNode); // meistens wohl Nil
-  Data:=AVST.GetNodeData(Result);
-  Data^.fDeleteData := aDeleteData;
-
+  Result:= AVST.AddChild(Nil, aDeleteData);
   Result.CheckType := ctCheckbox;
-
   if aDeleteData.DoDelete then
-      Result.CheckState := csCheckedNormal
+    Result.CheckState := csCheckedNormal
   else
-      Result.CheckState := csUnCheckedNormal;
+    Result.CheckState := csUnCheckedNormal;
 
   AVST.ValidateNode(Result,false);
 end;
@@ -154,9 +134,7 @@ begin
     if assigned(DataFromMedienBib) then
     begin
         for i := 0 to DataFromMedienBib.Count - 1 do
-        begin
-            AddVSTDrive(VSTDrives, Nil, TDeleteData(DataFromMedienBib[i]));
-        end;
+          AddVSTDrive(VSTDrives, Nil, TDeleteData(DataFromMedienBib[i]));
     end;
     VSTDrives.EndUpdate;
 
@@ -164,66 +142,40 @@ begin
 end;
 
 
-procedure TDeleteSelection.ReloadScheckBoxImages(aBaseDir: String; TryDefaultAgain: Boolean=False);
-var filename: String;
-    i: Integer;
-    FileIsMissing: Boolean;
+procedure TDeleteSelection.ReloadScheckBoxImages(UseSkin: Boolean);
+var
+  i: Integer;
 begin
-    aBaseDir := IncludeTrailingPathDelimiter(aBaseDir);
-    FileIsMissing := False;
     checkImages.Clear;
+
+    if UseSkin then
+      checkImages.ImageCollection := DataModuleGui.ICSkinIcons
+    else
+      checkImages.ImageCollection := DataModuleGui.ICIcons;
 
     // index 0..7: Unused
     // 8: normal
     // 9: hot
     //10: pressed
     //11: disabled
-    filename := aBaseDir + 'cbClean-UnCheckNormal.png';
-    if FileExists(filename) then
-    begin
-        for i := 0 to 11 do
-          AddPngToImageList(filename, checkImages);
-    end else
-        FileIsMissing := True;
-
+    for i := 0 to 11 do
+      checkImages.Add(i.ToString, cTreeCleanUnChecked);
     // index 16..23: Unused
-    filename := aBaseDir + 'cbClean-CheckNormal.png';
-    if FileExists(filename) then
-    begin
-        for i := 12 to 23 do
-          AddPngToImageList(filename, checkImages);
-    end else
-        FileIsMissing := True;
+    for i := 12 to 23 do
+      checkImages.Add(i.ToString, cTreeCleanChecked);
 
-    if FileIsMissing and TryDefaultAgain then
-    begin
-        // if Skin doesn't support Checkimages: load default ones
-        ReloadScheckBoxImages(ExtractFilePath(ParamStr(0)) + 'Images\', False);
-        exit;
-    end;
-
-    // if still something is missing: Use System default CheckBoxes
-    if FileIsMissing then
-    begin
-        VSTDrives.CustomCheckImages := Nil;
-        VSTDrives.CheckImageKind := ckSystemDefault;
-    end else
-    begin
-        // success, use custom Images
-        VSTDrives.CustomCheckImages := checkImages;
-        VSTDrives.CheckImageKind := ckCustom;
-    end;
+    VSTDrives.CustomCheckImages := checkImages;
+    VSTDrives.CheckImageKind := ckCustom;
 end;
 
 procedure TDeleteSelection.VSTDrivesChange(Sender: TBaseVirtualTree;
   Node: PVirtualNode);
-var currentDataP: PDeleteTreeData;
-    currentData: TDeleteData;
-    imgidx: Integer;
-    aType: String;
+var
+  currentData: TDeleteData;
+  aType, imgName: String;
 begin
-    currentDataP := Sender.GetNodeData(Node);
-    if not assigned(currentDataP) then
+    currentData := Sender.GetNodeData<TDeleteData>(Node);
+    if not assigned(currentData) then
     begin
         LblExplaination.Caption := '' ;
         LblWhatToDo.Caption := '';
@@ -231,7 +183,6 @@ begin
         exit;
     end;
 
-    currentData := currentDataP^.fDeleteData;
     FillTreeViews(currentData);
 
     if Node.CheckState = csCheckedNormal then
@@ -239,54 +190,55 @@ begin
     else
         LblFiles.Caption := DeleteSelect_FilesWillRemain;
 
-    imgidx := 0;
     aType := TDeleteData(DataFromMedienBib[Node.Index]).DriveType;
+    imgName := 'imgHDD';
     if aType = DriveTypeTexts[DRIVE_REMOVABLE] then
-        imgidx := 2;
-    if aType = DriveTypeTexts[DRIVE_REMOTE] then
-        imgidx := 4;
-    if aType = DriveTypeTexts[DRIVE_CDROM] then
-        imgidx := 6;
+      imgName := 'imgUSB'
+    else
+      if aType = DriveTypeTexts[DRIVE_REMOTE] then
+        imgName := 'imgNetwork'
+      else
+        if aType = DriveTypeTexts[DRIVE_CDROM] then
+          imgName := 'imgCD';
+
 
     case currentData.Hint of
         dh_DivePresent    : begin
+                      imgName := imgName + 'Mount';
                       LblExplaination.Caption  := DeleteHelper_DrivePresent  ;
                       LblExplaination2.Caption := DeleteHelper_DrivePresentFileMissing;
                       LblWhatToDo.Caption      := DeleteHelper_DoWithDrivePresent;
         end;
         dh_DriveMissing   : begin
-                      inc(imgIdx);
+                      imgName := imgName + 'Unmount';
                       LblExplaination.Caption  := DeleteHelper_DriveMissing    ;
                       LblExplaination2.Caption := '';//DeleteHelper_DriveMissingFileMissing;
                       LblWhatToDo.Caption      := DeleteHelper_DoWithDriveMissing;
         end;
         dh_NetworkPresent : begin
+                      imgName := imgName + 'Mount';
                       LblExplaination.Caption  := DeleteHelper_NetworkPresent  ;
                       LblExplaination2.Caption := DeleteHelper_DrivePresentFileMissing;
                       LblWhatToDo.Caption      := DeleteHelper_DoWithNetworkPresent;
         end;
         dh_NetworkMissing : begin
-                      inc(imgIdx);
+                      imgName := imgName + 'Unmount';
                       LblExplaination.Caption  := DeleteHelper_NetworkMissing  ;
                       LblExplaination2.Caption := '';//DeleteHelper_DriveMissingFileMissing;
                       LblWhatToDo.Caption      := DeleteHelper_DoWithNetworkMissing;
         end;
     end;
 
-    ImageList1.GetBitmap(imgIdx, DriveImage.Picture.Bitmap);
-    DriveImage.Refresh;
+    DriveImage.ImageName := imgName;
 end;
 
 procedure TDeleteSelection.VSTDrivesChecked(Sender: TBaseVirtualTree;
   Node: PVirtualNode);
-var currentDataP: PDeleteTreeData;
-    currentData: TDeleteData;
+var
+  currentData: TDeleteData;
 begin
-    currentDataP := Sender.GetNodeData(Node);
-    currentData := currentDataP^.fDeleteData;
-
+    currentData := Sender.GetNodeData<TDeleteData>(Node);
     currentData.DoDelete := (Node.CheckState = csCheckedNormal);
-
     // Refresh View
     VSTDrivesChange(Sender, Node);
 end;
@@ -294,15 +246,14 @@ end;
 procedure TDeleteSelection.VSTDrivesGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
   var CellText: string);
-var Data: PDeleteTreeData;
+var
+  Data: TDeleteData;
 begin
-    Data := Sender.GetNodeData(Node);
+    Data := Sender.GetNodeData<TDeleteData>(Node);
     if not assigned(Data) then exit;
-
     case Column of
-        0: cellText := Data^.fDeleteData.DriveString;
+        0: cellText := Data.DriveString;
     end;
-
 end;
 
 procedure TDeleteSelection.VSTFilesGetText(Sender: TBaseVirtualTree;
@@ -324,27 +275,6 @@ begin
     pl := Sender.GetNodeData<TLibraryPlaylist>(Node);
     if assigned(pl) then
       CellText := pl.Path;
-end;
-
-procedure TDeleteSelection.AddPngToImageList(aFilename: String;
-  aImageList: TImageList);
-var pngbmp: TPngImage;
-    bmp: TBitmap;
-begin
-  pngbmp := TPNGImage.Create;
-  try
-      pngbmp.LoadFromFile(aFilename);
-      bmp := TBitmap.Create;
-      try
-          pngbmp.AssignTo(bmp);
-          bmp.AlphaFormat:=afIgnored;
-          aImageList.Add(bmp, Nil);
-      finally
-          bmp.Free;
-      end;
-  finally
-      pngbmp.Free;
-  end;
 end;
 
 procedure TDeleteSelection.BtnHelpClick(Sender: TObject);

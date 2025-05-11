@@ -35,7 +35,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Spin, gnuGettext, System.DateUtils, Vcl.ExtCtrls;
+  Dialogs, StdCtrls, Spin, gnuGettext, System.DateUtils, Vcl.ExtCtrls,
+  Vcl.VirtualImage, dmGui;
 
 type
   TShutDownEditForm = class(TForm)
@@ -50,7 +51,7 @@ type
     SE_Minutes: TSpinEdit;
     LblConst_Minute: TLabel;
     LblConst_Hour: TLabel;
-    ImgShutDown: TImage;
+    ImgShutDown: TVirtualImage;
     lblShutDownMode: TLabel;
     lblCurrentStatus: TLabel;
     procedure FormCreate(Sender: TObject);
@@ -155,26 +156,29 @@ begin
 end;
 
 procedure TShutDownEditForm.ShowProperImage(aMode: Integer);
-var filename: String;
 begin
-    case aMode of
-        SHUTDOWNMODE_StopNemp  : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepStopNemp.png';
-        SHUTDOWNMODE_ExitNemp  : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepCloseNemp.png';
-        SHUTDOWNMODE_Suspend   : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepSuspend.png';
-        SHUTDOWNMODE_Hibernate : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepHibernate.png';
-        SHUTDOWNMODE_Shutdown  : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepShutdown.png';
+  case aMode of
+    SHUTDOWNMODE_StopNemp  : begin
+      ImgShutDown.ImageName := cImgSleepStopNemp;
+      lblShutDownMode.Caption := NempShutDown_StopPopupBlank;
     end;
-    if FileExists(filename) then
-        ImgShutDown.Picture.LoadFromFile(filename);
-
-    case aMode of
-        SHUTDOWNMODE_StopNemp  : lblShutDownMode.Caption := NempShutDown_StopPopupBlank      ;
-        SHUTDOWNMODE_ExitNemp  : lblShutDownMode.Caption := NempShutDown_ClosePopupBlank     ;
-        SHUTDOWNMODE_Suspend   : lblShutDownMode.Caption := NempShutDown_SuspendPopupBlank   ;
-        SHUTDOWNMODE_Hibernate : lblShutDownMode.Caption := NempShutDown_HibernatePopupBlank ;
-        SHUTDOWNMODE_Shutdown  : lblShutDownMode.Caption := NempShutDown_ShutDownPopupBlank  ;
+    SHUTDOWNMODE_ExitNemp  : begin
+      ImgShutDown.ImageName := cImgSleepCloseNemp;
+      lblShutDownMode.Caption := NempShutDown_ClosePopupBlank;
     end;
-
+    SHUTDOWNMODE_Suspend   : begin
+      ImgShutDown.ImageName := cImgSleepSuspend;
+      lblShutDownMode.Caption := NempShutDown_SuspendPopupBlank;
+    end;
+    SHUTDOWNMODE_Hibernate : begin
+      ImgShutDown.ImageName := cImgSleepHibernate;
+      lblShutDownMode.Caption := NempShutDown_HibernatePopupBlank;
+    end;
+    SHUTDOWNMODE_Shutdown  : begin
+      ImgShutDown.ImageName := cImgSleepShutdown;
+      lblShutDownMode.Caption := NempShutDown_ShutDownPopupBlank;
+    end;
+  end;
 end;
 
 end.

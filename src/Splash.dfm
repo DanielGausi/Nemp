@@ -5,39 +5,32 @@ object FSplash: TFSplash
   Caption = 'Nemp'
   ClientHeight = 173
   ClientWidth = 283
-  Color = clWhite
+  Color = clBlack
   TransparentColorValue = clMaroon
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   Scaled = False
   OnCreate = FormCreate
-  PixelsPerInch = 96
   TextHeight = 13
-  object Image1: TImage
+  object VirtualImage1: TVirtualImage
     Left = 0
     Top = 0
     Width = 283
     Height = 173
-    OnClick = Image1Click
-  end
-  object Label2: TLabel
-    Left = 4
-    Top = 157
-    Width = 125
-    Height = 13
-    AutoSize = False
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clSilver
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    ParentFont = False
-    Transparent = True
+    Align = alClient
+    ImageCollection = DataModuleGui.ICGraphics
+    ImageWidth = 0
+    ImageHeight = 0
+    ImageIndex = 0
+    ImageName = 'imgsplash'
+    ExplicitLeft = 72
+    ExplicitTop = 64
+    ExplicitWidth = 105
+    ExplicitHeight = 105
   end
   object StatusLBL: TLabel
     Left = 8
@@ -55,5 +48,19 @@ object FSplash: TFSplash
     ParentFont = False
     Transparent = True
     StyleElements = [seClient, seBorder]
+  end
+  object Label2: TLabel
+    Left = 4
+    Top = 157
+    Width = 125
+    Height = 13
+    AutoSize = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clSilver
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    Transparent = True
   end
 end

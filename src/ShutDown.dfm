@@ -23,6 +23,17 @@ object ShutDownForm: TShutDownForm
     Height = 13
     Caption = '...'
   end
+  object ImgShutDown: TVirtualImage
+    Left = 8
+    Top = 8
+    Width = 64
+    Height = 64
+    ImageCollection = DataModuleGui.ICGraphics
+    ImageWidth = 0
+    ImageHeight = 0
+    ImageIndex = 18
+    ImageName = 'imgSleepShutdown'
+  end
   object LblHinweis: TLabel
     Left = 88
     Top = 8
@@ -37,12 +48,6 @@ object ShutDownForm: TShutDownForm
     Font.Style = []
     ParentFont = False
     WordWrap = True
-  end
-  object ImgShutDown: TImage
-    Left = 8
-    Top = 8
-    Width = 64
-    Height = 64
   end
   object Btn_Cancel: TButton
     Left = 192

@@ -77,6 +77,7 @@ const // MAXCHILDS = 10;
   cBtnPlayerRecordOn      = 'PlayerRecordOn'     ;
   cBtnPlayerRecordOff     = 'PlayerRecordOff'    ;
   cBtnPlayerPlayReverse   = 'PlayerPlayReverse'  ;
+  cPlayerOverlayInfo      = 'PlayerOverlayInfo'  ;
 
   cBtnVolumeMute        = 'BtnVolumeMute';
   cBtnVolumeLow         = 'BtnVolumeLow';
@@ -141,11 +142,13 @@ const // MAXCHILDS = 10;
   cMenuWizard              = 'MenuWizard';
   cMenuEmpty               = 'MenuEmpty';
 
+  cMenuCancel = 'MenuCancel';
+  cMenuOk     = 'MenuOk';
+
   cMenuTreeCollapse        = 'MenuTreeCollapse';
   cMenuTreeExpand          =  'MenuTreeExpand';
 
   cMenuFileMissing = 'MenuFileMissing';
-  cMenuOk = 'MenuOk';
   cMenuPause = 'MenuPause';
   cMenuStop = 'MenuStop';
   cMenuWarningRed = 'MenuWarningRed';
@@ -153,7 +156,27 @@ const // MAXCHILDS = 10;
   cMenuReplayGainDisabled = 'MenuReplayGainDisabled';
   cMenuInfoReplace = 'MenuInfoReplace';
 
-  cBtnPlayerNames: Array[1..cBtnPlayerCount] of String = (
+  cImgCleanUp      = 'imgCleanUp';
+  cImgNempLogo     = 'imgNempLogo';
+  cImgRefresh      = 'imgRefresh';
+  cImgScanFiles    = 'imgScanFiles';
+  cImgSearchMusic  = 'imgSearchMusic';
+  cImgSearchTags   = 'imgSearchTags';
+  cImgWizardMetadata = 'ImgWizardMetadata';
+  cImgAlert        = 'ImgAlert';
+  cImgAlertRed     = 'ImgAlertRed';
+
+  cImgSleepStopNemp   = 'ImgSleepStopNemp';
+  cImgSleepCloseNemp  = 'ImgSleepCloseNemp';
+  cImgSleepSuspend    = 'ImgSleepSuspend';
+  cImgSleepHibernate  = 'ImgSleepHibernate';
+  cImgSleepShutdown   = 'ImgSleepShutdown';
+
+  cTreeCleanChecked   = 'TreeCleanChecked';
+  cTreeCleanUnchecked = 'TreeCleanUnchecked';
+
+
+  (*cBtnPlayerNames: Array[1..cBtnPlayerCount] of String = (
       cBtnPlayerPlay, cBtnPlayerPause, cBtnPlayerStop, cBtnPlayerPlayReverse,
       cBtnPlayerPrev, cBtnPlayerNext, cBtnPlayerSlideForward, cBtnPlayerSlideBackward,
       cBtnPlayerRepeatAll, cBtnPlayerRepeatTitle, cBtnPlayerRepeatRandom, cBtnPlayerRepeatOff,
@@ -165,7 +188,7 @@ const // MAXCHILDS = 10;
       cMenuMarkBlack, cMenuMarkBlue, cMenuMarkGreen, cMenuMarkRed, cMenuNempLogo, cMenuOpen,
       cMenuPlay, cenuRefresh, cMenuReplayGain, cMenuSave, cMenuSearch, cMenuSettings, cenuShutdown,
       cMenuSkins, cMenuSort, cMenuStarEmpty, cMenuStarFull, cMenuStarHalf, cMenuStream,
-      cMenuTagCloud, cMenuWarning, cMenuwinamp,cMenuWizard);
+      cMenuTagCloud, cMenuWarning, cMenuwinamp,cMenuWizard);*)
 
   cBtnPlayerBGCount = 4;
   cBtnPlayerBGNormal    = 'BtnBGNormal';

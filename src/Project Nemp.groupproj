@@ -12,6 +12,9 @@
         <Projects Include="..\Components\NewSkinnedTrackbar\DemoSkinnedTrackBar.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\Components\TACredits\Aviant_Credits.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -47,14 +50,23 @@
     <Target Name="DemoSkinnedTrackBar:Make">
         <MSBuild Projects="..\Components\NewSkinnedTrackbar\DemoSkinnedTrackBar.dproj" Targets="Make"/>
     </Target>
+    <Target Name="Aviant_Credits">
+        <MSBuild Projects="..\Components\TACredits\Aviant_Credits.dproj"/>
+    </Target>
+    <Target Name="Aviant_Credits:Clean">
+        <MSBuild Projects="..\Components\TACredits\Aviant_Credits.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Aviant_Credits:Make">
+        <MSBuild Projects="..\Components\TACredits\Aviant_Credits.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="nemp;NempKomponenten;DemoSkinnedTrackBar"/>
+        <CallTarget Targets="nemp;NempKomponenten;DemoSkinnedTrackBar;Aviant_Credits"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="nemp:Clean;NempKomponenten:Clean;DemoSkinnedTrackBar:Clean"/>
+        <CallTarget Targets="nemp:Clean;NempKomponenten:Clean;DemoSkinnedTrackBar:Clean;Aviant_Credits:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="nemp:Make;NempKomponenten:Make;DemoSkinnedTrackBar:Make"/>
+        <CallTarget Targets="nemp:Make;NempKomponenten:Make;DemoSkinnedTrackBar:Make;Aviant_Credits:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

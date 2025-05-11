@@ -160,9 +160,9 @@ begin
             fMode := aValue;
             FreeAndNil(fFlyingCow);
             FreeAndNil(fClassicFlow);
-            Nemp_MainForm.IMGMedienBibCover.Visible := False;
-            Nemp_MainForm.Lbl_CoverFlow.Visible     := False;
-            Nemp_MainForm.ImgScrollCover.Visible    := False;
+            // Nemp_MainForm.IMGMedienBibCover.Visible := False;
+            // Nemp_MainForm.Lbl_CoverFlow.Visible     := False;
+            // Nemp_MainForm.ImgScrollCover.Visible    := False;
         end;
 
         cm_Classic :

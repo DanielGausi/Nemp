@@ -38,7 +38,7 @@ uses
   System.Generics.Collections, System.Generics.Defaults,
 
   Nemp_ConstantsAndTypes, Vcl.ComCtrls, NempPanel, Vcl.Menus, System.IniFiles,
-  Vcl.Imaging.pngimage;
+  Vcl.Imaging.pngimage, Vcl.VirtualImage;
 
 type
 
@@ -92,9 +92,9 @@ type
     lblPlaylistAlwaysVisible: TLabel;
     mmExampleLayouts: TMenuItem;
     cbShowCategorySelection: TCheckBox;
-    imgInfo: TImage;
+    imgInfo: TVirtualImage;
     BtnHelp: TButton;
-    ImgHelp: TImage;
+    ImgHelp: TVirtualImage;
     procedure FormCreate(Sender: TObject);
     procedure BtnApplyClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -163,7 +163,7 @@ const
 
 procedure TMainFormBuilder.FormCreate(Sender: TObject);
 var
-  fnIni, imgFile: String;
+  fnIni: String;
 begin
   BackupComboboxes(self);
   TranslateComponent (self);
@@ -205,10 +205,6 @@ begin
     LayoutDefaults := Nil;
     AvailableLayouts := Nil;
   end;
-
-  imgFile := ExtractFilePath(ParamStr(0)) + 'Images\info.png';
-  if FileExists(imgFile) then
-    imgInfo.Picture.LoadFromFile(imgFile);
 
   BuildMainMenu;
 end;

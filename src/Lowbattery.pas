@@ -4,11 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, StdCtrls, gnuGettext;
+  Dialogs, ExtCtrls, StdCtrls, gnuGettext, Vcl.VirtualImage;
 
 type
   TFormLowBattery = class(TForm)
-    Image1: TImage;
+    Image1: TVirtualImage;
     Lbl_Warning: TLabel;
     st_Metadata: TLabel;
     BtnOk: TButton;
@@ -27,6 +27,9 @@ var
 
 implementation
 
+uses
+  dmGui;
+
 {$R *.dfm}
 
 procedure TFormLowBattery.FormCreate(Sender: TObject);
@@ -36,8 +39,8 @@ begin
     cb_ToDo.ItemIndex := 0;
     BtnOK.ModalResult := mrOk;
     filename := ExtractFilePath(ParamStr(0)) + 'Images\lowBattery.png';
-    if FileExists(filename) then
-        Image1.Picture.LoadFromFile(filename);
+    //if FileExists(filename) then
+    //    Image1.Picture.LoadFromFile(filename);
 end;
 
 

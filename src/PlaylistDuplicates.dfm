@@ -2,9 +2,10 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
   Left = 0
   Top = 0
   Caption = 'Nemp: Playlist duplicates'
-  ClientHeight = 506
-  ClientWidth = 588
+  ClientHeight = 504
+  ClientWidth = 584
   Color = clBtnFace
+  Constraints.MinWidth = 600
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -17,12 +18,13 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
   object pnlMain: TPanel
     Left = 0
     Top = 60
-    Width = 588
+    Width = 584
     Height = 139
     Align = alClient
     BevelOuter = bvNone
     Constraints.MinHeight = 139
     TabOrder = 0
+    ExplicitWidth = 588
     object Splitter2: TSplitter
       Left = 295
       Top = 0
@@ -36,19 +38,24 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       AlignWithMargins = True
       Left = 301
       Top = 3
-      Width = 284
+      Width = 280
       Height = 133
       Align = alClient
       Caption = 'Identified duplicates'
       Constraints.MinHeight = 80
       Constraints.MinWidth = 100
       TabOrder = 0
+      ExplicitWidth = 284
+      DesignSize = (
+        280
+        133)
       object VstDuplicates: TVirtualStringTree
         Left = 2
         Top = 15
-        Width = 284
-        Height = 82
+        Width = 276
+        Height = 68
         Align = alTop
+        Anchors = [akLeft, akTop, akRight, akBottom]
         BevelEdges = []
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -85,8 +92,10 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
         OnChange = VstDuplicatesChange
         OnColumnDblClick = VstDuplicatesColumnDblClick
         OnGetText = VstDuplicatesGetText
+        OnPaintText = VstDuplicatesPaintText
         Touch.InteractiveGestures = [igPan, igPressAndTap]
         Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+        ExplicitWidth = 280
         Columns = <
           item
             Alignment = taRightJustify
@@ -100,7 +109,7 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
             Position = 1
             Spacing = 0
             Text = 'Title'
-            Width = 214
+            Width = 206
           end
           item
             Alignment = taRightJustify
@@ -114,9 +123,10 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       object btnDeleteOriginal: TButton
         AlignWithMargins = True
         Left = 16
-        Top = 103
+        Top = 97
         Width = 118
         Height = 25
+        Anchors = [akLeft, akBottom]
         Caption = 'Delete original'
         TabOrder = 1
         OnClick = btnDeleteOriginalClick
@@ -124,9 +134,10 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       object btnDeleteDuplicate: TButton
         AlignWithMargins = True
         Left = 140
-        Top = 103
+        Top = 97
         Width = 118
         Height = 25
+        Anchors = [akLeft, akBottom]
         Caption = 'Delete duplicate'
         TabOrder = 2
         OnClick = btnDeleteDuplicateClick
@@ -179,19 +190,29 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
         Caption = '..............'
         ExplicitWidth = 225
       end
-      object imgDuplicateInfo: TImage
+      object imgDuplicateInfo: TVirtualImage
         AlignWithMargins = True
         Left = 16
         Top = 35
         Width = 32
         Height = 32
+        ImageCollection = DataModuleGui.ICGraphics
+        ImageWidth = 0
+        ImageHeight = 0
+        ImageIndex = 37
+        ImageName = 'imgTime'
       end
-      object imgDuplicateReason: TImage
+      object imgDuplicateReason: TVirtualImage
         AlignWithMargins = True
         Left = 16
         Top = 91
         Width = 32
         Height = 32
+        ImageCollection = DataModuleGui.ICGraphics
+        ImageWidth = 0
+        ImageHeight = 0
+        ImageIndex = 15
+        ImageName = 'imgAlert'
       end
       object lblDuplicateReason1: TLabel
         Left = 57
@@ -218,15 +239,16 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
   object PnlDetails: TPanel
     Left = 0
     Top = 199
-    Width = 588
-    Height = 266
+    Width = 584
+    Height = 264
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
+    ExplicitWidth = 588
     object Splitter1: TSplitter
       Left = 295
       Top = 0
-      Height = 266
+      Height = 264
       ResizeStyle = rsUpdate
       ExplicitLeft = 380
       ExplicitTop = -8
@@ -237,14 +259,14 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       Left = 3
       Top = 3
       Width = 289
-      Height = 260
+      Height = 258
       Align = alLeft
       Caption = 'Currently selected file in the playlist'
       Constraints.MinWidth = 100
       TabOrder = 0
       DesignSize = (
         289
-        260)
+        258)
       object Bevel2: TBevel
         Left = 13
         Top = 103
@@ -397,15 +419,16 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       AlignWithMargins = True
       Left = 301
       Top = 3
-      Width = 284
-      Height = 260
+      Width = 280
+      Height = 258
       Align = alClient
       Caption = 'Currently selected possible duplicate'
       Constraints.MinWidth = 100
       TabOrder = 1
+      ExplicitWidth = 284
       DesignSize = (
-        284
-        260)
+        280
+        258)
       object LblAlbumDuplicate: TLabel
         Tag = 2
         Left = 16
@@ -515,27 +538,11 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       object Bevel1: TBevel
         Left = 12
         Top = 103
-        Width = 251
+        Width = 247
         Height = 5
         Anchors = [akLeft, akTop, akRight]
         Shape = bsBottomLine
         ExplicitWidth = 293
-      end
-      object imgDuplicateTitle: TImage
-        Left = 289
-        Top = 28
-        Width = 16
-        Height = 16
-        ParentShowHint = False
-        ShowHint = True
-      end
-      object imgDuplicatePath: TImage
-        Left = 289
-        Top = 50
-        Width = 16
-        Height = 16
-        ParentShowHint = False
-        ShowHint = True
       end
       object LblPlaylistPositionDuplicate: TLabel
         Tag = 6
@@ -573,18 +580,19 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
   end
   object PnlFooter: TPanel
     Left = 0
-    Top = 465
-    Width = 588
+    Top = 463
+    Width = 584
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
+    ExplicitWidth = 588
     DesignSize = (
-      588
+      584
       41)
     object BtnOK: TButton
       AlignWithMargins = True
-      Left = 501
+      Left = 497
       Top = 8
       Width = 75
       Height = 25
@@ -592,6 +600,7 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
       Caption = 'Ok'
       TabOrder = 0
       OnClick = BtnOKClick
+      ExplicitLeft = 501
     end
     object BtnRefresh: TButton
       Left = 5
@@ -609,36 +618,41 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
   object PnlPlaylistSelect: TPanel
     Left = 0
     Top = 0
-    Width = 588
+    Width = 584
     Height = 60
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 3
+    ExplicitWidth = 588
     object grpBoxPlaylist: TGroupBox
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 582
+      Width = 578
       Height = 54
       Align = alClient
       Caption = 'Selection in Nemp playlist'
       TabOrder = 0
+      ExplicitWidth = 582
       DesignSize = (
-        582
+        578
         54)
-      object imgPlaylist: TImage
+      object imgPlaylist: TVirtualImage
         AlignWithMargins = True
         Left = 16
         Top = 15
-        Width = 64
+        Width = 32
         Height = 32
-        Proportional = True
-        Stretch = True
+        ImageCollection = DataModuleGui.ICGraphics
+        ImageWidth = 0
+        ImageHeight = 0
+        ImageIndex = 8
+        ImageName = 'imgNempLogo'
       end
       object LblPlaylistTitle: TLabel
-        Left = 123
+        Left = 91
         Top = 20
-        Width = 398
+        Width = 426
         Height = 19
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
@@ -649,10 +663,10 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
         Font.Name = 'Tahoma'
         Font.Style = []
         ParentFont = False
-        ExplicitWidth = 402
+        ExplicitWidth = 430
       end
       object LblPlaylistTime: TLabel
-        Left = 524
+        Left = 520
         Top = 20
         Width = 50
         Height = 19
@@ -669,7 +683,7 @@ object FormPlaylistDuplicates: TFormPlaylistDuplicates
         ExplicitLeft = 528
       end
       object lblPlaylistIndex: TLabel
-        Left = 86
+        Left = 54
         Top = 20
         Width = 30
         Height = 19

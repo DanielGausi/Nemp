@@ -53,11 +53,16 @@ type
       BirthdaySongFilename: String;
       CountDownFileName: String;
       ContinueAfter: Boolean;
-    end;
+  end;
+
+  teBirthdayMode = (bmUndef, bmCountDown, bmBirthday);
 
   TPrescanMode = (ps_None, ps_Now, ps_Later);
 
-  TPlayerMessageEvent = procedure(Sender: TObject; aMessage: String) of object;
+  TNempPlayer = class;
+
+  TPlayerMessageEvent = procedure(Sender: TNempPlayer; aMessage: String) of object;
+  TPlayerAudioFileEvent = procedure(Sender: TNempPlayer; aAudioFile: TAudioFile) of object;
 
   TNempPlayer = class
     private
@@ -82,6 +87,7 @@ type
 
       fIsURLStream: Boolean;
       fHeadsetIsURLStream: Boolean;
+      fCurrentBirthdayMode: teBirthdayMode; // 1: CountDown; 2: Birthday; other: Undef.
 
       // in some cases, fading must be disabled (e.g. cda, backward)
       fReallyUseFading: Boolean;
@@ -191,14 +197,15 @@ type
       fOnABRepeatChange: TNotifyEvent;
 
       fHeadSetCoverSize: Integer;
-    FPreviewTitleColor: TColor;
-    FPreviewTimeColor: TColor;
-    fPreviewShapeProgressBrushColor: TColor;
-    fPreviewShapePenColor: TColor;
-    FPreviewArtistColor: TColor;
-    fPreviewShapeBrushColor: TColor;
-    fPreviewShapeProgressPenColor: TColor;
-    fMainCoverSize: Integer;
+      FPreviewTitleColor: TColor;
+      FPreviewTimeColor: TColor;
+      fPreviewShapeProgressBrushColor: TColor;
+      fPreviewShapePenColor: TColor;
+      FPreviewArtistColor: TColor;
+      fPreviewShapeBrushColor: TColor;
+      fPreviewShapeProgressPenColor: TColor;
+      fMainCoverSize: Integer;
+      fOnBirthdayPlay: TPlayerAudioFileEvent;
 
 
 
@@ -223,8 +230,8 @@ type
       procedure SetProgress(Value: Double);
       function GetLength: Double;                 // Length of a song
 
-      function fGetSeconds: Integer; // current Progress, rounded to full seconds
-      function fGetSecondsHeadset: Integer;
+      function GetSeconds: Integer; // current Progress, rounded to full seconds
+      function GetSecondsHeadset: Integer;
 
       function GetAvoidMickyMausEffect: LongBool;
       procedure SetAvoidMickyMausEffect(aValue: LongBool);
@@ -285,6 +292,17 @@ type
       // for the new TAudioFileManager
       procedure OnBeforeAudioFileChange(Sender: TObject);
       procedure SetMainCoverSize(const Value: Integer);
+
+      function GetBirthdayTime: Double;
+      function GetSecondsBirthday: Integer;
+      function GetTimeStringBirthday: String;
+      procedure SetBirthdayTime(const Value: Double);
+      procedure SetBirthdayProgress(const Value: Double);
+      function GetBirthdayLength: Double;
+      function GetBirthdayProgress: Double;
+    function GetBassBirthdayStatus: DWord;
+    function GetAutoResumePlaylistAfterBirthday: Boolean;
+    procedure SetAutoResumePlaylistAfterBirthday(const Value: Boolean);
 
 
     public
@@ -414,18 +432,40 @@ type
         property MainStream: DWord read fMainStream write SetMainStream;
         property SlideStream: DWord read fSlideStream write fSlideStream;
 
-        property Volume: Single read GetVolume write SetVolume;
+        // Volume
         property Mute: Boolean read fIsMute write SetMute;
+        property Volume: Single read GetVolume write SetVolume;
         property HeadSetVolume: Single read GetHeadsetVolume write SetHeadsetVolume;
         property BirthdayVolume: Single read GetBirthdayVolume write SetBirthdayVolume;
-        property Time: Double read GetTime write SetTime;              // time in seconds
-        property TimeInSec: Integer read fGetSeconds;
-        property TimeInSecHeadset: Integer read fGetSecondsHeadset;
+        // Time
+        property Time: Double read GetTime write SetTime;
+        property HeadsetTime: Double read GetHeadsetTime write SetHeadsetTime;
+        property BirthdayTime: Double read GetBirthdayTime write SetBirthdayTime;
+
+        property TimeInSec: Integer read GetSeconds;
+        property TimeInSecHeadset: Integer read GetSecondsHeadset;
+        property TimeInSecBirthday: Integer read GetSecondsBirthday;
+
         property TimeString: String read GetTimeString;
         property TimeStringHeadset: String read GetTimeStringHeadset;
+        property TimeStringBirthday: String read GetTimeStringBirthday;
+        // Progress
         property Progress: Double read GetProgress write SetProgress;  // 0..1
+        property HeadsetProgress: Double read GetHeadsetProgress write SetHeadsetProgress;
+        property BirthdayProgress: Double read GetBirthdayProgress write SetBirthdayProgress;
+        // Dauer
         property Dauer: Double read Getlength;
+        property HeadsetDauer: Double read GetHeadsetLength;
+        property BirthdayDauer: Double read GetBirthdayLength;
 
+        property CurrentBirthdayMode: teBirthdayMode read fCurrentBirthdayMode;
+        property AutoResumePlaylistAfterBirthday: Boolean read GetAutoResumePlaylistAfterBirthday write SetAutoResumePlaylistAfterBirthday;
+
+
+      //  Progress und Time auch für Birthday - darin regeln, ob CountDown oder Birthday angezeigt/gesteuert werden soll
+      //  (dazu: privates Feld beim Start des jeweiligen Titels setzen)
+
+        // Effects
         property Speed: Single read fSampleRateFaktor write SetSamplerateFactor;
         property EchoWetDryMix: single  read fEchoWetDryMix write SetEchoMix  ;
         property EchoTime: single       read fEchoTime      write SetEchoTime;
@@ -440,6 +480,7 @@ type
         property StopStatus: Integer read fStopStatus;
         property BassStatus: DWord read GetBassStatus;
         property BassHeadSetStatus: DWord read GetBassHeadSetStatus;
+        property BassBirthdayStatus: DWord read GetBassBirthdayStatus;
 
         property CurrentFile: TPlaylistFile read GetCurrentAudioFile;
 
@@ -485,6 +526,8 @@ type
         property OnHeadSetStop   : TNotifyEvent read fOnHeadSetStop    write fOnHeadSetStop   ;
         property OnSetVolume: TNotifyEvent read fOnSetVolume write fOnSetVolume;
         property OnABRepeatChange: TNotifyEvent read fOnABRepeatChange write fOnABRepeatChange;
+
+        property OnBirthdayPlay: TPlayerAudioFileEvent read fOnBirthdayPlay write fOnBirthdayPlay;
 
         property DSPPluginFilenames: TStringList read fDSPPluginFilenames;
         property DSPPlugin: Cardinal read fdspPlugin;
@@ -562,10 +605,6 @@ type
         procedure StopHeadset;
         procedure PauseHeadset;
         procedure ResumeHeadset;
-        property HeadsetTime: Double read GetHeadsetTime write SetHeadsetTime;
-        // Fortschritt in Bruchteilen (0..1)
-        property HeadsetProgress: Double read GetHeadsetProgress write SetHeadsetProgress;
-        property HeadsetDauer: Double read GetHeadsetLength;
 
         // Aktualisiert den String, der in der Anzeige durchläuft
         function GenerateTaskbarTitel: UnicodeString;
@@ -576,9 +615,8 @@ type
         // procedure DrawHeadsetVisualisation; //(IncludingTime: Boolean = True);
         //procedure DrawTimeFromProgress(aProgress: Single);
         function GetTimeStringFromProgress(aProgress: Single): String;
-
-        //procedure DrawHeadsetTimeFromProgress(aProgress: Single);
         function GetHeadsetTimeStringFromProgress(aProgress: Single) : String;
+        function GeBirthdayTimeStringFromProgress(aProgress: Single) : String;
 
         function RefreshCoverBitmap: Boolean;
         function RefreshHeadsetCoverBitmap: Boolean;
@@ -1152,6 +1190,7 @@ begin
   if assigned(MainAudioFile) then
     BASS_WADSP_SetSongTitle(aPlugin, PAnsiChar(AnsiString(NempDisplay.PlaylistTitle(MainAudioFile))));
 end;
+
 
 function TNempPlayer.GetDSPPluginActive: Boolean;
 begin
@@ -2501,6 +2540,17 @@ begin
     result := 0;
 end;
 
+function TNempPlayer.GetBirthdayTime: Double;
+begin
+  result := 0;
+  case fCurrentBirthdayMode of
+    bmCountDown: if CountDownStream <> 0 then
+          result := BASS_ChannelBytes2Seconds(CountDownStream, BASS_ChannelGetPosition(CountDownStream, BASS_POS_BYTE));
+    bmBirthday: if BirthdayStream <> 0 then
+          result := BASS_ChannelBytes2Seconds(BirthdayStream, BASS_ChannelGetPosition(BirthdayStream, BASS_POS_BYTE));
+  end;
+end;
+
 function TNempPlayer.TimeToString(aTime, aDuration: Double): String;
 begin
   case TimeMode of
@@ -2512,29 +2562,32 @@ end;
 function TNempPlayer.GetTimeString: String;
 begin
   result := TimeToString(Time, Dauer);
-  {  case TimeMode of
-        0: result := SecToStr(Time);
-        1: result := '-' + SecToStr(Dauer - Time );
-    end;}
-end;
-
-function TNempPlayer.fGetSeconds;
-begin
-    result := Round(Time + 0.5);
-end;
-
-function TNempPlayer.fGetSecondsHeadset: Integer;
-begin
-    result := Round(HeadsetTime + 0.5);
 end;
 
 function TNempPlayer.GetTimeStringHeadset: String;
 begin
   result := TimeToString(HeadsetTime, HeadsetDauer);
-  {  Case TimeMode of
-        0: result := SecToStr(HeadsetTime);
-        1: result := '-' + SecToStr(HeadsetDauer - HeadsetTime );
-    end;}
+end;
+
+
+function TNempPlayer.GetTimeStringBirthday: String;
+begin
+  result := TimeToString(BirthdayTime, BirthdayDauer);
+end;
+
+function TNempPlayer.GetSeconds;
+begin
+    result := Round(Time + 0.5);
+end;
+
+function TNempPlayer.GetSecondsHeadset: Integer;
+begin
+    result := Round(HeadsetTime + 0.5);
+end;
+
+function TNempPlayer.GetSecondsBirthday: Integer;
+begin
+  result := Round(BirthdayTime + 0.5);
 end;
 
 
@@ -2543,10 +2596,6 @@ var tmpTime: Integer;
 begin
     tmpTime :=  Round(Dauer * aProgress);
     result := TimeToString(tmpTime, Dauer);
-    {case TimeMode of
-        0: result := SecToStr(tmpTime);
-        1: result := '-' + SecToStr(Dauer - tmpTime )
-    end;}
 end;
 
 function TNempPlayer.GetHeadsetTimeStringFromProgress(aProgress: Single) : String;
@@ -2554,10 +2603,33 @@ var tmpTime: Integer;
 begin
     tmpTime :=  Round(HeadsetDauer * aProgress);
     result := TimeToString(tmpTime, HeadsetDauer);
-    {case TimeMode of
-        0: result := SecToStr(tmpTime);
-        1: result := '-' + SecToStr(Dauer - tmpTime );
-    end;}
+end;
+
+function TNempPlayer.GeBirthdayTimeStringFromProgress(aProgress: Single) : String;
+var tmpTime: Integer;
+begin
+    tmpTime :=  Round(BirthdayDauer * aProgress);
+    result := TimeToString(tmpTime, BirthdayDauer);
+end;
+
+procedure TNempPlayer.SetAutoResumePlaylistAfterBirthday(const Value: Boolean);
+begin
+  NempBirthdayTimer.ContinueAfter := Value;
+  case CurrentBirthdayMode of
+    bmUndef: ;
+    bmCountDown: ;
+    bmBirthday: begin
+      if Value then
+        BirthdaySyncHandle := Bass_ChannelSetSync(BirthdayStream, BASS_SYNC_END, 0, @EndBirthdayProc, self)
+      else
+        BASS_ChannelRemoveSync(BirthdayStream, BirthdaySyncHandle);
+    end;
+  end;
+end;
+
+function TNempPlayer.GetAutoResumePlaylistAfterBirthday: Boolean;
+begin
+  result := NempBirthdayTimer.ContinueAfter;
 end;
 
 (*
@@ -2678,6 +2750,7 @@ begin
   else
     result := 0;
 end;
+
 function TNempPlayer.GetHeadsetTime: Double;
 begin
   if (HeadsetStream <> 0) and not fHeadsetIsURLStream then
@@ -2685,6 +2758,7 @@ begin
   else
     result := 0;
   end;
+
 procedure TNempPlayer.SetHeadsetTime(Value: Double);
 begin
   if fHeadsetIsURLStream then exit;
@@ -2693,6 +2767,7 @@ begin
     Value := BASS_ChannelBytes2seconds(HeadsetStream, BASS_ChannelGetLength(HeadsetStream, BASS_POS_BYTE));
   BASS_ChannelSetPosition(HeadsetStream, BASS_ChannelSeconds2Bytes(HeadsetStream, Value), BASS_POS_BYTE);
 end;
+
 function TNempPlayer.GetHeadsetProgress: Double;
 begin
   if BASS_ChannelIsActive(HeadsetStream) = BASS_ACTIVE_STOPPED then
@@ -2713,6 +2788,7 @@ begin
   if Value > 0.999 then Value := 0.999;
   BASS_ChannelSetPosition(HeadsetStream, Round(BASS_ChannelGetLength(HeadsetStream, BASS_POS_BYTE) * Value), BASS_POS_BYTE);
 end;
+
 function TNempPlayer.GetHeadsetLength: Double;
 begin
   if (HeadsetStream <> 0) and not fHeadsetIsURLStream then
@@ -2721,11 +2797,77 @@ begin
     result := 0;
 end;
 
+function TNempPlayer.GetBirthdayLength: Double;
+begin
+  result := 0;
+  case fCurrentBirthdayMode of
+    bmCountDown: if CountDownStream <> 0 then
+          result := BASS_ChannelBytes2Seconds(CountDownStream, BASS_ChannelGetLength(CountDownStream, BASS_POS_BYTE));
+    bmBirthday: if BirthdayStream <> 0 then
+          result := BASS_ChannelBytes2Seconds(BirthdayStream, BASS_ChannelGetLength(BirthdayStream, BASS_POS_BYTE));
+  end;
+end;
+
+function TNempPlayer.GetBirthdayProgress: Double;
+begin
+  result := 0;
+  case fCurrentBirthdayMode of
+    bmCountDown: if (CountDownStream <> 0) and (BASS_ChannelIsActive(CountDownStream) <> BASS_ACTIVE_STOPPED) then
+          result := BASS_ChannelGetPosition(CountDownStream, BASS_POS_BYTE) / BASS_ChannelGetLength(CountDownStream, BASS_POS_BYTE);
+    bmBirthday: if (BirthdayStream <> 0) and (BASS_ChannelIsActive(BirthdayStream) <> BASS_ACTIVE_STOPPED) then
+          result := BASS_ChannelGetPosition(BirthdayStream, BASS_POS_BYTE) / BASS_ChannelGetLength(BirthdayStream, BASS_POS_BYTE);
+  end;
+end;
+
+procedure TNempPlayer.SetBirthdayProgress(const Value: Double);
+var
+  prog: Double;
+begin
+  prog := Value;
+  if prog < 0 then prog := 0;
+  if prog > 0.999 then prog := 0.999;
+  case fCurrentBirthdayMode of
+    bmCountDown: BASS_ChannelSetPosition(CountDownStream, Round(BASS_ChannelGetLength(CountDownStream, BASS_POS_BYTE) * prog), BASS_POS_BYTE);
+    bmBirthday: BASS_ChannelSetPosition(BirthdayStream, Round(BASS_ChannelGetLength(BirthdayStream, BASS_POS_BYTE) * prog), BASS_POS_BYTE);
+  end;
+end;
+
+procedure TNempPlayer.SetBirthdayTime(const Value: Double);
+var
+  prog: Double;
+begin
+  prog := Value;
+  if prog < 0 then prog := 0;
+
+  case fCurrentBirthdayMode of
+    bmCountDown: begin
+      if prog > BASS_ChannelBytes2seconds(CountDownStream, BASS_ChannelGetLength(CountDownStream, BASS_POS_BYTE)) then
+        prog := BASS_ChannelBytes2seconds(CountDownStream, BASS_ChannelGetLength(CountDownStream, BASS_POS_BYTE));
+      BASS_ChannelSetPosition(CountDownStream, BASS_ChannelSeconds2Bytes(CountDownStream, prog), BASS_POS_BYTE);
+    end;
+    bmBirthday: begin
+      if prog > BASS_ChannelBytes2seconds(BirthdayStream, BASS_ChannelGetLength(BirthdayStream, BASS_POS_BYTE)) then
+        prog := BASS_ChannelBytes2seconds(BirthdayStream, BASS_ChannelGetLength(BirthdayStream, BASS_POS_BYTE));
+      BASS_ChannelSetPosition(BirthdayStream, BASS_ChannelSeconds2Bytes(BirthdayStream, prog), BASS_POS_BYTE);
+    end;
+  end;
+end;
+
+
 function TNempPlayer.GetBassStatus: DWord;
 begin
   result := BASS_ChannelIsActive(MainStream);
 end;
 
+function TNempPlayer.GetBassBirthdayStatus: DWord;
+begin
+  case fCurrentBirthdayMode of
+    bmCountDown: result := BASS_ChannelIsActive(CountDownStream);
+    bmBirthday: result := BASS_ChannelIsActive(BirthdayStream);
+  else
+    result := BASS_ACTIVE_STOPPED;
+  end;
+end;
 
 function TNempPlayer.GetBassHeadSetStatus: DWord;
 begin
@@ -4033,6 +4175,7 @@ var af: TAudioFile;
 begin
     af := TAudioFile.Create;
     try
+        fCurrentBirthdayMode := bmCountdown;
         af.Pfad := NempBirthdayTimer.CountDownFileName; // set path, determine AudioType
         // read file information (needed for ReplayGain)
         af.GetAudioData(NempBirthdayTimer.CountDownFileName);
@@ -4057,6 +4200,9 @@ begin
         BASS_ChannelPlay(CountDownStream, true);
         BASS_ChannelSlideAttribute(CountDownStream, BASS_ATTRIB_VOL, fBirthdayVolume, FadingInterval);
 
+        if assigned(fOnBirthdayPlay) then
+          fOnBirthdayPlay(self, af);
+
     finally
         af.Free;
     end;
@@ -4066,6 +4212,7 @@ var af: TAudioFile;
 begin
     af := TAudioFile.Create;
     try
+        fCurrentBirthdayMode := bmBirthday;
         af.Pfad := NempBirthdayTimer.BirthdaySongFilename; // set path, determine AudioType
         // read file information (needed for ReplayGain)
         af.GetAudioData(NempBirthdayTimer.BirthdaySongFilename);
@@ -4087,6 +4234,9 @@ begin
 
         BASS_ChannelPlay(BirthdayStream, true);
         BASS_ChannelSlideAttribute(BirthdayStream, BASS_ATTRIB_VOL, fBirthdayVolume, FadingInterval);
+
+        if assigned(fOnBirthdayPlay) then
+          fOnBirthdayPlay(self, af);
     finally
         af.Free;
     end;

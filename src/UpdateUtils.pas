@@ -39,7 +39,7 @@ uses Windows, Classes, SysUtils, StrUtils, Messages, ExtCtrls, DateUtils,
       Variants,  Graphics,  Forms, WinApi.ShellApi, Richedit, Vcl.StdCtrls,
   Vcl.Controls, Vcl.ComCtrls,
      Inifiles, System.Net.URLClient, System.Net.HttpClient, SystemHelper,
-     HtmlHelper, Nemp_RessourceStrings;
+     HtmlHelper, Nemp_RessourceStrings, Vcl.VirtualImage, dmGui;
 
 type
 
@@ -137,15 +137,15 @@ type
     TUpdateForm = class(TForm)
         RichEdit1: TRichEdit;
         Panel1: TPanel;
-        ImgLogo: TImage;
+        ImgLogo: TVirtualImage;
         LblNewVersion: TLabel;
         BtnDownload: TButton;
         BtnClose: TButton;
     lblCurrentVersion: TLabel;
         procedure BtnCloseClick(Sender: TObject);
         procedure BtnDownloadClick(Sender: TObject);
-        procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
     private
         { Private-Deklarationen }
     public
@@ -594,12 +594,10 @@ begin
         ShellExecute(Handle, 'open', 'https://www.gausi.de/nemp-en.html', nil, nil, SW_SHOW);
 end;
 
-procedure TUpdateForm.FormCreate(Sender: TObject);
-var filename: String;
+procedure TUpdateForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-    filename := ExtractFilePath(ParamStr(0)) + 'Images\NempLogo.png';
-    if FileExists(filename) then
-        ImgLogo.Picture.LoadFromFile(filename);
+  UpdateForm := Nil;
+  Release;
 end;
 
 procedure TUpdateForm.FormShow(Sender: TObject);

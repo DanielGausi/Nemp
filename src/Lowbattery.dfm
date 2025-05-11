@@ -10,15 +10,18 @@ object FormLowBattery: TFormLowBattery
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   OnCreate = FormCreate
-  PixelsPerInch = 96
   TextHeight = 13
-  object Image1: TImage
+  object Image1: TVirtualImage
     Left = 8
     Top = 8
     Width = 128
-    Height = 117
+    Height = 128
+    ImageCollection = DataModuleGui.ICGraphics
+    ImageWidth = 0
+    ImageHeight = 0
+    ImageIndex = 14
+    ImageName = 'imgLowBattery'
   end
   object Lbl_Warning: TLabel
     Left = 152

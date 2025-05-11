@@ -849,20 +849,20 @@ begin
             srListDeleteData := TObjectList(aMsg.LParam);
             tmpString := '';
 
-            if not assigned(DeleteSelection) then
-                Application.CreateForm(TDeleteSelection, DeleteSelection);
-
-
-            DeleteSelection.DataFromMedienBib := srListDeleteData;
-
-            if DeleteSelection.showModal <> mrOK then
-            begin
+            var DeleteSelectionForm: TDeleteSelection;
+            //if not assigned(DeleteSelection) then
+            Application.CreateForm(TDeleteSelection, DeleteSelectionForm);
+            try
+              DeleteSelectionForm.DataFromMedienBib := srListDeleteData;
+              if DeleteSelectionForm.showModal <> mrOK then begin
                 // the user cancelled the dialog - Do not delete any files
-                for i := 0 to srListDeleteData.Count - 1 do
-                begin
-                    delData := TDeleteData(srListDeleteData[i]);
+                for i := 0 to srListDeleteData.Count - 1 do begin
+                  delData := TDeleteData(srListDeleteData[i]);
                     delData.DoDelete := False;
                 end;
+              end;
+            finally
+              DeleteSelectionForm.Free;
             end;
         end;
 
@@ -1668,11 +1668,12 @@ begin
                              0: begin
                                         // Normales Stop-Bild anzeigen
                                         // SKIN_UMBAU_CHECK StopBtn.GlyphLine := 0;
+                                        StopBTN.OverlayImageName := '';
                                         StopBTN.Hint    := MainForm_StopBtn_NormalHint;
                              end;
                              1: begin
                                         // Aktiviertes Stop-Nach-Titel-Bild anzeigen
-                                        // SKIN_UMBAU_CHECK StopBtn.GlyphLine := 1;
+                                        StopBTN.OverlayImageName := cPlayerOverlayInfo;
                                         StopBTN.Hint    := MainForm_StopBtn_StopAfterTitleHint;
                              end;
                           end;
@@ -1699,8 +1700,8 @@ begin
                                                 //xxxNempTaskbarManager.ThumbButtons.Items[1].ImageIndex := 1;
                                                 PlayPauseBTN.ImageName := cBtnPlayerPlay;
                                                 AssignTaskbarIcon(1,1);
-                                                PM_TNA_PlayPause.Caption := PlayerBtn_Play;
-                                                PM_TNA_PlayPause.ImageIndex := 1;
+                                                // PM_TNA_PlayPause.Caption := PlayerBtn_Play;
+                                                // PM_TNA_PlayPause.ImageIndex := 1;
                                           end;
 
 
@@ -1709,8 +1710,8 @@ begin
                                             //xxxNempTaskbarManager.ThumbButtons.Items[1].ImageIndex := 2;
                                             PlayPauseBTN.ImageName := cBtnPlayerPause;
                                             AssignTaskbarIcon(1,2);
-                                            PM_TNA_PlayPause.Caption := PlayerBtn_Pause;
-                                            PM_TNA_PlayPause.ImageIndex := 2;
+                                            // PM_TNA_PlayPause.Caption := PlayerBtn_Pause;
+                                            // PM_TNA_PlayPause.ImageIndex := 2;
                                           end;
                                       end;
                                 end;
@@ -1832,8 +1833,11 @@ begin
     WM_COUNTDOWN_FINISH: NempPlayer.PlayBirthday;
 
     WM_BIRTHDAY_FINISH: begin
-      PlayPauseBTNIMGClick(Nil);
-      if assigned(BirthdayForm) then BirthdayForm.Close;
+      if NempPlayer.NempBirthdayTimer.ContinueAfter then begin
+        PlayPauseBTNIMGClick(Nil);
+        if assigned(BirthdayForm) then
+          BirthdayForm.Close;
+      end;
     end;
 
     else

@@ -3,8 +3,8 @@ object Wizard: TWizard
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Nemp Configuration Wizard'
-  ClientHeight = 320
-  ClientWidth = 540
+  ClientHeight = 295
+  ClientWidth = 547
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,18 +15,92 @@ object Wizard: TWizard
   OnCreate = FormCreate
   OnShow = FormShow
   TextHeight = 13
+  object pnlButtons: TPanel
+    Left = 0
+    Top = 254
+    Width = 547
+    Height = 41
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 0
+    object LblProgress: TLabel
+      AlignWithMargins = True
+      Left = 16
+      Top = 8
+      Width = 27
+      Height = 25
+      Margins.Left = 16
+      Margins.Top = 8
+      Margins.Right = 8
+      Margins.Bottom = 8
+      Align = alLeft
+      Caption = '1/6'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -19
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      Visible = False
+      ExplicitHeight = 23
+    end
+    object BtnBack: TButton
+      AlignWithMargins = True
+      Left = 274
+      Top = 8
+      Width = 75
+      Height = 25
+      Margins.Left = 8
+      Margins.Top = 8
+      Margins.Right = 8
+      Margins.Bottom = 8
+      Align = alRight
+      Caption = 'Back'
+      TabOrder = 0
+      OnClick = BtnUpdateBackClick
+    end
+    object BtnNo: TButton
+      AlignWithMargins = True
+      Left = 365
+      Top = 8
+      Width = 75
+      Height = 25
+      Margins.Left = 8
+      Margins.Top = 8
+      Margins.Right = 8
+      Margins.Bottom = 8
+      Align = alRight
+      Caption = 'No'
+      TabOrder = 1
+      OnClick = BtnUpdateNoClick
+    end
+    object BtnYes: TButton
+      AlignWithMargins = True
+      Left = 456
+      Top = 8
+      Width = 75
+      Height = 25
+      Margins.Left = 8
+      Margins.Top = 8
+      Margins.Right = 16
+      Margins.Bottom = 8
+      Align = alRight
+      Caption = 'Yes'
+      Default = True
+      TabOrder = 2
+      OnClick = BtnUpdateYesClick
+    end
+  end
   object pc_Wizard: TPageControl
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 534
-    Height = 314
+    Width = 541
+    Height = 248
     ActivePage = TabSheet1
     Align = alClient
     MultiLine = True
-    TabOrder = 0
-    ExplicitWidth = 538
-    ExplicitHeight = 315
+    TabOrder = 1
     object TabSheet1: TTabSheet
       Caption = '(welcome)'
       object Lbl_Welcome: TLabel
@@ -42,12 +116,16 @@ object Wizard: TWizard
         Font.Style = []
         ParentFont = False
       end
-      object ImgWelcome: TImage
+      object ImgWelcome: TVirtualImage
         Left = 8
         Top = 32
         Width = 128
         Height = 128
-        Transparent = True
+        ImageCollection = DataModuleGui.ICGraphics
+        ImageWidth = 0
+        ImageHeight = 0
+        ImageIndex = 3
+        ImageName = 'imgwizardmain'
       end
       object Lbl_Version: TLabel
         Left = 152
@@ -69,26 +147,6 @@ object Wizard: TWizard
           'ut being asked - and so do I.#13#10#13#10This Wizard will explai' +
           'n these features and ask for your permission to activate them.'
         WordWrap = True
-      end
-      object BtnContinue: TButton
-        Left = 424
-        Top = 257
-        Width = 75
-        Height = 25
-        Caption = 'Continue'
-        Default = True
-        TabOrder = 0
-        OnClick = BtnContinueClick
-      end
-      object BtnCancel: TButton
-        Left = 344
-        Top = 257
-        Width = 75
-        Height = 25
-        Cancel = True
-        Caption = 'Cancel'
-        TabOrder = 1
-        OnClick = BtnCancelClick
       end
     end
     object TabSheet2: TTabSheet
@@ -122,25 +180,16 @@ object Wizard: TWizard
         ParentFont = False
         WordWrap = True
       end
-      object ImageUpdate: TImage
+      object ImageUpdate: TVirtualImage
         Left = 8
         Top = 32
         Width = 128
         Height = 128
-        Transparent = True
-      end
-      object Label1: TLabel
-        Left = 8
-        Top = 257
-        Width = 27
-        Height = 23
-        Caption = '1/6'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -19
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
+        ImageCollection = DataModuleGui.ICGraphics
+        ImageWidth = 0
+        ImageHeight = 0
+        ImageIndex = 6
+        ImageName = 'imgWizardUpate'
       end
       object st_Updates: TLabel
         Left = 152
@@ -156,44 +205,20 @@ object Wizard: TWizard
           'tall the new version by hand.'
         WordWrap = True
       end
-      object BtnUpdateYes: TButton
-        Left = 424
-        Top = 257
-        Width = 75
-        Height = 25
-        Caption = 'Yes'
-        Default = True
-        TabOrder = 0
-        OnClick = BtnUpdateYesClick
-      end
-      object BtnUpdateNo: TButton
-        Left = 344
-        Top = 257
-        Width = 75
-        Height = 25
-        Caption = 'No'
-        TabOrder = 1
-        OnClick = BtnUpdateNoClick
-      end
-      object BtnUpdateBack: TButton
-        Left = 152
-        Top = 257
-        Width = 75
-        Height = 25
-        Caption = 'Back'
-        TabOrder = 2
-        OnClick = BtnUpdateBackClick
-      end
     end
     object TabSheet3: TTabSheet
       Caption = '(QuickAccess)'
       ImageIndex = 2
-      object ImageMetaData: TImage
+      object ImageMetaData: TVirtualImage
         Left = 8
         Top = 32
         Width = 128
         Height = 128
-        Transparent = True
+        ImageCollection = DataModuleGui.ICGraphics
+        ImageWidth = 0
+        ImageHeight = 0
+        ImageIndex = 4
+        ImageName = 'imgWizardMetadata'
       end
       object Lbl_QueryMetadata: TLabel
         Left = 152
@@ -223,19 +248,6 @@ object Wizard: TWizard
         Font.Style = []
         ParentFont = False
       end
-      object Label2: TLabel
-        Left = 8
-        Top = 257
-        Width = 27
-        Height = 23
-        Caption = '2/6'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -19
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-      end
       object st_Metadata: TLabel
         Left = 152
         Top = 45
@@ -252,43 +264,20 @@ object Wizard: TWizard
           'es" window.'
         WordWrap = True
       end
-      object Btn_MetaBack: TButton
-        Left = 152
-        Top = 257
-        Width = 75
-        Height = 25
-        Caption = 'Back'
-        TabOrder = 2
-        OnClick = BtnUpdateBackClick
-      end
-      object Btn_MetaYes: TButton
-        Left = 424
-        Top = 257
-        Width = 75
-        Height = 25
-        Caption = 'Yes'
-        Default = True
-        TabOrder = 0
-        OnClick = BtnUpdateYesClick
-      end
-      object Btn_MetaNo: TButton
-        Left = 344
-        Top = 257
-        Width = 75
-        Height = 25
-        Caption = 'No'
-        TabOrder = 1
-        OnClick = BtnUpdateNoClick
-      end
     end
     object TabSheet4: TTabSheet
       Caption = '(Rating)'
       ImageIndex = 3
-      object ImageRating: TImage
+      object ImageRating: TVirtualImage
         Left = 8
         Top = 32
         Width = 128
         Height = 128
+        ImageCollection = DataModuleGui.ICGraphics
+        ImageWidth = 0
+        ImageHeight = 0
+        ImageIndex = 5
+        ImageName = 'imgWizardRating'
       end
       object Lbl_Rating: TLabel
         Left = 152
@@ -318,19 +307,6 @@ object Wizard: TWizard
         ParentFont = False
         WordWrap = True
       end
-      object Label3: TLabel
-        Left = 8
-        Top = 257
-        Width = 27
-        Height = 23
-        Caption = '3/6'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -19
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-      end
       object st_Rating: TLabel
         Left = 152
         Top = 45
@@ -346,43 +322,20 @@ object Wizard: TWizard
           'les are changed quite often then.'
         WordWrap = True
       end
-      object Btn_AutoBack: TButton
-        Left = 152
-        Top = 257
-        Width = 75
-        Height = 25
-        Caption = 'Back'
-        TabOrder = 2
-        OnClick = BtnUpdateBackClick
-      end
-      object Btn_AutoNo: TButton
-        Left = 344
-        Top = 257
-        Width = 75
-        Height = 25
-        Caption = 'No'
-        TabOrder = 1
-        OnClick = BtnUpdateNoClick
-      end
-      object Btn_AutoYes: TButton
-        Left = 424
-        Top = 257
-        Width = 75
-        Height = 25
-        Caption = 'Yes'
-        Default = True
-        TabOrder = 0
-        OnClick = BtnUpdateYesClick
-      end
     end
     object TabSheet5: TTabSheet
       Caption = '(LastFM)'
       ImageIndex = 4
-      object ImageLastFM: TImage
-        Left = 8
+      object ImageLastFM: TVirtualImage
+        Left = 3
         Top = 32
         Width = 128
         Height = 128
+        ImageCollection = DataModuleGui.ICGraphics
+        ImageWidth = 0
+        ImageHeight = 0
+        ImageIndex = 2
+        ImageName = 'imgWizardLastFM'
       end
       object Lbl_LastFM: TLabel
         Left = 152
@@ -412,19 +365,6 @@ object Wizard: TWizard
         ParentFont = False
         WordWrap = True
       end
-      object Label4: TLabel
-        Left = 8
-        Top = 257
-        Width = 27
-        Height = 23
-        Caption = '4/6'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -19
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-      end
       object st_LastFM: TLabel
         Left = 152
         Top = 45
@@ -439,43 +379,20 @@ object Wizard: TWizard
           'ive audio file. '
         WordWrap = True
       end
-      object Btn_LastFMBack: TButton
-        Left = 152
-        Top = 257
-        Width = 75
-        Height = 25
-        Caption = 'Back'
-        TabOrder = 2
-        OnClick = BtnUpdateBackClick
-      end
-      object Btn_LastFMNo: TButton
-        Left = 344
-        Top = 257
-        Width = 75
-        Height = 25
-        Caption = 'No'
-        TabOrder = 1
-        OnClick = BtnUpdateNoClick
-      end
-      object Btn_LastFMYes: TButton
-        Left = 424
-        Top = 257
-        Width = 75
-        Height = 25
-        Caption = 'Yes'
-        Default = True
-        TabOrder = 0
-        OnClick = BtnUpdateYesClick
-      end
     end
     object TabSheet6: TTabSheet
       Caption = '(filetypes)'
       ImageIndex = 6
-      object ImageFiletypes: TImage
+      object ImageFiletypes: TVirtualImage
         Left = 8
         Top = 32
         Width = 128
         Height = 128
+        ImageCollection = DataModuleGui.ICGraphics
+        ImageWidth = 0
+        ImageHeight = 0
+        ImageIndex = 1
+        ImageName = 'imgWizardFiletypes'
       end
       object Lbl_Filetypes: TLabel
         Left = 152
@@ -505,19 +422,6 @@ object Wizard: TWizard
         ParentFont = False
         WordWrap = True
       end
-      object Label5: TLabel
-        Left = 8
-        Top = 257
-        Width = 27
-        Height = 23
-        Caption = '5/6'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -19
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-      end
       object st_filetypes: TLabel
         Left = 152
         Top = 45
@@ -532,44 +436,21 @@ object Wizard: TWizard
           'gs dialog.'
         WordWrap = True
       end
-      object Btn_FiletypesBack: TButton
-        Left = 152
-        Top = 257
-        Width = 75
-        Height = 25
-        Caption = 'Back'
-        TabOrder = 2
-        OnClick = BtnUpdateBackClick
-      end
-      object Btn_FiletypesNo: TButton
-        Left = 344
-        Top = 257
-        Width = 75
-        Height = 25
-        Caption = 'No'
-        TabOrder = 1
-        OnClick = BtnUpdateNoClick
-      end
-      object Btn_FiletypesYes: TButton
-        Left = 424
-        Top = 257
-        Width = 75
-        Height = 25
-        Caption = 'Yes'
-        Default = True
-        TabOrder = 0
-        OnClick = BtnUpdateYesClick
-      end
     end
-    object TabSheet7: TTabSheet
+    object TSSummary: TTabSheet
       Caption = '(summary)'
       ImageIndex = 5
-      OnShow = TabSheet7Show
-      object ImgSummary: TImage
+      OnShow = TSSummaryShow
+      object ImgSummary: TVirtualImage
         Left = 8
         Top = 32
         Width = 128
         Height = 128
+        ImageCollection = DataModuleGui.ICGraphics
+        ImageWidth = 0
+        ImageHeight = 0
+        ImageIndex = 3
+        ImageName = 'imgWizardMain'
       end
       object Lbl_summary: TLabel
         Left = 152
@@ -634,77 +515,55 @@ object Wizard: TWizard
         Height = 13
         Caption = 'Change metadata when needed'
       end
-      object img_sumUpdates: TImage
+      object img_sumUpdates: TVirtualImage
         Left = 152
         Top = 48
         Width = 16
         Height = 16
+        ImageCollection = DataModuleGui.ICIcons
+        ImageWidth = 0
+        ImageHeight = 0
+        ImageIndex = -1
       end
-      object img_sumFiletypes: TImage
+      object img_sumFiletypes: TVirtualImage
         Left = 152
         Top = 144
         Width = 16
         Height = 16
+        ImageCollection = DataModuleGui.ICIcons
+        ImageWidth = 0
+        ImageHeight = 0
+        ImageIndex = -1
       end
-      object img_sumLastFM: TImage
+      object img_sumLastFM: TVirtualImage
         Left = 152
         Top = 120
         Width = 16
         Height = 16
+        ImageCollection = DataModuleGui.ICIcons
+        ImageWidth = 0
+        ImageHeight = 0
+        ImageIndex = -1
       end
-      object img_sumMetadata: TImage
+      object img_sumMetadata: TVirtualImage
         Left = 152
         Top = 72
         Width = 16
         Height = 16
+        ImageCollection = DataModuleGui.ICIcons
+        ImageWidth = 0
+        ImageHeight = 0
+        ImageIndex = -1
       end
-      object img_sumRating: TImage
+      object img_sumRating: TVirtualImage
         Left = 152
         Top = 96
         Width = 16
         Height = 16
-      end
-      object Label6: TLabel
-        Left = 8
-        Top = 257
-        Width = 27
-        Height = 23
-        Caption = '6/6'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -19
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-      end
-      object Btn_CompleteBack: TButton
-        Left = 152
-        Top = 257
-        Width = 75
-        Height = 25
-        Caption = 'Back'
-        TabOrder = 2
-        OnClick = BtnUpdateBackClick
-      end
-      object Btn_CompleteCancel: TButton
-        Left = 344
-        Top = 257
-        Width = 75
-        Height = 25
-        Cancel = True
-        Caption = 'Cancel'
-        TabOrder = 1
-        OnClick = BtnCancelClick
-      end
-      object Btn_CompleteOK: TButton
-        Left = 424
-        Top = 257
-        Width = 75
-        Height = 25
-        Caption = 'Ok'
-        Default = True
-        TabOrder = 0
-        OnClick = Btn_CompleteOKClick
+        ImageCollection = DataModuleGui.ICIcons
+        ImageWidth = 0
+        ImageHeight = 0
+        ImageIndex = -1
       end
     end
   end

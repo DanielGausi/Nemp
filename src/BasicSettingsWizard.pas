@@ -39,7 +39,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtCtrls, StdCtrls, ComCtrls, gnuGettext, Nemp_SkinSystem, MyDialogs,
-  MainFormHelper, NempHelp ;
+  MainFormHelper, NempHelp, Vcl.VirtualImage ;
 
 const
     //WIZ_SHOW_AGAIN     = 41;
@@ -55,99 +55,72 @@ type
     TabSheet1: TTabSheet;
     Lbl_Welcome: TLabel;
     st_Introduction: TLabel;
-    ImgWelcome: TImage;
+    ImgWelcome: TVirtualImage;
     Lbl_Version: TLabel;
-    BtnContinue: TButton;
-    BtnCancel: TButton;
     TabSheet2: TTabSheet;
     Lbl_CheckUpdates: TLabel;
     st_Updates: TLabel;
     Lbl_QeryUpdate: TLabel;
-    BtnUpdateYes: TButton;
-    BtnUpdateNo: TButton;
-    ImageUpdate: TImage;
-    BtnUpdateBack: TButton;
+    ImageUpdate: TVirtualImage;
     TabSheet3: TTabSheet;
-    Btn_MetaBack: TButton;
-    ImageMetaData: TImage;
-    Btn_MetaYes: TButton;
+    ImageMetaData: TVirtualImage;
     Lbl_QueryMetadata: TLabel;
     st_Metadata: TLabel;
-    Btn_MetaNo: TButton;
     Lbl_SaveMetadata: TLabel;
     TabSheet4: TTabSheet;
-    ImageRating: TImage;
+    ImageRating: TVirtualImage;
     Lbl_Rating: TLabel;
     st_Rating: TLabel;
     Lbl_QueryRating: TLabel;
-    Btn_AutoBack: TButton;
-    Btn_AutoNo: TButton;
-    Btn_AutoYes: TButton;
     TabSheet5: TTabSheet;
-    ImageLastFM: TImage;
+    ImageLastFM: TVirtualImage;
     Lbl_LastFM: TLabel;
     st_LastFM: TLabel;
     Lbl_QueryLastFM: TLabel;
-    Btn_LastFMBack: TButton;
-    Btn_LastFMNo: TButton;
-    Btn_LastFMYes: TButton;
-    TabSheet7: TTabSheet;
-    ImgSummary: TImage;
+    TSSummary: TTabSheet;
+    ImgSummary: TVirtualImage;
     Lbl_summary: TLabel;
     Lbl_QuerySummary: TLabel;
-    Btn_CompleteBack: TButton;
-    Btn_CompleteCancel: TButton;
-    Btn_CompleteOK: TButton;
     TabSheet6: TTabSheet;
-    ImageFiletypes: TImage;
+    ImageFiletypes: TVirtualImage;
     Lbl_Filetypes: TLabel;
     Lbl_QueryFiletypes: TLabel;
     st_filetypes: TLabel;
-    Btn_FiletypesBack: TButton;
-    Btn_FiletypesNo: TButton;
-    Btn_FiletypesYes: TButton;
     lbl_sumUpdates: TLabel;
     lbl_sumFiletypes: TLabel;
     lbl_sumLastFM: TLabel;
     lbl_sumRating: TLabel;
     lbl_sumMetadata: TLabel;
-    img_sumUpdates: TImage;
-    img_sumFiletypes: TImage;
-    img_sumLastFM: TImage;
-    img_sumMetadata: TImage;
-    img_sumRating: TImage;
-    Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    Label4: TLabel;
-    Label5: TLabel;
-    Label6: TLabel;
+    img_sumUpdates: TVirtualImage;
+    img_sumFiletypes: TVirtualImage;
+    img_sumLastFM: TVirtualImage;
+    img_sumMetadata: TVirtualImage;
+    img_sumRating: TVirtualImage;
+    pnlButtons: TPanel;
+    BtnBack: TButton;
+    BtnNo: TButton;
+    BtnYes: TButton;
+    LblProgress: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure BtnCancelClick(Sender: TObject);
-    procedure BtnContinueClick(Sender: TObject);
     procedure BtnUpdateBackClick(Sender: TObject);
     procedure BtnUpdateYesClick(Sender: TObject);
     procedure BtnUpdateNoClick(Sender: TObject);
-    procedure TabSheet7Show(Sender: TObject);
+    procedure TSSummaryShow(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure Btn_CompleteOKClick(Sender: TObject);
   private
     { Private-Deklarationen }
+    procedure RefreshNavigation;
+    procedure ApplyWizardSettings;
   public
     { Public-Deklarationen }
   end;
 
-  TAnswers = record
-      Updates: Boolean;
-      MetaData: Boolean;
-      Rating: Boolean;
-      LastFM: Boolean;
-      FileTypes: Boolean;
-  end;
+
 
 var
   Wizard: TWizard;
-  Answers: TAnswers;
+
 
 
 procedure RunWizard;
@@ -157,7 +130,27 @@ implementation
 {$R *.dfm}
 
 uses NempMainUnit, Nemp_ConstantsAndTypes, SystemHelper, Nemp_RessourceStrings,
-    UpdateUtils, PlayerClass, MedienBibliothekClass, filetypes, UpdateCleaning, fUpdateCleaning;
+    UpdateUtils, PlayerClass, MedienBibliothekClass, filetypes, UpdateCleaning,
+    fUpdateCleaning, dmGui;
+
+resourcestring
+  rsBtnNo = 'No';
+  rsBtnYes = 'Yes';
+  rsBtnOk = 'Ok';
+  rsBtnContinue = 'Continue';
+  rsBtnCancel = 'Cancel';
+
+type
+  TAnswers = record
+    Updates: Boolean;
+    MetaData: Boolean;
+    Rating: Boolean;
+    LastFM: Boolean;
+    FileTypes: Boolean;
+  end;
+
+var
+  Answers: TAnswers;
 
 procedure RunWizard;
 var
@@ -212,62 +205,22 @@ end;
 
 procedure TWizard.BtnCancelClick(Sender: TObject);
 begin
-    //MessageDLG((WizardCancel), mtInformation, [mbOK], 0);
     Close;
 end;
 
 
 procedure TWizard.FormCreate(Sender: TObject);
-var filename: String;
-
 begin
-    TranslateComponent (self);
-    HelpContext := HELP_Wizard;
+  TranslateComponent (self);
+  HelpContext := HELP_Wizard;
+  for var i: Integer := 0 to pc_Wizard.PageCount - 1 do
+    pc_Wizard.Pages[i].TabVisible := False;
 
-    TabSheet1.TabVisible := False;
-    TabSheet2.TabVisible := False;
-    TabSheet3.TabVisible := False;
-    TabSheet4.TabVisible := False;
-    TabSheet5.TabVisible := False;
-    TabSheet6.TabVisible := False;
-    TabSheet7.TabVisible := False;
-
-    filename := ExtractFilePath(ParamStr(0)) + 'Images\Wizard.png';
-    if FileExists(filename) then
-    begin
-        ImgWelcome.Picture.LoadFromFile(filename);
-        ImgSummary.Picture.LoadFromFile(filename);
-    end;
-
-    filename := ExtractFilePath(ParamStr(0)) + 'Images\WizardUpate.png';
-    if FileExists(filename) then
-        ImageUpdate.Picture.LoadFromFile(filename);
-
-    filename := ExtractFilePath(ParamStr(0)) + 'Images\WizardMetadata.png';
-    if FileExists(filename) then
-        ImageMetadata.Picture.LoadFromFile(filename);
-
-    filename := ExtractFilePath(ParamStr(0)) + 'Images\WizardRating.png';
-    if FileExists(filename) then
-        ImageRating.Picture.LoadFromFile(filename);
-
-    filename := ExtractFilePath(ParamStr(0)) + 'Images\WizardLastFM.jpg';
-    if FileExists(filename) then
-        ImageLastFM.Picture.LoadFromFile(filename);
-
-
-    filename := ExtractFilePath(ParamStr(0)) + 'Images\WizardFiletypes.png';
-    if FileExists(filename) then
-        ImageFiletypes.Picture.LoadFromFile(filename);
-
-
-    Lbl_Version.Caption := 'Version ' + GetFileVersionString('');
-
-    pc_Wizard.ActivePage := TabSheet1;
-
-    {$IFDEF USESTYLES}
-    // UnskinForm(self);
-    {$ENDIF}
+  Lbl_Version.Caption := 'Version ' + GetFileVersionString('');
+  pc_Wizard.ActivePage := TabSheet1;
+  {$IFDEF USESTYLES}
+  // UnskinForm(self);
+  {$ENDIF}
 end;
 
 procedure TWizard.FormShow(Sender: TObject);
@@ -279,96 +232,96 @@ begin
     st_LastFM.Caption := StringReplace(st_LastFM.Caption, '#13#10', #13#10, [rfReplaceAll] );
     st_Filetypes.Caption := StringReplace(st_Filetypes.Caption, '#13#10', #13#10, [rfReplaceAll] );
     pc_Wizard.ActivePage := TabSheet1;
+    RefreshNavigation;
 end;
 
-procedure TWizard.BtnContinueClick(Sender: TObject);
+procedure TWizard.RefreshNavigation;
 begin
-    pc_Wizard.ActivePage := TabSheet2;
+  LblProgress.Visible := pc_Wizard.ActivePageIndex >= 1;
+  LblProgress.Caption := pc_Wizard.ActivePageIndex.ToString + '/6';
+
+  BtnBack.Visible := pc_Wizard.ActivePageIndex >= 1;
+
+  case pc_Wizard.ActivePageIndex of
+    0: begin
+      BtnNo.Caption := rsBtnCancel;
+      BtnYes.Caption := rsBtnContinue;
+    end;
+    6: begin
+      BtnNo.Caption := rsBtnCancel;
+      BtnYes.Caption := rsBtnOk;
+    end;
+    else begin
+      BtnNo.Caption := rsBtnNo;
+      BtnYes.Caption := rsBtnYes;
+    end;
+  end;
 end;
 
 procedure TWizard.BtnUpdateBackClick(Sender: TObject);
 begin
     pc_Wizard.ActivePageIndex := pc_Wizard.ActivePageIndex-1;
+    RefreshNavigation;
 end;
 
 procedure TWizard.BtnUpdateNoClick(Sender: TObject);
-var QuestionNumber: Integer;
 begin
-    QuestionNumber := pc_Wizard.ActivePageIndex;
-    //Showmessage(Inttostr(QuestionNumber)) ;
+  case pc_Wizard.ActivePageIndex of
+    0: Close;
+    1: Answers.Updates   := False;
+    2: Answers.Metadata  := False;
+    3: Answers.Rating    := False;
+    4: Answers.LastFM    := False;
+    5: Answers.Filetypes := False;
+    6: Close;
+  end;
 
-    case QuestionNumber of
-        1: Answers.Updates   := False;
-        2: Answers.Metadata  := False;
-        3: Answers.Rating    := False;
-        4: Answers.LastFM    := False;
-        5: Answers.Filetypes := False;
-    end;
-
-    pc_Wizard.ActivePageIndex := pc_Wizard.ActivePageIndex+1;
+  pc_Wizard.ActivePageIndex := pc_Wizard.ActivePageIndex+1;
+  RefreshNavigation;
 end;
 
 procedure TWizard.BtnUpdateYesClick(Sender: TObject);
-var QuestionNumber: Integer;
 begin
-    QuestionNumber := pc_Wizard.ActivePageIndex;
-    //Showmessage(Inttostr(QuestionNumber));
-
-    case QuestionNumber of
-        1: Answers.Updates   := True;
-        2: Answers.Metadata  := True;
-        3: Answers.Rating    := True;
-        4: Answers.LastFM    := True;
-        5: Answers.Filetypes := True;
+  case pc_Wizard.ActivePageIndex of
+    1: Answers.Updates   := True;
+    2: Answers.Metadata  := True;
+    3: Answers.Rating    := True;
+    4: Answers.LastFM    := True;
+    5: Answers.Filetypes := True;
+    6: begin
+      ApplyWizardSettings;
+      Close;
     end;
+  end;
 
-    pc_Wizard.ActivePageIndex := pc_Wizard.ActivePageIndex+1;
+  pc_Wizard.ActivePageIndex := pc_Wizard.ActivePageIndex+1;
+  RefreshNavigation;
 end;
 
+procedure TWizard.TSSummaryShow(Sender: TObject);
 
-procedure TWizard.TabSheet7Show(Sender: TObject);
-var fNo, fYes: String;
+  function GetImgName(aAnswer: Boolean): String;
+  begin
+    if aAnswer then
+      result := cMenuOk
+    else
+      result := cMenuCancel;
+  end;
+
 begin
-    fYes := ExtractFilePath(ParamStr(0)) + 'Images\WizardOk.png';
-    fNo  := ExtractFilePath(ParamStr(0)) + 'Images\WizardCancel.png';
-
-    if FileExists(fYes) and FileExists(fNo) then
-    begin
-
-
-        if Answers.Updates then
-            img_sumUpdates.Picture.LoadFromFile(fYes)
-        else
-            img_sumUpdates.Picture.LoadFromFile(fNo);
-
-        if Answers.MetaData then
-            img_sumMetadata.Picture.LoadFromFile(fYes)
-        else
-            img_sumMetadata.Picture.LoadFromFile(fNo);
-
-        if Answers.Rating then
-            img_sumRating.Picture.LoadFromFile(fYes)
-        else
-            img_sumRating.Picture.LoadFromFile(fNo);
-
-        if Answers.LastFM then
-            img_sumLastFM.Picture.LoadFromFile(fYes)
-        else
-            img_sumLastFM.Picture.LoadFromFile(fNo);
-
-        if Answers.FileTypes then
-            img_sumFiletypes.Picture.LoadFromFile(fYes)
-        else
-            img_sumFiletypes.Picture.LoadFromFile(fNo);
-    end;
+  img_sumUpdates.ImageName := GetImgName(Answers.Updates);
+  img_sumMetadata.ImageName := GetImgName(Answers.MetaData);
+  img_sumRating.ImageName := GetImgName(Answers.Rating);
+  img_sumLastFM.ImageName := GetImgName(Answers.LastFM);
+  img_sumFiletypes.ImageName := GetImgName(Answers.FileTypes);
 end;
 
-
-procedure TWizard.Btn_CompleteOKClick(Sender: TObject);
-var ftr: TFileTypeRegistration;
-    i: integer;
+procedure TWizard.ApplyWizardSettings;
+var
+  ftr: TFileTypeRegistration;
+  i: integer;
 begin
-    NempUpdater.AutoCheck  := Answers.Updates;
+  NempUpdater.AutoCheck  := Answers.Updates;
     if Answers.Updates then
     begin
         // subsettings to default
@@ -378,7 +331,7 @@ begin
     end;
 
     NempOptions.AllowQuickAccessToMetadata  := Answers.MetaData;
-    NempPlayer.PostProcessor.WriteToFiles                 := Answers.MetaData;
+    NempPlayer.PostProcessor.WriteToFiles   := Answers.MetaData;
 
     NempPlayer.PostProcessor.Active := Answers.Rating;
     if Answers.Rating then
@@ -442,8 +395,6 @@ begin
             ftr.Free;
         end;
     end;
-
-    Close;
 end;
 
 end.

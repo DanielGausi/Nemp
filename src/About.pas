@@ -38,14 +38,16 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
   Dialogs, jpeg, ExtCtrls, StdCtrls, ShellApi, Nemp_ConstantsAndTypes, gnuGettext,
-  Nemp_RessourceStrings, Credits, ImgList, System.ImageList,System.UITypes;
+  Nemp_RessourceStrings, Credits, ImgList, System.ImageList,System.UITypes,
+  Vcl.VirtualImageList, dmGui;
 
 type
   TAboutForm = class(TForm)
     BtnOK: TButton;
     NempCredits: TACredits;
-    ImageList1: TImageList;
     BtnDonate: TButton;
+    VirtualImageList1: TVirtualImageList;
+    pnlButtons: TPanel;
 
     procedure BtnOKClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -81,22 +83,8 @@ begin
 end;
 
 procedure TAboutForm.FormCreate(Sender: TObject);
-var filename: String;
-    tmpbmp: TBitmap;
 begin
-    filename := ExtractFilePath(ParamStr(0)) + 'Images\about_title.bmp';
-    if FileExists(filename) then
-    begin
-        tmpbmp := TBitmap.Create;
-        try
-            tmpbmp.LoadFromFile(filename);
-            ImageList1.Add(tmpbmp, Nil);
-        finally
-            tmpbmp.Free;
-        end;
-    end;
-
-   NempCredits.Credits.Insert(3, 'Version ' + GetFileVersionString(''));// + ' (Release Candidate)');
+  NempCredits.Credits.Insert(3, 'Version ' + GetFileVersionString(''));// + ' (Release Candidate)');
 end;
 
 procedure TAboutForm.FormShow(Sender: TObject);

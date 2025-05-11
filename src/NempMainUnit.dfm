@@ -507,7 +507,6 @@ object Nemp_MainForm: TNemp_MainForm
               OnPaintBackground = PanelPaintBackground
               OnPaintBackgroundEx = PanelPaintBackgroundEx
               OwnerDraw = False
-              ExplicitWidth = 357
               object PlayerArtistLabel: TLabel
                 AlignWithMargins = True
                 Left = 4
@@ -1007,7 +1006,6 @@ object Nemp_MainForm: TNemp_MainForm
               RangeBar.VisibleMode = vAlways
               RangeBar.Thickness = 4
               Align = alClient
-              ExplicitWidth = 459
             end
             object rbVolume: TProgressRangeBar
               AlignWithMargins = True
@@ -4667,34 +4665,35 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object TNAMenu: TPopupMenu
     AutoHotkeys = maManual
-    Images = TaskBarImages
+    Images = vilIconsWindows
     OnPopup = TNAMenuPopup
     Left = 993
     Top = 417
     object PM_TNA_PlayPause: TMenuItem
       Caption = 'Pause'
-      ImageIndex = 1
       OnClick = PlayPauseBTNIMGClick
     end
     object PM_TNA_Stop: TMenuItem
       Caption = 'Stop'
-      ImageIndex = 7
+      ImageIndex = 45
+      ImageName = 'MenuStop'
       OnClick = StopBTNIMGClick
     end
     object PM_TNA_Next: TMenuItem
       Caption = 'Next track'
-      ImageIndex = 3
+      ImageIndex = 69
+      ImageName = 'MenuPlayNext'
       OnClick = PlayNextBTNIMGClick
     end
     object PM_TNA_Previous: TMenuItem
       Caption = 'Previous track'
-      ImageIndex = 0
+      ImageIndex = 70
+      ImageName = 'MenuPlayPrev'
       OnClick = PlayPrevBTNIMGClick
     end
     object PM_TNA_Playlist: TMenuItem
       AutoHotkeys = maManual
       Caption = 'Playlist'
-      ImageIndex = 6
     end
     object N20: TMenuItem
       Caption = '-'
@@ -4705,6 +4704,8 @@ object Nemp_MainForm: TNemp_MainForm
     end
     object PM_TNA_Close: TMenuItem
       Caption = 'Close'
+      ImageIndex = 4
+      ImageName = 'MenuCloseNemp'
       OnClick = PM_TNA_CloseClick
     end
   end
@@ -6791,6 +6792,31 @@ object Nemp_MainForm: TNemp_MainForm
         CollectionIndex = 68
         CollectionName = 'BtnVolumeMute'
         Name = 'BtnVolumeMute'
+      end
+      item
+        CollectionIndex = 69
+        CollectionName = 'MenuPlayNext'
+        Name = 'MenuPlayNext'
+      end
+      item
+        CollectionIndex = 70
+        CollectionName = 'MenuPlayPrev'
+        Name = 'MenuPlayPrev'
+      end
+      item
+        CollectionIndex = 71
+        CollectionName = 'MenuCancel'
+        Name = 'MenuCancel'
+      end
+      item
+        CollectionIndex = 72
+        CollectionName = 'TreeCleanChecked'
+        Name = 'TreeCleanChecked'
+      end
+      item
+        CollectionIndex = 73
+        CollectionName = 'TreeCleanUnchecked'
+        Name = 'TreeCleanUnchecked'
       end>
     ImageCollection = DataModuleGui.ICIcons
     Left = 505
@@ -6915,6 +6941,11 @@ object Nemp_MainForm: TNemp_MainForm
         CollectionIndex = 17
         CollectionName = 'PlayerStop'
         Name = 'PlayerStop'
+      end
+      item
+        CollectionIndex = 18
+        CollectionName = 'PlayerOverlayInfo'
+        Name = 'PlayerOverlayInfo'
       end>
     ImageCollection = DataModuleGui.ICPlayerButtons
     Width = 36

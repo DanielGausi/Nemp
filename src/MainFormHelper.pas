@@ -899,7 +899,7 @@ begin
             RestoreComboboxes(CDOpenDialog);
         end;
 
-        if assigned(DeleteSelection) then ReTranslateComponent(DeleteSelection );
+        // if assigned(DeleteSelection) then ReTranslateComponent(DeleteSelection );
 
         if assigned(FormLowBattery) then
         begin

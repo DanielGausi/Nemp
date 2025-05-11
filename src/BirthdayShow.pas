@@ -36,23 +36,52 @@ interface
 
 uses
   Windows, Messages, SysUtils,  Classes,  Forms,
-  StdCtrls, Controls, gnuGettext, Vcl.ExtCtrls, Vcl.ComCtrls, NempTrackBar;
+  StdCtrls, Controls, gnuGettext, Vcl.ExtCtrls, Vcl.ComCtrls, NempTrackBar,
+  Vcl.VirtualImage, dmGui, NempSkinnedTrackbar, NempPanel,
+  NempAudioFiles, PlayerClass;
 
 type
   TBirthdayForm = class(TForm)
+    LblExplain: TLabel;
+    imgParty: TVirtualImage;
+    viVolume: TVirtualImage;
+    rbVolume: TProgressRangeBar;
+    pnlControlSlider: TNempPanel;
+    PlayerTimeLbl: TLabel;
+    rbTrackProgress: TProgressRangeBar;
+    lblTitle: TLabel;
+    BassTimer: TTimer;
+    LblCountdown: TLabel;
+    PageControlMode: TPageControl;
+    tsCountDown: TTabSheet;
+    tsBirthday: TTabSheet;
     Label1: TLabel;
-    Label2: TLabel;
-    imgParty: TImage;
-    BtnClose: TButton;
-    tbVolume: TNempTrackBar;
-    VolumeImage: TImage;
+    grpBoxControls: TGroupBox;
+    CBContinueAfter: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
-    procedure BtnCloseClick(Sender: TObject);
-    procedure tbVolumeChange(Sender: TObject);
+    procedure rbVolumeScroll(Sender: TProgressRangeBar;
+      ScrollButton: teScrollButton; ScrollPos: Integer; ScrollPosNorm: Double);
+    procedure rbVolumeMouseWheelDown(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
+    procedure rbVolumeMouseWheelUp(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
+    procedure viVolumeClick(Sender: TObject);
+    procedure BassTimerTimer(Sender: TObject);
+    procedure PlayerTimeLblClick(Sender: TObject);
+    procedure rbTrackProgressScroll(Sender: TProgressRangeBar;
+      ScrollButton: teScrollButton; ScrollPos: Integer; ScrollPosNorm: Double);
+    procedure rbTrackProgressEndScroll(Sender: TProgressRangeBar;
+      ScrollButton: teScrollButton);
+    procedure rbTrackProgressStep(Sender: TProgressRangeBar;
+      ScrollButton: teScrollButton; ScrollPos: Integer; ScrollPosNorm: Double);
+    procedure CBContinueAfterClick(Sender: TObject);
   private
     { Private-Deklarationen }
+    procedure RefreshVolumeGui;
+
+    procedure OnBirthdayPlay(Sender: TNempPlayer; aAudioFile: TAudioFile);
 
   public
     { Public-Deklarationen }
@@ -64,64 +93,163 @@ var
 
 implementation
 
-uses NempMainUnit, PlayerClass, MainFormHelper;
+uses NempMainUnit, MainFormHelper, AudioDisplayUtils, Nemp_ConstantsAndTypes;
 {$R *.dfm}
 
 
 procedure TBirthdayForm.FormCreate(Sender: TObject);
-var fn: String;
 begin
-    TranslateComponent (self);
-
-    fn := ExtractFilePath(ParamStr(0)) + 'Images\congratulations.jpg';
-    if FileExists(fn) then
-        imgParty.Picture.LoadFromFile(fn);
+  TranslateComponent (self);
 end;
 
 procedure TBirthdayForm.FormShow(Sender: TObject);
-var fn: String;
 begin
-   SetWindowPos(Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
+  CBContinueAfter.Checked := NempPlayer.AutoResumePlaylistAfterBirthday;
 
+  PageControlMode.Pages[0].TabVisible := False;
+  PageControlMode.Pages[1].TabVisible := False;
+
+   SetWindowPos(Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
    // default volume here: MainVolume
-   tbVolume.Position := Round(NempPlayer.Volume);
    NempPlayer.BirthdayVolume := NempPlayer.Volume;
+   RefreshVolumeGui;
+   NempPlayer.OnBirthdayPlay := OnBirthdayPlay;
 
    if NempPlayer.NempBirthdayTimer.UseCountDown then
      NempPlayer.PlayCountDown
    else
      NempPlayer.PlayBirthday;
-
-   if Nemp_MainForm.NempSkin.isActive then
-   begin
-      fn := IncludeTrailingPathDelimiter(Nemp_MainForm.NempSkin.Path) + 'VolumeBirthday.png';
-      if not FileExists(fn) then fn := IncludeTrailingPathDelimiter(Nemp_MainForm.NempSkin.Path) + 'VolumeBirthday.jpg';
-      if not FileExists(fn) then fn := IncludeTrailingPathDelimiter(Nemp_MainForm.NempSkin.Path) + 'Volume.png';
-      if not FileExists(fn) then fn := IncludeTrailingPathDelimiter(Nemp_MainForm.NempSkin.Path) + 'Volume.jpg';
-      if not FileExists(fn) then fn := ExtractFilePath(ParamStr(0)) + 'Images\Volume.png';
-   end else
-      fn := ExtractFilePath(ParamStr(0)) + 'Images\Volume.png';
-
-    if FileExists(fn) then
-        VolumeImage.Picture.LoadFromFile(fn);
 end;
 
-procedure TBirthdayForm.tbVolumeChange(Sender: TObject);
+procedure TBirthdayForm.CBContinueAfterClick(Sender: TObject);
 begin
-    NempPlayer.BirthdayVolume := tbVolume.Position;
-end;
-
-procedure TBirthdayForm.BtnCloseClick(Sender: TObject);
-begin
-    Close;
+  NempPlayer.AutoResumePlaylistAfterBirthday := CBContinueAfter.Checked;
 end;
 
 procedure TBirthdayForm.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
+  NempPlayer.OnBirthdayPlay := Nil;
   NempPlayer.AbortBirthday;
   ReArrangeToolImages;
 end;
 
+// Volume
+procedure TBirthdayForm.RefreshVolumeGui;
+begin
+  if rbVolume.ScrollingButton <> btnTrack then
+    rbVolume.Progress := NempPlayer.BirthdayVolume/100;
+
+  if (NempPlayer.BirthdayVolume <= 0.05) then
+    viVolume.ImageName := cBtnVolumeMute
+  else begin
+    if NempPlayer.BirthdayVolume >= 50 then
+      viVolume.ImageName := cBtnVolumeHigh
+    else
+      viVolume.ImageName := cBtnVolumeLow
+  end;
+end;
+
+
+procedure TBirthdayForm.rbVolumeMouseWheelDown(Sender: TObject;
+  Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+begin
+  NempPlayer.BirthdayVolume := NempPlayer.BirthdayVolume - 1;
+  RefreshVolumeGui;
+end;
+
+procedure TBirthdayForm.rbVolumeMouseWheelUp(Sender: TObject;
+  Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+begin
+  NempPlayer.BirthdayVolume := NempPlayer.BirthdayVolume + 1;
+  RefreshVolumeGui;
+end;
+
+procedure TBirthdayForm.rbVolumeScroll(Sender: TProgressRangeBar;
+  ScrollButton: teScrollButton; ScrollPos: Integer; ScrollPosNorm: Double);
+begin
+  if ScrollButton = btnTrack then
+    NempPlayer.BirthdayVolume := ScrollPos;
+end;
+
+procedure TBirthdayForm.viVolumeClick(Sender: TObject);
+begin
+  if NempPlayer.BirthdayVolume <= 0.05 then
+    NempPlayer.BirthdayVolume := 10
+  else
+    NempPlayer.BirthdayVolume := 0;
+  RefreshVolumeGui;
+end;
+
+// Title information
+procedure TBirthdayForm.OnBirthdayPlay(Sender: TNempPlayer;
+  aAudioFile: TAudioFile);
+begin
+  lblTitle.Caption := NempDisplay.PlaylistTitle(aAudioFile, False);
+
+  case NempPlayer.CurrentBirthdayMode of
+    bmCountDown: begin
+      PageControlMode.ActivePageIndex := 0;
+
+    end;
+
+    bmBirthday: begin
+      PageControlMode.ActivePageIndex := 1;
+
+    end;
+  end;
+
+end;
+
+
+// Progress
+procedure TBirthdayForm.BassTimerTimer(Sender: TObject);
+var
+  intTime: Integer;
+begin
+  if NempPlayer.BassBirthdayStatus <> BASS_ACTIVE_PLAYING then begin
+    playerTimeLbl.Caption := '00:00';
+    rbTrackProgress.Progress := 0;
+  end else begin
+    if rbTrackProgress.ScrollingButton = btnNone then
+      playerTimeLbl.Caption := NempPlayer.TimeStringBirthday; //RefreshTimeLabel(NempPlayer.BirthdayProgress, NempPlayer.TimeInSecBirthday);
+    if rbTrackProgress.ScrollingButton <> btnTrack then
+      rbTrackProgress.Progress := NempPlayer.BirthdayProgress;
+  end;
+
+  if NempPlayer.CurrentBirthdayMode = bmCountDown then begin
+    intTime := round(NempPlayer.BirthdayDauer - Nempplayer.BirthdayTime + 0.5);
+    LblCountDown.Caption := intTime.ToString;
+  end;
+
+end;
+
+
+
+procedure TBirthdayForm.PlayerTimeLblClick(Sender: TObject);
+begin
+  NempPlayer.TimeMode := (NempPlayer.TimeMode + 1) Mod 2;
+end;
+
+procedure TBirthdayForm.rbTrackProgressScroll(Sender: TProgressRangeBar;
+  ScrollButton: teScrollButton; ScrollPos: Integer; ScrollPosNorm: Double);
+begin
+  PlayerTimeLbl.Caption := NempPlayer.GeBirthdayTimeStringFromProgress(ScrollPosNorm);
+end;
+
+procedure TBirthdayForm.rbTrackProgressStep(Sender: TProgressRangeBar;
+  ScrollButton: teScrollButton; ScrollPos: Integer; ScrollPosNorm: Double);
+begin
+  if ScrollButton = btnTrack then
+    NempPlayer.BirthdayProgress := ScrollPosNorm;
+  PlayerTimeLbl.Caption := NempPlayer.GeBirthdayTimeStringFromProgress(ScrollPosNorm);
+end;
+
+procedure TBirthdayForm.rbTrackProgressEndScroll(Sender: TProgressRangeBar;
+  ScrollButton: teScrollButton);
+begin
+  if ScrollButton = btnTrack then
+    NempPlayer.BirthdayProgress := Sender.Progress;
+end;
 
 end.

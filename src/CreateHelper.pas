@@ -456,7 +456,7 @@ begin
 
         PlaylistVST.Canvas.Font.Size := maxFont;
         PlaylistVST.Header.Columns[2].Width := PlaylistVST.Canvas.TextWidth('@99:99hm');
-        PlaylistVST.Header.Columns[0].Width := PlaylistVST.Canvas.TextWidth('1234');
+        PlaylistVST.Header.Columns[0].Width := PlaylistVST.Canvas.TextWidth('12345');
         RefreshPlaylistVSTHeader;
 
         VST.Font.Size := NempOptions.DefaultFontSize;

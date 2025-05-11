@@ -3,7 +3,7 @@ object AboutForm: TAboutForm
   Top = 122
   BorderStyle = bsDialog
   Caption = 'About Nemp'
-  ClientHeight = 393
+  ClientHeight = 430
   ClientWidth = 367
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -12,21 +12,23 @@ object AboutForm: TAboutForm
   Font.Name = 'Tahoma'
   Font.Style = []
   Position = poScreenCenter
+  Scaled = False
   OnCreate = FormCreate
   OnHide = FormHide
   OnShow = FormShow
-  DesignSize = (
-    367
-    393)
   TextHeight = 13
   object NempCredits: TACredits
     AlignWithMargins = True
     Left = 8
     Top = 8
-    Width = 335
-    Height = 345
+    Width = 351
+    Height = 380
     Cursor = crDefault
-    Images = ImageList1
+    Margins.Left = 8
+    Margins.Top = 8
+    Margins.Right = 8
+    Margins.Bottom = 8
+    Images = VirtualImageList1
     Credits.Strings = (
       '[img="0"]'
       ''
@@ -62,7 +64,7 @@ object AboutForm: TAboutForm
       '[row="200"]'
       ''
       ''
-      'Programmed with CodeGear Delphi 2009 - 11.3'
+      'Programmed with CodeGear Delphi 2009 - 12.1'
       ''
       ''
       '[b]Used components/units[/b]'
@@ -163,7 +165,7 @@ object AboutForm: TAboutForm
     BackgroundImage.Data = {07544269746D617000000000}
     ForeGroundImage.Data = {07544269746D617000000000}
     ShowBorder = False
-    Anchors = [akLeft, akTop, akRight]
+    Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clSilver
     Font.Height = -11
@@ -174,32 +176,70 @@ object AboutForm: TAboutForm
     Smooth = [spTop, spBottom]
     TextOffset = 1
     ExplicitWidth = 353
+    ExplicitHeight = 345
   end
-  object BtnOK: TButton
+  object pnlButtons: TPanel
     AlignWithMargins = True
-    Left = 280
-    Top = 361
-    Width = 75
-    Height = 25
-    Cancel = True
-    Caption = 'Ok'
-    Default = True
+    Left = 0
+    Top = 396
+    Width = 367
+    Height = 30
+    Margins.Left = 0
+    Margins.Top = 0
+    Margins.Right = 0
+    Margins.Bottom = 4
+    Align = alBottom
+    BevelOuter = bvNone
     TabOrder = 0
-    OnClick = BtnOKClick
+    ExplicitLeft = 8
+    ExplicitTop = 403
+    object BtnDonate: TButton
+      AlignWithMargins = True
+      Left = 8
+      Top = 4
+      Width = 75
+      Height = 22
+      Margins.Left = 8
+      Margins.Top = 4
+      Margins.Right = 8
+      Margins.Bottom = 4
+      Align = alLeft
+      Caption = 'Donate'
+      TabOrder = 1
+      OnClick = BtnDonateClick
+      ExplicitTop = 8
+      ExplicitHeight = 25
+    end
+    object BtnOK: TButton
+      AlignWithMargins = True
+      Left = 284
+      Top = 4
+      Width = 75
+      Height = 22
+      Margins.Left = 8
+      Margins.Top = 4
+      Margins.Right = 8
+      Margins.Bottom = 4
+      Align = alRight
+      Cancel = True
+      Caption = 'Ok'
+      Default = True
+      TabOrder = 0
+      OnClick = BtnOKClick
+      ExplicitLeft = 212
+    end
   end
-  object BtnDonate: TButton
-    Left = 8
-    Top = 359
-    Width = 75
-    Height = 25
-    Caption = 'Donate'
-    TabOrder = 1
-    OnClick = BtnDonateClick
-  end
-  object ImageList1: TImageList
-    Height = 122
+  object VirtualImageList1: TVirtualImageList
+    Images = <
+      item
+        CollectionIndex = 32
+        CollectionName = 'imgSplashAbout'
+        Name = 'imgSplashAbout'
+      end>
+    ImageCollection = DataModuleGui.ICGraphics
     Width = 200
-    Left = 24
-    Top = 272
+    Height = 122
+    Left = 264
+    Top = 64
   end
 end

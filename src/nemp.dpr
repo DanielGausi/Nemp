@@ -167,8 +167,8 @@ begin
   {$ENDIF}
 
   Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
-  Application.CreateForm(TProgressForm, ProgressFormPlaylist);
-  Application.CreateForm(TProgressForm, ProgressFormLibrary);
+  // Application.CreateForm(TProgressForm, ProgressFormPlaylist);
+  // Application.CreateForm(TProgressForm, ProgressFormLibrary);
   Application.CreateForm(TReplayGainProgressForm, ReplayGainProgressForm);
   Application.CreateForm(TDataModuleGui, DataModuleGui);
   Application.CreateForm(TFormHeadsetControl, FormHeadsetControl);

@@ -5,8 +5,8 @@ object BirthdayForm: TBirthdayForm
   Margins.Right = 10
   BorderStyle = bsSingle
   Caption = 'Nemp: Congratulations!'
-  ClientHeight = 349
-  ClientWidth = 414
+  ClientHeight = 460
+  ClientWidth = 408
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,86 +17,411 @@ object BirthdayForm: TBirthdayForm
   OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
-  DesignSize = (
-    414
-    349)
   TextHeight = 13
-  object Label1: TLabel
-    AlignWithMargins = True
-    Left = 3
-    Top = 167
+  object PageControlMode: TPageControl
+    Left = 0
+    Top = 0
     Width = 408
-    Height = 98
+    Height = 346
+    ActivePage = tsBirthday
     Align = alTop
-    Alignment = taCenter
-    AutoSize = False
-    Caption = 
-      'The playlist was interrupted automatically for this special song' +
-      '. Congratulations to whatever you are celebrating! Have a good t' +
-      'ime with your guests and enjoy the party!'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    ParentFont = False
-    WordWrap = True
-    ExplicitWidth = 412
-  end
-  object Label2: TLabel
-    AlignWithMargins = True
-    Left = 3
-    Top = 271
-    Width = 408
-    Height = 26
-    Align = alTop
-    Alignment = taCenter
-    AutoSize = False
-    Caption = '(Close this window to continue with the regular playlist)'
-    WordWrap = True
-    ExplicitLeft = 14
-    ExplicitTop = 276
-    ExplicitWidth = 396
-  end
-  object imgParty: TImage
-    AlignWithMargins = True
-    Left = 3
-    Top = 3
-    Width = 408
-    Height = 158
-    Align = alTop
-    Center = True
-    ExplicitLeft = 8
-    ExplicitTop = 8
-    ExplicitWidth = 400
-  end
-  object VolumeImage: TImage
-    Left = 8
-    Top = 313
-    Width = 20
-    Height = 18
-  end
-  object BtnClose: TButton
-    Left = 269
-    Top = 313
-    Width = 128
-    Height = 25
-    Anchors = [akTop, akRight]
-    Caption = 'Close'
     TabOrder = 0
-    OnClick = BtnCloseClick
-    ExplicitLeft = 277
+    object tsCountDown: TTabSheet
+      Caption = 'tsCountDown'
+      DoubleBuffered = True
+      ParentDoubleBuffered = False
+      object Label1: TLabel
+        AlignWithMargins = True
+        Left = 4
+        Top = 4
+        Width = 392
+        Height = 61
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
+        Align = alTop
+        Alignment = taCenter
+        AutoSize = False
+        Caption = 
+          'The Nemp Birthday Mode has been activated and now plays a short ' +
+          'countdown before the party really gets going.'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        WordWrap = True
+      end
+      object LblCountdown: TLabel
+        AlignWithMargins = True
+        Left = 3
+        Top = 72
+        Width = 150
+        Height = 164
+        Align = alTop
+        Alignment = taCenter
+        Caption = '00'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -119
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        GlowSize = 10
+        ParentFont = False
+      end
+    end
+    object tsBirthday: TTabSheet
+      Caption = 'tsBirthday'
+      ImageIndex = 1
+      object imgParty: TVirtualImage
+        Left = 0
+        Top = 51
+        Width = 400
+        Height = 267
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
+        Align = alBottom
+        Center = True
+        ImageCollection = DataModuleGui.ICGraphics
+        ImageWidth = 0
+        ImageHeight = 0
+        ImageIndex = 38
+        ImageName = 'imgParty'
+        ExplicitLeft = 4
+        ExplicitTop = -102
+        ExplicitWidth = 273
+      end
+      object LblExplain: TLabel
+        AlignWithMargins = True
+        Left = 4
+        Top = 4
+        Width = 387
+        Height = 48
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
+        Align = alClient
+        Alignment = taCenter
+        Caption = 
+          'The playlist was interrupted automatically for this special song' +
+          '. Congratulations to whatever you are celebrating! Have a good t' +
+          'ime with your guests and enjoy the party!'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        WordWrap = True
+      end
+    end
   end
-  object tbVolume: TNempTrackBar
-    Left = 34
-    Top = 303
-    Width = 103
-    Height = 40
-    Max = 100
-    PageSize = 10
-    Frequency = 20
+  object grpBoxControls: TGroupBox
+    AlignWithMargins = True
+    Left = 4
+    Top = 365
+    Width = 400
+    Height = 62
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Align = alBottom
     TabOrder = 1
-    TickMarks = tmBoth
-    OnChange = tbVolumeChange
+    ExplicitLeft = 9
+    ExplicitTop = 371
+    object lblTitle: TLabel
+      AlignWithMargins = True
+      Left = 10
+      Top = 15
+      Width = 12
+      Height = 13
+      Margins.Left = 8
+      Margins.Top = 0
+      Margins.Right = 8
+      Margins.Bottom = 0
+      Align = alTop
+      Caption = '...'
+    end
+    object pnlControlSlider: TNempPanel
+      Tag = 5
+      AlignWithMargins = True
+      Left = 6
+      Top = 28
+      Width = 388
+      Height = 28
+      Margins.Left = 4
+      Margins.Top = 0
+      Margins.Right = 4
+      Margins.Bottom = 4
+      Align = alBottom
+      BevelOuter = bvNone
+      DoubleBuffered = False
+      ParentDoubleBuffered = False
+      TabOrder = 0
+      Ratio = 0
+      DrawMode = dm_Windows
+      DrawFrame = False
+      OwnerDraw = False
+      object PlayerTimeLbl: TLabel
+        AlignWithMargins = True
+        Left = 0
+        Top = 8
+        Width = 34
+        Height = 12
+        Margins.Left = 0
+        Margins.Top = 8
+        Margins.Right = 8
+        Margins.Bottom = 8
+        Align = alLeft
+        Alignment = taRightJustify
+        AutoSize = False
+        Caption = '00:00'
+        OnClick = PlayerTimeLblClick
+        ExplicitLeft = 4
+      end
+      object viVolume: TVirtualImage
+        AlignWithMargins = True
+        Left = 279
+        Top = 6
+        Width = 16
+        Height = 16
+        Margins.Left = 8
+        Margins.Top = 6
+        Margins.Right = 0
+        Margins.Bottom = 6
+        Align = alRight
+        ImageCollection = DataModuleGui.ICIcons
+        ImageWidth = 0
+        ImageHeight = 0
+        ImageIndex = 66
+        ImageName = 'BtnVolumeHigh'
+        OnClick = viVolumeClick
+        ExplicitLeft = 235
+        ExplicitTop = 4
+        ExplicitHeight = 20
+      end
+      object rbTrackProgress: TProgressRangeBar
+        AlignWithMargins = True
+        Left = 42
+        Top = 0
+        Width = 229
+        Height = 28
+        Margins.Left = 0
+        Margins.Top = 0
+        Margins.Right = 0
+        Margins.Bottom = 0
+        OnScroll = rbTrackProgressScroll
+        OnStep = rbTrackProgressStep
+        OnEndScroll = rbTrackProgressEndScroll
+        RangeMin = 0
+        RangeMax = 100
+        RangeMaxNorm = 1.000000000000000000
+        Orientation = trHorizontal
+        ButtonMode = bmCentered
+        Style = dm_Windows
+        TrackBarMargin = 8
+        Position = 0
+        DefaultPosition = 0
+        AllowRange = True
+        RangeActive = False
+        TrackButton.Colors.FrameColor = clActiveBorder
+        TrackButton.Colors.FrameHighlightColor = clActiveBorder
+        TrackButton.Colors.FrameDisabledColor = clInactiveBorder
+        TrackButton.Colors.BrushColor = clBtnFace
+        TrackButton.Colors.BrushHighlightColor = clBtnHighlight
+        TrackButton.Colors.BrushDisabledColor = clBtnShadow
+        TrackButton.Colors.FocusRectColor = clHighlight
+        TrackButton.FrameWidth = 1
+        TrackButton.Radius = 4
+        TrackButton.VisibleMode = vHover
+        TrackButton.Thickness = 12
+        TrackButton.Length = 20
+        RangeButtonMin.Colors.FrameColor = clActiveBorder
+        RangeButtonMin.Colors.FrameHighlightColor = clActiveBorder
+        RangeButtonMin.Colors.FrameDisabledColor = clInactiveBorder
+        RangeButtonMin.Colors.BrushColor = clBtnFace
+        RangeButtonMin.Colors.BrushHighlightColor = clBtnHighlight
+        RangeButtonMin.Colors.BrushDisabledColor = clBtnShadow
+        RangeButtonMin.Colors.FocusRectColor = clHighlight
+        RangeButtonMin.FrameWidth = 1
+        RangeButtonMin.Radius = 4
+        RangeButtonMin.VisibleMode = vAlways
+        RangeButtonMin.Thickness = 12
+        RangeButtonMin.Length = 18
+        RangeButtonMax.Colors.FrameColor = clActiveBorder
+        RangeButtonMax.Colors.FrameHighlightColor = clActiveBorder
+        RangeButtonMax.Colors.FrameDisabledColor = clInactiveBorder
+        RangeButtonMax.Colors.BrushColor = clBtnFace
+        RangeButtonMax.Colors.BrushHighlightColor = clBtnHighlight
+        RangeButtonMax.Colors.BrushDisabledColor = clBtnShadow
+        RangeButtonMax.Colors.FocusRectColor = clHighlight
+        RangeButtonMax.FrameWidth = 1
+        RangeButtonMax.Radius = 4
+        RangeButtonMax.VisibleMode = vAlways
+        RangeButtonMax.Thickness = 12
+        RangeButtonMax.Length = 18
+        TrackBar.Colors.FrameColor = clActiveBorder
+        TrackBar.Colors.FrameHighlightColor = clActiveBorder
+        TrackBar.Colors.FrameDisabledColor = clInactiveBorder
+        TrackBar.Colors.BrushColor = clBtnFace
+        TrackBar.Colors.BrushHighlightColor = clBtnHighlight
+        TrackBar.Colors.BrushDisabledColor = clBtnShadow
+        TrackBar.Colors.FocusRectColor = clHighlight
+        TrackBar.FrameWidth = 1
+        TrackBar.Radius = 4
+        TrackBar.VisibleMode = vAlways
+        TrackBar.Thickness = 8
+        ProgressBar.Colors.FrameColor = clActiveBorder
+        ProgressBar.Colors.FrameHighlightColor = clActiveBorder
+        ProgressBar.Colors.FrameDisabledColor = clInactiveBorder
+        ProgressBar.Colors.BrushColor = clHighlight
+        ProgressBar.Colors.BrushHighlightColor = clBtnHighlight
+        ProgressBar.Colors.BrushDisabledColor = clBtnShadow
+        ProgressBar.Colors.FocusRectColor = clHighlight
+        ProgressBar.FrameWidth = 1
+        ProgressBar.Radius = 4
+        ProgressBar.VisibleMode = vAlways
+        ProgressBar.Thickness = 8
+        RangeBar.Colors.FrameColor = clActiveBorder
+        RangeBar.Colors.FrameHighlightColor = clActiveBorder
+        RangeBar.Colors.FrameDisabledColor = clInactiveBorder
+        RangeBar.Colors.BrushColor = clBtnFace
+        RangeBar.Colors.BrushHighlightColor = clBtnHighlight
+        RangeBar.Colors.BrushDisabledColor = clBtnShadow
+        RangeBar.Colors.FocusRectColor = clHighlight
+        RangeBar.FrameWidth = 1
+        RangeBar.Radius = 4
+        RangeBar.VisibleMode = vAlways
+        RangeBar.Thickness = 4
+        Align = alClient
+      end
+      object rbVolume: TProgressRangeBar
+        AlignWithMargins = True
+        Left = 299
+        Top = 6
+        Width = 85
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 6
+        Margins.Right = 4
+        Margins.Bottom = 6
+        OnScroll = rbVolumeScroll
+        OnStep = rbVolumeScroll
+        OnMouseWheelDown = rbVolumeMouseWheelDown
+        OnMouseWheelUp = rbVolumeMouseWheelUp
+        RangeMin = 0
+        RangeMax = 100
+        RangeMaxNorm = 1.000000000000000000
+        Orientation = trHorizontal
+        ButtonMode = bmNested
+        Style = dm_Windows
+        TrackBarMargin = 4
+        Position = 0
+        DefaultPosition = 0
+        AllowRange = False
+        RangeActive = False
+        TrackButton.Colors.FrameColor = clActiveBorder
+        TrackButton.Colors.FrameHighlightColor = clActiveBorder
+        TrackButton.Colors.FrameDisabledColor = clInactiveBorder
+        TrackButton.Colors.BrushColor = clBtnFace
+        TrackButton.Colors.BrushHighlightColor = clBtnHighlight
+        TrackButton.Colors.BrushDisabledColor = clBtnShadow
+        TrackButton.Colors.FocusRectColor = clHighlight
+        TrackButton.FrameWidth = 1
+        TrackButton.Radius = 4
+        TrackButton.VisibleMode = vAlways
+        TrackButton.Thickness = 12
+        TrackButton.Length = 20
+        RangeButtonMin.Colors.FrameColor = clActiveBorder
+        RangeButtonMin.Colors.FrameHighlightColor = clActiveBorder
+        RangeButtonMin.Colors.FrameDisabledColor = clInactiveBorder
+        RangeButtonMin.Colors.BrushColor = clBtnFace
+        RangeButtonMin.Colors.BrushHighlightColor = clBtnHighlight
+        RangeButtonMin.Colors.BrushDisabledColor = clBtnShadow
+        RangeButtonMin.Colors.FocusRectColor = clHighlight
+        RangeButtonMin.FrameWidth = 1
+        RangeButtonMin.Radius = 4
+        RangeButtonMin.VisibleMode = vAlways
+        RangeButtonMin.Thickness = 12
+        RangeButtonMin.Length = 18
+        RangeButtonMax.Colors.FrameColor = clActiveBorder
+        RangeButtonMax.Colors.FrameHighlightColor = clActiveBorder
+        RangeButtonMax.Colors.FrameDisabledColor = clInactiveBorder
+        RangeButtonMax.Colors.BrushColor = clBtnFace
+        RangeButtonMax.Colors.BrushHighlightColor = clBtnHighlight
+        RangeButtonMax.Colors.BrushDisabledColor = clBtnShadow
+        RangeButtonMax.Colors.FocusRectColor = clHighlight
+        RangeButtonMax.FrameWidth = 1
+        RangeButtonMax.Radius = 4
+        RangeButtonMax.VisibleMode = vAlways
+        RangeButtonMax.Thickness = 12
+        RangeButtonMax.Length = 18
+        TrackBar.Colors.FrameColor = clActiveBorder
+        TrackBar.Colors.FrameHighlightColor = clActiveBorder
+        TrackBar.Colors.FrameDisabledColor = clInactiveBorder
+        TrackBar.Colors.BrushColor = clBtnFace
+        TrackBar.Colors.BrushHighlightColor = clBtnHighlight
+        TrackBar.Colors.BrushDisabledColor = clBtnShadow
+        TrackBar.Colors.FocusRectColor = clHighlight
+        TrackBar.FrameWidth = 1
+        TrackBar.Radius = 4
+        TrackBar.VisibleMode = vAlways
+        TrackBar.Thickness = 8
+        ProgressBar.Colors.FrameColor = clActiveBorder
+        ProgressBar.Colors.FrameHighlightColor = clActiveBorder
+        ProgressBar.Colors.FrameDisabledColor = clInactiveBorder
+        ProgressBar.Colors.BrushColor = clHighlight
+        ProgressBar.Colors.BrushHighlightColor = clBtnHighlight
+        ProgressBar.Colors.BrushDisabledColor = clBtnShadow
+        ProgressBar.Colors.FocusRectColor = clHighlight
+        ProgressBar.FrameWidth = 1
+        ProgressBar.Radius = 4
+        ProgressBar.VisibleMode = vAlways
+        ProgressBar.Thickness = 8
+        RangeBar.Colors.FrameColor = clActiveBorder
+        RangeBar.Colors.FrameHighlightColor = clActiveBorder
+        RangeBar.Colors.FrameDisabledColor = clInactiveBorder
+        RangeBar.Colors.BrushColor = clBtnFace
+        RangeBar.Colors.BrushHighlightColor = clBtnHighlight
+        RangeBar.Colors.BrushDisabledColor = clBtnShadow
+        RangeBar.Colors.FocusRectColor = clHighlight
+        RangeBar.FrameWidth = 1
+        RangeBar.Radius = 4
+        RangeBar.VisibleMode = vAlways
+        RangeBar.Thickness = 4
+        Align = alRight
+      end
+    end
+  end
+  object CBContinueAfter: TCheckBox
+    AlignWithMargins = True
+    Left = 8
+    Top = 435
+    Width = 392
+    Height = 17
+    Hint = 'Continue with the playlist after the birthday song.'
+    Margins.Left = 8
+    Margins.Top = 4
+    Margins.Right = 8
+    Margins.Bottom = 8
+    Align = alBottom
+    Caption = 'Continue with the playlist after playing the birthday song'
+    TabOrder = 2
+    OnClick = CBContinueAfterClick
+    ExplicitLeft = -8
+    ExplicitTop = 453
+    ExplicitWidth = 408
+  end
+  object BassTimer: TTimer
+    Interval = 25
+    OnTimer = BassTimerTimer
+    Left = 18
+    Top = 318
   end
 end

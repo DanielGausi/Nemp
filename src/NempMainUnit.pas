@@ -64,7 +64,7 @@ uses
   System.ImageList, System.Types, System.UITypes, ProgressShape,
   System.Win.TaskbarCore, Vcl.Taskbar, BaseForms, Vcl.VirtualImageList,
   System.Actions, Vcl.ActnList, Vcl.AppEvnts, NempSkinnedTrackbar, NempSpectrum,
-  Vcl.VirtualImage
+  Vcl.VirtualImage, Vcl.ImageCollection
   {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF}
   ;
 
@@ -1215,7 +1215,7 @@ type
 
 
     procedure OnPlayerStopped(Sender: TObject);
-    procedure OnPlayerMessage(Sender: TObject; aMessage: String);
+    procedure OnPlayerMessage(Sender: TNempPlayer; aMessage: String);
     procedure ReallyDeletePlaylistTimerTimer(Sender: TObject);
     procedure ImgDetailCoverDblClick(Sender: TObject);
     procedure __MainContainerPanelMouseDown(Sender: TObject;
@@ -1670,7 +1670,7 @@ uses  Splash, About, OptionsComplete, StreamVerwaltung,
   MainFormBuilderForm, ReplayGainProgress, NempReplayGainCalculation,
   NewFavoritePlaylist, PlaylistManagement, PlaylistEditor, AudioDisplayUtils ,
   fChangeFileCategory, fExport, fUpdateCleaning, UpdateCleaning,
-  FHeadsetControl, AudioFileManagement;
+  FHeadsetControl, AudioFileManagement, dmGUI;
 
 
 {$R *.dfm}
@@ -2342,7 +2342,6 @@ begin
 end;
 
 
-
 procedure TNemp_MainForm.CatchAllExceptionsOnShutDown(Sender: TObject; E: Exception);
 begin
     Application.Terminate;
@@ -2471,6 +2470,9 @@ begin
         LanguageList.Free;
         NempUpdater.Free;
         FreeAndNil(ErrorLog);
+
+        // RevokeDragDrop(Handle);
+        // RevokeDragFiles;
 
         Set8087CW(Default8087CW);
     except
@@ -3311,21 +3313,40 @@ procedure TNemp_MainForm.RefreshStarGraphicsAllForms;
     aRatingBtn.StarEmptyImageIndex := aRatingBtn.Images.GetIndexByName(cMenuStarEmpty);
   end;*)
 
+var
+  DefaultCollection, SkinCollection: TImageCollection;
 begin
 
   if NempSkin.IsActive and NempSkin.UseAdvancedSkin and NempOptions.GlobalUseAdvancedSkin then begin
     // we have a skin active, that also affects other forms
     DefaultRatingPainter.Images := vilIconsSkin;
     SkinRatingPainter.Images := vilIconsSkin;
+
+    DefaultCollection := DataModuleGui.ICSkinIcons;
+    SkinCollection :=  DataModuleGui.ICSkinIcons;
+
+    // aCollection := DataModuleGui.ICIcons;
   end else begin
     // the skin does NOT affects other forms
     DefaultRatingPainter.Images := vilIconsWindows;
+    DefaultCollection := DataModuleGui.ICIcons;
+
     // if its not active, set the SkinIcons to the DefaultIcons as well
-    if NempSkin.IsActive then
-      SkinRatingPainter.Images := vilIconsSkin
-    else
-      SkinRatingPainter.Images := vilIconsWindows
+    if NempSkin.IsActive then begin
+      SkinRatingPainter.Images := vilIconsSkin;
+      SkinCollection := DataModuleGui.ICSkinIcons;
+    end
+    else begin
+      SkinRatingPainter.Images := vilIconsWindows;
+      SkinCollection := DataModuleGui.ICIcons;
+    end;
   end;
+
+
+  viVolume.ImageCollection := SkinCollection;
+  if assigned(BirthdayForm) then
+    BirthdayForm.viVolume.ImageCollection := DefaultCollection;
+
 
   BtnMainAudioFileRating.Images := SkinRatingPainter.Images;
   BtnBibRating.Images := SkinRatingPainter.Images;
@@ -7586,16 +7607,10 @@ end;
 
 procedure TNemp_MainForm.PopupStopPopup(Sender: TObject);
 begin
-    if NempPlayer.StopStatus = PLAYER_STOP_NORMAL then
-    begin
-        PM_StopAfterTitle.Caption := MainForm_StopMenu_StopAfterTitle;
-        PM_StopAfterTitle.ImageIndex := 27;
-    end
-    else
-    begin
-        PM_StopAfterTitle.Caption := MainForm_StopMenu_NoStopAfterTitle;
-        PM_StopAfterTitle.ImageIndex := 26;
-    end;
+  if NempPlayer.StopStatus = PLAYER_STOP_NORMAL then
+    PM_StopAfterTitle.Caption := MainForm_StopMenu_StopAfterTitle
+  else
+    PM_StopAfterTitle.Caption := MainForm_StopMenu_NoStopAfterTitle;
 end;
 
 procedure TNemp_MainForm.PM_StopNowClick(Sender: TObject);
@@ -7868,7 +7883,7 @@ begin
       rbTrackProgress.Max := Ceil(NempPlayer.Dauer);
 end;
 
-procedure TNemp_MainForm.OnPlayerMessage(Sender: TObject; aMessage: String);
+procedure TNemp_MainForm.OnPlayerMessage(Sender: TNempPlayer; aMessage: String);
 begin
     PlayerArtistLabel.Caption := aMessage;
     PlayerTitleLabel.Caption  :=  '';
@@ -9939,14 +9954,11 @@ begin
     FreeAllControlStyleHooks;
     {$ENDIF}
     try
-        RevokeDragDrop(Handle);
-
-        RevokeDragFiles;
         IDropSource(fDropManager)._Release;// := Nil;
 
         TagLabelList.Free;
-        CoverScrollbar.WindowProc := OldScrollbarWindowProc;
-        LyricsMemo.WindowProc := OldLyricMemoWindowProc;
+        // CoverScrollbar.WindowProc := OldScrollbarWindowProc;
+        // LyricsMemo.WindowProc := OldLyricMemoWindowProc;
         AlphaBlendBMP.Free;
     except
         halt;
@@ -11189,6 +11201,15 @@ var i: Integer;
   aMenuItem: TMenuItem;
 
 begin
+
+  if NempPlayer.Status = PLAYER_ISPLAYING then begin
+    PM_TNA_PlayPause.Caption := PlayerBtn_Pause;
+    PM_TNA_PlayPause.ImageName := cMenuPause;
+  end else begin
+    PM_TNA_PlayPause.Caption := PlayerBtn_Play;
+    PM_TNA_PlayPause.ImageName := cMenuPlay;
+  end;
+
   // altes Menu mit Playlist-Einträgen erstellen und neues erstellen
   for i := PM_TNA_Playlist.Count - 1 downto 0 do
     PM_TNA_Playlist.Delete(i);
@@ -11242,6 +11263,7 @@ begin
     NempPlayer.PauseForBirthday;
     if Not Assigned(BirthdayForm) then
         Application.CreateForm(TBirthdayForm, BirthdayForm);
+    RefreshStarGraphicsAllForms;
     BirthdayForm.Show;
     BirthdayTimer.Enabled := False;
     ReArrangeToolImages;
@@ -11251,6 +11273,7 @@ end;
 procedure TNemp_MainForm.MenuBirthdayStartClick(Sender: TObject);
 var timeleft: Integer;
 begin
+
     if (not BirthdayTimer.Enabled) AND (Not NempPlayer.CheckBirthdaySettings) then
     begin
           if TranslateMessageDLG((BirthdaySettings_Incomplete), mtWarning, [mbYes, mbNo], 0) = mrYes then

@@ -19,12 +19,17 @@ object ShutDownEditForm: TShutDownEditForm
     469
     181)
   TextHeight = 13
-  object ImgShutDown: TImage
+  object ImgShutDown: TVirtualImage
     AlignWithMargins = True
     Left = 33
     Top = 15
     Width = 64
     Height = 64
+    ImageCollection = DataModuleGui.ICGraphics
+    ImageWidth = 0
+    ImageHeight = 0
+    ImageIndex = 18
+    ImageName = 'imgSleepShutdown'
   end
   object lblShutDownMode: TLabel
     AlignWithMargins = True
@@ -61,8 +66,6 @@ object ShutDownEditForm: TShutDownEditForm
     ModalResult = 1
     TabOrder = 1
     OnClick = BtnOkClick
-    ExplicitLeft = 296
-    ExplicitTop = 149
   end
   object BtnCancel: TButton
     AlignWithMargins = True
@@ -75,8 +78,6 @@ object ShutDownEditForm: TShutDownEditForm
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 2
-    ExplicitLeft = 377
-    ExplicitTop = 149
   end
   object grpBoxSettings: TGroupBox
     AlignWithMargins = True
@@ -87,8 +88,6 @@ object ShutDownEditForm: TShutDownEditForm
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Settings'
     TabOrder = 0
-    ExplicitWidth = 331
-    ExplicitHeight = 130
     object lblIntendedAction: TLabel
       Left = 16
       Top = 76

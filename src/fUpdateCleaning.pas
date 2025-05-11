@@ -55,7 +55,6 @@ ResourceString
   rsCaptionCleanupCompleted =  'Update: No clean up necessary';
 
 
-
 implementation
 
 uses Nemp_ConstantsAndTypes, NempHelp, UpdateCleaning, gnugettext;

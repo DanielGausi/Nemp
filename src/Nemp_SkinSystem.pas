@@ -253,8 +253,6 @@ type
         procedure SetImage(Dest, Backup: TImageCollection; ItemName: String; ItemIndex: Integer);
         procedure PrepareSkinImagesCollection(aDefaultCollection, aSkinCollection: TImageCollection);
 
-        // procedure AssignStarGraphics;
-        procedure AssignABGraphics;
 
         function GetPath: String;
 
@@ -271,9 +269,6 @@ type
         // Bild für den Mittelteil (den eigentlichen Player)
         // Kann leer sein - Aber wenn vorhanden, dann ist hier der Offset klar. Nämlich 0/0
         // UseSeparatePlayerBitmap: Boolean;
-
-        ABrepeatBitmapA: TBitmap;
-        ABrepeatBitmapB: TBitmap;
 
         // Originaler Offset des SKins
         PlayerPageOffsetXOrig: Integer;
@@ -416,7 +411,7 @@ implementation
 
 uses NempMainUnit, PlayerClass, Details, OptionsComplete, Hilfsfunktionen, System.StrUtils,
     SplitForm_Hilfsfunktionen, PlaylistUnit, AuswahlUnit, MedienlisteUnit, ExtendedControlsUnit,
-    VSTEditControls, MedienBibliothekClass, TagClouds, Systemhelper, DeleteSelect, dmGUI;
+    VSTEditControls, MedienBibliothekClass, TagClouds, Systemhelper, dmGUI;
 
 function GetSkinDirFromSkinName(aName: String): String;
 begin
@@ -446,19 +441,6 @@ begin
   NempPartyMode := TNempPartyMode.Create;
   NempPartymode.BackupOriginalPositions;
 
-  ABrepeatBitmapA := TBitmap.Create;
-  ABrepeatBitmapB := TBitmap.Create;
-
-  ABrepeatBitmapA.Transparent := True;
-  ABrepeatBitmapB.Transparent := True;
-  ABrepeatBitmapA.Width := 13;
-  ABrepeatBitmapA.Height := 14;
-  ABrepeatBitmapA.Canvas.Rectangle(0,0,14,14);
-
-  ABrepeatBitmapB.Width := 13;
-  ABrepeatBitmapB.Height := 14;
-  ABrepeatBitmapB.Canvas.Rectangle(0,0,14,14);
-
   isActive := False;
 
   RegisteredStyles := TStringList.Create;
@@ -476,11 +458,7 @@ begin
   for iBackground := Low(teNempBackroundImages) to High(teNempBackroundImages) do
     fNempBackgrounds[iBackground].Free;
 
-  ABRepeatBitmapA.Free;
-  ABRepeatBitmapB.Free;
-
   NempPartyMode.Free;
-
   inherited destroy;
 end;
 
@@ -992,11 +970,10 @@ begin
   LoadGraphicFromBaseName(NempPlayer.PreviewBackGround, Path + 'Win7PreviewBackground', false);
   // Grafiken für die Buttons setzem
   with Nemp_MainForm do begin
-    if assigned(DeleteSelection) then
-      DeleteSelection.ReloadScheckBoxImages(path, true);
+    //if assigned(DeleteSelection) then
+    //  DeleteSelection.ReloadScheckBoxImages(True);
 
     // Buttons / Images konfigurieren.
-    AssignABGraphics;
     RefreshStarGraphicsAllForms;
 
     SetControlButtonLook;
@@ -1183,8 +1160,8 @@ begin
   for i := 0 to fPanelList.Count - 1 do
     fPanelList[i].DrawMode := dm_Windows;
 
-  if assigned(DeleteSelection) then
-      DeleteSelection.ReloadScheckBoxImages(ExtractFilePath(ParamStr(0)) + 'Images\', false);
+  //if assigned(DeleteSelection) then
+  //    DeleteSelection.ReloadScheckBoxImages(False);
 
   // Grafiken für die Buttons setzen
   with Nemp_MainForm do begin
@@ -1193,7 +1170,6 @@ begin
     SetTreeImages(False);
     SetControlButtonLook;
     SetTabButtonLook;
-    AssignABGraphics;
     RefreshStarGraphicsAllForms;
   end;
 
@@ -1591,7 +1567,6 @@ end;
 function TNempSkin.LoadGraphicFromBaseName(aBmp: TPicture; aFilename: UnicodeString; Scaled: Boolean=False): Boolean;
 var NewName, ext: String;
     ScaleCorrectionNeeded: Boolean;
-    tmpPic: TPicture;
 
         function GetExistingExtension: string;
         begin
@@ -1723,37 +1698,9 @@ begin
 end;
 
 
-procedure TNempSkin.AssignABGraphics;
-var BaseDir: String;
-begin
-  // SKIN_UMBAU_CHECK// SKIN_UMBAU_CHECK// SKIN_UMBAU_CHECK// SKIN_UMBAU_CHECK
-  {
-    if isActive and (not UseDefaultStarBitmaps) then
-        BaseDir := path + '\'
-    else
-        BaseDir := ExtractFilePath(ParamStr(0)) + 'Images\';
-
-    // fallback
-    if  (not (FileExists(BaseDir + 'ab-repeat-end.bmp') or FileExists(BaseDir + 'ab-repeat-end.png')))
-       or (not (FileExists(BaseDir + 'ab-repeat-start.bmp') or FileExists(BaseDir + 'ab-repeat-start.png')))
-    then
-        BaseDir := ExtractFilePath(ParamStr(0)) + 'Images\';
-
-    // no scaling here, as Stre
-    LoadGraphicFromBaseName(ABRepeatBitmapA, BaseDir + 'ab-repeat-start', False);
-    LoadGraphicFromBaseName(ABRepeatBitmapB, BaseDir + 'ab-repeat-end', False);
-
-    with Nemp_MainForm do
-    begin
-        ab1.Picture.Assign(ABRepeatBitmapA);
-        ab2.Picture.Assign(ABRepeatBitmapB);
-    end;
-  }
-end;
-
 procedure TNempSkin.SetImage(Dest, Backup: TImageCollection; ItemName: String; ItemIndex: Integer);
 var
-  newCollectionItem, backupCollectionItem : TImageCollectionItem;
+  newCollectionItem : TImageCollectionItem;
   newImageCollectionSourceItem : TImageCollectionSourceItem;
   newItemFilename: String;
   i: Integer;
