@@ -28,7 +28,6 @@ object FormExport: TFormExport
     Caption = '...'
     TabOrder = 2
     OnClick = btnSelectExportFilenameClick
-    ExplicitLeft = 453
   end
   object rgExportSelection: TRadioGroup
     Left = 195
@@ -44,7 +43,6 @@ object FormExport: TFormExport
       'Currently displayed files'
       'The Playlist')
     TabOrder = 1
-    ExplicitWidth = 292
   end
   object edtExportFileName: TLabeledEdit
     Left = 8
@@ -52,13 +50,12 @@ object FormExport: TFormExport
     Width = 435
     Height = 23
     Anchors = [akLeft, akTop, akRight]
-    EditLabel.Width = 93
+    EditLabel.Width = 92
     EditLabel.Height = 15
     EditLabel.Caption = 'Export file save as'
     TabOrder = 3
     Text = ''
     OnChange = edtExportFileNameChange
-    ExplicitWidth = 439
   end
   object pnlButtons: TPanel
     Left = 0
@@ -164,7 +161,6 @@ object FormExport: TFormExport
       Caption = 'Cancel'
       ModalResult = 2
       TabOrder = 0
-      ExplicitLeft = 401
     end
     object btnOK: TButton
       Left = 310
@@ -174,9 +170,8 @@ object FormExport: TFormExport
       Anchors = [akTop, akRight]
       Caption = 'Ok'
       Default = True
-      ModalResult = 1
       TabOrder = 1
-      ExplicitLeft = 314
+      OnClick = btnOKClick
     end
   end
   object grpBoxTemplateSelection: TGroupBox

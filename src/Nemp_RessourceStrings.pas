@@ -1196,6 +1196,7 @@ ExportNewTemplateCaption = 'Export: New template';
 ExportNewTemplatePrompt = 'Please enter a name for the new template';
 ExportDeleteTemplateConfirmation = 'Do you really want to delete the template "%s"?';
 ExportDeleteTemplateFailed = 'The template could not be deleted.';
+ExportFileExists = 'The file already exists. Doy you want to overwrite it?';
 
 CoverList_Default = 'Cover';
 

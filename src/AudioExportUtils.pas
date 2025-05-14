@@ -260,11 +260,11 @@ end;
 
 function TAudioExport.ExportFiles(AudioFiles: TAudioFileList; TargetFilename: String): Boolean;
 var
-  sl: TStringList;
   i, iFile: Integer;
   totalCount: Integer;
   totalSize: Int64;
   totalDuration: Int64;
+  StreamWriter: TStreamWriter;
 
   function ParseGeneralLine(Value: String): String;
   begin
@@ -286,28 +286,22 @@ begin
   end;
 
   result := True;
-  sl := TStringList.Create;
-  try
-    sl.Capacity :=
-        fHeaderStrings.Count +
-        fFooterStrings.Count +
-        AudioFiles.Count * (fTemplateLines.Count);
 
+  StreamWriter := TStreamWriter.Create(TargetFilename, False, fEncoding);
+  try
     for i := 0 to fHeaderStrings.Count - 1 do
-      sl.Add(ParseGeneralLine(fHeaderStrings[i]));
+      StreamWriter.Write(ParseGeneralLine(fHeaderStrings[i])+#13#10);
 
     for iFile := 0 to AudioFiles.Count - 1 do begin
       for i := 0 to fTemplateLines.Count - 1 do
-        sl.Add(ParseTemplateLine(fTemplateLines[i], AudioFiles[iFile]));
+        StreamWriter.Write(ParseTemplateLine(fTemplateLines[i], AudioFiles[iFile])+#13#10);
     end;
 
     for i := 0 to fFooterStrings.Count - 1 do
-      sl.Add(ParseGeneralLine(fFooterStrings[i]));
-
-    sl.SaveToFile(TargetFilename, fEncoding);
+      StreamWriter.Write(ParseGeneralLine(fFooterStrings[i])+#13#10);
   finally
-    FreeAndNil(sl);
-  end;
+    StreamWriter.Free;
+  end
 end;
 
 function TAudioExport.GetTemplateFilename: String;

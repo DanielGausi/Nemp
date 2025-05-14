@@ -89,6 +89,7 @@ type
     procedure ActionDeleteTemplateExecute(Sender: TObject);
     procedure ActionCreateDefaultTemplatesExecute(Sender: TObject);
     procedure ImgHelpClick(Sender: TObject);
+    procedure btnOKClick(Sender: TObject);
   private
     { Private-Deklarationen }
     fAudioExport: TAudioExport;
@@ -379,6 +380,14 @@ end;
 procedure TFormExport.edtExportFileNameChange(Sender: TObject);
 begin
   CheckSettings;
+end;
+
+procedure TFormExport.btnOKClick(Sender: TObject);
+begin
+  if (not FileExists(edtExportFileName.Text))
+    or (TranslateMessageDLG(ExportFileExists, mtConfirmation, [mbYes, MBNo, mbCancel], 0) = mrYes)
+  then
+    ModalResult := mrOK;
 end;
 
 end.
