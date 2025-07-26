@@ -92,7 +92,7 @@ var
 implementation
 
 uses NempMainUnit,  SplitForm_Hilfsfunktionen, MedienlisteUnit,
-  AuswahlUnit, MessageHelper, ExtendedControlsUnit;
+  AuswahlUnit, MessageHelper, ExtendedControlsUnit, Nemp_SkinSystem;
 
 {$R *.dfm}
 
@@ -148,7 +148,7 @@ end;
 procedure TPlaylistForm.ContainerPanelPlaylistFormPaintBackground(
   Sender: TNempPanel; var Bitmap: TGraphic; var Offset: TPoint; var Tile: Boolean);
 begin
-  Nemp_MainForm.NempSkin.OnPaintControlBackground(Sender, Bitmap, Offset, Tile);
+  NempSkin.OnPaintControlBackground(Sender, Bitmap, Offset, Tile);
 end;
 
 procedure TPlaylistForm.FormClose(Sender: TObject;
@@ -181,9 +181,9 @@ end;
 procedure TPlaylistForm.FormResize(Sender: TObject);
 begin
   SetRegion(ContainerPanelPlaylistForm, self, NempRegionsDistance, handle);
-  If Nemp_MainForm.NempSkin.isActive then
+  If NempSkin.isActive then
   begin
-      Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.PlaylistVST);
+      NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.PlaylistVST);
       Repaint;
   end;
 end;
@@ -200,8 +200,8 @@ begin
     NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.Left;
     NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.Top;
 
-    if Nemp_MainForm.NempSkin.isActive then
-      Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.PlaylistVST);
+    if NempSkin.isActive then
+      NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.PlaylistVST);
 
   end;
 end;
@@ -225,10 +225,10 @@ begin
 
     NempRegionsDistance.docked := tmp;
 
-    if (Nemp_MainForm.NempSkin.isActive) {and (NOT Nemp_MainForm.NempSkin.FixedBackGround)} then
+    if (NempSkin.isActive) {and (NOT Nemp_MainForm.NempSkin.FixedBackGround)} then
     begin
-        Nemp_MainForm.NempSkin.RepairSkinOffset;
-        Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.PlaylistVST);
+        NempSkin.RepairSkinOffset;
+        NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.PlaylistVST);
         RepaintForm;
     end;
 end;

@@ -39,17 +39,17 @@ uses
   Dialogs, StdCtrls, ExtCtrls,  id3v2Frames, ExtDlgs, JPEG,
   PNGImage, gnuGettext,  CoverHelper,  M4aAtoms,
   AudioFiles.Base, AudioFiles.BaseTags, AudioFiles.Declarations,
-  Nemp_RessourceStrings, System.UITypes;
+  Nemp_RessourceStrings, System.UITypes, Vcl.VirtualImage;
 
 type
   TFNewPicture = class(TForm)
-    Image1: TImage;
+    ImageCover: TImage;
     cbPictureType: TComboBox;
     LblConst_PictureType: TLabel;
     LblConst_PictureDescription: TLabel;
     EdtPictureDescription: TEdit;
     PnlWarnung: TPanel;
-    Image2: TImage;
+    ImageWarning: TVirtualImage;
     Lbl_Warnings: TLabel;
     Btn_ChoosePicture: TButton;
     Btn_OK: TButton;
@@ -68,7 +68,7 @@ type
     function CheckDescription:boolean;
     procedure FormShow(Sender: TObject);
     procedure EdtPictureDescriptionChange(Sender: TObject);
-    procedure Image1DblClick(Sender: TObject);
+    procedure ImageCoverDblClick(Sender: TObject);
     procedure EdtFilenameExit(Sender: TObject);
     procedure EdtFilenameEnter(Sender: TObject);
   private
@@ -170,11 +170,11 @@ procedure TFNewPicture.PreviewPicture(aFilename: String);
 begin
   try
     EdtFilename.Text := aFileName;
-    Image1.Picture.LoadFromFile(aFileName);
+    ImageCover.Picture.LoadFromFile(aFileName);
     fValidFileSelected := True;
     UpdateWarning;
   except
-    Image1.Picture.Bitmap.Assign(NIL);
+    ImageCover.Picture.Bitmap.Assign(NIL);
     fValidFileSelected := False;
     Btn_OK.Enabled := False;
   end;
@@ -191,7 +191,7 @@ begin
   SelectImage;
 end;
 
-procedure TFNewPicture.Image1DblClick(Sender: TObject);
+procedure TFNewPicture.ImageCoverDblClick(Sender: TObject);
 begin
   SelectImage;
 end;

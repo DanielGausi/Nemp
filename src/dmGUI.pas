@@ -14,6 +14,7 @@ type
     ICSkinIcons: TImageCollection;
     ICSkinPlayerButtons: TImageCollection;
     ICSkinTabButtons: TImageCollection;
+    ICSettingsGraphics: TImageCollection;
   private
     { Private-Deklarationen }
   public

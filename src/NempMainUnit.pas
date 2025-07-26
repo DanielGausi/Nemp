@@ -38,7 +38,7 @@ Unit NempMainUnit;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Winapi.DwmApi, uxtheme,
   Dialogs, StdCtrls, NempAudioFiles, AudioFileHelper, ComCtrls, Grids, Contnrs, ShellApi,
   Menus, ImgList, ExtCtrls, StrUtils, Inifiles, CheckLst, //madexcept,
   Buttons,  VirtualTrees, VSTEditControls, uNempHintWindow,
@@ -81,6 +81,8 @@ type
   end;
   *)
   {$ENDIF}
+
+
 
   TNemp_MainForm = class(TNempCustomMainForm)
     BassTimer: TTimer;
@@ -300,9 +302,6 @@ type
     PM_ML_GetTags: TMenuItem;
     PM_ML_CloudEditor: TMenuItem;
     TaskBarImages: TImageList;
-    Win7TaskBarPopup: TPopupMenu;
-    test1: TMenuItem;
-    N67: TMenuItem;
     PM_PL_ShowInExplorer: TMenuItem;
     N69: TMenuItem;
     MM_T_CloudEditor: TMenuItem;
@@ -786,7 +785,6 @@ type
 
     procedure FormCreate(Sender: TObject);
 
-    procedure RefreshStarGraphicsAllForms;
     procedure Skinan1Click(Sender: TObject);
     procedure ActivateSkin(aName: String);
 
@@ -1114,7 +1112,6 @@ type
     procedure FormActivate(Sender: TObject);
     //procedure fspTaskbarPreviews1NeedIconicBitmap(Sender: TObject; Width,
     //  Height: Integer; var Bitmap: HBITMAP);
-    procedure Win7TaskBarPopupPopup(Sender: TObject);
     procedure GRPBOXArtistsAlbenResize(Sender: TObject);
     procedure SplitterBrowseMoved(Sender: TObject);
     procedure MM_H_ErrorLogClick(Sender: TObject);
@@ -1216,6 +1213,7 @@ type
 
     procedure OnPlayerStopped(Sender: TObject);
     procedure OnPlayerMessage(Sender: TNempPlayer; aMessage: String);
+    procedure OnMainPlayerStatusChange(Sender: TNempPlayer; aStatus: teNempPlayerStatus);
     procedure ReallyDeletePlaylistTimerTimer(Sender: TObject);
     procedure ImgDetailCoverDblClick(Sender: TObject);
     procedure __MainContainerPanelMouseDown(Sender: TObject;
@@ -1417,9 +1415,13 @@ type
     procedure PlaylistVSTNodeClick(Sender: TBaseVirtualTree;
       const HitInfo: THitInfo);
     procedure BtnVolumeClick(Sender: TObject);
+    procedure NempTaskbarManagerWindowPreviewItemRequest(Sender: TObject;
+      var Position: TPoint; PreviewBitmap: TBitmap);
+    procedure ApplicationEvents1Minimize(Sender: TObject);
 
   private
     { Private declarations }
+    fIconicFormPreviewCacheBitmap: TBitmap;
     CoverImgDownX: Integer;
     CoverImgDownY: Integer;
     TagCloudDownX: Integer;
@@ -1441,14 +1443,15 @@ type
     LastPaintedTime: Integer;
     FormReadyAndActivated : Boolean;
     MostRecentInsertNodeForPlaylist: PVirtualNode;
+    fTBProgressState: TTaskBarProgressState;
+    fTBProgressValue: Int64;
+
+    procedure UpdateIconicFormPreview;
 
     procedure OwnMessageProc(var msg: TMessage);
     procedure NewScrollBarWndProc(var Message: TMessage);
     procedure NewLyricMemoWndProc(var Message: TMessage);
     procedure WMStartEditing(var Msg: TMessage); Message WM_STARTEDITING;
-
-    procedure CMMenuClosed(var Msg: TMessage ); message CM_MENUCLOSED;
-    procedure CM_ENTERMENULOOP(var Msg: TMessage ); message CM_ENTERMENULOOP;
 
     procedure HandleRemoteFilename(filename: UnicodeString; Mode: Integer);
     procedure CatchAllExceptionsOnShutDown(Sender: TObject; E: Exception);
@@ -1483,6 +1486,7 @@ type
     // for the TAudioFileManager
     procedure OnPrepareAudioFileChange(Sender: TObject);
     procedure OnAfterAudioFileChanged(Sender: TObject);
+    procedure OnNempSkinChanged(Sender: TObject);
 
     procedure OnVolumeChange(Sender: TObject);
     procedure OnPlayerABRepeatChange(Sender: TObject);
@@ -1492,6 +1496,8 @@ type
     function FileTreeByAction(aActionSender: TObject): TVirtualStringTree; overload;
 
     procedure PlayFileInHeadset(af: TAudioFile);
+    procedure SetTBProgressState(const Value: TTaskBarProgressState);
+    procedure SetTBProgressValue(const Value: Int64);
 
   public
     { Public declarations }
@@ -1511,9 +1517,7 @@ type
     MinimizedIndicator: Boolean;
 
     NempDockedForms: Array [1..3] of Boolean;
-    NempSkin: TNempSkin;
-
-    TaskBarDelay: integer;
+    // NempSkin: TNempSkin;
 
     ContinueWithPlaylistAdding: Boolean;
     KeepOnWithLibraryProcess: Boolean;
@@ -1544,10 +1548,12 @@ type
 
     TagLabelList: TComponentList;
 
-    // reference to AB1 and AB2, needed for assigning the correct graphics
     Resizing: Boolean;
 
     property CurrentlySelectedFile: TAudioFile read GetCurrentlySelectedFile write SetCurrentlySelectedFile;
+
+    property TBProgressState: TTaskBarProgressState read fTBProgressState write SetTBProgressState;
+    property TBProgressValue: Int64 read fTBProgressValue write SetTBProgressValue;
 
     procedure MinimizeNemp(Sender: TObject);
     procedure DeactivateNemp(Sender: TObject);
@@ -1560,7 +1566,7 @@ type
 
     procedure RefreshCurrentSearchDirPlayist(Sender: TObject);
     procedure RefreshCurrentSearchDirMediaLibrary(Sender: TObject);
-    procedure ReInitTaskbarManager(TryAgainOnException: Boolean);
+    procedure ReCreateTaskbarManager(TryAgainOnException: Boolean);
     procedure ConfirmPlaylistClearing(InsertCount: Integer; var EnqueueMode: Integer);
     procedure PlayEnqueue(aCollection: TAudioCollection; EnqueueMode: Integer);
     procedure PlayEnqueueFromView(EnqueueMode: Integer);
@@ -1686,7 +1692,7 @@ end;
 
 procedure FreeAllControlStyleHooks;
 begin
-TStyleEngine.DoFreeControlHooks;
+  TStyleEngine.DoFreeControlHooks;
 end;
 /// -----------------------
 
@@ -1727,8 +1733,13 @@ begin
     NempSkin.SetRegionsAgain;
     ReAcceptDragFiles;
 
-    if NempTaskbarManager.Tag = 0 then
-      ReInitTaskbarManager(False);
+    //if NempTaskbarManager.Tag = 0 then
+    if not assigned(NempTaskbarManager) then
+      ReCreateTaskbarManager(False);
+
+    Constraints.MinWidth := 0; //MAINFORM_MinWidth;
+    Constraints.MaxHeight := 0; //5000;
+    Constraints.MinHeight := 0; //MAINFORM_MinHeight;
 end;
 
 // Refresh the CurrentDir information on the ProgreessForms
@@ -1945,6 +1956,9 @@ procedure TNemp_MainForm.FormCreate(Sender: TObject);
 begin
     FormReadyAndActivated := false;
 
+    fTBProgressState := TTaskBarProgressState.None;
+    fTBProgressValue := 0;
+
     FOwnMessageHandler := AllocateHWND( OwnMessageProc );
     TagLabelList := TComponentList.Create(True);
 
@@ -2138,6 +2152,7 @@ begin
     NempPlayer            := TNempPlayer.Create(FOwnMessageHandler);
     NempPlayer.Statusproc := StatusProc;
     NempPlayer.OnPlayerStopped := OnPlayerStopped;
+    NempPlayer.OnMainPlayerStatusChanged := OnMainPlayerStatusChange;
     NempPlayer.OnMessage := OnPlayerMessage;
     NempPlayer.OnSetVolume := OnVolumeChange;
     NempPlayer.OnABRepeatChange := OnPlayerABRepeatChange;
@@ -2189,7 +2204,8 @@ begin
     MedienBib.NewCoverFlow.DownloadThread := CoverDownloadThread;
 
     // Create Skin-System
-    NempSkin := TNempSkin.create(self);
+    NempSkin.MainForm := self; //  := TNempSkin.create(self);
+    NempSkin.OnSkinChanged.Add(OnNempSkinChanged);
 
     //NempSkin.FormBuilder := NempFormBuildOptions;
     NempSkin.FormLayout := NempLayout;
@@ -2229,6 +2245,7 @@ begin
     // ------------------------------------
 
     InitTaskBarIcons;
+    fIconicFormPreviewCacheBitmap := TBitmap.Create;
 
     // Create Updater
     NempUpdater := TNempUpdater.Create(FOwnMessageHandler);
@@ -2287,14 +2304,14 @@ begin
     TaskBarImages.GetIcon(3, aIcon); // next
     NemptaskbarManager.TaskBarButtons[2].Icon.Assign(aIcon);
 
-    TaskBarImages.GetIcon(6, aIcon); // menu
-    NemptaskbarManager.TaskBarButtons[3].Icon.Assign(aIcon);
+    //TaskBarImages.GetIcon(6, aIcon); // menu
+    //NemptaskbarManager.TaskBarButtons[3].Icon.Assign(aIcon);
 
     TaskBarImages.GetIcon(4, aIcon); //vol down
-    NemptaskbarManager.TaskBarButtons[4].Icon.Assign(aIcon);
+    NemptaskbarManager.TaskBarButtons[3].Icon.Assign(aIcon);
 
     TaskBarImages.GetIcon(5, aIcon); // vol up
-    NemptaskbarManager.TaskBarButtons[5].Icon.Assign(aIcon);
+    NemptaskbarManager.TaskBarButtons[4].Icon.Assign(aIcon);
 
     NemptaskbarManager.ApplyButtonsChanges;
   finally
@@ -2302,43 +2319,36 @@ begin
   end;
 end;
 
-procedure TNemp_MainForm.ReInitTaskbarManager(TryAgainOnException: Boolean);
-var progressValue: Int64;
-    progressState: TTaskbarProgressState;
-    i: Integer;
+procedure TNemp_MainForm.ReCreateTaskbarManager(TryAgainOnException: Boolean);
+var
+  i: Integer;
 begin
-
   Application.ProcessMessages;
   try
-      progressState := NempTaskbarManager.ProgressState;
-      progressValue := NempTaskbarManager.ProgressValue;
-      NempTaskbarManager.Free;
+    NempTaskbarManager := TTaskBar.Create(self);
+    NempTaskbarManager.TabProperties := [TThumbTabProperty.CustomizedPreview];
 
-      NempTaskbarManager := TTaskBar.Create(self);
-      NempTaskbarManager.TabProperties := [TThumbTabProperty.CustomizedPreview];
+    for i := 1 to 5 do
+      NempTaskbarManager.TaskBarButtons.Add;
 
-      for i := 1 to 6 do
-        NempTaskbarManager.TaskBarButtons.Add;
-      NempTaskbarManager.TaskBarButtons[3].ButtonState := [TThumbButtonState.Enabled, TThumbButtonState.NoBackGround];
+    NempTaskbarManager.OnThumbButtonClick := fspTaskbarManagerThumbButtonClick;
+    NempTaskbarManager.OnThumbPreviewRequest := NempTaskbarManagerThumbPreviewRequest;
+    NempTaskbarManager.OnWindowPreviewItemRequest := NempTaskbarManagerWindowPreviewItemRequest;
 
-      NempTaskbarManager.OnThumbButtonClick := fspTaskbarManagerThumbButtonClick;
-      NempTaskbarManager.OnThumbPreviewRequest := NempTaskbarManagerThumbPreviewRequest;
-
-      NempTaskbarManager.ProgressMaxValue := 100;
-      NempTaskbarManager.ProgressValue := progressValue;
-      NempTaskbarManager.ProgressState := progressState;
-      //if self.Visible then
-        NempTaskbarManager.Initialize;
-
-      //if self.Visible then
-        InitTaskBarIcons;
-
-      NempTaskbarManager.Tag := 1; // successfully initiated
+    NempTaskbarManager.ProgressMaxValue := 100;
+    NempTaskbarManager.ProgressValue := TBProgressValue;
+    NempTaskbarManager.ProgressState := TBProgressState;
+    //if self.Visible then
+      NempTaskbarManager.Initialize;
+    //if self.Visible then
+      InitTaskBarIcons;
+    NempTaskbarManager.Tag := 1; // successfully initiated
   except
+    if assigned(NempTaskbarManager) then
+      FreeAndNil(NempTaskbarManager);
     if TryAgainOnException then
       CorrectSkinRegionsTimer.Enabled := True;
   end;
-
 end;
 
 
@@ -2457,7 +2467,7 @@ begin
 
         fCurrentlySelectedFile.Free;
         // Spectrum.Free;
-        NempSkin.Free;
+        // NempSkin.Free;
         NempPlaylist.Free;
         NempPlayer.Free;
         MedienBib.NewCoverFlow.DownloadThread := Nil;
@@ -2471,9 +2481,7 @@ begin
         NempUpdater.Free;
         FreeAndNil(ErrorLog);
 
-        // RevokeDragDrop(Handle);
-        // RevokeDragFiles;
-
+        FreeAndNil(fIconicFormPreviewCacheBitmap);
         Set8087CW(Default8087CW);
     except
         halt;
@@ -2504,16 +2512,6 @@ begin
         /// This happens, when the user select "search for ..." in the popup-menu
         /// and the menu is over the "rating"-column
     end;
-end;
-
-procedure TNemp_MainForm.CMMenuClosed(var Msg: TMessage );
-begin
-    Win7TaskBarPopup.Tag := 0;
-end;
-
-procedure TNemp_MainForm.CM_ENTERMENULOOP(var Msg: TMessage );
-begin
-    Win7TaskBarPopup.Tag := 1;
 end;
 
 
@@ -3269,103 +3267,47 @@ end;
 
 procedure TNemp_MainForm.MM_O_Skin_UseAdvancedClick(Sender: TObject);
 begin
-    NempOptions.GlobalUseAdvancedSkin := NOT NempOptions.GlobalUseAdvancedSkin;
-
-    MM_O_Skin_UseAdvanced.Checked := NempOptions.GlobalUseAdvancedSkin;
-    PM_P_Skin_UseAdvancedSkin.Checked := NempOptions.GlobalUseAdvancedSkin;
-
     {$IFDEF USESTYLES}
-    // deactivate it immediately
-    if Not NempOptions.GlobalUseAdvancedSkin then
-    begin
-        TStyleManager.SetStyle('Windows');
-        ReInitTaskbarManager(True);
-        if NempOptions.UseSkin then
-        begin
-            if NOT NempSkin.UseDefaultMenuImages then
-              NempSkin.SetMenuImages(False);
-            NempSkin.SetVSTHeaderSettings;
-        end;
-         CorrectSkinRegionsTimer.Enabled := True;
-    end else
-    begin
-        // refresh skin, if a skin is used, and it supports advanced skinning
-        if NempOptions.UseSkin then
-        begin
-            if NempSkin.UseAdvancedSkin then
-                ActivateSkin(GetSkinDirFromSkinName(NempOptions.SkinName))
-            else
-                TranslateMessageDLG((AdvancedSkinActivateHint), mtInformation, [MBOK], 0);
-        end;
-    end;
-    //UpdateFormDesignNeu;     ??? 08.2018 warum war das hier???
+    NempSkin.GlobalUseAdvancedSkin := not NempSkin.GlobalUseAdvancedSkin;
 
-    RefreshStarGraphicsAllForms;
+    MM_O_Skin_UseAdvanced.Checked := NempSkin.GlobalUseAdvancedSkin;
+    PM_P_Skin_UseAdvancedSkin.Checked := NempSkin.GlobalUseAdvancedSkin;
+
+    if NempOptions.GlobalUseAdvancedSkin
+      and NempOptions.UseSkin
+      and not NempSkin.UseAdvancedSkin
+    then
+      TranslateMessageDLG((AdvancedSkinActivateHint), mtInformation, [MBOK], 0);
     {$ENDIF}
 end;
 
-procedure TNemp_MainForm.RefreshStarGraphicsAllForms;
-
-  (*procedure FixStarImages(aRatingBtn: TRatingButton);
-  begin
-    aRatingBtn.StarFullImageIndex := aRatingBtn.Images.GetIndexByName(cMenuStarFull);
-    aRatingBtn.StarHalfImageIndex := aRatingBtn.Images.GetIndexByName(cMenuStarHalf);
-    aRatingBtn.StarEmptyImageIndex := aRatingBtn.Images.GetIndexByName(cMenuStarEmpty);
-  end;*)
-
-var
-  DefaultCollection, SkinCollection: TImageCollection;
+procedure TNemp_MainForm.OnNempSkinChanged(Sender: TObject);
 begin
-
   if NempSkin.IsActive and NempSkin.UseAdvancedSkin and NempOptions.GlobalUseAdvancedSkin then begin
     // we have a skin active, that also affects other forms
     DefaultRatingPainter.Images := vilIconsSkin;
     SkinRatingPainter.Images := vilIconsSkin;
+    viVolume.ImageCollection :=  DataModuleGui.ICSkinIcons;
 
-    DefaultCollection := DataModuleGui.ICSkinIcons;
-    SkinCollection :=  DataModuleGui.ICSkinIcons;
-
-    // aCollection := DataModuleGui.ICIcons;
   end else begin
     // the skin does NOT affects other forms
     DefaultRatingPainter.Images := vilIconsWindows;
-    DefaultCollection := DataModuleGui.ICIcons;
 
-    // if its not active, set the SkinIcons to the DefaultIcons as well
     if NempSkin.IsActive then begin
       SkinRatingPainter.Images := vilIconsSkin;
-      SkinCollection := DataModuleGui.ICSkinIcons;
+      viVolume.ImageCollection := DataModuleGui.ICSkinIcons;
     end
     else begin
+      // if its not active, set the SkinIcons to the DefaultIcons as well
       SkinRatingPainter.Images := vilIconsWindows;
-      SkinCollection := DataModuleGui.ICIcons;
+      viVolume.ImageCollection := DataModuleGui.ICIcons;
     end;
   end;
 
-
-  viVolume.ImageCollection := SkinCollection;
-  if assigned(BirthdayForm) then
-    BirthdayForm.viVolume.ImageCollection := DefaultCollection;
-
-
   BtnMainAudioFileRating.Images := SkinRatingPainter.Images;
   BtnBibRating.Images := SkinRatingPainter.Images;
-
-  SetRatingImages(BtnMainAudioFileRating);
-  SetRatingImages(BtnBibRating);
-
-  if assigned(FDetails) then
-    FDetails.RatingImageList := DefaultRatingPainter.Images;
-
-  if assigned(RandomPlaylistForm) then
-    RandomPlaylistForm.RatingImageList := DefaultRatingPainter.Images;
-
-  if assigned(OptionsCompleteForm) then
-    OptionsCompleteForm.RatingImageList := DefaultRatingPainter.Images;
-
-  if assigned(FormPlaylistDuplicates) then
-    FormPlaylistDuplicates.RatingImageList := DefaultRatingPainter.Images;
 end;
+
 
 
 procedure TNemp_MainForm.ActivateSkin(aName: String);
@@ -4002,7 +3944,6 @@ procedure TNemp_MainForm.ActionPlaylistGenerateRandomExecute(Sender: TObject);
 begin
   if not Assigned(RandomPlaylistForm) then
     Application.CreateForm(TRandomPlaylistForm, RandomPlaylistForm);
-  RandomPlaylistForm.RatingImageList := DefaultRatingPainter.Images;
   RandomPlaylistForm.Show;
 end;
 
@@ -4148,7 +4089,7 @@ begin
       if not assigned(FormPlaylistDuplicates) then
       begin
         Application.CreateForm(TFormPlaylistDuplicates, FormPlaylistDuplicates);
-        FormPlaylistDuplicates.RatingImageList := DefaultRatingPainter.Images;
+        // FormPlaylistDuplicates.RatingImageList := DefaultRatingPainter.Images;
         FormPlaylistDuplicates.OnDeleteAudioFile := OnDeletePlaylistDuplicate;
         FormPlaylistDuplicates.OnDeleteOriginalAudioFile   := OnDeletePlaylistDuplicateOriginal;
 
@@ -4252,8 +4193,8 @@ begin
   MedienBib.StatusBibUpdate := 3;
   BlockGUI(3);
   KeepOnWithLibraryProcess := true; // ok, apm is used
-  NempTaskbarManager.ProgressState := TTaskBarProgressState.Normal;
-  NempTaskbarManager.ProgressValue := 0;
+  TBProgressState := TTaskBarProgressState.Normal;
+  TBProgressValue := 0;
 
   TagMod100 := (Sender as TAction).ActionComponent.Tag Mod 100;
   LocalTree := FileTreeByAction(Sender);
@@ -4296,7 +4237,7 @@ begin
     nt := GetTickCount;
     if (nt > ct + 250) or (nt < ct) then begin
       ct := nt;
-      NempTaskbarManager.ProgressValue := Round(iSel/iGes * 100);
+      TBProgressValue := Round(iSel/iGes * 100);
       ProgressFormLibrary.lblSuccessCount.Caption := IntToStr(iSel);
       ProgressFormLibrary.MainProgressBar.Position := Round(iSel/iGes * 100);
       ProgressFormLibrary.Update;
@@ -4316,7 +4257,7 @@ begin
   KeepOnWithLibraryProcess := False;
   MedienBib.StatusBibUpdate := 0;
   ShowSummary;
-  NempTaskbarManager.ProgressState := TTaskBarProgressState.None;
+  TBProgressState := TTaskBarProgressState.None;
 end;
 
 
@@ -4803,11 +4744,7 @@ procedure TNemp_MainForm.PM_ML_ConfigureMedialibraryClick(Sender: TObject);
 begin
   if Not Assigned(OptionsCompleteForm) then
     Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
-
-  OptionsCompleteForm.RatingImageList := DefaultRatingPainter.Images;
-  OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.CategoriesNode;
-  OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.CategoriesNode] := True;
-  OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.tabCategories;
+  OptionsCompleteForm.ActivePageNode := OptionsCompleteForm.CategoriesNode;
   OptionsCompleteForm.Show;
 end;
 
@@ -5689,7 +5626,7 @@ begin
   if Not Assigned(OptionsCompleteForm) then
     Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
 
-  OptionsCompleteForm.RatingImageList := DefaultRatingPainter.Images;
+  // OptionsCompleteForm.RatingImageList := DefaultRatingPainter.Images;
   OptionsCompleteForm.Show;
   OptionsCompleteForm.BringToFront;
 end;
@@ -7523,17 +7460,6 @@ begin
           RefreshTimeLabel(NempPlayer.Progress, NempPlayer.TimeInSec);
         if rbTrackProgress.ScrollingButton <> btnTrack then
           rbTrackProgress.Progress := NempPlayer.Progress;
-
-        //... scroll taskbar title
-        if NempPlayer.ScrollTaskbarTitel then
-        begin
-            inc(TaskBarDelay);
-            if TaskBarDelay >= NempPlayer.ScrollTaskbarDelay then
-            begin
-                Application.Title := copy(Application.Title, 2 , length(Application.Title)- 1) + Application.Title[1];
-                TaskBarDelay := 0;
-            end;
-        end;
     end;
 end;
 
@@ -7898,6 +7824,36 @@ begin
     PlayerArtistLabel.Caption := '';
     PlayerTitleLabel.Caption :=  '';
     // spectrum.DrawClear;
+end;
+
+procedure TNemp_MainForm.OnMainPlayerStatusChange(Sender: TNempPlayer; aStatus: teNempPlayerStatus);
+
+    procedure AssignTaskbarIcon(ButtonIndex, ImageIndex: Integer);
+    var   aIcon: TIcon;
+    begin
+      if not assigned(NemptaskbarManager) then
+        exit;
+      aIcon := TIcon.Create;
+      try
+        TaskBarImages.GetIcon(ImageIndex, aIcon);
+        NemptaskbarManager.TaskBarButtons[ButtonIndex].Icon.Assign(aIcon);
+        NempTaskbarManager.ApplyButtonsChanges;
+      finally
+        aIcon.Free;
+      end;
+    end;
+
+begin
+  case aStatus of
+    npsStopped, npsPaused: begin
+        PlayPauseBTN.ImageName := cBtnPlayerPlay;
+        AssignTaskbarIcon(1,1);
+    end;
+    npsPlaying: begin
+        PlayPauseBTN.ImageName := cBtnPlayerPause;
+        AssignTaskbarIcon(1,2);
+    end;
+  end;
 end;
 
 procedure TNemp_MainForm.PlaylistSelectNextFlagged(aFlag: Integer);
@@ -8636,7 +8592,7 @@ begin
       ST_Playlist.Break;
       ST_Medienliste.Break;
 
-      NempTaskbarManager.ProgressState := TTaskBarProgressState.None;
+      TBProgressState := TTaskBarProgressState.None;
       // kann sein, dass der Player ab und zu mal blockiert - hier dann umsetzen ;-)
       NempPlaylist.AcceptInput := True;
       KeepOnWithLibraryProcess := False;  // CancelButton
@@ -8988,6 +8944,20 @@ procedure TNemp_MainForm.SetRepeatBtnGraphics;
 begin
   RandomBtn.ImageName := cBtnRepeatNames[NempPlaylist.WiedergabeMode];
   RandomBtn.Hint := NempPlaylist.WiedergabeModeHint;
+end;
+
+procedure TNemp_MainForm.SetTBProgressState(const Value: TTaskBarProgressState);
+begin
+  fTBProgressState := Value;
+  if assigned(NempTaskbarManager) then
+    NempTaskbarManager.ProgressState := Value;
+end;
+
+procedure TNemp_MainForm.SetTBProgressValue(const Value: Int64);
+begin
+  fTBProgressValue := Value;
+  if assigned(NempTaskbarManager) then
+    NempTaskbarManager.ProgressValue;
 end;
 
 procedure TNemp_MainForm.RepeatBitBTNIMGClick(Sender: TObject);
@@ -9402,7 +9372,7 @@ begin
                   ST_Playlist.Break;
                   ST_Medienliste.Break;
                   MedienBib.Abort;
-                  NempTaskbarManager.ProgressState := TTaskBarProgressState.None;
+                  TBProgressState := TTaskBarProgressState.None;
                   // kann sein, dass der Player ab und zu mal blockiert - hier dann umsetzen ;-)
                   NempPlaylist.AcceptInput := True;
                   KeepOnWithLibraryProcess := False;
@@ -10184,7 +10154,8 @@ end;*)
 
 procedure TNemp_MainForm.BtnMinimizeClick(Sender: TObject);
 begin
-    Application.Minimize;
+  UpdateIconicFormPreview;
+  Application.Minimize;
 end;
 
 procedure TNemp_MainForm._ControlPanelMouseMove(Sender: TObject;
@@ -11167,7 +11138,8 @@ procedure TNemp_MainForm.RefreshTimeLabel(aProgress: Double; aSeconds: Integer);
 begin
   if LastPaintedTime <> aSeconds then begin
     playerTimeLbl.Caption := NempPlayer.TimeString;
-    NempTaskbarManager.InvalidateThumbPreview;
+    if assigned(NempTaskbarManager) then
+      NempTaskbarManager.InvalidateThumbPreview;
     LastPaintedTime := aSeconds;
   end;
 end;
@@ -11190,7 +11162,7 @@ begin
   if not assigned(FDetails) then
     Application.CreateForm(TFDetails, FDetails);
 
-  FDetails.RatingImageList := DefaultRatingPainter.Images;
+  // FDetails.RatingImageList := DefaultRatingPainter.Images;
   FDetails.NewAudioFileSelected(aAudioFile, DoShow);
 end;
 
@@ -11263,7 +11235,6 @@ begin
     NempPlayer.PauseForBirthday;
     if Not Assigned(BirthdayForm) then
         Application.CreateForm(TBirthdayForm, BirthdayForm);
-    RefreshStarGraphicsAllForms;
     BirthdayForm.Show;
     BirthdayTimer.Enabled := False;
     ReArrangeToolImages;
@@ -11279,11 +11250,8 @@ begin
           if TranslateMessageDLG((BirthdaySettings_Incomplete), mtWarning, [mbYes, mbNo], 0) = mrYes then
           begin
             if Not Assigned(OptionsCompleteForm) then
-                Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
-            OptionsCompleteForm.RatingImageList := DefaultRatingPainter.Images;
-            OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.BirthdayNode;
-            OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.BirthdayNode] := True;
-            OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.tabBirthday;
+              Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
+            OptionsCompleteForm.ActivePageNode := OptionsCompleteForm.BirthdayNode;
             OptionsCompleteForm.Show;
           end;
           exit;
@@ -11615,56 +11583,12 @@ begin
   CoverScrollbar.SetFocus;
 end;
 
-procedure TNemp_MainForm.Win7TaskBarPopupPopup(Sender: TObject);
-var i: Integer;
-  centerIdx, minIdx, maxIdx: Integer;
-  aMenuItem: TMenuItem;
-begin
-  // altes Menu mit Playlist-Einträgen erstellen und neues erstellen
-  for i := Win7TaskBarPopup.Items.Count - 3 downto 0 do
-      Win7TaskBarPopup.Items.Delete(i);
-
-  if assigned(NempPlaylist.Playlist) then
-  begin
-    centerIdx := NempPlaylist.PlayingIndex;
-
-    // min Idx Count.halbe vor dem aktuellen Lied
-    minIdx := centerIdx - (NempPlaylist.TNA_PlaylistCount DIV 2);
-    // ggf. auf 0 korrigieren
-    if MinIDX < 0 then MinIdx := 0;
-
-    // maxIdx Count mehr
-    maxIdx := minIdx + NempPlaylist.TNA_PlaylistCount;
-    if MaxIdx > NempPlaylist.Count - 1 then MaxIdx := NempPlaylist.Count - 1;
-
-    // ggf. den minIdx korrigieren, so dass immer count Einträge da sind
-    minIdx := maxIdx - NempPlaylist.TNA_PlaylistCount;
-    if minIdx < 0 then minIdx := 0;
-
-    for i := MaxIdx downto MinIdx do
-    begin
-        aMenuItem := TMenuItem.Create(Nemp_MainForm);
-        aMenuItem.AutoHotkeys := maManual;
-        aMenuItem.RadioItem := True;
-        aMenuItem.AutoCheck := True;
-        aMenuItem.Checked := (i=centerIdx) AND (NempPlaylist.PlayingFile = NempPlaylist.Playlist[i]);
-        aMenuItem.OnClick := TNA_PlaylistClick;
-        aMenuItem.Tag := i;
-        aMenuItem.Caption := EscapeAmpersAnd(NempDisplay.PlaylistTitle(NempPlaylist.Playlist[i]));
-        Win7TaskBarPopup.Items.Insert(0, aMenuItem);
-    end;
-  end;
-end;
-
 
 procedure TNemp_MainForm.PM_P_BirthdayOptionsClick(Sender: TObject);
 begin
   if Not Assigned(OptionsCompleteForm) then
     Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
-  OptionsCompleteForm.RatingImageList := DefaultRatingPainter.Images;
-  OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.BirthdayNode;
-  OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.BirthdayNode] := True;
-  OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.tabBirthday;
+  OptionsCompleteForm.ActivePageNode := OptionsCompleteForm.BirthdayNode;
   OptionsCompleteForm.Show;
 end;
 
@@ -11882,40 +11806,80 @@ end;
 
 procedure TNemp_MainForm.fspTaskbarManagerThumbButtonClick(Sender: TObject;
   ButtonId: Integer);
-var point: TPoint;
 begin
-    case ButtonID of
-        0: PlayPrevBTNIMGClick(Nil);
-        1: PlayPauseBTNIMGClick(Nil);
-        502: StopBTNIMGClick(Nil);
-        2: PlayNextBTNIMGClick(NIL);
-        4: NempPlayer.Volume := NempPlayer.Volume - 10;
-        5: NempPlayer.Volume := NempPlayer.Volume + 10;
-        3: begin
-            if Win7TaskBarPopup.Tag = 0 then
-            begin
-                GetCursorPos(Point);
-                Win7TaskBarPopup.Popup(Point.X, Point.Y-10);
-            end else
-            begin
-                // Post MoudeDown/Up to close the Popup-Menu
-                PostMessage(Handle, WM_LBUTTONDOWN, MK_LBUTTON, 0);
-                PostMessage(Handle, WM_LBUTTONUP, MK_LBUTTON, 0);
-            end;
-        end;
-    end;
+  case ButtonID of
+    0: PlayPrevBTNIMGClick(Nil);
+    1: PlayPauseBTNIMGClick(Nil);
+    2: PlayNextBTNIMGClick(NIL);
+    3: NempPlayer.Volume := NempPlayer.Volume - 10;
+    4: NempPlayer.Volume := NempPlayer.Volume + 10;
+  end;
 end;
-
-(*procedure TNemp_MainForm.fspTaskbarPreviews1NeedIconicBitmap(Sender: TObject;
-  Width, Height: Integer; var Bitmap: HBITMAP);
-begin
-    Bitmap := NempPlayer.DrawPreview(Width,Height, NempSkin.isActive);
-end;*)
 
 procedure TNemp_MainForm.NempTaskbarManagerThumbPreviewRequest(Sender: TObject;
   APreviewHeight, APreviewWidth: Integer; PreviewBitmap: TBitmap);
 begin
     NempPlayer.DrawPreviewNew(APreviewHeight, APreviewWidth, PreviewBitmap, NempSkin.isActive);
+end;
+
+procedure TNemp_MainForm.UpdateIconicFormPreview;
+var
+  hMenu, DC: HDC;
+  menuHeight: Integer;
+  WR: TRect;
+  offset: TPoint;
+
+begin
+  fIconicFormPreviewCacheBitmap.PixelFormat := pf24bit;
+
+  if Not NempSkin.isActive or not NempOptions.GlobalUseAdvancedSkin then begin
+    // Height of the menu bar
+    menuHeight := 0;
+    hMenu := GetMenu(Handle);
+    if hMenu <> 0 then
+      menuHeight := GetSystemMetrics(SM_CYMENU);
+    // offset (size of the title bar)
+    GetWindowRect(Handle, WR);
+    offset := ClientToScreen(Point(0,0));
+    // prepare Bitmap
+    fIconicFormPreviewCacheBitmap.SetSize(clientWidth, clientHeight + menuHeight);
+    // Paint client area + menu bar
+    dc := GetWindowDC(Handle);
+    try
+      BitBlt(fIconicFormPreviewCacheBitmap.Canvas.Handle, 0, 0, clientWidth, clientHeight + menuHeight, DC,
+          Offset.X - WR.Left,
+          Offset.Y - WR.Top- menuHeight,
+          SRCCOPY);
+    finally
+      ReleaseDC(Handle, dc);
+    end;
+  end else begin
+    DC := GetWindowDC(Handle);
+    try
+      fIconicFormPreviewCacheBitmap.SetSize(Width, Height);
+      BitBlt(fIconicFormPreviewCacheBitmap.Canvas.Handle, 0, 0, Width, Height, DC, 0, 0, SRCCOPY);
+    finally
+      ReleaseDC(Handle, DC);
+    end;
+  end;
+end;
+
+procedure TNemp_MainForm.ApplicationEvents1Minimize(Sender: TObject);
+begin
+  // cache the current state of the form, so that
+  // NempTaskbarManagerWindowPreviewItemRequest can draw something (even if it's outdated)
+  UpdateIconicFormPreview;
+end;
+
+procedure TNemp_MainForm.NempTaskbarManagerWindowPreviewItemRequest(
+  Sender: TObject; var Position: TPoint; PreviewBitmap: TBitmap);
+begin
+  if not IsIconic(Handle) then
+    UpdateIconicFormPreview;
+
+  PreviewBitmap.SetSize(fIconicFormPreviewCacheBitmap.Width, fIconicFormPreviewCacheBitmap.Height);
+  PreviewBitmap.PixelFormat := pf32bit;
+  PreviewBitmap.Canvas.Draw(0,0, fIconicFormPreviewCacheBitmap);
 end;
 
 procedure TNemp_MainForm.MM_H_CheckForUpdatesClick(Sender: TObject);
@@ -11983,10 +11947,7 @@ begin
         begin
             if Not Assigned(OptionsCompleteForm) then
                 Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
-            OptionsCompleteForm.RatingImageList := DefaultRatingPainter.Images;
-            OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.ScrobbleNode;
-            OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.ScrobbleNode] := True;
-            OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.tabLastfm;
+            OptionsCompleteForm.ActivePageNode := OptionsCompleteForm.ScrobbleNode;
             OptionsCompleteForm.Show;
         end;
         exit;
@@ -12028,10 +11989,7 @@ procedure TNemp_MainForm.PM_P_ScrobblerOptionsClick(Sender: TObject);
 begin
   if Not Assigned(OptionsCompleteForm) then
       Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
-  OptionsCompleteForm.RatingImageList := DefaultRatingPainter.Images;
-  OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.ScrobbleNode;
-  OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.ScrobbleNode] := True;
-  OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.tabLastfm;
+  OptionsCompleteForm.ActivePageNode := OptionsCompleteForm.ScrobbleNode;
   OptionsCompleteForm.Show;
 end;
 
@@ -12169,10 +12127,7 @@ procedure TNemp_MainForm.MM_T_WebServerOptionsClick(Sender: TObject);
 begin
     if Not Assigned(OptionsCompleteForm) then
         Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
-    OptionsCompleteForm.RatingImageList := DefaultRatingPainter.Images;
-    OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.WebServerNode;
-    OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.WebServerNode] := True;
-    OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.tabWebserver;
+    OptionsCompleteForm.ActivePageNode := OptionsCompleteForm.WebServerNode;
     OptionsCompleteForm.Show;
 end;
 
@@ -12986,7 +12941,7 @@ begin
   ReAlignBrowseTrees;
   ReAlignFileOverview;
 
-  MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
+  // MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle); // im Timer (?)
 
   // Show/Hide category selection
   RefreshCategorySelectionVisibility;
@@ -13067,6 +13022,7 @@ begin
 
   CallHelp := false;
 end;
+
 
 procedure TNemp_MainForm.CloseHelpWnd;
 var

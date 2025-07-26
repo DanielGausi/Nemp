@@ -38,7 +38,7 @@ uses
   NempAudioFiles, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, PlaylistClass,
   AudioDisplayUtils, TreeHelper, gnuGetText, NempHelp, dmGui,
   VirtualTrees, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Menus, SkinButtons,
-  Vcl.VirtualImage, Vcl.Themes;
+  Vcl.VirtualImage, Vcl.Themes, System.ImageList, Vcl.VirtualImageList;
 
 type
 
@@ -79,6 +79,7 @@ type
 
       function GetIsDuplicate: Boolean;
       function GetCount: Integer;
+
     public
       //property DuplicateFile: TAudioFile read fDuplicateFile write fDuplicateFile;
       property IsDuplicate: Boolean read GetIsDuplicate;
@@ -189,6 +190,7 @@ type
     btnDeleteDuplicate: TButton;
     BtnRatingPlaylist: TRatingButton;
     BtnRatingDuplicate: TRatingButton;
+    vilIcons: TVirtualImageList;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -205,6 +207,7 @@ type
     procedure VstDuplicatesPaintText(Sender: TBaseVirtualTree;
       const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
       TextType: TVSTTextType);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
     currentPlaylistRating,
@@ -236,8 +239,9 @@ type
     // called when the user deletes an entry from the middle treeview in this form
     procedure DeleteAudioFile(af: TAudioFile);
     procedure DeleteFocussedAudioFile;
-    procedure SetRatingImageList(const Value: TCustomImageList);
+    //procedure SetRatingImageList(const Value: TCustomImageList);
     procedure OnAfterAudioFileChanged(Sender: TObject);
+    procedure OnNempSkinChanged(Sender: TObject);
 
   public
     { Public declarations }
@@ -248,7 +252,7 @@ type
     property OnAfterLastDuplicateDeleted: TDuplicateNotifyEvent read fOnAfterLastDuplicateDeleted write fOnAfterLastDuplicateDeleted;
     property OnAfterRefreshDuplicateScan: TNotifyEvent read fOnAfterRefreshScan write fOnAfterRefreshScan;
     property OnDuplicateDblClick: TDuplicateNotifyEvent read fOnDuplicateDblClick write fOnDuplicateDblClick;
-    property RatingImageList: TCustomImageList write SetRatingImageList;
+    //property RatingImageList: TCustomImageList write SetRatingImageList;
 
     procedure RefreshAnalysisView; // after a Retranslate
     procedure ShowDuplicateAnalysis(af: TAudioFile);
@@ -265,7 +269,7 @@ var
 
 implementation
 
-uses NempMainUnit, MainFormHelper, math, AudioFileManagement;
+uses NempMainUnit, MainFormHelper, math, AudioFileManagement, Nemp_SkinSystem;
 
 {$R *.dfm}
 
@@ -561,11 +565,18 @@ begin
   fCurrentDuplicateFile := Nil;
 
   TAudioFileManager.OnAudioFileChanged.Add(OnAfterAudioFileChanged);
+  NempSkin.OnSkinChanged.Add(OnNempSkinChanged);
 end;
 
 procedure TFormPlaylistDuplicates.FormDestroy(Sender: TObject);
 begin
   TAudioFileManager.OnAudioFileChanged.Delete(OnAfterAudioFileChanged);
+  NempSkin.OnSkinChanged.Delete(OnNempSkinChanged);
+end;
+
+procedure TFormPlaylistDuplicates.FormShow(Sender: TObject);
+begin
+  vilIcons.ImageCollection := NempSkin.DefaultIconCollection;
 end;
 
 procedure TFormPlaylistDuplicates.FormClose(Sender: TObject;
@@ -590,7 +601,12 @@ begin
 end;
 
 
-procedure TFormPlaylistDuplicates.SetRatingImageList(
+procedure TFormPlaylistDuplicates.OnNempSkinChanged(Sender: TObject);
+begin
+  vilIcons.ImageCollection := NempSkin.DefaultIconCollection;
+end;
+
+(*procedure TFormPlaylistDuplicates.SetRatingImageList(
   const Value: TCustomImageList);
 begin
   BtnRatingPlaylist.Images := Value;
@@ -598,7 +614,7 @@ begin
 
   SetRatingImages(BtnRatingPlaylist);
   SetRatingImages(BtnRatingDuplicate);
-end;
+end;*)
 
 procedure TFormPlaylistDuplicates.VstDuplicatesChange(Sender: TBaseVirtualTree;
   Node: PVirtualNode);

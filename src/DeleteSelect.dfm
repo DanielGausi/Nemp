@@ -272,6 +272,7 @@ object DeleteSelection: TDeleteSelection
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 3
+    ExplicitTop = 425
     object ImgHelp: TVirtualImage
       AlignWithMargins = True
       Left = 8

@@ -146,7 +146,8 @@ uses
   bass_wadsp in '3rd Party Units\bass_wadsp.pas',
   dmGUI in 'dmGUI.pas' {DataModuleGui: TDataModule},
   FHeadsetControl in 'FHeadsetControl.pas' {FormHeadsetControl},
-  AudioFileManagement in 'AudioFileManagement.pas';
+  AudioFileManagement in 'AudioFileManagement.pas',
+  BasicClasses in 'BasicClasses.pas';
 
 {$R *.res}
 
@@ -166,11 +167,9 @@ begin
     //TStyleManager.Engine.RegisterStyleHook(TNemp_MainForm, TFormStyleHookFix);
   {$ENDIF}
 
-  Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
-  // Application.CreateForm(TProgressForm, ProgressFormPlaylist);
-  // Application.CreateForm(TProgressForm, ProgressFormLibrary);
-  Application.CreateForm(TReplayGainProgressForm, ReplayGainProgressForm);
   Application.CreateForm(TDataModuleGui, DataModuleGui);
+  Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
+  Application.CreateForm(TReplayGainProgressForm, ReplayGainProgressForm);
   Application.CreateForm(TFormHeadsetControl, FormHeadsetControl);
   Graphics.DefFontData.Name := 'Tahoma';
 

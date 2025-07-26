@@ -200,7 +200,6 @@ type
       UseDefaultActionOnCoverFlowDoubleClick: Boolean;
       // default-action when the user clicks "Add current Headphone-title to playlist"
       HeadSetAction: Integer;
-      AutoStopHeadsetSwitchTab: Boolean;
       AutoStopHeadsetAddToPlayist: Boolean;
 
       TNA_PlaylistCount: Integer; // number of files displayed in the TNA-menu
@@ -490,7 +489,6 @@ begin
   ApplyDefaultActionToWholeList := NempSettingsManager.ReadBool('Playlist','ApplyDefaultActionToWholeList',False);
   UseDefaultActionOnCoverFlowDoubleClick := NempSettingsManager.ReadBool('Playlist','UseDefaultActionOnCoverFlowDoubleClick', False);
   HeadSetAction         := NempSettingsManager.ReadInteger('Playlist','HeadSetAction',0);
-  AutoStopHeadsetSwitchTab       := NempSettingsManager.ReadBool('Playlist','AutoStopHeadset',True);
   AutoStopHeadsetAddToPlayist    := NempSettingsManager.ReadBool('Playlist','AutoStopHeadsetAddToPlayist',False);
 
   WiedergabeMode        := NempSettingsManager.ReadInteger('Playlist','WiedergabeModus',0);
@@ -536,7 +534,6 @@ begin
   NempSettingsManager.WriteBool('Playlist','ApplyDefaultActionToWholeList',ApplyDefaultActionToWholeList);
   NempSettingsManager.WriteBool('Playlist','UseDefaultActionOnCoverFlowDoubleClick', UseDefaultActionOnCoverFlowDoubleClick);
   NempSettingsManager.WriteInteger('Playlist','HeadSetAction',HeadSetAction);
-  NempSettingsManager.WriteBool('Playlist','AutoStopHeadset',AutoStopHeadsetSwitchTab);
   NempSettingsManager.WriteBool('Playlist','AutoStopHeadsetAddToPlayist',AutoStopHeadsetAddToPlayist);
 
   NempSettingsManager.WriteInteger('Playlist','WiedergabeModus',WiedergabeMode);

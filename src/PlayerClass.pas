@@ -55,7 +55,11 @@ type
       ContinueAfter: Boolean;
   end;
 
+  teNempPlayerStatus = (npsStopped, npsPlaying, npsPaused);
   teBirthdayMode = (bmUndef, bmCountDown, bmBirthday);
+
+  teVisualisationMode = (vmOff, vmVerySlow, vmSlow, vmMedium, vmFast, vmVeryFast);
+
 
   TPrescanMode = (ps_None, ps_Now, ps_Later);
 
@@ -63,6 +67,7 @@ type
 
   TPlayerMessageEvent = procedure(Sender: TNempPlayer; aMessage: String) of object;
   TPlayerAudioFileEvent = procedure(Sender: TNempPlayer; aAudioFile: TAudioFile) of object;
+  TPlayerStatusEvent = procedure(Sender: TNempPlayer; aStatus: teNempPlayerStatus) of object;
 
   TNempPlayer = class
     private
@@ -206,6 +211,9 @@ type
       fPreviewShapeProgressPenColor: TColor;
       fMainCoverSize: Integer;
       fOnBirthdayPlay: TPlayerAudioFileEvent;
+      fHeadSetMute: Boolean;
+    fOnMainPlayerStatusChanged: TPlayerStatusEvent;
+    fOnHeadsetPlayerStatusChanged: TPlayerStatusEvent;
 
 
 
@@ -271,7 +279,7 @@ type
       // param GetCoverWasSuccessful: used to start an online search for the cover, if no cover has been found
       procedure ResetPlayerVCL(GetCoverWasSuccessful: boolean);
       // set the play/pause button according to the current state of the player
-      procedure ActualizePlayPauseBtn(wParam, lParam: Integer);
+      //procedure ActualizePlayPauseBtn(wParam, lParam: Integer);
 
       procedure StartPrescanThread;
       function TimeToString(aTime, aDuration: Double): String;
@@ -303,6 +311,12 @@ type
     function GetBassBirthdayStatus: DWord;
     function GetAutoResumePlaylistAfterBirthday: Boolean;
     procedure SetAutoResumePlaylistAfterBirthday(const Value: Boolean);
+    procedure SetHeadSetMute(const Value: Boolean);
+
+      procedure DoHeadsetPlayerStatusChanged(aStatus: teNempPlayerStatus);
+      procedure DoMainPlayerStatusChanged(aStatus: teNempPlayerStatus);
+    function GetUseVisualization: Boolean;
+    function GetVisualizationInterval: Cardinal;
 
 
     public
@@ -357,13 +371,8 @@ type
         UseDefaultEqualizer: Boolean;
         PlayBufferSize: DWORD;
 
-        UseVisualization: Boolean;
-        VisualizationInterval: Cardinal;
-
+        VisualisationMode: teVisualisationMode;
         TimeMode: Byte;
-        ScrollTaskbarTitel: Boolean;
-        ScrollTaskbarDelay: Integer;
-        //ScrollAnzeigeDelay: Integer;
 
         ReInitAfterSuspend: Boolean;
         PauseOnSuspend    : Boolean;
@@ -436,6 +445,7 @@ type
         property Mute: Boolean read fIsMute write SetMute;
         property Volume: Single read GetVolume write SetVolume;
         property HeadSetVolume: Single read GetHeadsetVolume write SetHeadsetVolume;
+        property HeadSetMute: Boolean read fHeadSetMute write SetHeadSetMute;
         property BirthdayVolume: Single read GetBirthdayVolume write SetBirthdayVolume;
         // Time
         property Time: Double read GetTime write SetTime;
@@ -460,6 +470,9 @@ type
 
         property CurrentBirthdayMode: teBirthdayMode read fCurrentBirthdayMode;
         property AutoResumePlaylistAfterBirthday: Boolean read GetAutoResumePlaylistAfterBirthday write SetAutoResumePlaylistAfterBirthday;
+
+        property UseVisualization: Boolean read GetUseVisualization;
+        property VisualizationInterval: Cardinal read GetVisualizationInterval;
 
 
       //  Progress und Time auch für Birthday - darin regeln, ob CountDown oder Birthday angezeigt/gesteuert werden soll
@@ -528,6 +541,9 @@ type
         property OnABRepeatChange: TNotifyEvent read fOnABRepeatChange write fOnABRepeatChange;
 
         property OnBirthdayPlay: TPlayerAudioFileEvent read fOnBirthdayPlay write fOnBirthdayPlay;
+
+        property OnMainPlayerStatusChanged: TPlayerStatusEvent read fOnMainPlayerStatusChanged write fOnMainPlayerStatusChanged;
+        property OnHeadsetPlayerStatusChanged: TPlayerStatusEvent read fOnHeadsetPlayerStatusChanged write fOnHeadsetPlayerStatusChanged;
 
         property DSPPluginFilenames: TStringList read fDSPPluginFilenames;
         property DSPPlugin: Cardinal read fdspPlugin;
@@ -863,6 +879,7 @@ begin
     ValidExtensions.Add('.cda');
 
     fIsMute := False;
+    fHeadsetMute := False;
     ReadyForRecord := False;
     StreamRecording := False;
     fActivateDSPPlugins := False;
@@ -1319,7 +1336,9 @@ end;
     --------------------------------------------------------
 }
 procedure TNempPlayer.LoadSettings;
-var i: Integer;
+var
+  i: Integer;
+  tmp: Integer;
 begin
   MainDevice := NempSettingsManager.ReadInteger('Player','MainDevice',1);
   HeadsetDevice := NempSettingsManager.ReadInteger('Player','HeadsetDevice',2);
@@ -1363,12 +1382,30 @@ begin
   DefaultGainWithRG     := NempSettingsManager.ReadFloat('Player', 'DefaultGainWithRG', 0);
 
 
-  UseVisualization      := NempSettingsManager.ReadBool('Player','UseVisual',True);
-  VisualizationInterval := NempSettingsManager.ReadInteger('Player','Visualinterval',40);
+  if NempSettingsManager.ValueExists('Player', 'Visualisation') then begin
+    VisualisationMode := teVisualisationMode(NempSettingsManager.ReadInteger('Player', 'Visualisation', Integer(vmMedium)));
+  end else begin
+    // Fallback to previous system (<version 5.3)
+    if not NempSettingsManager.ReadBool('Player','UseVisual', True) then
+      VisualisationMode := vmOff
+    else begin
+      case NempSettingsManager.ReadInteger('Player','Visualinterval',40) of
+        // valid values: 10..100 (ms for the BassTimer.Interval)
+        0..20:   VisualisationMode := vmVeryFast;
+        21..40:  VisualisationMode := vmFast;
+        41..60:  VisualisationMode := vmMedium;
+        61..80:  VisualisationMode := vmSlow;
+        81..100: VisualisationMode := vmVerySlow;
+      else
+        VisualisationMode := vmMedium;
+      end;
+      // UseVisualization      := NempSettingsManager.ReadBool('Player','UseVisual', True);
+      // VisualizationInterval := NempSettingsManager.ReadInteger('Player','Visualinterval',40);
+    end;
+
+  end;
+
   TimeMode              := NempSettingsManager.ReadInteger('Player', 'ShowTime', 0);
-  ScrollTaskbarTitel    := NempSettingsManager.ReadBool('Player','ScrollTaskbarTitel',False);
-  ScrollTaskbarDelay    := NempSettingsManager.ReadInteger('Player', 'ScrollTaskbarDelay', 10);
-  if ScrollTaskbarDelay < 5 then ScrollTaskbarDelay := 5;
 
   ReInitAfterSuspend    := NempSettingsManager.ReadBool('Player','ReInitAfterSuspend',False);
   PauseOnSuspend        := NempSettingsManager.ReadBool('Player','PauseOnSuspend',True);
@@ -1488,9 +1525,6 @@ begin
   NempSettingsManager.WriteBool('Player','UseVisual', UseVisualization);
   NempSettingsManager.WriteInteger('Player','Visualinterval', VisualizationInterval);
   NempSettingsManager.WriteInteger('Player', 'ShowTime', TimeMode);
-  NempSettingsManager.WriteBool('Player','ScrollTaskbarTitel', ScrollTaskbarTitel);
-  NempSettingsManager.WriteInteger('Player', 'ScrollTaskbarDelay', ScrollTaskbarDelay);
-
 
   NempSettingsManager.WriteBool('Player','ReInitAfterSuspend',ReInitAfterSuspend);
   NempSettingsManager.WriteBool('Player','PauseOnSuspend',PauseOnSuspend);
@@ -1663,6 +1697,19 @@ begin
   end;
 end;
 
+procedure TNempPlayer.DoHeadsetPlayerStatusChanged(aStatus: teNempPlayerStatus);
+begin
+  if assigned(fOnHeadsetPlayerStatusChanged) then
+    fOnHeadsetPlayerStatusChanged(self, aStatus);
+end;
+
+procedure TNempPlayer.DoMainPlayerStatusChanged(aStatus: teNempPlayerStatus);
+begin
+  if assigned(fOnMainPlayerStatusChanged) then
+    fOnMainPlayerStatusChanged(self, aStatus);
+end;
+
+
 {
     --------------------------------------------------------
     StopAndFree
@@ -1703,7 +1750,8 @@ begin
 
     MainStream := 0;
     SlideStream := 0;
-    ActualizePlayPauseBtn(NEMP_API_STOPPED, 0);
+    // ActualizePlayPauseBtn(NEMP_API_STOPPED, 0);
+    DoMainPlayerStatusChanged(npsStopped);
 end;
 
 {
@@ -1852,7 +1900,8 @@ begin
                     if StartPlay then
                     begin
                       BASS_ChannelPlay(MainStream , False);
-                      BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume, Interval);
+                      if not Mute then
+                        BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume, Interval);
                     end;
               end else
               begin // also kein Fading
@@ -1860,7 +1909,8 @@ begin
                         BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_TEMPO, fSampleRateFaktor * 100 - 100)
                     else
                         BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_FREQ, OrignalSamplerate * fSampleRateFaktor);
-                    BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
+                    if not Mute then
+                      BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
 
                     if StartPos <> 0 then
                       Bass_ChannelSetPosition(Mainstream, BASS_ChannelSeconds2Bytes(MainStream, StartPos), BASS_POS_BYTE);
@@ -1912,11 +1962,13 @@ begin
                 if StartPlay then
                 begin
                     BASS_ChannelPlay(MainStream , True);
-                    BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume, FadingInterval);
+                    if not Mute then
+                      BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume, FadingInterval);
                 end;
               end
               else begin // also kein Fading, Lautstärke mormal
-                BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
+                if not Mute then
+                  BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
                 if StartPlay then
                     BASS_ChannelPlay(MainStream , True);
               end;
@@ -1944,11 +1996,13 @@ begin
                 if StartPlay then
                 begin
                     BASS_ChannelPlay(MainStream , False);
-                    BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume, FadingInterval);
+                    if not Mute then
+                      BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume, FadingInterval);
                 end;
               end
               else begin // also kein Fading, Lautstärke mormal
-                BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
+                if not Mute then
+                  BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
                 if StartPos <> 0 then
                       Bass_ChannelSetPosition(Mainstream, BASS_ChannelSeconds2Bytes(MainStream, StartPos), BASS_POS_BYTE);
                 if StartPlay then
@@ -2000,7 +2054,8 @@ begin
       begin
           fstatus := PLAYER_ISPLAYING;
           SendMessage(MainWindowHandle, WM_PlayerPlay, 0, 0);
-          ActualizePlayPauseBtn(NEMP_API_PLAYING, 0);
+          // ActualizePlayPauseBtn(NEMP_API_PLAYING, 0);
+          DoMainPlayerStatusChanged(npsPlaying);
 
           if (MainAudioFile.IsFile) or (MainAudioFile.isCDDA)  then
           begin
@@ -2015,7 +2070,9 @@ begin
           if MainAudioFile.isStream then
           begin
               fStatus := PLAYER_ISPAUSED; // Das ist wichtig fürs aufwecken nach einem Suspend und einem Reinit der Engine
-              ActualizePlayPauseBtn(NEMP_API_PAUSED, 0);
+              //ActualizePlayPauseBtn(NEMP_API_PAUSED, 0);
+              DoMainPlayerStatusChanged(npsPaused);
+
           end;
       end;
 
@@ -2045,7 +2102,8 @@ begin
         BASS_ChannelPause(MainStream);
       end;
       fStatus := PLAYER_ISPAUSED;
-      ActualizePlayPauseBtn(NEMP_API_PAUSED, 0);
+      //ActualizePlayPauseBtn(NEMP_API_PAUSED, 0);
+      DoMainPlayerStatusChanged(npsPaused);
   end;
 
 end;
@@ -2095,7 +2153,15 @@ begin
   // and playing. => Set Flag to allow Deleting from Playlist with "AutoDelete"
   MainAudioFileIsPresentAndPlaying := True;
   fStatus := PLAYER_ISPLAYING;
-  ActualizePlayPauseBtn(NEMP_API_PLAYING, 0);
+  // ActualizePlayPauseBtn(NEMP_API_PLAYING, 0);
+  DoMainPlayerStatusChanged(npsPlaying);
+
+  // cancel mute status on resume
+  if Mute then begin
+    fIsMute := False;
+    if assigned(fOnSetVolume) then
+      fOnSetVolume(self);
+  end;
 end;
 
 {
@@ -2153,7 +2219,8 @@ begin
     SetNoEndSyncs(MainStream);
     BASS_ChannelPlay(MainStream , False);
     MainStreamIsReverseStream := True;
-    ActualizePlayPauseBtn(NEMP_API_PLAYING, 0);
+    //ActualizePlayPauseBtn(NEMP_API_PLAYING, 0);
+    DoMainPlayerStatusChanged(npsPlaying);
 
     // No fading for ReverseStreams
     fReallyUseFading := False;
@@ -2347,7 +2414,8 @@ begin
                     @EndHeadSetFileProc, Self);
 
       Bass_SetDevice(MainDevice);
-      ActualizePlayPauseBtn(NEMP_API_PLAYING, 1);
+      //ActualizePlayPauseBtn(NEMP_API_PLAYING, 1);
+      DoHeadsetPlayerStatusChanged(npsPlaying);
   end;
 
   // get the cover for the current Headset-File
@@ -2364,7 +2432,9 @@ begin
   Bass_ChannelPause(HeadsetStream);
   Bass_SetDevice(MainDevice);
 
-  ActualizePlayPauseBtn(NEMP_API_PAUSED, 1);
+  //ActualizePlayPauseBtn(NEMP_API_PAUSED, 1);
+  DoHeadsetPlayerStatusChanged(npsPaused);
+
   if assigned(fOnHeadSetPause) then
     fOnHeadSetPause(self);
 end;
@@ -2375,7 +2445,8 @@ begin
     exit;
   BASS_ChannelPlay(HeadsetStream, False);
   Bass_SetDevice(MainDevice);
-  ActualizePlayPauseBtn(NEMP_API_PLAYING, 1);
+  // ActualizePlayPauseBtn(NEMP_API_PLAYING, 1);
+  DoHeadsetPlayerStatusChanged(npsPlaying);
   if assigned(fOnHeadSetResume) then
     fOnHeadSetResume(self);
 end;
@@ -2386,11 +2457,11 @@ begin
     exit;
   Bass_ChannelStop(HeadsetStream);
   Bass_SetDevice(MainDevice);
-  ActualizePlayPauseBtn(NEMP_API_STOPPED, 1);
+  // ActualizePlayPauseBtn(NEMP_API_STOPPED, 1);
+  DoHeadsetPlayerStatusChanged(npsStopped);
   if assigned(fOnHeadSetStop) then
     fOnHeadSetStop(self);
 end;
-
 
 {
     --------------------------------------------------------
@@ -2479,6 +2550,22 @@ begin
 end;*)
 
 
+function TNempPlayer.GetUseVisualization: Boolean;
+begin
+  result := VisualisationMode <> vmOff;
+end;
+
+function TNempPlayer.GetVisualizationInterval: Cardinal;
+begin
+  case VisualisationMode of
+    vmOff: ;
+    vmVerySlow : result := 200;
+    vmSlow     : result := 150;
+    vmMedium   : result := 100;
+    vmFast     : result := 50;
+    vmVeryFast : result := 10;
+  end;
+end;
 
 {
     --------------------------------------------------------
@@ -2517,7 +2604,8 @@ begin
           BASS_ChannelPlay(SlideStream , False);
         // Mainstream ausfaden und stoppen
         BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, -1, SeekFadingInterval);
-        BASS_ChannelSlideAttribute(SlideStream, BASS_ATTRIB_VOL, fMainVolume, SeekFadingInterval);
+        if not Mute then
+          BASS_ChannelSlideAttribute(SlideStream, BASS_ATTRIB_VOL, fMainVolume, SeekFadingInterval);
         // Streams vertauschen
         tmp := Mainstream;
         Mainstream := SlideStream;
@@ -3738,7 +3826,6 @@ begin
 end;
 
 
-
 (*procedure TNempPlayer.DrawHeadsetVisualisation;
 var FFTFata : TFFTData;
 begin
@@ -3788,6 +3875,19 @@ begin
   if fHeadSetCoverSize <> Value then begin
     fHeadSetCoverSize := Value;
     RefreshHeadsetCoverBitmap;
+  end;
+end;
+
+procedure TNempPlayer.SetHeadSetMute(const Value: Boolean);
+begin
+  if fHeadSetMute <> Value then begin
+    fHeadSetMute := Value;
+    if fHeadSetMute then
+      BASS_ChannelSetAttribute(HeadsetStream, BASS_ATTRIB_VOL, 0)
+    else
+      BASS_ChannelSetAttribute(HeadsetStream, BASS_ATTRIB_VOL, fHeadsetVolume);
+    //if assigned(fOnSetVolume) then
+    //  fOnSetVolume(self);
   end;
 end;
 
@@ -4118,10 +4218,10 @@ begin
   // this leads to a call of ReInitPlayerVCL(GetCoverWasSuccessful: Boolean);
 end;
 
-procedure TNempPlayer.ActualizePlayPauseBtn(wParam, lParam: Integer);
-begin
-  SendMessage(MainWindowHandle, WM_ActualizePlayPauseBtn, wParam, lParam);
-end;
+//procedure TNempPlayer.ActualizePlayPauseBtn(wParam, lParam: Integer);
+//begin
+//  SendMessage(MainWindowHandle, WM_ActualizePlayPauseBtn, wParam, lParam);
+//end;
 
 
 function TNempPlayer.GetCountDownLength(aFilename: UnicodeString): Integer;
@@ -4166,7 +4266,8 @@ begin
         //  BASS_ChannelPause(MainStream);
         //end;
         fStatus := PLAYER_ISPAUSED;
-        ActualizePlayPauseBtn(NEMP_API_PAUSED, 0);
+        // ActualizePlayPauseBtn(NEMP_API_PAUSED, 0);
+        DoMainPlayerStatusChanged(npsPaused);
     end;
 end;
 
@@ -4593,11 +4694,12 @@ begin
         //            AND NOT (IgnoreFadingOnShortTracks
         //                      AND (Bass_ChannelBytes2Seconds(MainStream,Bass_ChannelGetLength(MainStream, BASS_POS_BYTE)) < FadingInterval DIV 200))
         //then
-        begin
-            BASS_ChannelGetAttribute(MainStream, BASS_ATTRIB_VOL, oldVol);
-            BASS_ChannelSetAttribute(ThreadedMainStream, BASS_ATTRIB_VOL, oldVol);
+        if Mute then
+          BASS_ChannelSetAttribute(ThreadedMainStream, BASS_ATTRIB_VOL, 0)
+        else begin
+          BASS_ChannelGetAttribute(MainStream, BASS_ATTRIB_VOL, oldVol);
+          BASS_ChannelSetAttribute(ThreadedMainStream, BASS_ATTRIB_VOL, oldVol);
         end;
-
         //Set Position
         oldPosition := BASS_ChannelGetPosition(MainStream, BASS_POS_BYTE);
         BASS_ChannelSetPosition(ThreadedMainStream, oldPosition, BASS_POS_BYTE);
@@ -4606,7 +4708,7 @@ begin
         if Status = PLAYER_ISPLAYING then
             Bass_ChannelPlay(MainStream, False);
         BASS_ChannelStop(oldMain);
-        if fMainVolume <> 0 then
+        if (fMainVolume <> 0) and (not Mute) then
             BASS_ChannelSlideAttribute (ThreadedMainStream,
                       BASS_ATTRIB_VOL, fMainVolume,
                       Round((fMainVolume - oldVol)/(fMainVolume) * FadingInterval));

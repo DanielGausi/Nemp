@@ -16,6 +16,7 @@ object BirthdayForm: TBirthdayForm
   Position = poScreenCenter
   OnClose = FormClose
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   TextHeight = 13
   object PageControlMode: TPageControl
@@ -23,7 +24,7 @@ object BirthdayForm: TBirthdayForm
     Top = 0
     Width = 408
     Height = 346
-    ActivePage = tsBirthday
+    ActivePage = tsCountDown
     Align = alTop
     TabOrder = 0
     object tsCountDown: TTabSheet
@@ -58,7 +59,7 @@ object BirthdayForm: TBirthdayForm
         AlignWithMargins = True
         Left = 3
         Top = 72
-        Width = 150
+        Width = 394
         Height = 164
         Align = alTop
         Alignment = taCenter
@@ -70,6 +71,7 @@ object BirthdayForm: TBirthdayForm
         Font.Style = []
         GlowSize = 10
         ParentFont = False
+        ExplicitWidth = 150
       end
     end
     object tsBirthday: TTabSheet
@@ -99,8 +101,8 @@ object BirthdayForm: TBirthdayForm
         AlignWithMargins = True
         Left = 4
         Top = 4
-        Width = 387
-        Height = 48
+        Width = 392
+        Height = 43
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
@@ -118,6 +120,8 @@ object BirthdayForm: TBirthdayForm
         Font.Style = []
         ParentFont = False
         WordWrap = True
+        ExplicitWidth = 387
+        ExplicitHeight = 48
       end
     end
   end
@@ -133,13 +137,11 @@ object BirthdayForm: TBirthdayForm
     Margins.Bottom = 4
     Align = alBottom
     TabOrder = 1
-    ExplicitLeft = 9
-    ExplicitTop = 371
     object lblTitle: TLabel
       AlignWithMargins = True
       Left = 10
       Top = 15
-      Width = 12
+      Width = 380
       Height = 13
       Margins.Left = 8
       Margins.Top = 0
@@ -147,6 +149,7 @@ object BirthdayForm: TBirthdayForm
       Margins.Bottom = 0
       Align = alTop
       Caption = '...'
+      ExplicitWidth = 12
     end
     object pnlControlSlider: TNempPanel
       Tag = 5
@@ -414,9 +417,6 @@ object BirthdayForm: TBirthdayForm
     Caption = 'Continue with the playlist after playing the birthday song'
     TabOrder = 2
     OnClick = CBContinueAfterClick
-    ExplicitLeft = -8
-    ExplicitTop = 453
-    ExplicitWidth = 408
   end
   object BassTimer: TTimer
     Interval = 25

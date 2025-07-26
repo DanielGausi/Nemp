@@ -2,7 +2,7 @@ object CloudEditorForm: TCloudEditorForm
   Left = 0
   Top = 0
   Caption = 'Tagcloud: Editor'
-  ClientHeight = 465
+  ClientHeight = 460
   ClientWidth = 551
   Color = clBtnFace
   Constraints.MinHeight = 350
@@ -19,191 +19,208 @@ object CloudEditorForm: TCloudEditorForm
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnShow = FormShow
-  DesignSize = (
-    551
-    465)
   TextHeight = 13
-  object LblUpdateWarning: TLabel
-    Left = 8
-    Top = 432
-    Width = 109
-    Height = 13
-    Anchors = [akLeft, akBottom]
-    Caption = 'CountInconsistentFiles'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    ParentFont = False
-    Visible = False
-    ExplicitTop = 279
-  end
-  object BtnUpdateID3Tags: TButton
-    Left = 389
-    Top = 432
-    Width = 138
-    Height = 25
-    Anchors = [akRight, akBottom]
-    Caption = 'Update files now'
-    Enabled = False
-    TabOrder = 0
-    OnClick = BtnUpdateID3TagsClick
-  end
-  object BtnBugFix: TButton
-    Left = 192
-    Top = 432
-    Width = 77
-    Height = 25
-    Anchors = [akRight, akBottom]
-    Caption = 'BugFix'
-    TabOrder = 1
-    Visible = False
-    OnClick = BtnBugFixClick
-  end
   object PC_Select: TPageControl
+    AlignWithMargins = True
     Left = 8
     Top = 8
-    Width = 534
-    Height = 418
+    Width = 535
+    Height = 412
+    Margins.Left = 8
+    Margins.Top = 8
+    Margins.Right = 8
+    Margins.Bottom = 0
     ActivePage = TS_ExistingTags
-    Anchors = [akLeft, akTop, akRight, akBottom]
-    TabOrder = 2
+    Align = alClient
+    TabOrder = 0
+    ExplicitWidth = 534
+    ExplicitHeight = 265
     object TS_ExistingTags: TTabSheet
       Caption = 'Existing tags'
-      DesignSize = (
-        526
-        390)
-      object lbl_ExistingTagsExplain: TLabel
-        Left = 378
-        Top = 112
-        Width = 137
-        Height = 242
-        Anchors = [akTop, akRight, akBottom]
-        AutoSize = False
-        Caption = '..'
-        WordWrap = True
-        ExplicitLeft = 370
-        ExplicitHeight = 296
-      end
-      object cbHideAutoTags: TCheckBox
-        Left = 15
-        Top = 360
-        Width = 468
-        Height = 17
-        Hint = 
-          'Do not show Nemp-Auto-Tags like artist, albumname, genre, year a' +
-          'nd decade.'
-        Anchors = [akLeft, akBottom]
-        Caption = 'Hide Tags automatically added by Nemp'
-        Checked = True
-        ParentShowHint = False
-        ShowHint = True
-        State = cbChecked
+      object pnlExistingTags: TPanel
+        Left = 0
+        Top = 0
+        Width = 355
+        Height = 384
+        Align = alClient
+        BevelOuter = bvNone
         TabOrder = 0
-        OnClick = cbHideAutoTagsClick
+        ExplicitWidth = 257
+        ExplicitHeight = 395
+        object cbHideAutoTags: TCheckBox
+          AlignWithMargins = True
+          Left = 8
+          Top = 359
+          Width = 339
+          Height = 17
+          Hint = 
+            'Do not show Nemp-Auto-Tags like artist, albumname, genre, year a' +
+            'nd decade.'
+          Margins.Left = 8
+          Margins.Top = 8
+          Margins.Right = 8
+          Margins.Bottom = 8
+          Align = alBottom
+          Caption = 'Hide Tags automatically added by Nemp'
+          Checked = True
+          ParentShowHint = False
+          ShowHint = True
+          State = cbChecked
+          TabOrder = 0
+          OnClick = cbHideAutoTagsClick
+          ExplicitLeft = 57
+          ExplicitTop = 325
+          ExplicitWidth = 468
+        end
+        object TagVST: TVirtualStringTree
+          Left = 0
+          Top = 0
+          Width = 355
+          Height = 351
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 0
+          Align = alClient
+          BorderWidth = 1
+          Colors.UnfocusedSelectionColor = clHighlight
+          Colors.UnfocusedSelectionBorderColor = clHighlight
+          Header.AutoSizeIndex = 0
+          Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
+          IncrementalSearch = isAll
+          Indent = 4
+          PopupMenu = PopupExistingTags
+          TabOrder = 1
+          TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
+          TreeOptions.SelectionOptions = [toFullRowSelect, toMultiSelect]
+          OnColumnDblClick = TagVSTColumnDblClick
+          OnGetText = TagVSTGetText
+          OnPaintText = TagVSTPaintText
+          OnHeaderClick = TagVSTHeaderClick
+          OnIncrementalSearch = TagVSTIncrementalSearch
+          OnKeyDown = TagVSTKeyDown
+          Touch.InteractiveGestures = [igPan, igPressAndTap]
+          Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+          ExplicitLeft = 195
+          ExplicitTop = 32
+          ExplicitWidth = 178
+          ExplicitHeight = 247
+          Columns = <
+            item
+              Position = 0
+              Text = 'Tag'
+              Width = 217
+            end
+            item
+              Position = 1
+              Text = 'Count'
+              Width = 100
+            end>
+        end
       end
-      object TagVST: TVirtualStringTree
-        Left = 3
-        Top = 3
-        Width = 358
-        Height = 351
-        Anchors = [akLeft, akTop, akRight, akBottom]
-        BorderWidth = 1
-        Colors.UnfocusedSelectionColor = clHighlight
-        Colors.UnfocusedSelectionBorderColor = clHighlight
-        Header.AutoSizeIndex = 0
-        Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
-        IncrementalSearch = isAll
-        Indent = 4
-        PopupMenu = PopupExistingTags
+      object pnlExistingTagsButtons: TPanel
+        Left = 355
+        Top = 0
+        Width = 172
+        Height = 384
+        Align = alRight
+        BevelOuter = bvNone
         TabOrder = 1
-        TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
-        TreeOptions.SelectionOptions = [toFullRowSelect, toMultiSelect]
-        OnColumnDblClick = TagVSTColumnDblClick
-        OnGetText = TagVSTGetText
-        OnPaintText = TagVSTPaintText
-        OnHeaderClick = TagVSTHeaderClick
-        OnIncrementalSearch = TagVSTIncrementalSearch
-        OnKeyDown = TagVSTKeyDown
-        Touch.InteractiveGestures = [igPan, igPressAndTap]
-        Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-        Columns = <
-          item
-            Position = 0
-            Text = 'Tag'
-            Width = 217
-          end
-          item
-            Position = 1
-            Text = 'Count'
-            Width = 100
-          end>
-      end
-      object BtnMerge: TButton
-        Left = 378
-        Top = 9
-        Width = 137
-        Height = 25
-        Hint = 'Rename an existing tag and add a "Rename rule"'
-        Anchors = [akTop, akRight]
-        Caption = 'Add "Rename rule"'
-        ParentShowHint = False
-        ShowHint = True
-        TabOrder = 2
-        OnClick = BtnAddRenameRuleClick
-      end
-      object BtnDeleteTags: TButton
-        Left = 378
-        Top = 40
-        Width = 137
-        Height = 25
-        Hint = 'Remove an existing tag and add a "Ignore rule"'
-        Anchors = [akTop, akRight]
-        Caption = 'Add "Ignore rule"'
-        ParentShowHint = False
-        ShowHint = True
-        TabOrder = 3
-        OnClick = BtnAddIgnoreRuleClick
-      end
-      object BtnJustRemoveTags: TButton
-        Left = 378
-        Top = 71
-        Width = 138
-        Height = 25
-        Hint = 
-          'Just remove an existing tag from all files in the media library,' +
-          ' without a new "Ignore rule"'
-        Anchors = [akTop, akRight]
-        Caption = 'Just remove tags'
-        ParentShowHint = False
-        ShowHint = True
-        TabOrder = 4
-        OnClick = BtnJustRemoveTagsClick
+        ExplicitHeight = 395
+        object lbl_ExistingTagsExplain: TLabel
+          AlignWithMargins = True
+          Left = 8
+          Top = 107
+          Width = 156
+          Height = 269
+          Margins.Left = 8
+          Margins.Top = 8
+          Margins.Right = 8
+          Margins.Bottom = 8
+          Align = alClient
+          AutoSize = False
+          Caption = '..'
+          WordWrap = True
+          ExplicitLeft = 3
+          ExplicitTop = 115
+          ExplicitWidth = 137
+          ExplicitHeight = 247
+        end
+        object BtnDeleteTags: TButton
+          AlignWithMargins = True
+          Left = 8
+          Top = 41
+          Width = 156
+          Height = 25
+          Hint = 'Remove an existing tag and add a "Ignore rule"'
+          Margins.Left = 8
+          Margins.Top = 8
+          Margins.Right = 8
+          Margins.Bottom = 0
+          Align = alTop
+          Caption = 'Add "Ignore rule"'
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 0
+          OnClick = BtnAddIgnoreRuleClick
+          ExplicitLeft = 17
+          ExplicitTop = 39
+          ExplicitWidth = 137
+        end
+        object BtnJustRemoveTags: TButton
+          AlignWithMargins = True
+          Left = 8
+          Top = 74
+          Width = 156
+          Height = 25
+          Hint = 
+            'Just remove an existing tag from all files in the media library,' +
+            ' without a new "Ignore rule"'
+          Margins.Left = 8
+          Margins.Top = 8
+          Margins.Right = 8
+          Margins.Bottom = 0
+          Align = alTop
+          Caption = 'Just remove tags'
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 1
+          OnClick = BtnJustRemoveTagsClick
+          ExplicitLeft = 16
+          ExplicitTop = 70
+          ExplicitWidth = 138
+        end
+        object BtnMerge: TButton
+          AlignWithMargins = True
+          Left = 8
+          Top = 8
+          Width = 156
+          Height = 25
+          Hint = 'Rename an existing tag and add a "Rename rule"'
+          Margins.Left = 8
+          Margins.Top = 8
+          Margins.Right = 8
+          Margins.Bottom = 0
+          Align = alTop
+          Caption = 'Add "Rename rule"'
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 2
+          OnClick = BtnAddRenameRuleClick
+          ExplicitLeft = 17
+          ExplicitWidth = 137
+        end
       end
     end
     object TS_MergedTags: TTabSheet
       Caption = 'Rename rules'
       ImageIndex = 2
-      DesignSize = (
-        526
-        390)
-      object LblMergeTagHint: TLabel
-        Left = 378
-        Top = 40
-        Width = 126
-        Height = 333
-        Anchors = [akTop, akRight, akBottom]
-        AutoSize = False
-        Caption = '..'
-        WordWrap = True
-      end
       object MergeTagVST: TVirtualStringTree
-        Left = 3
-        Top = 3
-        Width = 358
+        Left = 0
+        Top = 0
+        Width = 355
         Height = 384
-        Anchors = [akLeft, akTop, akRight, akBottom]
+        Align = alClient
         BorderWidth = 1
         Colors.UnfocusedSelectionColor = clHighlight
         Colors.UnfocusedSelectionBorderColor = clHighlight
@@ -218,6 +235,10 @@ object CloudEditorForm: TCloudEditorForm
         OnHeaderClick = MergeTagVSTHeaderClick
         Touch.InteractiveGestures = [igPan, igPressAndTap]
         Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+        ExplicitLeft = 3
+        ExplicitTop = 3
+        ExplicitWidth = 118
+        ExplicitHeight = 389
         Columns = <
           item
             Position = 0
@@ -230,42 +251,66 @@ object CloudEditorForm: TCloudEditorForm
             Width = 150
           end>
       end
-      object BtnDeleteMergeTag: TButton
-        Left = 378
-        Top = 9
-        Width = 137
-        Height = 25
-        Hint = 'Delete the selected "Rename rules"'
-        Anchors = [akTop, akRight]
-        Caption = 'Delete "Rename rule"'
-        ParentShowHint = False
-        ShowHint = True
+      object pnlRenameRulesButtons: TPanel
+        Left = 355
+        Top = 0
+        Width = 172
+        Height = 384
+        Align = alRight
+        BevelOuter = bvNone
         TabOrder = 1
-        OnClick = BtnDeleteRenameRuleClick
+        ExplicitHeight = 395
+        object LblMergeTagHint: TLabel
+          AlignWithMargins = True
+          Left = 8
+          Top = 41
+          Width = 156
+          Height = 335
+          Margins.Left = 8
+          Margins.Top = 8
+          Margins.Right = 8
+          Margins.Bottom = 8
+          Align = alClient
+          AutoSize = False
+          Caption = '..'
+          WordWrap = True
+          ExplicitLeft = 51
+          ExplicitTop = 78
+          ExplicitWidth = 126
+          ExplicitHeight = 338
+        end
+        object BtnDeleteMergeTag: TButton
+          AlignWithMargins = True
+          Left = 8
+          Top = 8
+          Width = 156
+          Height = 25
+          Hint = 'Delete the selected "Rename rules"'
+          Margins.Left = 8
+          Margins.Top = 8
+          Margins.Right = 8
+          Margins.Bottom = 0
+          Align = alTop
+          Caption = 'Delete "Rename rule"'
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 0
+          OnClick = BtnDeleteRenameRuleClick
+          ExplicitLeft = 48
+          ExplicitTop = 9
+          ExplicitWidth = 137
+        end
       end
     end
     object TS_DeleteTags: TTabSheet
       Caption = 'Ignore rules'
       ImageIndex = 1
-      DesignSize = (
-        526
-        390)
-      object Lbl_IgnoreTagHint: TLabel
-        Left = 378
-        Top = 40
-        Width = 126
-        Height = 333
-        Anchors = [akTop, akRight, akBottom]
-        AutoSize = False
-        Caption = '..'
-        WordWrap = True
-      end
       object IgnoreTagVST: TVirtualStringTree
-        Left = 3
-        Top = 3
-        Width = 358
+        Left = 0
+        Top = 0
+        Width = 355
         Height = 384
-        Anchors = [akLeft, akTop, akRight, akBottom]
+        Align = alClient
         BorderWidth = 1
         Colors.UnfocusedSelectionColor = clHighlight
         Colors.UnfocusedSelectionBorderColor = clHighlight
@@ -279,6 +324,10 @@ object CloudEditorForm: TCloudEditorForm
         OnGetText = IgnoreTagVSTGetText
         Touch.InteractiveGestures = [igPan, igPressAndTap]
         Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+        ExplicitLeft = 3
+        ExplicitTop = 3
+        ExplicitWidth = 94
+        ExplicitHeight = 389
         Columns = <
           item
             Position = 0
@@ -286,27 +335,143 @@ object CloudEditorForm: TCloudEditorForm
             Width = 200
           end>
       end
-      object BtnDeleteIgnoreTag: TButton
-        Left = 378
-        Top = 9
-        Width = 137
-        Height = 25
-        Anchors = [akTop, akRight]
-        Caption = 'Delete "Ignore rule"'
+      object pnlIgnoreRulesButtons: TPanel
+        Left = 355
+        Top = 0
+        Width = 172
+        Height = 384
+        Align = alRight
+        BevelOuter = bvNone
         TabOrder = 1
-        OnClick = BtnDeleteIgnoreRuleClick
+        ExplicitLeft = 152
+        ExplicitTop = 9
+        ExplicitHeight = 383
+        object Lbl_IgnoreTagHint: TLabel
+          AlignWithMargins = True
+          Left = 8
+          Top = 41
+          Width = 156
+          Height = 335
+          Margins.Left = 8
+          Margins.Top = 8
+          Margins.Right = 8
+          Margins.Bottom = 8
+          Align = alClient
+          AutoSize = False
+          Caption = '..'
+          WordWrap = True
+          ExplicitLeft = 59
+          ExplicitTop = 40
+          ExplicitWidth = 126
+          ExplicitHeight = 338
+        end
+        object BtnDeleteIgnoreTag: TButton
+          AlignWithMargins = True
+          Left = 8
+          Top = 8
+          Width = 156
+          Height = 25
+          Margins.Left = 8
+          Margins.Top = 8
+          Margins.Right = 8
+          Margins.Bottom = 0
+          Align = alTop
+          Caption = 'Delete "Ignore rule"'
+          TabOrder = 0
+          OnClick = BtnDeleteIgnoreRuleClick
+          ExplicitLeft = 48
+          ExplicitTop = 9
+          ExplicitWidth = 137
+        end
       end
     end
   end
-  object BtnHelp: TButton
-    Left = 308
-    Top = 432
-    Width = 75
-    Height = 25
-    Anchors = [akRight, akBottom]
-    Caption = 'Help'
-    TabOrder = 3
-    OnClick = BtnHelpClick
+  object pnlButtons: TPanel
+    Left = 0
+    Top = 420
+    Width = 551
+    Height = 40
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 1
+    ExplicitLeft = 24
+    ExplicitTop = 408
+    ExplicitWidth = 473
+    object LblUpdateWarning: TLabel
+      Left = 47
+      Top = 12
+      Width = 109
+      Height = 13
+      Margins.Top = 8
+      Margins.Bottom = 8
+      Caption = 'CountInconsistentFiles'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      Visible = False
+    end
+    object ImgHelp: TVirtualImage
+      AlignWithMargins = True
+      Left = 8
+      Top = 4
+      Width = 32
+      Height = 32
+      Margins.Left = 8
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
+      Align = alLeft
+      ImageCollection = DataModuleGui.ICGraphics
+      ImageWidth = 0
+      ImageHeight = 0
+      ImageIndex = 21
+      ImageName = 'imgHelp'
+      OnClick = BtnHelpClick
+      ExplicitLeft = 16
+      ExplicitTop = 16
+      ExplicitHeight = 24
+    end
+    object BtnBugFix: TButton
+      AlignWithMargins = True
+      Left = 320
+      Top = 8
+      Width = 77
+      Height = 24
+      Margins.Left = 8
+      Margins.Top = 8
+      Margins.Right = 0
+      Margins.Bottom = 8
+      Align = alRight
+      Caption = 'BugFix'
+      TabOrder = 0
+      Visible = False
+      OnClick = BtnBugFixClick
+      ExplicitLeft = 216
+      ExplicitTop = -1
+      ExplicitHeight = 25
+    end
+    object BtnUpdateID3Tags: TButton
+      AlignWithMargins = True
+      Left = 405
+      Top = 8
+      Width = 138
+      Height = 24
+      Margins.Left = 8
+      Margins.Top = 8
+      Margins.Right = 8
+      Margins.Bottom = 8
+      Align = alRight
+      Caption = 'Update files now'
+      Enabled = False
+      TabOrder = 1
+      OnClick = BtnUpdateID3TagsClick
+      ExplicitLeft = 335
+      ExplicitTop = 7
+      ExplicitHeight = 25
+    end
   end
   object PopupExistingTags: TPopupMenu
     Left = 48

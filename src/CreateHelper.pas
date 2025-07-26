@@ -43,7 +43,7 @@ unit CreateHelper;
 interface
 
     uses Forms, Windows, Graphics, Classes, Menus, Controls, SysUtils, IniFiles, VirtualTrees, Messages,
-    dialogs, shellApi, ID3GenreList, ActiveX, OneInst, MainFormlayout, System.IOUtils, System.Types
+    dialogs, shellApi, ID3GenreList, ActiveX, OneInst, MainFormlayout, System.IOUtils, System.Types, System.UITypes
     {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF};
 
 
@@ -503,64 +503,64 @@ var
   i: Integer;
 begin
 
-  Nemp_MainForm.NempSkin.ArtistsVST   := Nemp_MainForm.ArtistsVST ;
-  Nemp_MainForm.NempSkin.AlbenVST     := Nemp_MainForm.AlbenVST   ;
-  Nemp_MainForm.NempSkin.MainVST      := Nemp_MainForm.VST        ;
-  Nemp_MainForm.NempSkin.PlaylistVST  := Nemp_MainForm.PlaylistVST;
+  NempSkin.ArtistsVST   := Nemp_MainForm.ArtistsVST ;
+  NempSkin.AlbenVST     := Nemp_MainForm.AlbenVST   ;
+  NempSkin.MainVST      := Nemp_MainForm.VST        ;
+  NempSkin.PlaylistVST  := Nemp_MainForm.PlaylistVST;
 
-  Nemp_MainForm.NempSkin.VclMenuImages  := Nemp_MainForm.vilIconsWindows;
-  Nemp_MainForm.NempSkin.SkinMenuImages := Nemp_MainForm.vilIconsSkin;
+  NempSkin.VclMenuImages  := Nemp_MainForm.vilIconsWindows;
+  NempSkin.SkinMenuImages := Nemp_MainForm.vilIconsSkin;
 
-  Nemp_MainForm.NempSkin.PanelList.Clear;
-  Nemp_MainForm.NempSkin.MenuList.Clear;
-  Nemp_MainForm.NempSkin.ControlButtonList.Clear;
+  NempSkin.PanelList.Clear;
+  NempSkin.MenuList.Clear;
+  NempSkin.ControlButtonList.Clear;
 
   for i := 0 to Nemp_MainForm.ComponentCount - 1 do
   begin
     if Nemp_MainForm.Components[i] is TNempPanel then
-      Nemp_MainForm.NempSkin.PanelList.Add(TNempPanel(Nemp_MainForm.Components[i]))
+      NempSkin.PanelList.Add(TNempPanel(Nemp_MainForm.Components[i]))
     else
       if Nemp_MainForm.Components[i] is TMenu then
-        Nemp_MainForm.NempSkin.MenuList.Add(TMenu(Nemp_MainForm.Components[i]))
+        NempSkin.MenuList.Add(TMenu(Nemp_MainForm.Components[i]))
   end;
-  Nemp_MainForm.NempSkin.PanelList.Add(AuswahlForm.ContainerPanelAuswahlform);
-  Nemp_MainForm.NempSkin.PanelList.Add(MedienListeForm.ContainerPanelMedienBibForm);
-  Nemp_MainForm.NempSkin.PanelList.Add(PlaylistForm.ContainerPanelPlaylistForm);
-  Nemp_MainForm.NempSkin.PanelList.Add(ExtendedControlForm.ContainerPanelExtendedControlsForm);
+  NempSkin.PanelList.Add(AuswahlForm.ContainerPanelAuswahlform);
+  NempSkin.PanelList.Add(MedienListeForm.ContainerPanelMedienBibForm);
+  NempSkin.PanelList.Add(PlaylistForm.ContainerPanelPlaylistForm);
+  NempSkin.PanelList.Add(ExtendedControlForm.ContainerPanelExtendedControlsForm);
 
   // Player control Buttons
-  Nemp_MainForm.NempSkin.ControlButtonList.Add(Nemp_MainForm.PlayPauseBTN);
-  Nemp_MainForm.NempSkin.ControlButtonList.Add(Nemp_MainForm.StopBTN);
-  Nemp_MainForm.NempSkin.ControlButtonList.Add(Nemp_MainForm.PlayPrevBTN);
-  Nemp_MainForm.NempSkin.ControlButtonList.Add(Nemp_MainForm.PlayNextBTN);
-  Nemp_MainForm.NempSkin.ControlButtonList.Add(Nemp_MainForm.SlideBackBTN);
-  Nemp_MainForm.NempSkin.ControlButtonList.Add(Nemp_MainForm.SlideForwardBTN);
-  Nemp_MainForm.NempSkin.ControlButtonList.Add(Nemp_MainForm.RecordBtn);
-  Nemp_MainForm.NempSkin.ControlButtonList.Add(Nemp_MainForm.RandomBtn);
+  NempSkin.ControlButtonList.Add(Nemp_MainForm.PlayPauseBTN);
+  NempSkin.ControlButtonList.Add(Nemp_MainForm.StopBTN);
+  NempSkin.ControlButtonList.Add(Nemp_MainForm.PlayPrevBTN);
+  NempSkin.ControlButtonList.Add(Nemp_MainForm.PlayNextBTN);
+  NempSkin.ControlButtonList.Add(Nemp_MainForm.SlideBackBTN);
+  NempSkin.ControlButtonList.Add(Nemp_MainForm.SlideForwardBTN);
+  NempSkin.ControlButtonList.Add(Nemp_MainForm.RecordBtn);
+  NempSkin.ControlButtonList.Add(Nemp_MainForm.RandomBtn);
 
   // Tab Buttons
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Cover);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_SummaryLock);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Equalizer);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Playlist);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Medialib);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Headset);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_mainForm.TabBtn_Marker);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_mainForm.TabBtn_Favorites);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_mainForm.TabBtnCoverCategory);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_mainForm.TabBtnTagCloudCategory);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Browse0);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_CoverFlow0);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_TagCloud0);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Preselection0);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Browse1);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_CoverFlow1);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_TagCloud1);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Preselection1);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Browse2);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_CoverFlow2);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_TagCloud2);
-  Nemp_MainForm.NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Preselection2);
+  NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Cover);
+  NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_SummaryLock);
+  NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Equalizer);
+  NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Playlist);
+  NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Medialib);
+  NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Headset);
+  NempSkin.TabButtonList.Add(Nemp_mainForm.TabBtn_Marker);
+  NempSkin.TabButtonList.Add(Nemp_mainForm.TabBtn_Favorites);
+  NempSkin.TabButtonList.Add(Nemp_mainForm.TabBtnCoverCategory);
+  NempSkin.TabButtonList.Add(Nemp_mainForm.TabBtnTagCloudCategory);
+  NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Browse0);
+  NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_CoverFlow0);
+  NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_TagCloud0);
+  NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Preselection0);
+  NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Browse1);
+  NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_CoverFlow1);
+  NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_TagCloud1);
+  NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Preselection1);
+  NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Browse2);
+  NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_CoverFlow2);
+  NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_TagCloud2);
+  NempSkin.TabButtonList.Add(Nemp_MainForm.TabBtn_Preselection2);
 
 end;
 
@@ -659,6 +659,7 @@ end;
 procedure StuffToDoAfterCreate;
 var TmpLastExitWasOK: Boolean;
 begin
+
     Formatsettings.LongTimeFormat := 'HH:mm';
     with Nemp_MainForm do
     begin
@@ -732,8 +733,8 @@ begin
   else
     MedienBib.NewCoverFlow.Mode := TCoverFlowMode(NempSettingsManager.ReadInteger('MedienBib', 'CoverFlowMode', Integer(cm_OpenGL)));
 
-  if Nemp_MainForm.NempSkin.isActive then
-    MedienBib.NewCoverFlow.SetColor(Nemp_MainForm.NempSkin.SkinColorScheme.CoverFlowCl)
+  if NempSkin.isActive then
+    MedienBib.NewCoverFlow.SetColor(NempSkin.SkinColorScheme.CoverFlowCl)
   else
     MedienBib.NewCoverFlow.SetColor(MedienBib.NewCoverFlow.Settings.DefaultColor);
 

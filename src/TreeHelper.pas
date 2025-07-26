@@ -75,7 +75,9 @@ uses Windows, Graphics, SysUtils, VirtualTrees, Forms, Controls, NempAudioFiles,
 
 implementation
 
-uses  NempMainUnit, PlayerClass, PlaylistClass, MainFormHelper, AudioDisplayUtils, Cover.ViewCache, VCL.Themes, VCL.GraphUtil;
+uses
+  NempMainUnit, PlayerClass, PlaylistClass, MainFormHelper, AudioDisplayUtils,
+  Cover.ViewCache, VCL.Themes, VCL.GraphUtil, Nemp_SkinSystem;
 
 
 function MaxFontSize(default: Integer): Integer;
@@ -528,7 +530,7 @@ var
   TM: TTextMetric;
 begin
     HintText := NempDisplay.HintText(af);
-    VclStyleEnabled := Nemp_MainForm.NempSkin.isActive and Nemp_MainForm.NempSkin.UseAdvancedSkin and NempOptions.GlobalUseAdvancedSkin;
+    VclStyleEnabled := NempSkin.isActive and NempSkin.UseAdvancedSkin and NempOptions.GlobalUseAdvancedSkin;
     with HintCanvas do begin
         StyleServices := Vcl.Themes.StyleServices{$if CompilerVersion >= 34}(Sender){$ifend};
         if VclStyleEnabled then begin

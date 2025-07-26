@@ -37,19 +37,23 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   System.Contnrs, myDialogs,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, NempReplayGainCalculation,
-  Vcl.ComCtrls, VirtualTrees, bass, nempAudiofiles, Vcl.ExtCtrls;
+  Vcl.ComCtrls, VirtualTrees, bass, nempAudiofiles, Vcl.ExtCtrls,
+  Vcl.VirtualImage, dmGui;
 
 type
   TReplayGainProgressForm = class(TForm)
     pbTrack: TProgressBar;
     BtnCancel: TButton;
     pbComplete: TProgressBar;
-    MainImage: TImage;
+    MainImage: TVirtualImage;
     LblMain: TLabel;
     LblStatus: TLabel;
     LogMemo: TMemo;
     cbAutoClose: TCheckBox;
     CloseTimer: TTimer;
+    pnlButtons: TPanel;
+    pnlProgressTitle: TPanel;
+    pnlHeader: TPanel;
     procedure BtnCancelClick(Sender: TObject);
 
     procedure OnThreadTerminate(Sender: TObject);
@@ -145,15 +149,8 @@ begin
 end;
 
 procedure TReplayGainProgressForm.FormCreate(Sender: TObject);
-var aPath: String;
 begin
     TranslateComponent (self);
-
-    aPath := ExtractFilePath(ParamStr(0)) + 'Images\ReplayGain.png';
-    if FileExists(aPath) then
-        MainImage.Picture.LoadFromFile(aPath)
-    else
-        MainImage.Picture.Assign(Nil);
 end;
 
 

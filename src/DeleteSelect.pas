@@ -108,7 +108,7 @@ begin
     VSTFiles.NodeDataSize  := SizeOf(TAudioFile);
     VSTDrives.NodeDataSize := SizeOf(TDeleteData);
 
-    ReloadScheckBoxImages(Nemp_MainForm.NempSkin.isActive);
+    ReloadScheckBoxImages(NempSkin.isActive);
 end;
 
 function AddVSTDrive(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aDeleteData: TDeleteData): PVirtualNode;

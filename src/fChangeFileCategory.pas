@@ -37,25 +37,23 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Winapi.ActiveX,
   Nemp_RessourceStrings, gnugetText, math, NempHelp,
   NempAudioFiles, LibraryOrganizer.Base, LibraryOrganizer.Files,
-  AudioDisplayUtils, Vcl.Imaging.pngimage;
+  AudioDisplayUtils, Vcl.Imaging.pngimage, Vcl.VirtualImage,
+  NempControls.ExtCtrls;
 
 type
   TFormChangeCategory = class(TForm)
     pnlButtons: TPanel;
     BtnCancel: TButton;
     BtnOK: TButton;
-    pnlNewCategory: TPanel;
-    lblNewCategory: TLabel;
-    cbCategorySelection: TComboBox;
+    cbCategorySelection: TLabeledComboBox;
     rbMoveFiles: TRadioButton;
     rbCopyFiles: TRadioButton;
-    pnlFiles: TPanel;
     memoFiles: TMemo;
     lblFiles: TLabel;
     pnlCurrent: TPanel;
     lblCurrentCategory: TLabel;
     lblHeadline: TLabel;
-    ImgHelp: TImage;
+    ImgHelp: TVirtualImage;
     procedure FormCreate(Sender: TObject);
     procedure ImgHelpClick(Sender: TObject);
   private

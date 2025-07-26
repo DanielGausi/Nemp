@@ -39,7 +39,8 @@ uses
   Menus,   Hilfsfunktionen, NempAudioFiles, BibHelper, math,
   Nemp_ConstantsAndTypes, LibraryOrganizer.Base, LibraryOrganizer.Files,
   gnuGettext, Nemp_RessourceStrings, ExtCtrls, ImgList, System.UITypes,
-  System.Generics.Collections, System.Generics.Defaults, SkinButtons;
+  System.Generics.Collections, System.Generics.Defaults, SkinButtons,
+  System.ImageList, Vcl.VirtualImageList;
 
 type
   TTagSetting = class
@@ -89,6 +90,10 @@ type
     LblTagMatchType: TLabel;
     BtnRefreshTags: TButton;
     RatingButton: TRatingButton;
+    vilIcons: TVirtualImageList;
+    pnlRow1: TPanel;
+    pnlRow2: TPanel;
+    pnlButtons: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure cbRestrictTimeClick(Sender: TObject);
     procedure cbRestrictTagsClick(Sender: TObject);
@@ -118,7 +123,6 @@ type
     LastCheckedTags: TStringList;
 
     ActualRating: Integer;
-
     TagRoot: TRootCollection;
 
     procedure SetLastCheckedTags;
@@ -126,12 +130,11 @@ type
 
     procedure FillTagList;
     procedure RefillTagList;
-    procedure SetRatingImageList(const Value: TCustomImageList);
+    procedure OnNempSkinChanged(Sender: TObject);
 
   public
     { Public-Deklarationen }
     procedure RefillTagListFromMainWindow;
-    property RatingImageList: TCustomImageList write SetRatingImageList;
   end;
 
 
@@ -157,7 +160,7 @@ implementation
 
 {$R *.dfm}
 
-uses NempMainUnit, TagClouds, MainFormHelper, MedienbibliothekClass;
+uses NempMainUnit, TagClouds, MainFormHelper, MedienbibliothekClass, Nemp_SkinSystem;
 
 
 Constructor TTagSetting.Create;
@@ -189,7 +192,7 @@ var ini: TMemIniFile;
     aTag: String;
     ltmp, c: Integer;
 begin
-  
+
   BackupComboboxes(self);
   TranslateComponent (self);
   RestoreComboboxes(self);
@@ -197,6 +200,7 @@ begin
 
   LastCheckedTags := TStringList.Create;
 
+  NempSkin.OnSkinChanged.Add(OnNempSkinChanged);
   TagRoot := TRootCollection.Create(Nil);
   TagRoot.AddSubCollectionType(ccTagCloud, csCount, sd_Descending);
 
@@ -335,6 +339,7 @@ begin
 
   TagRoot.Free;
   LastCheckedTags.Free;
+  NempSkin.OnSkinChanged.Delete(OnNempSkinChanged);
 end;
 
 procedure TRandomPlaylistForm.FormResize(Sender: TObject);
@@ -349,12 +354,6 @@ begin
     for i := 0 to cbGenres.Count - 1 do
         if cbGenres.Checked[i] then
             LastCheckedTags.Add(TAudioCollection(cbGenres.Items.Objects[i]).Key);
-end;
-
-procedure TRandomPlaylistForm.SetRatingImageList(const Value: TCustomImageList);
-begin
-  RatingButton.Images := Value;
-  SetRatingImages(RatingButton);
 end;
 
 procedure TRandomPlaylistForm.RecheckLastCheckedTags;
@@ -417,11 +416,17 @@ end;
 
 procedure TRandomPlaylistForm.FormShow(Sender: TObject);
 begin
-    //if MedienBib.BrowseMode <> 2 then
-    //    MedienBib.ReBuildTagCloud;
+  //if MedienBib.BrowseMode <> 2 then
+  //    MedienBib.ReBuildTagCloud;
 
-    FillTagList;
-    RecheckLastCheckedTags;
+  FillTagList;
+  RecheckLastCheckedTags;
+  vilIcons.ImageCollection := NempSkin.DefaultIconCollection;
+end;
+
+procedure TRandomPlaylistForm.OnNempSkinChanged(Sender: TObject);
+begin
+  vilIcons.ImageCollection := NempSkin.DefaultIconCollection;
 end;
 
 procedure TRandomPlaylistForm.cbRestrictTimeClick(Sender: TObject);

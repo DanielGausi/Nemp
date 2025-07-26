@@ -37,7 +37,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, System.IOUtils, ShellApi,
   AudioExportUtils, AudioDisplayUtils, Vcl.ExtCtrls, Vcl.Mask, System.Actions,
-  Vcl.ActnList, Vcl.Menus, Vcl.Imaging.pngimage;
+  Vcl.ActnList, Vcl.Menus, Vcl.Imaging.pngimage, Vcl.VirtualImage;
 
 type
   TFormExport = class(TForm)
@@ -74,7 +74,9 @@ type
     N2: TMenuItem;
     pmItemOpenTemplateDirectory: TMenuItem;
     pmItemCreateDefaultTemplates: TMenuItem;
-    ImgHelp: TImage;
+    imgHelp: TVirtualImage;
+    pnlSettings: TPanel;
+    pnlFilename: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);

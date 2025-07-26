@@ -37,7 +37,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, VirtualTrees, contnrs, StrUtils, gnugettext, MyDialogs, NempHelp,
   NempAudioFiles, TagClouds, StdCtrls, Spin, TagHelper, ComCtrls, Vcl.Menus,
-  System.UITypes, LibraryOrganizer.Base, LibraryOrganizer.Files;
+  System.UITypes, LibraryOrganizer.Base, LibraryOrganizer.Files, Vcl.ExtCtrls,
+  Vcl.VirtualImage;
 
 type
 
@@ -53,14 +54,10 @@ type
     TagVST: TVirtualStringTree;
     MergeTagVST: TVirtualStringTree;
     IgnoreTagVST: TVirtualStringTree;
-    LblMergeTagHint: TLabel;
-    BtnDeleteMergeTag: TButton;
-    BtnDeleteIgnoreTag: TButton;
     BtnMerge: TButton;
     BtnDeleteTags: TButton;
     BtnJustRemoveTags: TButton;
     lbl_ExistingTagsExplain: TLabel;
-    Lbl_IgnoreTagHint: TLabel;
     PopupExistingTags: TPopupMenu;
     PopupRenameRules: TPopupMenu;
     PopupIgnoreRules: TPopupMenu;
@@ -69,7 +66,16 @@ type
     pm_JustRemoveTags: TMenuItem;
     pm_DeleteRenameRule: TMenuItem;
     pm_DeleteIgnoreRule: TMenuItem;
-    BtnHelp: TButton;
+    pnlButtons: TPanel;
+    ImgHelp: TVirtualImage;
+    pnlExistingTags: TPanel;
+    pnlExistingTagsButtons: TPanel;
+    pnlRenameRulesButtons: TPanel;
+    LblMergeTagHint: TLabel;
+    BtnDeleteMergeTag: TButton;
+    pnlIgnoreRulesButtons: TPanel;
+    Lbl_IgnoreTagHint: TLabel;
+    BtnDeleteIgnoreTag: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);

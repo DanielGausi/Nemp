@@ -91,7 +91,7 @@ var
 
 implementation
 
-uses NempMainUnit, MedienlisteUnit, AuswahlUnit, PlaylistUnit;
+uses NempMainUnit, MedienlisteUnit, AuswahlUnit, PlaylistUnit, Nemp_SkinSystem;
 
 {$R *.dfm}
 
@@ -132,7 +132,7 @@ end;
 procedure TExtendedControlForm.ContainerPanelExtendedControlsFormPaintBackground(
   Sender: TNempPanel; var Bitmap: TGraphic; var Offset: TPoint; var Tile: Boolean);
 begin
-  Nemp_MainForm.NempSkin.OnPaintControlBackground(Sender, Bitmap, Offset, Tile);
+  NempSkin.OnPaintControlBackground(Sender, Bitmap, Offset, Tile);
 end;
 
 procedure TExtendedControlForm.FormClose(Sender: TObject;
@@ -179,9 +179,9 @@ begin
         NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.Left;
         NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.Top;
 
-        if (Nemp_MainForm.NempSkin.isActive) {and (NOT Nemp_MainForm.NempSkin.FixedBackGround)} then
+        if (NempSkin.isActive) {and (NOT Nemp_MainForm.NempSkin.FixedBackGround)} then
         begin
-            Nemp_MainForm.NempSkin.RepairSkinOffset;
+            NempSkin.RepairSkinOffset;
             RepaintForm;
         end;
 
@@ -207,9 +207,9 @@ begin
 
     NempRegionsDistance.docked := tmp;
 
-    if (Nemp_MainForm.NempSkin.isActive) {and (NOT Nemp_MainForm.NempSkin.FixedBackGround)} then
+    if (NempSkin.isActive) {and (NOT Nemp_MainForm.NempSkin.FixedBackGround)} then
     begin
-        Nemp_MainForm.NempSkin.RepairSkinOffset;
+        NempSkin.RepairSkinOffset;
         RepaintForm;
     end;
 end;
@@ -219,9 +219,9 @@ begin
 
     SetRegion(ContainerPanelExtendedControlsForm, self, NempRegionsDistance, handle);
 
-    If Nemp_MainForm.NempSkin.isActive then
+    If NempSkin.isActive then
     begin
-        Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.VST);
+        NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.VST);
         //Repaint;
     end;
 end;

@@ -60,6 +60,9 @@ uses Windows, forms, Classes, Controls, StdCtrls, ExtCtrls, Graphics, Nemp_Const
   procedure ReAcceptDragFiles;
   procedure RevokeDragFiles;
 
+  procedure OnBeforeHandleChange;
+  procedure OnAfterHandleChange;
+
   procedure UpdateSmallMainForm;
   procedure UpdateFormDesignNeu(newMode: Integer; NempStarting: Boolean = False);
 
@@ -73,7 +76,8 @@ const
 implementation
 
 uses NempMainUnit, PlaylistUnit, MedienlisteUnit, AuswahlUnit, ExtendedControlsUnit,
-     SystemHelper, Inifiles, MainFormBuilderForm, FHeadsetControl, MedienbibliothekClass;
+     SystemHelper, Inifiles, MainFormBuilderForm, FHeadsetControl, MedienbibliothekClass,
+     Nemp_SkinSystem;
 
 procedure SetRegion(GrpBox: TPanel; aForm: TForm; var NempRegionsDistance: TNempRegionsDistance; aHandle: hWnd);
 begin
@@ -820,6 +824,13 @@ begin
   with Nemp_MainForm do
   begin
 
+
+      Constraints.MinWidth := 0; //MAINFORM_MinWidth;
+      Constraints.MaxHeight := 0; //5000;
+      Constraints.MinHeight := 0; //MAINFORM_MinHeight;
+
+
+
    _ControlPanel.Align := alBottom;
    _ControlPanel.AlignWithMargins := False;
    _ControlPanel.Height := 100;
@@ -828,10 +839,7 @@ begin
     MedienListeControlPanel.Width := EditFastSearch.Left + EditFastSearch.Width + 6;
     MedienListeStatusLBL.Width := MedienlisteFillPanel.Width - 16;
 
-      Height := _ControlPanel.Height + 2;
-      Constraints.MaxHeight := 0;
-      Constraints.MinWidth := MAINFORM_MinWidth;
-      Constraints.MinHeight := MAINFORM_MinHeight;
+      Height := 800; //_ControlPanel.Height + 2;
 
       Borderstyle := bsSizeable;
 
@@ -897,6 +905,8 @@ var //formregion,
   xpbottom, xptop, xpleft, xpright: integer;
   aPoint: TPoint;
 begin
+
+
 
     with Nemp_MainForm do
     begin
@@ -1098,9 +1108,22 @@ begin
   end;
 end;
 
+procedure OnBeforeHandleChange;
+begin
+  RevokeDragFiles;
+  FreeAndNil(Nemp_MainForm.NempTaskbarManager);
+end;
+
+procedure OnAfterHandleChange;
+begin
+  Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
+end;
+
+
 procedure RevokeDragFiles;
 begin
-  RevokeDragDrop(Nemp_MainForm.PlayerControlPanel.Handle);
+  //RevokeDragDrop(Nemp_MainForm.PlayerControlPanel.Handle);
+  RevokeDragDrop(Nemp_MainForm._ControlPanel.Handle);
   RevokeDragDrop(Nemp_MainForm.TreePanel.Handle);
   RevokeDragDrop(Nemp_MainForm.CloudPanel.Handle);
   RevokeDragDrop(Nemp_MainForm.CoverflowPanel.Handle);

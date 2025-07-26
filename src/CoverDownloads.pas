@@ -38,7 +38,7 @@ uses
   Dialogs, StrUtils, ContNrs, Jpeg, PNGImage,  math, DateUtils,
   CoverHelper, ID3v2Tags, ID3v2Frames, NempAudioFiles, cddaUtils,
   Nemp_ConstantsAndTypes, SyncObjs, System.Types,
-  LibraryOrganizer.Base, LibraryOrganizer.Files,
+  LibraryOrganizer.Base, LibraryOrganizer.Files, dmGui,
   // new method for downloading stuff
   System.Net.URLClient, System.Net.HttpClient;
 
@@ -1194,9 +1194,8 @@ begin
 end;
 
 procedure TCoverDownloadWorkerThread.SyncUpdateCover;
-var bmp: TBitmap;
-    // HintString: String;
-
+var
+  bmp: TBitmap;
 begin
     bmp := TBitmap.Create;
     try
@@ -1238,40 +1237,14 @@ end;
 
 
 procedure TCoverDownloadWorkerThread.AddLogoToBitmap(aLogo: String; Target: TBitmap);
-var logoPic: TPicture;
-    logoBmp: TBitmap;
-    filename: String;
-    SizeX, relevantCoverSize: Integer;
+var
+  SizeX: Integer;
 begin
-    // Add Icon to Image
-    filename := ExtractFilePath(ParamStr(0)) + 'Images\' + aLogo + '.png';
-    if not FileExists(filename) then
-      filename := ExtractFilePath(ParamStr(0)) + 'Images\' + aLogo + '.jpg';
-    if not FileExists(filename) then
-      filename := ExtractFilePath(ParamStr(0)) + 'Images\' + aLogo + '.bmp';
-
-    relevantCoverSize := Target.width;
-    if Target.Height > relevantCoverSize then
-      relevantCoverSize := Target.Height;
-    SizeX := relevantCoverSize Div 10;
-
-    if FileExists(filename) then
-    begin
-        logoPic := TPicture.Create;
-        logoBmp := TBitmap.Create;
-        try
-            logoPic.LoadFromFile(filename);
-            logoBmp.Assign(logoPic.Graphic);
-            StretchBlt(Target.Canvas.Handle,
-                  Target.Width - SizeX, 0, SizeX, SizeX,
-                  logoBmp.Canvas.Handle,
-                  0, 0, logoBmp.Width, logoBmp.Height,
-                  SRCCopy);
-        finally
-            logoBmp.Free;
-            logoPic.Free;
-        end;
-    end;
+  SizeX := max(Target.Width, Target.Height) Div 10;
+  DataModuleGui.ICGraphics.Draw(
+      Target.Canvas,
+      Rect(Target.Width - SizeX, 0, Target.Width, SizeX),
+      aLogo);
 end;
 
 
@@ -1325,7 +1298,6 @@ procedure TCoverDownloadWorkerThread.SyncUpdateMedialib;
 begin
     if FileExists(fNewCoverFilename) then begin
       fCurrentDownloadItem.newFilename := fNewCoverFilename;
-
       if assigned(fOnDownloadSaved) then
         fOnDownloadSaved(fCurrentDownloadItem);
     end;

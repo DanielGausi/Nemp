@@ -131,7 +131,7 @@ type
 
 implementation
 
-uses NempMainUnit, MedienbibliothekClass, PlaylistClass, MainFormHelper, TreeHelper, OptionsComplete;
+uses NempMainUnit, MedienbibliothekClass, PlaylistClass, MainFormHelper, TreeHelper, OptionsComplete, Nemp_SkinSystem;
 
 
 { TNempPartyMode }
@@ -617,14 +617,14 @@ begin
         NempPlaylist.ReInitPlaylist;
 
         // Load correctly scaled graphics
-        if Nemp_MainForm.NempSkin.isActive then
+        if NempSkin.isActive then
         begin
-            Nemp_MainForm.NempSkin.Reload;
-            Nemp_MainForm.NempSkin.ActivateSkin
+            NempSkin.Reload;
+            NempSkin.ActivateSkin
         end
         else
             // Star-Graphics must be reloaded!
-            Nemp_MainForm.NempSkin.DeActivateSkin;
+            NempSkin.DeActivateSkin;
 
         // SKIN_UMBAU_CHECK // SKIN_UMBAU_CHECK
         //if fActive then

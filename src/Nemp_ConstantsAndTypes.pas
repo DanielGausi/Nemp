@@ -525,7 +525,7 @@ const
     WM_PlayerPlay = WM_USER + 509;
     WM_PlayerAcceptInput = WM_User + 510;
 
-    WM_ActualizePlayPauseBtn = WM_USER + 511;
+    // WM_ActualizePlayPauseBtn = WM_USER + 511;
     WM_PlayerStopRecord = WM_User + 512;
 
     // Wird von den SetEndSyncs gesendet, mit Zusatzparameter, ob am Ende neue Datei gespielt wird, oder gestoppt wird.

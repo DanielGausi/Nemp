@@ -2,10 +2,10 @@ object FormHeadsetControl: TFormHeadsetControl
   Left = 0
   Top = 0
   Caption = 'Nemp: Headset control'
-  ClientHeight = 149
+  ClientHeight = 150
   ClientWidth = 418
   Color = clBtnFace
-  Constraints.MaxHeight = 188
+  Constraints.MaxHeight = 192
   Constraints.MinHeight = 188
   Constraints.MinWidth = 400
   Font.Charset = DEFAULT_CHARSET
@@ -17,15 +17,17 @@ object FormHeadsetControl: TFormHeadsetControl
   OnAfterMonitorDpiChanged = FormAfterMonitorDpiChanged
   OnClose = FormClose
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   TextHeight = 15
   object pnlBars: TPanel
     Left = 0
-    Top = 117
+    Top = 118
     Width = 418
     Height = 32
     Align = alBottom
     TabOrder = 0
+    ExplicitTop = 121
     object HeadsetTimeLbl: TLabel
       AlignWithMargins = True
       Left = 9
@@ -44,11 +46,30 @@ object FormHeadsetControl: TFormHeadsetControl
       ExplicitTop = 0
       ExplicitHeight = 48
     end
+    object viVolume: TVirtualImage
+      AlignWithMargins = True
+      Left = 296
+      Top = 7
+      Width = 16
+      Height = 18
+      Margins.Left = 0
+      Margins.Top = 6
+      Margins.Right = 4
+      Margins.Bottom = 6
+      Align = alRight
+      ImageCollection = DataModuleGui.ICIcons
+      ImageWidth = 0
+      ImageHeight = 0
+      ImageIndex = 66
+      ImageName = 'BtnVolumeHigh'
+      OnClick = BtnMuteClick
+      ExplicitTop = 6
+    end
     object rbHeadsetTrack: TProgressRangeBar
       AlignWithMargins = True
       Left = 43
       Top = 7
-      Width = 245
+      Width = 253
       Height = 18
       Margins.Left = 0
       Margins.Top = 6
@@ -138,21 +159,6 @@ object FormHeadsetControl: TFormHeadsetControl
       RangeBar.VisibleMode = vAlways
       RangeBar.Thickness = 4
       Align = alClient
-    end
-    object BtnMute: TSkinButton
-      AlignWithMargins = True
-      Left = 292
-      Top = 4
-      Width = 24
-      Height = 24
-      Margins.Left = 4
-      Margins.Right = 0
-      Align = alRight
-      DoubleBuffered = True
-      DrawMode = dm_Windows
-      ParentDoubleBuffered = False
-      TabOrder = 1
-      Caption = 'SkinButton1'
     end
     object rbVolume: TProgressRangeBar
       AlignWithMargins = True
@@ -253,19 +259,20 @@ object FormHeadsetControl: TFormHeadsetControl
     Left = 0
     Top = 0
     Width = 418
-    Height = 117
+    Height = 118
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
     Margins.Bottom = 0
     Align = alClient
     TabOrder = 1
+    ExplicitHeight = 121
     object imgCover: TImage
       AlignWithMargins = True
       Left = 9
       Top = 9
-      Width = 99
-      Height = 99
+      Width = 100
+      Height = 100
       Margins.Left = 8
       Margins.Top = 8
       Margins.Right = 8
@@ -275,20 +282,23 @@ object FormHeadsetControl: TFormHeadsetControl
       Stretch = True
       OnMouseDown = imgCoverMouseDown
       OnMouseMove = imgCoverMouseMove
+      ExplicitLeft = 6
+      ExplicitTop = 10
     end
     object pnlInfo: TPanel
-      Left = 116
+      Left = 117
       Top = 1
-      Width = 301
-      Height = 115
+      Width = 300
+      Height = 116
       Align = alClient
       BevelOuter = bvNone
       DoubleBuffered = True
       ParentDoubleBuffered = False
       TabOrder = 0
       OnMouseDown = pnlInfoMouseDown
-      ExplicitLeft = 117
-      ExplicitWidth = 300
+      ExplicitLeft = 116
+      ExplicitWidth = 301
+      ExplicitHeight = 119
       object PlayerTitleLabel: TLabel
         Left = 8
         Top = 28
@@ -312,68 +322,130 @@ object FormHeadsetControl: TFormHeadsetControl
         ShowAccelChar = False
       end
       object BtnHeadsetPlaynow: TSkinButton
-        Left = 99
-        Top = 75
-        Width = 32
-        Height = 32
+        Left = 110
+        Top = 72
+        Width = 36
+        Height = 36
         Hint = 'Add file to playlist and begin playback from current position'
         DoubleBuffered = True
         DrawMode = dm_Windows
+        Images = viPlayerButtons
         ParentDoubleBuffered = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 0
         OnClick = BtnHeadsetPlaynowClick
+        ImageIndex = 20
+        ImageName = 'HeadSetPlayNext'
+        BackgroundIndex = 0
+        BackgroundIndexHighlight = 1
+        BackgroundIndexPressed = 2
+        BackgroundIndexDisabled = 3
+        BackgroundName = 'BtnBGNormal'
+        BackgroundNameHighlight = 'BtnBGHighlight'
+        BackgroundNamePressed = 'BtnBGDown'
+        BackgroundNameDisabled = 'BtnBGDisabled'
       end
       object BtnHeadsetToPlaylist: TSkinButton
-        Left = 137
-        Top = 75
-        Width = 32
-        Height = 32
+        Left = 152
+        Top = 72
+        Width = 36
+        Height = 36
         Hint = 'Add current file to playlist (Right click for options)'
         DoubleBuffered = True
         DrawMode = dm_Windows
+        Images = viPlayerButtons
         ParentDoubleBuffered = False
+        ParentShowHint = False
         PopupMenu = PopupHeadset
+        ShowHint = True
         TabOrder = 1
         OnClick = BtnHeadsetToPlaylistClick
+        ImageIndex = 19
+        ImageName = 'HeadSetAdd'
+        BackgroundIndex = 0
+        BackgroundIndexHighlight = 1
+        BackgroundIndexPressed = 2
+        BackgroundIndexDisabled = 3
+        BackgroundName = 'BtnBGNormal'
+        BackgroundNameHighlight = 'BtnBGHighlight'
+        BackgroundNamePressed = 'BtnBGDown'
+        BackgroundNameDisabled = 'BtnBGDisabled'
       end
       object BtnLoadHeadset: TSkinButton
-        Left = 193
-        Top = 75
-        Width = 32
-        Height = 32
+        Left = 204
+        Top = 72
+        Width = 36
+        Height = 36
         Hint = 'Load selected file into headset (Ctrl+H)'
         DoubleBuffered = True
         DrawMode = dm_Windows
+        Images = viPlayerButtons
         ParentDoubleBuffered = False
         TabOrder = 2
         Visible = False
+        BackgroundIndex = 0
+        BackgroundIndexHighlight = 1
+        BackgroundIndexPressed = 2
+        BackgroundIndexDisabled = 3
+        BackgroundName = 'BtnBGNormal'
+        BackgroundNameHighlight = 'BtnBGHighlight'
+        BackgroundNamePressed = 'BtnBGDown'
+        BackgroundNameDisabled = 'BtnBGDisabled'
       end
       object PlayPauseHeadSetBtn: TSkinButton
         Left = 8
-        Top = 75
-        Width = 32
-        Height = 32
+        Top = 72
+        Width = 36
+        Height = 36
+        Hint = 'Play/Pause'
         DoubleBuffered = True
         DrawMode = dm_Windows
+        Images = viPlayerButtons
         ParentDoubleBuffered = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 3
         OnClick = PlayPauseHeadSetBtnClick
+        ImageIndex = 6
+        ImageName = 'PlayerPlay'
+        BackgroundIndex = 0
+        BackgroundIndexHighlight = 1
+        BackgroundIndexPressed = 2
+        BackgroundIndexDisabled = 3
+        BackgroundName = 'BtnBGNormal'
+        BackgroundNameHighlight = 'BtnBGHighlight'
+        BackgroundNamePressed = 'BtnBGDown'
+        BackgroundNameDisabled = 'BtnBGDisabled'
       end
       object StopHeadSetBtn: TSkinButton
-        Left = 46
-        Top = 75
-        Width = 32
-        Height = 32
+        Left = 50
+        Top = 72
+        Width = 36
+        Height = 36
+        Hint = 'Stop'
         DoubleBuffered = True
         DrawMode = dm_Windows
-        Images = vilIcons
+        Images = viPlayerButtons
         ParentDoubleBuffered = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 4
         OnClick = StopHeadSetBtnClick
+        ImageIndex = 17
+        ImageName = 'PlayerStop'
+        BackgroundIndex = 0
+        BackgroundIndexHighlight = 1
+        BackgroundIndexPressed = 2
+        BackgroundIndexDisabled = 3
+        BackgroundName = 'BtnBGNormal'
+        BackgroundNameHighlight = 'BtnBGHighlight'
+        BackgroundNamePressed = 'BtnBGDown'
+        BackgroundNameDisabled = 'BtnBGDisabled'
       end
       object BtnHeadsetRating: TRatingButton
         Left = 8
-        Top = 51
+        Top = 50
         Width = 80
         Height = 16
         DoubleBuffered = True
@@ -397,6 +469,7 @@ object FormHeadsetControl: TFormHeadsetControl
     end
   end
   object HeadsetTimer: TTimer
+    Enabled = False
     OnTimer = HeadsetTimerTimer
     Left = 32
     Top = 32
@@ -706,39 +779,80 @@ object FormHeadsetControl: TFormHeadsetControl
       end
       item
         CollectionIndex = 60
-        CollectionName = 'ToolBtnStream'
-        Name = 'ToolBtnStream'
-      end
-      item
-        CollectionIndex = 61
         CollectionName = 'ToolBtnWarning'
         Name = 'ToolBtnWarning'
       end
       item
-        CollectionIndex = 62
+        CollectionIndex = 61
         CollectionName = 'ToolBtnwinamp'
         Name = 'ToolBtnwinamp'
       end
       item
-        CollectionIndex = 63
+        CollectionIndex = 62
         CollectionName = 'SysBtnCloseForm'
         Name = 'SysBtnCloseForm'
       end
       item
-        CollectionIndex = 64
+        CollectionIndex = 63
         CollectionName = 'SysBtnCloseNemp'
         Name = 'SysBtnCloseNemp'
       end
       item
-        CollectionIndex = 65
+        CollectionIndex = 64
         CollectionName = 'SysBtnMinimize'
         Name = 'SysBtnMinimize'
+      end
+      item
+        CollectionIndex = 65
+        CollectionName = 'ToolBtnWebserver'
+        Name = 'ToolBtnWebserver'
+      end
+      item
+        CollectionIndex = 66
+        CollectionName = 'BtnVolumeHigh'
+        Name = 'BtnVolumeHigh'
+      end
+      item
+        CollectionIndex = 67
+        CollectionName = 'BtnVolumeLow'
+        Name = 'BtnVolumeLow'
+      end
+      item
+        CollectionIndex = 68
+        CollectionName = 'BtnVolumeMute'
+        Name = 'BtnVolumeMute'
+      end
+      item
+        CollectionIndex = 69
+        CollectionName = 'MenuPlayNext'
+        Name = 'MenuPlayNext'
+      end
+      item
+        CollectionIndex = 70
+        CollectionName = 'MenuPlayPrev'
+        Name = 'MenuPlayPrev'
+      end
+      item
+        CollectionIndex = 71
+        CollectionName = 'MenuCancel'
+        Name = 'MenuCancel'
+      end
+      item
+        CollectionIndex = 72
+        CollectionName = 'TreeCleanChecked'
+        Name = 'TreeCleanChecked'
+      end
+      item
+        CollectionIndex = 73
+        CollectionName = 'TreeCleanUnchecked'
+        Name = 'TreeCleanUnchecked'
       end>
     ImageCollection = DataModuleGui.ICIcons
     Left = 217
     Top = 17
   end
   object PopupHeadset: TPopupMenu
+    OnPopup = PopupHeadsetPopup
     Left = 315
     Top = 18
     object PM_H_EnqueueEndOfPlaylist: TMenuItem
@@ -760,5 +874,119 @@ object FormHeadsetControl: TFormHeadsetControl
       Caption = 'Just play the track (don'#39't change the playlist)'
       OnClick = InsertHeadsetToPlaylistClick
     end
+  end
+  object viPlayerButtons: TVirtualImageList
+    AutoFill = True
+    Images = <
+      item
+        CollectionIndex = 0
+        CollectionName = 'BtnBGNormal'
+        Name = 'BtnBGNormal'
+      end
+      item
+        CollectionIndex = 1
+        CollectionName = 'BtnBGHighlight'
+        Name = 'BtnBGHighlight'
+      end
+      item
+        CollectionIndex = 2
+        CollectionName = 'BtnBGDown'
+        Name = 'BtnBGDown'
+      end
+      item
+        CollectionIndex = 3
+        CollectionName = 'BtnBGDisabled'
+        Name = 'BtnBGDisabled'
+      end
+      item
+        CollectionIndex = 4
+        CollectionName = 'PlayerNext'
+        Name = 'PlayerNext'
+      end
+      item
+        CollectionIndex = 5
+        CollectionName = 'PlayerPause'
+        Name = 'PlayerPause'
+      end
+      item
+        CollectionIndex = 6
+        CollectionName = 'PlayerPlay'
+        Name = 'PlayerPlay'
+      end
+      item
+        CollectionIndex = 7
+        CollectionName = 'PlayerPlayReverse'
+        Name = 'PlayerPlayReverse'
+      end
+      item
+        CollectionIndex = 8
+        CollectionName = 'PlayerPrev'
+        Name = 'PlayerPrev'
+      end
+      item
+        CollectionIndex = 9
+        CollectionName = 'PlayerRecordOff'
+        Name = 'PlayerRecordOff'
+      end
+      item
+        CollectionIndex = 10
+        CollectionName = 'PlayerRecordOn'
+        Name = 'PlayerRecordOn'
+      end
+      item
+        CollectionIndex = 11
+        CollectionName = 'PlayerRepeatAll'
+        Name = 'PlayerRepeatAll'
+      end
+      item
+        CollectionIndex = 12
+        CollectionName = 'PlayerRepeatOff'
+        Name = 'PlayerRepeatOff'
+      end
+      item
+        CollectionIndex = 13
+        CollectionName = 'PlayerRepeatRandom'
+        Name = 'PlayerRepeatRandom'
+      end
+      item
+        CollectionIndex = 14
+        CollectionName = 'PlayerRepeatTitle'
+        Name = 'PlayerRepeatTitle'
+      end
+      item
+        CollectionIndex = 15
+        CollectionName = 'PlayerSlideBackward'
+        Name = 'PlayerSlideBackward'
+      end
+      item
+        CollectionIndex = 16
+        CollectionName = 'PlayerSlideForward'
+        Name = 'PlayerSlideForward'
+      end
+      item
+        CollectionIndex = 17
+        CollectionName = 'PlayerStop'
+        Name = 'PlayerStop'
+      end
+      item
+        CollectionIndex = 18
+        CollectionName = 'PlayerOverlayInfo'
+        Name = 'PlayerOverlayInfo'
+      end
+      item
+        CollectionIndex = 19
+        CollectionName = 'HeadSetAdd'
+        Name = 'HeadSetAdd'
+      end
+      item
+        CollectionIndex = 20
+        CollectionName = 'HeadSetPlayNext'
+        Name = 'HeadSetPlayNext'
+      end>
+    ImageCollection = DataModuleGui.ICPlayerButtons
+    Width = 36
+    Height = 36
+    Left = 350
+    Top = 73
   end
 end

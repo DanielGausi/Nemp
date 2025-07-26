@@ -19,14 +19,16 @@ object FDetails: TFDetails
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnHide = FormHide
+  OnShow = FormShow
   TextHeight = 13
   object MainPageControl: TPageControl
     AlignWithMargins = True
     Left = 3
-    Top = 3
+    Top = 8
     Width = 559
-    Height = 489
-    ActivePage = Tab_MetaData
+    Height = 487
+    Margins.Top = 8
+    ActivePage = Tab_General
     Align = alClient
     MultiLine = True
     TabOrder = 0
@@ -249,74 +251,24 @@ object FDetails: TFDetails
         object PnlWarnung: TPanel
           Left = 235
           Top = 101
-          Width = 208
+          Width = 203
           Height = 24
           BevelOuter = bvNone
           TabOrder = 0
-          object Image1: TImage
+          object ImageWarning: TVirtualImage
             Left = 0
             Top = 0
             Width = 24
             Height = 24
-            Picture.Data = {
-              07544269746D617076060000424D760600000000000036040000280000001800
-              000018000000010008000000000040020000C30E0000C30E0000000100000001
-              00000800000008080800310010004A08180031101800391821005A1821004A18
-              290063292900522131006B21310039314200843142001042420018394A001042
-              4A008C524A0031395200084252006B4A5200085252005A525200845252005A5A
-              5A00635A5A006B5A5A00845A5A008C5A5A00635A6300845A63005A6363008463
-              6300946363008C6B6B00A56B6B00086B7300426B730094737300396B7B009C7B
-              7B00A57B7B00AD848400187B9400188C9C00298C9C0029949C002994A500B5A5
-              A500218CAD00089CAD0021A5AD0021ADAD009CA5B5007BB5B500089CBD00219C
-              BD0021B5BD00089CC60008BDC60010A5CE0018B5CE0008BDD60000B5DE0008B5
-              DE0010B5DE0008DEDE0000BDE70008BDE70000C6E70008C6E70018C6E70008CE
-              E70052CEE70000D6E70000DEE70018E7E70000BDEF0000C6EF0000CEEF0000D6
-              EF0018D6EF0000DEEF0008DEEF0063DEEF0000E7EF0008E7EF0010E7EF004AE7
-              EF0063E7EF0000EFEF004AEFEF0000C6F70000CEF7006BDEF70000E7F70094E7
-              F7009CE7F70000EFF70008F7F70010F7F700FF00FF0000D6FF0000DEFF0008DE
-              FF0000E7FF0008E7FF0000EFFF0008EFFF0010EFFF0000F7FF0008F7FF0010F7
-              FF0018F7FF0000FFFF0008FFFF0010FFFF0018FFFF0031FFFF0052FFFF00FFFF
-              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-              FF006464646464646464646464646464646464646464646464646464642F1F1A
-              1D1D1D1D1D1D1D1D1D1D1D1D1D1D161B64646464483B36363636363636393636
-              36363636363930081B6464483F3E42424242424D3F37404C4242424242425B26
-              10646453434D655C5C5C654E0F073446655C5C5C655C5C2429646464464D6765
-              656565440104093C656565656C65431364646464534467676565654F12000E47
-              656565676C5C2C276464646464464E69666565665E495E666565667067451C64
-              64646464645D4E6769666666662A666666666970662E2964646464646464504F
-              6C666666490B4F68666670674F1964646464646464645344676966683A063D6A
-              666C6C662C28646464646464646464474F6B686A310C2B6A686F694715646464
-              6464646464646453496B6B61230A26616B70682D286464646464646464646464
-              505E6E540F0311496F6C5418646464646464646464646464585162410102053A
-              706A322264646464646464646464646464526141000204386E52176464646464
-              64646464646464646457515514010D4B6D332164646464646464646464646464
-              646456616E4A746E551E6464646464646464646464646464646458546E72746D
-              382064646464646464646464646464646464644B627573611E64646464646464
-              64646464646464646464645A5975713825646464646464646464646464646464
-              64646464636E6335646464646464646464646464646464646464646453765364
-              6464646464646464646464646464646464646464645364646464646464646464
-              6464}
-            Transparent = True
+            ImageCollection = DataModuleGui.ICIcons
+            ImageWidth = 0
+            ImageHeight = 0
+            ImageIndex = 33
+            ImageName = 'MenuWarning'
           end
           object Lbl_Warnings: TLabel
             Left = 30
-            Top = 0
+            Top = -3
             Width = 170
             Height = 24
             AutoSize = False
@@ -337,7 +289,7 @@ object FDetails: TFDetails
         Left = 0
         Top = 145
         Width = 551
-        Height = 316
+        Height = 314
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
@@ -345,7 +297,7 @@ object FDetails: TFDetails
           Left = 0
           Top = 0
           Width = 551
-          Height = 316
+          Height = 314
           Align = alClient
           Caption = 'Metadata overview'
           DoubleBuffered = False
@@ -355,13 +307,13 @@ object FDetails: TFDetails
             Left = 409
             Top = 15
             Width = 140
-            Height = 299
+            Height = 297
             Align = alClient
             BevelOuter = bvNone
             TabOrder = 1
             DesignSize = (
               140
-              299)
+              297)
             object lblExtendedTags: TLabel
               Left = 6
               Top = 8
@@ -383,7 +335,7 @@ object FDetails: TFDetails
               Left = 6
               Top = 27
               Width = 111
-              Height = 256
+              Height = 254
               Anchors = [akLeft, akTop, akRight, akBottom]
               ItemHeight = 13
               PopupMenu = PM_EditExtendedTags
@@ -395,9 +347,11 @@ object FDetails: TFDetails
             Left = 2
             Top = 15
             Width = 407
-            Height = 299
+            Height = 297
             Align = alLeft
             BevelOuter = bvNone
+            DoubleBuffered = True
+            ParentDoubleBuffered = False
             TabOrder = 0
             object lblAlbumArtist: TLabel
               Left = 14
@@ -717,12 +671,14 @@ object FDetails: TFDetails
               OnExit = Edit_LibraryExit
             end
             object Btn_LibraryRating: TRatingButton
-              Left = 96
-              Top = 222
+              Left = 94
+              Top = 220
               Width = 80
               Height = 16
               DoubleBuffered = True
+              DoubleBufferedMode = dbmRequested
               DrawMode = dm_Windows
+              Images = vilIcons
               ParentDoubleBuffered = False
               TabOrder = 10
               TransparentBackground = True
@@ -733,6 +689,9 @@ object FDetails: TFDetails
               StarFullImageIndex = 29
               StarHalfImageIndex = 30
               StarEmptyImageIndex = 28
+              StarFullImageName = 'MenuStarFull'
+              StarHalfImageName = 'MenuStarHalf'
+              StarEmptyImageName = 'MenuStarEmpty'
             end
           end
         end
@@ -745,7 +704,7 @@ object FDetails: TFDetails
         Left = 0
         Top = 0
         Width = 551
-        Height = 461
+        Height = 459
         Align = alClient
         Caption = 'Lyrics'
         TabOrder = 0
@@ -754,7 +713,7 @@ object FDetails: TFDetails
           Left = 5
           Top = 18
           Width = 541
-          Height = 399
+          Height = 397
           Align = alClient
           ScrollBars = ssVertical
           TabOrder = 0
@@ -765,7 +724,7 @@ object FDetails: TFDetails
         object pnlSearchLyrics: TPanel
           AlignWithMargins = True
           Left = 5
-          Top = 423
+          Top = 421
           Width = 541
           Height = 33
           Align = alBottom
@@ -818,7 +777,7 @@ object FDetails: TFDetails
         Left = 3
         Top = 3
         Width = 301
-        Height = 455
+        Height = 453
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
@@ -826,26 +785,35 @@ object FDetails: TFDetails
           Left = 0
           Top = 0
           Width = 301
-          Height = 455
+          Height = 453
           Align = alClient
           Caption = 'Cover art (meta data and image files)'
           TabOrder = 0
-          DesignSize = (
-            301
-            455)
           object lblCoverInfo: TLabel
-            Left = 16
+            AlignWithMargins = True
+            Left = 10
             Top = 430
-            Width = 12
+            Width = 281
             Height = 13
+            Margins.Left = 8
+            Margins.Top = 8
+            Margins.Right = 8
+            Margins.Bottom = 8
+            Align = alBottom
             Caption = '...'
+            ExplicitWidth = 12
           end
           object VSTCover: TVirtualStringTree
-            Left = 16
-            Top = 7
-            Width = 255
-            Height = 94
-            Anchors = [akLeft, akRight, akBottom]
+            AlignWithMargins = True
+            Left = 10
+            Top = 23
+            Width = 281
+            Height = 102
+            Margins.Left = 8
+            Margins.Top = 8
+            Margins.Right = 8
+            Margins.Bottom = 8
+            Align = alClient
             Colors.UnfocusedSelectionColor = clHighlight
             Colors.UnfocusedSelectionBorderColor = clHighlight
             Header.AutoSizeIndex = 0
@@ -865,22 +833,28 @@ object FDetails: TFDetails
             Columns = <
               item
                 Position = 0
-                Width = 251
+                Width = 277
               end>
           end
           object pnlCoverCurrentSelection: TPanel
-            Left = 16
-            Top = 124
-            Width = 323
-            Height = 300
+            AlignWithMargins = True
+            Left = 10
+            Top = 141
+            Width = 281
+            Height = 281
+            Margins.Left = 8
+            Margins.Top = 8
+            Margins.Right = 8
+            Margins.Bottom = 0
+            Align = alBottom
             BevelKind = bkFlat
             BevelOuter = bvNone
             TabOrder = 1
             object ImgCurrentSelection: TImage
               Left = 0
               Top = 0
-              Width = 319
-              Height = 296
+              Width = 277
+              Height = 277
               Align = alClient
               Center = True
               Proportional = True
@@ -899,13 +873,13 @@ object FDetails: TFDetails
         Left = 310
         Top = 3
         Width = 238
-        Height = 455
+        Height = 453
         Align = alRight
         Caption = 'Cover art for the Media library'
         TabOrder = 1
         DesignSize = (
           238
-          455)
+          453)
         object CoverLibrary2: TImage
           AlignWithMargins = True
           Left = 19
@@ -951,7 +925,7 @@ object FDetails: TFDetails
         Left = 0
         Top = 0
         Width = 551
-        Height = 272
+        Height = 270
         Align = alClient
         Caption = 'Metadata frames'
         TabOrder = 0
@@ -959,7 +933,7 @@ object FDetails: TFDetails
           Left = 2
           Top = 15
           Width = 547
-          Height = 255
+          Height = 253
           Align = alClient
           BorderStyle = bsNone
           BorderWidth = 1
@@ -1008,7 +982,7 @@ object FDetails: TFDetails
       end
       object Pnl_ID3v1_MPEG: TPanel
         Left = 0
-        Top = 272
+        Top = 270
         Width = 551
         Height = 189
         Align = alBottom
@@ -1509,69 +1483,96 @@ object FDetails: TFDetails
   end
   object pnlButtons: TPanel
     AlignWithMargins = True
-    Left = 3
+    Left = 8
     Top = 498
-    Width = 559
-    Height = 30
+    Width = 549
+    Height = 33
+    Margins.Left = 8
+    Margins.Top = 0
+    Margins.Right = 8
+    Margins.Bottom = 0
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
-    DesignSize = (
-      559
-      30)
     object Btn_Close: TButton
-      Left = 290
-      Top = 0
+      AlignWithMargins = True
+      Left = 300
+      Top = 4
       Width = 75
       Height = 25
-      Anchors = [akTop, akRight]
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
+      Align = alRight
       Cancel = True
       Caption = 'Cancel'
       TabOrder = 0
       OnClick = Btn_CloseClick
     end
     object BtnUndo: TButton
-      Left = 371
-      Top = 0
+      AlignWithMargins = True
+      Left = 383
+      Top = 4
       Width = 75
       Height = 25
-      Anchors = [akTop, akRight]
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
+      Align = alRight
       Caption = 'Undo'
       TabOrder = 1
       OnClick = BtnUndoClick
     end
     object BtnApply: TButton
-      Left = 452
-      Top = 0
+      AlignWithMargins = True
+      Left = 466
+      Top = 4
       Width = 75
       Height = 25
-      Anchors = [akTop, akRight]
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 8
+      Margins.Bottom = 4
+      Align = alRight
       Caption = 'Apply'
       TabOrder = 2
       OnClick = BtnApplyClick
     end
+    object cbQuickRefresh: TCheckBox
+      AlignWithMargins = True
+      Left = 8
+      Top = 4
+      Width = 167
+      Height = 25
+      Hint = 
+        'Refresh this form whenever you select another file in the main w' +
+        'indow.'
+      Margins.Left = 8
+      Margins.Top = 4
+      Margins.Right = 0
+      Margins.Bottom = 4
+      Align = alLeft
+      Caption = 'Quick refresh'
+      TabOrder = 4
+      OnClick = cbQuickRefreshClick
+    end
     object BtnRefreshCoverflow: TButton
-      Left = 117
-      Top = 0
+      AlignWithMargins = True
+      Left = 135
+      Top = 4
       Width = 157
       Height = 25
-      Anchors = [akTop, akRight]
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
+      Align = alRight
       Caption = 'Refresh Coverflow'
       TabOrder = 3
       Visible = False
       OnClick = BtnRefreshCoverflowClick
-    end
-    object cbQuickRefresh: TCheckBox
-      Left = 12
-      Top = 0
-      Width = 167
-      Height = 17
-      Hint = 
-        'Refresh this form whenever you select another file in the main w' +
-        'indow.'
-      Caption = 'Quick refresh'
-      TabOrder = 4
-      OnClick = cbQuickRefreshClick
     end
   end
   object PM_URLCopy: TPopupMenu
@@ -2031,5 +2032,382 @@ object FDetails: TFDetails
     object Refresh1: TMenuItem
       Action = ActionRefreshFile
     end
+  end
+  object vilIcons: TVirtualImageList
+    AutoFill = True
+    Images = <
+      item
+        CollectionIndex = 0
+        CollectionName = 'MenuInfo'
+        Name = 'MenuInfo'
+      end
+      item
+        CollectionIndex = 1
+        CollectionName = 'MenuAddFolder'
+        Name = 'MenuAddFolder'
+      end
+      item
+        CollectionIndex = 2
+        CollectionName = 'MenuBirthday'
+        Name = 'MenuBirthday'
+      end
+      item
+        CollectionIndex = 3
+        CollectionName = 'MenuCleanUp'
+        Name = 'MenuCleanUp'
+      end
+      item
+        CollectionIndex = 4
+        CollectionName = 'MenuCloseNemp'
+        Name = 'MenuCloseNemp'
+      end
+      item
+        CollectionIndex = 5
+        CollectionName = 'MenuConfigureLibrary'
+        Name = 'MenuConfigureLibrary'
+      end
+      item
+        CollectionIndex = 6
+        CollectionName = 'MenuDelete'
+        Name = 'MenuDelete'
+      end
+      item
+        CollectionIndex = 7
+        CollectionName = 'MenuEffects'
+        Name = 'MenuEffects'
+      end
+      item
+        CollectionIndex = 8
+        CollectionName = 'MenuHeadphones'
+        Name = 'MenuHeadphones'
+      end
+      item
+        CollectionIndex = 9
+        CollectionName = 'MenuHelp'
+        Name = 'MenuHelp'
+      end
+      item
+        CollectionIndex = 10
+        CollectionName = 'MenuKeyboard'
+        Name = 'MenuKeyboard'
+      end
+      item
+        CollectionIndex = 11
+        CollectionName = 'MenuLastFM'
+        Name = 'MenuLastFM'
+      end
+      item
+        CollectionIndex = 12
+        CollectionName = 'MenuMarkAll'
+        Name = 'MenuMarkAll'
+      end
+      item
+        CollectionIndex = 13
+        CollectionName = 'MenuMarkBlack'
+        Name = 'MenuMarkBlack'
+      end
+      item
+        CollectionIndex = 14
+        CollectionName = 'MenuMarkBlue'
+        Name = 'MenuMarkBlue'
+      end
+      item
+        CollectionIndex = 15
+        CollectionName = 'MenuMarkGreen'
+        Name = 'MenuMarkGreen'
+      end
+      item
+        CollectionIndex = 16
+        CollectionName = 'MenuMarkRed'
+        Name = 'MenuMarkRed'
+      end
+      item
+        CollectionIndex = 17
+        CollectionName = 'MenuNempLogo'
+        Name = 'MenuNempLogo'
+      end
+      item
+        CollectionIndex = 18
+        CollectionName = 'MenuOpen'
+        Name = 'MenuOpen'
+      end
+      item
+        CollectionIndex = 19
+        CollectionName = 'MenuPlay'
+        Name = 'MenuPlay'
+      end
+      item
+        CollectionIndex = 20
+        CollectionName = 'MenuRefresh'
+        Name = 'MenuRefresh'
+      end
+      item
+        CollectionIndex = 21
+        CollectionName = 'MenuReplayGain'
+        Name = 'MenuReplayGain'
+      end
+      item
+        CollectionIndex = 22
+        CollectionName = 'MenuSave'
+        Name = 'MenuSave'
+      end
+      item
+        CollectionIndex = 23
+        CollectionName = 'MenuSearch'
+        Name = 'MenuSearch'
+      end
+      item
+        CollectionIndex = 24
+        CollectionName = 'MenuSettings'
+        Name = 'MenuSettings'
+      end
+      item
+        CollectionIndex = 25
+        CollectionName = 'MenuShutdown'
+        Name = 'MenuShutdown'
+      end
+      item
+        CollectionIndex = 26
+        CollectionName = 'MenuSkins'
+        Name = 'MenuSkins'
+      end
+      item
+        CollectionIndex = 27
+        CollectionName = 'MenuSort'
+        Name = 'MenuSort'
+      end
+      item
+        CollectionIndex = 28
+        CollectionName = 'MenuStarEmpty'
+        Name = 'MenuStarEmpty'
+      end
+      item
+        CollectionIndex = 29
+        CollectionName = 'MenuStarFull'
+        Name = 'MenuStarFull'
+      end
+      item
+        CollectionIndex = 30
+        CollectionName = 'MenuStarHalf'
+        Name = 'MenuStarHalf'
+      end
+      item
+        CollectionIndex = 31
+        CollectionName = 'MenuStream'
+        Name = 'MenuStream'
+      end
+      item
+        CollectionIndex = 32
+        CollectionName = 'MenuTagCloud'
+        Name = 'MenuTagCloud'
+      end
+      item
+        CollectionIndex = 33
+        CollectionName = 'MenuWarning'
+        Name = 'MenuWarning'
+      end
+      item
+        CollectionIndex = 34
+        CollectionName = 'Menuwinamp'
+        Name = 'Menuwinamp'
+      end
+      item
+        CollectionIndex = 35
+        CollectionName = 'MenuWizard'
+        Name = 'MenuWizard'
+      end
+      item
+        CollectionIndex = 36
+        CollectionName = 'MenuAddMusic'
+        Name = 'MenuAddMusic'
+      end
+      item
+        CollectionIndex = 37
+        CollectionName = 'MenuCDDA'
+        Name = 'MenuCDDA'
+      end
+      item
+        CollectionIndex = 38
+        CollectionName = 'MenuAddToLibrary'
+        Name = 'MenuAddToLibrary'
+      end
+      item
+        CollectionIndex = 39
+        CollectionName = 'MenuUSB'
+        Name = 'MenuUSB'
+      end
+      item
+        CollectionIndex = 40
+        CollectionName = 'MenuFileMissing'
+        Name = 'MenuFileMissing'
+      end
+      item
+        CollectionIndex = 41
+        CollectionName = 'MenuInfoReplace'
+        Name = 'MenuInfoReplace'
+      end
+      item
+        CollectionIndex = 42
+        CollectionName = 'MenuOk'
+        Name = 'MenuOk'
+      end
+      item
+        CollectionIndex = 43
+        CollectionName = 'MenuPause'
+        Name = 'MenuPause'
+      end
+      item
+        CollectionIndex = 44
+        CollectionName = 'MenuReplayGainDisabled'
+        Name = 'MenuReplayGainDisabled'
+      end
+      item
+        CollectionIndex = 45
+        CollectionName = 'MenuStop'
+        Name = 'MenuStop'
+      end
+      item
+        CollectionIndex = 46
+        CollectionName = 'MenuTimer'
+        Name = 'MenuTimer'
+      end
+      item
+        CollectionIndex = 47
+        CollectionName = 'MenuWarningRed'
+        Name = 'MenuWarningRed'
+      end
+      item
+        CollectionIndex = 48
+        CollectionName = 'MenuNempUpdate'
+        Name = 'MenuNempUpdate'
+      end
+      item
+        CollectionIndex = 49
+        CollectionName = 'MenuEmpty'
+        Name = 'MenuEmpty'
+      end
+      item
+        CollectionIndex = 50
+        CollectionName = 'MenuTreeCollapse'
+        Name = 'MenuTreeCollapse'
+      end
+      item
+        CollectionIndex = 51
+        CollectionName = 'MenuTreeExpand'
+        Name = 'MenuTreeExpand'
+      end
+      item
+        CollectionIndex = 52
+        CollectionName = 'ToolBtnBGDisabled'
+        Name = 'ToolBtnBGDisabled'
+      end
+      item
+        CollectionIndex = 53
+        CollectionName = 'ToolBtnBGDown'
+        Name = 'ToolBtnBGDown'
+      end
+      item
+        CollectionIndex = 54
+        CollectionName = 'ToolBtnBGHighlight'
+        Name = 'ToolBtnBGHighlight'
+      end
+      item
+        CollectionIndex = 55
+        CollectionName = 'ToolBtnBGNormal'
+        Name = 'ToolBtnBGNormal'
+      end
+      item
+        CollectionIndex = 56
+        CollectionName = 'ToolBtnBirthday'
+        Name = 'ToolBtnBirthday'
+      end
+      item
+        CollectionIndex = 57
+        CollectionName = 'ToolBtnCloseNemp'
+        Name = 'ToolBtnCloseNemp'
+      end
+      item
+        CollectionIndex = 58
+        CollectionName = 'ToolBtnLastFM'
+        Name = 'ToolBtnLastFM'
+      end
+      item
+        CollectionIndex = 59
+        CollectionName = 'ToolBtnShutdown'
+        Name = 'ToolBtnShutdown'
+      end
+      item
+        CollectionIndex = 60
+        CollectionName = 'ToolBtnWarning'
+        Name = 'ToolBtnWarning'
+      end
+      item
+        CollectionIndex = 61
+        CollectionName = 'ToolBtnwinamp'
+        Name = 'ToolBtnwinamp'
+      end
+      item
+        CollectionIndex = 62
+        CollectionName = 'SysBtnCloseForm'
+        Name = 'SysBtnCloseForm'
+      end
+      item
+        CollectionIndex = 63
+        CollectionName = 'SysBtnCloseNemp'
+        Name = 'SysBtnCloseNemp'
+      end
+      item
+        CollectionIndex = 64
+        CollectionName = 'SysBtnMinimize'
+        Name = 'SysBtnMinimize'
+      end
+      item
+        CollectionIndex = 65
+        CollectionName = 'ToolBtnWebserver'
+        Name = 'ToolBtnWebserver'
+      end
+      item
+        CollectionIndex = 66
+        CollectionName = 'BtnVolumeHigh'
+        Name = 'BtnVolumeHigh'
+      end
+      item
+        CollectionIndex = 67
+        CollectionName = 'BtnVolumeLow'
+        Name = 'BtnVolumeLow'
+      end
+      item
+        CollectionIndex = 68
+        CollectionName = 'BtnVolumeMute'
+        Name = 'BtnVolumeMute'
+      end
+      item
+        CollectionIndex = 69
+        CollectionName = 'MenuPlayNext'
+        Name = 'MenuPlayNext'
+      end
+      item
+        CollectionIndex = 70
+        CollectionName = 'MenuPlayPrev'
+        Name = 'MenuPlayPrev'
+      end
+      item
+        CollectionIndex = 71
+        CollectionName = 'MenuCancel'
+        Name = 'MenuCancel'
+      end
+      item
+        CollectionIndex = 72
+        CollectionName = 'TreeCleanChecked'
+        Name = 'TreeCleanChecked'
+      end
+      item
+        CollectionIndex = 73
+        CollectionName = 'TreeCleanUnchecked'
+        Name = 'TreeCleanUnchecked'
+      end>
+    ImageCollection = DataModuleGui.ICIcons
+    Left = 337
+    Top = 193
   end
 end

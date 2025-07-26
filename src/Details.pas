@@ -51,7 +51,8 @@ uses
   CoverHelper, Buttons, ExtDlgs, ImgList,  Hilfsfunktionen, Systemhelper, HtmlHelper,
   Nemp_ConstantsAndTypes, gnuGettext, Lyrics, TagClouds, LibraryOrganizer.Base,
   Nemp_RessourceStrings, Menus, Spin, VirtualTrees, Vcl.Themes, vcl.styles,
-  System.ImageList, System.Actions, Vcl.ActnList, SkinButtons;
+  System.ImageList, System.Actions, Vcl.ActnList, SkinButtons,
+  Vcl.VirtualImageList, Vcl.VirtualImage;
 
 type
 
@@ -102,7 +103,7 @@ type
     Tab_Lyrics: TTabSheet;
     GrpBox_Lyrics: TGroupBox;
     PnlWarnung: TPanel;
-    Image1: TImage;
+    ImageWarning: TVirtualImage;
     Tab_Pictures: TTabSheet;
     PM_URLCopy: TPopupMenu;
     PM_CopyURLToClipboard: TMenuItem;
@@ -294,6 +295,7 @@ type
     Refresh1: TMenuItem;
     cbQuickRefresh: TCheckBox;
     Btn_LibraryRating: TRatingButton;
+    vilIcons: TVirtualImageList;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -393,6 +395,7 @@ type
     procedure edtID3v1Change(Sender: TObject);
     procedure Btn_LibraryRatingRatingChanged(Sender: TRatingButton;
       aRating: Integer);
+    procedure FormShow(Sender: TObject);
   protected
 
   private
@@ -479,10 +482,9 @@ type
     // for the TAudioFileManager
     procedure OnPrepareAudioFileChange(Sender: TObject);
     procedure OnAfterAudioFileChanged(Sender: TObject);
-    procedure SetRatingImageList(const Value: TCustomImageList);
+    procedure OnNempSkinChanged(Sender: TObject);
 
   public
-    property RatingImageList: TCustomImageList write SetRatingImageList;
 
     procedure AudioFileEdited(AudioFile: TAudioFile);
     procedure NewAudioFileSelected(AudioFile: TAudioFile; UserDoWantShow: Boolean);
@@ -496,7 +498,7 @@ var
 implementation
 
 Uses NempMainUnit, PlayerClass, PlaylistClass, NewPicture, Clipbrd, MedienbibliothekClass, MainFormHelper, TagHelper,
-    AudioFileHelper, CloudEditor, NewMetaFrame, MetaTagSorting, math, AudioDisplayUtils, AudioFileManagement;
+    AudioFileHelper, CloudEditor, NewMetaFrame, MetaTagSorting, math, AudioDisplayUtils, AudioFileManagement, Nemp_SkinSystem;
 
 {$R *.dfm}
 
@@ -690,6 +692,7 @@ begin
 
   TAudioFileManager.OnPrepareAudioFileChange.Add(OnPrepareAudioFileChange);
   TAudioFileManager.OnAudioFileChanged.Add(OnAfterAudioFileChanged);
+  NempSkin.OnSkinChanged.Add(OnNempSkinChanged);
 end;
 
 
@@ -703,6 +706,14 @@ begin
     fOriginalFileCopy.Free;
     fEditFile.Free;
     CoverArtSearcher.Free;
+    TAudioFileManager.OnPrepareAudioFileChange.Delete(OnPrepareAudioFileChange);
+    TAudioFileManager.OnAudioFileChanged.Delete(OnAfterAudioFileChanged);
+    NempSkin.OnSkinChanged.Delete(OnNempSkinChanged);
+end;
+
+procedure TFDetails.FormShow(Sender: TObject);
+begin
+  vilIcons.ImageCollection := NempSkin.DefaultIconCollection;
 end;
 
 procedure TFDetails.FormHide(Sender: TObject);
@@ -726,17 +737,15 @@ begin
 end;
 {$ENDREGION}
 
-procedure TFDetails.SetRatingImageList(const Value: TCustomImageList);
+procedure TFDetails.OnNempSkinChanged(Sender: TObject);
 begin
-  Btn_LibraryRating.Images := Value;
-  SetRatingImages(Btn_LibraryRating);
+  vilIcons.ImageCollection := NempSkin.DefaultIconCollection;
 end;
 
 procedure TFDetails.cbQuickRefreshClick(Sender: TObject);
 begin
   NempOptions.QuickRefreshDetails := cbQuickRefresh.Checked;
 end;
-
 
 procedure TFDetails.AudioFileEdited(AudioFile: TAudioFile);
 begin

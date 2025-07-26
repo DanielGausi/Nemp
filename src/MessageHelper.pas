@@ -68,7 +68,8 @@ uses NempMainUnit, Nemp_ConstantsAndTypes, NempAPI, Details,
     SearchTool, MMSystem, BibHelper, CloudEditor, SplitForm_Hilfsfunktionen,
     DeleteSelect, GnuGetText, MedienbibliothekClass, PlayerLog,
     PostProcessorUtils, ProgressUnit, EffectsAndEqualizer,
-    AudioDisplayUtils, System.Win.TaskbarCore, cddaUtils, AudioFileManagement;
+    AudioDisplayUtils, System.Win.TaskbarCore, cddaUtils, AudioFileManagement,
+    Nemp_SkinSystem;
 
 var NEMP_API_InfoString: Array[0..500] of AnsiChar;
     NEMP_API_InfoStringW: Array[0..500] of WideChar;
@@ -586,7 +587,7 @@ begin
                 LblEmptyLibraryHint.Caption := '';
 
             KeepOnWithLibraryProcess := False;
-            NempTaskbarManager.ProgressState := TTaskBarProgressState.None;
+            TBProgressState := TTaskBarProgressState.None;
 
             if NewDrivesNotificationCount > 0 then
                 HandleNewConnectedDrive;
@@ -650,11 +651,11 @@ begin
         end;
 
         MB_SetWin7TaskbarProgress: begin
-            NempTaskbarManager.ProgressState := TTaskBarProgressState(aMsg.LParam);
+            TBProgressState := TTaskBarProgressState(aMsg.LParam);
         end;
 
         MB_ProgressRefreshJustProgressbar: begin
-            NempTaskbarManager.ProgressValue := aMsg.LParam;
+            TBProgressValue := aMsg.LParam;
             // ProgressFormLibrary.SetProgress_Library(aMsg.LParam);
             ProgressFormLibrary.MainProgressBar.Position := aMsg.LParam;
         end;
@@ -1467,9 +1468,11 @@ begin
     end;
 end;
 
-procedure AssignTaskbarIcon(ButtonIndex, ImageIndex: Integer);
+(*procedure AssignTaskbarIcon(ButtonIndex, ImageIndex: Integer);
 var   aIcon: TIcon;
 begin
+  if not assigned(Nemp_MainForm.NemptaskbarManager) then
+    exit;
   aIcon := TIcon.Create;
   try
     Nemp_MainForm.TaskBarImages.GetIcon(ImageIndex, aIcon);
@@ -1478,7 +1481,7 @@ begin
   finally
     aIcon.Free;
   end;
-end;
+end;*)
 
 function GetFirstDrive(UnitMask: DWORD): Char;
 var
@@ -1691,13 +1694,11 @@ begin
 
     WM_ResetPlayerVCL: ReInitPlayerVCL(Boolean(Message.wParam));
 
-    WM_ActualizePlayPauseBtn: begin
+    (*WM_ActualizePlayPauseBtn: begin
                             case Message.LParam of
                                 0: begin
                                       case Message.WParam of
                                           NEMP_API_STOPPED, NEMP_API_PAUSED: begin
-                                                // SKIN_UMBAU_CHECK PlayPauseBTN.GlyphLine := 0;
-                                                //xxxNempTaskbarManager.ThumbButtons.Items[1].ImageIndex := 1;
                                                 PlayPauseBTN.ImageName := cBtnPlayerPlay;
                                                 AssignTaskbarIcon(1,1);
                                                 // PM_TNA_PlayPause.Caption := PlayerBtn_Play;
@@ -1706,8 +1707,6 @@ begin
 
 
                                           NEMP_API_PLAYING : begin
-                                            // SKIN_UMBAU_CHECK PlayPauseBTN.GlyphLine := 1;
-                                            //xxxNempTaskbarManager.ThumbButtons.Items[1].ImageIndex := 2;
                                             PlayPauseBTN.ImageName := cBtnPlayerPause;
                                             AssignTaskbarIcon(1,2);
                                             // PM_TNA_PlayPause.Caption := PlayerBtn_Pause;
@@ -1734,7 +1733,7 @@ begin
                                       end;
                                 end;
                             end;
-    end;
+    end;     *)
 
     //WM_NewMetaData
     WM_WebRadio: begin
@@ -1938,7 +1937,7 @@ var
   lastFilename: String;
 begin
   result := True;
-  if Nemp_MainForm.NempSkin.NempPartyMode.DoBlockBibOperations then
+  if NempSkin.NempPartyMode.DoBlockBibOperations then
   begin
       Nemp_MainForm.fDropManager.FinishDrag;
       exit;
@@ -2034,8 +2033,8 @@ begin
         ProgressFormLibrary.AutoClose := AutoCloseProgressForm;
         ProgressFormLibrary.InitiateProcess(True, pa_SearchFiles);
 
-        Nemp_MainForm.NempTaskbarManager.ProgressValue := 0;
-        Nemp_MainForm.NempTaskbarManager.ProgressState := TTaskBarProgressState.Indeterminate;
+        Nemp_MainForm.TBProgressValue := 0;
+        Nemp_MainForm.TBProgressState := TTaskBarProgressState.Indeterminate;
 
         ST_Medienliste.SearchFiles(MedienBib.ST_Ordnerlist[0]);
     end;
@@ -2141,7 +2140,7 @@ begin
                 end else
                 begin
                     NempPlaylist.Status := 0;
-                    NempTaskbarManager.ProgressState := TTaskBarProgressState.None;
+                    TBProgressState := TTaskBarProgressState.None;
 
                     if NempPlaylist.FileSearchCounter = 0 then
                       ProgressFormPlaylist.LblMain.Caption := Playlist_SearchingNewFilesCompleteNothingFound

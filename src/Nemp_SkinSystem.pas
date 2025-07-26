@@ -38,10 +38,10 @@ unit Nemp_SkinSystem;
 interface
 
 uses
-  Windows, Graphics, ExtCtrls, Controls, Types, Forms, dialogs, SysUtils, VirtualTrees,  StdCtrls,
+  Windows, Graphics, ExtCtrls, Controls, Types, Forms, dialogs, SysUtils, VirtualTrees,  StdCtrls, System.IOUtils,
   Vcl.Menus, System.Generics.Defaults, System.Generics.Collections, Vcl.ImgList, VCL.ImageCollection,
   iniFiles, jpeg, NempPanel, NempControls.Common, Classes, oneinst, SkinButtons, PNGImage, ProgressShape, MainFormLayout,
-  Nemp_ConstantsAndTypes, PartyModeClass{$IFDEF USESTYLES}, vcl.themes, vcl.styles, Vcl.CheckLst {$ENDIF};
+  Nemp_ConstantsAndTypes, BasicClasses, PartyModeClass{$IFDEF USESTYLES}, vcl.themes, vcl.styles, Vcl.CheckLst {$ENDIF};
 
 const MAX_MENUIMAGE_INDEX = 43;
       MAX_PLAYLIST_IMAGE_INDEX = 24;
@@ -56,8 +56,10 @@ const
   IconIDX_SkipBackward = 10;
 
 const
-  cScaleDirectories: Array[0..4] of String =
-    ('100', '125', '150', '175', '200');
+
+  cSubDirPlayerButtons = 'PlayerButtons';
+  cSubDirTabButtons    = 'TabButtons';
+  cSubDirIcons         = 'Icons';
 
 type
 
@@ -222,6 +224,7 @@ type
         fSkinMenuImages: TCustomImageList;
         fButtonMode: Integer;
         fTabButtonMode: Integer;
+        FOnSkinChanged: TEventList;
 
         procedure SetControlButtonLook;
         procedure SetTabButtonLook;
@@ -250,9 +253,7 @@ type
         procedure SetTreeColors(aTree: TVirtualStringTree; aTreeColors: TTreeColors);
 
         // New Graphic Methods
-        procedure SetImage(Dest, Backup: TImageCollection; ItemName: String; ItemIndex: Integer);
-        procedure PrepareSkinImagesCollection(aDefaultCollection, aSkinCollection: TImageCollection);
-
+        procedure PrepareSkinImagesCollection(aDefaultCollection, aSkinCollection: TImageCollection; SubDir: String);
 
         function GetPath: String;
 
@@ -261,6 +262,9 @@ type
 
         procedure SetButtonMode(const Value: Integer);
         procedure SetTabButtonMode(const Value: Integer);
+        function GetGlobalUseAdvancedSkin: Boolean;
+        procedure SetGlobalUseAdvancedSkin(const Value: Boolean);
+    function GetDefaultIconCollection: TImageCollection;
 
       public
         Name: UnicodeString;
@@ -334,6 +338,7 @@ type
         NempPartyMode: TNempPartyMode;
         FormLayout: TNempLayout;
 
+        property MainForm: TForm read fNempMainForm write fNempMainForm;
         // ButtonMode:
         // 0: Windows default (this includes the VCL stlye of the skin!), Nemp default icons
         // 1: Button itself as in Windows, icons from the skin files
@@ -349,6 +354,10 @@ type
         property VclMenuImages: TCustomImageList read fVclMenuImages write fVclMenuImages;
         property SkinMenuImages: TCustomImageList read fSkinMenuImages write fSkinMenuImages;
 
+        property DefaultIconCollection: TImageCollection read GetDefaultIconCollection;
+        property OnSkinChanged: TEventList read FOnSkinChanged;
+        property GlobalUseAdvancedSkin: Boolean read GetGlobalUseAdvancedSkin write SetGlobalUseAdvancedSkin;
+
         // (nbiDefault, nbiBrowse, nbiMedialist, nbiPlaylist, nbiDetails, nbiPlayerControls, nbiPlayerCover);
         property CompleteBitmap  : TGraphic index nbiDefault   read  GetBackgroundBitmapByIndex;
         property BrowseBitmap    : TGraphic index nbiBrowse    read  GetBackgroundBitmapByIndex;
@@ -363,7 +372,7 @@ type
 
         property Path: String read GetPath;
 
-        constructor create(aMainForm: TForm);
+        constructor Create; //(aMainForm: TForm);
         destructor Destroy;  override;         //Complete:: Für die Optionen-Vorschau. Da z.B. nicht die SkinButtons ändern
         procedure LoadFromDir(DirName: UnicodeString; Complete: Boolean = True);
         procedure Reload;
@@ -374,6 +383,7 @@ type
         procedure RepairSkinOffset;
         procedure RefreshTreeBackgrounds(aTree: TVirtualStringTree = Nil);
 
+        procedure RefreshVCLStyle(NotTheFirstActivation: Boolean = True);
         procedure SetMenuImages(aUseSkin: Boolean);
         procedure SetTreeImages(aUseSkin: Boolean);
         procedure SetVSTHeaderSettings;
@@ -398,6 +408,8 @@ type
 
   function GetSkinDirFromSkinName(aName: String): String;
 
+  function NempSkin: TNempSkin;
+
   {$IFDEF USESTYLES}
   // not used atm
   //procedure UnSkinForm(aForm: TForm);
@@ -408,10 +420,22 @@ const CustomColorNames : Array [0..15] of string = ('ColorA','ColorB','ColorC','
 
 implementation
 
-
 uses NempMainUnit, PlayerClass, Details, OptionsComplete, Hilfsfunktionen, System.StrUtils,
     SplitForm_Hilfsfunktionen, PlaylistUnit, AuswahlUnit, MedienlisteUnit, ExtendedControlsUnit,
     VSTEditControls, MedienBibliothekClass, TagClouds, Systemhelper, dmGUI;
+
+var
+  fNempSkin: TNempSkin;
+
+
+function NempSkin: TNempSkin;
+begin
+  if not assigned(fNempSkin) then
+    fNempSkin := TNempSkin.create;
+
+  Result := fNempSkin;
+end;
+
 
 function GetSkinDirFromSkinName(aName: String): String;
 begin
@@ -424,16 +448,17 @@ begin
   }
 end;
 
-constructor TNempSkin.create(aMainForm: TForm);
+constructor TNempSkin.Create; // (aMainForm: TForm);
 var
   iBackground: teNempBackroundImages;
 begin
   inherited create;
-  fNempMainForm := aMainForm;
+  fNempMainForm := Nil; // aMainForm;
   fPanelList := TPanelList.Create;
   fMenuList := TMenuList.Create;
   fControlButtonList := TSkinButtonList.Create;
   fTabButtonList := TSkinButtonList.Create;
+  FOnSkinChanged := TEventList.Create;
 
   for iBackground := Low(teNempBackroundImages) to High(teNempBackroundImages) do
     fNempBackgrounds[iBackground] := TPicture.Create;
@@ -450,6 +475,7 @@ destructor TNempSkin.Destroy;
 var
   iBackground: teNempBackroundImages;
 begin
+  FOnSkinChanged.Free;
   RegisteredStyles.Free;
   fPanelList.Free;
   fMenuList.Free;
@@ -464,7 +490,7 @@ end;
 
 procedure TNempSkin.Reload;
 begin
-    LoadFromDir(path);
+  LoadFromDir(path);
 end;
 
 procedure TNempSkin.LoadFromDir(DirName: UnicodeString; Complete: Boolean = True);
@@ -681,11 +707,11 @@ begin
   if Not Complete then exit;
 
 
-  PrepareSkinImagesCollection(DataModuleGui.ICIcons, DataModuleGui.ICSkinIcons);
-  SkinMenuImages.Change;
+  PrepareSkinImagesCollection(DataModuleGui.ICIcons, DataModuleGui.ICSkinIcons, cSubDirIcons);
+  //SkinMenuImages.Change;
 
   SetTreeImages(not UseDefaultListImages);
-  SetMenuImages((not UseDefaultMenuImages) and NempOptions.GlobalUseAdvancedSkin)
+  SetMenuImages((not UseDefaultMenuImages) and NempOptions.GlobalUseAdvancedSkin);
 end;
 
 procedure TNempSkin.SetMenuImages(aUseSkin: Boolean);
@@ -711,6 +737,60 @@ begin
   MainVST.Images     := aList;
 end;
 
+function TNempSkin.GetDefaultIconCollection: TImageCollection;
+begin
+  if IsActive and UseAdvancedSkin and GlobalUseAdvancedSkin then begin
+    // we have a skin active, that also affects other forms
+    Result := DataModuleGui.ICSkinIcons;
+  end else begin
+    // the skin does NOT affects other forms
+    Result := DataModuleGui.ICIcons;
+  end;
+end;
+
+procedure TNempSkin.SetGlobalUseAdvancedSkin(const Value: Boolean);
+begin
+    NempOptions.GlobalUseAdvancedSkin := Value;
+
+    if not NempOptions.GlobalUseAdvancedSkin then begin
+      // deactivate VCL Style immediately
+        OnBeforeHandleChange;
+        TStyleManager.TrySetStyle('Windows');
+        OnAfterHandleChange;
+
+        if IsActive then begin
+          if not UseDefaultMenuImages then
+            SetMenuImages(False);
+          SetVSTHeaderSettings;
+        end;
+    end else
+    begin
+      // refresh skin, if a skin is used, and it supports advanced skinning
+      if IsActive and UseAdvancedSkin then begin
+        LoadFromDir(fPath);
+        ActivateSkin;
+      end;
+    end;
+
+    OnSkinChanged.Fire(self);
+end;
+
+procedure TNempSkin.RefreshVCLStyle(NotTheFirstActivation: Boolean = True);
+begin
+  {$IFDEF USESTYLES}
+  if IsActive and UseAdvancedSkin and NempOptions.GlobalUseAdvancedSkin then begin
+    OnBeforeHandleChange;
+    TStylemanager.TrySetStyle(AdvancedStyleName);
+    OnAfterhandleChange;
+  end else begin
+    if NotTheFirstActivation then
+      OnBeforeHandleChange;
+    TStyleManager.TrySetStyle('Windows');
+    if NotTheFirstActivation then
+      OnAfterhandleChange;
+  end;
+  {$ENDIF}
+end;
 
 Procedure TNempSkin.FitSkinToNewWindow;
 begin
@@ -897,7 +977,7 @@ begin
       ControlButtonList[i].StyleElements := [seFont, seClient, seBorder];
     end;
   end else begin
-    PrepareSkinImagesCollection(DataModuleGui.ICPlayerButtons, DataModuleGui.ICSkinPlayerButtons);
+    PrepareSkinImagesCollection(DataModuleGui.ICPlayerButtons, DataModuleGui.ICSkinPlayerButtons, cSubDirPlayerButtons);
     Nemp_MainForm.viPlayerButtons.ImageCollection := DataModuleGui.ICSkinPlayerButtons;
 
     case ButtonMode of
@@ -930,7 +1010,7 @@ begin
       TabButtonList[i].StyleElements := [seFont, seClient, seBorder];
     end;
   end else begin
-    PrepareSkinImagesCollection(DataModuleGui.ICTabButtons, DataModuleGui.ICSkinTabButtons);
+    PrepareSkinImagesCollection(DataModuleGui.ICTabButtons, DataModuleGui.ICSkinTabButtons, cSubDirTabButtons);
     Nemp_MainForm.viTabButtons.ImageCollection := DataModuleGui.ICSkinTabButtons;
     case TabButtonMode of
       1: begin
@@ -958,7 +1038,6 @@ var
   i: integer;
 begin
   isActive := True;
-  RevokeDragFiles;
 
   //zunächst: Ownerdraw der Boxen/Panels setzen
   for i := 0 to fPanelList.Count - 1 do begin
@@ -974,8 +1053,6 @@ begin
     //  DeleteSelection.ReloadScheckBoxImages(True);
 
     // Buttons / Images konfigurieren.
-    RefreshStarGraphicsAllForms;
-
     SetControlButtonLook;
     SetTabButtonLook;
   end;
@@ -1120,29 +1197,15 @@ begin
   // Spectrum-Hintergrund setzen
   // UpdateSpectrumGraphics;
 
-  {$IFDEF USESTYLES}
-  if UseAdvancedSkin and NempOptions.GlobalUseAdvancedSkin then
-  begin
-      RevokeDragFiles;
-      TStylemanager.TrySetStyle(self.AdvancedStyleName);
-      //if NotTheFirstActivation then
-        Nemp_MainForm.ReInitTaskbarManager(True);
-  end
-  else
-  begin
-      if NotTheFirstActivation then
-        RevokeDragFiles;
-      TStyleManager.TrySetStyle('Windows');
-      if NotTheFirstActivation then
-        Nemp_MainForm.ReInitTaskbarManager(True);
-  end;
-  {$ENDIF}
-
-  Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
+  RefreshVCLStyle(NotTheFirstActivation);
+  OnSkinChanged.Fire(Self);
 end;
 
 procedure TNempSkin.SetRegionsAgain;
 begin
+
+  EXIT;
+
     with Nemp_MainForm do begin
       if NempOptions.AnzeigeMode = 1 then
          UpdateSmallMainForm;
@@ -1155,7 +1218,6 @@ var
 
 begin
   isActive := False;
-  RevokeDragFiles;
   //zunächst: Ownerdraw der Boxen/Panels setzen
   for i := 0 to fPanelList.Count - 1 do
     fPanelList[i].DrawMode := dm_Windows;
@@ -1170,7 +1232,6 @@ begin
     SetTreeImages(False);
     SetControlButtonLook;
     SetTabButtonLook;
-    RefreshStarGraphicsAllForms;
   end;
 
   ArtistsVST.Background.Assign(Nil);
@@ -1278,15 +1339,10 @@ begin
     if NempOptions.AnzeigeMode = 0 then
         Menu := Nemp_MainMenu;
 
-    {$IFDEF USESTYLES}
-    if NotTheFirstActivation then
-      RevokeDragFiles;
-    TStyleManager.TrySetStyle('Windows');
-    if NotTheFirstActivation then
-      Nemp_MainForm.ReInitTaskbarManager(True);
-    {$ENDIF}
-    Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
+    RefreshVCLStyle(NotTheFirstActivation);
   end;
+
+  OnSkinChanged.Fire(Self);
 end;
 
 
@@ -1384,9 +1440,15 @@ begin
     result := fNempBackgroundSettings[nbiDefault].Tile
 end;
 
+
 function TNempSkin.GetDefaultOffset(aControl: TWinControl): TPoint;
 begin
   result := Point(PlayerPageOffsetX, PlayerPageOffsetY)- aControl.ClientToScreen(Point(0,0));
+end;
+
+function TNempSkin.GetGlobalUseAdvancedSkin: Boolean;
+begin
+  result := NempOptions.GlobalUseAdvancedSkin;
 end;
 
 function TNempSkin.GetBaseControlOffset(aBaseControl: TWinControl; aBitmap: TGraphic; aAlignment: teNempAlignment): TPoint;
@@ -1697,55 +1759,51 @@ begin
   *)
 end;
 
-
-procedure TNempSkin.SetImage(Dest, Backup: TImageCollection; ItemName: String; ItemIndex: Integer);
+procedure TNempSkin.PrepareSkinImagesCollection(aDefaultCollection, aSkinCollection: TImageCollection; SubDir: String);
 var
-  newCollectionItem : TImageCollectionItem;
-  newImageCollectionSourceItem : TImageCollectionSourceItem;
-  newItemFilename: String;
-  i: Integer;
-  success: Boolean;
+  i, iImg: Integer;
+  Files: TStringDynArray;
 
-  function GetExistingImageFile(ScaleDir: String; var FileName: String): Boolean;
-  var
-    fn: String;
+  function FileMatch(ItemName, Filename: String): Boolean;
   begin
-    result := True;
-    FileName := '';
-    fn := IncludeTrailingPathDelimiter(Path + ScaleDir) + ItemName;
-    if FileExists(fn + '.png') then FileName := fn + '.png'
-    else if FileExists(fn + '.bmp') then FileName := fn + '.bmp'
-    else if FileExists(fn + '.jpg') then FileName := fn + '.jpg'
-    else
-      result := False;
+    result := StartsText(ItemName + '.', Filename)
+          or StartsText(ItemName + '-', Filename);
   end;
 
-begin
-  //create "place" for new image
-  newCollectionItem := Dest.Images.Add;
-  newCollectionItem.Name := ItemName;
-  //create item to put source of new image
-  success := False;
-  for i := Low(cScaleDirectories) to High(cScaleDirectories) do begin
-    if GetExistingImageFile(cScaleDirectories[i], newItemFilename) then begin
-      newImageCollectionSourceItem := newCollectionItem.SourceImages.Add;
-      newImageCollectionSourceItem.Image.LoadFromFile(newItemFilename);
-      success := True;
+  procedure SetImage(Dest, Backup: TImageCollection; ItemName: String; ItemIndex: Integer);
+  var
+    newCollectionItem : TImageCollectionItem;
+    newImageCollectionSourceItem : TImageCollectionSourceItem;
+    iFiles: Integer;
+    success: Boolean;
+  begin
+    newCollectionItem := Dest.Images.Add;
+    newCollectionItem.Name := ItemName;
+    success := False;
+    for iFiles := Low(Files) to High(Files) do begin
+      if FileMatch(ItemName, Files[iFiles]) then begin
+        newImageCollectionSourceItem := newCollectionItem.SourceImages.Add;
+        newImageCollectionSourceItem.Image.LoadFromFile(IncludeTrailingPathDelimiter(Path + SubDir) + Files[iFiles]);
+        success := True;
+      end;
     end;
+    if assigned(Backup) and not Success then
+      newCollectionItem.Assign(Backup.Images[ItemIndex]);
   end;
-  if assigned(Backup) and not Success then
-    newCollectionItem.Assign(Backup.Images[ItemIndex]);
-end;
 
-procedure TNempSkin.PrepareSkinImagesCollection(aDefaultCollection, aSkinCollection: TImageCollection);
-var
-  i: Integer;
 begin
+  if DirectoryExists(Path + SubDir) then
+    Files := TDirectory.GetFiles(Path + SubDir)
+  else
+    Files := [];
+  for i := Low(Files) to High(Files) do
+    Files[i] := ExtractFilename(Files[i]);
+
   aSkinCollection.Images.BeginUpdate;
   try
     aSkinCollection.Images.Clear;
-    for i := 0 to aDefaultCollection.Images.Count - 1 do
-      SetImage(aSkinCollection, aDefaultCollection, aDefaultCollection.Images[i].Name, i);
+    for iImg := 0 to aDefaultCollection.Images.Count - 1 do
+      SetImage(aSkinCollection, aDefaultCollection, aDefaultCollection.Images[iImg].Name, iImg);
   finally
     aSkinCollection.Images.EndUpdate;
     aSkinCollection.Change;
@@ -1770,5 +1828,13 @@ begin
 end; }
 {$ENDIF}
 
+initialization
+
+  fNempSkin := Nil;
+
+finalization
+
+  if assigned(fNempSkin) then
+    FreeAndNil(fNempSkin);
 
 end.

@@ -432,6 +432,7 @@ object Nemp_MainForm: TNemp_MainForm
                 Align = alRight
                 DoubleBuffered = True
                 DrawMode = dm_Skin
+                DrawFocus = False
                 Images = vilIconsWindows
                 ParentDoubleBuffered = False
                 ParentShowHint = False
@@ -465,6 +466,7 @@ object Nemp_MainForm: TNemp_MainForm
                 Align = alRight
                 DoubleBuffered = True
                 DrawMode = dm_Skin
+                DrawFocus = False
                 Images = vilIconsWindows
                 ParentDoubleBuffered = False
                 ParentShowHint = False
@@ -863,7 +865,7 @@ object Nemp_MainForm: TNemp_MainForm
             Margins.Bottom = 4
             Align = alBottom
             BevelOuter = bvNone
-            DoubleBuffered = False
+            DoubleBuffered = True
             ParentDoubleBuffered = False
             TabOrder = 2
             Ratio = 0
@@ -5480,17 +5482,6 @@ object Nemp_MainForm: TNemp_MainForm
       FFFFE7FFE3C7FFFFFFFFFFFFFFFFFFFF00000000000000000000000000000000
       000000000000}
   end
-  object Win7TaskBarPopup: TPopupMenu
-    OnPopup = Win7TaskBarPopupPopup
-    Left = 992
-    Top = 368
-    object N67: TMenuItem
-      Caption = '-'
-    end
-    object test1: TMenuItem
-      Caption = 'Close this menu'
-    end
-  end
   object RefreshCoverFlowTimer: TTimer
     Enabled = False
     Interval = 300
@@ -6024,15 +6015,14 @@ object Nemp_MainForm: TNemp_MainForm
       item
       end
       item
-        ButtonState = [Enabled, NoBackground]
-      end
-      item
       end
       item
       end>
     ProgressMaxValue = 100
+    PreviewClipRegion.Height = 100
     TabProperties = [CustomizedPreview]
     OnThumbPreviewRequest = NempTaskbarManagerThumbPreviewRequest
+    OnWindowPreviewItemRequest = NempTaskbarManagerWindowPreviewItemRequest
     OnThumbButtonClick = fspTaskbarManagerThumbButtonClick
     Left = 993
     Top = 271
@@ -6415,6 +6405,7 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object ApplicationEvents1: TApplicationEvents
     OnHelp = ApplicationEvents1Help
+    OnMinimize = ApplicationEvents1Minimize
     Left = 672
     Top = 416
   end
@@ -6946,6 +6937,16 @@ object Nemp_MainForm: TNemp_MainForm
         CollectionIndex = 18
         CollectionName = 'PlayerOverlayInfo'
         Name = 'PlayerOverlayInfo'
+      end
+      item
+        CollectionIndex = 19
+        CollectionName = 'HeadSetAdd'
+        Name = 'HeadSetAdd'
+      end
+      item
+        CollectionIndex = 20
+        CollectionName = 'HeadSetPlayNext'
+        Name = 'HeadSetPlayNext'
       end>
     ImageCollection = DataModuleGui.ICPlayerButtons
     Width = 36

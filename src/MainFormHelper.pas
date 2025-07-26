@@ -121,7 +121,9 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     PlayerLog, progressUnit, Hilfsfunktionen, EffectsAndEqualizer, MainFormBuilderForm,
     ReplayGainProgress, NewMetaFrame, WebQRCodes, PlaylistEditor, NewFavoritePlaylist,
     AudioDisplayUtils, PlaylistDuplicates, LibraryOrganizer.Configuration.NewLayer,
-    fChangeFileCategory, fConfigErrorDlg, fExport, fUpdateCleaning, fHeadsetControl, AudioFileManagement;
+    fChangeFileCategory, fConfigErrorDlg, fExport, fUpdateCleaning, fHeadsetControl,
+    AudioFileManagement, Nemp_SkinSystem;
+
 
 
 function APIEQToPlayer(Value: Integer): Single;
@@ -757,7 +759,7 @@ end;
 
 procedure ReTranslateNemp(LanguageCode: String);
 begin
-    with Nemp_MainForm do
+    //with Nemp_MainForm do
     begin
         Uselanguage(LanguageCode);
 
@@ -774,41 +776,60 @@ begin
 
         //c := Nemp_MainForm.CBHeadSetControlInsertMode.ItemIndex;
         //BackupComboboxes(Nemp_MainForm);
-        ReTranslateComponent (Nemp_MainForm);
-        RefreshVSTDetailsTimer.Enabled := False;
-        RefreshVSTDetailsTimer.Enabled := True;
+        try
+          ReTranslateComponent(Nemp_MainForm);
+        except
+
+        end;
+        Nemp_MainForm.RefreshVSTDetailsTimer.Enabled := False;
+        Nemp_MainForm.RefreshVSTDetailsTimer.Enabled := True;
         //RestoreComboboxes(Nemp_MainForm);
 
         //Nemp_MainForm.CBHeadSetControlInsertMode.ItemIndex := c;
 
-        DisplayPlayerTitleInformation(True);
+        Nemp_MainForm.DisplayPlayerTitleInformation(True);
 
-        ShowVSTDetails(NempPlayer.CurrentFile, SD_PLAYER);
+        Nemp_MainForm.ShowVSTDetails(NempPlayer.CurrentFile, SD_PLAYER);
 
-        LblEmptyLibraryHint.Caption := MainForm_LibraryIsEmpty;
-        VST.EmptyListMessage := MedienBib.BibSearcher.EmptyListMessage;
-        VST.Invalidate;
+        Nemp_MainForm.LblEmptyLibraryHint.Caption := MainForm_LibraryIsEmpty;
+        Nemp_MainForm.VST.EmptyListMessage := MedienBib.BibSearcher.EmptyListMessage;
+        Nemp_MainForm.VST.Invalidate;
 
-        PlaylistVST.EmptyListMessage := MainForm_PlaylistIsEmpty;
-        PlaylistVST.Invalidate;
+        Nemp_MainForm.PlaylistVST.EmptyListMessage := MainForm_PlaylistIsEmpty;
+        Nemp_MainForm.PlaylistVST.Invalidate;
 
                                         //        EmptyListMessage  dummaudiofile
 
         // refresh Hints und sonstige Anzeigen
-        RandomBtn.Hint := NempPlaylist.WiedergabeModeHint;
+        Nemp_MainForm.RandomBtn.Hint := NempPlaylist.WiedergabeModeHint;
 
         if NempPlayer.StopStatus = PLAYER_STOP_NORMAL then
-            StopBTN.Hint    := MainForm_StopBtn_NormalHint
+            Nemp_MainForm.StopBTN.Hint    := MainForm_StopBtn_NormalHint
         else
-            StopBTN.Hint    := MainForm_StopBtn_StopAfterTitleHint;
+            Nemp_MainForm.StopBTN.Hint    := MainForm_StopBtn_StopAfterTitleHint;
 
         if NempPlayer.StreamRecording then
-            RecordBtn.Hint := (MainForm_RecordBtnHint_Recording)
+            Nemp_MainForm.RecordBtn.Hint := (MainForm_RecordBtnHint_Recording)
         else
-            RecordBtn.Hint := (MainForm_RecordBtnHint_Start);
+            Nemp_MainForm.RecordBtn.Hint := (MainForm_RecordBtnHint_Start);
 
-        if SleepTimer.Enabled then SleepTimerTimer(Nil);
-        if BirthdayTimer.Enabled then BirthdayTimerTimer(Nil);
+        if Nemp_MainForm.SleepTimer.Enabled then Nemp_MainForm.SleepTimerTimer(Nil);
+        if Nemp_MainForm.BirthdayTimer.Enabled then Nemp_MainForm.BirthdayTimerTimer(Nil);
+
+        // Categories
+        Nemp_MainForm.ArtistsVST.Header.Columns[0].Text := TreeHeader_Categories;
+        Nemp_MainForm.ArtistsVST.Invalidate; // Translate Captions of Playlist- and Webradio-Category
+        Nemp_MainForm.AlbenVST.Invalidate; // Translate RootCollection-Captions
+        // Collections
+        Nemp_MainForm.RefreshCollectionTreeHeader(MedienBib.CurrentCategory);
+
+        // refill playlist headers
+        Nemp_MainForm.PlaylistPropertiesChanged(NempPlaylist);
+
+        if Medienbib.BrowseMode = 1 then
+          Nemp_MainForm.CoverScrollbarChange(Nil); // trigger redraw of label
+    end;
+
 
         ReTranslateComponent (PlaylistForm    );
         ReTranslateComponent (AuswahlForm     );
@@ -864,6 +885,7 @@ begin
            BackUpComboBoxes(OptionsCompleteForm);
            ReTranslateComponent(OptionsCompleteForm );
            OptionsCompleteForm.OptionsVST.Invalidate;
+           OptionsCompleteForm.DoOnAfterTranslate;
            RestoreComboboxes(OptionsCompleteForm);
         end;
         if assigned(FormStreamVerwaltung ) then
@@ -936,20 +958,6 @@ begin
         if assigned(FormUpdateCleaning) then
           ReTranslateComponent(FormUpdateCleaning);
 
-        // Categories
-        ArtistsVST.Header.Columns[0].Text := TreeHeader_Categories;
-        ArtistsVST.Invalidate; // Translate Captions of Playlist- and Webradio-Category
-        AlbenVST.Invalidate; // Translate RootCollection-Captions
-        // Collections
-        RefreshCollectionTreeHeader(MedienBib.CurrentCategory);
-
-        // refill playlist headers
-        PlaylistPropertiesChanged(NempPlaylist);
-
-        if Medienbib.BrowseMode = 1 then
-          CoverScrollbarChange(Nil); // trigger redraw of label
-
-    end;
 end;
 
 procedure ClearShortCuts;
@@ -1399,7 +1407,8 @@ begin
           PlaylistCueChanged(NempPlaylist);
           PlayerTimeLbl.Caption := '00:00'; //Spectrum.DrawTime('00:00');
           //xxx fspTaskbarPreviews1.InvalidatePreview;
-          NempTaskbarManager.InvalidateThumbPreview;
+          if assigned(NempTaskbarManager) then
+            NempTaskbarManager.InvalidateThumbPreview;
         end;
         Application.Title := NempPlayer.GenerateTaskbarTitel;
         PlaylistVST.Invalidate;
@@ -1678,7 +1687,5 @@ begin
     ccWebStations: TAudioWebradioCollection(ac).Station.TuneIn(NempPlaylist.BassHandlePlaylist);
   end;
 end;
-
-
 
 end.

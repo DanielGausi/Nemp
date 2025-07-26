@@ -3,7 +3,7 @@ object PlaylistCopyForm: TPlaylistCopyForm
   Top = 0
   BorderStyle = bsSingle
   Caption = 'Nemp: Copy playlist to USB'
-  ClientHeight = 357
+  ClientHeight = 347
   ClientWidth = 391
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,16 +18,18 @@ object PlaylistCopyForm: TPlaylistCopyForm
   OnShow = FormShow
   TextHeight = 13
   object GrpboxSettings: TGroupBox
-    AlignWithMargins = True
-    Left = 3
-    Top = 3
-    Width = 385
+    Left = 0
+    Top = 0
+    Width = 391
     Height = 185
     Align = alTop
     Caption = 'Settings'
     TabOrder = 0
+    ExplicitLeft = 3
+    ExplicitTop = 3
+    ExplicitWidth = 385
     DesignSize = (
-      385
+      391
       185)
     object LblRenameSetting: TLabel
       Left = 16
@@ -37,7 +39,7 @@ object PlaylistCopyForm: TPlaylistCopyForm
       Caption = 'Rename files'
     end
     object BtnSelectDirectory: TButton
-      Left = 333
+      Left = 339
       Top = 38
       Width = 26
       Height = 21
@@ -48,11 +50,12 @@ object PlaylistCopyForm: TPlaylistCopyForm
       ShowHint = True
       TabOrder = 0
       OnClick = BtnSelectDirectoryClick
+      ExplicitLeft = 333
     end
     object cbRenameSetting: TComboBox
       Left = 16
       Top = 84
-      Width = 343
+      Width = 349
       Height = 21
       Hint = 'Choose how the files should be renamed'
       Anchors = [akLeft, akTop, akRight]
@@ -65,11 +68,12 @@ object PlaylistCopyForm: TPlaylistCopyForm
         '<index> - <filename>'
         '<index> - <artist> - <title>'
         '<index> - <artist> - <title> - (<album>)')
+      ExplicitWidth = 343
     end
     object EditDirectory: TLabeledEdit
       Left = 16
       Top = 38
-      Width = 311
+      Width = 317
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       EditLabel.Width = 100
@@ -79,6 +83,7 @@ object PlaylistCopyForm: TPlaylistCopyForm
       ShowHint = True
       TabOrder = 2
       Text = ''
+      ExplicitWidth = 311
     end
     object cbCreatePlaylistFile: TCheckBox
       Left = 16
@@ -121,16 +126,18 @@ object PlaylistCopyForm: TPlaylistCopyForm
     end
   end
   object GrpboxStatus: TGroupBox
-    AlignWithMargins = True
-    Left = 3
-    Top = 194
-    Width = 385
+    Left = 0
+    Top = 185
+    Width = 391
     Height = 122
-    Align = alTop
+    Align = alClient
     Caption = 'Status'
     TabOrder = 1
+    ExplicitLeft = 3
+    ExplicitTop = 194
+    ExplicitWidth = 385
     DesignSize = (
-      385
+      391
       122)
     object LblProgressFile: TLabel
       Left = 16
@@ -149,47 +156,56 @@ object PlaylistCopyForm: TPlaylistCopyForm
     object PBCurrentFile: TProgressBar
       Left = 16
       Top = 39
-      Width = 345
+      Width = 351
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
+      ExplicitWidth = 345
     end
     object PBComplete: TProgressBar
       Left = 16
       Top = 88
-      Width = 345
+      Width = 351
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 1
+      ExplicitWidth = 345
     end
   end
   object pnlButtons: TPanel
     Left = 0
-    Top = 322
+    Top = 307
     Width = 391
-    Height = 35
+    Height = 40
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitTop = 333
     DesignSize = (
       391
-      35)
+      40)
     object BtnCopyFiles: TButton
-      Left = 274
-      Top = 6
+      AlignWithMargins = True
+      Left = 286
+      Top = 8
       Width = 97
-      Height = 21
-      Anchors = [akTop, akRight]
+      Height = 24
+      Margins.Left = 8
+      Margins.Top = 8
+      Margins.Right = 8
+      Margins.Bottom = 8
+      Align = alRight
       Caption = 'Copy files'
       Default = True
       TabOrder = 0
       OnClick = BtnCopyFilesClick
+      ExplicitLeft = 274
+      ExplicitTop = 6
+      ExplicitHeight = 21
     end
     object cbCloseWindow: TCheckBox
       AlignWithMargins = True
-      Left = 19
-      Top = 8
+      Left = 16
+      Top = 11
       Width = 249
       Height = 17
       Hint = 'Close this window when the copy process is completed'

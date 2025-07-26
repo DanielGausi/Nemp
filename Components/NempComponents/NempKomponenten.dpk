@@ -29,7 +29,8 @@ package NempKomponenten;
 
 requires
   rtl,
-  vcl;
+  vcl,
+  VclSmp;
 
 contains
   NempGroupBox in 'NempGroupBox.pas',
@@ -41,7 +42,8 @@ contains
   NempSkinnedTrackbar in 'NempSkinnedTrackbar.pas',
   uNempHintWindow in 'uNempHintWindow.pas',
   NempSpectrum in 'NempSpectrum.pas',
-  NempControls.Common in 'NempControls.Common.pas';
+  NempControls.Common in 'NempControls.Common.pas',
+  NempControls.ExtCtrls in 'NempControls.ExtCtrls.pas';
 
 //Vcl.ExtCtrls;
 end.

@@ -77,11 +77,13 @@ type
     procedure rbTrackProgressStep(Sender: TProgressRangeBar;
       ScrollButton: teScrollButton; ScrollPos: Integer; ScrollPosNorm: Double);
     procedure CBContinueAfterClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     { Private-Deklarationen }
     procedure RefreshVolumeGui;
 
     procedure OnBirthdayPlay(Sender: TNempPlayer; aAudioFile: TAudioFile);
+    procedure OnNempSkinChanged(Sender: TObject);
 
   public
     { Public-Deklarationen }
@@ -93,17 +95,27 @@ var
 
 implementation
 
-uses NempMainUnit, MainFormHelper, AudioDisplayUtils, Nemp_ConstantsAndTypes;
+uses
+  NempMainUnit, MainFormHelper, AudioDisplayUtils, Nemp_ConstantsAndTypes,
+  Nemp_SkinSystem;
 {$R *.dfm}
 
 
 procedure TBirthdayForm.FormCreate(Sender: TObject);
 begin
-  TranslateComponent (self);
+  TranslateComponent(self);
+  NempSkin.OnSkinChanged.Add(OnNempSkinChanged);
+end;
+
+procedure TBirthdayForm.FormDestroy(Sender: TObject);
+begin
+  NempSkin.OnSkinChanged.Delete(OnNempSkinChanged);
 end;
 
 procedure TBirthdayForm.FormShow(Sender: TObject);
 begin
+  viVolume.ImageCollection := NempSkin.DefaultIconCollection;
+
   CBContinueAfter.Checked := NempPlayer.AutoResumePlaylistAfterBirthday;
 
   PageControlMode.Pages[0].TabVisible := False;
@@ -201,6 +213,11 @@ begin
 
 end;
 
+
+procedure TBirthdayForm.OnNempSkinChanged(Sender: TObject);
+begin
+  viVolume.ImageCollection := NempSkin.DefaultIconCollection;
+end;
 
 // Progress
 procedure TBirthdayForm.BassTimerTimer(Sender: TObject);

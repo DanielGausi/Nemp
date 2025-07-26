@@ -4,7 +4,7 @@ object FormNewLayer: TFormNewLayer
   BorderStyle = bsDialog
   Caption = 'Nemp: New category layer'
   ClientHeight = 249
-  ClientWidth = 420
+  ClientWidth = 408
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,50 +16,66 @@ object FormNewLayer: TFormNewLayer
   TextHeight = 13
   object PnlButtons: TPanel
     Left = 0
-    Top = 208
-    Width = 420
-    Height = 41
+    Top = 209
+    Width = 408
+    Height = 40
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
-    DesignSize = (
-      420
-      41)
+    ExplicitWidth = 420
     object BtnOK: TButton
-      Left = 226
-      Top = 6
+      AlignWithMargins = True
+      Left = 206
+      Top = 8
       Width = 85
-      Height = 25
-      Anchors = [akRight, akBottom]
+      Height = 24
+      Margins.Left = 8
+      Margins.Top = 8
+      Margins.Right = 8
+      Margins.Bottom = 8
+      Align = alRight
       Caption = 'OK'
       Default = True
       ModalResult = 1
       TabOrder = 0
       OnClick = BtnOKClick
+      ExplicitLeft = 150
+      ExplicitTop = 6
+      ExplicitHeight = 34
     end
     object BtnCancel: TButton
-      Left = 325
-      Top = 6
+      AlignWithMargins = True
+      Left = 307
+      Top = 8
       Width = 85
-      Height = 25
-      Anchors = [akRight, akBottom]
+      Height = 24
+      Margins.Left = 8
+      Margins.Top = 8
+      Margins.Right = 16
+      Margins.Bottom = 8
+      Align = alRight
       Cancel = True
       Caption = 'Cancel'
       ModalResult = 2
       TabOrder = 1
+      ExplicitLeft = 325
+      ExplicitTop = 6
+      ExplicitHeight = 25
     end
   end
   object MainPanel: TPanel
     Left = 0
     Top = 0
-    Width = 420
-    Height = 208
+    Width = 408
+    Height = 209
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
+    ExplicitWidth = 420
+    ExplicitHeight = 208
     DesignSize = (
-      420
-      208)
+      408
+      209)
     object lblGroupBy: TLabel
       Left = 16
       Top = 32
@@ -97,12 +113,13 @@ object FormNewLayer: TFormNewLayer
     object cbProperties: TComboBox
       Left = 16
       Top = 51
-      Width = 392
+      Width = 380
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
       OnChange = cbPropertiesChange
+      ExplicitWidth = 392
     end
     object cbPrimarySorting: TComboBox
       Left = 16
@@ -116,7 +133,7 @@ object FormNewLayer: TFormNewLayer
       AlignWithMargins = True
       Left = 216
       Top = 99
-      Width = 192
+      Width = 180
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
@@ -126,12 +143,13 @@ object FormNewLayer: TFormNewLayer
       Items.Strings = (
         'Ascending'
         'Descending')
+      ExplicitWidth = 192
     end
     object cbSecondaryDirection: TComboBox
       AlignWithMargins = True
       Left = 216
       Top = 147
-      Width = 192
+      Width = 180
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
@@ -141,12 +159,13 @@ object FormNewLayer: TFormNewLayer
       Items.Strings = (
         'Ascending'
         'Descending')
+      ExplicitWidth = 192
     end
     object cbTertiaryDirection: TComboBox
       AlignWithMargins = True
       Left = 216
       Top = 174
-      Width = 192
+      Width = 180
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
@@ -156,6 +175,7 @@ object FormNewLayer: TFormNewLayer
       Items.Strings = (
         'Ascending'
         'Descending')
+      ExplicitWidth = 192
     end
     object cbSecondarySorting: TComboBox
       Left = 16

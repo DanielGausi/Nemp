@@ -68,6 +68,10 @@ OptionsTree_PlayerScrobbler   = 'LastFM (scrobble)';
 OptionsTree_PlayerWebServer   = 'WebServer';
 OptionsTree_SystemFiletyps    = 'Windows: File types registration';
 
+Options_HappyBirthday = 'Happy Birthday song';
+Options_CountDownTitle = 'Contdown title';
+Options_WarningFileNotFound = 'File not found';
+
 TreeHeader_Categories = 'Categories';
 TreeHeader_CatFiles = 'Music files';
 TreeHeader_CatPlaylists = 'Playlists';
@@ -234,6 +238,7 @@ CoverFlowLastFM_HintInvalid      = 'Downloading a cover from LastFM cancelled.' 
 
     //Warning_No_PNG = 'PNG-Images are not supported.';
 
+FloatingPointChannelsLabel = 'Floating-point channels';
 FloatingPointChannels_On = 'Current status: On';
 FloatingPointChannels_Off = 'Current status: Off';
 

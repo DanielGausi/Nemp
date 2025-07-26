@@ -96,7 +96,7 @@ implementation
 {$R *.dfm}
 
 uses NempMainUnit, SplitForm_Hilfsfunktionen, MedienlisteUnit,
-  PlaylistUnit, MessageHelper, ExtendedControlsUnit, MedienbibliothekClass;
+  PlaylistUnit, MessageHelper, ExtendedControlsUnit, MedienbibliothekClass, Nemp_SkinSystem;
 
 
 // Zur Zeit wird das nicht automatisch aufgerufen!!!!
@@ -149,7 +149,7 @@ end;
 procedure TAuswahlForm.ContainerPanelAuswahlformPaintBackground(
   Sender: TNempPanel; var Bitmap: TGraphic; var Offset: TPoint; var Tile: Boolean);
 begin
-  Nemp_MainForm.NempSkin.OnPaintControlBackground(Sender, Bitmap, Offset, Tile);
+  NempSkin.OnPaintControlBackground(Sender, Bitmap, Offset, Tile);
 end;
 
 procedure TAuswahlForm.FormClose(Sender: TObject;
@@ -183,11 +183,11 @@ begin
           Nemp_MainForm.ArtistsVST.Width := Nemp_MainForm.TreePanel.width DIV 2;
 
   SetRegion(ContainerPanelAuswahlForm, self, NempRegionsDistance, handle);
-  If Nemp_MainForm.NempSkin.isActive then
+  If NempSkin.isActive then
   begin
       // Nemp_MainForm.NempSkin.SetArtistAlbumOffsets;
-      Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.ArtistsVST);
-      Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.AlbenVST);
+      NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.ArtistsVST);
+      NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.AlbenVST);
       Repaint;
   end;
 end;
@@ -201,10 +201,10 @@ begin
     Top := Top +  Y - DownY;
     NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.Left;
     NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.Top;
-    If Nemp_MainForm.NempSkin.isActive then
+    If NempSkin.isActive then
     begin
-      Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.ArtistsVST);
-      Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.AlbenVST);
+      NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.ArtistsVST);
+      NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.AlbenVST);
       //Repaint;
     end;
   end;
@@ -229,11 +229,11 @@ begin
 
     NempRegionsDistance.docked := tmp;
 
-    if (Nemp_MainForm.NempSkin.isActive) {and (NOT Nemp_MainForm.NempSkin.FixedBackGround)} then
+    if (NempSkin.isActive) {and (NOT Nemp_MainForm.NempSkin.FixedBackGround)} then
     begin
-        Nemp_MainForm.NempSkin.RepairSkinOffset;
-        Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.ArtistsVST);
-        Nemp_MainForm.NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.AlbenVST);
+        NempSkin.RepairSkinOffset;
+        NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.ArtistsVST);
+        NempSkin.RefreshTreeBackgrounds(Nemp_MainForm.AlbenVST);
         RepaintForm;
     end;
 end;

@@ -5,8 +5,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsDialog
   Caption = 'Preferences'
-  ClientHeight = 663
-  ClientWidth = 662
+  ClientHeight = 672
+  ClientWidth = 672
   Color = clWindow
   Constraints.MinHeight = 520
   Constraints.MinWidth = 594
@@ -29,20 +29,19 @@ object OptionsCompleteForm: TOptionsCompleteForm
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 656
-    Height = 619
+    Width = 666
+    Height = 626
     Align = alClient
     BevelEdges = []
     BevelOuter = bvNone
     Caption = 'Panel1'
     TabOrder = 0
-    ExplicitWidth = 661
     object OptionsVST: TVirtualStringTree
       AlignWithMargins = True
       Left = 3
       Top = 3
       Width = 203
-      Height = 613
+      Height = 620
       Align = alLeft
       BevelInner = bvNone
       BevelOuter = bvNone
@@ -58,7 +57,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Font.Style = []
       Header.AutoSizeIndex = 0
       Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowImages]
-      Images = ImageList1
+      Images = vilTree
       Indent = 8
       ParentFont = False
       ScrollBarOptions.ScrollBars = ssNone
@@ -82,21 +81,22 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object PageControl1: TPageControl
       Left = 209
       Top = 0
-      Width = 447
-      Height = 619
-      ActivePage = tabBirthday
+      Width = 457
+      Height = 626
+      ActivePage = tabGeneral
       Align = alClient
+      Images = vilTree
       MultiLine = True
       TabOrder = 1
       TabStop = False
-      ExplicitWidth = 452
       object tabGeneral: TTabSheet
-        Caption = 'General'
+        ImageIndex = 5
+        ImageName = 'OptionsGeneral'
         object cpgMainOptions: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 439
-          Height = 555
+          Width = 449
+          Height = 546
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -106,14 +106,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
           HeaderFont.Style = []
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
-          ExplicitWidth = 444
           object cpUpdateThread_FAILSAFE: TCategoryPanel
-            Top = 808
+            Top = 815
             Height = 80
             Caption = 'Failsafe'
-            TabOrder = 4
+            TabOrder = 0
             Visible = False
-            ExplicitWidth = 423
             object XXX_CB_BetaDontUseThreadedUpdate: TCheckBox
               Left = 16
               Top = 16
@@ -125,93 +123,122 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpHibernate: TCategoryPanel
-            Top = 680
+            Top = 687
             Height = 128
             Caption = 'Hibernate/standby'
-            TabOrder = 3
-            ExplicitWidth = 423
+            TabOrder = 1
             object Btn_ReinitPlayerEngine: TButton
+              AlignWithMargins = True
               Left = 16
-              Top = 59
-              Width = 197
+              Top = 54
+              Width = 192
               Height = 25
               Hint = 'Reinit player engine now.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 4
               Caption = 'Reinit player engine now'
               TabOrder = 2
               OnClick = Btn_ReinitPlayerEngineClick
             end
             object cbPauseOnSuspend: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 13
-              Width = 427
+              Top = 8
+              Width = 394
               Height = 17
               Hint = 
                 'Stop the player when the system hibernates, so the playback is s' +
                 'topped when the PC is turned on again.'
-              Anchors = [akLeft, akTop, akRight]
+              Margins.Left = 16
+              Margins.Top = 8
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'Stop player when system hibernates'
               Checked = True
               State = cbChecked
               TabOrder = 0
-              ExplicitWidth = 432
             end
             object cbReInitAfterSuspend: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 36
-              Width = 427
+              Top = 29
+              Width = 394
               Height = 17
               Hint = 
                 'Use this, if the playback don'#39't work after hibernating the syste' +
                 'm.'
-              Anchors = [akLeft, akTop, akRight]
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'Reinitialize player engine on wakeup'
               TabOrder = 1
-              ExplicitWidth = 432
             end
           end
           object cpNempUpdates: TCategoryPanel
-            Top = 520
+            Top = 527
             Height = 160
             Caption = 'Search for Updates'
             TabOrder = 2
-            ExplicitWidth = 423
             object Btn_CHeckNowForUpdates: TButton
               Left = 16
-              Top = 92
-              Width = 161
+              Top = 88
+              Width = 192
               Height = 25
               Caption = 'Check now'
               TabOrder = 3
               OnClick = Btn_CHeckNowForUpdatesClick
             end
             object CB_AutoCheck: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 16
-              Width = 401
+              Top = 8
+              Width = 394
               Height = 17
               Hint = 
                 'Check for updates and show a message if a newer version is avail' +
                 'able'
+              Margins.Left = 16
+              Margins.Top = 8
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'Automatically check for new versions of Nemp'
               TabOrder = 0
               OnClick = CB_AutoCheckClick
             end
             object CB_AutoCheckNotifyOnBetas: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 67
-              Width = 409
+              Top = 62
+              Width = 394
               Height = 17
               Hint = 
                 'Notify on Beta-releases. As Beta-software is normally instable, ' +
                 'this is recommended for advanced users only.'
+              Margins.Left = 16
+              Margins.Top = 8
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'Notify on Beta-releases'
               TabOrder = 2
             end
             object CBBOX_UpdateInterval: TComboBox
+              AlignWithMargins = True
               Left = 16
-              Top = 39
-              Width = 177
+              Top = 29
+              Width = 210
               Height = 21
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 200
+              Margins.Bottom = 4
+              Align = alTop
               Style = csDropDownList
               ItemIndex = 2
               TabOrder = 1
@@ -225,76 +252,98 @@ object OptionsCompleteForm: TOptionsCompleteForm
             end
           end
           object cpPortable: TCategoryPanel
-            Top = 340
-            Height = 180
+            Top = 355
+            Height = 172
             Caption = 'Nemp portable'
-            TabOrder = 1
-            ExplicitWidth = 423
+            TabOrder = 3
             object lblNempPortable: TLabel
+              AlignWithMargins = True
               Left = 16
-              Top = 113
-              Width = 420
-              Height = 44
-              AutoSize = False
+              Top = 101
+              Width = 394
+              Height = 26
+              Margins.Left = 16
+              Margins.Top = 8
+              Margins.Right = 16
+              Margins.Bottom = 4
+              Align = alTop
               Caption = 
                 'If you want to use Nemp only on one device, then these settings ' +
                 'have no effect. Please refer to the documentation for more infor' +
                 'mation.'
               WordWrap = True
+              ExplicitWidth = 393
             end
             object lblNempPortable1: TLabel
+              AlignWithMargins = True
               Left = 16
-              Top = 16
-              Width = 440
-              Height = 57
-              Anchors = [akLeft, akTop, akRight]
-              AutoSize = False
+              Top = 8
+              Width = 394
+              Height = 39
+              Margins.Left = 16
+              Margins.Top = 8
+              Margins.Right = 16
+              Margins.Bottom = 4
+              Align = alTop
               Caption = 
                 'If you want to use Nemp and the media library on multiple device' +
                 's, then Nemp has to consider some things when managing the files' +
                 '. Please choose the way you share the media library on your devi' +
                 'ces.'
               WordWrap = True
-              ExplicitWidth = 433
+              ExplicitWidth = 393
             end
             object cb_EnableCloudMode: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 84
-              Width = 408
+              Top = 76
+              Width = 394
               Height = 17
               Hint = 
                 'Use relative paths in the library, if you use Nemp in a cloud dr' +
                 'ive on different computers'
-              Anchors = [akLeft, akTop, akRight]
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'Enable cloud mode'
               TabOrder = 1
-              ExplicitWidth = 413
             end
             object cb_EnableUSBMode: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 61
-              Width = 408
+              Top = 55
+              Width = 394
               Height = 17
               Hint = 
                 'Nemp will try to adjust drive letters, when USB drives with your' +
                 ' music are used at different computers.'
-              Anchors = [akLeft, akTop, akRight]
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'Enable USB mode'
               TabOrder = 0
-              ExplicitWidth = 413
             end
           end
           object cpStarting: TCategoryPanel
             Top = 0
-            Height = 340
+            Height = 355
             Caption = 'Starting Nemp'
-            TabOrder = 0
-            ExplicitWidth = 423
+            TabOrder = 4
             object lblNempStartPlayer: TLabel
+              AlignWithMargins = True
               Left = 16
               Top = 16
-              Width = 95
+              Width = 394
               Height = 14
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 4
+              Align = alTop
               Caption = 'Player and Playlist'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
@@ -302,12 +351,19 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Font.Name = 'Tahoma'
               Font.Style = []
               ParentFont = False
+              ExplicitWidth = 95
             end
             object lblNempStartLibrary: TLabel
+              AlignWithMargins = True
               Left = 16
-              Top = 129
-              Width = 66
+              Top = 134
+              Width = 394
               Height = 14
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 4
+              Align = alTop
               Caption = 'Media library'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
@@ -315,12 +371,19 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Font.Name = 'Tahoma'
               Font.Style = []
               ParentFont = False
+              ExplicitWidth = 66
             end
             object lblNempStartSystem: TLabel
+              AlignWithMargins = True
               Left = 16
-              Top = 200
-              Width = 50
+              Top = 210
+              Width = 394
               Height = 14
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 4
+              Align = alTop
               Caption = 'Windows'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
@@ -328,135 +391,176 @@ object OptionsCompleteForm: TOptionsCompleteForm
               Font.Name = 'Tahoma'
               Font.Style = []
               ParentFont = False
+              ExplicitWidth = 50
             end
             object CB_AllowMultipleInstances: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 240
-              Width = 427
+              Top = 253
+              Width = 394
               Height = 17
               Hint = 'Allow multiple instances of Nemp.'
-              Anchors = [akLeft, akTop, akRight]
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'Allow multiple instances'
               TabOrder = 7
-              ExplicitWidth = 432
             end
             object CB_AutoPlayEnqueueTitle: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 96
-              Width = 420
+              Top = 101
+              Width = 394
               Height = 17
               Hint = 
                 'Stop playback of the current file, when the user double-clicks a' +
                 ' new file in the Windows explorer'
-              Anchors = [akLeft, akTop, akRight]
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 
                 'Switch to enqueued file (even if another track is already playin' +
                 'g)'
               ParentShowHint = False
               ShowHint = True
               TabOrder = 3
-              ExplicitWidth = 425
             end
             object CB_AutoPlayNewTitle: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 76
-              Width = 420
+              Top = 80
+              Width = 394
               Height = 17
               Hint = 
                 'When starting Nemp by double-clicking a file in the Windows-Expl' +
                 'orer: Use this file instead of the last one.'
-              Anchors = [akLeft, akTop, akRight]
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'If applicable: Start playback with new file'
               TabOrder = 2
-              ExplicitWidth = 425
             end
             object CB_AutoPlayOnStart: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 36
-              Width = 420
+              Top = 38
+              Width = 394
               Height = 17
               Hint = 'Automatically begin playback when Nemp starts'
-              Anchors = [akLeft, akTop, akRight]
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'Begin playback on start'
               TabOrder = 0
               OnClick = CB_AutoPlayOnStartClick
-              ExplicitWidth = 425
             end
             object CB_SavePositionInTrack: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 56
-              Width = 420
+              Top = 59
+              Width = 394
               Height = 17
               Hint = 'Begin playback at the last known position within the track'
-              Anchors = [akLeft, akTop, akRight]
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'Remember last track position'
               TabOrder = 1
-              ExplicitWidth = 425
             end
             object CBAutoLoadMediaList: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 149
-              Width = 427
+              Top = 156
+              Width = 394
               Height = 17
               Hint = 'Automatically load the Nemp medialibrary.'
-              Anchors = [akLeft, akTop, akRight]
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'Load media library on start'
               TabOrder = 4
-              ExplicitWidth = 432
             end
             object CBAutoSaveMediaList: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 169
-              Width = 427
+              Top = 177
+              Width = 394
               Height = 17
               Hint = 'Automatically save the Nemp medialibrary.'
-              Anchors = [akLeft, akTop, akRight]
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'Save media library on close'
               TabOrder = 5
-              ExplicitWidth = 432
             end
             object CB_StartMinimized: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 260
-              Width = 427
+              Top = 274
+              Width = 394
               Height = 17
               Hint = 'Do not show Nemp window on start - directly minimize it.'
-              Anchors = [akLeft, akTop, akRight]
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'Start minimized (you can also use the parameter "/minimized")'
               TabOrder = 8
-              ExplicitWidth = 432
             end
             object cb_ShowSplashScreen: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 220
-              Width = 427
+              Top = 232
+              Width = 394
               Height = 17
-              Anchors = [akLeft, akTop, akRight]
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'Show splash screen'
               TabOrder = 6
-              ExplicitWidth = 432
             end
             object cbShowTrayIcon: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 280
-              Width = 427
+              Top = 295
+              Width = 394
               Height = 17
-              Anchors = [akLeft, akTop, akRight]
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'Show tray icon'
               TabOrder = 9
-              ExplicitWidth = 432
             end
           end
         end
       end
-      object tabControl: TTabSheet
-        Caption = 'Controls'
-        ImageIndex = 1
-        object cpgControlSettings: TCategoryPanelGroup
+      object tabPlayer: TTabSheet
+        ImageIndex = 11
+        ImageName = 'OptionsPlayback'
+        object cpgPlayerMain: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 439
-          Height = 555
+          Width = 449
+          Height = 546
           VertScrollBar.Tracking = True
           Align = alClient
           HeaderFont.Charset = DEFAULT_CHARSET
@@ -466,36 +570,5398 @@ object OptionsCompleteForm: TOptionsCompleteForm
           HeaderFont.Style = []
           TabOrder = 0
           OnMouseWheel = CategoryPanelGroupMouseWheel
-          ExplicitWidth = 444
+          object cpAdvanced: TCategoryPanel
+            Top = 825
+            Height = 100
+            Caption = 'Advanced'
+            TabOrder = 0
+            object cb_SafePlayback: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 16
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Use safe playback'
+              TabOrder = 0
+            end
+            object cbActivatePluginSystem: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 37
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Activate Winamp DSP plugins (beta, restart required)'
+              TabOrder = 1
+            end
+          end
+          object cpSilenceDetection: TCategoryPanel
+            Top = 673
+            Height = 152
+            Caption = 'Pause between tracks'
+            TabOrder = 1
+            object cb_AddBreakBetweenTracks: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 67
+              Width = 394
+              Height = 17
+              Hint = 'Add a little break between two tracks'
+              Margins.Left = 16
+              Margins.Top = 8
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Add extra silence between tracks'
+              TabOrder = 2
+              OnClick = CB_SilenceDetectionClick
+            end
+            object CB_SilenceDetection: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 16
+              Width = 394
+              Height = 17
+              Hint = 
+                'Automatically detect and skip the silent parts at the end of the' +
+                ' tracks '
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Skip silence at the end of tracks'
+              TabOrder = 0
+              OnClick = CB_SilenceDetectionClick
+            end
+            object SE_BreakBetweenTracks: TLabeledSpinEdit
+              AlignWithMargins = True
+              Left = 36
+              Top = 88
+              Width = 75
+              Height = 22
+              Hint = 'Length of the break between tracks'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Constraints.MaxWidth = 75
+              Increment = 100
+              MaxValue = 20000
+              MinValue = 0
+              TabOrder = 3
+              Value = 2000
+              EditLabel.Width = 13
+              EditLabel.Height = 22
+              EditLabel.Caption = 'ms'
+              LabelPosition = lpRight
+              LabelSpacing = 8
+            end
+            object SE_SilenceThreshold: TLabeledSpinEdit
+              AlignWithMargins = True
+              Left = 36
+              Top = 37
+              Width = 75
+              Height = 22
+              Hint = 
+                'Threshold for "silence". A threshold of -5dB to -10dB will skip ' +
+                'a lot, -40dB and below will skip only really quiet parts.'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Constraints.MaxWidth = 75
+              MaxValue = -5
+              MinValue = -100
+              TabOrder = 1
+              Value = -40
+              EditLabel.Width = 54
+              EditLabel.Height = 22
+              EditLabel.Caption = 'db treshold'
+              LabelPosition = lpRight
+              LabelSpacing = 8
+            end
+          end
+          object cpFading: TCategoryPanel
+            Top = 360
+            Height = 313
+            Caption = 'Fading'
+            TabOrder = 2
+            object CB_Fading: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 16
+              Width = 394
+              Height = 17
+              Hint = 'Use crossfading.'
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Fade in/out'
+              TabOrder = 0
+              OnClick = CB_FadingClick
+            end
+            object CB_IgnoreFadingOnPause: TCheckBox
+              AlignWithMargins = True
+              Left = 36
+              Top = 110
+              Width = 374
+              Height = 17
+              Hint = 'Ignore fading when clicking on "Pause".'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Ignore on pause'
+              TabOrder = 4
+            end
+            object CB_IgnoreFadingOnShortTracks: TCheckBox
+              AlignWithMargins = True
+              Left = 36
+              Top = 89
+              Width = 374
+              Height = 17
+              Hint = 'Ignore fading on short tracks.'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Ignore on short tracks'
+              TabOrder = 3
+            end
+            object CB_IgnoreFadingOnStop: TCheckBox
+              AlignWithMargins = True
+              Left = 36
+              Top = 131
+              Width = 374
+              Height = 17
+              Hint = 'Ignore fading when stopping the player.'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Ignore on stop'
+              TabOrder = 5
+            end
+            object SE_Fade: TLabeledSpinEdit
+              AlignWithMargins = True
+              Left = 36
+              Top = 37
+              Width = 75
+              Height = 22
+              Hint = 'Fading length between two songs.'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Constraints.MaxWidth = 75
+              Increment = 100
+              MaxValue = 10000
+              MinValue = 0
+              TabOrder = 1
+              Value = 2000
+              EditLabel.Width = 87
+              EditLabel.Height = 22
+              EditLabel.Caption = 'ms on title change'
+              LabelPosition = lpRight
+              LabelSpacing = 8
+            end
+            object SE_SeekFade: TLabeledSpinEdit
+              AlignWithMargins = True
+              Left = 36
+              Top = 63
+              Width = 75
+              Height = 22
+              Hint = 'Fading length when scrolling inside a song.'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Constraints.MaxWidth = 75
+              Increment = 100
+              MaxValue = 10000
+              MinValue = 0
+              TabOrder = 2
+              Value = 2000
+              EditLabel.Width = 106
+              EditLabel.Height = 22
+              EditLabel.Caption = 'ms on position change'
+              LabelPosition = lpRight
+              LabelSpacing = 8
+            end
+            object cbIgnoreFadingOnLiveRecordings: TCheckBox
+              AlignWithMargins = True
+              Left = 36
+              Top = 152
+              Width = 374
+              Height = 17
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'No fading between live tracks'
+              TabOrder = 6
+              OnClick = CB_FadingClick
+            end
+            object edtLiveRecordingCheckIdentifier: TLabeledEdit
+              AlignWithMargins = True
+              Left = 56
+              Top = 193
+              Width = 354
+              Height = 21
+              Margins.Left = 56
+              Margins.Top = 24
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Constraints.MaxWidth = 354
+              EditLabel.Width = 104
+              EditLabel.Height = 13
+              EditLabel.Caption = 'Identify live tracks by'
+              TabOrder = 7
+              Text = 'live'
+            end
+            object cbLiveRecordingCheckTitle: TCheckBox
+              AlignWithMargins = True
+              Left = 56
+              Top = 218
+              Width = 354
+              Height = 17
+              Margins.Left = 56
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Check title'
+              TabOrder = 8
+            end
+            object cbLiveRecordingCheckAlbum: TCheckBox
+              AlignWithMargins = True
+              Left = 56
+              Top = 239
+              Width = 354
+              Height = 17
+              Margins.Left = 56
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Check album name'
+              TabOrder = 9
+            end
+            object cbLiveRecordingCheckTags: TCheckBox
+              AlignWithMargins = True
+              Left = 56
+              Top = 260
+              Width = 354
+              Height = 17
+              Margins.Left = 56
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Check extended tags'
+              TabOrder = 10
+            end
+          end
+          object cpOutputDevices: TCategoryPanel
+            Top = 0
+            Height = 360
+            Caption = 'Output'
+            TabOrder = 3
+            object MainDeviceCB: TLabeledComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 24
+              Width = 394
+              Height = 21
+              Hint = 'The main device.'
+              Margins.Left = 16
+              Margins.Top = 24
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Style = csDropDownList
+              TabOrder = 0
+              EditLabel.Width = 22
+              EditLabel.Height = 13
+              EditLabel.Caption = 'Main'
+            end
+            object HeadphonesDeviceCB: TLabeledComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 69
+              Width = 297
+              Height = 21
+              Hint = 'The secondary device.'
+              Margins.Left = 16
+              Margins.Top = 24
+              Margins.Right = 113
+              Margins.Bottom = 0
+              Align = alTop
+              Style = csDropDownList
+              TabOrder = 1
+              EditLabel.Width = 60
+              EditLabel.Height = 13
+              EditLabel.Caption = 'Headphones'
+            end
+            object BtnRefreshDevices: TButton
+              Left = 321
+              Top = 69
+              Width = 89
+              Height = 21
+              Caption = 'Refresh'
+              TabOrder = 2
+              OnClick = BtnRefreshDevicesClick
+            end
+            object editSoundFont: TLabeledEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 114
+              Width = 297
+              Height = 21
+              Hint = 'The SoundFont file used for MIDI playback'
+              Margins.Left = 16
+              Margins.Top = 24
+              Margins.Right = 113
+              Margins.Bottom = 0
+              Align = alTop
+              EditLabel.Width = 157
+              EditLabel.Height = 13
+              EditLabel.Caption = 'SoundFont file for MIDI playback'
+              TabOrder = 3
+              Text = ''
+            end
+            object BtnSelectSoundFontFile: TButton
+              Left = 321
+              Top = 114
+              Width = 25
+              Height = 21
+              Hint = 'Select file'
+              Caption = '...'
+              TabOrder = 4
+              OnClick = BtnSelectSoundFontFileClick
+            end
+            object SEBufferSize: TLabeledSpinEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 159
+              Width = 75
+              Height = 22
+              Hint = 'Increase this value, if the playback stutters sometimes.'
+              Margins.Left = 16
+              Margins.Top = 24
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Constraints.MaxWidth = 75
+              Increment = 100
+              MaxValue = 5000
+              MinValue = 100
+              TabOrder = 5
+              Value = 500
+              EditLabel.Width = 75
+              EditLabel.Height = 13
+              EditLabel.Caption = 'Buffer size (ms)'
+            end
+            object CB_FloatingPoint: TLabeledComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 205
+              Width = 160
+              Height = 21
+              Hint = 'Try to change this, if the playback is distorted.'
+              Margins.Left = 16
+              Margins.Top = 24
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Style = csDropDownList
+              Constraints.MaxWidth = 160
+              ItemIndex = 0
+              TabOrder = 6
+              Text = 'Auto-detect'
+              Items.Strings = (
+                'Auto-detect'
+                'Off'
+                'On')
+              EditLabel.Width = 111
+              EditLabel.Height = 13
+              EditLabel.Caption = 'Floating-point channels'
+            end
+            object CB_Mixing: TLabeledComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 250
+              Width = 160
+              Height = 21
+              Hint = 'Try to change this, if the playback is distorted.'
+              Margins.Left = 16
+              Margins.Top = 24
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Style = csDropDownList
+              Constraints.MaxWidth = 160
+              ItemIndex = 0
+              TabOrder = 7
+              Text = 'Hardware'
+              Items.Strings = (
+                'Hardware'
+                'Software')
+              EditLabel.Width = 30
+              EditLabel.Height = 13
+              EditLabel.Caption = 'Mixing'
+            end
+            object cbVisualisation: TLabeledComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 295
+              Width = 160
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 24
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Style = csDropDownList
+              Constraints.MaxWidth = 160
+              ItemIndex = 3
+              TabOrder = 8
+              Text = 'Medium'
+              Items.Strings = (
+                'Off'
+                'Very slow'
+                'Slow'
+                'Medium'
+                'Fast'
+                'Very fast')
+              EditLabel.Width = 58
+              EditLabel.Height = 13
+              EditLabel.Caption = 'Visualization'
+            end
+          end
+        end
+      end
+      object tabPlaylist: TTabSheet
+        ImageIndex = 12
+        ImageName = 'OptionsPlaylist'
+        object cpgPlaylistSettings: TCategoryPanelGroup
+          Left = 0
+          Top = 0
+          Width = 449
+          Height = 546
+          VertScrollBar.Tracking = True
+          Align = alClient
+          HeaderFont.Charset = DEFAULT_CHARSET
+          HeaderFont.Color = clWindowText
+          HeaderFont.Height = -12
+          HeaderFont.Name = 'Segoe UI'
+          HeaderFont.Style = []
+          TabOrder = 0
+          OnMouseWheel = CategoryPanelGroupMouseWheel
+          object cpPlaylistLog: TCategoryPanel
+            Top = 802
+            Height = 120
+            Caption = 'Playlist log'
+            TabOrder = 0
+            object LblLogDuration: TLabel
+              Left = 36
+              Top = 39
+              Width = 144
+              Height = 13
+              Caption = 'Remove log entries older than'
+            end
+            object LblLogDuration2: TLabel
+              Left = 104
+              Top = 61
+              Width = 143
+              Height = 13
+              Caption = 'days (0 for unlimited logging).'
+            end
+            object cbSaveLogToFile: TCheckBox
+              Left = 16
+              Top = 16
+              Width = 417
+              Height = 17
+              Caption = 'Use logfile on hard disk to log previous sessions'
+              TabOrder = 0
+              OnClick = cbSaveLogToFileClick
+            end
+            object seLogDuration: TSpinEdit
+              Left = 37
+              Top = 58
+              Width = 61
+              Height = 22
+              MaxValue = 366
+              MinValue = 0
+              TabOrder = 1
+              Value = 7
+            end
+          end
+          object cpRandomPlayback: TCategoryPanel
+            Top = 452
+            Height = 350
+            Caption = 'Random playback'
+            TabOrder = 1
+            object lbl_WeightedRandom: TLabel
+              Left = 34
+              Top = 100
+              Width = 170
+              Height = 13
+              Caption = 'Indivdual weights, based on rating.'
+            end
+            object lblCount00: TLabel
+              Left = 24
+              Top = 251
+              Width = 383
+              Height = 13
+              AutoSize = False
+              Caption = '* Including 1000 unrated files'
+              Visible = False
+            end
+            object lblCount05: TLabel
+              Left = 159
+              Top = 123
+              Width = 38
+              Height = 13
+              Caption = '(99999)'
+              Visible = False
+            end
+            object lblCount10: TLabel
+              Left = 159
+              Top = 149
+              Width = 38
+              Height = 13
+              Caption = '(99999)'
+              Visible = False
+            end
+            object lblCount15: TLabel
+              Left = 159
+              Top = 175
+              Width = 38
+              Height = 13
+              Caption = '(99999)'
+              Visible = False
+            end
+            object lblCount20: TLabel
+              Left = 159
+              Top = 201
+              Width = 38
+              Height = 13
+              Caption = '(99999)'
+              Visible = False
+            end
+            object lblCount25: TLabel
+              Left = 159
+              Top = 227
+              Width = 38
+              Height = 13
+              Caption = '(99999)'
+              Visible = False
+            end
+            object lblCount30: TLabel
+              Left = 350
+              Top = 123
+              Width = 38
+              Height = 13
+              Caption = '(99999)'
+              Visible = False
+            end
+            object lblCount35: TLabel
+              Left = 350
+              Top = 147
+              Width = 38
+              Height = 13
+              Caption = '(99999)'
+              Visible = False
+            end
+            object lblCount40: TLabel
+              Left = 350
+              Top = 175
+              Width = 38
+              Height = 13
+              Caption = '(99999)'
+              Visible = False
+            end
+            object lblCount45: TLabel
+              Left = 350
+              Top = 201
+              Width = 38
+              Height = 13
+              Caption = '(99999)'
+              Visible = False
+            end
+            object lblCount50: TLabel
+              Left = 350
+              Top = 228
+              Width = 38
+              Height = 13
+              Caption = '(99999)'
+              Visible = False
+            end
+            object LblConst_AvoidRepetitions: TLabel
+              Left = 245
+              Top = 16
+              Width = 162
+              Height = 13
+              Alignment = taRightJustify
+              Anchors = [akTop, akRight]
+              AutoSize = False
+              Caption = 'Avoid repetitions'
+            end
+            object LblConst_ReallyRandom: TLabel
+              Left = 16
+              Top = 16
+              Width = 153
+              Height = 13
+              AutoSize = False
+              Caption = 'Really random'
+            end
+            object BtnCountRating: TButton
+              Left = 16
+              Top = 282
+              Width = 137
+              Height = 25
+              Hint = 
+                'Count how many files in the media library (or the playlist) exis' +
+                't with the specific rating.'
+              Caption = 'Count Ratings'
+              TabOrder = 12
+              OnClick = BtnCountRatingClick
+            end
+            object cb_UseWeightedRNG: TCheckBox
+              Left = 16
+              Top = 77
+              Width = 401
+              Height = 17
+              Caption = 'Use weighted random'
+              TabOrder = 1
+              OnClick = cb_UseWeightedRNGClick
+            end
+            object cbCountRatingOnlyPlaylist: TCheckBox
+              Left = 159
+              Top = 286
+              Width = 258
+              Height = 17
+              Caption = 'Restrict counting to playlist'
+              TabOrder = 13
+            end
+            object RandomWeight05: TEdit
+              Left = 110
+              Top = 120
+              Width = 43
+              Height = 21
+              NumbersOnly = True
+              TabOrder = 2
+              Text = '0'
+              OnExit = RandomWeight05Exit
+            end
+            object RandomWeight10: TEdit
+              Left = 110
+              Top = 146
+              Width = 43
+              Height = 21
+              NumbersOnly = True
+              TabOrder = 3
+              Text = '0'
+              OnExit = RandomWeight05Exit
+            end
+            object RandomWeight15: TEdit
+              Left = 110
+              Top = 172
+              Width = 43
+              Height = 21
+              NumbersOnly = True
+              TabOrder = 4
+              Text = '1'
+              OnExit = RandomWeight05Exit
+            end
+            object RandomWeight20: TEdit
+              Left = 110
+              Top = 198
+              Width = 43
+              Height = 21
+              NumbersOnly = True
+              TabOrder = 5
+              Text = '2'
+              OnExit = RandomWeight05Exit
+            end
+            object RandomWeight25: TEdit
+              Left = 110
+              Top = 224
+              Width = 43
+              Height = 21
+              NumbersOnly = True
+              TabOrder = 6
+              Text = '4'
+              OnExit = RandomWeight05Exit
+            end
+            object RandomWeight30: TEdit
+              Left = 300
+              Top = 120
+              Width = 43
+              Height = 21
+              NumbersOnly = True
+              TabOrder = 7
+              Text = '7'
+              OnExit = RandomWeight05Exit
+            end
+            object RandomWeight35: TEdit
+              Left = 301
+              Top = 146
+              Width = 43
+              Height = 21
+              NumbersOnly = True
+              TabOrder = 8
+              Text = '12'
+              OnExit = RandomWeight05Exit
+            end
+            object RandomWeight40: TEdit
+              Left = 300
+              Top = 172
+              Width = 43
+              Height = 21
+              NumbersOnly = True
+              TabOrder = 9
+              Text = '20'
+              OnExit = RandomWeight05Exit
+            end
+            object RandomWeight45: TEdit
+              Left = 300
+              Top = 198
+              Width = 43
+              Height = 21
+              NumbersOnly = True
+              TabOrder = 10
+              Text = '35'
+              OnExit = RandomWeight05Exit
+            end
+            object RandomWeight50: TEdit
+              Left = 301
+              Top = 224
+              Width = 43
+              Height = 21
+              NumbersOnly = True
+              TabOrder = 11
+              Text = '60'
+              OnExit = RandomWeight05Exit
+            end
+            object TBRandomRepeat: TTrackBar
+              Left = 12
+              Top = 32
+              Width = 400
+              Height = 33
+              Anchors = [akLeft, akTop, akRight]
+              Max = 75
+              Frequency = 5
+              Position = 18
+              TabOrder = 0
+            end
+            object BtnRating05: TRatingButton
+              Left = 24
+              Top = 122
+              Width = 80
+              Height = 16
+              DoubleBuffered = True
+              DrawMode = dm_Windows
+              Images = vilIcons
+              ParentDoubleBuffered = False
+              TabOrder = 14
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 1
+              AllowChangeRating = False
+              StarFullImageIndex = 29
+              StarHalfImageIndex = 30
+              StarEmptyImageIndex = 28
+              StarFullImageName = 'MenuStarFull'
+              StarHalfImageName = 'MenuStarHalf'
+              StarEmptyImageName = 'MenuStarEmpty'
+            end
+            object BtnRating10: TRatingButton
+              Left = 24
+              Top = 148
+              Width = 80
+              Height = 16
+              DoubleBuffered = True
+              DrawMode = dm_Windows
+              Images = vilIcons
+              ParentDoubleBuffered = False
+              TabOrder = 15
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 37
+              AllowChangeRating = False
+              StarFullImageIndex = 29
+              StarHalfImageIndex = 30
+              StarEmptyImageIndex = 28
+              StarFullImageName = 'MenuStarFull'
+              StarHalfImageName = 'MenuStarHalf'
+              StarEmptyImageName = 'MenuStarEmpty'
+            end
+            object BtnRating15: TRatingButton
+              Left = 24
+              Top = 174
+              Width = 80
+              Height = 16
+              DoubleBuffered = True
+              DrawMode = dm_Windows
+              Images = vilIcons
+              ParentDoubleBuffered = False
+              TabOrder = 16
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 52
+              AllowChangeRating = False
+              StarFullImageIndex = 29
+              StarHalfImageIndex = 30
+              StarEmptyImageIndex = 28
+              StarFullImageName = 'MenuStarFull'
+              StarHalfImageName = 'MenuStarHalf'
+              StarEmptyImageName = 'MenuStarEmpty'
+            end
+            object BtnRating20: TRatingButton
+              Left = 24
+              Top = 200
+              Width = 80
+              Height = 16
+              DoubleBuffered = True
+              DrawMode = dm_Windows
+              Images = vilIcons
+              ParentDoubleBuffered = False
+              TabOrder = 17
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 78
+              AllowChangeRating = False
+              StarFullImageIndex = 29
+              StarHalfImageIndex = 30
+              StarEmptyImageIndex = 28
+              StarFullImageName = 'MenuStarFull'
+              StarHalfImageName = 'MenuStarHalf'
+              StarEmptyImageName = 'MenuStarEmpty'
+            end
+            object BtnRating25: TRatingButton
+              Left = 24
+              Top = 225
+              Width = 80
+              Height = 16
+              DoubleBuffered = True
+              DrawMode = dm_Windows
+              Images = vilIcons
+              ParentDoubleBuffered = False
+              TabOrder = 18
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 102
+              AllowChangeRating = False
+              StarFullImageIndex = 29
+              StarHalfImageIndex = 30
+              StarEmptyImageIndex = 28
+              StarFullImageName = 'MenuStarFull'
+              StarHalfImageName = 'MenuStarHalf'
+              StarEmptyImageName = 'MenuStarEmpty'
+            end
+            object BtnRating30: TRatingButton
+              Left = 214
+              Top = 122
+              Width = 80
+              Height = 16
+              DoubleBuffered = True
+              DrawMode = dm_Windows
+              Images = vilIcons
+              ParentDoubleBuffered = False
+              TabOrder = 19
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 128
+              AllowChangeRating = False
+              StarFullImageIndex = 29
+              StarHalfImageIndex = 30
+              StarEmptyImageIndex = 28
+              StarFullImageName = 'MenuStarFull'
+              StarHalfImageName = 'MenuStarHalf'
+              StarEmptyImageName = 'MenuStarEmpty'
+            end
+            object BtnRating35: TRatingButton
+              Left = 214
+              Top = 148
+              Width = 80
+              Height = 16
+              DoubleBuffered = True
+              DrawMode = dm_Windows
+              Images = vilIcons
+              ParentDoubleBuffered = False
+              TabOrder = 20
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 153
+              AllowChangeRating = False
+              StarFullImageIndex = 29
+              StarHalfImageIndex = 30
+              StarEmptyImageIndex = 28
+              StarFullImageName = 'MenuStarFull'
+              StarHalfImageName = 'MenuStarHalf'
+              StarEmptyImageName = 'MenuStarEmpty'
+            end
+            object BtnRating40: TRatingButton
+              Left = 214
+              Top = 174
+              Width = 80
+              Height = 16
+              DoubleBuffered = True
+              DrawMode = dm_Windows
+              Images = vilIcons
+              ParentDoubleBuffered = False
+              TabOrder = 21
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 179
+              AllowChangeRating = False
+              StarFullImageIndex = 29
+              StarHalfImageIndex = 30
+              StarEmptyImageIndex = 28
+              StarFullImageName = 'MenuStarFull'
+              StarHalfImageName = 'MenuStarHalf'
+              StarEmptyImageName = 'MenuStarEmpty'
+            end
+            object BtnRating45: TRatingButton
+              Left = 214
+              Top = 200
+              Width = 80
+              Height = 16
+              DoubleBuffered = True
+              DrawMode = dm_Windows
+              Images = vilIcons
+              ParentDoubleBuffered = False
+              TabOrder = 22
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 205
+              AllowChangeRating = False
+              StarFullImageIndex = 29
+              StarHalfImageIndex = 30
+              StarEmptyImageIndex = 28
+              StarFullImageName = 'MenuStarFull'
+              StarHalfImageName = 'MenuStarHalf'
+              StarEmptyImageName = 'MenuStarEmpty'
+            end
+            object BtnRating50: TRatingButton
+              Left = 214
+              Top = 225
+              Width = 80
+              Height = 16
+              DoubleBuffered = True
+              DrawMode = dm_Windows
+              Images = vilIcons
+              ParentDoubleBuffered = False
+              TabOrder = 23
+              TransparentBackground = True
+              StyleElements = [seFont, seBorder]
+              Rating = 230
+              AllowChangeRating = False
+              StarFullImageIndex = 29
+              StarHalfImageIndex = 30
+              StarEmptyImageIndex = 28
+              StarFullImageName = 'MenuStarFull'
+              StarHalfImageName = 'MenuStarHalf'
+              StarEmptyImageName = 'MenuStarEmpty'
+            end
+          end
+          object cpPlaylistBehaviour: TCategoryPanel
+            Top = 217
+            Height = 235
+            Caption = 'General playlist settings'
+            TabOrder = 2
+            object CB_AutoScanPlaylist: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 16
+              Width = 394
+              Height = 17
+              Hint = 
+                'Read metadata from the audiofiles or just use the data stored in' +
+                ' the playlistfile.'
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Check files when loading a playlist'
+              TabOrder = 0
+            end
+            object CB_JumpToNextCue: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 37
+              Width = 394
+              Height = 17
+              Hint = 'When clicking "next", jump to the next cuesheet (if available)'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Jump to next entry in cuesheet on "next"'
+              TabOrder = 1
+            end
+            object cb_PlaylistManagerAutoSave: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 100
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Autosave favorite playlists'
+              TabOrder = 4
+              OnClick = cb_PlaylistManagerAutoSaveClick
+            end
+            object cb_PlaylistManagerAutoSaveUserInput: TCheckBox
+              AlignWithMargins = True
+              Left = 36
+              Top = 121
+              Width = 374
+              Height = 17
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Decide individually when loading a new playlist '
+              TabOrder = 5
+            end
+            object CB_RememberInterruptedPlayPosition: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 79
+              Width = 394
+              Height = 17
+              Hint = 'Used in combination with "Just play focussed file"'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 
+                'Remember track position when playing a song directly from the li' +
+                'brary'
+              TabOrder = 3
+            end
+            object cb_ReplayCue: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 58
+              Width = 394
+              Height = 17
+              Hint = 
+                'Repeat only the current part of a file instead of the whole trac' +
+                'k when "Repeat title" is selected'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Repeat current entry in cuesheet on "Repeat title"'
+              TabOrder = 2
+            end
+            object CB_AutoDeleteFromPlaylist: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 142
+              Width = 394
+              Height = 17
+              Hint = 'remove a track from the playlist after it is completely played.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Delete completely played tracks from the playlist'
+              TabOrder = 6
+              OnClick = CB_AutoDeleteFromPlaylistClick
+            end
+            object CB_AutoMixPlaylist: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 184
+              Width = 394
+              Height = 17
+              Hint = 'Randomize playlist after the last track.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Mix playlist after last track'
+              TabOrder = 8
+            end
+            object CB_DisableAutoDeleteAtUserInput: TCheckBox
+              AlignWithMargins = True
+              Left = 36
+              Top = 163
+              Width = 374
+              Height = 17
+              Hint = 'Exceptions for deleting a file from the playlist.'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Do not delete after manual stop/pause/slide/next/previous'
+              TabOrder = 7
+            end
+          end
+          object cpPlaylistDefaultActions: TCategoryPanel
+            Top = 0
+            Height = 217
+            Caption = 'Default actions'
+            TabOrder = 3
+            object LblPlaylistDefaultAction: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 16
+              Width = 394
+              Height = 13
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              AutoSize = False
+              Caption = 'Insert mode from media list into the playlist'
+              ExplicitWidth = 405
+            end
+            object LblHeadsetDefaultAction: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 66
+              Width = 394
+              Height = 13
+              Margins.Left = 16
+              Margins.Top = 12
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              AutoSize = False
+              Caption = 'Insert mode from headset to playlist'
+              ExplicitTop = 109
+              ExplicitWidth = 405
+            end
+            object cb_AutoStopHeadsetAddToPlayist: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 150
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Stop headset when adding headset file to playlist'
+              TabOrder = 4
+            end
+            object GrpBox_DefaultAction: TComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 33
+              Width = 310
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 100
+              Margins.Bottom = 0
+              Align = alTop
+              Style = csDropDownList
+              ItemIndex = 0
+              TabOrder = 0
+              Text = 'Enqueue at the end of the playlist'
+              Items.Strings = (
+                'Enqueue at the end of the playlist'
+                'Play (and clear current playlist)'
+                'Enqueue after current track'
+                'Just play (don'#39't change the playlist)')
+            end
+            object GrpBox_HeadsetDefaultAction: TComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 83
+              Width = 310
+              Height = 21
+              Hint = 'Insert mode for files from the headset'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 100
+              Margins.Bottom = 0
+              Align = alTop
+              Style = csDropDownList
+              ItemIndex = 0
+              TabOrder = 3
+              Text = 'Enqueue at the end of the playlist'
+              Items.Strings = (
+                'Enqueue at the end of the playlist'
+                'Play (and clear current playlist)'
+                'Enqueue after current track'
+                'Just play (don'#39't change the playlist)')
+            end
+            object cbApplyDefaultActionToWholeList: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 108
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Add complete list, not only the selected title'
+              TabOrder = 1
+            end
+            object cbUseDefaultActionOnCoverFlowDoubleClick: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 129
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Use default action on double-click in Coverflow'
+              TabOrder = 2
+            end
+          end
+        end
+      end
+      object tabFileManagement: TTabSheet
+        ImageIndex = 3
+        ImageName = 'OptionsFileManagement'
+        object cpgFileManagement: TCategoryPanelGroup
+          Left = 0
+          Top = 0
+          Width = 449
+          Height = 546
+          VertScrollBar.Tracking = True
+          Align = alClient
+          HeaderFont.Charset = DEFAULT_CHARSET
+          HeaderFont.Color = clWindowText
+          HeaderFont.Height = -12
+          HeaderFont.Name = 'Segoe UI'
+          HeaderFont.Style = []
+          TabOrder = 0
+          OnMouseWheel = CategoryPanelGroupMouseWheel
+          object cpLibraryCoverArt: TCategoryPanel
+            Top = 516
+            Height = 320
+            Caption = 'Cover art'
+            TabOrder = 0
+            object lblSearchCoverArt: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 16
+              Width = 394
+              Height = 13
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Search cover art in ...'
+              ExplicitWidth = 106
+            end
+            object CB_CoverSearch_inDir: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 33
+              Width = 394
+              Height = 17
+              Hint = 'Search for coverfiles within the directory of the audiofile'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Directory itself'
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 0
+            end
+            object CB_CoverSearch_inParentDir: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 54
+              Width = 394
+              Height = 17
+              Hint = 'Search for coverfiles in the parent directory of the audiofile.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Parent directory'
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 1
+            end
+            object CB_CoverSearch_inSisterDir: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 121
+              Width = 394
+              Height = 17
+              Hint = 
+                'Search for coverfiles in the specified subdirectory of the paren' +
+                't directory.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Sister directory (name)'
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 4
+              OnClick = CB_CoverSearch_inSisterDirClick
+            end
+            object CB_CoverSearch_inSubDir: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 75
+              Width = 394
+              Height = 17
+              Hint = 'Search for coverfiles in the specified subdirectory.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Subdirectory (name)'
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 2
+              OnClick = CB_CoverSearch_inSubDirClick
+            end
+            object EDTCoverSisterDirName: TEdit
+              AlignWithMargins = True
+              Left = 36
+              Top = 142
+              Width = 190
+              Height = 21
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 200
+              Margins.Bottom = 0
+              Align = alTop
+              TabOrder = 5
+              Text = 'cover'
+            end
+            object EDTCoverSubDirName: TEdit
+              AlignWithMargins = True
+              Left = 36
+              Top = 96
+              Width = 190
+              Height = 21
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 200
+              Margins.Bottom = 0
+              Align = alTop
+              TabOrder = 3
+              Text = 'cover'
+            end
+            object CB_CoverSearch_LastFM: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 224
+              Width = 394
+              Height = 17
+              Hint = 'Allow Nemp downloading missing cover files from the internet'
+              Margins.Left = 16
+              Margins.Top = 8
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Download missing covers from LastFM'
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 7
+            end
+            object BtnClearCoverCache: TButton
+              Left = 16
+              Top = 251
+              Width = 99
+              Height = 25
+              Hint = 'Clear the list of unsuccessfully checked covers'
+              Caption = 'Clear cache'
+              TabOrder = 8
+              OnClick = BtnClearCoverCacheClick
+            end
+            object cb_CoverSize: TLabeledComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 195
+              Width = 210
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 32
+              Margins.Right = 200
+              Margins.Bottom = 0
+              Align = alTop
+              Style = csDropDownList
+              ItemIndex = 1
+              TabOrder = 6
+              Text = 'Normal (500x500)'
+              Items.Strings = (
+                'Low (240x240)'
+                'Normal (500x500)'
+                'High (750x750)'
+                'Highest (1000x1000)')
+              EditLabel.Width = 188
+              EditLabel.Height = 13
+              EditLabel.Caption = 'Quality of cover art in the media library'
+            end
+          end
+          object cpLibraryFileTypes: TCategoryPanel
+            Top = 281
+            Height = 235
+            Caption = 'File types for the media library'
+            TabOrder = 1
+            object LblConst_OnlythefollowingTypes: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 37
+              Width = 394
+              Height = 13
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Only the following types:'
+              ExplicitWidth = 120
+            end
+            object BtnRecommendedFiletypes: TButton
+              Left = 16
+              Top = 171
+              Width = 128
+              Height = 21
+              Hint = 'Select recommended filetypes only'
+              Caption = 'Recommended'
+              TabOrder = 2
+              OnClick = RecommendedFiletypesClick
+            end
+            object cbIncludeAll: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 16
+              Width = 394
+              Height = 17
+              Hint = 
+                'When searching for files: Add every supported file or just some ' +
+                'special types.'
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'All types supported by the player'
+              TabOrder = 0
+              OnClick = cbIncludeAllClick
+            end
+            object cbIncludeFiles: TCheckListBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 54
+              Width = 394
+              Height = 111
+              Hint = 'List of supported audio files.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Columns = 4
+              ItemHeight = 13
+              Style = lbOwnerDrawFixed
+              TabOrder = 1
+              OnDrawItem = clbViewMainColumnsDrawItem
+            end
+          end
+          object cpScanDirectories: TCategoryPanel
+            Top = 0
+            Height = 281
+            Caption = 'Directories'
+            TabOrder = 2
+            object cb_AutoDeleteFiles: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 183
+              Width = 394
+              Height = 17
+              Hint = 
+                'Check for missing files in your music directories when starting ' +
+                'Nemp and remove them from the media library.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Automatically delete missing files from the media library'
+              TabOrder = 3
+              OnClick = CBAutoScanClick
+            end
+            object cb_AutoDeleteFilesShowInfo: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 204
+              Width = 394
+              Height = 17
+              Hint = 'Create a log message about missing files'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Log summary about deleted files'
+              TabOrder = 4
+            end
+            object CBAskForAutoAddNewDirs: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 162
+              Width = 394
+              Height = 17
+              Hint = 
+                'When selecting a new directory: Show query whether it should be ' +
+                'added to this list or not.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Show query dialog when adding new directories'
+              TabOrder = 2
+            end
+            object CBAutoAddNewDirs: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 141
+              Width = 394
+              Height = 17
+              Hint = 'Add new directories to this list'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Automatically monitor new directories'
+              TabOrder = 1
+            end
+            object CBAutoScan: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 16
+              Width = 394
+              Height = 17
+              Hint = 
+                'Check for new files in your music directories when starting Nemp' +
+                '.'
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Scan the following directories for new files on start'
+              TabOrder = 0
+              OnClick = CBAutoScanClick
+            end
+            object CBAutoScanPlaylistFilesOnView: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 225
+              Width = 394
+              Height = 17
+              Hint = 
+                'When browsing in playlists: Get the meta-data from the included ' +
+                'audiofiles'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Scan files in playlists on view'
+              TabOrder = 5
+            end
+            object pnlScanDirectories: TPanel
+              AlignWithMargins = True
+              Left = 0
+              Top = 37
+              Width = 426
+              Height = 100
+              Margins.Left = 0
+              Margins.Top = 4
+              Margins.Right = 0
+              Margins.Bottom = 0
+              Align = alTop
+              BevelOuter = bvNone
+              TabOrder = 6
+              DesignSize = (
+                426
+                100)
+              object LBAutoscan: TListBox
+                AlignWithMargins = True
+                Left = 16
+                Top = 0
+                Width = 257
+                Height = 100
+                Margins.Left = 16
+                Margins.Top = 0
+                Margins.Right = 0
+                Margins.Bottom = 0
+                Style = lbOwnerDrawVariable
+                Align = alLeft
+                ItemHeight = 13
+                TabOrder = 0
+                OnDrawItem = clbViewMainColumnsDrawItem
+                OnKeyDown = LBAutoscanKeyDown
+              end
+              object BtnAutoScanAdd: TButton
+                AlignWithMargins = True
+                Left = 289
+                Top = 3
+                Width = 125
+                Height = 21
+                Anchors = [akTop, akRight]
+                Caption = 'Add'
+                TabOrder = 1
+                OnClick = BtnAutoScanAddClick
+              end
+              object BtnAutoScanDelete: TButton
+                AlignWithMargins = True
+                Left = 289
+                Top = 30
+                Width = 125
+                Height = 21
+                Anchors = [akTop, akRight]
+                Caption = 'Delete'
+                TabOrder = 2
+                OnClick = BtnAutoScanDeleteClick
+              end
+              object BtnAutoScanNow: TButton
+                AlignWithMargins = True
+                Left = 289
+                Top = 57
+                Width = 125
+                Height = 21
+                Hint = 'Scan now for new or missing files, according to the settings'
+                Anchors = [akTop, akRight]
+                Caption = 'Scan now'
+                TabOrder = 3
+                OnClick = BtnAutoScanNowClick
+              end
+            end
+          end
+        end
+      end
+      object tabCategories: TTabSheet
+        ImageIndex = 7
+        ImageName = 'OptionsLibrary'
+        object cpgCategories: TCategoryPanelGroup
+          Left = 0
+          Top = 0
+          Width = 449
+          Height = 546
+          VertScrollBar.Tracking = True
+          Align = alClient
+          HeaderFont.Charset = DEFAULT_CHARSET
+          HeaderFont.Color = clWindowText
+          HeaderFont.Height = -12
+          HeaderFont.Name = 'Segoe UI'
+          HeaderFont.Style = []
+          TabOrder = 0
+          OnMouseWheel = CategoryPanelGroupMouseWheel
+          object cpCategoryPlaylists: TCategoryPanel
+            Top = 787
+            Height = 145
+            Caption = 'Category "Playlists"'
+            TabOrder = 0
+            object lblPlaylistCaptionMode: TLabel
+              Left = 16
+              Top = 16
+              Width = 89
+              Height = 13
+              Caption = 'Display playlists as'
+            end
+            object lblPlaylistSortMode: TLabel
+              Left = 16
+              Top = 62
+              Width = 35
+              Height = 13
+              Caption = 'Sort by'
+            end
+            object cbPlaylistCaptionMode: TComboBox
+              Left = 16
+              Top = 35
+              Width = 225
+              Height = 21
+              Style = csDropDownList
+              ItemIndex = 0
+              TabOrder = 0
+              Text = 'Filename'
+              Items.Strings = (
+                'Filename'
+                'Folder'
+                'Folder\Filename'
+                'Complete path')
+            end
+            object cbPlaylistSortDirection: TComboBox
+              AlignWithMargins = True
+              Left = 247
+              Top = 81
+              Width = 121
+              Height = 21
+              Style = csDropDownList
+              ItemIndex = 0
+              TabOrder = 2
+              Text = 'Ascending'
+              Items.Strings = (
+                'Ascending'
+                'Descending')
+            end
+            object cbPlaylistSortMode: TComboBox
+              Left = 16
+              Top = 81
+              Width = 225
+              Height = 21
+              Style = csDropDownList
+              ItemIndex = 0
+              TabOrder = 1
+              Text = 'Filename'
+              Items.Strings = (
+                'Filename'
+                'Folder'
+                'Complete path')
+            end
+          end
+          object cpCategorySettings: TCategoryPanel
+            Top = 454
+            Height = 333
+            Caption = 'Group and sort settings'
+            TabOrder = 1
+            object lblSamplerSorting: TLabel
+              Left = 16
+              Top = 248
+              Width = 43
+              Height = 14
+              Caption = 'Sampler'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+            end
+            object lblAlbumArtist: TLabel
+              Left = 16
+              Top = 167
+              Width = 67
+              Height = 14
+              Caption = 'Album-Artist'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+            end
+            object lblDefineAlbum: TLabel
+              Left = 16
+              Top = 36
+              Width = 101
+              Height = 13
+              Caption = 'Define an "Album" by'
+            end
+            object lblAlbumDefinition: TLabel
+              Left = 16
+              Top = 16
+              Width = 39
+              Height = 14
+              Caption = 'Albums'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+            end
+            object cbSamplerSortingIgnoreReleaseYear: TCheckBox
+              Left = 16
+              Top = 268
+              Width = 401
+              Height = 17
+              Caption = 
+                'Use "Album name" instead of "Release Year" for sorting (where ap' +
+                'propriate)'
+              TabOrder = 5
+            end
+            object cbPreferAlbumArtist: TCheckBox
+              Left = 16
+              Top = 187
+              Width = 401
+              Height = 17
+              Caption = 'Prefer Album-Artist when grouping by "Artist"'
+              TabOrder = 3
+              OnClick = cbPreferAlbumArtistClick
+            end
+            object cpIgnoreAlbumArtistVariousArtists: TCheckBox
+              Left = 16
+              Top = 207
+              Width = 401
+              Height = 17
+              Caption = 'Ignore Album-Artist "Various Artists"'
+              TabOrder = 4
+            end
+            object cbAlbumKeymode: TComboBox
+              Left = 16
+              Top = 53
+              Width = 273
+              Height = 21
+              Style = csDropDownList
+              ItemIndex = 2
+              TabOrder = 0
+              Text = 'Property "Album" and Directory'
+              Items.Strings = (
+                'Property "Album"'
+                'Properties "Album" and "Artist"'
+                'Property "Album" and Directory'
+                'Directory'
+                'Cover')
+            end
+            object cbIgnoreCDDirectories: TCheckBox
+              Left = 16
+              Top = 80
+              Width = 401
+              Height = 17
+              Caption = 'Allow multi-folder albums (e.g. "CD 1" and "CD 2")'
+              TabOrder = 1
+            end
+            object editCDNames: TLabeledEdit
+              Left = 16
+              Top = 123
+              Width = 0
+              Height = 21
+              Anchors = [akLeft, akTop, akRight]
+              AutoSize = False
+              EditLabel.Width = 325
+              EditLabel.Height = 13
+              EditLabel.Caption = 'Folder names not forming an album of their own (comma separated)'
+              TabOrder = 2
+              Text = ''
+            end
+          end
+          object cpCategoryCoverflow: TCategoryPanel
+            Top = 329
+            Height = 125
+            Caption = 'Display as "Coverflow"'
+            TabOrder = 2
+            object btnEditCoverflow: TButton
+              Left = 375
+              Top = 32
+              Width = 28
+              Height = 21
+              Caption = '...'
+              TabOrder = 1
+              OnClick = btnEditCoverflowClick
+            end
+            object cbMissingCoverMode: TComboBox
+              Left = 16
+              Top = 59
+              Width = 353
+              Height = 21
+              Style = csDropDownList
+              ItemIndex = 1
+              TabOrder = 2
+              Text = 'No special handling of missing cover'
+              Items.Strings = (
+                'All missing cover at the beginning'
+                'No special handling of missing cover'
+                'All missing cover at the end')
+            end
+            object edtCoverFlowSortings: TLabeledEdit
+              Left = 16
+              Top = 32
+              Width = 353
+              Height = 21
+              EditLabel.Width = 87
+              EditLabel.Height = 13
+              EditLabel.Caption = 'Sort Coverflow by'
+              ReadOnly = True
+              TabOrder = 0
+              Text = ''
+            end
+          end
+          object cpCategories: TCategoryPanel
+            Top = 0
+            Height = 329
+            Caption = 'Categories and tree view layers'
+            TabOrder = 3
+            object lblDefaultCategory: TLabel
+              Left = 16
+              Top = 190
+              Width = 81
+              Height = 13
+              Anchors = [akLeft, akBottom]
+              Caption = 'Default category'
+              ExplicitTop = 166
+            end
+            object lblRecentlyAddedCategory: TLabel
+              Left = 232
+              Top = 190
+              Width = 131
+              Height = 13
+              Anchors = [akLeft, akBottom]
+              Caption = 'Category "Recently added"'
+              ExplicitTop = 166
+            end
+            object lblCategories: TLabel
+              Left = 16
+              Top = 16
+              Width = 52
+              Height = 13
+              Caption = 'Categories'
+            end
+            object lblTreeViewLayers: TLabel
+              Left = 232
+              Top = 16
+              Width = 79
+              Height = 13
+              Caption = 'Tree view layers'
+            end
+            object VSTCategories: TVirtualStringTree
+              Left = 16
+              Top = 32
+              Width = 196
+              Height = 112
+              Anchors = [akLeft, akTop, akBottom]
+              Colors.UnfocusedSelectionColor = clHighlight
+              Colors.UnfocusedSelectionBorderColor = clHighlight
+              DragOperations = [doMove]
+              Header.AutoSizeIndex = 0
+              Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs]
+              Indent = 4
+              PopupMenu = PopupCategories
+              TabOrder = 0
+              TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoChangeScale]
+              TreeOptions.MiscOptions = [toAcceptOLEDrop, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning, toFullRowDrag, toEditOnClick]
+              TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
+              OnDragAllowed = VSTCategoriesDragAllowed
+              OnDragOver = VSTCategoriesDragOver
+              OnDragDrop = VSTCategoriesDragDrop
+              OnEditing = VSTCategoriesEditing
+              OnGetText = VSTCategoriesGetText
+              OnPaintText = VSTCategoriesPaintText
+              OnNewText = VSTCategoriesNewText
+              Touch.InteractiveGestures = [igPan, igPressAndTap]
+              Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+              Columns = <
+                item
+                  Position = 0
+                  Width = 192
+                end>
+            end
+            object btnCategoryEdit: TButton
+              Left = 16
+              Top = 150
+              Width = 99
+              Height = 21
+              Anchors = [akLeft, akBottom]
+              Caption = 'Edit'
+              TabOrder = 1
+              OnClick = btnCategoryEditClick
+            end
+            object cbDefaultCategory: TComboBox
+              Left = 16
+              Top = 208
+              Width = 179
+              Height = 21
+              Style = csDropDownList
+              Anchors = [akLeft, akBottom]
+              TabOrder = 4
+              OnChange = cbDefaultCategoryChange
+            end
+            object cbNewFilesCategory: TComboBox
+              Left = 232
+              Top = 208
+              Width = 177
+              Height = 21
+              Style = csDropDownList
+              Anchors = [akLeft, akBottom]
+              TabOrder = 5
+              OnChange = cbNewFilesCategoryChange
+            end
+            object btnLayerEdit: TButton
+              Left = 232
+              Top = 150
+              Width = 99
+              Height = 21
+              Anchors = [akLeft, akBottom]
+              Caption = 'Edit'
+              TabOrder = 3
+              OnClick = btnLayerEditClick
+            end
+            object VSTSortings: TVirtualStringTree
+              Left = 232
+              Top = 31
+              Width = 196
+              Height = 113
+              Anchors = [akLeft, akTop, akBottom]
+              BevelInner = bvNone
+              BevelOuter = bvNone
+              Colors.UnfocusedSelectionColor = clHighlight
+              Colors.UnfocusedSelectionBorderColor = clHighlight
+              DragOperations = [doMove]
+              Header.AutoSizeIndex = 0
+              Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs]
+              HintMode = hmHint
+              PopupMenu = PopupLayers
+              TabOrder = 2
+              TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoChangeScale]
+              TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowDropmark, toShowRoot, toShowTreeLines, toThemeAware, toUseBlendedImages]
+              OnDragAllowed = VSTSortingsDragAllowed
+              OnDragOver = VSTSortingsDragOver
+              OnDragDrop = VSTSortingsDragDrop
+              OnFocusChanged = VSTSortingsFocusChanged
+              OnGetText = VSTSortingsGetText
+              OnPaintText = VSTSortingsPaintText
+              OnGetHint = VSTSortingsGetHint
+              Touch.InteractiveGestures = [igPan, igPressAndTap]
+              Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+              Columns = <
+                item
+                  Position = 0
+                  Width = 192
+                end>
+            end
+            object cbLibConfigShowPlaylistCategories: TCheckBox
+              Left = 16
+              Top = 245
+              Width = 378
+              Height = 17
+              Anchors = [akLeft, akBottom]
+              Caption = 'Show playlist categories'
+              TabOrder = 6
+            end
+            object cbLibConfigShowWebradioCategory: TCheckBox
+              Left = 16
+              Top = 268
+              Width = 378
+              Height = 17
+              Anchors = [akLeft, akBottom]
+              Caption = 'Show web radio category'
+              TabOrder = 7
+            end
+          end
+        end
+      end
+      object tabViewingSettings: TTabSheet
+        ImageIndex = 8
+        ImageName = 'OptionsListView'
+        object cpgViewingSettings: TCategoryPanelGroup
+          Left = 0
+          Top = 0
+          Width = 449
+          Height = 546
+          VertScrollBar.Tracking = True
+          Align = alClient
+          HeaderFont.Charset = DEFAULT_CHARSET
+          HeaderFont.Color = clWindowText
+          HeaderFont.Height = -12
+          HeaderFont.Name = 'Segoe UI'
+          HeaderFont.Style = []
+          TabOrder = 0
+          OnMouseWheel = CategoryPanelGroupMouseWheel
+          object cpExtendedViewingSettings: TCategoryPanel
+            Top = 863
+            Height = 168
+            Caption = 'Extended viewing settings'
+            TabOrder = 0
+            object cb_limitMarkerToCurrentFiles: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 50
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Show marked files only from the current preselection'
+              TabOrder = 2
+            end
+            object CBAlwaysSortAnzeigeList: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 8
+              Width = 394
+              Height = 17
+              Hint = 'Always sort the displayed files in the library.'
+              Margins.Left = 16
+              Margins.Top = 8
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Always sort view (slower)'
+              TabOrder = 0
+              OnClick = CBAlwaysSortAnzeigeListClick
+            end
+            object CBSkipSortOnLargeLists: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 29
+              Width = 394
+              Height = 17
+              Hint = 'Skip this sorting when the list is too large.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Skip sort on large lists (> 5000)'
+              TabOrder = 1
+            end
+            object CB_ShowAdvancedHints: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 92
+              Width = 394
+              Height = 17
+              Hint = 'Show hints in the playlist or not.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Show advanced hints'
+              TabOrder = 4
+            end
+            object CBFullRowSelect: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 113
+              Width = 394
+              Height = 17
+              Hint = 'Select full row or just a single cell in the library.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Select full row in media list'
+              TabOrder = 5
+            end
+            object CBShowHintsInTitlelists: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 71
+              Width = 394
+              Height = 17
+              Hint = 'Show hints in the library or not.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Show hints in the playlist and the media list'
+              TabOrder = 3
+              OnClick = CBAlwaysSortAnzeigeListClick
+            end
+          end
+          object cpPlaylistFormatting: TCategoryPanel
+            Top = 663
+            Caption = 'Playlist formatting'
+            TabOrder = 1
+            object cbPlaylistTitle: TLabeledComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 16
+              Width = 210
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 200
+              Margins.Bottom = 0
+              Align = alTop
+              AutoComplete = False
+              Color = clBtnFace
+              ItemIndex = 0
+              TabOrder = 0
+              Text = '<artist> - <title>'
+              Items.Strings = (
+                '<artist> - <title>'
+                '<artist> - <title> (<year>)'
+                '<artist> - <title> (<album>)'
+                '<artist> - <title> (<album>, Track <track>)'
+                '<artist> - <title> (Track <track>)'
+                '<artist> - <album>'
+                '<filename>'
+                '<subdir>\<filename>'
+                '<fullpath>')
+              EditLabel.Width = 58
+              EditLabel.Height = 21
+              EditLabel.Caption = 'Regular title'
+              LabelPosition = lpRight
+              LabelSpacing = 8
+            end
+            object cbPlaylistTitleCueAlbum: TLabeledComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 66
+              Width = 210
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 200
+              Margins.Bottom = 0
+              Align = alTop
+              AutoComplete = False
+              Color = clBtnFace
+              ItemIndex = 5
+              TabOrder = 2
+              Text = '<artist> - <album>'
+              Items.Strings = (
+                '<artist> - <title>'
+                '<artist> - <title> (<year>)'
+                '<artist> - <title> (<album>)'
+                '<artist> - <title> (<album>, Track <track>)'
+                '<artist> - <title> (Track <track>)'
+                '<artist> - <album>'
+                '<filename>'
+                '<subdir>\<filename>'
+                '<fullpath>')
+              EditLabel.Width = 59
+              EditLabel.Height = 21
+              EditLabel.Caption = 'Cue (Album)'
+              LabelPosition = lpRight
+              LabelSpacing = 8
+            end
+            object cbPlaylistTitleCueTitle: TLabeledComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 91
+              Width = 210
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 200
+              Margins.Bottom = 0
+              Align = alTop
+              AutoComplete = False
+              Color = clBtnFace
+              ItemIndex = 4
+              TabOrder = 3
+              Text = '<artist> - <title> (Track <track>)'
+              Items.Strings = (
+                '<artist> - <title>'
+                '<artist> - <title> (<year>)'
+                '<artist> - <title> (<album>)'
+                '<artist> - <title> (<album>, Track <track>)'
+                '<artist> - <title> (Track <track>)'
+                '<artist> - <album>'
+                '<filename>'
+                '<subdir>\<filename>'
+                '<fullpath>')
+              EditLabel.Width = 50
+              EditLabel.Height = 21
+              EditLabel.Caption = 'Cue (Title)'
+              LabelPosition = lpRight
+              LabelSpacing = 8
+            end
+            object cbPlaylistTitleFB: TLabeledComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 41
+              Width = 210
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 200
+              Margins.Bottom = 0
+              Align = alTop
+              AutoComplete = False
+              Color = clBtnFace
+              ItemIndex = 2
+              TabOrder = 1
+              Text = '<artist> - <title> (<album>)'
+              Items.Strings = (
+                '<artist> - <title>'
+                '<artist> - <title> (<year>)'
+                '<artist> - <title> (<album>)'
+                '<artist> - <title> (<album>, Track <track>)'
+                '<artist> - <title> (Track <track>)'
+                '<artist> - <album>'
+                '<filename>'
+                '<subdir>\<filename>'
+                '<fullpath>')
+              EditLabel.Width = 105
+              EditLabel.Height = 21
+              EditLabel.Caption = 'Regular title (fallback)'
+              LabelPosition = lpRight
+              LabelSpacing = 8
+            end
+            object cbPlaylistWebradioTitle: TLabeledComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 116
+              Width = 210
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 200
+              Margins.Bottom = 0
+              Align = alTop
+              AutoComplete = False
+              Color = clBtnFace
+              ItemIndex = 0
+              TabOrder = 4
+              Text = '<station>: <title>'
+              Items.Strings = (
+                '<station>: <title>'
+                '<title>')
+              EditLabel.Width = 46
+              EditLabel.Height = 21
+              EditLabel.Caption = 'Webradio'
+              LabelPosition = lpRight
+              LabelSpacing = 8
+            end
+            object cb_ShowIndexInTreeview: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 141
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Show column "Index"'
+              TabOrder = 5
+            end
+          end
+          object cpMissingMetaData: TCategoryPanel
+            Top = 331
+            Height = 332
+            Caption = 'Not available metadata'
+            TabOrder = 2
+            object lblMissingMetaData: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 16
+              Width = 394
+              Height = 13
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              AutoSize = False
+              Caption = 'Fallback properties'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = 14
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              WordWrap = True
+              ExplicitWidth = 385
+            end
+            object cbReplaceAlbumBy: TLabeledComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 87
+              Width = 210
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 200
+              Margins.Bottom = 0
+              Align = alTop
+              Style = csDropDownList
+              ItemIndex = 3
+              TabOrder = 2
+              Text = 'Directory (last part)'
+              Items.Strings = (
+                '(Empty string)'
+                #39'N/A'#39
+                'Filename'
+                'Directory (last part)'
+                'Directory'
+                'Complete path'
+                'Filename(with extension)')
+              EditLabel.Width = 85
+              EditLabel.Height = 21
+              EditLabel.Caption = 'if Album is missing'
+              LabelPosition = lpRight
+              LabelSpacing = 8
+            end
+            object cbReplaceArtistBy: TLabeledComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 37
+              Width = 210
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 8
+              Margins.Right = 200
+              Margins.Bottom = 0
+              Align = alTop
+              Style = csDropDownList
+              ItemIndex = 2
+              TabOrder = 0
+              Text = 'Filename'
+              Items.Strings = (
+                '(Empty string)'
+                #39'N/A'#39
+                'Filename'
+                'Directory (last part)'
+                'Directory'
+                'Complete path'
+                'Filename(with extension)')
+              EditLabel.Width = 82
+              EditLabel.Height = 21
+              EditLabel.Caption = 'if Artist is missing'
+              LabelPosition = lpRight
+              LabelSpacing = 8
+            end
+            object cbReplaceTitleBy: TLabeledComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 62
+              Width = 210
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 200
+              Margins.Bottom = 0
+              Align = alTop
+              Style = csDropDownList
+              ItemIndex = 2
+              TabOrder = 1
+              Text = 'Filename'
+              Items.Strings = (
+                '(Empty string)'
+                #39'N/A'#39
+                'Filename'
+                'Directory (last part)'
+                'Directory'
+                'Complete path'
+                'Filename(with extension)')
+              EditLabel.Width = 76
+              EditLabel.Height = 21
+              EditLabel.Caption = 'if Title is missing'
+              LabelPosition = lpRight
+              LabelSpacing = 8
+            end
+            object GrpBoxDefaultCover: TGroupBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 116
+              Width = 394
+              Height = 173
+              Margins.Left = 16
+              Margins.Top = 8
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Default cover'
+              TabOrder = 3
+              object lbl_DefaultCoverHint: TLabel
+                Left = 176
+                Top = 91
+                Width = 215
+                Height = 62
+                AutoSize = False
+                Caption = 
+                  'Note: Cover art already displayed in the player will not change ' +
+                  'until the cover art is loaded again.'
+                WordWrap = True
+              end
+              object img_DefaultCover: TImage
+                Left = 16
+                Top = 20
+                Width = 137
+                Height = 137
+              end
+              object btn_DefaultCoverReset: TButton
+                Left = 176
+                Top = 52
+                Width = 110
+                Height = 25
+                Hint = 'Reset the default cover to the Nemp default cover'
+                Caption = 'Reset'
+                TabOrder = 1
+                OnClick = btn_DefaultCoverResetClick
+              end
+              object btn_DefaultCover: TButton
+                Left = 176
+                Top = 21
+                Width = 110
+                Height = 25
+                Hint = 'Select a file you want to use as cover art'
+                Caption = 'Select'
+                TabOrder = 0
+                OnClick = btn_DefaultCoverClick
+              end
+            end
+          end
+          object cpViewCategoriesSettings: TCategoryPanel
+            Top = 200
+            Height = 131
+            Caption = 'Display of Albums, Directories, ...'
+            TabOrder = 3
+            object cbShowCoverForAlbum: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 8
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 8
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Show cover art for albums in tree view'
+              TabOrder = 0
+            end
+            object cbShowElementCount: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 29
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Show number of contained elements'
+              TabOrder = 1
+            end
+            object cbCombineLayers: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 50
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Combine tree view layers when reasonable'
+              TabOrder = 2
+            end
+            object cbShowFilesRecursively: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 71
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 
+                'Show all contained files recursively (always possible by double ' +
+                'click)'
+              TabOrder = 3
+            end
+          end
+          object cpVisibleColumns: TCategoryPanel
+            Top = 0
+            Caption = 'Visible columns in the medialist'
+            TabOrder = 4
+            object clbViewMainColumns: TCheckListBox
+              Left = 0
+              Top = 0
+              Width = 426
+              Height = 174
+              Align = alClient
+              Columns = 3
+              ItemHeight = 13
+              Style = lbOwnerDrawFixed
+              TabOrder = 0
+              OnDrawItem = clbViewMainColumnsDrawItem
+            end
+          end
+        end
+      end
+      object tabFontSizes: TTabSheet
+        ImageIndex = 4
+        ImageName = 'OptionsFonts'
+        object cpgDisplaySettings: TCategoryPanelGroup
+          Left = 0
+          Top = 0
+          Width = 449
+          Height = 546
+          VertScrollBar.Tracking = True
+          Align = alClient
+          ChevronColor = clWindowText
+          ChevronHotColor = clHighlightText
+          Color = clWindow
+          GradientBaseColor = clBtnFace
+          GradientColor = clBtnShadow
+          HeaderFont.Charset = DEFAULT_CHARSET
+          HeaderFont.Color = clWindowText
+          HeaderFont.Height = -13
+          HeaderFont.Name = 'Segoe UI'
+          HeaderFont.Style = []
+          ParentBackground = True
+          TabOrder = 0
+          object cpPartyMode: TCategoryPanel
+            Top = 329
+            Height = 230
+            Caption = 'Party mode'
+            TabOrder = 0
+            object CB_PartyMode_ResizeFactor: TLabeledComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 24
+              Width = 210
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 24
+              Margins.Right = 200
+              Margins.Bottom = 0
+              Align = alTop
+              Style = csDropDownList
+              ItemIndex = 1
+              TabOrder = 0
+              Text = '1.5 (moderate amplification)'
+              Items.Strings = (
+                '1 (no amplification)'
+                '1.5 (moderate amplification)'
+                '2 (double sized)'
+                '2.5 (really huge)')
+              EditLabel.Width = 92
+              EditLabel.Height = 13
+              EditLabel.Caption = 'Amplification factor'
+            end
+            object cb_PartyMode_ShowPasswordOnActivate: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 94
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Show password when activating the Nemp Party Mode'
+              TabOrder = 2
+            end
+            object Edt_PartyModePassword: TLabeledEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 69
+              Width = 210
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 24
+              Margins.Right = 200
+              Margins.Bottom = 0
+              Align = alTop
+              EditLabel.Width = 139
+              EditLabel.Height = 13
+              EditLabel.Caption = 'Password to exit Party-Mode'
+              TabOrder = 1
+              Text = ''
+            end
+            object cb_PartyMode_BlockCurrentTitleRating: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 144
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Block rating of current title'
+              TabOrder = 4
+            end
+            object cb_PartyMode_BlockTools: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 165
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Block tools'
+              TabOrder = 5
+            end
+            object cb_PartyMode_BlockTreeEdit: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 123
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 12
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Block editing file information in the media list'
+              TabOrder = 3
+            end
+          end
+          object cpFontSettings: TCategoryPanel
+            Top = 0
+            Height = 329
+            Caption = 'Font settings'
+            TabOrder = 1
+            object lblFontBrowselists: TLabel
+              Left = 16
+              Top = 16
+              Width = 125
+              Height = 14
+              Caption = 'Tree view (categories)'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label32: TLabel
+              Left = 16
+              Top = 36
+              Width = 43
+              Height = 13
+              Caption = 'Font size'
+              ParentShowHint = False
+              ShowHint = True
+            end
+            object Label34: TLabel
+              Left = 152
+              Top = 36
+              Width = 54
+              Height = 13
+              Caption = 'Row height'
+            end
+            object lbl_Browselist_FontStyle: TLabel
+              Left = 262
+              Top = 36
+              Width = 48
+              Height = 13
+              Caption = 'Font style'
+            end
+            object lblFontPlaylistMedialist: TLabel
+              Left = 16
+              Top = 88
+              Width = 109
+              Height = 14
+              Caption = 'Playlist and medialist'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+            end
+            object lbl_Medialist_FontStyle: TLabel
+              Left = 262
+              Top = 108
+              Width = 48
+              Height = 13
+              Caption = 'Font style'
+            end
+            object LblConst_BasicFontSize: TLabel
+              Left = 16
+              Top = 108
+              Width = 43
+              Height = 13
+              Caption = 'Font size'
+              ParentShowHint = False
+              ShowHint = True
+            end
+            object LblConst_RowHeight: TLabel
+              Left = 152
+              Top = 108
+              Width = 54
+              Height = 13
+              Caption = 'Row height'
+            end
+            object LblConst_FontCBR: TLabel
+              Left = 226
+              Top = 250
+              Width = 119
+              Height = 13
+              Caption = 'Font for constant bitrate'
+            end
+            object LblConst_FontVBR: TLabel
+              Left = 35
+              Top = 252
+              Width = 115
+              Height = 13
+              Caption = 'Font for variable bitrate'
+            end
+            object cb_Browselist_FontStyle: TComboBox
+              Left = 262
+              Top = 55
+              Width = 129
+              Height = 21
+              Style = csDropDownList
+              ItemIndex = 0
+              TabOrder = 2
+              Text = 'normal'
+              Items.Strings = (
+                'normal'
+                'bold'
+                'italic'
+                'bold italic')
+            end
+            object SEArtistAlbenRowHeight: TSpinEdit
+              Left = 152
+              Top = 52
+              Width = 49
+              Height = 22
+              MaxValue = 144
+              MinValue = 4
+              TabOrder = 1
+              Value = 16
+            end
+            object SEArtistAlbenSIze: TSpinEdit
+              Left = 16
+              Top = 53
+              Width = 49
+              Height = 22
+              MaxValue = 72
+              MinValue = 4
+              TabOrder = 0
+              Value = 16
+            end
+            object cb_Medialist_FontStyle: TComboBox
+              Left = 262
+              Top = 124
+              Width = 129
+              Height = 21
+              Style = csDropDownList
+              ItemIndex = 0
+              TabOrder = 5
+              Text = 'normal'
+              Items.Strings = (
+                'normal'
+                'bold'
+                'italic'
+                'bold italic')
+            end
+            object SEFontSize: TSpinEdit
+              Left = 16
+              Top = 127
+              Width = 49
+              Height = 22
+              MaxValue = 72
+              MinValue = 4
+              TabOrder = 3
+              Value = 8
+            end
+            object SERowHeight: TSpinEdit
+              Left = 152
+              Top = 124
+              Width = 49
+              Height = 22
+              MaxValue = 144
+              MinValue = 4
+              TabOrder = 4
+              Value = 16
+            end
+            object CBChangeFontColoronBitrate: TCheckBox
+              Left = 16
+              Top = 210
+              Width = 400
+              Height = 17
+              Hint = 'Use different colors for different bitrates.'
+              Caption = 'Change font color according to bitrate'
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 8
+              WordWrap = True
+            end
+            object CBChangeFontOnCbrVbr: TCheckBox
+              Left = 16
+              Top = 229
+              Width = 400
+              Height = 17
+              Hint = 'Use different fonts for files with fixed or variable bitrate.'
+              Caption = 'Change font according to constant/variable bitrate'
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 9
+              WordWrap = True
+              OnClick = CBChangeFontOnCbrVbrClick
+            end
+            object CBChangeFontSizeOnLength: TCheckBox
+              Left = 16
+              Top = 191
+              Width = 400
+              Height = 17
+              Hint = 
+                'User bigger fonts for long tracks and smaller ones for short tra' +
+                'cks.'
+              Caption = 'Change font size according to track length'
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 7
+              WordWrap = True
+            end
+            object CBChangeFontStyleOnMode: TCheckBox
+              Left = 16
+              Top = 172
+              Width = 400
+              Height = 17
+              Hint = 'Normal: Joint Stereo, Bold: Full Stereo, Italic: Mono'
+              Caption = 'Change font style according to channel mode'
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 6
+              WordWrap = True
+            end
+            object CBFontNameCBR: TComboBox
+              Left = 226
+              Top = 269
+              Width = 161
+              Height = 21
+              Style = csDropDownList
+              TabOrder = 11
+            end
+            object CBFontNameVBR: TComboBox
+              Left = 35
+              Top = 269
+              Width = 161
+              Height = 21
+              Style = csDropDownList
+              TabOrder = 10
+            end
+          end
+        end
+      end
+      object tabCoverflow: TTabSheet
+        ImageIndex = 1
+        ImageName = 'OptionsCoverflow'
+        object PnlCoverFlowControl: TPanel
+          Left = 0
+          Top = 516
+          Width = 449
+          Height = 30
+          Align = alBottom
+          BevelOuter = bvNone
+          TabOrder = 1
+          DesignSize = (
+            449
+            30)
+          object BtnUndoCoverFlowSettings: TButton
+            AlignWithMargins = True
+            Left = 296
+            Top = 3
+            Width = 123
+            Height = 25
+            Anchors = [akTop, akRight]
+            Caption = 'Undo'
+            TabOrder = 0
+            OnClick = BtnUndoCoverFlowSettingsClick
+          end
+          object BtnCoverFlowDefault: TButton
+            AlignWithMargins = True
+            Left = 157
+            Top = 3
+            Width = 123
+            Height = 25
+            Anchors = [akTop, akRight]
+            Caption = 'Default'
+            TabOrder = 1
+            OnClick = BtnCoverFlowDefaultClick
+          end
+        end
+        object cpgCoverFlowView: TCategoryPanelGroup
+          Left = 0
+          Top = 0
+          Width = 449
+          Height = 516
+          VertScrollBar.Tracking = True
+          Align = alClient
+          HeaderFont.Charset = DEFAULT_CHARSET
+          HeaderFont.Color = clWindowText
+          HeaderFont.Height = -12
+          HeaderFont.Name = 'Segoe UI'
+          HeaderFont.Style = []
+          TabOrder = 0
+          object cpCoverflowMixedSettings: TCategoryPanel
+            Top = 570
+            Height = 150
+            Caption = 'Mixed settings'
+            TabOrder = 5
+            object lblCoverflowTextures: TLabel
+              Left = 92
+              Top = 19
+              Width = 159
+              Height = 13
+              Caption = 'max. number of displayed covers'
+            end
+            object shapeCoverflowColor: TShape
+              Left = 16
+              Top = 88
+              Width = 21
+              Height = 21
+              OnMouseDown = shapeCoverflowColorMouseDown
+            end
+            object lblCoverFlowColor: TLabel
+              Left = 16
+              Top = 69
+              Width = 243
+              Height = 13
+              Caption = 'Default background color (Windows standard only)'
+            end
+            object cb_UseClassicCoverflow: TCheckBox
+              Left = 16
+              Top = 44
+              Width = 409
+              Height = 17
+              Hint = 'Classic coverflow for systems without OpenGL-support'
+              Caption = 'Use classic 2D coverflow'
+              TabOrder = 1
+            end
+            object seCoverflowTextureCache: TSpinEdit
+              Left = 16
+              Top = 16
+              Width = 67
+              Height = 22
+              MaxValue = 200
+              MinValue = 20
+              TabOrder = 0
+              Value = 20
+            end
+            object edtCoverFlowColor: TEdit
+              Left = 43
+              Top = 88
+              Width = 121
+              Height = 21
+              TabOrder = 2
+            end
+            object btnSelectCoverFlowColor: TButton
+              Left = 170
+              Top = 88
+              Width = 31
+              Height = 21
+              Caption = '...'
+              TabOrder = 3
+              OnClick = btnSelectCoverFlowColorClick
+            end
+          end
+          object cpCoverflowReflection: TCategoryPanel
+            Top = 445
+            Height = 125
+            Caption = 'Reflection'
+            TabOrder = 4
+            object lblCoverFlowIntensity: TLabel
+              Left = 16
+              Top = 37
+              Width = 43
+              Height = 13
+              Caption = 'Intenisty'
+            end
+            object lblCoverflowReflexionGap: TLabel
+              Left = 232
+              Top = 37
+              Width = 56
+              Height = 13
+              Caption = 'Vertical gap'
+            end
+            object cbCoverFlowUseReflection: TCheckBox
+              Left = 16
+              Top = 16
+              Width = 217
+              Height = 17
+              Caption = 'Enabled'
+              TabOrder = 0
+              OnClick = tbCoverZMainChange
+            end
+            object tbCoverReflexionGap: TNempTrackBar
+              AlignWithMargins = True
+              Left = 232
+              Top = 56
+              Width = 185
+              Height = 22
+              Max = 100
+              PageSize = 5
+              Frequency = 10
+              Position = 20
+              TabOrder = 2
+              ThumbLength = 15
+              OnChange = tbCoverZMainChange
+            end
+            object tbCoverReflexionIntensity: TNempTrackBar
+              AlignWithMargins = True
+              Left = 16
+              Top = 56
+              Width = 185
+              Height = 22
+              Max = 100
+              PageSize = 5
+              Frequency = 10
+              Position = 15
+              TabOrder = 1
+              ThumbLength = 15
+              OnChange = tbCoverZMainChange
+            end
+          end
+          object cpCoverflowAngles: TCategoryPanel
+            Top = 345
+            Height = 100
+            Caption = 'Angles'
+            TabOrder = 3
+            object lblCoverFlowAngleLeft: TLabel
+              Left = 16
+              Top = 16
+              Width = 19
+              Height = 13
+              Caption = 'Left'
+            end
+            object lblCoverFlowAngleMain: TLabel
+              Left = 159
+              Top = 16
+              Width = 67
+              Height = 13
+              Caption = 'Current cover'
+            end
+            object lblCoverFlowAngleRight: TLabel
+              Left = 288
+              Top = 16
+              Width = 25
+              Height = 13
+              Caption = 'Right'
+            end
+            object tbCoverAngleLeft: TNempTrackBar
+              AlignWithMargins = True
+              Left = 16
+              Top = 30
+              Width = 137
+              Height = 22
+              Max = 180
+              Min = -180
+              PageSize = 5
+              Frequency = 30
+              Position = -85
+              TabOrder = 0
+              ThumbLength = 15
+              OnChange = tbCoverZMainChange
+            end
+            object tbCoverAngleMain: TNempTrackBar
+              AlignWithMargins = True
+              Left = 159
+              Top = 30
+              Width = 123
+              Height = 22
+              Max = 45
+              Min = -45
+              PageSize = 5
+              Frequency = 10
+              Position = 1
+              TabOrder = 1
+              ThumbLength = 15
+              OnChange = tbCoverZMainChange
+            end
+            object tbCoverAngleRight: TNempTrackBar
+              AlignWithMargins = True
+              Left = 288
+              Top = 30
+              Width = 137
+              Height = 22
+              Max = 180
+              Min = -180
+              PageSize = 5
+              Frequency = 30
+              Position = 85
+              TabOrder = 2
+              ThumbLength = 15
+              OnChange = tbCoverZMainChange
+            end
+          end
+          object cpCoverflowSpacing: TCategoryPanel
+            Top = 215
+            Height = 130
+            Caption = 'Spacing between cover art'
+            TabOrder = 2
+            object lblCoverFlowGapLeft: TLabel
+              Left = 16
+              Top = 16
+              Width = 19
+              Height = 13
+              Caption = 'Left'
+            end
+            object lblCoverFlowGapRight: TLabel
+              Left = 232
+              Top = 16
+              Width = 25
+              Height = 13
+              Caption = 'Right'
+            end
+            object tbCoverGapFirstLeft: TNempTrackBar
+              AlignWithMargins = True
+              Left = 16
+              Top = 30
+              Width = 185
+              Height = 22
+              Max = 500
+              Min = 10
+              PageSize = 5
+              Frequency = 50
+              Position = 100
+              TabOrder = 0
+              ThumbLength = 15
+              OnChange = tbCoverZMainChange
+            end
+            object tbCoverGapFirstRight: TNempTrackBar
+              AlignWithMargins = True
+              Left = 232
+              Top = 30
+              Width = 185
+              Height = 22
+              Max = 500
+              Min = 10
+              PageSize = 5
+              Frequency = 50
+              Position = 100
+              TabOrder = 1
+              ThumbLength = 15
+              OnChange = tbCoverZMainChange
+            end
+            object tbCoverGapLeft: TNempTrackBar
+              AlignWithMargins = True
+              Left = 16
+              Top = 60
+              Width = 185
+              Height = 22
+              Max = 500
+              Min = 10
+              PageSize = 5
+              Frequency = 50
+              Position = 100
+              TabOrder = 2
+              ThumbLength = 15
+              OnChange = tbCoverZMainChange
+            end
+            object tbCoverGapRight: TNempTrackBar
+              AlignWithMargins = True
+              Left = 232
+              Top = 60
+              Width = 185
+              Height = 22
+              Max = 500
+              Min = 10
+              PageSize = 5
+              Frequency = 50
+              Position = 100
+              TabOrder = 3
+              ThumbLength = 15
+              OnChange = tbCoverZMainChange
+            end
+          end
+          object cpCoverflowViewPosition: TCategoryPanel
+            Top = 135
+            Height = 80
+            Caption = 'Viewing position (x-axis)'
+            TabOrder = 1
+            object tbCoverViewPosition: TNempTrackBar
+              AlignWithMargins = True
+              Left = 16
+              Top = 16
+              Width = 400
+              Height = 22
+              Max = 180
+              Min = -180
+              PageSize = 5
+              Frequency = 50
+              Position = -85
+              TabOrder = 0
+              ThumbLength = 15
+              OnChange = tbCoverZMainChange
+            end
+          end
+          object cpCoverflowPosition: TCategoryPanel
+            Top = 0
+            Height = 135
+            Caption = 'Position of cover art (z-axis)'
+            TabOrder = 0
+            object LblCoverZLeft: TLabel
+              Left = 16
+              Top = 41
+              Width = 19
+              Height = 13
+              Caption = 'Left'
+            end
+            object lblCoverZMain: TLabel
+              Left = 16
+              Top = 16
+              Width = 67
+              Height = 13
+              Caption = 'Current cover'
+            end
+            object LblCoverZRight: TLabel
+              Left = 16
+              Top = 66
+              Width = 25
+              Height = 13
+              Caption = 'Right'
+            end
+            object tbCoverZLeft: TNempTrackBar
+              AlignWithMargins = True
+              Left = 88
+              Top = 42
+              Width = 328
+              Height = 22
+              Max = 150
+              Min = -800
+              PageSize = 10
+              Frequency = 50
+              Position = 100
+              TabOrder = 1
+              ThumbLength = 15
+              OnChange = tbCoverZMainChange
+            end
+            object tbCoverZMain: TNempTrackBar
+              AlignWithMargins = True
+              Left = 88
+              Top = 16
+              Width = 328
+              Height = 22
+              Max = 150
+              Min = -800
+              PageSize = 10
+              Frequency = 50
+              Position = 100
+              TabOrder = 0
+              ThumbLength = 15
+              OnChange = tbCoverZMainChange
+            end
+            object tbCoverZRight: TNempTrackBar
+              AlignWithMargins = True
+              Left = 88
+              Top = 68
+              Width = 328
+              Height = 22
+              Max = 150
+              Min = -800
+              PageSize = 10
+              Frequency = 50
+              Position = 100
+              TabOrder = 2
+              ThumbLength = 15
+              OnChange = tbCoverZMainChange
+            end
+          end
+        end
+      end
+      object tabMetadata: TTabSheet
+        ImageIndex = 9
+        ImageName = 'OptionsMetaData'
+        object cpgMetadata: TCategoryPanelGroup
+          Left = 0
+          Top = 0
+          Width = 449
+          Height = 546
+          VertScrollBar.Tracking = True
+          Align = alClient
+          HeaderFont.Charset = DEFAULT_CHARSET
+          HeaderFont.Color = clWindowText
+          HeaderFont.Height = -12
+          HeaderFont.Name = 'Segoe UI'
+          HeaderFont.Style = []
+          TabOrder = 0
+          OnMouseWheel = CategoryPanelGroupMouseWheel
+          object cpMetaData: TCategoryPanel
+            Top = 0
+            Height = 424
+            Caption = 'Meta data (e.g. ID3-Tags)'
+            TabOrder = 0
+            object lblQuickAccess: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 16
+              Width = 394
+              Height = 14
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Quick access to metadata ("ID3-Tags")'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ExplicitWidth = 214
+            end
+            object lblMetaDataLyrics: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 67
+              Width = 394
+              Height = 14
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Lyrics in the media library'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ExplicitWidth = 136
+            end
+            object lblMetaDataAutomaticRating: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 118
+              Width = 394
+              Height = 14
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Automatic rating'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ExplicitWidth = 91
+            end
+            object lblExtendedTags: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 253
+              Width = 394
+              Height = 14
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Extended tags for tag cloud'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ExplicitWidth = 154
+            end
+            object lbMetaDataAutoDetectCharset: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 346
+              Width = 394
+              Height = 14
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Heuristics for obsolete character sets'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ExplicitWidth = 202
+            end
+            object cb_AccessMetadata: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 34
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Write changes directly to the metadata'
+              TabOrder = 0
+            end
+            object cb_IgnoreLyrics: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 85
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Ignore Lyrics (recommended for very large  music collections)'
+              TabOrder = 1
+              OnClick = cb_IgnoreLyricsClick
+            end
+            object cb_RatingActive: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 136
+              Width = 394
+              Height = 17
+              Hint = '(De)activate automatic rating/playcounter'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Change rating and play counter of played files'
+              TabOrder = 2
+              OnClick = cb_RatingActiveClick
+            end
+            object cb_RatingChangeCounter: TCheckBox
+              AlignWithMargins = True
+              Left = 36
+              Top = 178
+              Width = 374
+              Height = 17
+              Hint = 'Increase the playcounter of a file after it was played'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Increase play counter'
+              TabOrder = 4
+            end
+            object cb_RatingDecreaseRating: TCheckBox
+              AlignWithMargins = True
+              Left = 36
+              Top = 220
+              Width = 374
+              Height = 17
+              Hint = 
+                'Automatically decrease rating on aborted tracks. The change will' +
+                ' be smaller the higher the playcounter is.'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Decrease rating on aborted tracks'
+              TabOrder = 6
+            end
+            object cb_RatingIgnoreShortFiles: TCheckBox
+              AlignWithMargins = True
+              Left = 36
+              Top = 157
+              Width = 374
+              Height = 17
+              Hint = 'Do not change rating and playcounter on short tracks.'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Ignore short tracks (i.e. less than 30 seconds)'
+              TabOrder = 3
+            end
+            object cb_RatingIncreaseRating: TCheckBox
+              AlignWithMargins = True
+              Left = 36
+              Top = 199
+              Width = 374
+              Height = 17
+              Hint = 
+                'Automatically increase rating on played tracks. The change will ' +
+                'be smaller the higher the playcounter is.'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Increase rating on played tracks'
+              TabOrder = 5
+            end
+            object cb_AskForAutoResolveInconsistencies: TCheckBox
+              AlignWithMargins = True
+              Left = 36
+              Top = 292
+              Width = 374
+              Height = 17
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'If not: Show query dialog when inconsistencies occur'
+              TabOrder = 8
+            end
+            object cb_AutoResolveInconsistencies: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 271
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Automatically resolve inconsistencies when entering new tags'
+              TabOrder = 7
+            end
+            object cb_ShowAutoResolveInconsistenciesHints: TCheckBox
+              AlignWithMargins = True
+              Left = 36
+              Top = 313
+              Width = 374
+              Height = 17
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 
+                'If not: Show information dialog when minor inconsistencies occur' +
+                ' '
+              TabOrder = 9
+            end
+            object CBAutoDetectCharCode: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 364
+              Width = 394
+              Height = 17
+              Hint = 
+                'Use a uber-ingenious special method for better tag-reading in fi' +
+                'les with "unicode-filenames".'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Auto-detect (probably) used character sets'
+              TabOrder = 10
+            end
+          end
+          object cpCDDB: TCategoryPanel
+            Top = 424
+            Height = 290
+            Caption = 'CDDB settings'
+            TabOrder = 1
+            object lblInvalidCDDBMail: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 169
+              Width = 394
+              Height = 11
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'E-mail is invalid'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -9
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ExplicitWidth = 65
+            end
+            object lblLocalCDDBCache: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 196
+              Width = 394
+              Height = 14
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Local cache for CDDB information'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ExplicitWidth = 181
+            end
+            object cbUseCDDB: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 37
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Use online CDDB to get audio CD information'
+              TabOrder = 1
+            end
+            object cbPreferCDDB: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 58
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Prefer CDDB information over CD-Text'
+              TabOrder = 2
+            end
+            object edtCDDBServer: TLabeledEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 99
+              Width = 394
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 24
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              EditLabel.Width = 197
+              EditLabel.Height = 13
+              EditLabel.Caption = 'CDDB server (default: gnudb.gnudb.org)'
+              TabOrder = 3
+              Text = ''
+            end
+            object edtCDDBEMail: TLabeledEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 144
+              Width = 394
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 24
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              EditLabel.Width = 53
+              EditLabel.Height = 13
+              EditLabel.Caption = 'Your e-mail'
+              TabOrder = 4
+              Text = ''
+              OnExit = edtCDDBEMailExit
+            end
+            object cbAutoCheckNewCDs: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 16
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Automatically scan new CDs'
+              TabOrder = 0
+            end
+            object btnClearCDDBCache: TButton
+              Left = 16
+              Top = 217
+              Width = 99
+              Height = 25
+              Caption = 'Clear cache'
+              TabOrder = 5
+              OnClick = btnClearCDDBCacheClick
+            end
+          end
+        end
+      end
+      object tabSearch: TTabSheet
+        ImageIndex = 13
+        ImageName = 'OptionsSearch'
+        object cpgSearchSettings: TCategoryPanelGroup
+          Left = 0
+          Top = 0
+          Width = 449
+          Height = 546
+          VertScrollBar.Tracking = True
+          Align = alClient
+          Color = clBtnFace
+          HeaderFont.Charset = DEFAULT_CHARSET
+          HeaderFont.Color = clWindowText
+          HeaderFont.Height = -12
+          HeaderFont.Name = 'Segoe UI'
+          HeaderFont.Style = []
+          TabOrder = 0
+          object cpGeneralSearchSettings: TCategoryPanel
+            Top = 0
+            Height = 481
+            Caption = 'Search settings'
+            TabOrder = 0
+            object lblSearchSettingsHint: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 16
+              Width = 411
+              Height = 26
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 
+                'Nemp can increase the speed of the quick search, but this also i' +
+                'ncreases the memory usage.'
+              WordWrap = True
+            end
+            object Label2: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 205
+              Width = 411
+              Height = 14
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Quick search performance'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ExplicitWidth = 142
+            end
+            object CB_AccelerateLyricSearch: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 172
+              Width = 411
+              Height = 17
+              Hint = 'Use some tricky algorithms to accelerate the search for lyrics.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Accelerate lyrics search'
+              TabOrder = 6
+            end
+            object CB_AccelerateSearch: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 46
+              Width = 411
+              Height = 17
+              Hint = 'Use some tricky algorithms to accelerate the search.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Accelerate search'
+              TabOrder = 0
+              OnClick = CB_AccelerateSearchClick
+            end
+            object CB_AccelerateSearchIncludeComment: TCheckBox
+              AlignWithMargins = True
+              Left = 36
+              Top = 88
+              Width = 391
+              Height = 17
+              Hint = 'Include comments to the accelerated search algorithms.'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Including comments'
+              TabOrder = 2
+            end
+            object CB_AccelerateSearchIncludeGenre: TCheckBox
+              AlignWithMargins = True
+              Left = 36
+              Top = 109
+              Width = 391
+              Height = 17
+              Hint = 'Include genres to the accelerated search algorithms.'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Including genre'
+              TabOrder = 3
+            end
+            object CB_AccelerateSearchIncludePath: TCheckBox
+              AlignWithMargins = True
+              Left = 36
+              Top = 67
+              Width = 391
+              Height = 17
+              Hint = 'Include filenames to the accelerated search algorithms.'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Including filenames'
+              TabOrder = 1
+            end
+            object cb_ChangeCoverflowOnSearch: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 286
+              Width = 411
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Change coverflow according to results'
+              TabOrder = 10
+            end
+            object CB_QuickSearchAllowErrorsOnEnter: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 244
+              Width = 411
+              Height = 17
+              Hint = 
+                'Do a fuzzy search after pressing "enter" (e.g. show files from "' +
+                'Amy MacDonald" when you search for "Amy McDonald")'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Allow errors on [Enter]'
+              TabOrder = 8
+            end
+            object CB_QuickSearchAllowErrorsWhileTyping: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 265
+              Width = 411
+              Height = 17
+              Hint = 
+                'Always use a fuzzy search (e.g. show files from "Amy MacDonald" ' +
+                'when you search for "Amy McDonald")'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Allow errors while typing'
+              TabOrder = 9
+            end
+            object CB_QuickSearchWhileYouType: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 223
+              Width = 411
+              Height = 17
+              Hint = 
+                'Show search results in "real time" or just after pressing the "e' +
+                'nter"-key.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = '"While you type"'
+              TabOrder = 7
+            end
+            object CB_AccelerateSearchIncludeAlbumArtist: TCheckBox
+              AlignWithMargins = True
+              Left = 36
+              Top = 130
+              Width = 391
+              Height = 17
+              Hint = 'Include the album-artist to the accelerated search algorithms.'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Including album-artist'
+              TabOrder = 4
+            end
+            object CB_AccelerateSearchIncludeComposer: TCheckBox
+              AlignWithMargins = True
+              Left = 36
+              Top = 151
+              Width = 391
+              Height = 17
+              Hint = 'Include the composer to the accelerated search algorithms.'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Including composer'
+              TabOrder = 5
+            end
+          end
+        end
+      end
+      object tabWebradio: TTabSheet
+        ImageIndex = 14
+        ImageName = 'OptionsWebradio'
+        object cpgWebstreams: TCategoryPanelGroup
+          Left = 0
+          Top = 0
+          Width = 449
+          Height = 546
+          VertScrollBar.Tracking = True
+          Align = alClient
+          Color = clBtnFace
+          HeaderFont.Charset = DEFAULT_CHARSET
+          HeaderFont.Color = clWindowText
+          HeaderFont.Height = -12
+          HeaderFont.Name = 'Segoe UI'
+          HeaderFont.Style = []
+          TabOrder = 0
+          OnMouseWheel = CategoryPanelGroupMouseWheel
+          object cpWebstreamsPlaylists: TCategoryPanel
+            Top = 336
+            Height = 121
+            Caption = 'Playlist parsing'
+            TabOrder = 0
+            object Label1: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 16
+              Width = 411
+              Height = 13
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Playlist files (e.g. http://myradio.com/tunein.pls)'
+              ExplicitWidth = 233
+            end
+            object rbWebRadioParseFile: TRadioButton
+              AlignWithMargins = True
+              Left = 16
+              Top = 33
+              Width = 411
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Parse stream playlist and add all contained streams to playlist'
+              TabOrder = 0
+            end
+            object rbWebRadioHandledByBass: TRadioButton
+              AlignWithMargins = True
+              Left = 16
+              Top = 54
+              Width = 411
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Just add playlist URL to the playlist (recommended)'
+              Checked = True
+              TabOrder = 1
+              TabStop = True
+            end
+          end
+          object cpWebstremRecording: TCategoryPanel
+            Top = 0
+            Height = 336
+            Caption = 'Recording settings'
+            TabOrder = 1
+            object LblConst_FilenameExtension: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 113
+              Width = 231
+              Height = 13
+              Margins.Left = 16
+              Margins.Top = 2
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Caption = '(A proper extension will be added automatically)'
+            end
+            object LblConst_WebradioHint: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 288
+              Width = 433
+              Height = 33
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              AutoSize = False
+              Caption = 
+                'These values are approximate values. Resulting length/size may v' +
+                'ary.'
+              WordWrap = True
+            end
+            object lblSplitWebRadioStreams: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 152
+              Width = 47
+              Height = 14
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Caption = 'Split files'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+            end
+            object cbAutoSplitBySize: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 189
+              Width = 394
+              Height = 17
+              Hint = 'Split recordings by size.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Caption = 'Split files by size'
+              TabOrder = 3
+              OnClick = cbAutoSplitBySizeClick
+            end
+            object cbAutoSplitByTime: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 236
+              Width = 394
+              Height = 17
+              Hint = 'Split recordings by time.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Caption = 'Split files by time'
+              TabOrder = 5
+              OnClick = cbAutoSplitByTimeClick
+            end
+            object cbAutoSplitByTitle: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 168
+              Width = 394
+              Height = 17
+              Hint = 
+                'Try to split the stream when a new title begins. This will work ' +
+                'only if the station submits proper title information.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Caption = 'Begin new file for every title'
+              Checked = True
+              State = cbChecked
+              TabOrder = 2
+            end
+            object cbFilenameFormat: TLabeledComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 90
+              Width = 377
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 24
+              Margins.Right = 200
+              Margins.Bottom = 0
+              Anchors = [akLeft, akTop, akRight]
+              ItemIndex = 0
+              TabOrder = 1
+              Text = '<date>, <time> - <title>'
+              OnChange = cbFilenameFormatChange
+              Items.Strings = (
+                '<date>, <time> - <title>'
+                '<date>, <time> - <streamname> - <title>'
+                '<title>'
+                '<streamname> - <title>')
+              EditLabel.Width = 101
+              EditLabel.Height = 13
+              EditLabel.Caption = 'Pattern for filenames'
+            end
+            object cbUseStreamnameAsDirectory: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 49
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Caption = 'Use streamname as directory'
+              TabOrder = 0
+            end
+            object SE_AutoSplitMaxSize: TLabeledSpinEdit
+              AlignWithMargins = True
+              Left = 36
+              Top = 210
+              Width = 65
+              Height = 22
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 320
+              Margins.Bottom = 0
+              MaxValue = 2000
+              MinValue = 1
+              TabOrder = 4
+              Value = 10
+              EditLabel.Width = 50
+              EditLabel.Height = 22
+              EditLabel.Caption = 'MB per file'
+              LabelPosition = lpRight
+              LabelSpacing = 8
+            end
+            object SE_AutoSplitMaxTime: TLabeledSpinEdit
+              AlignWithMargins = True
+              Left = 36
+              Top = 257
+              Width = 65
+              Height = 22
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Right = 320
+              Margins.Bottom = 0
+              MaxValue = 1440
+              MinValue = 1
+              TabOrder = 6
+              Value = 10
+              EditLabel.Width = 73
+              EditLabel.Height = 22
+              EditLabel.Caption = 'Minutes per file'
+              LabelPosition = lpRight
+              LabelSpacing = 8
+            end
+            object EdtDownloadDir: TLabeledEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 24
+              Width = 377
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 24
+              Margins.Right = 64
+              Margins.Bottom = 0
+              Anchors = [akLeft, akTop, akRight]
+              EditLabel.Width = 93
+              EditLabel.Height = 13
+              EditLabel.Caption = 'Download directory'
+              TabOrder = 7
+              Text = ''
+            end
+            object BtnChooseDownloadDir: TButton
+              AlignWithMargins = True
+              Left = 403
+              Top = 24
+              Width = 28
+              Height = 21
+              Anchors = [akTop, akRight]
+              Caption = '...'
+              TabOrder = 8
+              OnClick = BtnChooseDownloadDirClick
+            end
+          end
+        end
+      end
+      object tabEffects: TTabSheet
+        ImageIndex = 2
+        ImageName = 'OptionsEffects'
+        object cpgEffects: TCategoryPanelGroup
+          Left = 0
+          Top = 0
+          Width = 449
+          Height = 546
+          VertScrollBar.Tracking = True
+          Align = alClient
+          Color = clBtnFace
+          HeaderFont.Charset = DEFAULT_CHARSET
+          HeaderFont.Color = clWindowText
+          HeaderFont.Height = -12
+          HeaderFont.Name = 'Segoe UI'
+          HeaderFont.Style = []
+          TabOrder = 0
+          object cpReplayGain: TCategoryPanel
+            Top = 0
+            Height = 190
+            Caption = 'ReplayGain'
+            TabOrder = 0
+            object lblDefaultGainValue: TLabel
+              Left = 376
+              Top = 128
+              Width = 37
+              Height = 13
+              Caption = '0.00 dB'
+            end
+            object lblDefaultGainValue2: TLabel
+              Left = 376
+              Top = 104
+              Width = 37
+              Height = 13
+              Caption = '0.00 dB'
+            end
+            object lblReplayGainDefault: TLabel
+              Left = 16
+              Top = 82
+              Width = 88
+              Height = 14
+              Caption = 'Pre-amplification'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+            end
+            object lblRG_Preamp1: TLabel
+              Left = 16
+              Top = 104
+              Width = 39
+              Height = 13
+              Caption = 'With RG'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+            end
+            object lblRG_Preamp2: TLabel
+              Left = 16
+              Top = 128
+              Width = 55
+              Height = 13
+              Caption = 'Without RG'
+            end
+            object cb_ApplyReplayGain: TCheckBox
+              Left = 16
+              Top = 16
+              Width = 420
+              Height = 17
+              Hint = 
+                'Use ReplayGain values to achieve a more consistent loudness duri' +
+                'ng playback.'
+              Caption = 'Use ReplayGain for a more consistent loudness during playback'
+              TabOrder = 0
+              OnClick = cb_ApplyReplayGainClick
+            end
+            object cb_PreferAlbumGain: TCheckBox
+              Left = 16
+              Top = 34
+              Width = 420
+              Height = 17
+              Hint = 
+                'Use AlbumGain values to maintain intentional loudness changes wi' +
+                'thin albums'
+              Caption = 'Prefer AlbumGain'
+              TabOrder = 1
+            end
+            object cb_ReplayGainPreventClipping: TCheckBox
+              Left = 16
+              Top = 52
+              Width = 420
+              Height = 17
+              Hint = 'Limit amplification to prevent playback from clipping, if needed'
+              Caption = 'Prevent clipping'
+              TabOrder = 2
+            end
+            object tp_DefaultGain: TNempTrackBar
+              Left = 104
+              Top = 123
+              Width = 266
+              Height = 24
+              Hint = 'Pre-amplification for tracks without ReplayGain information'
+              Max = 200
+              Min = -200
+              PageSize = 10
+              TabOrder = 4
+              TickMarks = tmBoth
+              TickStyle = tsNone
+              OnChange = tp_DefaultGainChange
+              OnMouseDown = tp_DefaultGainMouseDown
+            end
+            object tp_DefaultGain2: TNempTrackBar
+              Left = 104
+              Top = 100
+              Width = 266
+              Height = 24
+              Hint = 'Pre-amplification for tracks with ReplayGain information'
+              Max = 200
+              Min = -200
+              PageSize = 10
+              TabOrder = 3
+              TickMarks = tmBoth
+              TickStyle = tsNone
+              OnChange = tp_DefaultGain2Change
+              OnMouseDown = tp_DefaultGain2MouseDown
+            end
+          end
+          object cpEffects: TCategoryPanel
+            Top = 190
+            Height = 245
+            Caption = 'Equalizer and Effects'
+            TabOrder = 1
+            object lblJingles: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 91
+              Width = 411
+              Height = 14
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Jingles (playback via F9, Push-to-talk via F8)'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              ExplicitWidth = 238
+            end
+            object LblConst_JingleVolume: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 160
+              Width = 411
+              Height = 13
+              Hint = 'Volume of the jingle in relation to main volume.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Volume of jingles'
+              ExplicitWidth = 80
+            end
+            object CB_UseDefaultEffects: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 37
+              Width = 411
+              Height = 17
+              Hint = 'Disable effects when Nemp starts'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Reset effects on start'
+              Checked = True
+              State = cbChecked
+              TabOrder = 1
+            end
+            object CB_UseDefaultEqualizer: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 16
+              Width = 411
+              Height = 17
+              Hint = 'Disable equalizer when Nemp starts'
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Reset equalizer on start'
+              TabOrder = 0
+            end
+            object cb_UseWalkmanMode: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 58
+              Width = 411
+              Height = 17
+              Hint = 'Just as those cassette players did before "mp3" was invented.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Flutter playback when battery is low ("Walkman mode")'
+              TabOrder = 2
+            end
+            object CBJingleReduce: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 113
+              Width = 411
+              Height = 17
+              Hint = 'Reduce main volume before when playing a jingle'
+              Margins.Left = 16
+              Margins.Top = 8
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Reduce main volume to'
+              TabOrder = 3
+              OnClick = CBJingleReduceClick
+            end
+            object SEJingleReduce: TLabeledSpinEdit
+              AlignWithMargins = True
+              Left = 36
+              Top = 134
+              Width = 50
+              Height = 22
+              Hint = 'Reduce main volume before when playing a jingle'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Bottom = 0
+              Align = alTop
+              Constraints.MaxWidth = 50
+              MaxValue = 100
+              MinValue = 0
+              TabOrder = 4
+              Value = 50
+              EditLabel.Width = 11
+              EditLabel.Height = 22
+              EditLabel.Caption = '%'
+              LabelPosition = lpRight
+              LabelSpacing = 8
+            end
+            object SEJingleVolume: TLabeledSpinEdit
+              AlignWithMargins = True
+              Left = 36
+              Top = 177
+              Width = 50
+              Height = 22
+              Hint = 'Volume of the jingle in relation to main volume.'
+              Margins.Left = 36
+              Margins.Top = 4
+              Margins.Bottom = 0
+              Align = alTop
+              Constraints.MaxWidth = 50
+              MaxValue = 200
+              MinValue = 0
+              TabOrder = 5
+              Value = 100
+              EditLabel.Width = 86
+              EditLabel.Height = 22
+              EditLabel.Caption = '% of main volume'
+              LabelPosition = lpRight
+              LabelSpacing = 8
+            end
+          end
+        end
+      end
+      object tabBirthday: TTabSheet
+        ImageIndex = 10
+        ImageName = 'OptionsParty'
+        object cpgBirthday: TCategoryPanelGroup
+          Left = 0
+          Top = 0
+          Width = 449
+          Height = 546
+          VertScrollBar.Tracking = True
+          Align = alClient
+          Color = clBtnFace
+          HeaderFont.Charset = DEFAULT_CHARSET
+          HeaderFont.Color = clWindowText
+          HeaderFont.Height = -12
+          HeaderFont.Name = 'Segoe UI'
+          HeaderFont.Style = []
+          TabOrder = 0
+          object cpBirthdayMain: TCategoryPanel
+            Top = 0
+            Height = 489
+            Caption = 'Happy Birthday timer'
+            TabOrder = 0
+            object lblHappyBirthday: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 16
+              Width = 411
+              Height = 39
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 
+                'If you are celebrating into a birthday, or celebrating into the ' +
+                'New Year and you don'#39't want to miss midnight, then you can activ' +
+                'ate the Happy Birthday timer. Nemp will then pause the playlist ' +
+                'at the specified time to play a special song.'
+              WordWrap = True
+              ExplicitLeft = 8
+              ExplicitTop = 0
+              ExplicitWidth = 417
+            end
+            object BtnActivateBirthdayMode: TButton
+              AlignWithMargins = True
+              Left = 16
+              Top = 319
+              Width = 105
+              Height = 25
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 4
+              Caption = 'Activate'
+              Constraints.MaxWidth = 411
+              TabOrder = 8
+              OnClick = BtnActivateBirthdayModeClick
+            end
+            object BtnBirthdaySong: TButton
+              Left = 458
+              Top = 127
+              Width = 25
+              Height = 21
+              Hint = 'Select file'
+              Anchors = [akTop, akRight]
+              Caption = '...'
+              TabOrder = 1
+              OnClick = BtnBirthdaySongClick
+            end
+            object BtnGetBirthdayTitel: TButton
+              AlignWithMargins = True
+              Left = 16
+              Top = 138
+              Width = 200
+              Height = 25
+              Hint = 'Use the current selected file in player as birthday song.'
+              Margins.Left = 16
+              Margins.Top = 0
+              Margins.Right = 16
+              Margins.Bottom = 4
+              Caption = 'Use selection in main window'
+              Constraints.MaxWidth = 411
+              TabOrder = 2
+              OnClick = BtnGetBirthdayTitelClick
+            end
+            object CBContinueAfter: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 282
+              Width = 411
+              Height = 17
+              Hint = 'Continue with the playlist after the birthday song.'
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 4
+              Caption = 'Continue with the playlist after playing the birthday song'
+              TabOrder = 7
+            end
+            object EditBirthdaySong: TLabeledEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 113
+              Width = 411
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 4
+              EditLabel.Width = 100
+              EditLabel.Height = 13
+              EditLabel.Caption = 'Happy Birthday song'
+              TabOrder = 0
+              Text = ''
+              OnChange = EditBirthdaySongChange
+            end
+            object BtnCountDownSong: TButton
+              Left = 458
+              Top = 234
+              Width = 25
+              Height = 21
+              Hint = 'Select file'
+              Anchors = [akTop, akRight]
+              Caption = '...'
+              TabOrder = 5
+              OnClick = BtnCountDownSongClick
+            end
+            object BtnGetCountDownTitel: TButton
+              AlignWithMargins = True
+              Left = 16
+              Top = 237
+              Width = 200
+              Height = 25
+              Hint = 'Use the current selected file in player as countdown.'
+              Margins.Left = 16
+              Margins.Top = 0
+              Margins.Right = 16
+              Margins.Bottom = 4
+              Caption = 'Use selection in main window'
+              Constraints.MaxWidth = 411
+              TabOrder = 6
+              OnClick = BtnGetCountDownTitelClick
+            end
+            object CBStartCountDown: TCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 175
+              Width = 411
+              Height = 17
+              Hint = 'Signalize birthday song with a countdown.'
+              Margins.Left = 16
+              Margins.Top = 8
+              Margins.Right = 16
+              Margins.Bottom = 4
+              Caption = 'Start a countdown before the actual time'
+              TabOrder = 3
+              OnClick = CBStartCountDownClick
+            end
+            object EditCountdownSong: TLabeledEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 212
+              Width = 411
+              Height = 21
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 4
+              EditLabel.Width = 76
+              EditLabel.Height = 13
+              EditLabel.Caption = 'Countdown title'
+              TabOrder = 4
+              Text = ''
+              OnChange = EditCountdownSongChange
+            end
+            object pnlBirthdayTime: TPanel
+              AlignWithMargins = True
+              Left = 0
+              Top = 59
+              Width = 443
+              Height = 30
+              Margins.Left = 0
+              Margins.Top = 4
+              Margins.Right = 0
+              Margins.Bottom = 8
+              Align = alTop
+              BevelOuter = bvNone
+              TabOrder = 9
+              object Lbl_Const_EventTime: TLabel
+                Left = 16
+                Top = 7
+                Width = 22
+                Height = 13
+                Hint = 
+                  'Time when the birthday song should be played. The optional count' +
+                  'down will end at this time.'
+                Caption = 'Time'
+              end
+              object mskEdt_BirthdayTime: TMaskEdit
+                Left = 67
+                Top = 4
+                Width = 41
+                Height = 21
+                EditMask = '!90:00;1;_'
+                MaxLength = 5
+                TabOrder = 0
+                Text = '  :  '
+                OnExit = mskEdt_BirthdayTimeExit
+              end
+            end
+          end
+        end
+      end
+      object tabLastfm: TTabSheet
+        ImageIndex = 6
+        ImageName = 'OptionsLastFM'
+        object cpgScrobble: TCategoryPanelGroup
+          Left = 0
+          Top = 0
+          Width = 449
+          Height = 546
+          VertScrollBar.Tracking = True
+          Align = alClient
+          Color = clBtnFace
+          HeaderFont.Charset = DEFAULT_CHARSET
+          HeaderFont.Color = clWindowText
+          HeaderFont.Height = -12
+          HeaderFont.Name = 'Segoe UI'
+          HeaderFont.Style = []
+          TabOrder = 0
+          object cpScrobbleLog: TCategoryPanel
+            Top = 329
+            Height = 240
+            Caption = 'Scrobble log (this session only)'
+            TabOrder = 0
+            object MemoScrobbleLog: TMemo
+              Left = 0
+              Top = 0
+              Width = 426
+              Height = 214
+              Align = alClient
+              Lines.Strings = (
+                'MemoScrobbleLog')
+              ReadOnly = True
+              ScrollBars = ssVertical
+              TabOrder = 0
+            end
+          end
+          object cpScrobbleSettings: TCategoryPanel
+            Top = 169
+            Height = 160
+            Caption = 'Scrobble settings'
+            TabOrder = 1
+            object Label5: TLabel
+              Left = 32
+              Top = 72
+              Width = 343
+              Height = 13
+              Caption = 
+                'In case scrobbling was paused automatically and you fixed the re' +
+                'ason: '
+            end
+            object Btn_ScrobbleAgain: TButton
+              Left = 32
+              Top = 88
+              Width = 145
+              Height = 25
+              Hint = 'Restart scrobbling.'
+              Caption = 'Scrobble again!'
+              TabOrder = 3
+              OnClick = Btn_ScrobbleAgainClick
+            end
+            object CB_AlwaysScrobble: TCheckBox
+              Left = 16
+              Top = 16
+              Width = 414
+              Height = 17
+              Hint = 'Always begin scrobbling when nemp starts.'
+              Caption = 'Scrobble always'
+              TabOrder = 0
+            end
+            object CB_ScrobbleThisSession: TCheckBox
+              Left = 16
+              Top = 32
+              Width = 414
+              Height = 17
+              Hint = 'Begin scrobbling now.'
+              Caption = 'Scrobble this session'
+              TabOrder = 1
+            end
+            object CB_SilentError: TCheckBox
+              Left = 16
+              Top = 49
+              Width = 414
+              Height = 17
+              Hint = 
+                'Ignore hard failures like "no internet connection", "invalid use' +
+                'rname/password", ...'
+              Caption = 
+                'Ignore hard failures - just stop scrobbling if something goes wr' +
+                'ong'
+              TabOrder = 2
+            end
+          end
+          object cpScrobbleSetup: TCategoryPanel
+            Top = 0
+            Height = 169
+            Caption = 'last.fm Scrobbler setup'
+            TabOrder = 2
+            object LblScrobble1: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 16
+              Width = 394
+              Height = 39
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Margins.Bottom = 8
+              Align = alTop
+              Caption = 
+                'Nemp can scrobble what you hear to your account on LastFM. To do' +
+                ' this, Nemp needs your permission to access your account. Go onl' +
+                'ine and click the button below to start the configuration.'
+              WordWrap = True
+              ExplicitWidth = 385
+            end
+            object BtnScrobbleWizard: TButton
+              Left = 16
+              Top = 76
+              Width = 75
+              Height = 25
+              Caption = 'Start'
+              TabOrder = 0
+              OnClick = BtnScrobbleWizardClick
+            end
+            object lblLastFMLink: TLinkLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 118
+              Width = 394
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 0
+              Margins.Right = 16
+              Margins.Bottom = 8
+              Align = alBottom
+              Caption = 'For details visit <a href="https://www.last.fm">www.last.fm</a>'
+              TabOrder = 1
+              OnLinkClick = lblLastFMLinkLinkClick
+              ExplicitWidth = 140
+            end
+          end
+        end
+      end
+      object tabWebserver: TTabSheet
+        ImageIndex = 15
+        ImageName = 'OptionsWebServer'
+        object cpgWebserverConfiguration: TCategoryPanelGroup
+          Left = 0
+          Top = 0
+          Width = 449
+          Height = 546
+          VertScrollBar.Tracking = True
+          Align = alClient
+          HeaderFont.Charset = DEFAULT_CHARSET
+          HeaderFont.Color = clWindowText
+          HeaderFont.Height = -12
+          HeaderFont.Name = 'Segoe UI'
+          HeaderFont.Style = []
+          TabOrder = 0
+          OnMouseWheel = CategoryPanelGroupMouseWheel
+          object cpWebServerUrls: TCategoryPanel
+            Top = 409
+            Height = 650
+            Caption = 'Webserver URLs'
+            TabOrder = 2
+            object LabelLANIP: TLabel
+              Left = 16
+              Top = 16
+              Width = 121
+              Height = 13
+              AutoSize = False
+              Caption = 'Your IP (LAN)'
+              Transparent = True
+            end
+            object LblConst_IPWAN: TLabel
+              Left = 16
+              Top = 59
+              Width = 86
+              Height = 13
+              Caption = 'Your IP (Internet)'
+              Transparent = True
+            end
+            object imgQRCode: TImage
+              Left = 17
+              Top = 204
+              Width = 400
+              Height = 400
+              Stretch = True
+            end
+            object lblQRCode: TLabel
+              Left = 17
+              Top = 118
+              Width = 44
+              Height = 14
+              Caption = 'QRCode'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+            end
+            object lblCurrentQRCodeURL: TLabel
+              Left = 17
+              Top = 185
+              Width = 120
+              Height = 13
+              Caption = 'Current URL in QRCode: '
+            end
+            object BtnGetIPs: TButton
+              Left = 222
+              Top = 73
+              Width = 159
+              Height = 25
+              Hint = 
+                'Get your Internet-IP (done via a little php-script on www.gausi.' +
+                'de).'
+              Caption = 'Get IP-address'
+              TabOrder = 2
+              OnClick = BtnGetIPsClick
+            end
+            object cbLANIPs: TComboBox
+              Left = 17
+              Top = 32
+              Width = 200
+              Height = 21
+              Hint = 'Your IP(s) inside the local area network (LAN).'
+              Style = csDropDownList
+              TabOrder = 0
+              OnChange = ChangeWebserverLinks
+              Items.Strings = (
+                '')
+            end
+            object EdtGlobalIP: TEdit
+              Left = 16
+              Top = 75
+              Width = 200
+              Height = 21
+              Hint = 
+                'Your IP "in the internet". You have to configure your router and' +
+                '/or firewall properly (e.g. forwarding Port80 to your machine) '
+              ReadOnly = True
+              TabOrder = 1
+              Text = '?'
+            end
+            object cbWebserverAdminQRCode: TCheckBox
+              AlignWithMargins = True
+              Left = 17
+              Top = 138
+              Width = 315
+              Height = 17
+              Caption = 'Include "\admin" in QRCode URL'
+              TabOrder = 3
+              OnClick = ChangeWebserverLinks
+            end
+            object cbWebserverInternetQRCode: TCheckBox
+              AlignWithMargins = True
+              Left = 17
+              Top = 158
+              Width = 315
+              Height = 17
+              Caption = 'Use Internet-IP'
+              Enabled = False
+              TabOrder = 4
+              OnClick = ChangeWebserverLinks
+            end
+          end
+          object cbWebserverUserRights: TCategoryPanel
+            Top = 209
+            Caption = 'User rights'
+            TabOrder = 1
+            object LblConst_Password2: TLabel
+              Left = 224
+              Top = 16
+              Width = 46
+              Height = 13
+              Hint = 'Set username and password to access your library'
+              Caption = 'Password'
+            end
+            object LblConst_Username2: TLabel
+              Left = 16
+              Top = 16
+              Width = 48
+              Height = 13
+              Hint = 'Set username and password to access your library.'
+              Caption = 'Username'
+            end
+            object LblWebserverUserURL: TLabel
+              Left = 17
+              Top = 59
+              Width = 74
+              Height = 13
+              Cursor = crHandPoint
+              Caption = 'http://localhost'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlue
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = [fsUnderline]
+              ParentFont = False
+              OnClick = LblWebserverUserURLClick
+            end
+            object cbAllowRemoteControl: TCheckBox
+              Left = 16
+              Top = 144
+              Width = 397
+              Height = 15
+              Hint = 'Let the user control the player (play/stop/next/volume/...)'
+              Caption = 'Permit remote control of the player'
+              TabOrder = 5
+              OnClick = ChangeWebserverLinks
+            end
+            object cbPermitLibraryAccess: TCheckBox
+              Left = 16
+              Top = 96
+              Width = 397
+              Height = 15
+              Hint = 'Let the user search and browse in your library'
+              Caption = 'Permit access to the media library (read only)'
+              TabOrder = 3
+            end
+            object cbPermitPlaylistDownload: TCheckBox
+              Left = 16
+              Top = 112
+              Width = 397
+              Height = 15
+              Hint = 'Let the user download files from your playlist and library'
+              Caption = 'Permit downloading files'
+              TabOrder = 4
+            end
+            object cbPermitVote: TCheckBox
+              Left = 16
+              Top = 80
+              Width = 397
+              Height = 15
+              Hint = 
+                'Let the user vote for files - files with many votes will be play' +
+                'ed first'
+              Caption = 'Permit voting for files'
+              TabOrder = 2
+            end
+            object EdtPassword: TEdit
+              Left = 223
+              Top = 32
+              Width = 200
+              Height = 21
+              TabOrder = 1
+              OnKeyPress = EdtPasswordKeyPress
+            end
+            object EdtUsername: TEdit
+              Left = 17
+              Top = 32
+              Width = 200
+              Height = 21
+              TabOrder = 0
+              OnKeyPress = EdtUsernameKeyPress
+            end
+            object cbPermitHtmlAudio: TCheckBox
+              Left = 16
+              Top = 128
+              Width = 397
+              Height = 15
+              Hint = 'Let the user play files in the browser'
+              Caption = 'Permit Html audio'
+              TabOrder = 6
+            end
+          end
+          object cpWebserverConfiguration: TCategoryPanel
+            Top = 0
+            Height = 209
+            Caption = 'Webserver configuration'
+            TabOrder = 0
+            object Label7: TLabel
+              Left = 16
+              Top = 85
+              Width = 88
+              Height = 13
+              Hint = 'Set username and password to access your library.'
+              Caption = 'Username (Admin)'
+            end
+            object Label8: TLabel
+              Left = 224
+              Top = 85
+              Width = 86
+              Height = 13
+              Hint = 'Set username and password to access your library'
+              Caption = 'Password (Admin)'
+            end
+            object LblWebServer_Port: TLabel
+              Left = 183
+              Top = 16
+              Width = 20
+              Height = 13
+              Caption = 'Port'
+            end
+            object LblWebserverAdminURL: TLabel
+              Left = 16
+              Top = 127
+              Width = 106
+              Height = 13
+              Cursor = crHandPoint
+              Caption = 'http://localhost/admin'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlue
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = [fsUnderline]
+              ParentFont = False
+              OnClick = LblWebserverAdminURLClick
+            end
+            object LblWebServerTheme: TLabel
+              Left = 16
+              Top = 16
+              Width = 32
+              Height = 13
+              Caption = 'Theme'
+            end
+            object BtnServerActivate: TButton
+              Left = 298
+              Top = 145
+              Width = 125
+              Height = 25
+              Caption = 'Activate server'
+              TabOrder = 6
+              OnClick = BtnServerActivateClick
+            end
+            object BtnShowWebserverLog: TButton
+              Left = 165
+              Top = 145
+              Width = 125
+              Height = 25
+              Caption = 'Show Log'
+              TabOrder = 5
+              OnClick = BtnShowWebserverLogClick
+            end
+            object CBAutoStartWebServer: TCheckBox
+              Left = 16
+              Top = 62
+              Width = 393
+              Height = 17
+              Hint = 'Automatically activate the webserver when Nemp starts.'
+              Caption = 'Activate webserver on start'
+              TabOrder = 2
+            end
+            object cbWebserverRootDir: TComboBox
+              Left = 16
+              Top = 32
+              Width = 155
+              Height = 21
+              Style = csDropDownList
+              TabOrder = 0
+            end
+            object EdtPasswordAdmin: TEdit
+              Left = 223
+              Top = 100
+              Width = 200
+              Height = 21
+              TabOrder = 4
+              OnKeyPress = EdtPasswordKeyPress
+            end
+            object EdtUsernameAdmin: TEdit
+              Left = 17
+              Top = 100
+              Width = 200
+              Height = 21
+              TabOrder = 3
+              OnKeyPress = EdtUsernameAdminKeyPress
+            end
+            object seWebServer_Port: TSpinEdit
+              Left = 183
+              Top = 31
+              Width = 75
+              Height = 22
+              MaxValue = 65535
+              MinValue = 0
+              TabOrder = 1
+              Value = 80
+              OnChange = ChangeWebserverLinks
+            end
+          end
+        end
+      end
+      object tabControl: TTabSheet
+        ImageName = 'OptionsControls'
+        object cpgControlSettings: TCategoryPanelGroup
+          Left = 0
+          Top = 0
+          Width = 449
+          Height = 546
+          VertScrollBar.Tracking = True
+          Align = alClient
+          Color = clBtnFace
+          HeaderFont.Charset = DEFAULT_CHARSET
+          HeaderFont.Color = clWindowText
+          HeaderFont.Height = -12
+          HeaderFont.Name = 'Segoe UI'
+          HeaderFont.Style = []
+          TabOrder = 0
+          OnMouseWheel = CategoryPanelGroupMouseWheel
           object cpTabulatorKeys: TCategoryPanel
-            Top = 405
+            Top = 390
             Height = 100
             Caption = 'Tabulator key'
             TabOrder = 2
-            ExplicitWidth = 440
             object CB_TabStopAtPlayerControls: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 13
-              Width = 401
+              Top = 8
+              Width = 411
               Height = 17
+              Margins.Left = 16
+              Margins.Top = 8
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'Tabstop at player controls'
               TabOrder = 0
             end
             object CB_TabStopAtTabs: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 36
-              Width = 401
+              Top = 29
+              Width = 411
               Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'Tabstop at tool buttons (cover, lyrics, ...)'
               TabOrder = 1
             end
           end
           object cpHotkeys: TCategoryPanel
-            Top = 120
+            Top = 105
             Height = 285
             Caption = 'Global Hotkeys'
             TabOrder = 1
-            ExplicitWidth = 440
             object CB_Activate_DecVol: TCheckBox
               Left = 34
               Top = 200
@@ -1285,36 +6751,53 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object cpMediaKeys: TCategoryPanel
             Top = 0
-            Height = 120
+            Height = 105
             Caption = 'Media keys'
             TabOrder = 0
-            ExplicitWidth = 440
             object CB_IgnoreVolume: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 36
-              Width = 413
+              Top = 29
+              Width = 411
               Height = 17
               Hint = 
                 'If checked, Nemp will ignore volume keys, to allow global volume' +
                 ' control by these keys.'
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'Use volume up/down keys for system-wide volume control'
               Checked = True
               State = cbChecked
               TabOrder = 1
             end
             object cb_RegisterMediaHotkeys: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 16
-              Width = 413
+              Top = 8
+              Width = 411
               Height = 17
+              Margins.Left = 16
+              Margins.Top = 8
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 'Use media keys, even if Nemp is in the background'
               TabOrder = 0
             end
             object cb_UseG15Display: TCheckBox
+              AlignWithMargins = True
               Left = 16
-              Top = 56
-              Width = 401
+              Top = 50
+              Width = 411
               Height = 17
+              Margins.Left = 16
+              Margins.Top = 4
+              Margins.Right = 16
+              Margins.Bottom = 0
+              Align = alTop
               Caption = 
                 'Use keyboard display (Logitech G15 keyboard or compatible requir' +
                 'ed)'
@@ -1323,4931 +6806,28 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
         end
       end
-      object tabViewingSettings: TTabSheet
-        Caption = 'View'
-        ImageIndex = 6
-        object cpgViewingSettings: TCategoryPanelGroup
-          Left = 0
-          Top = 0
-          Width = 439
-          Height = 555
-          VertScrollBar.Tracking = True
-          Align = alClient
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWindowText
-          HeaderFont.Height = -12
-          HeaderFont.Name = 'Segoe UI'
-          HeaderFont.Style = []
-          TabOrder = 0
-          OnMouseWheel = CategoryPanelGroupMouseWheel
-          ExplicitWidth = 444
-          object cpExtendedViewingSettings: TCategoryPanel
-            Top = 940
-            Height = 175
-            Caption = 'Extended viewing settings'
-            TabOrder = 0
-            ExplicitWidth = 423
-            object cb_limitMarkerToCurrentFiles: TCheckBox
-              Left = 16
-              Top = 56
-              Width = 402
-              Height = 17
-              Caption = 'Show marked files only from the current preselection'
-              TabOrder = 2
-            end
-            object CBAlwaysSortAnzeigeList: TCheckBox
-              Left = 16
-              Top = 16
-              Width = 402
-              Height = 17
-              Hint = 'Always sort the displayed files in the library.'
-              Caption = 'Always sort view (slower)'
-              TabOrder = 0
-              OnClick = CBAlwaysSortAnzeigeListClick
-            end
-            object CBSkipSortOnLargeLists: TCheckBox
-              Left = 16
-              Top = 36
-              Width = 402
-              Height = 17
-              Hint = 'Skip this sorting when the list is too large.'
-              Caption = 'Skip sort on large lists (> 5000)'
-              TabOrder = 1
-            end
-            object CB_ShowAdvancedHints: TCheckBox
-              Left = 16
-              Top = 96
-              Width = 402
-              Height = 17
-              Hint = 'Show hints in the playlist or not.'
-              Caption = 'Show advanced hints'
-              TabOrder = 4
-            end
-            object CBFullRowSelect: TCheckBox
-              Left = 16
-              Top = 116
-              Width = 402
-              Height = 17
-              Hint = 'Select full row or just a single cell in the library.'
-              Caption = 'Select full row in media list'
-              TabOrder = 5
-            end
-            object CBShowHintsInTitlelists: TCheckBox
-              Left = 16
-              Top = 76
-              Width = 402
-              Height = 17
-              Hint = 'Show hints in the library or not.'
-              Caption = 'Show hints in the playlist and the media list'
-              TabOrder = 3
-              OnClick = CBAlwaysSortAnzeigeListClick
-            end
-          end
-          object cpPlaylistFormatting: TCategoryPanel
-            Top = 750
-            Height = 190
-            Caption = 'Playlist formatting'
-            TabOrder = 1
-            ExplicitWidth = 423
-            object lblPlaylistTitle: TLabel
-              Left = 16
-              Top = 16
-              Width = 125
-              Height = 13
-              AutoSize = False
-              Caption = 'Regular title'
-            end
-            object lblPlaylistTitleCueAlbum: TLabel
-              Left = 16
-              Top = 60
-              Width = 125
-              Height = 13
-              AutoSize = False
-              Caption = 'Cue (Album)'
-            end
-            object lblPlaylistTitleCueTitle: TLabel
-              Left = 16
-              Top = 82
-              Width = 125
-              Height = 13
-              AutoSize = False
-              Caption = 'Cue (Title)'
-            end
-            object lblPlaylistTitleFB: TLabel
-              Left = 16
-              Top = 38
-              Width = 125
-              Height = 13
-              AutoSize = False
-              Caption = 'Regular title (fallback)'
-            end
-            object lblPlaylistWebradioTitle: TLabel
-              Left = 16
-              Top = 104
-              Width = 125
-              Height = 13
-              AutoSize = False
-              Caption = 'Webradio'
-            end
-            object cb_ShowIndexInTreeview: TCheckBox
-              Left = 16
-              Top = 128
-              Width = 409
-              Height = 17
-              Caption = 'Show column "Index"'
-              TabOrder = 5
-            end
-            object cbPlaylistTitle: TComboBox
-              AlignWithMargins = True
-              Left = 168
-              Top = 11
-              Width = 250
-              Height = 21
-              AutoComplete = False
-              Color = clBtnFace
-              ItemIndex = 0
-              TabOrder = 0
-              Text = '<artist> - <title>'
-              Items.Strings = (
-                '<artist> - <title>'
-                '<artist> - <title> (<year>)'
-                '<artist> - <title> (<album>)'
-                '<artist> - <title> (<album>, Track <track>)'
-                '<artist> - <title> (Track <track>)'
-                '<artist> - <album>'
-                '<filename>'
-                '<subdir>\<filename>'
-                '<fullpath>')
-            end
-            object cbPlaylistTitleCueAlbum: TComboBox
-              AlignWithMargins = True
-              Left = 168
-              Top = 57
-              Width = 250
-              Height = 21
-              AutoComplete = False
-              Color = clBtnFace
-              ItemIndex = 5
-              TabOrder = 2
-              Text = '<artist> - <album>'
-              Items.Strings = (
-                '<artist> - <title>'
-                '<artist> - <title> (<year>)'
-                '<artist> - <title> (<album>)'
-                '<artist> - <title> (<album>, Track <track>)'
-                '<artist> - <title> (Track <track>)'
-                '<artist> - <album>'
-                '<filename>'
-                '<subdir>\<filename>'
-                '<fullpath>')
-            end
-            object cbPlaylistTitleCueTitle: TComboBox
-              AlignWithMargins = True
-              Left = 168
-              Top = 79
-              Width = 250
-              Height = 21
-              AutoComplete = False
-              Color = clBtnFace
-              ItemIndex = 4
-              TabOrder = 3
-              Text = '<artist> - <title> (Track <track>)'
-              Items.Strings = (
-                '<artist> - <title>'
-                '<artist> - <title> (<year>)'
-                '<artist> - <title> (<album>)'
-                '<artist> - <title> (<album>, Track <track>)'
-                '<artist> - <title> (Track <track>)'
-                '<artist> - <album>'
-                '<filename>'
-                '<subdir>\<filename>'
-                '<fullpath>')
-            end
-            object cbPlaylistTitleFB: TComboBox
-              AlignWithMargins = True
-              Left = 168
-              Top = 35
-              Width = 250
-              Height = 21
-              AutoComplete = False
-              Color = clBtnFace
-              ItemIndex = 2
-              TabOrder = 1
-              Text = '<artist> - <title> (<album>)'
-              Items.Strings = (
-                '<artist> - <title>'
-                '<artist> - <title> (<year>)'
-                '<artist> - <title> (<album>)'
-                '<artist> - <title> (<album>, Track <track>)'
-                '<artist> - <title> (Track <track>)'
-                '<artist> - <album>'
-                '<filename>'
-                '<subdir>\<filename>'
-                '<fullpath>')
-            end
-            object cbPlaylistWebradioTitle: TComboBox
-              AlignWithMargins = True
-              Left = 168
-              Top = 101
-              Width = 250
-              Height = 21
-              AutoComplete = False
-              Color = clBtnFace
-              ItemIndex = 0
-              TabOrder = 4
-              Text = '<station>: <title>'
-              Items.Strings = (
-                '<station>: <title>'
-                '<title>')
-            end
-          end
-          object cpMissingMetaData: TCategoryPanel
-            Top = 328
-            Height = 422
-            Caption = 'Not available metadata'
-            TabOrder = 2
-            ExplicitWidth = 423
-            object LblReplaceAlbumBy: TLabel
-              Left = 16
-              Top = 126
-              Width = 201
-              Height = 13
-              AutoSize = False
-              Caption = 'Album'
-            end
-            object LblReplaceArtistBy: TLabel
-              Left = 16
-              Top = 36
-              Width = 201
-              Height = 13
-              AutoSize = False
-              Caption = 'Artist'
-            end
-            object LblReplaceTitletBy: TLabel
-              Left = 16
-              Top = 81
-              Width = 201
-              Height = 13
-              AutoSize = False
-              Caption = 'Title'
-            end
-            object lblMissingMetaData: TLabel
-              Left = 16
-              Top = 16
-              Width = 385
-              Height = 13
-              AutoSize = False
-              Caption = 'If property ... is not available, display ... instead.'
-              WordWrap = True
-            end
-            object img_DefaultCover: TImage
-              Left = 16
-              Top = 204
-              Width = 137
-              Height = 137
-            end
-            object lbl_DefaultCover: TLabel
-              Left = 16
-              Top = 181
-              Width = 401
-              Height = 17
-              AutoSize = False
-              Caption = 'Default cover (used when no proper cover art can be found.)'
-              WordWrap = True
-            end
-            object lbl_DefaultCoverHint: TLabel
-              Left = 16
-              Top = 347
-              Width = 401
-              Height = 38
-              AutoSize = False
-              Caption = 
-                'Note: Cover art already displayed in the player will not change ' +
-                'until the cover art is loaded again.'
-              WordWrap = True
-            end
-            object cbReplaceAlbumBy: TComboBox
-              Left = 16
-              Top = 144
-              Width = 201
-              Height = 21
-              Style = csDropDownList
-              ItemIndex = 3
-              TabOrder = 2
-              Text = 'Directory (last part)'
-              Items.Strings = (
-                '(Empty string)'
-                #39'N/A'#39
-                'Filename'
-                'Directory (last part)'
-                'Directory'
-                'Complete path'
-                'Filename(with extension)')
-            end
-            object cbReplaceArtistBy: TComboBox
-              Left = 16
-              Top = 54
-              Width = 201
-              Height = 21
-              Style = csDropDownList
-              ItemIndex = 2
-              TabOrder = 0
-              Text = 'Filename'
-              Items.Strings = (
-                '(Empty string)'
-                #39'N/A'#39
-                'Filename'
-                'Directory (last part)'
-                'Directory'
-                'Complete path'
-                'Filename(with extension)')
-            end
-            object cbReplaceTitleBy: TComboBox
-              Left = 16
-              Top = 99
-              Width = 201
-              Height = 21
-              Style = csDropDownList
-              ItemIndex = 2
-              TabOrder = 1
-              Text = 'Filename'
-              Items.Strings = (
-                '(Empty string)'
-                #39'N/A'#39
-                'Filename'
-                'Directory (last part)'
-                'Directory'
-                'Complete path'
-                'Filename(with extension)')
-            end
-            object btn_DefaultCover: TButton
-              Left = 168
-              Top = 204
-              Width = 110
-              Height = 25
-              Hint = 'Select a file you want to use as cover art'
-              Caption = 'Select'
-              TabOrder = 3
-              OnClick = btn_DefaultCoverClick
-            end
-            object btn_DefaultCoverReset: TButton
-              Left = 168
-              Top = 235
-              Width = 110
-              Height = 25
-              Hint = 'Reset the default cover to the Nemp default cover'
-              Caption = 'Reset'
-              TabOrder = 4
-              OnClick = btn_DefaultCoverResetClick
-            end
-          end
-          object cpViewCategoriesSettings: TCategoryPanel
-            Top = 200
-            Height = 128
-            Caption = 'Display of Albums, Directories, ...'
-            TabOrder = 3
-            ExplicitWidth = 423
-            object cbShowCoverForAlbum: TCheckBox
-              Left = 16
-              Top = 16
-              Width = 421
-              Height = 17
-              Caption = 'Show cover art for albums in tree view'
-              TabOrder = 0
-            end
-            object cbShowElementCount: TCheckBox
-              Left = 16
-              Top = 36
-              Width = 421
-              Height = 17
-              Caption = 'Show number of contained elements'
-              TabOrder = 1
-            end
-            object cbCombineLayers: TCheckBox
-              Left = 16
-              Top = 56
-              Width = 401
-              Height = 17
-              Caption = 'Combine tree view layers when reasonable'
-              TabOrder = 2
-            end
-            object cbShowFilesRecursively: TCheckBox
-              Left = 16
-              Top = 76
-              Width = 401
-              Height = 17
-              Caption = 
-                'Show all contained files recursively (always possible by double ' +
-                'click)'
-              TabOrder = 3
-            end
-          end
-          object cpVisibleColumns: TCategoryPanel
-            Top = 0
-            Caption = 'Visible columns in the medialist'
-            TabOrder = 4
-            ExplicitWidth = 423
-            object clbViewMainColumns: TCheckListBox
-              Left = 0
-              Top = 0
-              Width = 416
-              Height = 174
-              Align = alClient
-              Columns = 3
-              ItemHeight = 13
-              Style = lbOwnerDrawFixed
-              TabOrder = 0
-              OnDrawItem = clbViewMainColumnsDrawItem
-              ExplicitWidth = 421
-            end
-          end
-        end
-      end
-      object tabFontSizes: TTabSheet
-        Caption = 'Fontsizes'
-        ImageIndex = 7
-        object cpgDisplaySettings: TCategoryPanelGroup
-          Left = 0
-          Top = 0
-          Width = 439
-          Height = 555
-          VertScrollBar.Tracking = True
-          Align = alClient
-          ChevronColor = clWindowText
-          ChevronHotColor = clHighlightText
-          Color = clWindow
-          GradientBaseColor = clBtnFace
-          GradientColor = clBtnShadow
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWindowText
-          HeaderFont.Height = -13
-          HeaderFont.Name = 'Segoe UI'
-          HeaderFont.Style = []
-          ParentBackground = True
-          TabOrder = 0
-          ExplicitWidth = 444
-          object cpPartyMode: TCategoryPanel
-            Top = 329
-            Height = 255
-            Caption = 'Party mode'
-            TabOrder = 1
-            ExplicitWidth = 423
-            object Lbl_PartyMode_ResizeFactor: TLabel
-              Left = 16
-              Top = 16
-              Width = 92
-              Height = 13
-              Caption = 'Amplification factor'
-            end
-            object CB_PartyMode_ResizeFactor: TComboBox
-              Left = 16
-              Top = 35
-              Width = 165
-              Height = 21
-              Style = csDropDownList
-              ItemIndex = 1
-              TabOrder = 0
-              Text = '1.5 (moderate amplification)'
-              Items.Strings = (
-                '1 (no amplification)'
-                '1.5 (moderate amplification)'
-                '2 (double sized)'
-                '2.5 (really huge)')
-            end
-            object cb_PartyMode_ShowPasswordOnActivate: TCheckBox
-              Left = 16
-              Top = 118
-              Width = 409
-              Height = 17
-              Caption = 'Show password when activating the Nemp Party Mode'
-              TabOrder = 2
-            end
-            object Edt_PartyModePassword: TLabeledEdit
-              Left = 16
-              Top = 91
-              Width = 121
-              Height = 21
-              EditLabel.Width = 139
-              EditLabel.Height = 13
-              EditLabel.Caption = 'Password to exit Party-Mode'
-              TabOrder = 1
-              Text = ''
-            end
-            object cb_PartyMode_BlockCurrentTitleRating: TCheckBox
-              Left = 16
-              Top = 174
-              Width = 409
-              Height = 17
-              Caption = 'Block rating of current title'
-              TabOrder = 4
-            end
-            object cb_PartyMode_BlockTools: TCheckBox
-              Left = 16
-              Top = 194
-              Width = 409
-              Height = 17
-              Caption = 'Block tools'
-              TabOrder = 5
-            end
-            object cb_PartyMode_BlockTreeEdit: TCheckBox
-              Left = 16
-              Top = 154
-              Width = 409
-              Height = 17
-              Caption = 'Block editing file information in the media list'
-              TabOrder = 3
-            end
-          end
-          object cpFontSettings: TCategoryPanel
-            Top = 0
-            Height = 329
-            Caption = 'Font settings'
-            TabOrder = 0
-            ExplicitWidth = 423
-            object lblFontBrowselists: TLabel
-              Left = 16
-              Top = 16
-              Width = 125
-              Height = 14
-              Caption = 'Tree view (categories)'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -12
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-            end
-            object Label32: TLabel
-              Left = 16
-              Top = 36
-              Width = 43
-              Height = 13
-              Caption = 'Font size'
-              ParentShowHint = False
-              ShowHint = True
-            end
-            object Label34: TLabel
-              Left = 152
-              Top = 36
-              Width = 54
-              Height = 13
-              Caption = 'Row height'
-            end
-            object lbl_Browselist_FontStyle: TLabel
-              Left = 262
-              Top = 36
-              Width = 48
-              Height = 13
-              Caption = 'Font style'
-            end
-            object lblFontPlaylistMedialist: TLabel
-              Left = 16
-              Top = 88
-              Width = 109
-              Height = 14
-              Caption = 'Playlist and medialist'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -12
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-            end
-            object lbl_Medialist_FontStyle: TLabel
-              Left = 262
-              Top = 108
-              Width = 48
-              Height = 13
-              Caption = 'Font style'
-            end
-            object LblConst_BasicFontSize: TLabel
-              Left = 16
-              Top = 108
-              Width = 43
-              Height = 13
-              Caption = 'Font size'
-              ParentShowHint = False
-              ShowHint = True
-            end
-            object LblConst_RowHeight: TLabel
-              Left = 152
-              Top = 108
-              Width = 54
-              Height = 13
-              Caption = 'Row height'
-            end
-            object LblConst_FontCBR: TLabel
-              Left = 226
-              Top = 250
-              Width = 119
-              Height = 13
-              Caption = 'Font for constant bitrate'
-            end
-            object LblConst_FontVBR: TLabel
-              Left = 35
-              Top = 252
-              Width = 115
-              Height = 13
-              Caption = 'Font for variable bitrate'
-            end
-            object cb_Browselist_FontStyle: TComboBox
-              Left = 262
-              Top = 55
-              Width = 129
-              Height = 21
-              Style = csDropDownList
-              ItemIndex = 0
-              TabOrder = 2
-              Text = 'normal'
-              Items.Strings = (
-                'normal'
-                'bold'
-                'italic'
-                'bold italic')
-            end
-            object SEArtistAlbenRowHeight: TSpinEdit
-              Left = 152
-              Top = 52
-              Width = 49
-              Height = 22
-              MaxValue = 144
-              MinValue = 4
-              TabOrder = 1
-              Value = 16
-            end
-            object SEArtistAlbenSIze: TSpinEdit
-              Left = 16
-              Top = 53
-              Width = 49
-              Height = 22
-              MaxValue = 72
-              MinValue = 4
-              TabOrder = 0
-              Value = 16
-            end
-            object cb_Medialist_FontStyle: TComboBox
-              Left = 262
-              Top = 124
-              Width = 129
-              Height = 21
-              Style = csDropDownList
-              ItemIndex = 0
-              TabOrder = 5
-              Text = 'normal'
-              Items.Strings = (
-                'normal'
-                'bold'
-                'italic'
-                'bold italic')
-            end
-            object SEFontSize: TSpinEdit
-              Left = 16
-              Top = 127
-              Width = 49
-              Height = 22
-              MaxValue = 72
-              MinValue = 4
-              TabOrder = 3
-              Value = 8
-            end
-            object SERowHeight: TSpinEdit
-              Left = 152
-              Top = 124
-              Width = 49
-              Height = 22
-              MaxValue = 144
-              MinValue = 4
-              TabOrder = 4
-              Value = 16
-            end
-            object CBChangeFontColoronBitrate: TCheckBox
-              Left = 16
-              Top = 210
-              Width = 400
-              Height = 17
-              Hint = 'Use different colors for different bitrates.'
-              Caption = 'Change font color according to bitrate'
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 8
-              WordWrap = True
-            end
-            object CBChangeFontOnCbrVbr: TCheckBox
-              Left = 16
-              Top = 229
-              Width = 400
-              Height = 17
-              Hint = 'Use different fonts for files with fixed or variable bitrate.'
-              Caption = 'Change font according to constant/variable bitrate'
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 9
-              WordWrap = True
-              OnClick = CBChangeFontOnCbrVbrClick
-            end
-            object CBChangeFontSizeOnLength: TCheckBox
-              Left = 16
-              Top = 191
-              Width = 400
-              Height = 17
-              Hint = 
-                'User bigger fonts for long tracks and smaller ones for short tra' +
-                'cks.'
-              Caption = 'Change font size according to track length'
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 7
-              WordWrap = True
-            end
-            object CBChangeFontStyleOnMode: TCheckBox
-              Left = 16
-              Top = 172
-              Width = 400
-              Height = 17
-              Hint = 'Normal: Joint Stereo, Bold: Full Stereo, Italic: Mono'
-              Caption = 'Change font style according to channel mode'
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 6
-              WordWrap = True
-            end
-            object CBFontNameCBR: TComboBox
-              Left = 226
-              Top = 269
-              Width = 161
-              Height = 21
-              Style = csDropDownList
-              TabOrder = 11
-            end
-            object CBFontNameVBR: TComboBox
-              Left = 35
-              Top = 269
-              Width = 161
-              Height = 21
-              Style = csDropDownList
-              TabOrder = 10
-            end
-          end
-        end
-      end
-      object tabFileManagement: TTabSheet
-        Caption = 'Filemanagement'
-        ImageIndex = 4
-        object cpgFileManagement: TCategoryPanelGroup
-          Left = 0
-          Top = 0
-          Width = 439
-          Height = 555
-          VertScrollBar.Tracking = True
-          Align = alClient
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWindowText
-          HeaderFont.Height = -12
-          HeaderFont.Name = 'Segoe UI'
-          HeaderFont.Style = []
-          TabOrder = 0
-          OnMouseWheel = CategoryPanelGroupMouseWheel
-          ExplicitWidth = 444
-          object cpLibraryCoverArt: TCategoryPanel
-            Top = 495
-            Height = 280
-            Caption = 'Cover art'
-            TabOrder = 0
-            ExplicitWidth = 423
-            object lblSearchCoverArt: TLabel
-              Left = 16
-              Top = 16
-              Width = 106
-              Height = 13
-              Caption = 'Search cover art in ...'
-            end
-            object lblCoverArtQuality: TLabel
-              Left = 16
-              Top = 128
-              Width = 188
-              Height = 13
-              Caption = 'Quality of cover art in the media library'
-            end
-            object CB_CoverSearch_inDir: TCheckBox
-              Left = 16
-              Top = 34
-              Width = 201
-              Height = 17
-              Hint = 'Search for coverfiles within the directory of the audiofile'
-              Caption = 'Directory itself'
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 0
-            end
-            object CB_CoverSearch_inParentDir: TCheckBox
-              Left = 16
-              Top = 54
-              Width = 201
-              Height = 17
-              Hint = 'Search for coverfiles in the parent directory of the audiofile.'
-              Caption = 'Parent directory'
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 1
-            end
-            object CB_CoverSearch_inSisterDir: TCheckBox
-              Left = 16
-              Top = 94
-              Width = 201
-              Height = 17
-              Hint = 
-                'Search for coverfiles in the specified subdirectory of the paren' +
-                't directory.'
-              Caption = 'Sister directory (name)'
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 4
-              OnClick = CB_CoverSearch_inSisterDirClick
-            end
-            object CB_CoverSearch_inSubDir: TCheckBox
-              Left = 16
-              Top = 74
-              Width = 201
-              Height = 17
-              Hint = 'Search for coverfiles in the specified subdirectory.'
-              Caption = 'Subdirectory (name)'
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 2
-              OnClick = CB_CoverSearch_inSubDirClick
-            end
-            object EDTCoverSisterDirName: TEdit
-              Left = 223
-              Top = 94
-              Width = 105
-              Height = 21
-              TabOrder = 5
-              Text = 'cover'
-            end
-            object EDTCoverSubDirName: TEdit
-              Left = 223
-              Top = 74
-              Width = 105
-              Height = 21
-              TabOrder = 3
-              Text = 'cover'
-            end
-            object CB_CoverSearch_LastFM: TCheckBox
-              Left = 16
-              Top = 188
-              Width = 273
-              Height = 17
-              Hint = 'Allow Nemp downloading missing cover files from the internet'
-              Caption = 'Download missing covers from LastFM'
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 7
-            end
-            object BtnClearCoverCache: TButton
-              Left = 16
-              Top = 211
-              Width = 99
-              Height = 25
-              Hint = 'Clear the list of unsuccessfully checked covers'
-              Caption = 'Clear cache'
-              TabOrder = 8
-              OnClick = BtnClearCoverCacheClick
-            end
-            object cb_CoverSize: TComboBox
-              Left = 16
-              Top = 147
-              Width = 201
-              Height = 21
-              Style = csDropDownList
-              ItemIndex = 1
-              TabOrder = 6
-              Text = 'Normal (500x500)'
-              Items.Strings = (
-                'Low (240x240)'
-                'Normal (500x500)'
-                'High (750x750)'
-                'Highest (1000x1000)')
-            end
-          end
-          object cpLibraryFileTypes: TCategoryPanel
-            Top = 260
-            Height = 235
-            Caption = 'File types for the media library'
-            TabOrder = 1
-            ExplicitWidth = 423
-            object LblConst_OnlythefollowingTypes: TLabel
-              Left = 16
-              Top = 39
-              Width = 120
-              Height = 13
-              Caption = 'Only the following types:'
-            end
-            object BtnRecommendedFiletypes: TButton
-              Left = 16
-              Top = 171
-              Width = 128
-              Height = 21
-              Hint = 'Select recommended filetypes only'
-              Caption = 'Recommended'
-              TabOrder = 2
-              OnClick = RecommendedFiletypesClick
-            end
-            object cbIncludeAll: TCheckBox
-              Left = 16
-              Top = 16
-              Width = 397
-              Height = 17
-              Hint = 
-                'When searching for files: Add every supported file or just some ' +
-                'special types.'
-              Caption = 'All types supported by the player'
-              TabOrder = 0
-              OnClick = cbIncludeAllClick
-            end
-            object cbIncludeFiles: TCheckListBox
-              Left = 16
-              Top = 54
-              Width = 440
-              Height = 111
-              Hint = 'List of supported audio files.'
-              Anchors = [akLeft, akTop, akRight]
-              Columns = 4
-              ItemHeight = 13
-              Style = lbOwnerDrawFixed
-              TabOrder = 1
-              OnDrawItem = clbViewMainColumnsDrawItem
-              ExplicitWidth = 445
-            end
-          end
-          object cpScanDirectories: TCategoryPanel
-            Top = 0
-            Height = 260
-            Caption = 'Directories'
-            TabOrder = 2
-            ExplicitWidth = 423
-            object BtnAutoScanAdd: TButton
-              AlignWithMargins = True
-              Left = 341
-              Top = 39
-              Width = 125
-              Height = 21
-              Anchors = [akTop, akRight]
-              Caption = 'Add'
-              TabOrder = 2
-              OnClick = BtnAutoScanAddClick
-              ExplicitLeft = 346
-            end
-            object BtnAutoScanDelete: TButton
-              AlignWithMargins = True
-              Left = 341
-              Top = 64
-              Width = 125
-              Height = 21
-              Anchors = [akTop, akRight]
-              Caption = 'Delete'
-              TabOrder = 3
-              OnClick = BtnAutoScanDeleteClick
-              ExplicitLeft = 346
-            end
-            object BtnAutoScanNow: TButton
-              AlignWithMargins = True
-              Left = 341
-              Top = 88
-              Width = 125
-              Height = 21
-              Hint = 'Scan now for new or missing files, according to the settings'
-              Anchors = [akTop, akRight]
-              Caption = 'Scan now'
-              TabOrder = 4
-              OnClick = BtnAutoScanNowClick
-              ExplicitLeft = 346
-            end
-            object cb_AutoDeleteFiles: TCheckBox
-              Left = 16
-              Top = 156
-              Width = 397
-              Height = 17
-              Hint = 
-                'Check for missing files in your music directories when starting ' +
-                'Nemp and remove them from the media library.'
-              Caption = 'Automatically delete missing files from the media library'
-              TabOrder = 7
-              OnClick = CBAutoScanClick
-            end
-            object cb_AutoDeleteFilesShowInfo: TCheckBox
-              Left = 16
-              Top = 176
-              Width = 397
-              Height = 17
-              Hint = 'Create a log message about missing files'
-              Caption = 'Log summary about deleted files'
-              TabOrder = 8
-            end
-            object CBAskForAutoAddNewDirs: TCheckBox
-              Left = 16
-              Top = 136
-              Width = 397
-              Height = 17
-              Hint = 
-                'When selecting a new directory: Show query whether it should be ' +
-                'added to this list or not.'
-              Caption = 'Show query dialog when adding new directories'
-              TabOrder = 6
-            end
-            object CBAutoAddNewDirs: TCheckBox
-              Left = 16
-              Top = 115
-              Width = 397
-              Height = 17
-              Hint = 'Add new directories to this list'
-              Caption = 'Automatically monitor new directories'
-              TabOrder = 5
-            end
-            object CBAutoScan: TCheckBox
-              Left = 16
-              Top = 16
-              Width = 409
-              Height = 17
-              Hint = 
-                'Check for new files in your music directories when starting Nemp' +
-                '.'
-              Caption = 'Scan the following directories for new files on start'
-              TabOrder = 0
-              OnClick = CBAutoScanClick
-            end
-            object LBAutoscan: TListBox
-              Left = 28
-              Top = 39
-              Width = 299
-              Height = 70
-              Style = lbOwnerDrawVariable
-              Anchors = [akLeft, akTop, akRight]
-              ItemHeight = 13
-              TabOrder = 1
-              OnDrawItem = clbViewMainColumnsDrawItem
-              OnKeyDown = LBAutoscanKeyDown
-              ExplicitWidth = 304
-            end
-            object CBAutoScanPlaylistFilesOnView: TCheckBox
-              Left = 16
-              Top = 196
-              Width = 401
-              Height = 17
-              Hint = 
-                'When browsing in playlists: Get the meta-data from the included ' +
-                'audiofiles'
-              Caption = 'Scan files in playlists on view'
-              TabOrder = 9
-            end
-          end
-        end
-      end
-      object tabCategories: TTabSheet
-        Caption = 'Medialib Configuration'
-        ImageIndex = 5
-        object cpgCategories: TCategoryPanelGroup
-          Left = 0
-          Top = 0
-          Width = 439
-          Height = 555
-          VertScrollBar.Tracking = True
-          Align = alClient
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWindowText
-          HeaderFont.Height = -12
-          HeaderFont.Name = 'Segoe UI'
-          HeaderFont.Style = []
-          TabOrder = 0
-          OnMouseWheel = CategoryPanelGroupMouseWheel
-          ExplicitWidth = 444
-          object cpCategoryPlaylists: TCategoryPanel
-            Top = 787
-            Height = 145
-            Caption = 'Category "Playlists"'
-            TabOrder = 0
-            ExplicitWidth = 423
-            object lblPlaylistCaptionMode: TLabel
-              Left = 16
-              Top = 16
-              Width = 89
-              Height = 13
-              Caption = 'Display playlists as'
-            end
-            object lblPlaylistSortMode: TLabel
-              Left = 16
-              Top = 62
-              Width = 35
-              Height = 13
-              Caption = 'Sort by'
-            end
-            object cbPlaylistCaptionMode: TComboBox
-              Left = 16
-              Top = 35
-              Width = 225
-              Height = 21
-              Style = csDropDownList
-              ItemIndex = 0
-              TabOrder = 0
-              Text = 'Filename'
-              Items.Strings = (
-                'Filename'
-                'Folder'
-                'Folder\Filename'
-                'Complete path')
-            end
-            object cbPlaylistSortDirection: TComboBox
-              AlignWithMargins = True
-              Left = 247
-              Top = 81
-              Width = 121
-              Height = 21
-              Style = csDropDownList
-              ItemIndex = 0
-              TabOrder = 2
-              Text = 'Ascending'
-              Items.Strings = (
-                'Ascending'
-                'Descending')
-            end
-            object cbPlaylistSortMode: TComboBox
-              Left = 16
-              Top = 81
-              Width = 225
-              Height = 21
-              Style = csDropDownList
-              ItemIndex = 0
-              TabOrder = 1
-              Text = 'Filename'
-              Items.Strings = (
-                'Filename'
-                'Folder'
-                'Complete path')
-            end
-          end
-          object cpCategorySettings: TCategoryPanel
-            Top = 454
-            Height = 333
-            Caption = 'Group and sort settings'
-            TabOrder = 1
-            ExplicitWidth = 423
-            object lblSamplerSorting: TLabel
-              Left = 16
-              Top = 248
-              Width = 43
-              Height = 14
-              Caption = 'Sampler'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -12
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-            end
-            object lblAlbumArtist: TLabel
-              Left = 16
-              Top = 167
-              Width = 67
-              Height = 14
-              Caption = 'Album-Artist'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -12
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-            end
-            object lblDefineAlbum: TLabel
-              Left = 16
-              Top = 36
-              Width = 101
-              Height = 13
-              Caption = 'Define an "Album" by'
-            end
-            object lblAlbumDefinition: TLabel
-              Left = 16
-              Top = 16
-              Width = 39
-              Height = 14
-              Caption = 'Albums'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -12
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-            end
-            object cbSamplerSortingIgnoreReleaseYear: TCheckBox
-              Left = 16
-              Top = 268
-              Width = 401
-              Height = 17
-              Caption = 
-                'Use "Album name" instead of "Release Year" for sorting (where ap' +
-                'propriate)'
-              TabOrder = 5
-            end
-            object cbPreferAlbumArtist: TCheckBox
-              Left = 16
-              Top = 187
-              Width = 401
-              Height = 17
-              Caption = 'Prefer Album-Artist when grouping by "Artist"'
-              TabOrder = 3
-              OnClick = cbPreferAlbumArtistClick
-            end
-            object cpIgnoreAlbumArtistVariousArtists: TCheckBox
-              Left = 16
-              Top = 207
-              Width = 401
-              Height = 17
-              Caption = 'Ignore Album-Artist "Various Artists"'
-              TabOrder = 4
-            end
-            object cbAlbumKeymode: TComboBox
-              Left = 16
-              Top = 53
-              Width = 273
-              Height = 21
-              Style = csDropDownList
-              ItemIndex = 2
-              TabOrder = 0
-              Text = 'Property "Album" and Directory'
-              Items.Strings = (
-                'Property "Album"'
-                'Properties "Album" and "Artist"'
-                'Property "Album" and Directory'
-                'Directory'
-                'Cover')
-            end
-            object cbIgnoreCDDirectories: TCheckBox
-              Left = 16
-              Top = 80
-              Width = 401
-              Height = 17
-              Caption = 'Allow multi-folder albums (e.g. "CD 1" and "CD 2")'
-              TabOrder = 1
-            end
-            object editCDNames: TLabeledEdit
-              Left = 16
-              Top = 123
-              Width = 0
-              Height = 21
-              Anchors = [akLeft, akTop, akRight]
-              AutoSize = False
-              EditLabel.Width = 325
-              EditLabel.Height = 13
-              EditLabel.Caption = 'Folder names not forming an album of their own (comma separated)'
-              TabOrder = 2
-              Text = ''
-            end
-          end
-          object cpCategoryCoverflow: TCategoryPanel
-            Top = 329
-            Height = 125
-            Caption = 'Display as "Coverflow"'
-            TabOrder = 2
-            ExplicitWidth = 423
-            object btnEditCoverflow: TButton
-              Left = 375
-              Top = 32
-              Width = 28
-              Height = 21
-              Caption = '...'
-              TabOrder = 1
-              OnClick = btnEditCoverflowClick
-            end
-            object cbMissingCoverMode: TComboBox
-              Left = 16
-              Top = 59
-              Width = 353
-              Height = 21
-              Style = csDropDownList
-              ItemIndex = 1
-              TabOrder = 2
-              Text = 'No special handling of missing cover'
-              Items.Strings = (
-                'All missing cover at the beginning'
-                'No special handling of missing cover'
-                'All missing cover at the end')
-            end
-            object edtCoverFlowSortings: TLabeledEdit
-              Left = 16
-              Top = 32
-              Width = 353
-              Height = 21
-              EditLabel.Width = 87
-              EditLabel.Height = 13
-              EditLabel.Caption = 'Sort Coverflow by'
-              ReadOnly = True
-              TabOrder = 0
-              Text = ''
-            end
-          end
-          object cpCategories: TCategoryPanel
-            Top = 0
-            Height = 329
-            Caption = 'Categories and tree view layers'
-            TabOrder = 3
-            ExplicitWidth = 423
-            object lblDefaultCategory: TLabel
-              Left = 16
-              Top = 190
-              Width = 81
-              Height = 13
-              Anchors = [akLeft, akBottom]
-              Caption = 'Default category'
-              ExplicitTop = 166
-            end
-            object lblRecentlyAddedCategory: TLabel
-              Left = 232
-              Top = 190
-              Width = 131
-              Height = 13
-              Anchors = [akLeft, akBottom]
-              Caption = 'Category "Recently added"'
-              ExplicitTop = 166
-            end
-            object lblCategories: TLabel
-              Left = 16
-              Top = 16
-              Width = 52
-              Height = 13
-              Caption = 'Categories'
-            end
-            object lblTreeViewLayers: TLabel
-              Left = 232
-              Top = 16
-              Width = 79
-              Height = 13
-              Caption = 'Tree view layers'
-            end
-            object VSTCategories: TVirtualStringTree
-              Left = 16
-              Top = 32
-              Width = 196
-              Height = 112
-              Anchors = [akLeft, akTop, akBottom]
-              Colors.UnfocusedSelectionColor = clHighlight
-              Colors.UnfocusedSelectionBorderColor = clHighlight
-              DragOperations = [doMove]
-              Header.AutoSizeIndex = 0
-              Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs]
-              Indent = 4
-              PopupMenu = PopupCategories
-              TabOrder = 0
-              TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoChangeScale]
-              TreeOptions.MiscOptions = [toAcceptOLEDrop, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning, toFullRowDrag, toEditOnClick]
-              TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
-              OnDragAllowed = VSTCategoriesDragAllowed
-              OnDragOver = VSTCategoriesDragOver
-              OnDragDrop = VSTCategoriesDragDrop
-              OnEditing = VSTCategoriesEditing
-              OnGetText = VSTCategoriesGetText
-              OnPaintText = VSTCategoriesPaintText
-              OnNewText = VSTCategoriesNewText
-              Touch.InteractiveGestures = [igPan, igPressAndTap]
-              Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-              Columns = <
-                item
-                  Position = 0
-                  Width = 192
-                end>
-            end
-            object btnCategoryEdit: TButton
-              Left = 16
-              Top = 150
-              Width = 99
-              Height = 21
-              Anchors = [akLeft, akBottom]
-              Caption = 'Edit'
-              TabOrder = 1
-              OnClick = btnCategoryEditClick
-            end
-            object cbDefaultCategory: TComboBox
-              Left = 16
-              Top = 208
-              Width = 179
-              Height = 21
-              Style = csDropDownList
-              Anchors = [akLeft, akBottom]
-              TabOrder = 4
-              OnChange = cbDefaultCategoryChange
-            end
-            object cbNewFilesCategory: TComboBox
-              Left = 232
-              Top = 208
-              Width = 177
-              Height = 21
-              Style = csDropDownList
-              Anchors = [akLeft, akBottom]
-              TabOrder = 5
-              OnChange = cbNewFilesCategoryChange
-            end
-            object btnLayerEdit: TButton
-              Left = 232
-              Top = 150
-              Width = 99
-              Height = 21
-              Anchors = [akLeft, akBottom]
-              Caption = 'Edit'
-              TabOrder = 3
-              OnClick = btnLayerEditClick
-            end
-            object VSTSortings: TVirtualStringTree
-              Left = 232
-              Top = 31
-              Width = 196
-              Height = 113
-              Anchors = [akLeft, akTop, akBottom]
-              BevelInner = bvNone
-              BevelOuter = bvNone
-              Colors.UnfocusedSelectionColor = clHighlight
-              Colors.UnfocusedSelectionBorderColor = clHighlight
-              DragOperations = [doMove]
-              Header.AutoSizeIndex = 0
-              Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs]
-              HintMode = hmHint
-              PopupMenu = PopupLayers
-              TabOrder = 2
-              TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoChangeScale]
-              TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowDropmark, toShowRoot, toShowTreeLines, toThemeAware, toUseBlendedImages]
-              OnDragAllowed = VSTSortingsDragAllowed
-              OnDragOver = VSTSortingsDragOver
-              OnDragDrop = VSTSortingsDragDrop
-              OnFocusChanged = VSTSortingsFocusChanged
-              OnGetText = VSTSortingsGetText
-              OnPaintText = VSTSortingsPaintText
-              OnGetHint = VSTSortingsGetHint
-              Touch.InteractiveGestures = [igPan, igPressAndTap]
-              Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-              Columns = <
-                item
-                  Position = 0
-                  Width = 192
-                end>
-            end
-            object cbLibConfigShowPlaylistCategories: TCheckBox
-              Left = 16
-              Top = 245
-              Width = 378
-              Height = 17
-              Anchors = [akLeft, akBottom]
-              Caption = 'Show playlist categories'
-              TabOrder = 6
-            end
-            object cbLibConfigShowWebradioCategory: TCheckBox
-              Left = 16
-              Top = 268
-              Width = 378
-              Height = 17
-              Anchors = [akLeft, akBottom]
-              Caption = 'Show web radio category'
-              TabOrder = 7
-            end
-          end
-        end
-      end
-      object tabMetadata: TTabSheet
-        Caption = 'Metadata'
-        ImageIndex = 9
-        object cpgMetadata: TCategoryPanelGroup
-          Left = 0
-          Top = 0
-          Width = 439
-          Height = 555
-          VertScrollBar.Tracking = True
-          Align = alClient
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWindowText
-          HeaderFont.Height = -12
-          HeaderFont.Name = 'Segoe UI'
-          HeaderFont.Style = []
-          TabOrder = 0
-          OnMouseWheel = CategoryPanelGroupMouseWheel
-          ExplicitWidth = 444
-          object cpMetaData: TCategoryPanel
-            Top = 0
-            Height = 445
-            Caption = 'Meta data (e.g. ID3-Tags)'
-            TabOrder = 0
-            ExplicitWidth = 423
-            object lblQuickAccess: TLabel
-              Left = 16
-              Top = 16
-              Width = 214
-              Height = 14
-              Caption = 'Quick access to metadata ("ID3-Tags")'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -12
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-            end
-            object lblMetaDataLyrics: TLabel
-              Left = 16
-              Top = 72
-              Width = 136
-              Height = 14
-              Caption = 'Lyrics in the media library'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -12
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-            end
-            object lblMetaDataAutomaticRating: TLabel
-              Left = 16
-              Top = 128
-              Width = 91
-              Height = 14
-              Caption = 'Automatic rating'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -12
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-            end
-            object lblExtendedTags: TLabel
-              Left = 16
-              Top = 264
-              Width = 154
-              Height = 14
-              Caption = 'Extended tags for tag cloud'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -12
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-            end
-            object lbMetaDataAutoDetectCharset: TLabel
-              Left = 16
-              Top = 360
-              Width = 202
-              Height = 14
-              Caption = 'Heuristics for obsolete character sets'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -12
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-            end
-            object cb_AccessMetadata: TCheckBox
-              Left = 16
-              Top = 36
-              Width = 414
-              Height = 17
-              Caption = 'Write changes directly to the metadata'
-              TabOrder = 0
-            end
-            object cb_IgnoreLyrics: TCheckBox
-              Left = 16
-              Top = 92
-              Width = 414
-              Height = 17
-              Caption = 'Ignore Lyrics (recommended for very large  music collections)'
-              TabOrder = 1
-              OnClick = cb_IgnoreLyricsClick
-            end
-            object cb_RatingActive: TCheckBox
-              Left = 16
-              Top = 148
-              Width = 397
-              Height = 17
-              Hint = '(De)activate automatic rating/playcounter'
-              Caption = 'Change rating and play counter of played files'
-              TabOrder = 2
-              OnClick = cb_RatingActiveClick
-            end
-            object cb_RatingChangeCounter: TCheckBox
-              Left = 33
-              Top = 188
-              Width = 397
-              Height = 17
-              Hint = 'Increase the playcounter of a file after it was played'
-              Caption = 'Increase play counter'
-              TabOrder = 4
-            end
-            object cb_RatingDecreaseRating: TCheckBox
-              Left = 33
-              Top = 228
-              Width = 397
-              Height = 17
-              Hint = 
-                'Automatically decrease rating on aborted tracks. The change will' +
-                ' be smaller the higher the playcounter is.'
-              Caption = 'Decrease rating on aborted tracks'
-              TabOrder = 6
-            end
-            object cb_RatingIgnoreShortFiles: TCheckBox
-              Left = 33
-              Top = 168
-              Width = 397
-              Height = 17
-              Hint = 'Do not change rating and playcounter on short tracks.'
-              Caption = 'Ignore short tracks (i.e. less than 30 seconds)'
-              TabOrder = 3
-            end
-            object cb_RatingIncreaseRating: TCheckBox
-              Left = 33
-              Top = 208
-              Width = 397
-              Height = 17
-              Hint = 
-                'Automatically increase rating on played tracks. The change will ' +
-                'be smaller the higher the playcounter is.'
-              Caption = 'Increase rating on played tracks'
-              TabOrder = 5
-            end
-            object cb_AskForAutoResolveInconsistencies: TCheckBox
-              Left = 33
-              Top = 304
-              Width = 397
-              Height = 17
-              Caption = 'If not: Show query dialog when inconsistencies occur'
-              TabOrder = 8
-            end
-            object cb_AutoResolveInconsistencies: TCheckBox
-              Left = 16
-              Top = 284
-              Width = 397
-              Height = 17
-              Caption = 'Automatically resolve inconsistencies when entering new tags'
-              TabOrder = 7
-            end
-            object cb_ShowAutoResolveInconsistenciesHints: TCheckBox
-              Left = 33
-              Top = 324
-              Width = 397
-              Height = 17
-              Caption = 
-                'If not: Show information dialog when minor inconsistencies occur' +
-                ' '
-              TabOrder = 9
-            end
-            object CBAutoDetectCharCode: TCheckBox
-              Left = 16
-              Top = 380
-              Width = 397
-              Height = 17
-              Hint = 
-                'Use a uber-ingenious special method for better tag-reading in fi' +
-                'les with "unicode-filenames".'
-              Caption = 'Auto-detect (probably) used character sets'
-              TabOrder = 10
-            end
-          end
-          object cpCDDB: TCategoryPanel
-            Top = 445
-            Height = 290
-            Caption = 'CDDB settings'
-            TabOrder = 1
-            ExplicitWidth = 423
-            object lblInvalidCDDBMail: TLabel
-              Left = 16
-              Top = 167
-              Width = 65
-              Height = 11
-              Caption = 'E-mail is invalid'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -9
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-            end
-            object lblLocalCDDBCache: TLabel
-              Left = 16
-              Top = 194
-              Width = 181
-              Height = 14
-              Caption = 'Local cache for CDDB information'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -12
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-            end
-            object cbUseCDDB: TCheckBox
-              Left = 16
-              Top = 39
-              Width = 393
-              Height = 17
-              Caption = 'Use online CDDB to get audio CD information'
-              TabOrder = 1
-            end
-            object cbPreferCDDB: TCheckBox
-              Left = 16
-              Top = 62
-              Width = 401
-              Height = 17
-              Caption = 'Prefer CDDB information over CD-Text'
-              TabOrder = 2
-            end
-            object edtCDDBServer: TLabeledEdit
-              Left = 16
-              Top = 104
-              Width = 393
-              Height = 21
-              EditLabel.Width = 197
-              EditLabel.Height = 13
-              EditLabel.Caption = 'CDDB server (default: gnudb.gnudb.org)'
-              TabOrder = 3
-              Text = ''
-            end
-            object edtCDDBEMail: TLabeledEdit
-              Left = 16
-              Top = 144
-              Width = 393
-              Height = 21
-              EditLabel.Width = 53
-              EditLabel.Height = 13
-              EditLabel.Caption = 'Your e-mail'
-              TabOrder = 4
-              Text = ''
-              OnExit = edtCDDBEMailExit
-            end
-            object cbAutoCheckNewCDs: TCheckBox
-              Left = 16
-              Top = 16
-              Width = 401
-              Height = 17
-              Caption = 'Automatically scan new CDs'
-              TabOrder = 0
-            end
-            object btnClearCDDBCache: TButton
-              Left = 16
-              Top = 214
-              Width = 99
-              Height = 25
-              Caption = 'Clear cache'
-              TabOrder = 5
-              OnClick = btnClearCDDBCacheClick
-            end
-          end
-        end
-      end
-      object tabSearch: TTabSheet
-        Caption = 'Search'
-        ImageIndex = 10
-        object cpgSearchSettings: TCategoryPanelGroup
-          Left = 0
-          Top = 0
-          Width = 439
-          Height = 555
-          VertScrollBar.Tracking = True
-          Align = alClient
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWindowText
-          HeaderFont.Height = -12
-          HeaderFont.Name = 'Segoe UI'
-          HeaderFont.Style = []
-          TabOrder = 0
-          ExplicitWidth = 444
-          object cpGeneralSearchSettings: TCategoryPanel
-            Top = 0
-            Height = 481
-            Caption = 'Search settings'
-            TabOrder = 0
-            ExplicitWidth = 440
-            object lblSearchSettingsHint: TLabel
-              Left = 16
-              Top = 16
-              Width = 430
-              Height = 33
-              Anchors = [akLeft, akTop, akRight]
-              AutoSize = False
-              Caption = 
-                'Nemp can increase the speed of the quick search, but this also i' +
-                'ncreases the memory usage.'
-              WordWrap = True
-              ExplicitWidth = 400
-            end
-            object Label2: TLabel
-              Left = 16
-              Top = 217
-              Width = 137
-              Height = 14
-              Anchors = [akLeft, akTop, akRight]
-              Caption = 'Quick search performance'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -12
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-              ExplicitWidth = 142
-            end
-            object CB_AccelerateLyricSearch: TCheckBox
-              Left = 16
-              Top = 176
-              Width = 414
-              Height = 17
-              Hint = 'Use some tricky algorithms to accelerate the search for lyrics.'
-              Caption = 'Accelerate lyrics search'
-              TabOrder = 6
-            end
-            object CB_AccelerateSearch: TCheckBox
-              Left = 16
-              Top = 55
-              Width = 414
-              Height = 17
-              Hint = 'Use some tricky algorithms to accelerate the search.'
-              Caption = 'Accelerate search'
-              TabOrder = 0
-              OnClick = CB_AccelerateSearchClick
-            end
-            object CB_AccelerateSearchIncludeComment: TCheckBox
-              Left = 35
-              Top = 95
-              Width = 414
-              Height = 17
-              Hint = 'Include comments to the accelerated search algorithms.'
-              Caption = 'Including comments'
-              TabOrder = 2
-            end
-            object CB_AccelerateSearchIncludeGenre: TCheckBox
-              Left = 35
-              Top = 115
-              Width = 414
-              Height = 17
-              Hint = 'Include genres to the accelerated search algorithms.'
-              Caption = 'Including genre'
-              TabOrder = 3
-            end
-            object CB_AccelerateSearchIncludePath: TCheckBox
-              Left = 35
-              Top = 75
-              Width = 414
-              Height = 17
-              Hint = 'Include filenames to the accelerated search algorithms.'
-              Caption = 'Including filenames'
-              TabOrder = 1
-            end
-            object cb_ChangeCoverflowOnSearch: TCheckBox
-              Left = 16
-              Top = 301
-              Width = 397
-              Height = 17
-              Caption = 'Change coverflow according to results'
-              TabOrder = 10
-            end
-            object CB_QuickSearchAllowErrorsOnEnter: TCheckBox
-              Left = 16
-              Top = 261
-              Width = 397
-              Height = 17
-              Hint = 
-                'Do a fuzzy search after pressing "enter" (e.g. show files from "' +
-                'Amy MacDonald" when you search for "Amy McDonald")'
-              Caption = 'Allow errors on [Enter]'
-              TabOrder = 8
-            end
-            object CB_QuickSearchAllowErrorsWhileTyping: TCheckBox
-              Left = 16
-              Top = 281
-              Width = 397
-              Height = 17
-              Hint = 
-                'Always use a fuzzy search (e.g. show files from "Amy MacDonald" ' +
-                'when you search for "Amy McDonald")'
-              Caption = 'Allow errors while typing'
-              TabOrder = 9
-            end
-            object CB_QuickSearchWhileYouType: TCheckBox
-              Left = 16
-              Top = 241
-              Width = 397
-              Height = 17
-              Hint = 
-                'Show search results in "real time" or just after pressing the "e' +
-                'nter"-key.'
-              Caption = '"While you type"'
-              TabOrder = 7
-            end
-            object CB_AccelerateSearchIncludeAlbumArtist: TCheckBox
-              Left = 35
-              Top = 135
-              Width = 398
-              Height = 17
-              Hint = 'Include the album-artist to the accelerated search algorithms.'
-              Caption = 'Including album-artist'
-              TabOrder = 4
-            end
-            object CB_AccelerateSearchIncludeComposer: TCheckBox
-              Left = 35
-              Top = 155
-              Width = 406
-              Height = 17
-              Hint = 'Include the composer to the accelerated search algorithms.'
-              Caption = 'Including composer'
-              TabOrder = 5
-            end
-          end
-        end
-      end
-      object tabPlayer: TTabSheet
-        Caption = 'Player'
-        ImageIndex = 2
-        object cpgPlayerMain: TCategoryPanelGroup
-          Left = 0
-          Top = 0
-          Width = 439
-          Height = 555
-          VertScrollBar.Tracking = True
-          Align = alClient
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWindowText
-          HeaderFont.Height = -12
-          HeaderFont.Name = 'Segoe UI'
-          HeaderFont.Style = []
-          TabOrder = 0
-          OnMouseWheel = CategoryPanelGroupMouseWheel
-          ExplicitWidth = 444
-          object cpAdvanced: TCategoryPanel
-            Top = 1012
-            Height = 100
-            Caption = 'Advanced'
-            TabOrder = 0
-            ExplicitWidth = 423
-            object cb_SafePlayback: TCheckBox
-              Left = 16
-              Top = 16
-              Width = 420
-              Height = 17
-              Caption = 'Use safe playback'
-              TabOrder = 0
-            end
-            object cbActivatePluginSystem: TCheckBox
-              Left = 16
-              Top = 36
-              Width = 401
-              Height = 17
-              Caption = 'Activate Winamp DSP plugins (beta, restart required)'
-              TabOrder = 1
-            end
-          end
-          object cpVisualisation: TCategoryPanel
-            Top = 850
-            Height = 162
-            Caption = 'Visualization'
-            TabOrder = 1
-            ExplicitWidth = 423
-            object Lbl_Framerate: TLabel
-              Left = 191
-              Top = 42
-              Width = 12
-              Height = 13
-              Caption = '...'
-            end
-            object CB_ScrollTitelTaskBar: TCheckBox
-              Left = 16
-              Top = 72
-              Width = 401
-              Height = 17
-              Caption = 'Scroll title in taskbar'
-              TabOrder = 2
-              OnClick = CB_visualClick
-            end
-            object CB_TaskBarDelay: TComboBox
-              Left = 40
-              Top = 95
-              Width = 145
-              Height = 21
-              Style = csDropDownList
-              ItemIndex = 4
-              TabOrder = 3
-              Text = 'Very fast'
-              Items.Strings = (
-                'Very slow'
-                'Slower'
-                'Normal'
-                'Faster'
-                'Very fast')
-            end
-            object CB_visual: TCheckBox
-              Left = 16
-              Top = 16
-              Width = 409
-              Height = 17
-              Caption = 'Visualization'
-              TabOrder = 0
-              OnClick = CB_visualClick
-            end
-            object TB_Refresh: TTrackBar
-              Left = 32
-              Top = 36
-              Width = 153
-              Height = 33
-              Max = 90
-              Frequency = 10
-              Position = 20
-              TabOrder = 1
-              OnChange = TB_RefreshChange
-            end
-          end
-          object cpSilenceDetection: TCategoryPanel
-            Top = 663
-            Height = 187
-            Caption = 'Pause between tracks'
-            TabOrder = 2
-            ExplicitWidth = 423
-            object Lbl_SilenceDB: TLabel
-              Left = 95
-              Top = 59
-              Width = 12
-              Height = 13
-              Caption = 'dB'
-            end
-            object Lbl_SilenceThreshold: TLabel
-              Left = 32
-              Top = 39
-              Width = 47
-              Height = 13
-              Caption = 'Threshold'
-            end
-            object lblBreakBetweenTracks: TLabel
-              Left = 95
-              Top = 124
-              Width = 13
-              Height = 13
-              Hint = 'Fading length between two songs.'
-              Caption = 'ms'
-            end
-            object cb_AddBreakBetweenTracks: TCheckBox
-              Left = 16
-              Top = 96
-              Width = 409
-              Height = 17
-              Hint = 'Add a little break between two tracks'
-              Caption = 'Add extra silence between tracks'
-              TabOrder = 2
-              OnClick = CB_SilenceDetectionClick
-            end
-            object CB_SilenceDetection: TCheckBox
-              Left = 16
-              Top = 16
-              Width = 409
-              Height = 17
-              Hint = 
-                'Automatically detect and skip the silent parts at the end of the' +
-                ' tracks '
-              Caption = 'Skip silence at the end of tracks'
-              TabOrder = 0
-              OnClick = CB_SilenceDetectionClick
-            end
-            object SE_BreakBetweenTracks: TSpinEdit
-              Left = 32
-              Top = 119
-              Width = 57
-              Height = 22
-              Hint = 'Length of the break between tracks'
-              Increment = 100
-              MaxValue = 20000
-              MinValue = 0
-              TabOrder = 3
-              Value = 2000
-            end
-            object SE_SilenceThreshold: TSpinEdit
-              Left = 32
-              Top = 55
-              Width = 57
-              Height = 22
-              Hint = 
-                'Threshold for "silence". A threshold of -5dB to -10dB will skip ' +
-                'a lot, -40dB and below will skip only really quiet parts.'
-              MaxValue = -5
-              MinValue = -100
-              TabOrder = 1
-              Value = -40
-            end
-          end
-          object cpFading: TCategoryPanel
-            Top = 350
-            Height = 313
-            Caption = 'Fading'
-            TabOrder = 3
-            ExplicitWidth = 423
-            object LblConst_ms1: TLabel
-              Left = 90
-              Top = 64
-              Width = 13
-              Height = 13
-              Hint = 'Fading length between two songs.'
-              Caption = 'ms'
-            end
-            object LblConst_ms2: TLabel
-              Left = 202
-              Top = 64
-              Width = 13
-              Height = 13
-              Hint = 'Fading length when scrolling inside a song.'
-              Caption = 'ms'
-            end
-            object LblConst_TitleChange: TLabel
-              Left = 32
-              Top = 40
-              Width = 73
-              Height = 13
-              Hint = 'Fading length between two songs.'
-              Caption = 'On title change'
-            end
-            object LblConst_Titlefade: TLabel
-              Left = 144
-              Top = 40
-              Width = 92
-              Height = 13
-              Hint = 'Fading length when scrolling inside a song.'
-              Caption = 'On position change'
-            end
-            object lblIdentifyLiveTracksBy: TLabel
-              Left = 48
-              Top = 171
-              Width = 377
-              Height = 13
-              AutoSize = False
-              Caption = 'Identify live tracks by'
-            end
-            object CB_Fading: TCheckBox
-              Left = 16
-              Top = 16
-              Width = 401
-              Height = 17
-              Hint = 'Use crossfading.'
-              Caption = 'Fade in/out'
-              TabOrder = 0
-              OnClick = CB_FadingClick
-            end
-            object CB_IgnoreFadingOnPause: TCheckBox
-              Left = 32
-              Top = 108
-              Width = 385
-              Height = 17
-              Hint = 'Ignore fading when clicking on "Pause".'
-              Caption = 'Ignore on pause'
-              TabOrder = 4
-            end
-            object CB_IgnoreFadingOnShortTracks: TCheckBox
-              Left = 32
-              Top = 88
-              Width = 385
-              Height = 17
-              Hint = 'Ignore fading on short tracks.'
-              Caption = 'Ignore on short tracks'
-              TabOrder = 3
-            end
-            object CB_IgnoreFadingOnStop: TCheckBox
-              Left = 32
-              Top = 128
-              Width = 393
-              Height = 17
-              Hint = 'Ignore fading when stopping the player.'
-              Caption = 'Ignore on stop'
-              TabOrder = 5
-            end
-            object SE_Fade: TSpinEdit
-              Left = 32
-              Top = 59
-              Width = 57
-              Height = 22
-              Hint = 'Fading length between two songs.'
-              Increment = 100
-              MaxValue = 10000
-              MinValue = 0
-              TabOrder = 1
-              Value = 2000
-            end
-            object SE_SeekFade: TSpinEdit
-              Left = 144
-              Top = 59
-              Width = 57
-              Height = 22
-              Hint = 'Fading length when scrolling inside a song.'
-              Increment = 100
-              MaxValue = 10000
-              MinValue = 0
-              TabOrder = 2
-              Value = 2000
-            end
-            object cbIgnoreFadingOnLiveRecordings: TCheckBox
-              Left = 32
-              Top = 148
-              Width = 393
-              Height = 17
-              Caption = 'No fading between live tracks'
-              TabOrder = 6
-              OnClick = CB_FadingClick
-            end
-            object edtLiveRecordingCheckIdentifier: TEdit
-              Left = 48
-              Top = 190
-              Width = 121
-              Height = 21
-              TabOrder = 7
-              Text = 'live'
-            end
-            object cbLiveRecordingCheckTitle: TCheckBox
-              Left = 48
-              Top = 216
-              Width = 377
-              Height = 17
-              Caption = 'Check title'
-              TabOrder = 8
-            end
-            object cbLiveRecordingCheckAlbum: TCheckBox
-              Left = 48
-              Top = 236
-              Width = 377
-              Height = 17
-              Caption = 'Check album name'
-              TabOrder = 9
-            end
-            object cbLiveRecordingCheckTags: TCheckBox
-              Left = 48
-              Top = 256
-              Width = 377
-              Height = 17
-              Caption = 'Check extended tags'
-              TabOrder = 10
-            end
-          end
-          object cpOutputDevices: TCategoryPanel
-            Top = 0
-            Height = 350
-            Caption = 'Output devices'
-            TabOrder = 4
-            ExplicitWidth = 423
-            object LblConst_MainDevice: TLabel
-              Left = 16
-              Top = 16
-              Width = 385
-              Height = 13
-              AutoSize = False
-              Caption = 'Main'
-            end
-            object LblConst_Headphones: TLabel
-              Left = 16
-              Top = 62
-              Width = 305
-              Height = 13
-              AutoSize = False
-              Caption = 'Headphones'
-            end
-            object LblSoundFont: TLabel
-              Left = 16
-              Top = 116
-              Width = 250
-              Height = 13
-              AutoSize = False
-              Caption = 'SoundFont file for MIDI playback'
-            end
-            object LblConst_Buffersize: TLabel
-              Left = 16
-              Top = 172
-              Width = 401
-              Height = 13
-              Hint = 'Increase this value, if the playback stutters sometimes.'
-              AutoSize = False
-              Caption = 'Buffer size'
-            end
-            object LblConst_ms: TLabel
-              Left = 79
-              Top = 191
-              Width = 13
-              Height = 13
-              Hint = 'Increase this value, if the playback stutters sometimes.'
-              Caption = 'ms'
-            end
-            object LblConst_UseFloatingPoint: TLabel
-              Left = 16
-              Top = 220
-              Width = 401
-              Height = 13
-              Hint = 'Try to change this, if the playback is distorted.'
-              AutoSize = False
-              Caption = 'Floating-point channels'
-            end
-            object LblConst_Mixing: TLabel
-              Left = 16
-              Top = 268
-              Width = 409
-              Height = 13
-              Hint = 'Try to change this, if the playback is distorted.'
-              AutoSize = False
-              Caption = 'Mixing'
-            end
-            object Lbl_FloatingPoints_Status: TLabel
-              Left = 167
-              Top = 239
-              Width = 12
-              Height = 13
-              Hint = 'Try to change this, if the playback is distorted.'
-              Caption = '...'
-            end
-            object MainDeviceCB: TComboBox
-              Left = 16
-              Top = 35
-              Width = 250
-              Height = 21
-              Hint = 'The main device.'
-              Style = csDropDownList
-              TabOrder = 0
-            end
-            object HeadphonesDeviceCB: TComboBox
-              Left = 16
-              Top = 81
-              Width = 250
-              Height = 21
-              Hint = 'The secondary device.'
-              Style = csDropDownList
-              TabOrder = 1
-            end
-            object BtnRefreshDevices: TButton
-              Left = 272
-              Top = 79
-              Width = 89
-              Height = 25
-              Caption = 'Refresh'
-              TabOrder = 2
-              OnClick = BtnRefreshDevicesClick
-            end
-            object editSoundFont: TEdit
-              Left = 16
-              Top = 135
-              Width = 250
-              Height = 21
-              Hint = 'The SoundFont file used for MIDI playback'
-              TabOrder = 3
-            end
-            object BtnSelectSoundFontFile: TButton
-              Left = 272
-              Top = 135
-              Width = 25
-              Height = 21
-              Hint = 'Select file'
-              Caption = '...'
-              TabOrder = 4
-              OnClick = BtnSelectSoundFontFileClick
-            end
-            object SEBufferSize: TSpinEdit
-              Left = 16
-              Top = 188
-              Width = 57
-              Height = 22
-              Hint = 'Increase this value, if the playback stutters sometimes.'
-              Increment = 100
-              MaxValue = 5000
-              MinValue = 100
-              TabOrder = 5
-              Value = 500
-            end
-            object CB_FloatingPoint: TComboBox
-              Left = 16
-              Top = 236
-              Width = 145
-              Height = 21
-              Hint = 'Try to change this, if the playback is distorted.'
-              Style = csDropDownList
-              ItemIndex = 0
-              TabOrder = 6
-              Text = 'Auto-detect'
-              Items.Strings = (
-                'Auto-detect'
-                'Off'
-                'On')
-            end
-            object CB_Mixing: TComboBox
-              Left = 16
-              Top = 287
-              Width = 145
-              Height = 21
-              Hint = 'Try to change this, if the playback is distorted.'
-              Style = csDropDownList
-              ItemIndex = 0
-              TabOrder = 7
-              Text = 'Hardware'
-              Items.Strings = (
-                'Hardware'
-                'Software')
-            end
-          end
-        end
-      end
-      object tabPlaylist: TTabSheet
-        Caption = 'Playlist'
-        ImageIndex = 3
-        object cpgPlaylistSettings: TCategoryPanelGroup
-          Left = 0
-          Top = 0
-          Width = 439
-          Height = 555
-          VertScrollBar.Tracking = True
-          Align = alClient
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWindowText
-          HeaderFont.Height = -12
-          HeaderFont.Name = 'Segoe UI'
-          HeaderFont.Style = []
-          TabOrder = 0
-          OnMouseWheel = CategoryPanelGroupMouseWheel
-          ExplicitWidth = 444
-          object cpPlaylistLog: TCategoryPanel
-            Top = 818
-            Height = 120
-            Caption = 'Playlist log'
-            TabOrder = 0
-            ExplicitWidth = 423
-            object LblLogDuration: TLabel
-              Left = 36
-              Top = 39
-              Width = 144
-              Height = 13
-              Caption = 'Remove log entries older than'
-            end
-            object LblLogDuration2: TLabel
-              Left = 104
-              Top = 61
-              Width = 143
-              Height = 13
-              Caption = 'days (0 for unlimited logging).'
-            end
-            object cbSaveLogToFile: TCheckBox
-              Left = 16
-              Top = 16
-              Width = 417
-              Height = 17
-              Caption = 'Use logfile on hard disk to log previous sessions'
-              TabOrder = 0
-              OnClick = cbSaveLogToFileClick
-            end
-            object seLogDuration: TSpinEdit
-              Left = 37
-              Top = 58
-              Width = 61
-              Height = 22
-              MaxValue = 366
-              MinValue = 0
-              TabOrder = 1
-              Value = 7
-            end
-          end
-          object cpRandomPlayback: TCategoryPanel
-            Top = 468
-            Height = 350
-            Caption = 'Random playback'
-            TabOrder = 1
-            ExplicitWidth = 423
-            object lbl_WeightedRandom: TLabel
-              Left = 34
-              Top = 100
-              Width = 170
-              Height = 13
-              Caption = 'Indivdual weights, based on rating.'
-            end
-            object lblCount00: TLabel
-              Left = 24
-              Top = 251
-              Width = 383
-              Height = 13
-              AutoSize = False
-              Caption = '* Including 1000 unrated files'
-              Visible = False
-            end
-            object lblCount05: TLabel
-              Left = 159
-              Top = 123
-              Width = 38
-              Height = 13
-              Caption = '(99999)'
-              Visible = False
-            end
-            object lblCount10: TLabel
-              Left = 159
-              Top = 149
-              Width = 38
-              Height = 13
-              Caption = '(99999)'
-              Visible = False
-            end
-            object lblCount15: TLabel
-              Left = 159
-              Top = 175
-              Width = 38
-              Height = 13
-              Caption = '(99999)'
-              Visible = False
-            end
-            object lblCount20: TLabel
-              Left = 159
-              Top = 201
-              Width = 38
-              Height = 13
-              Caption = '(99999)'
-              Visible = False
-            end
-            object lblCount25: TLabel
-              Left = 159
-              Top = 227
-              Width = 38
-              Height = 13
-              Caption = '(99999)'
-              Visible = False
-            end
-            object lblCount30: TLabel
-              Left = 350
-              Top = 123
-              Width = 38
-              Height = 13
-              Caption = '(99999)'
-              Visible = False
-            end
-            object lblCount35: TLabel
-              Left = 350
-              Top = 147
-              Width = 38
-              Height = 13
-              Caption = '(99999)'
-              Visible = False
-            end
-            object lblCount40: TLabel
-              Left = 350
-              Top = 175
-              Width = 38
-              Height = 13
-              Caption = '(99999)'
-              Visible = False
-            end
-            object lblCount45: TLabel
-              Left = 350
-              Top = 201
-              Width = 38
-              Height = 13
-              Caption = '(99999)'
-              Visible = False
-            end
-            object lblCount50: TLabel
-              Left = 350
-              Top = 228
-              Width = 38
-              Height = 13
-              Caption = '(99999)'
-              Visible = False
-            end
-            object LblConst_AvoidRepetitions: TLabel
-              Left = 260
-              Top = 16
-              Width = 162
-              Height = 13
-              Alignment = taRightJustify
-              Anchors = [akTop, akRight]
-              AutoSize = False
-              Caption = 'Avoid repetitions'
-              ExplicitLeft = 218
-            end
-            object LblConst_ReallyRandom: TLabel
-              Left = 16
-              Top = 16
-              Width = 153
-              Height = 13
-              AutoSize = False
-              Caption = 'Really random'
-            end
-            object BtnCountRating: TButton
-              Left = 16
-              Top = 282
-              Width = 137
-              Height = 25
-              Hint = 
-                'Count how many files in the media library (or the playlist) exis' +
-                't with the specific rating.'
-              Caption = 'Count Ratings'
-              TabOrder = 12
-              OnClick = BtnCountRatingClick
-            end
-            object cb_UseWeightedRNG: TCheckBox
-              Left = 16
-              Top = 77
-              Width = 401
-              Height = 17
-              Caption = 'Use weighted random'
-              TabOrder = 1
-              OnClick = cb_UseWeightedRNGClick
-            end
-            object cbCountRatingOnlyPlaylist: TCheckBox
-              Left = 159
-              Top = 286
-              Width = 258
-              Height = 17
-              Caption = 'Restrict counting to playlist'
-              TabOrder = 13
-            end
-            object RandomWeight05: TEdit
-              Left = 110
-              Top = 120
-              Width = 43
-              Height = 21
-              NumbersOnly = True
-              TabOrder = 2
-              Text = '0'
-              OnExit = RandomWeight05Exit
-            end
-            object RandomWeight10: TEdit
-              Left = 110
-              Top = 146
-              Width = 43
-              Height = 21
-              NumbersOnly = True
-              TabOrder = 3
-              Text = '0'
-              OnExit = RandomWeight05Exit
-            end
-            object RandomWeight15: TEdit
-              Left = 110
-              Top = 172
-              Width = 43
-              Height = 21
-              NumbersOnly = True
-              TabOrder = 4
-              Text = '1'
-              OnExit = RandomWeight05Exit
-            end
-            object RandomWeight20: TEdit
-              Left = 110
-              Top = 198
-              Width = 43
-              Height = 21
-              NumbersOnly = True
-              TabOrder = 5
-              Text = '2'
-              OnExit = RandomWeight05Exit
-            end
-            object RandomWeight25: TEdit
-              Left = 110
-              Top = 224
-              Width = 43
-              Height = 21
-              NumbersOnly = True
-              TabOrder = 6
-              Text = '4'
-              OnExit = RandomWeight05Exit
-            end
-            object RandomWeight30: TEdit
-              Left = 300
-              Top = 120
-              Width = 43
-              Height = 21
-              NumbersOnly = True
-              TabOrder = 7
-              Text = '7'
-              OnExit = RandomWeight05Exit
-            end
-            object RandomWeight35: TEdit
-              Left = 301
-              Top = 146
-              Width = 43
-              Height = 21
-              NumbersOnly = True
-              TabOrder = 8
-              Text = '12'
-              OnExit = RandomWeight05Exit
-            end
-            object RandomWeight40: TEdit
-              Left = 300
-              Top = 172
-              Width = 43
-              Height = 21
-              NumbersOnly = True
-              TabOrder = 9
-              Text = '20'
-              OnExit = RandomWeight05Exit
-            end
-            object RandomWeight45: TEdit
-              Left = 300
-              Top = 198
-              Width = 43
-              Height = 21
-              NumbersOnly = True
-              TabOrder = 10
-              Text = '35'
-              OnExit = RandomWeight05Exit
-            end
-            object RandomWeight50: TEdit
-              Left = 301
-              Top = 224
-              Width = 43
-              Height = 21
-              NumbersOnly = True
-              TabOrder = 11
-              Text = '60'
-              OnExit = RandomWeight05Exit
-            end
-            object TBRandomRepeat: TTrackBar
-              Left = 12
-              Top = 32
-              Width = 415
-              Height = 33
-              Anchors = [akLeft, akTop, akRight]
-              Max = 75
-              Frequency = 5
-              Position = 23
-              TabOrder = 0
-              ExplicitWidth = 420
-            end
-            object BtnRating05: TRatingButton
-              Left = 24
-              Top = 122
-              Width = 80
-              Height = 16
-              DoubleBuffered = True
-              DrawMode = dm_Windows
-              ParentDoubleBuffered = False
-              TabOrder = 14
-              TransparentBackground = True
-              StyleElements = [seFont, seBorder]
-              Rating = 1
-              AllowChangeRating = False
-              StarFullImageIndex = 0
-              StarHalfImageIndex = 1
-              StarEmptyImageIndex = 2
-            end
-            object BtnRating10: TRatingButton
-              Left = 24
-              Top = 148
-              Width = 80
-              Height = 16
-              DoubleBuffered = True
-              DrawMode = dm_Windows
-              ParentDoubleBuffered = False
-              TabOrder = 15
-              TransparentBackground = True
-              StyleElements = [seFont, seBorder]
-              Rating = 37
-              AllowChangeRating = False
-              StarFullImageIndex = 0
-              StarHalfImageIndex = 1
-              StarEmptyImageIndex = 2
-            end
-            object BtnRating15: TRatingButton
-              Left = 24
-              Top = 174
-              Width = 80
-              Height = 16
-              DoubleBuffered = True
-              DrawMode = dm_Windows
-              ParentDoubleBuffered = False
-              TabOrder = 16
-              TransparentBackground = True
-              StyleElements = [seFont, seBorder]
-              Rating = 52
-              AllowChangeRating = False
-              StarFullImageIndex = 0
-              StarHalfImageIndex = 1
-              StarEmptyImageIndex = 2
-            end
-            object BtnRating20: TRatingButton
-              Left = 24
-              Top = 200
-              Width = 80
-              Height = 16
-              DoubleBuffered = True
-              DrawMode = dm_Windows
-              ParentDoubleBuffered = False
-              TabOrder = 17
-              TransparentBackground = True
-              StyleElements = [seFont, seBorder]
-              Rating = 78
-              AllowChangeRating = False
-              StarFullImageIndex = 0
-              StarHalfImageIndex = 1
-              StarEmptyImageIndex = 2
-            end
-            object BtnRating25: TRatingButton
-              Left = 24
-              Top = 225
-              Width = 80
-              Height = 16
-              DoubleBuffered = True
-              DrawMode = dm_Windows
-              ParentDoubleBuffered = False
-              TabOrder = 18
-              TransparentBackground = True
-              StyleElements = [seFont, seBorder]
-              Rating = 102
-              AllowChangeRating = False
-              StarFullImageIndex = 0
-              StarHalfImageIndex = 1
-              StarEmptyImageIndex = 2
-            end
-            object BtnRating30: TRatingButton
-              Left = 214
-              Top = 122
-              Width = 80
-              Height = 16
-              DoubleBuffered = True
-              DrawMode = dm_Windows
-              ParentDoubleBuffered = False
-              TabOrder = 19
-              TransparentBackground = True
-              StyleElements = [seFont, seBorder]
-              Rating = 128
-              AllowChangeRating = False
-              StarFullImageIndex = 0
-              StarHalfImageIndex = 1
-              StarEmptyImageIndex = 2
-            end
-            object BtnRating35: TRatingButton
-              Left = 214
-              Top = 148
-              Width = 80
-              Height = 16
-              DoubleBuffered = True
-              DrawMode = dm_Windows
-              ParentDoubleBuffered = False
-              TabOrder = 20
-              TransparentBackground = True
-              StyleElements = [seFont, seBorder]
-              Rating = 153
-              AllowChangeRating = False
-              StarFullImageIndex = 0
-              StarHalfImageIndex = 1
-              StarEmptyImageIndex = 2
-            end
-            object BtnRating40: TRatingButton
-              Left = 214
-              Top = 174
-              Width = 80
-              Height = 16
-              DoubleBuffered = True
-              DrawMode = dm_Windows
-              ParentDoubleBuffered = False
-              TabOrder = 21
-              TransparentBackground = True
-              StyleElements = [seFont, seBorder]
-              Rating = 179
-              AllowChangeRating = False
-              StarFullImageIndex = 0
-              StarHalfImageIndex = 1
-              StarEmptyImageIndex = 2
-            end
-            object BtnRating45: TRatingButton
-              Left = 214
-              Top = 200
-              Width = 80
-              Height = 16
-              DoubleBuffered = True
-              DrawMode = dm_Windows
-              ParentDoubleBuffered = False
-              TabOrder = 22
-              TransparentBackground = True
-              StyleElements = [seFont, seBorder]
-              Rating = 205
-              AllowChangeRating = False
-              StarFullImageIndex = 0
-              StarHalfImageIndex = 1
-              StarEmptyImageIndex = 2
-            end
-            object BtnRating50: TRatingButton
-              Left = 214
-              Top = 225
-              Width = 80
-              Height = 16
-              DoubleBuffered = True
-              DrawMode = dm_Windows
-              ParentDoubleBuffered = False
-              TabOrder = 23
-              TransparentBackground = True
-              StyleElements = [seFont, seBorder]
-              Rating = 230
-              AllowChangeRating = False
-              StarFullImageIndex = 0
-              StarHalfImageIndex = 1
-              StarEmptyImageIndex = 2
-            end
-          end
-          object cpPlaylistBehaviour: TCategoryPanel
-            Top = 233
-            Height = 235
-            Caption = 'General playlist settings'
-            TabOrder = 2
-            ExplicitWidth = 423
-            object CB_AutoScanPlaylist: TCheckBox
-              Left = 16
-              Top = 16
-              Width = 415
-              Height = 17
-              Hint = 
-                'Read metadata from the audiofiles or just use the data stored in' +
-                ' the playlistfile.'
-              Caption = 'Check files when loading a playlist'
-              TabOrder = 0
-            end
-            object CB_JumpToNextCue: TCheckBox
-              Left = 16
-              Top = 36
-              Width = 415
-              Height = 17
-              Hint = 'When clicking "next", jump to the next cuesheet (if available)'
-              Caption = 'Jump to next entry in cuesheet on "next"'
-              TabOrder = 1
-            end
-            object cb_PlaylistManagerAutoSave: TCheckBox
-              Left = 16
-              Top = 96
-              Width = 415
-              Height = 17
-              Caption = 'Autosave favorite playlists'
-              TabOrder = 4
-              OnClick = cb_PlaylistManagerAutoSaveClick
-            end
-            object cb_PlaylistManagerAutoSaveUserInput: TCheckBox
-              Left = 28
-              Top = 116
-              Width = 415
-              Height = 17
-              Caption = 'Decide individually when loading a new playlist '
-              TabOrder = 5
-            end
-            object CB_RememberInterruptedPlayPosition: TCheckBox
-              Left = 16
-              Top = 76
-              Width = 415
-              Height = 17
-              Hint = 'Used in combination with "Just play focussed file"'
-              Caption = 
-                'Remember track position when playing a song directly from the li' +
-                'brary'
-              TabOrder = 3
-            end
-            object cb_ReplayCue: TCheckBox
-              Left = 16
-              Top = 56
-              Width = 415
-              Height = 17
-              Hint = 
-                'Repeat only the current part of a file instead of the whole trac' +
-                'k when "Repeat title" is selected'
-              Caption = 'Repeat current entry in cuesheet on "Repeat title"'
-              TabOrder = 2
-            end
-            object CB_AutoDeleteFromPlaylist: TCheckBox
-              Left = 16
-              Top = 136
-              Width = 415
-              Height = 17
-              Hint = 'remove a track from the playlist after it is completely played.'
-              Caption = 'Delete completely played tracks from the playlist'
-              TabOrder = 6
-              OnClick = CB_AutoDeleteFromPlaylistClick
-            end
-            object CB_AutoMixPlaylist: TCheckBox
-              Left = 16
-              Top = 176
-              Width = 415
-              Height = 17
-              Hint = 'Randomize playlist after the last track.'
-              Caption = 'Mix playlist after last track'
-              TabOrder = 8
-            end
-            object CB_DisableAutoDeleteAtUserInput: TCheckBox
-              Left = 36
-              Top = 156
-              Width = 415
-              Height = 17
-              Hint = 'Exceptions for deleting a file from the playlist.'
-              Caption = 'Do not delete after manual stop/pause/slide/next/previous'
-              TabOrder = 7
-            end
-          end
-          object cpPlaylistDefaultActions: TCategoryPanel
-            Top = 0
-            Height = 233
-            Caption = 'Default actions'
-            TabOrder = 3
-            ExplicitWidth = 423
-            object LblPlaylistDefaultAction: TLabel
-              Left = 16
-              Top = 16
-              Width = 405
-              Height = 13
-              AutoSize = False
-              Caption = 'Insert mode from media list into the playlist'
-            end
-            object LblHeadsetDefaultAction: TLabel
-              Left = 16
-              Top = 109
-              Width = 405
-              Height = 13
-              AutoSize = False
-              Caption = 'Insert mode from headset to playlist'
-            end
-            object cb_AutoStopHeadsetAddToPlayist: TCheckBox
-              Left = 16
-              Top = 175
-              Width = 405
-              Height = 17
-              Caption = 'Stop headset when adding headset file to playlist'
-              TabOrder = 5
-            end
-            object cb_AutoStopHeadsetSwitchTab: TCheckBox
-              Left = 16
-              Top = 155
-              Width = 413
-              Height = 17
-              Caption = 'Stop headset when switching to another tab'
-              TabOrder = 4
-            end
-            object GrpBox_DefaultAction: TComboBox
-              Left = 16
-              Top = 33
-              Width = 285
-              Height = 21
-              Style = csDropDownList
-              ItemIndex = 0
-              TabOrder = 0
-              Text = 'Enqueue at the end of the playlist'
-              Items.Strings = (
-                'Enqueue at the end of the playlist'
-                'Play (and clear current playlist)'
-                'Enqueue after current track'
-                'Just play (don'#39't change the playlist)')
-            end
-            object GrpBox_HeadsetDefaultAction: TComboBox
-              Left = 16
-              Top = 128
-              Width = 285
-              Height = 21
-              Hint = 'Insert mode for files from the headset'
-              Style = csDropDownList
-              ItemIndex = 0
-              TabOrder = 3
-              Text = 'Enqueue at the end of the playlist'
-              Items.Strings = (
-                'Enqueue at the end of the playlist'
-                'Play (and clear current playlist)'
-                'Enqueue after current track'
-                'Just play (don'#39't change the playlist)')
-            end
-            object cbApplyDefaultActionToWholeList: TCheckBox
-              Left = 16
-              Top = 59
-              Width = 401
-              Height = 17
-              Caption = 'Add complete list, not only the selected title'
-              TabOrder = 1
-            end
-            object cbUseDefaultActionOnCoverFlowDoubleClick: TCheckBox
-              Left = 16
-              Top = 79
-              Width = 401
-              Height = 17
-              Caption = 'Use default action on double-click in Coverflow'
-              TabOrder = 2
-            end
-          end
-        end
-      end
-      object tabWebradio: TTabSheet
-        Caption = 'Webradio'
-        ImageIndex = 11
-        object cpgWebstreams: TCategoryPanelGroup
-          Left = 0
-          Top = 0
-          Width = 439
-          Height = 555
-          VertScrollBar.Tracking = True
-          Align = alClient
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWindowText
-          HeaderFont.Height = -12
-          HeaderFont.Name = 'Segoe UI'
-          HeaderFont.Style = []
-          TabOrder = 0
-          OnMouseWheel = CategoryPanelGroupMouseWheel
-          ExplicitWidth = 444
-          object cpWebstreamsPlaylists: TCategoryPanel
-            Top = 345
-            Height = 121
-            Caption = 'Playlist parsing'
-            TabOrder = 1
-            ExplicitWidth = 440
-            object Label1: TLabel
-              Left = 16
-              Top = 16
-              Width = 233
-              Height = 13
-              Caption = 'Playlist files (e.g. http://myradio.com/tunein.pls)'
-            end
-            object rbWebRadioParseFile: TRadioButton
-              Left = 16
-              Top = 37
-              Width = 448
-              Height = 17
-              Anchors = [akLeft, akTop, akRight]
-              Caption = 'Parse stream playlist and add all contained streams to playlist'
-              TabOrder = 0
-              ExplicitWidth = 453
-            end
-            object rbWebRadioHandledByBass: TRadioButton
-              Left = 16
-              Top = 60
-              Width = 448
-              Height = 17
-              Anchors = [akLeft, akTop, akRight]
-              Caption = 'Just add playlist URL to the playlist (recommended)'
-              Checked = True
-              TabOrder = 1
-              TabStop = True
-              ExplicitWidth = 453
-            end
-          end
-          object cpWebstremRecording: TCategoryPanel
-            Top = 0
-            Height = 345
-            Caption = 'Recording settings'
-            TabOrder = 0
-            ExplicitWidth = 440
-            object LblConst_DownloadDir: TLabel
-              Left = 16
-              Top = 16
-              Width = 93
-              Height = 13
-              Caption = 'Download directory'
-            end
-            object LblConst_FilenameExtension: TLabel
-              Left = 16
-              Top = 117
-              Width = 231
-              Height = 13
-              Caption = '(A proper extension will be added automatically)'
-            end
-            object LblConst_FilenameFormat: TLabel
-              Left = 16
-              Top = 80
-              Width = 101
-              Height = 13
-              Caption = 'Pattern for filenames'
-            end
-            object LblConst_MaxSize: TLabel
-              Left = 96
-              Top = 215
-              Width = 50
-              Height = 13
-              Caption = 'MB per file'
-            end
-            object LblConst_MaxTime: TLabel
-              Left = 96
-              Top = 263
-              Width = 73
-              Height = 13
-              Caption = 'Minutes per file'
-            end
-            object LblConst_WebradioHint: TLabel
-              Left = 16
-              Top = 288
-              Width = 380
-              Height = 33
-              Anchors = [akLeft, akTop, akRight]
-              AutoSize = False
-              Caption = 
-                'These values are approximate values. Resulting length/size may v' +
-                'ary.'
-              WordWrap = True
-              ExplicitWidth = 433
-            end
-            object lblSplitWebRadioStreams: TLabel
-              Left = 16
-              Top = 152
-              Width = 47
-              Height = 14
-              Caption = 'Split files'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -12
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-            end
-            object BtnChooseDownloadDir: TButton
-              Left = 416
-              Top = 32
-              Width = 25
-              Height = 21
-              Hint = 'Choose a download directory'
-              Caption = '...'
-              TabOrder = 1
-              OnClick = BtnChooseDownloadDirClick
-            end
-            object cbAutoSplitBySize: TCheckBox
-              Left = 16
-              Top = 192
-              Width = 420
-              Height = 17
-              Hint = 'Split recordings by size.'
-              Caption = 'Split files by size'
-              TabOrder = 5
-              OnClick = cbAutoSplitBySizeClick
-            end
-            object cbAutoSplitByTime: TCheckBox
-              Left = 16
-              Top = 240
-              Width = 420
-              Height = 17
-              Hint = 'Split recordings by time.'
-              Caption = 'Split files by time'
-              TabOrder = 7
-              OnClick = cbAutoSplitByTimeClick
-            end
-            object cbAutoSplitByTitle: TCheckBox
-              Left = 16
-              Top = 172
-              Width = 420
-              Height = 17
-              Hint = 
-                'Try to split the stream when a new title begins. This will work ' +
-                'only if the station submits proper title information.'
-              Caption = 'Begin new file for every title'
-              Checked = True
-              State = cbChecked
-              TabOrder = 4
-            end
-            object cbFilenameFormat: TComboBox
-              Left = 16
-              Top = 99
-              Width = 393
-              Height = 21
-              TabOrder = 3
-              Text = '<date>, <time> - <title>'
-              OnChange = cbFilenameFormatChange
-              Items.Strings = (
-                '<date>, <time> - <title>'
-                '<date>, <time> - <streamname> - <title>'
-                '<title>'
-                '<streamname> - <title>')
-            end
-            object cbUseStreamnameAsDirectory: TCheckBox
-              Left = 16
-              Top = 56
-              Width = 420
-              Height = 17
-              Caption = 'Use streamname as directory'
-              TabOrder = 2
-            end
-            object EdtDownloadDir: TEdit
-              Left = 16
-              Top = 32
-              Width = 394
-              Height = 21
-              TabOrder = 0
-            end
-            object SE_AutoSplitMaxSize: TSpinEdit
-              Left = 16
-              Top = 212
-              Width = 65
-              Height = 22
-              MaxValue = 2000
-              MinValue = 1
-              TabOrder = 6
-              Value = 10
-            end
-            object SE_AutoSplitMaxTime: TSpinEdit
-              Left = 16
-              Top = 260
-              Width = 65
-              Height = 22
-              MaxValue = 1440
-              MinValue = 1
-              TabOrder = 8
-              Value = 10
-            end
-          end
-        end
-      end
-      object tabEffects: TTabSheet
-        Caption = 'Effects'
-        ImageIndex = 12
-        object cpgEffects: TCategoryPanelGroup
-          Left = 0
-          Top = 0
-          Width = 439
-          Height = 555
-          VertScrollBar.Tracking = True
-          Align = alClient
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWindowText
-          HeaderFont.Height = -12
-          HeaderFont.Name = 'Segoe UI'
-          HeaderFont.Style = []
-          TabOrder = 0
-          ExplicitWidth = 444
-          object cpReplayGain: TCategoryPanel
-            Top = 0
-            Height = 190
-            Caption = 'ReplayGain'
-            TabOrder = 0
-            ExplicitWidth = 440
-            object lblDefaultGainValue: TLabel
-              Left = 376
-              Top = 128
-              Width = 37
-              Height = 13
-              Caption = '0.00 dB'
-            end
-            object lblDefaultGainValue2: TLabel
-              Left = 376
-              Top = 104
-              Width = 37
-              Height = 13
-              Caption = '0.00 dB'
-            end
-            object lblReplayGainDefault: TLabel
-              Left = 16
-              Top = 82
-              Width = 88
-              Height = 14
-              Caption = 'Pre-amplification'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -12
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-            end
-            object lblRG_Preamp1: TLabel
-              Left = 16
-              Top = 104
-              Width = 39
-              Height = 13
-              Caption = 'With RG'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -11
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-            end
-            object lblRG_Preamp2: TLabel
-              Left = 16
-              Top = 128
-              Width = 55
-              Height = 13
-              Caption = 'Without RG'
-            end
-            object cb_ApplyReplayGain: TCheckBox
-              Left = 16
-              Top = 16
-              Width = 420
-              Height = 17
-              Hint = 
-                'Use ReplayGain values to achieve a more consistent loudness duri' +
-                'ng playback.'
-              Caption = 'Use ReplayGain for a more consistent loudness during playback'
-              TabOrder = 0
-              OnClick = cb_ApplyReplayGainClick
-            end
-            object cb_PreferAlbumGain: TCheckBox
-              Left = 16
-              Top = 34
-              Width = 420
-              Height = 17
-              Hint = 
-                'Use AlbumGain values to maintain intentional loudness changes wi' +
-                'thin albums'
-              Caption = 'Prefer AlbumGain'
-              TabOrder = 1
-            end
-            object cb_ReplayGainPreventClipping: TCheckBox
-              Left = 16
-              Top = 52
-              Width = 420
-              Height = 17
-              Hint = 'Limit amplification to prevent playback from clipping, if needed'
-              Caption = 'Prevent clipping'
-              TabOrder = 2
-            end
-            object tp_DefaultGain: TNempTrackBar
-              Left = 104
-              Top = 123
-              Width = 266
-              Height = 24
-              Hint = 'Pre-amplification for tracks without ReplayGain information'
-              Max = 200
-              Min = -200
-              PageSize = 10
-              TabOrder = 4
-              TickMarks = tmBoth
-              TickStyle = tsNone
-              OnChange = tp_DefaultGainChange
-              OnMouseDown = tp_DefaultGainMouseDown
-            end
-            object tp_DefaultGain2: TNempTrackBar
-              Left = 104
-              Top = 100
-              Width = 266
-              Height = 24
-              Hint = 'Pre-amplification for tracks with ReplayGain information'
-              Max = 200
-              Min = -200
-              PageSize = 10
-              TabOrder = 3
-              TickMarks = tmBoth
-              TickStyle = tsNone
-              OnChange = tp_DefaultGain2Change
-              OnMouseDown = tp_DefaultGain2MouseDown
-            end
-          end
-          object cpEffects: TCategoryPanel
-            Top = 190
-            Height = 245
-            Caption = 'Equalizer and Effects'
-            TabOrder = 1
-            ExplicitWidth = 440
-            object lblJingles: TLabel
-              Left = 16
-              Top = 88
-              Width = 238
-              Height = 14
-              Caption = 'Jingles (playback via F9, Push-to-talk via F8)'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -12
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-            end
-            object LblConst_JingleVolume: TLabel
-              Left = 16
-              Top = 159
-              Width = 75
-              Height = 13
-              Hint = 'Volume of the jingle in relation to main volume.'
-              Anchors = [akLeft, akTop, akRight]
-              Caption = 'Volume of jingles'
-              ExplicitWidth = 80
-            end
-            object LblConst_JingleVolumePercent: TLabel
-              Left = 91
-              Top = 183
-              Width = 86
-              Height = 13
-              Hint = 'Volume of the jingle in relation to main volume.'
-              Caption = '% of main volume'
-            end
-            object LblJingleReduce: TLabel
-              Left = 91
-              Top = 135
-              Width = 11
-              Height = 13
-              Caption = '%'
-            end
-            object CB_UseDefaultEffects: TCheckBox
-              Left = 16
-              Top = 36
-              Width = 414
-              Height = 17
-              Hint = 'Disable effects when Nemp starts'
-              Caption = 'Reset effects on start'
-              Checked = True
-              State = cbChecked
-              TabOrder = 1
-            end
-            object CB_UseDefaultEqualizer: TCheckBox
-              Left = 16
-              Top = 16
-              Width = 414
-              Height = 17
-              Hint = 'Disable equalizer when Nemp starts'
-              Caption = 'Reset equalizer on start'
-              TabOrder = 0
-            end
-            object cb_UseWalkmanMode: TCheckBox
-              Left = 16
-              Top = 56
-              Width = 414
-              Height = 17
-              Hint = 'Just as those cassette players did before "mp3" was invented.'
-              Caption = 'Flutter playback when battery is low ("Walkman mode")'
-              TabOrder = 2
-            end
-            object CBJingleReduce: TCheckBox
-              Left = 16
-              Top = 108
-              Width = 414
-              Height = 17
-              Hint = 'Reduce main volume before when playing a jingle'
-              Caption = 'Reduce main volume to'
-              TabOrder = 3
-              OnClick = CBJingleReduceClick
-            end
-            object SEJingleReduce: TSpinEdit
-              Left = 35
-              Top = 131
-              Width = 49
-              Height = 22
-              Hint = 'Reduce main volume before when playing a jingle'
-              MaxValue = 100
-              MinValue = 0
-              TabOrder = 4
-              Value = 50
-            end
-            object SEJingleVolume: TSpinEdit
-              Left = 35
-              Top = 178
-              Width = 49
-              Height = 22
-              Hint = 'Volume of the jingle in relation to main volume.'
-              MaxValue = 200
-              MinValue = 0
-              TabOrder = 5
-              Value = 100
-            end
-          end
-        end
-      end
-      object tabBirthday: TTabSheet
-        Caption = 'Birthday'
-        ImageIndex = 13
-        object cpgBirthday: TCategoryPanelGroup
-          Left = 0
-          Top = 0
-          Width = 439
-          Height = 555
-          VertScrollBar.Tracking = True
-          Align = alClient
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWindowText
-          HeaderFont.Height = -12
-          HeaderFont.Name = 'Segoe UI'
-          HeaderFont.Style = []
-          TabOrder = 0
-          ExplicitWidth = 444
-          object cpBirthdayMain: TCategoryPanel
-            Top = 0
-            Height = 409
-            Caption = 'Happy Birthday timer'
-            TabOrder = 0
-            ExplicitWidth = 440
-            object Lbl_Const_EventTime: TLabel
-              Left = 16
-              Top = 80
-              Width = 22
-              Height = 13
-              Hint = 
-                'Time when the birthday song should be played. The optional count' +
-                'down will end at this time.'
-              Caption = 'Time'
-            end
-            object lblBirthdayTitel: TLabel
-              Left = 16
-              Top = 111
-              Width = 100
-              Height = 13
-              Caption = 'Happy Birthday song'
-            end
-            object LblEventWarning: TLabel
-              Left = 363
-              Top = 111
-              Width = 76
-              Height = 13
-              Alignment = taRightJustify
-              Anchors = [akTop, akRight]
-              Caption = 'File not found'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -11
-              Font.Name = 'Tahoma'
-              Font.Style = [fsBold]
-              ParentFont = False
-              ExplicitLeft = 352
-            end
-            object lblCountDownTitel: TLabel
-              Left = 16
-              Top = 218
-              Width = 76
-              Height = 13
-              Caption = 'Countdown title'
-            end
-            object LBlCountDownWarning: TLabel
-              Left = 363
-              Top = 218
-              Width = 76
-              Height = 13
-              Alignment = taRightJustify
-              Anchors = [akTop, akRight]
-              Caption = 'File not found'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -11
-              Font.Name = 'Tahoma'
-              Font.Style = [fsBold]
-              ParentFont = False
-              ExplicitLeft = 352
-            end
-            object lblHappyBirthday: TLabel
-              Left = 16
-              Top = 16
-              Width = 460
-              Height = 55
-              Anchors = [akLeft, akTop, akRight]
-              AutoSize = False
-              Caption = 
-                'If you are celebrating into a birthday, or celebrating into the ' +
-                'New Year and you don'#39't want to miss midnight, then you can activ' +
-                'ate the Happy Birthday timer. Nemp will then pause the playlist ' +
-                'at the specified time to play a special song.'
-              WordWrap = True
-              ExplicitWidth = 449
-            end
-            object BtnActivateBirthdayMode: TButton
-              AlignWithMargins = True
-              Left = 350
-              Top = 337
-              Width = 131
-              Height = 25
-              Anchors = [akTop, akRight]
-              Caption = 'Activate'
-              TabOrder = 9
-              OnClick = BtnActivateBirthdayModeClick
-              ExplicitLeft = 355
-            end
-            object BtnBirthdaySong: TButton
-              Left = 448
-              Top = 127
-              Width = 25
-              Height = 21
-              Hint = 'Select file'
-              Anchors = [akTop, akRight]
-              Caption = '...'
-              TabOrder = 2
-              OnClick = BtnBirthdaySongClick
-              ExplicitLeft = 453
-            end
-            object BtnGetBirthdayTitel: TButton
-              Left = 16
-              Top = 153
-              Width = 281
-              Height = 25
-              Hint = 'Use the current selected file in player as birthday song.'
-              Caption = 'Use selected file in mainwindow'
-              TabOrder = 3
-              OnClick = BtnGetBirthdayTitelClick
-            end
-            object CBContinueAfter: TCheckBox
-              Left = 16
-              Top = 314
-              Width = 410
-              Height = 17
-              Hint = 'Continue with the playlist after the birthday song.'
-              Margins.Right = 8
-              Caption = 'Continue with the playlist after playing the birthday song'
-              TabOrder = 8
-            end
-            object EditBirthdaySong: TEdit
-              Left = 16
-              Top = 127
-              Width = 426
-              Height = 21
-              Anchors = [akLeft, akTop, akRight]
-              TabOrder = 1
-              OnChange = EditBirthdaySongChange
-              ExplicitWidth = 431
-            end
-            object mskEdt_BirthdayTime: TMaskEdit
-              Left = 64
-              Top = 77
-              Width = 41
-              Height = 21
-              EditMask = '!90:00;1;_'
-              MaxLength = 5
-              TabOrder = 0
-              Text = '  :  '
-              OnExit = mskEdt_BirthdayTimeExit
-            end
-            object BtnCountDownSong: TButton
-              Left = 448
-              Top = 234
-              Width = 25
-              Height = 21
-              Hint = 'Select file'
-              Anchors = [akTop, akRight]
-              Caption = '...'
-              TabOrder = 6
-              OnClick = BtnCountDownSongClick
-              ExplicitLeft = 453
-            end
-            object BtnGetCountDownTitel: TButton
-              Left = 16
-              Top = 261
-              Width = 281
-              Height = 25
-              Hint = 'Use the current selected file in player as countdown.'
-              Caption = 'Use selected file in mainwindow'
-              TabOrder = 7
-              OnClick = BtnGetCountDownTitelClick
-            end
-            object CBStartCountDown: TCheckBox
-              Left = 16
-              Top = 196
-              Width = 417
-              Height = 17
-              Hint = 'Signalize birthday song with a countdown.'
-              Caption = 'Start a countdown before the actual time'
-              TabOrder = 4
-              OnClick = CBStartCountDownClick
-            end
-            object EditCountdownSong: TEdit
-              Left = 16
-              Top = 234
-              Width = 426
-              Height = 21
-              Anchors = [akLeft, akTop, akRight]
-              TabOrder = 5
-              OnChange = EditCountdownSongChange
-              ExplicitWidth = 431
-            end
-          end
-        end
-      end
-      object tabLastfm: TTabSheet
-        Caption = 'LastFM'
-        ImageIndex = 14
-        object cpgScrobble: TCategoryPanelGroup
-          Left = 0
-          Top = 0
-          Width = 439
-          Height = 555
-          VertScrollBar.Tracking = True
-          Align = alClient
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWindowText
-          HeaderFont.Height = -12
-          HeaderFont.Name = 'Segoe UI'
-          HeaderFont.Style = []
-          TabOrder = 0
-          ExplicitWidth = 444
-          object cpScrobbleLog: TCategoryPanel
-            Top = 313
-            Height = 240
-            Caption = 'Scrobble log (this session only)'
-            TabOrder = 2
-            ExplicitWidth = 423
-            object MemoScrobbleLog: TMemo
-              Left = 0
-              Top = 0
-              Width = 416
-              Height = 214
-              Align = alClient
-              Lines.Strings = (
-                'MemoScrobbleLog')
-              ReadOnly = True
-              ScrollBars = ssVertical
-              TabOrder = 0
-              ExplicitWidth = 421
-            end
-          end
-          object cpScrobbleSettings: TCategoryPanel
-            Top = 153
-            Height = 160
-            Caption = 'Scrobble settings'
-            TabOrder = 1
-            ExplicitWidth = 423
-            object Label5: TLabel
-              Left = 32
-              Top = 72
-              Width = 343
-              Height = 13
-              Caption = 
-                'In case scrobbling was paused automatically and you fixed the re' +
-                'ason: '
-            end
-            object Btn_ScrobbleAgain: TButton
-              Left = 32
-              Top = 88
-              Width = 145
-              Height = 25
-              Hint = 'Restart scrobbling.'
-              Caption = 'Scrobble again!'
-              TabOrder = 3
-              OnClick = Btn_ScrobbleAgainClick
-            end
-            object CB_AlwaysScrobble: TCheckBox
-              Left = 16
-              Top = 16
-              Width = 414
-              Height = 17
-              Hint = 'Always begin scrobbling when nemp starts.'
-              Caption = 'Scrobble always'
-              TabOrder = 0
-            end
-            object CB_ScrobbleThisSession: TCheckBox
-              Left = 16
-              Top = 32
-              Width = 414
-              Height = 17
-              Hint = 'Begin scrobbling now.'
-              Caption = 'Scrobble this session'
-              TabOrder = 1
-            end
-            object CB_SilentError: TCheckBox
-              Left = 16
-              Top = 49
-              Width = 414
-              Height = 17
-              Hint = 
-                'Ignore hard failures like "no internet connection", "invalid use' +
-                'rname/password", ...'
-              Caption = 
-                'Ignore hard failures - just stop scrobbling if something goes wr' +
-                'ong'
-              TabOrder = 2
-            end
-          end
-          object cpScrobbleSetup: TCategoryPanel
-            Top = 0
-            Height = 153
-            Caption = 'last.fm Scrobbler setup'
-            TabOrder = 0
-            ExplicitWidth = 423
-            object Image2: TImage
-              AlignWithMargins = True
-              Left = 394
-              Top = 73
-              Width = 80
-              Height = 28
-              Cursor = crHandPoint
-              Anchors = [akTop, akRight]
-              Picture.Data = {
-                07544269746D6170761A0000424D761A00000000000036000000280000005000
-                00001C0000000100180000000000401A00000000000000000000000000000000
-                0000D0D2F63339D9040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1
-                040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1040C
-                D1040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD104
-                0CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1
-                040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1040C
-                D1040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD104
-                0CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1040CD1
-                040CD1040CD1040CD1040CD13339D9D0D2F6343CD9060FD1060FD1060FD1060F
-                D1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD106
-                0FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1
-                060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060F
-                D1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD106
-                0FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1
-                060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060F
-                D1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD1060FD134
-                3CD90811D20811D20811D20811D20811D20811D20811D20811D20811D20811D2
-                0811D20811D20811D20811D20811D20811D20811D20811D20811D20811D20811
-                D20811D20811D20811D20811D20811D20811D20811D20811D20811D20811D208
-                11D20811D20811D20811D20811D20811D20811D20811D20811D20811D20811D2
-                0811D20811D20811D20811D20811D20811D20811D20811D20811D20811D20811
-                D20811D20811D20811D20811D20811D20811D20811D20811D20811D20811D208
-                11D20811D20811D20811D20811D20811D20811D20811D20811D20811D20811D2
-                0811D20811D20811D20811D20811D20811D20A13D20A13D20A13D20A13D20A13
-                D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A
-                13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D2
-                0A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13
-                D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A
-                13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D2
-                0A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13
-                D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A13D20A
-                13D20D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D3
-                0D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15
-                D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D
-                15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D3
-                0D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15
-                D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D
-                15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D30D15D3
-                0D15D30D15D30D15D30D15D30D15D30D15D30F18D30F18D30F18D30F18D30F18
-                D30F18D30F18D30F18D33C43DB787DE64B52DE2D35D90F18D30F18D30F18D32D
-                35D9696FE4878CE9878CE95A60E11E26D60F18D30F18D30F18D30F18D30F18D3
-                4B52DE878CE9878CE9878CE9696FE43C43DB0F18D30F18D30F18D30F18D30F18
-                D30F18D35A60E1878CE9878CE9696FE42D35D90F18D30F18D32D35D94B52DE2D
-                35D90F18D30F18D30F18D34B52DE4B52DE3C43DB0F18D30F18D30F18D31E26D6
-                4B52DE4B52DE2D35D90F18D30F18D30F18D32D35D94B52DE4B52DE1E26D60F18
-                D30F18D30F18D33C43DB4B52DE4B52DE0F18D30F18D30F18D30F18D30F18D30F
-                18D3111AD4111AD4111AD4111AD4111AD4111AD4111AD4969AECFFFFFFFFFFFF
-                FFFFFF888DEA111AD42028D7B4B7F2FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-                FF969AEC111AD4111AD4888DEAF0F1FCFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-                FFFFC3C6F42028D7111AD4111AD4111AD4C3C6F4FFFFFFFFFFFFFFFFFFFFFFFF
-                FFFFFF2028D72028D7F0F1FCFFFFFFFFFFFF4D53DF111AD4111AD4FFFFFFFFFF
-                FFC3C6F4111AD4111AD4111AD44D53DFFFFFFFFFFFFF888DEA111AD4111AD411
-                1AD4888DEAFFFFFFFFFFFF4D53DF111AD4111AD4111AD4C3C6F4FFFFFFFFFFFF
-                111AD4111AD4111AD4111AD4111AD4111AD4131CD4131CD4131CD4131CD4131C
-                D4131CD43138D9FFFFFFFFFFFFFFFFFFFFFFFF898EEA131CD4C4C6F4FFFFFFFF
-                FFFFFFFFFFE1E3FAE1E3FAFFFFFFFFFFFFE1E3FA131CD4A6AAEFFFFFFFFFFFFF
-                FFFFFFF0F1FCC4C6F4C4C6F4FFFFFFFFFFFFFFFFFFC4C6F4131CD4131CD46C71
-                E4FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0F1FC131CD44E55DFFFFFFFFFFFFFFF
-                FFFF898EEA131CD4131CD4FFFFFFFFFFFFC4C6F4131CD4131CD4131CD44E55DF
-                FFFFFFFFFFFF898EEA131CD4131CD4131CD4898EEAFFFFFFFFFFFF4E55DF131C
-                D4131CD4131CD4C4C6F4FFFFFFFFFFFF131CD4131CD4131CD4131CD4131CD413
-                1CD4161ED4161ED4161ED4161ED4161ED4161ED45056DFFFFFFFFFFFFFE2E3FA
-                5056DF333AD95056DFFFFFFFFFFFFFFFFFFF5F65E1161ED4161ED4333AD9D3D5
-                F78B8FEA5056DFFFFFFFFFFFFFFFFFFF7C81E7161ED4161ED4161ED4252CD7E2
-                E3FAFFFFFFFFFFFF161ED4161ED48B8FEAFFFFFFFFFFFFB6B8F2161ED4333AD9
-                7C81E7161ED44248DCFFFFFFFFFFFFFFFFFF6E73E4161ED4161ED4FFFFFFFFFF
-                FFC5C7F4161ED4161ED4161ED45056DFFFFFFFFFFFFF8B8FEA161ED4161ED416
-                1ED48B8FEAFFFFFFFFFFFF5056DF161ED4161ED4161ED4C5C7F4FFFFFFFFFFFF
-                161ED4161ED4161ED4161ED4161ED4161ED41821D51821D51821D51821D51821
-                D51821D55259E0FFFFFFFFFFFFC5C7F41821D51821D58C90EAFFFFFFFFFFFF9A
-                9DED1821D51821D51821D51821D51821D5262FD8B7B9F2FFFFFFFFFFFF8C90EA
-                1821D51821D51821D51821D5262FD8E2E3FAFFFFFFFFFFFF1821D51821D58C90
-                EAFFFFFFFFFFFF5259E01821D51821D51821D51821D51821D55259E08C90EA6F
-                75E51821D51821D51821D5FFFFFFFFFFFFC5C7F41821D51821D51821D55259E0
-                FFFFFFFFFFFF8C90EA1821D51821D51821D58C90EAFFFFFFFFFFFF5259E01821
-                D51821D51821D5C5C7F4FFFFFFFFFFFF1821D51821D51821D51821D51821D518
-                21D51A23D61A23D61A23D61A23D61A23D61A23D6535AE0FFFFFFFFFFFFC6C8F5
-                1A23D61A23D6C6C8F5FFFFFFFFFFFF535AE01A23D61A23D61A23D61A23D61A23
-                D62831D9FFFFFFFFFFFFF1F1FC2831D91A23D6373FDB7076E5A9ACF0F1F1FCFF
-                FFFFFFFFFFE2E3FA1A23D61A23D68D91EBFFFFFFFFFFFF535AE01A23D61A23D6
-                1A23D61A23D61A23D61A23D61A23D61A23D61A23D61A23D61A23D6FFFFFFFFFF
-                FFC6C8F51A23D61A23D61A23D6535AE0FFFFFFFFFFFF8D91EB1A23D61A23D61A
-                23D68D91EBFFFFFFFFFFFF535AE01A23D61A23D61A23D6C6C8F5FFFFFFFFFFFF
-                1A23D61A23D61A23D61A23D61A23D61A23D61D25D61D25D61D25D61D25D61D25
-                D61D25D6565CE0FFFFFFFFFFFFC6C8F51D25D61D25D6C6C8F5FFFFFFFFFFFF56
-                5CE01D25D61D25D61D25D61D25D61D25D67277E5FFFFFFFFFFFFAAADF02B33D9
-                C6C8F5FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF1F1FC484EDE1D25D61D25D68E92
-                EBFFFFFFFFFFFF565CE01D25D61D25D61D25D61D25D61D25D61D25D61D25D61D
-                25D61D25D61D25D61D25D6FFFFFFFFFFFFC6C8F51D25D61D25D61D25D6565CE0
-                FFFFFFFFFFFF8E92EB1D25D61D25D61D25D68E92EBFFFFFFFFFFFF565CE01D25
-                D61D25D61D25D6C6C8F5FFFFFFFFFFFF1D25D61D25D61D25D61D25D61D25D61D
-                25D61F27D71F27D71F27D71F27D71F27D71F27D7575DE1FFFFFFFFFFFFC7C9F5
-                1F27D71F27D7C7C9F5FFFFFFFFFFFF575DE11F27D71F27D71F27D71F27D71F27
-                D7B9BBF2FFFFFFFFFFFF656BE4ABAEF0FFFFFFFFFFFFFFFFFFFFFFFFC7C9F59D
-                A0ED3B42DC1F27D71F27D71F27D78F93EBFFFFFFFFFFFF575DE11F27D71F27D7
-                1F27D71F27D71F27D71F27D71F27D71F27D71F27D71F27D71F27D7FFFFFFFFFF
-                FFC7C9F51F27D71F27D71F27D7575DE1FFFFFFFFFFFFABAEF01F27D71F27D71F
-                27D78F93EBFFFFFFFFFFFF575DE11F27D71F27D71F27D7C7C9F5FFFFFFFFFFFF
-                1F27D71F27D71F27D71F27D71F27D71F27D7212AD7212AD7212AD7212AD7212A
-                D7212AD7595FE1FFFFFFFFFFFFC7CAF5212AD7212AD79095EBFFFFFFFFFFFF83
-                88E9212AD7212AD7212AD7212AD73D45DCFFFFFFFFFFFFF1F2FC2F37DAF1F2FC
-                FFFFFFFFFFFF757AE6212AD7212AD7212AD7212AD7212AD7212AD7212AD79095
-                EBFFFFFFFFFFFF595FE1212AD7212AD7212AD7212AD7212AD7212AD7212AD721
-                2AD7212AD7212AD7212AD7FFFFFFFFFFFFC7CAF5212AD7212AD7212AD7595FE1
-                FFFFFFFFFFFFD5D7F7212AD7212AD7212AD79095EBFFFFFFFFFFFF8388E9212A
-                D7212AD7212AD7D5D7F7FFFFFFFFFFFF212AD7212AD7212AD7212AD7212AD721
-                2AD7232CD8232CD8232CD8232CD8232CD8232CD85A61E2FFFFFFFFFFFFC8CAF5
-                232CD8232CD84C54DFFFFFFFFFFFFFF1F2FD3139DA232CD8232CD8232CD8BABD
-                F3FFFFFFFFFFFFACB0F0232CD8F1F2FDFFFFFFD6D7F8232CD8232CD8232CD8E3
-                E5FAC8CAF5C8CAF5232CD8232CD89196ECFFFFFFFFFFFF5A61E2232CD8232CD8
-                232CD8232CD8232CD8232CD8232CD8232CD8232CD8232CD8232CD8FFFFFFFFFF
-                FFC8CAF5232CD8232CD8232CD85A61E2FFFFFFFFFFFFFFFFFF5A61E2232CD823
-                2CD8D6D7F8FFFFFFFFFFFFE3E5FA3139DA232CD84C54DFFFFFFFFFFFFFFFFFFF
-                232CD8232CD8232CD8232CD8232CD8232CD8262ED8262ED8262ED8262ED8262E
-                D8262ED85C62E2FFFFFFFFFFFFC9CBF5262ED8262ED8262ED8C9CBF5FFFFFFFF
-                FFFFF1F2FDA0A3EE9397ECE4E5FAFFFFFFFFFFFFF1F2FD4148DD262ED8BBBDF3
-                FFFFFFFFFFFFBBBDF39397ECBBBDF3FFFFFFFFFFFFD6D8F84F55DFC9CBF5E4E5
-                FAFFFFFFFFFFFFD6D8F8C9CBF5C9CBF5A0A3EE262ED8262ED8262ED8262ED826
-                2ED8262ED8A0A3EEC9CBF5FFFFFFFFFFFFF1F2FDC9CBF5C9CBF5A0A3EE5C62E2
-                FFFFFFFFFFFFF1F2FDFFFFFFC9CBF5E4E5FAFFFFFFFFFFFFFFFFFFFFFFFFF1F2
-                FDC9CBF5F1F2FDFFFFFFFFFFFFE4E5FA262ED8262ED8262ED8262ED8262ED826
-                2ED82830D92830D92830D92830D92830D92830D95E64E3FFFFFFFFFFFFC9CBF5
-                2830D92830D92830D9353DDBD7D8F8FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-                FFF2F2FD5057E02830D92830D95057E0F2F2FDFFFFFFFFFFFFFFFFFFFFFFFFFF
-                FFFFFFFFFF5E64E35E64E3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-                C9CBF52830D92830D92830D92830D92830D92830D9C9CBF5FFFFFFFFFFFFFFFF
-                FFFFFFFFFFFFFFFFFFFFC9CBF55E64E3FFFFFFFFFFFF868BEAF2F2FDFFFFFFFF
-                FFFFFFFFFFFFFFFFA1A4EEA1A4EEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF797EE7
-                2830D92830D92830D92830D92830D92830D92A33D92A33D92A33D92A33D92A33
-                D92A33D95F66E3FFFFFFFFFFFFCACCF52A33D92A33D92A33D92A33D92A33D97A
-                80E7AFB2F1CACCF5CACCF5BCBFF3888DEA3740DB2A33D92A33D92A33D92A33D9
-                3740DB888DEACACCF5CACCF5CACCF5A1A5EE454DDE2A33D9454DDE9599ECCACC
-                F5FFFFFFFFFFFFAFB2F19599EC9599EC7A80E72A33D92A33D92A33D92A33D92A
-                33D92A33D97A80E79599ECFFFFFFFFFFFFE4E5FA9599EC9599EC7A80E7454DDE
-                9599EC9599EC454DDE454DDEAFB2F1CACCF5CACCF5888DEA2A33D92A33D96D73
-                E5BCBFF3CACCF5BCBFF36D73E52A33D92A33D92A33D92A33D92A33D92A33D92A
-                33D92D35DA2D35DA2D35DA2D35DA2D35DA2D35DA6268E3FFFFFFFFFFFFCACCF6
-                2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35
-                DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D
-                35DA2D35DA2D35DA2D35DA2D35DA969AEDFFFFFFFFFFFF6268E32D35DA2D35DA
-                2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DAFFFFFFFFFF
-                FFCACCF62D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D
-                35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA
-                2D35DA2D35DA2D35DA2D35DA2D35DA2D35DA2F37DA2F37DA2F37DA2F37DA2F37
-                DA2F37DA6369E3FFFFFFFFFFFFCBCDF62F37DA2F37DA2F37DA2F37DA2F37DA2F
-                37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA
-                2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA979B
-                EDFFFFFFFFFFFF6369E32F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F
-                37DA2F37DA2F37DA2F37DAFFFFFFFFFFFFFFFFFF3C44DC2F37DA2F37DA4950DF
-                2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37
-                DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F37DA2F
-                37DA3139DB3139DB3139DB3139DB3139DB3139DB656BE4FFFFFFFFFFFFCBCDF6
-                3139DB3139DB3139DB3139DB3139DB3139DB3139DB3139DB3139DB3139DB3139
-                DB3139DB3139DB3139DB3139DB3139DB3139DB3139DB3139DB3139DB3139DB31
-                39DB3139DB3139DB3139DB3139DB3139DB3139DB585EE23E45DD3139DB3139DB
-                3139DB3139DB3139DB3139DB3139DB3139DB3139DB3139DB3139DBBEC1F4FFFF
-                FFFFFFFFE5E6FACBCDF6E5E6FAA5A8EF3139DB3139DB3139DB3139DB3139DB31
-                39DB3139DB3139DB3139DB3139DB3139DB3139DB3139DB3139DB3139DB3139DB
-                3139DB3139DB3139DB3139DB3139DB3139DB333CDB333CDB333CDB333CDB333C
-                DB333CDB666DE4FFFFFFFFFFFFCCCEF6333CDB333CDB333CDB333CDB333CDB33
-                3CDB333CDB333CDB333CDB333CDB333CDB333CDB333CDB333CDB333CDB333CDB
-                333CDB333CDB333CDB333CDB333CDB333CDB333CDB333CDB333CDB333CDB333C
-                DB333CDB333CDB333CDB333CDB333CDB333CDB333CDB333CDB333CDB333CDB33
-                3CDB333CDB333CDB333CDB5961E2F2F3FDFFFFFFFFFFFFFFFFFFFFFFFFCCCEF6
-                333CDB333CDB333CDB333CDB333CDB333CDB333CDB333CDB333CDB333CDB333C
-                DB333CDB333CDB333CDB333CDB333CDB333CDB333CDB333CDB333CDB333CDB33
-                3CDB363EDC363EDC363EDC363EDC363EDC363EDC4F56E09B9FEE9B9FEE8287E9
-                363EDC363EDC363EDC363EDC363EDC363EDC363EDC363EDC363EDC363EDC363E
-                DC363EDC363EDC363EDC363EDC363EDC363EDC363EDC363EDC363EDC363EDC36
-                3EDC363EDC363EDC363EDC363EDC363EDC363EDC363EDC363EDC363EDC363EDC
-                363EDC363EDC363EDC363EDC363EDC363EDC363EDC363EDC363EDC363EDC434A
-                DE9B9FEECDCFF6CDCFF6C0C2F4757BE7363EDC363EDC363EDC363EDC363EDC36
-                3EDC363EDC363EDC363EDC363EDC363EDC363EDC363EDC363EDC363EDC363EDC
-                363EDC363EDC363EDC363EDC363EDC363EDC3840DC3840DC3840DC3840DC3840
-                DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC38
-                40DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC
-                3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840
-                DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC38
-                40DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC
-                3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840
-                DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC3840DC38
-                40DC3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD
-                3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42
-                DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A
-                42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD
-                3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42
-                DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A
-                42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD
-                3A42DD3A42DD3A42DD3A42DD3A42DD3A42DD3C45DD3C45DD3C45DD3C45DD3C45
-                DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C
-                45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD
-                3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45
-                DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C
-                45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD
-                3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45
-                DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C45DD3C
-                45DD6369E43F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE
-                3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47
-                DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F
-                47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE
-                3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47
-                DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F
-                47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE3F47DE
-                3F47DE3F47DE3F47DE3F47DE3F47DE6369E4DBDCF8646BE44149DE4149DE4149
-                DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE41
-                49DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE
-                4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149
-                DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE41
-                49DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE
-                4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149
-                DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE4149DE646BE4DB
-                DCF8}
-              OnClick = Image2Click
-              ExplicitLeft = 370
-            end
-            object LblScrobble1: TLabel
-              Left = 16
-              Top = 16
-              Width = 456
-              Height = 57
-              Anchors = [akLeft, akTop, akRight]
-              AutoSize = False
-              Caption = 
-                'Nemp can scrobble what you hear to your account on LastFM. To do' +
-                ' this, Nemp needs your permission to access your account. Go onl' +
-                'ine and click the button below to start the configuration.'
-              WordWrap = True
-              ExplicitWidth = 432
-            end
-            object LblVisitLastFM: TLabel
-              AlignWithMargins = True
-              Left = 218
-              Top = 80
-              Width = 172
-              Height = 13
-              Alignment = taRightJustify
-              Anchors = [akTop, akRight]
-              AutoSize = False
-              Caption = 'For details visit'
-              ExplicitLeft = 194
-            end
-            object BtnScrobbleWizard: TButton
-              Left = 16
-              Top = 76
-              Width = 75
-              Height = 25
-              Caption = 'Start'
-              TabOrder = 0
-              OnClick = BtnScrobbleWizardClick
-            end
-          end
-        end
-      end
-      object tabWebserver: TTabSheet
-        Caption = 'Webserver'
-        ImageIndex = 15
-        object cpgWebserverConfiguration: TCategoryPanelGroup
-          Left = 0
-          Top = 0
-          Width = 439
-          Height = 555
-          VertScrollBar.Tracking = True
-          Align = alClient
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWindowText
-          HeaderFont.Height = -12
-          HeaderFont.Name = 'Segoe UI'
-          HeaderFont.Style = []
-          TabOrder = 0
-          OnMouseWheel = CategoryPanelGroupMouseWheel
-          ExplicitWidth = 444
-          object cpWebServerUrls: TCategoryPanel
-            Top = 409
-            Height = 650
-            Caption = 'Webserver URLs'
-            TabOrder = 2
-            ExplicitWidth = 423
-            object LabelLANIP: TLabel
-              Left = 16
-              Top = 16
-              Width = 121
-              Height = 13
-              AutoSize = False
-              Caption = 'Your IP (LAN)'
-              Transparent = True
-            end
-            object LblConst_IPWAN: TLabel
-              Left = 16
-              Top = 59
-              Width = 86
-              Height = 13
-              Caption = 'Your IP (Internet)'
-              Transparent = True
-            end
-            object imgQRCode: TImage
-              Left = 17
-              Top = 204
-              Width = 400
-              Height = 400
-              Stretch = True
-            end
-            object lblQRCode: TLabel
-              Left = 17
-              Top = 118
-              Width = 44
-              Height = 14
-              Caption = 'QRCode'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -12
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-            end
-            object lblCurrentQRCodeURL: TLabel
-              Left = 17
-              Top = 185
-              Width = 120
-              Height = 13
-              Caption = 'Current URL in QRCode: '
-            end
-            object BtnGetIPs: TButton
-              Left = 222
-              Top = 73
-              Width = 159
-              Height = 25
-              Hint = 
-                'Get your Internet-IP (done via a little php-script on www.gausi.' +
-                'de).'
-              Caption = 'Get IP-address'
-              TabOrder = 2
-              OnClick = BtnGetIPsClick
-            end
-            object cbLANIPs: TComboBox
-              Left = 17
-              Top = 32
-              Width = 200
-              Height = 21
-              Hint = 'Your IP(s) inside the local area network (LAN).'
-              Style = csDropDownList
-              TabOrder = 0
-              OnChange = ChangeWebserverLinks
-              Items.Strings = (
-                '')
-            end
-            object EdtGlobalIP: TEdit
-              Left = 16
-              Top = 75
-              Width = 200
-              Height = 21
-              Hint = 
-                'Your IP "in the internet". You have to configure your router and' +
-                '/or firewall properly (e.g. forwarding Port80 to your machine) '
-              ReadOnly = True
-              TabOrder = 1
-              Text = '?'
-            end
-            object cbWebserverAdminQRCode: TCheckBox
-              AlignWithMargins = True
-              Left = 17
-              Top = 138
-              Width = 315
-              Height = 17
-              Caption = 'Include "\admin" in QRCode URL'
-              TabOrder = 3
-              OnClick = ChangeWebserverLinks
-            end
-            object cbWebserverInternetQRCode: TCheckBox
-              AlignWithMargins = True
-              Left = 17
-              Top = 158
-              Width = 315
-              Height = 17
-              Caption = 'Use Internet-IP'
-              Enabled = False
-              TabOrder = 4
-              OnClick = ChangeWebserverLinks
-            end
-          end
-          object cbWebserverUserRights: TCategoryPanel
-            Top = 209
-            Caption = 'User rights'
-            TabOrder = 1
-            ExplicitWidth = 423
-            object LblConst_Password2: TLabel
-              Left = 224
-              Top = 16
-              Width = 46
-              Height = 13
-              Hint = 'Set username and password to access your library'
-              Caption = 'Password'
-            end
-            object LblConst_Username2: TLabel
-              Left = 16
-              Top = 16
-              Width = 48
-              Height = 13
-              Hint = 'Set username and password to access your library.'
-              Caption = 'Username'
-            end
-            object LblWebserverUserURL: TLabel
-              Left = 17
-              Top = 59
-              Width = 74
-              Height = 13
-              Cursor = crHandPoint
-              Caption = 'http://localhost'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clBlue
-              Font.Height = -11
-              Font.Name = 'Tahoma'
-              Font.Style = [fsUnderline]
-              ParentFont = False
-              OnClick = LblWebserverUserURLClick
-            end
-            object cbAllowRemoteControl: TCheckBox
-              Left = 16
-              Top = 144
-              Width = 397
-              Height = 15
-              Hint = 'Let the user control the player (play/stop/next/volume/...)'
-              Caption = 'Permit remote control of the player'
-              TabOrder = 5
-              OnClick = ChangeWebserverLinks
-            end
-            object cbPermitLibraryAccess: TCheckBox
-              Left = 16
-              Top = 96
-              Width = 397
-              Height = 15
-              Hint = 'Let the user search and browse in your library'
-              Caption = 'Permit access to the media library (read only)'
-              TabOrder = 3
-            end
-            object cbPermitPlaylistDownload: TCheckBox
-              Left = 16
-              Top = 112
-              Width = 397
-              Height = 15
-              Hint = 'Let the user download files from your playlist and library'
-              Caption = 'Permit downloading files'
-              TabOrder = 4
-            end
-            object cbPermitVote: TCheckBox
-              Left = 16
-              Top = 80
-              Width = 397
-              Height = 15
-              Hint = 
-                'Let the user vote for files - files with many votes will be play' +
-                'ed first'
-              Caption = 'Permit voting for files'
-              TabOrder = 2
-            end
-            object EdtPassword: TEdit
-              Left = 223
-              Top = 32
-              Width = 200
-              Height = 21
-              TabOrder = 1
-              OnKeyPress = EdtPasswordKeyPress
-            end
-            object EdtUsername: TEdit
-              Left = 17
-              Top = 32
-              Width = 200
-              Height = 21
-              TabOrder = 0
-              OnKeyPress = EdtUsernameKeyPress
-            end
-            object cbPermitHtmlAudio: TCheckBox
-              Left = 16
-              Top = 128
-              Width = 397
-              Height = 15
-              Hint = 'Let the user play files in the browser'
-              Caption = 'Permit Html audio'
-              TabOrder = 6
-            end
-          end
-          object cpWebserverConfiguration: TCategoryPanel
-            Top = 0
-            Height = 209
-            Caption = 'Webserver configuration'
-            TabOrder = 0
-            ExplicitWidth = 423
-            object Label7: TLabel
-              Left = 16
-              Top = 85
-              Width = 88
-              Height = 13
-              Hint = 'Set username and password to access your library.'
-              Caption = 'Username (Admin)'
-            end
-            object Label8: TLabel
-              Left = 224
-              Top = 85
-              Width = 86
-              Height = 13
-              Hint = 'Set username and password to access your library'
-              Caption = 'Password (Admin)'
-            end
-            object LblWebServer_Port: TLabel
-              Left = 183
-              Top = 16
-              Width = 20
-              Height = 13
-              Caption = 'Port'
-            end
-            object LblWebserverAdminURL: TLabel
-              Left = 16
-              Top = 127
-              Width = 106
-              Height = 13
-              Cursor = crHandPoint
-              Caption = 'http://localhost/admin'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clBlue
-              Font.Height = -11
-              Font.Name = 'Tahoma'
-              Font.Style = [fsUnderline]
-              ParentFont = False
-              OnClick = LblWebserverAdminURLClick
-            end
-            object LblWebServerTheme: TLabel
-              Left = 16
-              Top = 16
-              Width = 32
-              Height = 13
-              Caption = 'Theme'
-            end
-            object BtnServerActivate: TButton
-              Left = 298
-              Top = 145
-              Width = 125
-              Height = 25
-              Caption = 'Activate server'
-              TabOrder = 6
-              OnClick = BtnServerActivateClick
-            end
-            object BtnShowWebserverLog: TButton
-              Left = 165
-              Top = 145
-              Width = 125
-              Height = 25
-              Caption = 'Show Log'
-              TabOrder = 5
-              OnClick = BtnShowWebserverLogClick
-            end
-            object CBAutoStartWebServer: TCheckBox
-              Left = 16
-              Top = 62
-              Width = 393
-              Height = 17
-              Hint = 'Automatically activate the webserver when Nemp starts.'
-              Caption = 'Activate webserver on start'
-              TabOrder = 2
-            end
-            object cbWebserverRootDir: TComboBox
-              Left = 16
-              Top = 32
-              Width = 155
-              Height = 21
-              Style = csDropDownList
-              TabOrder = 0
-            end
-            object EdtPasswordAdmin: TEdit
-              Left = 223
-              Top = 100
-              Width = 200
-              Height = 21
-              TabOrder = 4
-              OnKeyPress = EdtPasswordKeyPress
-            end
-            object EdtUsernameAdmin: TEdit
-              Left = 16
-              Top = 100
-              Width = 200
-              Height = 21
-              TabOrder = 3
-              OnKeyPress = EdtUsernameAdminKeyPress
-            end
-            object seWebServer_Port: TSpinEdit
-              Left = 183
-              Top = 31
-              Width = 75
-              Height = 22
-              MaxValue = 65535
-              MinValue = 0
-              TabOrder = 1
-              Value = 80
-              OnChange = ChangeWebserverLinks
-            end
-          end
-        end
-      end
-      object tabCoverflow: TTabSheet
-        Caption = '3D-CoverFlow'
-        ImageIndex = 8
-        object PnlCoverFlowControl: TPanel
-          Left = 0
-          Top = 525
-          Width = 439
-          Height = 30
-          Align = alBottom
-          BevelOuter = bvNone
-          TabOrder = 1
-          ExplicitWidth = 444
-          DesignSize = (
-            439
-            30)
-          object BtnUndoCoverFlowSettings: TButton
-            AlignWithMargins = True
-            Left = 286
-            Top = 3
-            Width = 123
-            Height = 25
-            Anchors = [akTop, akRight]
-            Caption = 'Undo'
-            TabOrder = 0
-            OnClick = BtnUndoCoverFlowSettingsClick
-            ExplicitLeft = 291
-          end
-          object BtnCoverFlowDefault: TButton
-            AlignWithMargins = True
-            Left = 147
-            Top = 3
-            Width = 123
-            Height = 25
-            Anchors = [akTop, akRight]
-            Caption = 'Default'
-            TabOrder = 1
-            OnClick = BtnCoverFlowDefaultClick
-            ExplicitLeft = 152
-          end
-        end
-        object cpgCoverFlowView: TCategoryPanelGroup
-          Left = 0
-          Top = 0
-          Width = 439
-          Height = 525
-          VertScrollBar.Tracking = True
-          Align = alClient
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWindowText
-          HeaderFont.Height = -12
-          HeaderFont.Name = 'Segoe UI'
-          HeaderFont.Style = []
-          TabOrder = 0
-          ExplicitWidth = 444
-          object cpCoverflowMixedSettings: TCategoryPanel
-            Top = 570
-            Height = 150
-            Caption = 'Mixed settings'
-            TabOrder = 5
-            ExplicitWidth = 423
-            object lblCoverflowTextures: TLabel
-              Left = 92
-              Top = 19
-              Width = 159
-              Height = 13
-              Caption = 'max. number of displayed covers'
-            end
-            object shapeCoverflowColor: TShape
-              Left = 16
-              Top = 88
-              Width = 21
-              Height = 21
-              OnMouseDown = shapeCoverflowColorMouseDown
-            end
-            object lblCoverFlowColor: TLabel
-              Left = 16
-              Top = 69
-              Width = 243
-              Height = 13
-              Caption = 'Default background color (Windows standard only)'
-            end
-            object cb_UseClassicCoverflow: TCheckBox
-              Left = 16
-              Top = 44
-              Width = 409
-              Height = 17
-              Hint = 'Classic coverflow for systems without OpenGL-support'
-              Caption = 'Use classic 2D coverflow'
-              TabOrder = 1
-            end
-            object seCoverflowTextureCache: TSpinEdit
-              Left = 16
-              Top = 16
-              Width = 67
-              Height = 22
-              MaxValue = 200
-              MinValue = 20
-              TabOrder = 0
-              Value = 20
-            end
-            object edtCoverFlowColor: TEdit
-              Left = 43
-              Top = 88
-              Width = 121
-              Height = 21
-              TabOrder = 2
-            end
-            object btnSelectCoverFlowColor: TButton
-              Left = 170
-              Top = 88
-              Width = 31
-              Height = 21
-              Caption = '...'
-              TabOrder = 3
-              OnClick = btnSelectCoverFlowColorClick
-            end
-          end
-          object cpCoverflowReflection: TCategoryPanel
-            Top = 445
-            Height = 125
-            Caption = 'Reflection'
-            TabOrder = 4
-            ExplicitWidth = 423
-            object lblCoverFlowIntensity: TLabel
-              Left = 16
-              Top = 37
-              Width = 43
-              Height = 13
-              Caption = 'Intenisty'
-            end
-            object lblCoverflowReflexionGap: TLabel
-              Left = 278
-              Top = 37
-              Width = 56
-              Height = 13
-              Anchors = [akTop, akRight]
-              Caption = 'Vertical gap'
-              ExplicitLeft = 240
-            end
-            object cbCoverFlowUseReflection: TCheckBox
-              Left = 16
-              Top = 16
-              Width = 217
-              Height = 17
-              Caption = 'Enabled'
-              TabOrder = 0
-              OnClick = tbCoverZMainChange
-            end
-            object tbCoverReflexionGap: TNempTrackBar
-              AlignWithMargins = True
-              Left = 283
-              Top = 56
-              Width = 185
-              Height = 22
-              Anchors = [akTop, akRight]
-              Max = 100
-              PageSize = 5
-              Frequency = 10
-              Position = 20
-              TabOrder = 2
-              ThumbLength = 15
-              OnChange = tbCoverZMainChange
-              ExplicitLeft = 288
-            end
-            object tbCoverReflexionIntensity: TNempTrackBar
-              AlignWithMargins = True
-              Left = 16
-              Top = 56
-              Width = 185
-              Height = 22
-              Max = 100
-              PageSize = 5
-              Frequency = 10
-              Position = 15
-              TabOrder = 1
-              ThumbLength = 15
-              OnChange = tbCoverZMainChange
-            end
-          end
-          object cpCoverflowAngles: TCategoryPanel
-            Top = 345
-            Height = 100
-            Caption = 'Angles'
-            TabOrder = 3
-            ExplicitWidth = 423
-            object lblCoverFlowAngleLeft: TLabel
-              Left = 16
-              Top = 16
-              Width = 19
-              Height = 13
-              Caption = 'Left'
-            end
-            object lblCoverFlowAngleMain: TLabel
-              Left = 159
-              Top = 16
-              Width = 67
-              Height = 13
-              Caption = 'Current cover'
-            end
-            object lblCoverFlowAngleRight: TLabel
-              Left = 326
-              Top = 16
-              Width = 25
-              Height = 13
-              Anchors = [akTop, akRight]
-              Caption = 'Right'
-              ExplicitLeft = 298
-            end
-            object tbCoverAngleLeft: TNempTrackBar
-              AlignWithMargins = True
-              Left = 16
-              Top = 30
-              Width = 137
-              Height = 22
-              Max = 180
-              Min = -180
-              PageSize = 5
-              Frequency = 30
-              Position = -85
-              TabOrder = 0
-              ThumbLength = 15
-              OnChange = tbCoverZMainChange
-            end
-            object tbCoverAngleMain: TNempTrackBar
-              AlignWithMargins = True
-              Left = 159
-              Top = 30
-              Width = 123
-              Height = 22
-              Max = 45
-              Min = -45
-              PageSize = 5
-              Frequency = 10
-              TabOrder = 1
-              ThumbLength = 15
-              OnChange = tbCoverZMainChange
-            end
-            object tbCoverAngleRight: TNempTrackBar
-              AlignWithMargins = True
-              Left = 331
-              Top = 30
-              Width = 137
-              Height = 22
-              Anchors = [akTop, akRight]
-              Max = 180
-              Min = -180
-              PageSize = 5
-              Frequency = 30
-              Position = 85
-              TabOrder = 2
-              ThumbLength = 15
-              OnChange = tbCoverZMainChange
-              ExplicitLeft = 336
-            end
-          end
-          object cpCoverflowSpacing: TCategoryPanel
-            Top = 215
-            Height = 130
-            Caption = 'Spacing between cover art'
-            TabOrder = 2
-            ExplicitWidth = 423
-            object lblCoverFlowGapLeft: TLabel
-              Left = 16
-              Top = 16
-              Width = 19
-              Height = 13
-              Caption = 'Left'
-            end
-            object lblCoverFlowGapRight: TLabel
-              Left = 278
-              Top = 16
-              Width = 25
-              Height = 13
-              Anchors = [akTop, akRight]
-              Caption = 'Right'
-              ExplicitLeft = 271
-            end
-            object tbCoverGapFirstLeft: TNempTrackBar
-              AlignWithMargins = True
-              Left = 16
-              Top = 30
-              Width = 185
-              Height = 22
-              Max = 500
-              Min = 10
-              PageSize = 5
-              Frequency = 50
-              Position = 100
-              TabOrder = 0
-              ThumbLength = 15
-              OnChange = tbCoverZMainChange
-            end
-            object tbCoverGapFirstRight: TNempTrackBar
-              AlignWithMargins = True
-              Left = 283
-              Top = 30
-              Width = 185
-              Height = 22
-              Anchors = [akTop, akRight]
-              Max = 500
-              Min = 10
-              PageSize = 5
-              Frequency = 50
-              Position = 100
-              TabOrder = 1
-              ThumbLength = 15
-              OnChange = tbCoverZMainChange
-              ExplicitLeft = 288
-            end
-            object tbCoverGapLeft: TNempTrackBar
-              AlignWithMargins = True
-              Left = 16
-              Top = 60
-              Width = 185
-              Height = 22
-              Max = 500
-              Min = 10
-              PageSize = 5
-              Frequency = 50
-              Position = 100
-              TabOrder = 2
-              ThumbLength = 15
-              OnChange = tbCoverZMainChange
-            end
-            object tbCoverGapRight: TNempTrackBar
-              AlignWithMargins = True
-              Left = 283
-              Top = 58
-              Width = 185
-              Height = 22
-              Anchors = [akTop, akRight]
-              Max = 500
-              Min = 10
-              PageSize = 5
-              Frequency = 50
-              Position = 100
-              TabOrder = 3
-              ThumbLength = 15
-              OnChange = tbCoverZMainChange
-              ExplicitLeft = 288
-            end
-          end
-          object cpCoverflowViewPosition: TCategoryPanel
-            Top = 135
-            Height = 80
-            Caption = 'Viewing position (x-axis)'
-            TabOrder = 1
-            ExplicitWidth = 423
-            object tbCoverViewPosition: TNempTrackBar
-              AlignWithMargins = True
-              Left = 16
-              Top = 16
-              Width = 457
-              Height = 22
-              Anchors = [akLeft, akTop, akRight]
-              Max = 180
-              Min = -180
-              PageSize = 5
-              Frequency = 50
-              Position = -85
-              TabOrder = 0
-              ThumbLength = 15
-              OnChange = tbCoverZMainChange
-              ExplicitWidth = 462
-            end
-          end
-          object cpCoverflowPosition: TCategoryPanel
-            Top = 0
-            Height = 135
-            Caption = 'Position of cover art (z-axis)'
-            TabOrder = 0
-            ExplicitWidth = 423
-            object LblCoverZLeft: TLabel
-              Left = 16
-              Top = 41
-              Width = 19
-              Height = 13
-              Caption = 'Left'
-            end
-            object lblCoverZMain: TLabel
-              Left = 16
-              Top = 16
-              Width = 67
-              Height = 13
-              Caption = 'Current cover'
-            end
-            object LblCoverZRight: TLabel
-              Left = 16
-              Top = 66
-              Width = 25
-              Height = 13
-              Caption = 'Right'
-            end
-            object tbCoverZLeft: TNempTrackBar
-              AlignWithMargins = True
-              Left = 88
-              Top = 42
-              Width = 380
-              Height = 22
-              Anchors = [akLeft, akTop, akRight]
-              Max = 150
-              Min = -800
-              PageSize = 10
-              Frequency = 50
-              Position = 100
-              TabOrder = 1
-              ThumbLength = 15
-              OnChange = tbCoverZMainChange
-              ExplicitWidth = 385
-            end
-            object tbCoverZMain: TNempTrackBar
-              AlignWithMargins = True
-              Left = 88
-              Top = 16
-              Width = 380
-              Height = 22
-              Anchors = [akLeft, akTop, akRight]
-              Max = 150
-              Min = -800
-              PageSize = 10
-              Frequency = 50
-              Position = 100
-              TabOrder = 0
-              ThumbLength = 15
-              OnChange = tbCoverZMainChange
-              ExplicitWidth = 385
-            end
-            object tbCoverZRight: TNempTrackBar
-              AlignWithMargins = True
-              Left = 88
-              Top = 68
-              Width = 380
-              Height = 22
-              Anchors = [akLeft, akTop, akRight]
-              Max = 150
-              Min = -800
-              PageSize = 10
-              Frequency = 50
-              Position = 100
-              TabOrder = 2
-              ThumbLength = 15
-              OnChange = tbCoverZMainChange
-              ExplicitWidth = 385
-            end
-          end
-        end
-      end
       object tabFiletypes: TTabSheet
-        Caption = 'Filetypes'
         ImageIndex = 16
+        ImageName = 'OptionsWindows'
         object cpgFileTypesRegistration: TCategoryPanelGroup
           Left = 0
           Top = 0
-          Width = 439
-          Height = 555
+          Width = 449
+          Height = 546
           VertScrollBar.Tracking = True
           Align = alClient
+          Color = clBtnFace
           HeaderFont.Charset = DEFAULT_CHARSET
           HeaderFont.Color = clWindowText
           HeaderFont.Height = -12
           HeaderFont.Name = 'Segoe UI'
           HeaderFont.Style = []
           TabOrder = 0
-          ExplicitWidth = 444
           object cpFileTypeRegistration: TCategoryPanel
             Top = 0
             Height = 467
             Caption = 'Register file types'
             TabOrder = 0
-            ExplicitWidth = 440
             object lbl_AudioFormats: TLabel
               Left = 16
               Top = 16
@@ -6379,144 +6959,79 @@ object OptionsCompleteForm: TOptionsCompleteForm
   end
   object Panel2: TPanel
     Left = 0
-    Top = 625
-    Width = 662
-    Height = 38
+    Top = 632
+    Width = 672
+    Height = 40
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitWidth = 667
-    DesignSize = (
-      662
-      38)
-    object ImgHelp: TImage
-      Left = 6
-      Top = 0
+    object imgHelp: TVirtualImage
+      AlignWithMargins = True
+      Left = 8
+      Top = 4
       Width = 32
       Height = 32
-      Picture.Data = {
-        0954506E67496D61676589504E470D0A1A0A0000000D49484452000000200000
-        00200806000000737A7AF40000001974455874536F6674776172650041646F62
-        6520496D616765526561647971C9653C000008F34944415478DA9D570950D4D7
-        19FFED0DAC2CB0BBC825720822201ED0AE1123F1AE6722B1029A38365E89699B
-        B44E278E899D761233D1B4D369DA999878744C44BC8889F1A095E89826D18282
-        9C02A2C0022E2CBBDC2C0B7BF67B8F5D5C10129337F32DC3FBDEFFBDDFFB7DE7
-        13E0098772E5FB0A81EFA46D0E8178B3C3299CE1743A877502818004100A1C65
-        42A7FD13674FD391F6CB6FF43CC9BE821FD2ABD30F463B64AA2FC412C9F4D4E4
-        28C44C562326420DA94404BBDD0987C30EBBC30993D98A075A23EA9BDB71A75A
-        0787CD5A21301BD71A3EDF5947FB387F0A00912AEBF48722897447D6CAD9484D
-        8E80B71498E00D787BD16DD9AECE21A1F361B303DD26078CDD16749014DF7D88
-        6B376A189043869319AFD272FB8F012009C83CAB4D8C0D0D79699D0661816228
-        FD8082AA2E1454EA5159D70E43D700A71DAEEBA9FDBD9030598994B889489AA2
-        44539B1935DA2E5CF9A606CDBA8E1663CEBA085A667D120012BF8C330DEB57CC
-        0E5D362F06616AE081AE1F7FCF2D4157AF05129110429180EC2D18FED8C9D970
-        7253D8EC0EF8C965D8B22A01214A394A6B3B70ABBC198577EA74ED27D7478E06
-        311A00DDFC4CE3BAE5B383D9E19121C027FFAEC37F0A1A21239B8BE970B7C38D
-        35864C3204C44236499B198667E74D4141851E8515CD2829D3B61A727E39D913
-        84E756225546F6C7F171915B7FFD622AA6840AF0F1F95ADCAC68E5870B85427E
-        B0DBEECE517EC5F8607AF71A87730844726C20D63D138BAF8B75C8FFB606FAD6
-        B6A386531B5F76FB841B80C07FD1DE69D2B094BBEFFC6E0512A264C8BDAEC5B5
-        A226C8A462888443CB98B35989E2419B83FEB20818022124BD84442A1642CACC
-        E35ECF9970604E7C109E4E0AC395C226E47F5D09EBC3A2848EABFBAA19696E00
-        5265E6A992ACD59AF8956951E83299F17E4E3179BD0822917078B301DA4C3D41
-        8A03EB63911CA118C14091B607FB2FD5A3B6AD1F5E04C40D9A9BC36AC7E6E509
-        14AA367C75A30E1577B5551419B3486DE1AB7CA6AD0A95FF6CFBC3BFEE5E8D69
-        E122EC395C04F3A01D62DA48E072328BD58148B5174EBD3203DF37320F96A1A1
-        7D80CC261CA69739A6974C8C1DAB9270F1463DB15085BEC2C361A6EA4B3AB646
-        A44C3FB427756ECA3B9BD7CE44A7C984A317AAE025153DA292109808D0D99D49
-        04C29BCFD5B49AB03FAF81DBFEE567C23027DACF756340B3AF00BE5E62B83EE7
-        FE6025F6D6A446C3D069C6D51BF7A1AB7FF047C367DBDF634BBC0332728A5E48
-        9F1BBF3A2D12976F6A5152DB06895834ECED8CFE3E0250B057C3FF67F65FF897
-        DB3CF9307EBA89DA2BBB5210AE94717DF2DB05F0F77EE43B6E166226F9232E5C
-        8DCFAF56A1F65E2399212B85AD08F0CFCAED78F3D5259837DD0FFB4F9412FD0E
-        B2FDA38F995733C74B89F0457C881CBAAE417C55D5C91D8E39A58DF479AFCF84
-        826ECD86E6DD5BF01B0580F9026375FD82381CCFAB44595923DAB2D3956C45A0
-        5F666EDB9F5F5B8E390972EC39749B9C4F3C4CBF7B30166C24CC1C4CC5F43662
-        82E1CCD99E08B5AF94AF6B683763D3D12A4CE026F4F89E451051B6654512FE75
-        B11C65E58D3064A74F64A74C2400FA37772EC5BC2405FE74AC88908A79A67B2C
-        D17830C22865517C625B3C5472E9F09AEDC7ABD1D831C043D27307270F613B36
-        2D49C4E1F365A8AA6A660C047100FE04E08D1D8B317FA63FF61D2FA1D8178D09
-        C0934EE613E75E4982BF8F88CF197AAD78EB7C1DB4ED833C0C3D6FEF09206B61
-        3C3EFAA204F76B741E00B272F5BFDFBA100B662929FE4B5D996F6C008C05E6D1
-        D342E538901ECDE7DAE8F02D9F5643404AA9E8F1C31FB166C7F36971F8F05C31
-        EAEFEB1F01506EF84CBF63432A966882712CAF1A0316FB08071A0D609072C24B
-        A9C1786EA69ACFBD7D498BDB9488BC28F6C7638E85A24C2CC6FC1993F0D1B93B
-        D03519A13F3E0420509991FDDDB245C9B16B17C4A0ACAE0DF79BBB79E1F93E06
-        E6442BF0872593F8DCAEDC0768EE6495727CB331270E51C92197497136FF2EBA
-        F4FA5AFDC98DF37818062C7F6FEFF43969BBD2972642211722BFA89997DDB12E
-        C30030EF37114BA641079F9B2013C287FC663C004E0EC08119514128AE694561
-        49137AB5A57F6BCFDBBD8F272249605CBC72C581A24DCF6BB0282504E7BEB98F
-        C171CCC06CC96AC28B3F9F88D5494A3E77B1BC03D9B7DAB8F38D057A887E1166
-        C504530494A0E5613B3A2FEF4EB1186AAA782A260956679CF8AF46131FBD6C6E
-        34FC15525E0945AEC6632495401F813BB3356EC47CC6D19AC762DF0D98F50889
-        5181A87C60C0F55B0D307718EB5A4F6E4C2375AB7B777FEF98C54F2BE6FEF6C2
-        8A458958F65438EA75DDA86BE9E62C083C40B0DB30EA4FFC6AEA88835E38768F
-        EC3BD209DD9D5250809C6896528D29457F672F7A6EFE734D7FEDD56F49DD355C
-        8E494294CFFEE383E0A8F8E7E66B62F00B02515E6784CED03BDC8CB86FC4D272
-        66B21ACBE2FDF9DC15EA154F171B8966E1883E911D1EE0EB8330952F8E7C598A
-        367D27AC46ED79C3F9DFBC4EEA16B8CB31861A93092451EA0DA7AF4D9B1AAE4A
-        981A8CA59A708A882E34197A6863A147711A6A4C58516283391F735A77E0385D
-        BF2A5F39E5791F7C9A578E96D66E584DBDEDADD9198B48594FD2078F86042E5F
-        509144AB334F5E88890D574747AAB17876389CB47175A391F70443F9D5D525B8
-        73B34783CAB211ABA4A12A05FAA94A9EC9AF4247671F6C7D3DC6D69CCC35B482
-        BD13DA31AA25730F0909CB2E518159A72E04A80294119181488E0B4252B41A3D
-        FD83E8EC1D40AF7990CC601FA68EFD4845227A2F48A90F90F166E47F952DB85E
-        D4089B7900CEC1FE8ED613FC70767323C6694A47838850AFF960AF3820625548
-        5800D44A052607F952A7ACA077829C129598DBD8EDE566AB0D0DBA1E7A0B1851
-        ADED808980DA062CB077692F19BE7C6D1FEDA71D7DF87800DC200258787A45CE
-        9BEEFBD4CE778512DF48859F37643209245E125E5EED94DB798966423E61B1D8
-        E0A0FECF366885D3DADBD073F3E05BE686EF2A58B89174E2091F269E3EE1E3F2
-        8B40B1223448A1D9B646AC9ABA542095478DDC44C077725AFAEAADC67BF93D85
-        472ED87A747A52195CF6EEC78F7C9A79EA252E207212D60AB3E68F3586A38B05
-        CBCB66926E12F63236B90EB6E2273E4EC76284E50B7A9A423CC6B7BC4C900C90
-        58C6BBF1E8F17F3F8FF30A7AACC85E0000000049454E44AE426082}
+      Margins.Left = 8
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
+      Align = alLeft
+      ImageCollection = DataModuleGui.ICGraphics
+      ImageWidth = 0
+      ImageHeight = 0
+      ImageIndex = 21
+      ImageName = 'imgHelp'
       OnClick = BtnHelpClick
+      ExplicitLeft = 80
+      ExplicitTop = 8
+      ExplicitHeight = 22
     end
     object BTNok: TButton
-      Left = 391
-      Top = 4
+      AlignWithMargins = True
+      Left = 421
+      Top = 8
       Width = 75
-      Height = 25
-      Anchors = [akTop, akRight]
+      Height = 24
+      Margins.Left = 0
+      Margins.Top = 8
+      Margins.Right = 8
+      Margins.Bottom = 8
+      Align = alRight
       Caption = 'Ok'
       Default = True
       TabOrder = 0
       OnClick = BTNokClick
-      ExplicitLeft = 396
     end
     object BTNCancel: TButton
-      Left = 472
-      Top = 4
+      AlignWithMargins = True
+      Left = 589
+      Top = 8
       Width = 75
-      Height = 25
-      Anchors = [akTop, akRight]
+      Height = 24
+      Margins.Left = 0
+      Margins.Top = 8
+      Margins.Right = 8
+      Margins.Bottom = 8
+      Align = alRight
       Cancel = True
       Caption = 'Cancel'
       TabOrder = 1
       OnClick = BTNCancelClick
-      ExplicitLeft = 477
     end
     object BTNApply: TButton
-      Left = 553
-      Top = 4
+      AlignWithMargins = True
+      Left = 504
+      Top = 8
       Width = 77
-      Height = 25
-      Anchors = [akTop, akRight]
+      Height = 24
+      Margins.Left = 0
+      Margins.Top = 8
+      Margins.Right = 8
+      Margins.Bottom = 8
+      Align = alRight
       Caption = 'Apply'
       TabOrder = 2
       OnClick = BTNApplyClick
-      ExplicitLeft = 558
-    end
-    object BtnHelp: TButton
-      AlignWithMargins = True
-      Left = 72
-      Top = 3
-      Width = 75
-      Height = 25
-      Caption = 'Help'
-      TabOrder = 3
-      Visible = False
-      OnClick = BtnHelpClick
     end
   end
   object OpenDlg_CountdownSongs: TOpenDialog
@@ -9298,5 +9813,476 @@ object OptionsCompleteForm: TOptionsCompleteForm
   object ColorDlgCoverflow: TColorDialog
     Left = 43
     Top = 555
+  end
+  object vilIcons: TVirtualImageList
+    AutoFill = True
+    Images = <
+      item
+        CollectionIndex = 0
+        CollectionName = 'MenuInfo'
+        Name = 'MenuInfo'
+      end
+      item
+        CollectionIndex = 1
+        CollectionName = 'MenuAddFolder'
+        Name = 'MenuAddFolder'
+      end
+      item
+        CollectionIndex = 2
+        CollectionName = 'MenuBirthday'
+        Name = 'MenuBirthday'
+      end
+      item
+        CollectionIndex = 3
+        CollectionName = 'MenuCleanUp'
+        Name = 'MenuCleanUp'
+      end
+      item
+        CollectionIndex = 4
+        CollectionName = 'MenuCloseNemp'
+        Name = 'MenuCloseNemp'
+      end
+      item
+        CollectionIndex = 5
+        CollectionName = 'MenuConfigureLibrary'
+        Name = 'MenuConfigureLibrary'
+      end
+      item
+        CollectionIndex = 6
+        CollectionName = 'MenuDelete'
+        Name = 'MenuDelete'
+      end
+      item
+        CollectionIndex = 7
+        CollectionName = 'MenuEffects'
+        Name = 'MenuEffects'
+      end
+      item
+        CollectionIndex = 8
+        CollectionName = 'MenuHeadphones'
+        Name = 'MenuHeadphones'
+      end
+      item
+        CollectionIndex = 9
+        CollectionName = 'MenuHelp'
+        Name = 'MenuHelp'
+      end
+      item
+        CollectionIndex = 10
+        CollectionName = 'MenuKeyboard'
+        Name = 'MenuKeyboard'
+      end
+      item
+        CollectionIndex = 11
+        CollectionName = 'MenuLastFM'
+        Name = 'MenuLastFM'
+      end
+      item
+        CollectionIndex = 12
+        CollectionName = 'MenuMarkAll'
+        Name = 'MenuMarkAll'
+      end
+      item
+        CollectionIndex = 13
+        CollectionName = 'MenuMarkBlack'
+        Name = 'MenuMarkBlack'
+      end
+      item
+        CollectionIndex = 14
+        CollectionName = 'MenuMarkBlue'
+        Name = 'MenuMarkBlue'
+      end
+      item
+        CollectionIndex = 15
+        CollectionName = 'MenuMarkGreen'
+        Name = 'MenuMarkGreen'
+      end
+      item
+        CollectionIndex = 16
+        CollectionName = 'MenuMarkRed'
+        Name = 'MenuMarkRed'
+      end
+      item
+        CollectionIndex = 17
+        CollectionName = 'MenuNempLogo'
+        Name = 'MenuNempLogo'
+      end
+      item
+        CollectionIndex = 18
+        CollectionName = 'MenuOpen'
+        Name = 'MenuOpen'
+      end
+      item
+        CollectionIndex = 19
+        CollectionName = 'MenuPlay'
+        Name = 'MenuPlay'
+      end
+      item
+        CollectionIndex = 20
+        CollectionName = 'MenuRefresh'
+        Name = 'MenuRefresh'
+      end
+      item
+        CollectionIndex = 21
+        CollectionName = 'MenuReplayGain'
+        Name = 'MenuReplayGain'
+      end
+      item
+        CollectionIndex = 22
+        CollectionName = 'MenuSave'
+        Name = 'MenuSave'
+      end
+      item
+        CollectionIndex = 23
+        CollectionName = 'MenuSearch'
+        Name = 'MenuSearch'
+      end
+      item
+        CollectionIndex = 24
+        CollectionName = 'MenuSettings'
+        Name = 'MenuSettings'
+      end
+      item
+        CollectionIndex = 25
+        CollectionName = 'MenuShutdown'
+        Name = 'MenuShutdown'
+      end
+      item
+        CollectionIndex = 26
+        CollectionName = 'MenuSkins'
+        Name = 'MenuSkins'
+      end
+      item
+        CollectionIndex = 27
+        CollectionName = 'MenuSort'
+        Name = 'MenuSort'
+      end
+      item
+        CollectionIndex = 28
+        CollectionName = 'MenuStarEmpty'
+        Name = 'MenuStarEmpty'
+      end
+      item
+        CollectionIndex = 29
+        CollectionName = 'MenuStarFull'
+        Name = 'MenuStarFull'
+      end
+      item
+        CollectionIndex = 30
+        CollectionName = 'MenuStarHalf'
+        Name = 'MenuStarHalf'
+      end
+      item
+        CollectionIndex = 31
+        CollectionName = 'MenuStream'
+        Name = 'MenuStream'
+      end
+      item
+        CollectionIndex = 32
+        CollectionName = 'MenuTagCloud'
+        Name = 'MenuTagCloud'
+      end
+      item
+        CollectionIndex = 33
+        CollectionName = 'MenuWarning'
+        Name = 'MenuWarning'
+      end
+      item
+        CollectionIndex = 34
+        CollectionName = 'Menuwinamp'
+        Name = 'Menuwinamp'
+      end
+      item
+        CollectionIndex = 35
+        CollectionName = 'MenuWizard'
+        Name = 'MenuWizard'
+      end
+      item
+        CollectionIndex = 36
+        CollectionName = 'MenuAddMusic'
+        Name = 'MenuAddMusic'
+      end
+      item
+        CollectionIndex = 37
+        CollectionName = 'MenuCDDA'
+        Name = 'MenuCDDA'
+      end
+      item
+        CollectionIndex = 38
+        CollectionName = 'MenuAddToLibrary'
+        Name = 'MenuAddToLibrary'
+      end
+      item
+        CollectionIndex = 39
+        CollectionName = 'MenuUSB'
+        Name = 'MenuUSB'
+      end
+      item
+        CollectionIndex = 40
+        CollectionName = 'MenuFileMissing'
+        Name = 'MenuFileMissing'
+      end
+      item
+        CollectionIndex = 41
+        CollectionName = 'MenuInfoReplace'
+        Name = 'MenuInfoReplace'
+      end
+      item
+        CollectionIndex = 42
+        CollectionName = 'MenuOk'
+        Name = 'MenuOk'
+      end
+      item
+        CollectionIndex = 43
+        CollectionName = 'MenuPause'
+        Name = 'MenuPause'
+      end
+      item
+        CollectionIndex = 44
+        CollectionName = 'MenuReplayGainDisabled'
+        Name = 'MenuReplayGainDisabled'
+      end
+      item
+        CollectionIndex = 45
+        CollectionName = 'MenuStop'
+        Name = 'MenuStop'
+      end
+      item
+        CollectionIndex = 46
+        CollectionName = 'MenuTimer'
+        Name = 'MenuTimer'
+      end
+      item
+        CollectionIndex = 47
+        CollectionName = 'MenuWarningRed'
+        Name = 'MenuWarningRed'
+      end
+      item
+        CollectionIndex = 48
+        CollectionName = 'MenuNempUpdate'
+        Name = 'MenuNempUpdate'
+      end
+      item
+        CollectionIndex = 49
+        CollectionName = 'MenuEmpty'
+        Name = 'MenuEmpty'
+      end
+      item
+        CollectionIndex = 50
+        CollectionName = 'MenuTreeCollapse'
+        Name = 'MenuTreeCollapse'
+      end
+      item
+        CollectionIndex = 51
+        CollectionName = 'MenuTreeExpand'
+        Name = 'MenuTreeExpand'
+      end
+      item
+        CollectionIndex = 52
+        CollectionName = 'ToolBtnBGDisabled'
+        Name = 'ToolBtnBGDisabled'
+      end
+      item
+        CollectionIndex = 53
+        CollectionName = 'ToolBtnBGDown'
+        Name = 'ToolBtnBGDown'
+      end
+      item
+        CollectionIndex = 54
+        CollectionName = 'ToolBtnBGHighlight'
+        Name = 'ToolBtnBGHighlight'
+      end
+      item
+        CollectionIndex = 55
+        CollectionName = 'ToolBtnBGNormal'
+        Name = 'ToolBtnBGNormal'
+      end
+      item
+        CollectionIndex = 56
+        CollectionName = 'ToolBtnBirthday'
+        Name = 'ToolBtnBirthday'
+      end
+      item
+        CollectionIndex = 57
+        CollectionName = 'ToolBtnCloseNemp'
+        Name = 'ToolBtnCloseNemp'
+      end
+      item
+        CollectionIndex = 58
+        CollectionName = 'ToolBtnLastFM'
+        Name = 'ToolBtnLastFM'
+      end
+      item
+        CollectionIndex = 59
+        CollectionName = 'ToolBtnShutdown'
+        Name = 'ToolBtnShutdown'
+      end
+      item
+        CollectionIndex = 60
+        CollectionName = 'ToolBtnWarning'
+        Name = 'ToolBtnWarning'
+      end
+      item
+        CollectionIndex = 61
+        CollectionName = 'ToolBtnwinamp'
+        Name = 'ToolBtnwinamp'
+      end
+      item
+        CollectionIndex = 62
+        CollectionName = 'SysBtnCloseForm'
+        Name = 'SysBtnCloseForm'
+      end
+      item
+        CollectionIndex = 63
+        CollectionName = 'SysBtnCloseNemp'
+        Name = 'SysBtnCloseNemp'
+      end
+      item
+        CollectionIndex = 64
+        CollectionName = 'SysBtnMinimize'
+        Name = 'SysBtnMinimize'
+      end
+      item
+        CollectionIndex = 65
+        CollectionName = 'ToolBtnWebserver'
+        Name = 'ToolBtnWebserver'
+      end
+      item
+        CollectionIndex = 66
+        CollectionName = 'BtnVolumeHigh'
+        Name = 'BtnVolumeHigh'
+      end
+      item
+        CollectionIndex = 67
+        CollectionName = 'BtnVolumeLow'
+        Name = 'BtnVolumeLow'
+      end
+      item
+        CollectionIndex = 68
+        CollectionName = 'BtnVolumeMute'
+        Name = 'BtnVolumeMute'
+      end
+      item
+        CollectionIndex = 69
+        CollectionName = 'MenuPlayNext'
+        Name = 'MenuPlayNext'
+      end
+      item
+        CollectionIndex = 70
+        CollectionName = 'MenuPlayPrev'
+        Name = 'MenuPlayPrev'
+      end
+      item
+        CollectionIndex = 71
+        CollectionName = 'MenuCancel'
+        Name = 'MenuCancel'
+      end
+      item
+        CollectionIndex = 72
+        CollectionName = 'TreeCleanChecked'
+        Name = 'TreeCleanChecked'
+      end
+      item
+        CollectionIndex = 73
+        CollectionName = 'TreeCleanUnchecked'
+        Name = 'TreeCleanUnchecked'
+      end>
+    ImageCollection = DataModuleGui.ICIcons
+    Left = 129
+    Top = 457
+  end
+  object vilTree: TVirtualImageList
+    AutoFill = True
+    Images = <
+      item
+        CollectionIndex = 0
+        CollectionName = 'OptionsControls'
+        Name = 'OptionsControls'
+      end
+      item
+        CollectionIndex = 1
+        CollectionName = 'OptionsCoverflow'
+        Name = 'OptionsCoverflow'
+      end
+      item
+        CollectionIndex = 2
+        CollectionName = 'OptionsEffects'
+        Name = 'OptionsEffects'
+      end
+      item
+        CollectionIndex = 3
+        CollectionName = 'OptionsFileManagement'
+        Name = 'OptionsFileManagement'
+      end
+      item
+        CollectionIndex = 4
+        CollectionName = 'OptionsFonts'
+        Name = 'OptionsFonts'
+      end
+      item
+        CollectionIndex = 5
+        CollectionName = 'OptionsGeneral'
+        Name = 'OptionsGeneral'
+      end
+      item
+        CollectionIndex = 6
+        CollectionName = 'OptionsLastFM'
+        Name = 'OptionsLastFM'
+      end
+      item
+        CollectionIndex = 7
+        CollectionName = 'OptionsLibrary'
+        Name = 'OptionsLibrary'
+      end
+      item
+        CollectionIndex = 8
+        CollectionName = 'OptionsListView'
+        Name = 'OptionsListView'
+      end
+      item
+        CollectionIndex = 9
+        CollectionName = 'OptionsMetaData'
+        Name = 'OptionsMetaData'
+      end
+      item
+        CollectionIndex = 10
+        CollectionName = 'OptionsParty'
+        Name = 'OptionsParty'
+      end
+      item
+        CollectionIndex = 11
+        CollectionName = 'OptionsPlayback'
+        Name = 'OptionsPlayback'
+      end
+      item
+        CollectionIndex = 12
+        CollectionName = 'OptionsPlaylist'
+        Name = 'OptionsPlaylist'
+      end
+      item
+        CollectionIndex = 13
+        CollectionName = 'OptionsSearch'
+        Name = 'OptionsSearch'
+      end
+      item
+        CollectionIndex = 14
+        CollectionName = 'OptionsWebradio'
+        Name = 'OptionsWebradio'
+      end
+      item
+        CollectionIndex = 15
+        CollectionName = 'OptionsWebServer'
+        Name = 'OptionsWebServer'
+      end
+      item
+        CollectionIndex = 16
+        CollectionName = 'OptionsWindows'
+        Name = 'OptionsWindows'
+      end>
+    ImageCollection = DataModuleGui.ICSettingsGraphics
+    Width = 32
+    Height = 32
+    Left = 51
+    Top = 403
   end
 end
