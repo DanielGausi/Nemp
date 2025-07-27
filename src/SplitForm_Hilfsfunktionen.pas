@@ -77,7 +77,7 @@ implementation
 
 uses NempMainUnit, PlaylistUnit, MedienlisteUnit, AuswahlUnit, ExtendedControlsUnit,
      SystemHelper, Inifiles, MainFormBuilderForm, FHeadsetControl, MedienbibliothekClass,
-     Nemp_SkinSystem;
+     Nemp_SkinSystem, PartyModeClass;
 
 procedure SetRegion(GrpBox: TPanel; aForm: TForm; var NempRegionsDistance: TNempRegionsDistance; aHandle: hWnd);
 begin
@@ -665,7 +665,7 @@ begin
         newMode := newMode mod 2;
         if newMode = 1 then
             // Party-mode in Separate-Window-Mode is not allowed.
-            NempSkin.NempPartyMode.Active := False;
+            NempPartyMode.Active := False;
 
         UpdateFormDesignNeu(newMode);
     end;

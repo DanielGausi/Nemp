@@ -7,7 +7,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2019, Daniel Gaussmann
+    Copyright (C) 2005-2025, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -40,15 +40,17 @@ uses Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls,
 type
   TPasswordDlg = class(TForm)
     Label1: TLabel;
-    Password: TEdit;
+    editPassword: TEdit;
     OKBtn: TButton;
     CancelBtn: TButton;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
+    function GetPassword: String;
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
+    property Password: String read GetPassword;
   end;
 
 var
@@ -60,12 +62,17 @@ implementation
 
 procedure TPasswordDlg.FormCreate(Sender: TObject);
 begin
-    TranslateComponent (self);
+  TranslateComponent (self);
 end;
 
 procedure TPasswordDlg.FormShow(Sender: TObject);
 begin
-    Password.Text := '';
+  editPassword.Text := '';
+end;
+
+function TPasswordDlg.GetPassword: String;
+begin
+  result := editPassword.Text;
 end;
 
 end.

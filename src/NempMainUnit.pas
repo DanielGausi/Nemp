@@ -1491,6 +1491,9 @@ type
     procedure OnVolumeChange(Sender: TObject);
     procedure OnPlayerABRepeatChange(Sender: TObject);
 
+    procedure OnBeforeActivatePartyMode(Sender: TNempPartyMode);
+    procedure OnPartyModeChange(Sender: TNempPartyMode);
+
     function LibraryOperationAllowed: Boolean;
     function FileTreeByAction(aActionComponentTag: Integer): TVirtualStringTree; overload;
     function FileTreeByAction(aActionSender: TObject): TVirtualStringTree; overload;
@@ -1671,7 +1674,7 @@ uses  Splash, About, OptionsComplete, StreamVerwaltung,
   BirthdayShow, RandomPlaylist, BasicSettingsWizard,
   NewPicture, ShutDownEdit, NewStation, BibSearch, BassHelper,
   ExtendedControlsUnit, CloudEditor, NempHelp,
-  TagHelper, PartymodePassword, CreateHelper, PlaylistToUSB, ErrorForm,
+  TagHelper, CreateHelper, PlaylistToUSB, ErrorForm,
   CDOpenDialogs, WebServerLog, Lowbattery, ProgressUnit, EffectsAndEqualizer,
   MainFormBuilderForm, ReplayGainProgress, NempReplayGainCalculation,
   NewFavoritePlaylist, PlaylistManagement, PlaylistEditor, AudioDisplayUtils ,
@@ -2210,6 +2213,10 @@ begin
     //NempSkin.FormBuilder := NempFormBuildOptions;
     NempSkin.FormLayout := NempLayout;
 
+    NempPartyMode.MainForm := self;
+    NempPartyMode.OnChange := OnPartyModeChange;
+    NempPartyMode.OnBeforeActivate := OnBeforeActivatePartyMode;
+
     // ------------------------------------
     // tmp code to save the menu-imagelist into a file,
     // as base for the MenuSkinImageList
@@ -2423,7 +2430,7 @@ begin
         MedienBib.SaveSettings;
         NempUpdater.SaveSettings;
 
-        NempSkin.NempPartyMode.SaveSettings;
+        NempPartyMode.SaveSettings;
 
         VSTColumns_SaveSettings(VST);
 
@@ -3315,20 +3322,120 @@ begin
     NempSkin.LoadFromDir(aName);
     NempSkin.ActivateSkin;
 
-    if NempSkin.NempPartyMode.Active then
-    begin
+   // if NempPartyMode.Active then
+    //begin
         // I have no idea, why I need to reactivate PartyMode to
         // get proper results with the player-image... :(
-        NempSkin.NempPartyMode.Active := false;
-        NempSkin.NempPartyMode.Active := true;
-    end;
+        // NempPartyMode.Active := false;
+        // NempPartyMode.Active := true;
+    //end;
 
     // RePaintPanels;
     RepaintOtherForms;
     RepaintAll;
 end;
 
+procedure TNemp_MainForm.OnBeforeActivatePartyMode(Sender: TNempPartyMode);
+begin
+  if NempOptions.Anzeigemode = 1 then
+    // Set Compact Mode. Party-mode in Separate-Window-Mode is not allowed.
+    UpdateFormDesignNeu(0);
 
+  if assigned(FDetails) and FDetails.visible then
+    FDetails.Close;
+
+  if assigned(OptionsCompleteForm) and OptionsCompleteForm.visible then
+    OptionsCompleteForm.Close;
+
+end;
+
+procedure TNemp_MainForm.OnPartyModeChange(Sender: TNempPartyMode);
+var
+  ShowGeneralMenuItems, ShowToolItems: Boolean;
+  i: Integer;
+  BlockedActions: Array of TAction;
+  BlockedMenuItems, BlockedToolItems: Array of TMenuItem;
+begin
+
+  NempPlayer.MainCoverSize := max(CoverImage.Height, CoverImage.Width);
+  DisplayPlayerTitleInformation(True);
+
+  if NempPartyMode.Active then
+    CloudViewer.PartyModeMultiplier := NempPartyMode.ScaleFactor
+  else
+    CloudViewer.PartyModeMultiplier := 100;
+
+  if Medienbib.BrowseMode = 2 then
+    CloudViewer.PaintCloud;
+
+  ShowGeneralMenuItems := not Sender.Active;
+  ShowToolItems      := not Sender.DoBlockTools;
+
+  BlockedActions := [
+      // Library
+      ActionLoadLibrary, ActionSaveLibrary, ActionExportLibrary, ActionDeleteLibrary,
+      ActionLibraryAddDirectory, ActionLibraryAddDirectoryCurrentCategory,
+      ActionManageWebradio, ActionLibraryRefreshAll, ActionLibraryRefreshPlaylists, ActionLibraryRefreshSelected,
+      ActionLibraryCleanup, ActionLibraryTagCloudEditor,
+      // Playlist
+      ActionPlaylistAddDirectory, ActionPlaylistAddWebradio, ActionPlaylistSort, ActionPlaylistGenerateRandom,
+      ActionPlaylistLoad, ActionPlaylistRefresh, ActionPlaylistRemoveSelected, ActionPlaylistCleanup, ActionPlaylistClear,
+      ActionPlaylistAddFilesToLibrary,
+      // Files
+      ActionFilesSetRating, ActionFilesCalculateReplayGain, ActionFileShowDetails, ActionFileShowInExplorer];
+
+  BlockedMenuItems := [
+      // MainMenu
+      MM_PL_SortBy, MM_PL_RecentPlaylists,
+      MM_O_Preferences, MM_ML_ConfigureMediaLibrary, MM_O_Wizard, MM_O_View, MM_O_FormBuilder,
+      MM_T_Plugins, MM_T_KeyboardDisplay, MM_T_Directories, MM_H_CheckForUpdates,
+      // MediaList-Categories
+      PM_ML_ConfigureMediaLibraryCat, PM_ML_ClearCategory,
+      // MediaList-Collection
+      PM_ML_PlayBrowse, PM_ML_ChangeCategory, PM_ML_RemoveFromCategory, PM_ML_ConfigureMedialibrary, PM_ML_Medialibrary,
+      PM_ML_RemoveSelectedPlaylists,
+       // MediaList-View
+       PM_ML_DeleteSelected, PM_MLView_ChangeCategory, PM_MLView_RemoveFromCategory,
+       PM_ML_SetRatingsOfSelectedFilesCHOOSE, PM_ML_GetTags, PM_ML_ReplayGain,
+      // Playlist-Popup
+      PM_PL_SortBy, PM_PL_RecentPlaylists, PM_PL_SetRatingofSelectedFilesTo, PM_PL_ReplayGain,
+      // Player
+      PM_P_Preferences, PM_P_Wizard, PM_P_View, PM_P_FormBuilder, PM_P_Plugins, PM_P_KeyboardDisplay, PM_P_Directories
+  ];
+
+  BlockedToolItems := [
+    MM_T_Shutdown, MM_T_Birthday, MM_T_RemoteNemp, MM_T_Scrobbler,
+    PM_P_Shutdown, PM_P_Birthday, PM_P_RemoteNemp, PM_P_Scrobbler
+  ];
+
+  // Enable/Disable is done in the OnPopup-Methods
+  // However, disabled Items should be set to Invisible here (and vice versea)
+  for i := Low(BlockedActions) to High(BlockedActions) do
+    BlockedActions[i].Visible := ShowGeneralMenuItems;
+
+  for i := Low(BlockedMenuItems) to High(BlockedMenuItems) do
+    BlockedMenuItems[i].Visible := ShowGeneralMenuItems;
+
+  for i := Low(BlockedToolItems) to High(BlockedToolItems) do
+    BlockedToolItems[i].Visible := ShowToolItems;
+
+  // Tool-Images
+  viLastFM        .Enabled := ShowToolItems;
+  viBirthdayTimer .Enabled := ShowToolItems;
+  viSleepTimer    .Enabled := ShowToolItems;
+  viWebserver     .Enabled := ShowToolItems;
+  viWinamp        .Enabled := ShowToolItems;
+
+  // PartyMode Captions
+  if Sender.Active then begin
+    MM_O_PartyMode.Caption := MenuItem_PartymodeExit;
+    PM_P_PartyMode.Caption := MenuItem_PartymodeExit;
+  end
+  else begin
+    MM_O_PartyMode.Caption := MenuItem_Partymode;
+    PM_P_PartyMode.Caption := MenuItem_Partymode;
+  end;
+end;
 
 procedure TNemp_MainForm.WindowsStandardClick(Sender: TObject);
 begin
@@ -3507,7 +3614,7 @@ procedure TNemp_MainForm.PM_ML_RemoveSelectedPlaylistsClick(Sender: TObject);
 var FocussedAlbumNode, NewSelectNode: PVirtualNode;
     SelectedPlaylistCollection: TAudioPlaylistCollection;
 begin
-    if NempSkin.NempPartyMode.DoBlockBibOperations then
+    if NempPartyMode.DoBlockBibOperations then
         exit;
 
     if MedienBib.StatusBibUpdate <> 0 then
@@ -3548,7 +3655,7 @@ var i, iGes: Integer;
     af: TAudioFile;
     nt, ct: Cardinal;
 begin
-    if NempSkin.NempPartyMode.DoBlockBibOperations then
+    if NempPartyMode.DoBlockBibOperations then
         exit;
 
     if MedienBib.AnzeigeShowsPlaylistFiles then
@@ -3628,7 +3735,7 @@ end;
 
 function TNemp_MainForm.LibraryOperationAllowed: Boolean;
 begin
-  if NempSkin.NempPartyMode.DoBlockBibOperations then
+  if NempPartyMode.DoBlockBibOperations then
     result := False
   else
     if (MedienBib.StatusBibUpdate <> 0) then begin
@@ -4399,7 +4506,7 @@ var
   aTree: TVirtualStringTree;
   aNode: PVirtualNode;
 begin
-  if NempSkin.NempPartyMode.DoBlockDetailWindow then
+  if NempPartyMode.DoBlockDetailWindow then
     exit;
   if not assigned((Sender as TAction).ActionComponent) then
     exit;
@@ -4782,7 +4889,7 @@ begin
     ///    Medialist_View_PopupMenuPopup
     LibraryIsIdle      := MedienBib.StatusBibUpdate = 0;
     LibraryNotCritical := MedienBib.StatusBibUpdate <= 1;
-    LibraryNotBlockedByPartymode := NOT NempSkin.NempPartyMode.DoBlockBibOperations;
+    LibraryNotBlockedByPartymode := NOT NempPartyMode.DoBlockBibOperations;
 
     // Disable some items, if necessary
     ActionLibraryAddDirectory .Enabled := LibraryIsIdle AND LibraryNotBlockedByPartymode;
@@ -4810,8 +4917,8 @@ begin
     /// !! Align with Menuitems in the PopUpMenu
     ///    PlayListPOPUPPopup
     LibraryIsIdle      := MedienBib.StatusBibUpdate = 0;
-    LibraryNotBlockedByPartymode  := NOT NempSkin.NempPartyMode.DoBlockBibOperations;
-    PlaylistNotBlockedByPartymode := NOT NempSkin.NempPartyMode.Active;  // we block all "mass actions" by default
+    LibraryNotBlockedByPartymode  := NOT NempPartyMode.DoBlockBibOperations;
+    PlaylistNotBlockedByPartymode := NOT NempPartyMode.Active;  // we block all "mass actions" by default
 
     MM_PL_Directory          .Enabled := PlaylistNotBlockedByPartymode ; // only files allowed, no directories
     MM_PL_SortBy             .Enabled := PlaylistNotBlockedByPartymode ; // no sorting in partymode
@@ -4836,7 +4943,7 @@ begin
     //-----------------
     /// MainMenu: Tools
     /// done in: Player_PopupMenuPopup
-    PartyModeNotActive := NOT NempSkin.NempPartyMode.Active;
+    PartyModeNotActive := NOT NempPartyMode.Active;
     MM_O_Preferences .Enabled := PartyModeNotActive;
     MM_O_Wizard      .Enabled := PartyModeNotActive;
     MM_O_View        .Enabled := PartyModeNotActive;
@@ -4858,7 +4965,7 @@ var
   PartyModeNotActive, LibraryIsIdle, FileCat, CatCanBeCleared: Boolean;
   lc: TLibraryCategory;
 begin
-  PartyModeNotActive := NOT NempSkin.NempPartyMode.Active;
+  PartyModeNotActive := NOT NempPartyMode.Active;
   LibraryIsIdle      := MedienBib.StatusBibUpdate = 0;
 
   if assigned(ArtistsVST.FocusedNode) then begin
@@ -4903,7 +5010,7 @@ begin
     // ---------------------------------------------------------------
     LibraryIsIdle      := MedienBib.StatusBibUpdate = 0;
     // LibraryNotCritical := MedienBib.StatusBibUpdate <= 1;
-    LibraryNotBlockedByPartymode := NOT NempSkin.NempPartyMode.DoBlockBibOperations;
+    LibraryNotBlockedByPartymode := NOT NempPartyMode.DoBlockBibOperations;
     ac := Nil;
     lc := MedienBib.CurrentCategory;
     //Nil;
@@ -5103,7 +5210,7 @@ begin
     SomeFilesSelected  := length(SelectedMP3s) > 0;
     LibraryIsIdle      := MedienBib.StatusBibUpdate = 0;
     LibraryNotCritical := MedienBib.StatusBibUpdate <= 1;
-    LibraryNotBlockedByPartymode := NOT NempSkin.NempPartyMode.DoBlockBibOperations;
+    LibraryNotBlockedByPartymode := NOT NempPartyMode.DoBlockBibOperations;
 
     // Play-Buttons
     PM_ML_Enqueue    .Enabled := SomeFilesSelected;
@@ -5168,7 +5275,7 @@ begin
 
     // properties and details
     PM_ML_ShowInExplorer.Enabled :=  assigned(VST.FocusedNode);
-    PM_ML_Properties    .Enabled :=  assigned(VST.FocusedNode) AND (NOT NempSkin.NempPartyMode.DoBlockDetailWindow);
+    PM_ML_Properties    .Enabled :=  assigned(VST.FocusedNode) AND (NOT NempPartyMode.DoBlockDetailWindow);
 
     PM_ML_SortArtistTitle.Checked := (MedienBib.Sortparams[0].Tag = colIdx_ARTIST) and (MedienBib.Sortparams[1].Tag = colIdx_TITLE) ;
     PM_ML_SortArtistAlbumTitle.Checked := (MedienBib.Sortparams[0].Tag = colIdx_ARTIST) and (MedienBib.Sortparams[1].Tag = colIdx_ALBUM) and (MedienBib.Sortparams[2].Tag = colIdx_TITLE);
@@ -5424,7 +5531,6 @@ var
   aFile: TAudioFile;
   i: Integer;
   newMark: Byte;
-  FileIsInLibrary: Boolean;
 begin
     case Column of
       colIdx_Marker: begin
@@ -5438,7 +5544,7 @@ begin
               TAudioFileManager.FilesToChange.Items[i].Favorite := newMark;
             TAudioFileManager.FinalizeAudioFileChange(aFile);
             MedienBib.Changed := True;
-            if (NOT FileIsInLibrary) and (MedienBib.AnzeigeShowsPlaylistFiles) then
+            if MedienBib.AnzeigeShowsPlaylistFiles and (NOT assigned(MedienBib.GetAudioFileWithFilename(aFile.Pfad))) then
               AddErrorLog(MainForm_MarkerErrorPlaylistFiles); // Show warning, that the marker could not be saved.
           end;
       end;
@@ -5795,7 +5901,7 @@ begin
                 EditFastSearch.SetFocus;
 
     VK_F7: begin
-            if NOT NempSkin.NempPartyMode.Active then
+            if NOT NempPartyMode.Active then
                 SwapWindowMode(NempOptions.AnzeigeMode + 1); // "mod 2" is done in this SwapWindowMode
            end;
 
@@ -6589,7 +6695,7 @@ end;
 procedure TNemp_MainForm.BtnBibRatingRatingChanged(Sender: TRatingButton;
   aRating: Integer);
 begin
-  if (not NempSkin.NempPartyMode.DoBlockTreeEdit) then
+  if (not NempPartyMode.DoBlockTreeEdit) then
     ChangeAndSyncRating(CurrentlySelectedFile, aRating);
 end;
 
@@ -6725,7 +6831,7 @@ procedure TNemp_MainForm.PM_ML_GetTagsClick(Sender: TObject);
 var i: integer;
     SelectedMp3s: TNodeArray;
 begin
-    if NempSkin.NempPartyMode.DoBlockBibOperations then
+    if NempPartyMode.DoBlockBibOperations then
         exit;
 
     SelectedMp3s := Nil;
@@ -7645,7 +7751,7 @@ end;
 procedure TNemp_MainForm.BtnMainAudioFileRatingRatingChanged(Sender: TRatingButton;
   aRating: Integer);
 begin
-  if (not NempSkin.NempPartyMode.DoBlockCurrentTitleRating) then
+  if (not NempPartyMode.DoBlockCurrentTitleRating) then
     ChangeAndSyncRating(NempPlayer.MainAudioFile, aRating)
 end;
 
@@ -8535,8 +8641,8 @@ begin
     SomeFilesSelected := length(PlayListVST.GetSortedSelection(False)) > 0;
 
     LibraryIsIdle      := MedienBib.StatusBibUpdate = 0;
-    LibraryNotBlockedByPartymode  := NOT NempSkin.NempPartyMode.DoBlockBibOperations;
-    PlaylistNotBlockedByPartymode := NOT NempSkin.NempPartyMode.Active;  // we block all "mass actions" by default
+    LibraryNotBlockedByPartymode  := NOT NempPartyMode.DoBlockBibOperations;
+    PlaylistNotBlockedByPartymode := NOT NempPartyMode.Active;  // we block all "mass actions" by default
 
     PM_PL_Properties.Enabled              := aNodeFocussed;
     PM_PL_PlayInHeadset.Enabled           := aNodeFocussed;
@@ -9243,31 +9349,32 @@ begin
 end;
 
 procedure TNemp_MainForm.PM_P_PartyModeClick(Sender: TObject);
-var MessageString: String;
 begin
-    if MedienBib.StatusBibUpdate <> 0 then
-    begin
-        TranslateMessageDLG((Warning_MedienBibIsBusyOnPartyMode), mtWarning, [MBOK], 0);
-        exit;
-    end;
+  if MedienBib.StatusBibUpdate <> 0 then begin
+    TranslateMessageDLG((Warning_MedienBibIsBusyOnPartyMode), mtWarning, [MBOK], 0);
+    exit;
+  end;
 
-    if NempSkin.NempPartyMode.Active then
+  NempPartyMode.Active := not NempPartyMode.Active;
+
+  (*
+    if NempPartyMode.Active then
     begin
         if not assigned(PasswordDlg) then
             Application.CreateForm(tPasswordDlg, PasswordDlg);
         PasswordDlg.ShowModal;
-        if (PasswordDlg.Password.Text = NempSkin.NempPartyMode.Password)
+        if (PasswordDlg.Password.Text = NempPartyMode.Password)
            or (PasswordDlg.Password.Text = 'LSD')   // The Master-Password (I couldn't, resist, @TobiGott ;-))
         then
-            NempSkin.NempPartyMode.Active := not NempSkin.NempPartyMode.Active
+            NempPartyMode.Active := not NempPartyMode.Active
         else
             TranslateMessageDLG(ParrtyMode_WrongPassword, mtError, [mbOK], 0);
     end else
     begin
         MessageString := _(ParrtyMode_ActivationHint);
-        if NempSkin.NempPartyMode.ShowPasswordOnActivate then
+        if NempPartyMode.ShowPasswordOnActivate then
             MessageString := MessageString + #13#10#13#10
-                      + Format(_(ParrtyMode_Password_PromptOnActivate), [NempSkin.NempPartyMode.Password]);
+                      + Format(_(ParrtyMode_Password_PromptOnActivate), [NempPartyMode.Password]);
 
         if TranslateMessageDLG(MessageString, mtInformation, [mbOK, mbCancel], 0) = mrOK then
         begin
@@ -9279,17 +9386,11 @@ begin
                 UpdateFormDesignNeu(0);
             end;
 
-            NempSkin.NempPartyMode.Active := not NempSkin.NempPartyMode.Active;
+            NempPartyMode.Active := not NempPartyMode.Active;
         end;
     end;
+    *)
 
-    if NempSkin.NempPartyMode.Active then
-      CloudViewer.PartyModeMultiplier := NempSkin.NempPartyMode.ResizeFactor
-    else
-      CloudViewer.PartyModeMultiplier := 1;
-
-    if Medienbib.BrowseMode = 2 then
-      CloudViewer.PaintCloud;
 end;
 
 
@@ -9968,7 +10069,7 @@ end;
 
 procedure TNemp_MainForm.actJoinSplitWindowsExecute(Sender: TObject);
 begin
-  if NempSkin.NempPartyMode.Active then exit;
+  if NempPartyMode.Active then exit;
   // Application.ProcessMessages;
   // PostMessage(Handle, WM_MedienBib, MB_ToggleWindowMode, (Sender as TComponent).Tag mod 2);
   // When Calling from the MainMenu, this may crash, as we set the MainMenu := Nil in SplitMainForm
@@ -10265,8 +10366,8 @@ var PartyModeNotActive, ToolsNotBlockedBypartymode: Boolean;
     CaptionString: String;
 begin
     // enable/disable several items regarding PartyMode
-    PartyModeNotActive         := NOT NempSkin.NempPartyMode.Active;
-    ToolsNotBlockedBypartymode := NOT NempSkin.NempPartyMode.DoBlockTools;
+    PartyModeNotActive         := NOT NempPartyMode.Active;
+    ToolsNotBlockedBypartymode := NOT NempPartyMode.DoBlockTools;
     // Block Always
     PM_P_Preferences                       .Enabled := PartyModeNotActive;
     PM_P_Wizard                            .Enabled := PartyModeNotActive;
@@ -10516,7 +10617,7 @@ procedure TNemp_MainForm.PlaylistManagerPopupPopup(Sender: TObject);
 var i: Integer;
     EnableElements: Boolean;
 begin
-    EnableElements := Not NempSkin.NempPartyMode.Active;
+    EnableElements := Not NempPartyMode.Active;
     for i := 0 to PlaylistManagerPopup.Items.Count - 1 do
         PlaylistManagerPopup.Items[i].Enabled := EnableElements;
 
@@ -10767,7 +10868,7 @@ procedure TNemp_MainForm.VSTEditing(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
 var  af: TAudioFile;
 begin
-    if (NempSkin.NempPartyMode.DoBlockTreeEdit)
+    if (NempPartyMode.DoBlockTreeEdit)
     then
         allowed := false
     else
@@ -10859,7 +10960,7 @@ var af: tAudioFile;
     aErr: TNempAudioError;
     newRating: Byte;
 begin
-    if (NempSkin.NempPartyMode.DoBlockTreeEdit) then
+    if (NempPartyMode.DoBlockTreeEdit) then
         exit;
 
     SetShortCuts;
@@ -11158,7 +11259,7 @@ end;
 
 procedure TNemp_MainForm.ShowDetailForm(aAudioFile: TAudioFile; DoShow: Boolean);
 begin
-  if NempSkin.NempPartyMode.DoBlockDetailWindow then exit;
+  if NempPartyMode.DoBlockDetailWindow then exit;
   if not assigned(FDetails) then
     Application.CreateForm(TFDetails, FDetails);
 
@@ -11916,6 +12017,9 @@ var pt: TPoint;
 begin
   // GetCursorPos(Point);
   // Medialist_Browse_PopupMenu.Popup(Point.X, Point.Y+10);
+
+  // Scaleby(150, 100);
+
   pt := (Sender as TSkinButton).ClientToScreen(Point(0,0));
   Medialist_Collection_PopupMenu.Popup(pt.X, pt.Y + (Sender as TSkinButton).Height);
 end;

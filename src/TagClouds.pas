@@ -185,7 +185,7 @@ type
           fSearchString: String;
           fOnGetHint: TCloudGetHintEvent;
 
-          fPartyModeMultiplier: Single;
+          fPartyModeMultiplier: Integer;
           fCategorySelectionVisible: Boolean;
 
           procedure SetMouseOverTag(Value: TPaintTag);
@@ -247,7 +247,7 @@ type
           property RootCollection: TAudioFileCollection read GetRootCollection;
           property OnGetHint: TCloudGetHintEvent read fOnGetHint write fOnGetHint;
 
-          property PartyModeMultiplier: Single read fPartyModeMultiplier write fPartyModeMultiplier;
+          property PartyModeMultiplier: Integer read fPartyModeMultiplier write fPartyModeMultiplier;
           property CategorySelectionVisible: Boolean read fCategorySelectionVisible write fCategorySelectionVisible;
 
           constructor Create(AOwner: TComponent); override;
@@ -590,7 +590,7 @@ begin
   fPaintBreadCrumbs := TPaintTagList.Create(True);
   fPaintTags := TPaintTagList.Create(True);
 
-  fPartyModeMultiplier := 1;
+  fPartyModeMultiplier := 100;
   fCategorySelectionVisible := True;
   BevelInner := bvNone;
   BevelOuter := bvNone;
@@ -750,7 +750,7 @@ end;
 function TCloudView.CalcBreadCrumbMargin: Integer;
 begin
   if fCategorySelectionVisible then
-    result := Ceil(FIRST_BREADCRUMB_MARGIN * fPartyModeMultiplier)
+    result := Ceil(FIRST_BREADCRUMB_MARGIN * fPartyModeMultiplier / 100)
   else
     result := 0;
 end;

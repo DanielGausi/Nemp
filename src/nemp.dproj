@@ -379,6 +379,10 @@
         </DCCReference>
         <DCCReference Include="AudioFileManagement.pas"/>
         <DCCReference Include="BasicClasses.pas"/>
+        <DCCReference Include="FPartyModeConfirmation.pas">
+            <Form>FormPartyModeConfirmation</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <RcItem Include="ressources\csv.nxp">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>

@@ -1164,6 +1164,7 @@ object Nemp_MainForm: TNemp_MainForm
           Header.AutoSizeIndex = 1
           Header.Background = clWindow
           Header.MainColumn = 1
+          Header.MaxHeight = 19
           Header.Options = [hoAutoResize, hoDrag, hoVisible]
           Header.PopupMenu = PlaylistVST_HeaderPopup
           HintMode = hmHint
@@ -1179,6 +1180,7 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 0
           TextMargin = 2
           TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoChangeScale]
+          TreeOptions.MiscOptions = [toAcceptOLEDrop, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick]
           TreeOptions.PaintOptions = [toShowBackground, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
           TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toMultiSelect, toRightClickSelect]
           OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
@@ -2127,6 +2129,7 @@ object Nemp_MainForm: TNemp_MainForm
           Header.AutoSizeIndex = -1
           Header.Background = clWindow
           Header.Height = 21
+          Header.MaxHeight = 21
           Header.Options = [hoColumnResize, hoDblClickResize, hoDrag, hoRestrictDrag, hoShowSortGlyphs, hoVisible]
           Header.SortColumn = 0
           HintMode = hmHint
@@ -2611,6 +2614,7 @@ object Nemp_MainForm: TNemp_MainForm
           Header.AutoSizeIndex = 0
           Header.Background = clWindow
           Header.Height = 21
+          Header.MaxHeight = 21
           Header.Options = [hoAutoResize, hoDrag, hoVisible]
           IncrementalSearch = isAll
           Indent = 14
@@ -2668,6 +2672,7 @@ object Nemp_MainForm: TNemp_MainForm
           Header.AutoSizeIndex = 0
           Header.Background = clWindow
           Header.Height = 21
+          Header.MaxHeight = 21
           Header.Options = [hoAutoResize, hoDrag, hoVisible]
           Images = DummyImageList
           IncrementalSearch = isAll
@@ -5713,7 +5718,8 @@ object Nemp_MainForm: TNemp_MainForm
     end
     object PM_ML_SortLayerBy: TMenuItem
       Caption = 'Sort layer by'
-      ImageName = 'Effects'
+      ImageIndex = 27
+      ImageName = 'MenuSort'
       object PM_ML_SortLayerByName: TMenuItem
         Caption = 'Name'
         OnClick = SortierAuswahl1POPUPClick
@@ -5776,7 +5782,8 @@ object Nemp_MainForm: TNemp_MainForm
     end
     object PM_ML_SortPlaylistsBy: TMenuItem
       Caption = 'Sort playlists by'
-      ImageName = 'Effects'
+      ImageIndex = 27
+      ImageName = 'MenuSort'
       object PM_ML_SortPlaylistsByFilename: TMenuItem
         Caption = 'Filename'
         OnClick = PM_ML_SortPlaylistsDescendingClick
@@ -5808,8 +5815,8 @@ object Nemp_MainForm: TNemp_MainForm
     end
     object PM_ML_ConfigureMedialibrary: TMenuItem
       Caption = 'Configure media library'
-      ImageIndex = 42
-      ImageName = 'MenuOk'
+      ImageIndex = 5
+      ImageName = 'MenuConfigureLibrary'
       OnClick = PM_ML_ConfigureMedialibraryClick
     end
     object PM_ML_ShowCategorySelection: TMenuItem

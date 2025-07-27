@@ -65,7 +65,7 @@ uses NempMainUnit, Splash, gnugettext, PlaylistClass, PlayerClass,
 
     MedienListeUnit, AuswahlUnit, ExtendedControlsUnit, PlaylistUnit, FHeadsetControl,
     WindowsVersionInfo, AudioDisplayUtils, MyDialogs, NempHelp, NempSpectrum,
-    Cover.ViewCache, fConfigErrorDlg;
+    Cover.ViewCache, fConfigErrorDlg, PartyModeClass;
 
 
 procedure UpdateSplashScreen(status: String);
@@ -148,7 +148,7 @@ begin
         end;
 
         NempUpdater.LoadSettings;
-        NempSkin.NempPartyMode.LoadSettings;
+        NempPartyMode.LoadSettings;
 
         CoverManager.LoadSettings;
         DummyImageList.Width := CoverManager.CoverSize;

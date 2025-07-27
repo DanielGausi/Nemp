@@ -41,7 +41,7 @@ uses
   Windows, Graphics, ExtCtrls, Controls, Types, Forms, dialogs, SysUtils, VirtualTrees,  StdCtrls, System.IOUtils,
   Vcl.Menus, System.Generics.Defaults, System.Generics.Collections, Vcl.ImgList, VCL.ImageCollection,
   iniFiles, jpeg, NempPanel, NempControls.Common, Classes, oneinst, SkinButtons, PNGImage, ProgressShape, MainFormLayout,
-  Nemp_ConstantsAndTypes, BasicClasses, PartyModeClass{$IFDEF USESTYLES}, vcl.themes, vcl.styles, Vcl.CheckLst {$ENDIF};
+  Nemp_ConstantsAndTypes, BasicClasses {$IFDEF USESTYLES}, vcl.themes, vcl.styles, Vcl.CheckLst {$ENDIF};
 
 const MAX_MENUIMAGE_INDEX = 43;
       MAX_PLAYLIST_IMAGE_INDEX = 24;
@@ -335,7 +335,7 @@ type
         SkinColorScheme: TNempColorScheme;
         DialogCustomColors: Array[0..15] of TColor;
 
-        NempPartyMode: TNempPartyMode;
+
         FormLayout: TNempLayout;
 
         property MainForm: TForm read fNempMainForm write fNempMainForm;
@@ -463,9 +463,6 @@ begin
   for iBackground := Low(teNempBackroundImages) to High(teNempBackroundImages) do
     fNempBackgrounds[iBackground] := TPicture.Create;
 
-  NempPartyMode := TNempPartyMode.Create;
-  NempPartymode.BackupOriginalPositions;
-
   isActive := False;
 
   RegisteredStyles := TStringList.Create;
@@ -484,7 +481,6 @@ begin
   for iBackground := Low(teNempBackroundImages) to High(teNempBackroundImages) do
     fNempBackgrounds[iBackground].Free;
 
-  NempPartyMode.Free;
   inherited destroy;
 end;
 
@@ -705,7 +701,6 @@ begin
     PaintFallbackImage;
 
   if Not Complete then exit;
-
 
   PrepareSkinImagesCollection(DataModuleGui.ICIcons, DataModuleGui.ICSkinIcons, cSubDirIcons);
   //SkinMenuImages.Change;
@@ -1414,7 +1409,7 @@ begin
         result := fNempBackgrounds[nbiDefault].Graphic;
     end;
   else
-    GetBackgroundBitmapByIndex(bgIndex)
+    result := GetBackgroundBitmapByIndex(bgIndex)
   end;
 end;
 
@@ -1646,17 +1641,17 @@ var NewName, ext: String;
 begin
   result := False;
   // First: Select the correct scaled file
-  if Scaled and (NempPartyMode.Active) then
+  (*if Scaled and (NempPartyMode.Active) then
   begin
       // Get scaling-suffix
-      case NempPartyMode.FactorToIndex of
-          0: NewName := aFilename;       // + '.bmp';
-          1: NewName := aFilename + '15';// .bmp';
-          2: NewName := aFilename + '20';// .bmp';
-          3: NewName := aFilename + '25';// .bmp';
-      else
-           NewName := aFilename + '15';// .bmp';
-      end;
+      //case NempPartyMode.FactorToIndex of
+      //    0: NewName := aFilename;       // + '.bmp';
+      //    1: NewName := aFilename + '15';// .bmp';
+      //    2: NewName := aFilename + '20';// .bmp';
+      //    3: NewName := aFilename + '25';// .bmp';
+      //else
+      //     NewName := aFilename + '15';// .bmp';
+      //end;
 
       // Get an existing Filename "NewName.ext"
       ext := GetExistingExtension;
@@ -1681,7 +1676,7 @@ begin
           end;
       end;
   end
-  else
+  else*)
   begin
       // no scaling, Buttons have default sizes
       ScaleCorrectionNeeded := False;
@@ -1755,8 +1750,8 @@ begin
           aBmp.Canvas.Brush.Color := clWhite;
           aBmp.Canvas.FillRect(Rect(1,1,13,13));
       end;
-  end;
-  *)
+  end;      *)
+
 end;
 
 procedure TNempSkin.PrepareSkinImagesCollection(aDefaultCollection, aSkinCollection: TImageCollection; SubDir: String);

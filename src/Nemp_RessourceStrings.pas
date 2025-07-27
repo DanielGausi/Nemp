@@ -967,12 +967,12 @@ MenuItem_Deactivate = 'Deactivate';
 ParrtyMode_WrongPassword = 'Invalid password. Try again if you should know it. Or go back to the party and have some fun.';
 ParrtyMode_Password_Caption = 'Nemp Party-Mode';
 ParrtyMode_Password_Prompt = 'Please enter the password to exit the Nemp Party-Mode';
-ParrtyMode_Password_PromptOnActivate = 'Note: The password to exit the Nemp Party-Mode is "%s".';
-ParrtyMode_ActivationHint =
-'This will activate the Nemp Party-Mode. In this mode, some features are disabled to prevent'+#13#10+
-'unwanted changes to the playlist and media library.'  + #13#10 +
-'However, if you don''t trust your party guests, you might want to lock the computer completely'+#13#10+
-'and use the Nemp web server for remote control.';
+//ParrtyMode_Password_PromptOnActivate = 'Note: The password to exit the Nemp Party-Mode is "%s".';
+//ParrtyMode_ActivationHint =
+//'This will activate the Nemp Party-Mode. In this mode, some features are disabled to prevent'+#13#10+
+//'unwanted changes to the playlist and media library.'  + #13#10 +
+//'However, if you don''t trust your party guests, you might want to lock the computer completely'+#13#10+
+//'and use the Nemp web server for remote control.';
 
 HeadSetLabel_Default1 = 'Headphones (no title loaded)';
 HeadSetLabel_Default2 = '(no title loaded)';

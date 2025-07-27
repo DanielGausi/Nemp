@@ -147,7 +147,8 @@ uses
   dmGUI in 'dmGUI.pas' {DataModuleGui: TDataModule},
   FHeadsetControl in 'FHeadsetControl.pas' {FormHeadsetControl},
   AudioFileManagement in 'AudioFileManagement.pas',
-  BasicClasses in 'BasicClasses.pas';
+  BasicClasses in 'BasicClasses.pas',
+  FPartyModeConfirmation in 'FPartyModeConfirmation.pas' {FormPartyModeConfirmation};
 
 {$R *.res}
 

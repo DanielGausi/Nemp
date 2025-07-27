@@ -913,7 +913,7 @@ var
 implementation
 
 uses NempMainUnit, PlayerClass, PlaylistClass, Details, SplitForm_Hilfsfunktionen, WindowsVersionInfo,
-  WebServerLog, MedienBibliothekClass, DriveRepairTools, WebQRCodes,
+  WebServerLog, MedienBibliothekClass, DriveRepairTools, WebQRCodes, PartyModeClass,
   AudioDisplayUtils, unitFlyingCow, RedeemerQR, NempHelp, cddaUtils;
 
 {$R *.dfm}
@@ -1419,12 +1419,12 @@ begin
   CBFontNameVBR.ItemIndex := CBFontNameVBR.Items.IndexOf(NempOptions.FontNameVBR);
   EnableFontControls;
   // PartyMode
-  CB_PartyMode_ResizeFactor.ItemIndex := NempSkin.NempPartyMode.FactorToIndex;
-  cb_PartyMode_BlockTreeEdit          .Checked := NempSkin.NempPartyMode.BlockTreeEdit            ;
-  cb_PartyMode_BlockCurrentTitleRating.Checked := NempSkin.NempPartyMode.BlockCurrentTitleRating  ;
-  cb_PartyMode_BlockTools             .Checked := NempSkin.NempPartyMode.BlockTools               ;
-  cb_PartyMode_ShowPasswordOnActivate .Checked := NempSkin.NempPartyMode.ShowPasswordOnActivate   ;
-  Edt_PartyModePassword.Text := NempSkin.NempPartyMode.password;
+  CB_PartyMode_ResizeFactor.ItemIndex := Integer(NempPartyMode.Scaling);
+  cb_PartyMode_BlockTreeEdit          .Checked := NempPartyMode.BlockTreeEdit            ;
+  cb_PartyMode_BlockCurrentTitleRating.Checked := NempPartyMode.BlockCurrentTitleRating  ;
+  cb_PartyMode_BlockTools             .Checked := NempPartyMode.BlockTools               ;
+  cb_PartyMode_ShowPasswordOnActivate .Checked := NempPartyMode.ShowPasswordOnActivate   ;
+  Edt_PartyModePassword.Text := NempPartyMode.password;
 end;
 
 procedure TOptionsCompleteForm.ShowFileSearchSettings;
@@ -2550,12 +2550,12 @@ begin
     NempPlaylist.ReInitPlaylist;
   end;
   // Partymode settings
-  NempSkin.NempPartyMode.ResizeFactor := NempSkin.NempPartyMode.IndexToFactor(CB_PartyMode_ResizeFactor.ItemIndex);
-  NempSkin.NempPartyMode.BlockTreeEdit := cb_PartyMode_BlockTreeEdit.Checked;
-  NempSkin.NempPartyMode.BlockCurrentTitleRating := cb_PartyMode_BlockCurrentTitleRating.Checked;
-  NempSkin.NempPartyMode.BlockTools := cb_PartyMode_BlockTools.Checked;
-  NempSkin.NempPartyMode.ShowPasswordOnActivate := cb_PartyMode_ShowPasswordOnActivate.Checked;
-  NempSkin.NempPartyMode.password := Edt_PartyModePassword.Text;
+  NempPartyMode.Scaling := tePartyModeScaling(CB_PartyMode_ResizeFactor.ItemIndex);
+  NempPartyMode.BlockTreeEdit := cb_PartyMode_BlockTreeEdit.Checked;
+  NempPartyMode.BlockCurrentTitleRating := cb_PartyMode_BlockCurrentTitleRating.Checked;
+  NempPartyMode.BlockTools := cb_PartyMode_BlockTools.Checked;
+  NempPartyMode.ShowPasswordOnActivate := cb_PartyMode_ShowPasswordOnActivate.Checked;
+  NempPartyMode.password := Edt_PartyModePassword.Text;
 end;
 
 procedure TOptionsCompleteForm.ApplyWebRadioSettings;
@@ -4033,12 +4033,12 @@ begin
   (NempOptions.ChangeFontOnCbrVbr <> CBChangeFontOnCbrVbr.Checked) or
   (NempOptions.FontNameCBR <> CBFontNameCBR.Items[CBFontNameCBR.itemindex]) or
   (NempOptions.FontNameVBR <> CBFontNameVBR.Items[CBFontNameVBR.itemindex]) or
-  (NempSkin.NempPartyMode.ResizeFactor <> NempSkin.NempPartyMode.IndexToFactor(CB_PartyMode_ResizeFactor.ItemIndex)) or
-  (NempSkin.NempPartyMode.BlockTreeEdit <> cb_PartyMode_BlockTreeEdit.Checked) or
-  (NempSkin.NempPartyMode.BlockCurrentTitleRating <> cb_PartyMode_BlockCurrentTitleRating.Checked) or
-  (NempSkin.NempPartyMode.BlockTools <> cb_PartyMode_BlockTools.Checked) or
-  (NempSkin.NempPartyMode.ShowPasswordOnActivate <> cb_PartyMode_ShowPasswordOnActivate.Checked) or
-  (NempSkin.NempPartyMode.password <> Edt_PartyModePassword.Text);
+  (NempPartyMode.Scaling <> tePartyModeScaling(CB_PartyMode_ResizeFactor.ItemIndex)) or
+  (NempPartyMode.BlockTreeEdit <> cb_PartyMode_BlockTreeEdit.Checked) or
+  (NempPartyMode.BlockCurrentTitleRating <> cb_PartyMode_BlockCurrentTitleRating.Checked) or
+  (NempPartyMode.BlockTools <> cb_PartyMode_BlockTools.Checked) or
+  (NempPartyMode.ShowPasswordOnActivate <> cb_PartyMode_ShowPasswordOnActivate.Checked) or
+  (NempPartyMode.password <> Edt_PartyModePassword.Text);
 end;
 function TOptionsCompleteForm.FileSearchSettingsChanged: Boolean;
 begin

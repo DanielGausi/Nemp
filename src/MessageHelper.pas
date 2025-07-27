@@ -69,7 +69,7 @@ uses NempMainUnit, Nemp_ConstantsAndTypes, NempAPI, Details,
     DeleteSelect, GnuGetText, MedienbibliothekClass, PlayerLog,
     PostProcessorUtils, ProgressUnit, EffectsAndEqualizer,
     AudioDisplayUtils, System.Win.TaskbarCore, cddaUtils, AudioFileManagement,
-    Nemp_SkinSystem;
+    Nemp_SkinSystem, PartyModeClass;
 
 var NEMP_API_InfoString: Array[0..500] of AnsiChar;
     NEMP_API_InfoStringW: Array[0..500] of WideChar;
@@ -1937,7 +1937,7 @@ var
   lastFilename: String;
 begin
   result := True;
-  if NempSkin.NempPartyMode.DoBlockBibOperations then
+  if NempPartyMode.DoBlockBibOperations then
   begin
       Nemp_MainForm.fDropManager.FinishDrag;
       exit;

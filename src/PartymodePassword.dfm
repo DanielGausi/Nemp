@@ -7,24 +7,22 @@ object PasswordDlg: TPasswordDlg
   ClientWidth = 233
   Color = clBtnFace
   ParentFont = True
-  OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
   OnShow = FormShow
-  PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 15
   object Label1: TLabel
     Left = 8
     Top = 9
-    Width = 168
-    Height = 13
+    Width = 181
+    Height = 15
     Caption = 'Enter password to exit Party-Mode'
   end
-  object Password: TEdit
+  object editPassword: TEdit
     Left = 8
     Top = 27
     Width = 217
-    Height = 21
+    Height = 23
     PasswordChar = '*'
     TabOrder = 0
   end
