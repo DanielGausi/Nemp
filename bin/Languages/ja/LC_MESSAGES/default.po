@@ -1,0 +1,6539 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Nemp 5.2.0\n"
+"POT-Creation-Date: 2024-12-31 11:04\n"
+"PO-Revision-Date: 2026-07-25 16:13+0900\n"
+"Last-Translator: coolvitto\n"
+"Language-Team: \n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.9\n"
+
+msgid " "
+msgstr " "
+
+msgid "               "
+msgstr "               "
+
+msgid "                  "
+msgstr "                    "
+
+msgid "  :  "
+msgstr " : "
+
+msgid " (found %d/%d)"
+msgstr " (%d/%d 件見つかりました)"
+
+msgid "!90:00;1;_"
+msgstr "!90:00;1;_"
+
+msgid "\"Enqueue\" as default action for audio files"
+msgstr "オーディオファイルのデフォルトアクションを「キューに追加」にする"
+
+msgid "\"Enqueue\" as default action for playlists"
+msgstr "プレイリストのデフォルトアクションを「キューに追加」にする"
+
+msgid "\"While you type\""
+msgstr "「入力中に検索」"
+
+msgid "#"
+msgstr "#"
+
+msgid "%"
+msgstr "%"
+
+msgid "% of main volume"
+msgstr "メインボリュームの %"
+
+msgid "%.2f MB"
+msgstr "%.2f MB"
+
+msgid "%d Bytes (%d used)"
+msgstr "%d バイト (%d 使用中)"
+
+msgid "%d cue sheet track selected"
+msgstr "%d キューシートトラックが選択されました"
+
+msgid "%d cue sheet tracks selected"
+msgstr "%d キューシートトラックが選択されました"
+
+msgid "%d file selected; "
+msgstr "%d ファイルが選択されました; "
+
+msgid "%d file; "
+msgstr "%d ファイル; "
+
+msgid "%d files (and cue sheet tracks); "
+msgstr "%d ファイル (およびキューシートトラック); "
+
+msgid "%d files in total"
+msgstr "合計 %d ファイル"
+
+msgid "%d files selected; "
+msgstr "%d ファイルが選択されました; "
+
+msgid "%d files; "
+msgstr "%d ファイル; "
+
+msgid "%d kbit/s"
+msgstr "%d kbit/s"
+
+msgid "%d kbit/s (CD-Audio)"
+msgstr "%d kbit/s (CDオーディオ)"
+
+msgid "%d kbit/s (vbr)"
+msgstr "%d kbit/s (vbr)"
+
+msgid "%d kbit/s (vbr), %s kHz, %s"
+msgstr "%d kbit/s (vbr)、%s kHz、%s"
+
+msgid "%d kbit/s, %s kHz, %s"
+msgstr "%d kbit/s、%s kHz、%s"
+
+msgid "%d kbit/s, %s kHz, %s (CD-Audio)"
+msgstr "%d kbit/s、%s kHz、%s (CDオーディオ)"
+
+msgid "%d playlist"
+msgstr "%d プレイリスト"
+
+msgid "%d playlists"
+msgstr "%d プレイリスト"
+
+msgid "%d tracks"
+msgstr "%d トラック"
+
+msgid "%d webradio station"
+msgstr "%d ウェブラジオ局"
+
+msgid "%d webradio stations"
+msgstr "%d ウェブラジオ局"
+
+msgid "%d:%.2d "
+msgstr "%d:%.2d "
+
+msgid "%d:%.2d min"
+msgstr "%d:%.2d 分"
+
+msgid "%d:%.2d min (start at %d:%.2d)"
+msgstr "%d:%.2d 分 (開始 %d:%.2d)"
+
+msgid "%d:%.2d min (total %d:%.2d, %.2f MB)"
+msgstr "%d:%.2d 分 (合計 %d:%.2d、%.2f MB)"
+
+msgid "%d:%.2d min, %.2f MB"
+msgstr "%d:%.2d 分、%.2f MB"
+
+msgid "%dx"
+msgstr "%dx"
+
+msgid "%s"
+msgstr "%s"
+
+msgid "%s (by %s)"
+msgstr "%s (%s による)"
+
+msgid "%s - %s"
+msgstr "%s - %s"
+
+msgid "%s kHz"
+msgstr "%s kHz"
+
+msgid "%s kHz, %s"
+msgstr "%s kHz、%s"
+
+msgid "%s play time"
+msgstr "%s 再生時間"
+
+msgid "%s, Track %d"
+msgstr "%s、トラック %d"
+
+msgid "%s: %s"
+msgstr "%s: %s"
+
+msgid "&Abort"
+msgstr "中止(&A)"
+
+msgid "&About Nemp"
+msgstr "Nemp について(&A)"
+
+msgid "&All"
+msgstr "すべて(&A)"
+
+msgid "&Artist"
+msgstr "アーティスト(&A)"
+
+msgid "&Birthday mode"
+msgstr "バースデーモード(&B)"
+
+msgid "&Data (cover, preferences, ...)"
+msgstr "データ (カバー、設定など)(&D)"
+
+msgid "&Delete"
+msgstr "削除(&D)"
+
+msgid "&Directories"
+msgstr "ディレクトリ(&D)"
+
+msgid "&Disable"
+msgstr "無効(&D)"
+
+msgid "&Export"
+msgstr "エクスポート(&E)"
+
+msgid "&Filename"
+msgstr "ファイル名(&F)"
+
+msgid "&Generate random playlist"
+msgstr "ランダムプレイリストを生成(&G)"
+
+msgid "&Help"
+msgstr "ヘルプ(&H)"
+
+msgid "&Ignore"
+msgstr "無視(&I)"
+
+msgid "&Inverse"
+msgstr "逆順(&I)"
+
+msgid "&Load"
+msgstr "読み込み(&L)"
+
+msgid "&Load (and clear current list)"
+msgstr "読み込み (現在のリストをクリア)(&L)"
+
+msgid "&Media library"
+msgstr "メディアライブラリ(&M)"
+
+msgid "&Mix"
+msgstr "ミックス(&M)"
+
+msgid "&No"
+msgstr "いいえ(&N)"
+
+msgid "&Playlist"
+msgstr "プレイリスト(&P)"
+
+msgid "&Preferences"
+msgstr "環境設定(&P)"
+
+msgid "&Recent playlists"
+msgstr "最近のプレイリスト(&R)"
+
+msgid "&Recordings (webradio)"
+msgstr "録音 (ウェブラジオ)(&R)"
+
+msgid "&Refresh (rescan all files)"
+msgstr "更新 (全ファイル再スキャン)(&R)"
+
+msgid "&Retry"
+msgstr "再試行(&R)"
+
+msgid "&Save"
+msgstr "保存(&S)"
+
+msgid "&Settings"
+msgstr "設定(&S)"
+
+msgid "&Shutdown"
+msgstr "シャットダウン(&S)"
+
+msgid "&Skins"
+msgstr "スキン(&S)"
+
+msgid "&Title"
+msgstr "タイトル(&T)"
+
+msgid "&Tools"
+msgstr "ツール(&T)"
+
+msgid "&View"
+msgstr "表示(&V)"
+
+msgid "&Yes"
+msgstr "はい(&Y)"
+
+msgid "'N/A'"
+msgstr "N/A"
+
+msgid "(%d)  %s"
+msgstr "(%d)  %s"
+
+msgid "(%d) Searching %s"
+msgstr "(%d) %s を検索中"
+
+msgid "(99999)"
+msgstr "(99999)"
+
+msgid "(A proper extension will be added automatically)"
+msgstr "(適切な拡張子は自動的に追加されます)"
+
+msgid "(Close this window to continue with the regular playlist)"
+msgstr "(このウィンドウを閉じると通常のプレイリストに戻ります)"
+
+msgid "(Custom)"
+msgstr "(カスタム)"
+
+msgid "(De)activate automatic rating/playcounter"
+msgstr "自動評価/再生カウントを (無効/)有効にする"
+
+msgid "(Empty string)"
+msgstr "(空の文字列)"
+
+msgid "(File not found)"
+msgstr "(ファイルが見つかりません)"
+
+msgid "(LastFM)"
+msgstr "(LastFM)"
+
+msgid "(No category selected)"
+msgstr "(カテゴリが選択されていません)"
+
+msgid "(Playlists)"
+msgstr "(プレイリスト)"
+
+msgid "(QuickAccess)"
+msgstr "(クイックアクセス)"
+
+msgid "(Rating)"
+msgstr "(評価)"
+
+msgid "(Unknown Artist)"
+msgstr "(不明なアーティスト)"
+
+msgid "(Updates)"
+msgstr "(アップデート)"
+
+msgid "(Webstream)"
+msgstr "(ウェブストリーム)"
+
+msgid "(extended search)"
+msgstr "(拡張検索)"
+
+msgid "(filetypes)"
+msgstr "(ファイルタイプ)"
+
+msgid "(no title loaded)"
+msgstr "(タイトルが読み込まれていません)"
+
+msgid "(not active)"
+msgstr "(無効)"
+
+msgid "(only one cover supported)"
+msgstr "(サポートされているカバーは1つだけです)"
+
+msgid "(refined search)"
+msgstr "(絞り込み検索)"
+
+msgid "(summary)"
+msgstr "(概要)"
+
+msgid "(welcome)"
+msgstr "(ようこそ)"
+
+msgid "(write protected)"
+msgstr "(書き込み禁止)"
+
+msgid "*"
+msgstr "*"
+
+msgid "* Including %d unrated files."
+msgstr "* %d 個の未評価ファイルを含む。"
+
+msgid "* Including 1000 unrated files"
+msgstr "* 1000 個の未評価ファイルを含む"
+
+msgid "+"
+msgstr "+"
+
+msgid "-"
+msgstr "-"
+
+msgid "- ? -"
+msgstr "- ? -"
+
+msgid "- The grouping of titles by artist/album/tags/... may not be up to date."
+msgstr "- アーティスト/アルバム/タグなどによるタイトルのグループ化が最新でない可能性があります。"
+
+msgid "- The search function may not find all titles."
+msgstr "- 検索機能ですべてのタイトルが見つからない場合があります。"
+
+msgid "-?-"
+msgstr "-?-"
+
+msgid "."
+msgstr "。"
+
+msgid ".."
+msgstr ".."
+
+msgid "..."
+msgstr "..."
+
+msgid "... and %d more"
+msgstr "... 他 %d 件"
+
+msgid "... and include a proper playlist file"
+msgstr "... 適切なプレイリストファイルを含む"
+
+msgid "... and include a proper playlist-file"
+msgstr "... 適切なプレイリストファイルを含む"
+
+msgid "... and many short snips from \"the internet\""
+msgstr "... そして「インターネット」からの多くの短いスニペット"
+
+msgid "... by nagging about peanuts"
+msgstr "... ピーナッツについてうるさく言うことで"
+
+msgid "... by sending test material"
+msgstr "... テスト資料を送ることで"
+
+msgid "... by solving programming problems"
+msgstr "... プログラミングの問題を解決することで"
+
+msgid "... by testing and sending bugreports"
+msgstr "... テストとバグレポートの送信で"
+
+msgid "... just by saying \"thank you, this is a fine piece of software\" "
+msgstr "... 「ありがとう、これは素晴らしいソフトウェアだ」と言うだけで"
+
+msgid "....."
+msgstr "....."
+
+msgid ".............."
+msgstr ".............."
+
+msgid ".........................."
+msgstr ".........................."
+
+msgid ".......................... "
+msgstr ".......................... "
+
+msgid ".asx"
+msgstr ".asx"
+
+msgid ".cue"
+msgstr ".cue"
+
+msgid ".m3u"
+msgstr ".m3u"
+
+msgid ".m3u8"
+msgstr ".m3u8"
+
+msgid ".npl"
+msgstr ".npl"
+
+msgid ".pls"
+msgstr ".pls"
+
+msgid ".wax"
+msgstr ".wax"
+
+msgid "0.00 dB"
+msgstr "0.00 dB"
+
+msgid "0.5 stars"
+msgstr "星0.5"
+
+msgid "00:00"
+msgstr "00:00"
+
+msgid "0m0s"
+msgstr "0分0秒"
+
+msgid "1 (no amplification)"
+msgstr "1 (増幅なし)"
+
+msgid "1 hour"
+msgstr "1時間"
+
+msgid "1 star"
+msgstr "星1"
+
+msgid "1.5 (moderate amplification)"
+msgstr "1.5 (中程度の増幅)"
+
+msgid "1.5 hours"
+msgstr "1.5時間"
+
+msgid "1.5 stars"
+msgstr "星1.5"
+
+msgid "1/6"
+msgstr "1/6"
+
+msgid "12K"
+msgstr "12K"
+
+msgid "15 minutes"
+msgstr "15分"
+
+msgid "16K"
+msgstr "16K"
+
+msgid "1K"
+msgstr "1K"
+
+msgid "2 (double sized)"
+msgstr "2 (2倍サイズ)"
+
+msgid "2 hours"
+msgstr "2時間"
+
+msgid "2 stars"
+msgstr "星2"
+
+msgid "2.5 (really huge)"
+msgstr "2.5 (非常に大きい)"
+
+msgid "2.5 stars"
+msgstr "星2.5"
+
+msgid "2/6"
+msgstr "2/6"
+
+msgid "2K"
+msgstr "2K"
+
+msgid "3 stars"
+msgstr "星3"
+
+msgid "3.5 stars"
+msgstr "星3.5"
+
+msgid "3/6"
+msgstr "3/6"
+
+msgid "30 minutes"
+msgstr "30分"
+
+msgid "3D Coverflow"
+msgstr "3D カバーフロー"
+
+msgid "3D-CoverFlow"
+msgstr "3D-カバーフロー"
+
+msgid "4 stars"
+msgstr "星4"
+
+msgid "4.5 stars"
+msgstr "星4.5"
+
+msgid "4/6"
+msgstr "4/6"
+
+msgid "45 minutes"
+msgstr "45分"
+
+msgid "4K"
+msgstr "4K"
+
+msgid "5 minutes"
+msgstr "5分"
+
+msgid "5 stars"
+msgstr "星5"
+
+msgid "5/6"
+msgstr "5/6"
+
+msgid "6/6"
+msgstr "6/6"
+
+msgid "<"
+msgstr "<"
+
+msgid "<Unknown Album>"
+msgstr "<不明なアルバム>"
+
+msgid "<artist> - <album>"
+msgstr "<artist> - <album>"
+
+msgid "<artist> - <title>"
+msgstr "<artist> - <title>"
+
+msgid "<artist> - <title> (<album>)"
+msgstr "<artist> - <title> (<album>)"
+
+msgid "<artist> - <title> (<album>, Track <track>)"
+msgstr "<artist> - <title> (<album>、トラック <track>)"
+
+msgid "<artist> - <title> (<year>)"
+msgstr "<artist> - <title> (<year>)"
+
+msgid "<artist> - <title> (Track <track>)"
+msgstr "<artist> - <title> (トラック <track>)"
+
+msgid "<date>, <time> - <streamname> - <title>"
+msgstr "<date>、<time> - <streamname> - <title>"
+
+msgid "<date>, <time> - <title>"
+msgstr "<date>、<time> - <title>"
+
+msgid "<filename>"
+msgstr "<filename>"
+
+msgid "<fullpath>"
+msgstr "<fullpath>"
+
+msgid "<index> - <artist> - <title>"
+msgstr "<index> - <artist> - <title>"
+
+msgid "<index> - <artist> - <title> - (<album>)"
+msgstr "<index> - <artist> - <title> - (<album>)"
+
+msgid "<index> - <filename>"
+msgstr "<index> - <filename>"
+
+msgid "<station>: <title>"
+msgstr "<station>: <title>"
+
+msgid "<streamname> - <title>"
+msgstr "<streamname> - <title>"
+
+msgid "<subdir>\\<filename>"
+msgstr "<subdir>\\<filename>"
+
+msgid "<title>"
+msgstr "<title>"
+
+msgid ">"
+msgstr ">"
+
+msgid "?"
+msgstr "?"
+
+msgid "A"
+msgstr "A"
+
+msgid ""
+"A list of all \"Ignore rules\". \n"
+"\n"
+"When you try to add one of these tags to an audio file (manually or automatically from last.fm), it is automatically ignored. This is done to avoid tags with actual no meaning.\n"
+"\n"
+"You can remove some of these rules here. To add a new one, use the buttons on the first page of this window."
+msgstr ""
+"すべての「無視ルール」のリストです。\n"
+"\n"
+"これらのタグのいずれかをオーディオファイルに（手動またはlast.fmから自動で）追加しようとすると、自動的に無視されます。これは、実質的に意味のないタグを避けるためのものです。\n"
+"\n"
+"ここでいくつかのルールを削除できます。新しいルールを追加するには、このウィンドウの最初のページのボタンを使用してください。"
+
+msgid ""
+"A list of all \"Rename rules\". \n"
+"\n"
+"When you try to add one of these tags to an audio file (manually or automatically from last.fm), it is automatically replaced. This is done to avoid multiple similar tags with the same actual meaning.\n"
+"\n"
+"You can remove some of these rules here. To add a new one, use the buttons on the first page of this window."
+msgstr ""
+"すべての「置換ルール」のリストです。\n"
+"\n"
+"これらのタグのいずれかをオーディオファイルに (手動または last.fm から自動で) 追加しようとすると、自動的に置換されます。これは、実質的に同じ意味を持つ類似した複数のタグを避けるためのものです。\n"
+"\n"
+"ここでいくつかのルールを削除できます。新しいルールを追加するには、このウィンドウの最初のページのボタンを使用してください。"
+
+msgid ""
+"A list of all tags in the media library. Changes will affect each audio file, which is marked with the selected tags. \n"
+"\n"
+"Adding \"Rename\" and \"Ignore\" rules will rename (remove) these tags in all files of the media library and prevent adding these tags later. "
+msgstr ""
+"メディアライブラリ内のすべてのタグのリストです。変更は、選択したタグが付けられた各オーディオファイルに影響します。\n"
+"\n"
+"「置換ルール」と「無視ルール」を追加すると、メディアライブラリ内のすべてのファイルでこれらのタグが置換 (削除) され、後でこれらのタグが追加されるのを防ぎます。"
+
+msgid ""
+"A little break before the next track starts.\n"
+"\n"
+"You can change this behavior in the player settings."
+msgstr ""
+"次のトラックが始まる前に少し休止します。\n"
+"\n"
+"この動作はプレイヤー設定で変更できます。"
+
+msgid "A subdirectory of the selected directory was removed from the list: "
+msgstr "選択したディレクトリのサブディレクトリがリストから削除されました："
+
+msgid "A&lbum, Tracknr."
+msgstr "アルバム、トラック番号(&L)"
+
+msgid "A-B Repeat"
+msgstr "A-B リピート"
+
+msgid "A-B repeat"
+msgstr "A-B リピート"
+
+msgid "Abort"
+msgstr "中止"
+
+msgid "Aborted by user"
+msgstr "ユーザーにより中止されました"
+
+msgid "About Nemp"
+msgstr "Nemp について"
+
+msgid "Accelerate lyrics search"
+msgstr "歌詞検索を高速化"
+
+msgid "Accelerate search"
+msgstr "検索を高速化"
+
+msgid "Access denied."
+msgstr "アクセスが拒否されました。"
+
+msgid "Access denied. Choose OK to continue with next file, or cancel the copying process."
+msgstr "アクセスが拒否されました。OK を選択すると次のファイルに進み、コピープロセスをキャンセルします。"
+
+msgid "Activate"
+msgstr "有効化"
+
+msgid "Activate Party-Mode"
+msgstr "パーティーモードを有効化"
+
+msgid "Activate Winamp DSP plugins (beta, restart required)"
+msgstr "Winamp DSP プラグインを有効化 (ベータ版、再起動が必要)"
+
+msgid "Activate server"
+msgstr "サーバーを有効化"
+
+msgid "Activate webserver on start"
+msgstr "起動時にウェブサーバーを有効化"
+
+msgid "Add"
+msgstr "追加"
+
+msgid "Add \"Ignore rule\""
+msgstr "「無視ルール」を追加"
+
+msgid "Add \"Ignore rule\" and remove this tag from all files"
+msgstr "「無視ルール」を追加し、すべてのファイルからこのタグを削除"
+
+msgid "Add \"Play/Enqueue in Nemp\" to the context menu in the Windows Explorer."
+msgstr "Windows エクスプローラーのコンテキストメニューに「Nemp で再生/キューに追加」を追加する。"
+
+msgid "Add \"Rename rule\""
+msgstr "「置換ルール」を追加"
+
+msgid "Add \"Rename rule\" and rename this tag in all files"
+msgstr "「置換ルール」を追加し、すべてのファイルでこのタグを置換"
+
+msgid "Add &directory"
+msgstr "ディレクトリを追加(&d)"
+
+msgid "Add &files"
+msgstr "ファイルを追加(&f)"
+
+msgid "Add &webradio"
+msgstr "ウェブラジオを追加(&w)"
+
+msgid "Add CD-Audio"
+msgstr "オーディオ CD を追加"
+
+msgid "Add a file to the playlist when double-clicking it in the Windows-Explorer. Otherwise the current playlist will be deleted."
+msgstr "Windowsエクスプローラーでファイルをダブルクリックしたときに、プレイリストに追加します。有効にしない場合、現在のプレイリストは削除されます。"
+
+msgid "Add a little break between two tracks"
+msgstr "2つのトラックの間に短い休止を挿入"
+
+msgid "Add a new layer to organize your audiofiles"
+msgstr "オーディオファイルを整理するための新しいレイヤーを追加"
+
+msgid "Add a picture"
+msgstr "画像を追加"
+
+msgid "Add all displayed titles"
+msgstr "表示されているすべてのタイトルを追加"
+
+msgid "Add all files to the media library"
+msgstr "すべてのファイルをメディアライブラリに追加"
+
+msgid "Add all files within this directory"
+msgstr "このディレクトリ内のすべてのファイルを追加"
+
+msgid "Add category"
+msgstr "カテゴリを追加"
+
+msgid "Add complete list, not only the selected title"
+msgstr "選択したタイトルだけでなく、リスト全体を追加"
+
+msgid "Add cover to metadata"
+msgstr "メタデータにカバーを追加"
+
+msgid "Add current file to playlist (Right click for options)"
+msgstr "現在のファイルをプレイリストに追加 (右クリックでオプション)"
+
+msgid "Add directory"
+msgstr "ディレクトリを追加"
+
+msgid "Add directory to the current category"
+msgstr "現在のカテゴリにディレクトリを追加"
+
+msgid "Add extra silence between tracks"
+msgstr "トラック間に追加の無音を挿入"
+
+msgid "Add file to playlist and begin playback from current position"
+msgstr "ファイルをプレイリストに追加し、現在の位置から再生を開始"
+
+msgid "Add files"
+msgstr "ファイルを追加"
+
+msgid "Add files to the current playlist"
+msgstr "現在のプレイリストにファイルを追加"
+
+msgid "Add layer"
+msgstr "レイヤーを追加"
+
+msgid "Add new directories to this list"
+msgstr "新しいディレクトリをこのリストに追加"
+
+msgid "Add new meta data"
+msgstr "新しいメタデータを追加"
+
+msgid "Add new station"
+msgstr "新しい局を追加"
+
+msgid "Add new tag to this file"
+msgstr "このファイルに新しいタグを追加"
+
+msgid "Add playlist"
+msgstr "プレイリストを追加"
+
+msgid "Add root layer"
+msgstr "ルートレイヤーを追加"
+
+msgid "Add tag"
+msgstr "タグを追加"
+
+msgid "Add the files of a playlist to the current playlist when double-clicking it in the Windows-Explorer. Otherwise the current playlist will be deleted."
+msgstr "Windowsエクスプローラーでプレイリストをダブルクリックしたときに、そのファイルを現在のプレイリストに追加します。有効にしない場合、現在のプレイリストは削除されます。"
+
+msgid "Add to Media Library"
+msgstr "メディアライブラリに追加"
+
+msgid "Add to Playlist here"
+msgstr "ここでプレイリストに追加"
+
+msgid "Add to category %1"
+msgstr "カテゴリ %1 に追加"
+
+msgid "Add to playlist"
+msgstr "プレイリストに追加"
+
+msgid "Add webradio"
+msgstr "ウェブラジオを追加"
+
+msgid "Adding the playlist to the media library..."
+msgstr "プレイリストをメディアライブラリに追加中..."
+
+msgid "Additional configuration"
+msgstr "追加設定"
+
+msgid "Admin"
+msgstr "管理者"
+
+msgid "Advanced"
+msgstr "詳細設定"
+
+msgid "Affected drives"
+msgstr "影響を受けるドライブ"
+
+msgid "Affected files: %d"
+msgstr "影響を受けるファイル : %d"
+
+msgid "After"
+msgstr "後"
+
+msgid "After the last title"
+msgstr "最後のタイトルの後"
+
+msgid "Album"
+msgstr "アルバム"
+
+msgid "Album gain"
+msgstr "アルバムゲイン"
+
+msgid "Album peak"
+msgstr "アルバムピーク"
+
+msgid "Album, Artist, Title"
+msgstr "アルバム、アーティスト、タイトル"
+
+msgid "Album, Title, Artist"
+msgstr "アルバム、タイトル、アーティスト"
+
+msgid "Album, Tracknr."
+msgstr "アルバム、トラック番号."
+
+msgid "Album-Artist"
+msgstr "アルバムアーティスト"
+
+msgid "Album: %.2f dB, Peak: %.6f"
+msgstr "アルバム : %.2f dB、ピーク : %.6f"
+
+msgid "Album: %s"
+msgstr "アルバム : %s"
+
+msgid "Album: %s (Track %d)"
+msgstr "アルバム : %s (トラック %d)"
+
+msgid "Album: -?-"
+msgstr "アルバム : -?-"
+
+msgid "AlbumGain: %6.2f dB, Peak %6.6f"
+msgstr "アルバムゲイン : %6.2f dB、ピーク %6.6f"
+
+msgid "Albums"
+msgstr "アルバム"
+
+msgid "All ID3-Tags have been successfully updated."
+msgstr "すべての ID3 タグが正常に更新されました。"
+
+msgid "All ID3-Tags have been updated."
+msgstr "すべての ID3 タグが更新されました。"
+
+msgid "All artists"
+msgstr "すべてのアーティスト"
+
+msgid "All missing cover at the beginning"
+msgstr "カバーがないものを先頭に"
+
+msgid "All missing cover at the end"
+msgstr "カバーがないものを末尾に"
+
+msgid "All ratings have been successfully updated."
+msgstr "すべての評価が正常に更新されました。"
+
+msgid "All supported files|*.m3u;*.m3u8;*.pls;*.npl;*.asx;*.wax|m3u-lists|*.m3u|m3u8-lists (unicode-capable)|*.m3u8|pls-lists|*.pls|Nemp playlists|*.npl|WindowsMedia|*.asx;*.wax"
+msgstr "サポートされているすべてのファイル|*.m3u;*.m3u8;*.pls;*.npl;*.asx;*.wax|m3uリスト|*.m3u|m3u8リスト (Unicode対応)|*.m3u8|plsリスト|*.pls|Nemp プレイリスト|*.npl|WindowsMedia|*.asx;*.wax"
+
+msgid "All supported meta frames are already set."
+msgstr "サポートされているすべてのメタフレームはすでに設定されています。"
+
+msgid "All tracks on the CD"
+msgstr "CD 上のすべてのトラック"
+
+msgid "All types supported by the player"
+msgstr "プレイヤーがサポートするすべてのタイプ"
+
+msgid "Allow Nemp downloading missing cover files from the internet"
+msgstr "Nemp がインターネットから不足しているカバーファイルをダウンロードすることを許可"
+
+msgid "Allow Nemp to change meta data in audio files?"
+msgstr "Nemp がオーディオファイルのメタデータを変更することを許可しますか？"
+
+msgid "Allow Nemp to check for updates periodically?"
+msgstr "Nemp が定期的にアップデートを確認することを許可しますか？"
+
+msgid "Allow errors on [Enter]"
+msgstr "[Enter] でエラーを許可"
+
+msgid "Allow errors while typing"
+msgstr "入力中のエラーを許可"
+
+msgid "Allow multi-folder albums (e.g. \"CD 1\" and \"CD 2\")"
+msgstr "複数フォルダーのアルバムを許可 (例 : \"CD 1\" と \"CD 2\")"
+
+msgid "Allow multiple instances"
+msgstr "複数インスタンスを許可"
+
+msgid "Allow multiple instances of Nemp."
+msgstr "Nemp の複数インスタンスを許可します。"
+
+msgid "Allright, no error"
+msgstr "問題ありません、エラーなし"
+
+msgid "Almost done..."
+msgstr "もうすぐ完了..."
+
+msgid "Alt + Ctrl"
+msgstr "Alt + Ctrl"
+
+msgid "Alt + Shift"
+msgstr "Alt + Shift"
+
+msgid "Always begin scrobbling when nemp starts."
+msgstr "Nemp 起動時に常にスクロブリングを開始する。"
+
+msgid "Always sort the displayed files in the library."
+msgstr "ライブラリに表示されるファイルを常にソートする。"
+
+msgid "Always sort view (slower)"
+msgstr "表示を常にソートする (遅くなります)"
+
+msgid "Always use a fuzzy search (e.g. show files from \"Amy MacDonald\" when you search for \"Amy McDonald\")"
+msgstr "常にあいまい検索を使用する (例 : \"Amy McDonald\" を検索したときに \"Amy MacDonald\" のファイルを表示する)"
+
+msgid "Amplification factor"
+msgstr "増幅率"
+
+msgid "An Error occured while updating drivelist. Please report this error."
+msgstr "ドライブリストの更新中にエラーが発生しました。このエラーを報告してください。"
+
+msgid "An error occured while connecting LastFM server."
+msgstr "LastFM サーバーへの接続中にエラーが発生しました。"
+
+msgid "An error occured while getting new playing file. This should not happen."
+msgstr "新しい再生ファイルの取得中にエラーが発生しました。これは発生すべきではありません。"
+
+msgid "An error occured while getting update information from server."
+msgstr "サーバーからアップデート情報を取得中にエラーが発生しました。"
+
+msgid "An error occured while initializing the player. This should not happen."
+msgstr "プレイヤーの初期化中にエラーが発生しました。これは発生すべきではありません。"
+
+msgid "An error occured while loading the media library. This should not happen."
+msgstr "メディアライブラリの読み込み中にエラーが発生しました。これは発生すべきではありません。"
+
+msgid "An error occured while saving the media library. Please report this error."
+msgstr "メディアライブラリの保存中にエラーが発生しました。このエラーを報告してください。"
+
+msgid "An error occured while starting playback of a new track. This should not happen."
+msgstr "新しいトラックの再生開始中にエラーが発生しました。これは発生すべきではありません。"
+
+msgid "An error occured. See log below and try again."
+msgstr "エラーが発生しました。下のログを確認して、もう一度試してください。"
+
+msgid "An error occurred while preparing the accelerated search for lyrics. That was never supposed to happen."
+msgstr "歌詞の高速検索の準備中にエラーが発生しました。これは本来発生すべきではありません。"
+
+msgid "An error occurred while preparing the accelerated search. That was never supposed to happen."
+msgstr "高速検索の準備中にエラーが発生しました。これは本来発生すべきではありません。"
+
+msgid "Angles"
+msgstr "アングル"
+
+msgid "Apply"
+msgstr "適用"
+
+msgid "Apply changes"
+msgstr "変更を適用"
+
+msgid "Apply changes to ..."
+msgstr "変更を適用する対象 ..."
+
+msgid "Apply to all files in this playlist"
+msgstr "このプレイリスト内のすべてのファイルに適用"
+
+msgid "Artist"
+msgstr "アーティスト"
+
+msgid "Artist, Album"
+msgstr "アーティスト、アルバム"
+
+msgid "Artist, Album, Title"
+msgstr "アーティスト、アルバム、タイトル"
+
+msgid "Artist, Release Year"
+msgstr "アーティスト、リリース年"
+
+msgid "Artist, Title"
+msgstr "アーティスト、タイトル"
+
+msgid "Artist: %s"
+msgstr "アーティスト : %s"
+
+msgid "Artist: -?-"
+msgstr "アーティスト : -?-"
+
+msgid "Artists"
+msgstr "アーティスト"
+
+msgid "As one album"
+msgstr "1つのアルバムとして"
+
+msgid "Ascending"
+msgstr "昇順"
+
+msgid "Assign the current layout to the Nemp window"
+msgstr "現在のレイアウトを Nemp ウィンドウに割り当てる"
+
+msgid "At least %s play time (+ webstream)"
+msgstr "少なくとも %s の再生時間 (+ ウェブストリーム)"
+
+msgid "Audio books"
+msgstr "オーディオブック"
+
+msgid "Audio files"
+msgstr "オーディオファイル"
+
+msgid "Audio files on the selected drive"
+msgstr "選択したドライブ上のオーディオファイル"
+
+msgid "Audio information: -?-"
+msgstr "オーディオ情報 : -?-"
+
+msgid "Auto refresh"
+msgstr "自動更新"
+
+msgid "Auto-detect"
+msgstr "自動検出"
+
+msgid "Auto-detect (probably) used character sets"
+msgstr "使用されている (おそらく) 文字セットを自動検出する"
+
+msgid "Automatic rating"
+msgstr "自動評価"
+
+msgid "Automatic rating/playcounter"
+msgstr "自動評価/再生カウント"
+
+msgid "Automatically activate the webserver when Nemp starts."
+msgstr "Nemp 起動時にウェブサーバーを自動的に有効化する。"
+
+msgid "Automatically adjust ratings"
+msgstr "評価を自動調整"
+
+msgid "Automatically adjust the rating of your files?"
+msgstr "ファイルの評価を自動的に調整しますか？"
+
+msgid "Automatically begin playback when Nemp starts"
+msgstr "Nemp 起動時に自動的に再生を開始する"
+
+msgid "Automatically check for new versions of Nemp"
+msgstr "Nemp の新バージョンを自動的に確認する"
+
+msgid "Automatically choose filename"
+msgstr "ファイル名を自動選択"
+
+msgid "Automatically decrease rating on aborted tracks. The change will be smaller the higher the playcounter is."
+msgstr "中断されたトラックの評価を自動的に下げる。変更量は再生回数が多いほど小さくなります。"
+
+msgid "Automatically delete missing files from the media library"
+msgstr "メディアライブラリから欠落ファイルを自動的に削除する"
+
+msgid "Automatically detect and skip the silent parts at the end of the tracks "
+msgstr "トラック末尾の無音部分を自動検出してスキップする "
+
+msgid "Automatically download missing cover art from last.fm?"
+msgstr "last.fm から不足しているカバーアートを自動的にダウンロードしますか？"
+
+msgid "Automatically increase rating on played tracks. The change will be smaller the higher the playcounter is."
+msgstr "再生されたトラックの評価を自動的に上げる。変更量は再生回数が多いほど小さくなります。"
+
+msgid "Automatically load the Nemp medialibrary."
+msgstr "Nemp メディアライブラリを自動的に読み込む。"
+
+msgid "Automatically monitor new directories"
+msgstr "新しいディレクトリを自動監視"
+
+msgid "Automatically resolve inconsistencies when entering new tags"
+msgstr "新しいタグ入力時に不整合を自動解決"
+
+msgid "Automatically save the Nemp medialibrary."
+msgstr "Nemp メディアライブラリを自動的に保存する。"
+
+msgid "Automatically scan new CDs"
+msgstr "新しい CD を自動スキャン"
+
+msgid "Autosave favorite playlists"
+msgstr "お気に入りプレイリストを自動保存"
+
+msgid "Available IPs"
+msgstr "利用可能な IP アドレス"
+
+msgid "Avoid repetitions"
+msgstr "繰り返しを避ける"
+
+msgid "B"
+msgstr "B"
+
+msgid "BPM"
+msgstr "BPM"
+
+msgid "BPM (Beats per minute)"
+msgstr "BPM (ビート/分)"
+
+msgid "Back"
+msgstr "戻る"
+
+msgid "Before"
+msgstr "前"
+
+msgid "Begin new file for every title"
+msgstr "タイトルごとに新しいファイルを開始"
+
+msgid "Begin playback at the last known position within the track"
+msgstr "トラック内の最後に再生した位置から再生を開始"
+
+msgid "Begin playback on start"
+msgstr "起動時に再生を開始"
+
+msgid "Begin scrobbling now."
+msgstr "今すぐスクロブリングを開始する。"
+
+msgid "Beta-Settings. Do not change, unless you know what yo are doing!"
+msgstr "ベータ設定。何をしているか分からない限り、変更しないでください！"
+
+msgid "Between these tracks:"
+msgstr "これらのトラックの間 :"
+
+msgid "Bi-weekly"
+msgstr "隔週"
+
+msgid "Birthday"
+msgstr "バースデー"
+
+msgid "Birthday in %s"
+msgstr "%s のバースデー"
+
+msgid "Birthday mode"
+msgstr "バースデーモード"
+
+msgid "Bitrate"
+msgstr "ビットレート"
+
+msgid "Bitrate: %d kbit/s"
+msgstr "ビットレート : %d kbit/s"
+
+msgid "Bitrate: %d kbit/s (CD-Audio)"
+msgstr "ビットレート : %d kbit/s (CDオーディオ)"
+
+msgid "Bitrate: %d kbit/s (vbr)"
+msgstr "ビットレート : %d kbit/s (vbr)"
+
+msgid "Block editing file information in the media list"
+msgstr "メディアリストでのファイル情報編集をブロック"
+
+msgid "Block rating of current title"
+msgstr "現在のタイトルの評価をブロック"
+
+msgid "Block tools"
+msgstr "ツールをブロック"
+
+msgid "Browse your media library through a coverflow"
+msgstr "カバーフローでメディアライブラリを閲覧"
+
+msgid "Browse your media library through a tag cloud"
+msgstr "タグクラウドでメディアライブラリを閲覧"
+
+msgid "Browse your media library through a tree view"
+msgstr "ツリービューでメディアライブラリを閲覧"
+
+msgid "Buffer size"
+msgstr "バッファサイズ"
+
+msgid "BugFix"
+msgstr "バグ修正"
+
+msgid "C"
+msgstr "C"
+
+msgid "CD"
+msgstr "CD"
+
+msgid "CD-Audio, Track %d"
+msgstr "CD オーディオ、トラック %d"
+
+msgid "CD/DVD drives"
+msgstr "CD/DVD ドライブ"
+
+msgid "CDDB server (default: gnudb.gnudb.org)"
+msgstr "CDDB サーバー (デフォルト: gnudb.gnudb.org)"
+
+msgid "CDDB settings"
+msgstr "CDDB 設定"
+
+msgid "CSV files"
+msgstr "CSV ファイル"
+
+msgid "Calculating ReplayGain values (TrackGain only) for %d files ..."
+msgstr "%d ファイルの ReplayGain値 (TrackGainのみ) を計算中 ..."
+
+msgid "Calculating ReplayGain values (with AlbumGain) for %d files ..."
+msgstr "%d ファイルの ReplayGain値 (AlbumGain含む) を計算中 ..."
+
+msgid "Calculating ReplayGain values for album \"%s\" with %d files ..."
+msgstr "アルバム \"%s\" (%d ファイル) の ReplayGain値を計算中 ..."
+
+msgid "Calculating complete, synchronizing %d files ..."
+msgstr "計算完了、%d ファイルを同期中 ..."
+
+msgid "Calculation AlbumGain complete."
+msgstr "AlbumGain の計算が完了しました。"
+
+msgid "Calculation of ReplayGain aborted. Some values may have been already written to the metadata of the files."
+msgstr "ReplayGain の計算が中止されました。一部の値は既にファイルのメタデータに書き込まれている可能性があります。"
+
+msgid "Calculation of ReplayGain complete. The values have been written to the metadata of the files."
+msgstr "ReplayGain の計算が完了しました。値はファイルのメタデータに書き込まれました。"
+
+msgid "Can't open file."
+msgstr "ファイルを開けません。"
+
+msgid "Cancel"
+msgstr "キャンセル"
+
+msgid "Cancel (keep files and directories)"
+msgstr "キャンセル (ファイルとディレクトリを保持)"
+
+msgid "Cancel - do not remove any files from the library"
+msgstr "キャンセル - ライブラリからファイルを削除しない"
+
+msgid "Cancel copying"
+msgstr "コピーをキャンセル"
+
+msgid "Categories"
+msgstr "カテゴリ"
+
+msgid "Categories and tree view layers"
+msgstr "カテゴリとツリービューレイヤー"
+
+msgid "Category \"Playlists\""
+msgstr "カテゴリ「プレイリスト」"
+
+msgid "Category \"Recently added\""
+msgstr "カテゴリ「最近追加したもの」"
+
+msgid "Change Category"
+msgstr "カテゴリを変更"
+
+msgid "Change category"
+msgstr "カテゴリを変更"
+
+msgid "Change category of selected files"
+msgstr "選択したファイルのカテゴリを変更"
+
+msgid "Change coverflow according to results"
+msgstr "結果に応じてカバーフローを変更"
+
+msgid "Change font according to constant/variable bitrate"
+msgstr "定数/可変ビットレートに応じてフォントを変更"
+
+msgid "Change font color according to bitrate"
+msgstr "ビットレートに応じてフォントの色を変更"
+
+msgid "Change font size according to track length"
+msgstr "トラック長に応じてフォントサイズを変更"
+
+msgid "Change font style according to channel mode"
+msgstr "チャンネルモードに応じてフォントスタイルを変更"
+
+msgid "Change layer properties"
+msgstr "レイヤープロパティを変更"
+
+msgid "Change metadata when needed"
+msgstr "必要に応じてメタデータを変更"
+
+msgid "Change rating and play counter of played files"
+msgstr "再生されたファイルの評価と再生カウンターを変更"
+
+msgid "Channelmode"
+msgstr "チャンネルモード"
+
+msgid "Check album name"
+msgstr "アルバム名を確認"
+
+msgid "Check extended tags"
+msgstr "拡張タグを確認"
+
+msgid "Check files when loading a playlist"
+msgstr "プレイリスト読み込み時にファイルを確認"
+
+msgid "Check for missing files in your music directories when starting Nemp and remove them from the media library."
+msgstr "Nemp 起動時に音楽ディレクトリ内の欠落ファイルを確認し、メディアライブラリから削除する。"
+
+msgid "Check for new files in your music directories when starting Nemp."
+msgstr "Nemp 起動時に音楽ディレクトリ内の新しいファイルを確認する。"
+
+msgid "Check for updates"
+msgstr "アップデートを確認"
+
+msgid "Check for updates and show a message if a newer version is available"
+msgstr "アップデートを確認し、新しいバージョンがある場合はメッセージを表示"
+
+msgid "Check now"
+msgstr "今すぐ確認"
+
+msgid "Check title"
+msgstr "タイトルを確認"
+
+msgid "Check: Fail. Description already exists"
+msgstr "チェック : 失敗。説明は既に存在します"
+
+msgid "Check: Fail. Duplicate description and filename"
+msgstr "チェック : 失敗。説明とファイル名が重複しています"
+
+msgid "Check: Fail. Filename already exists"
+msgstr "チェック : 失敗。ファイル名は既に存在します"
+
+msgid "Check: Fail: Empty or invalid filename"
+msgstr "チェック : 失敗。ファイル名が空または無効です"
+
+msgid "Check: Ok"
+msgstr "チェック : OK"
+
+msgid "Choose a download directory"
+msgstr "ダウンロードディレクトリを選択"
+
+msgid "Choose how the files should be renamed"
+msgstr "ファイルのリネーム方法を選択"
+
+msgid "Chrystal Project Icons by Everaldo Coelho"
+msgstr "Chrystal Project Icons by Everaldo Coelho"
+
+msgid "Classic coverflow for systems without OpenGL-support"
+msgstr "OpenGL 非対応システム向けのクラシックカバーフロー"
+
+msgid "Clean up update"
+msgstr "アップデートのクリーンアップ"
+
+msgid "Cleanup (remove &missing files)"
+msgstr "クリーンアップ (欠落ファイルを削除)(&m)"
+
+msgid "Cleanup (remove missing files)"
+msgstr "クリーンアップ (欠落ファイルを削除)"
+
+msgid "Cleanup library"
+msgstr "ライブラリをクリーンアップ"
+
+msgid "Clear"
+msgstr "クリア"
+
+msgid "Clear Messages"
+msgstr "メッセージをクリア"
+
+msgid "Clear ReplayGain"
+msgstr "ReplayGain をクリア"
+
+msgid "Clear cache"
+msgstr "キャッシュをクリア"
+
+msgid "Clear category"
+msgstr "カテゴリをクリア"
+
+msgid "Clear category \"%s\""
+msgstr "カテゴリ \"%s\" をクリア"
+
+msgid "Clear inputs"
+msgstr "入力をクリア"
+
+msgid "Clear the list of unsuccessfully checked covers"
+msgstr "確認に失敗したカバーのリストをクリア"
+
+msgid ""
+"Click %s and %s to split the window into multiple panes.\n"
+"Then drag and drop the 7 Nemp GUI-Elements to those panes."
+msgstr ""
+"%s と %s をクリックしてウィンドウを複数のペインに分割します。\n"
+"その後、7つの Nemp GUI 要素をそれらのペインにドラッグ＆ドロップします。"
+
+msgid "Click to change rating"
+msgstr "クリックして評価を変更"
+
+msgid "Click to resolve these inconsistencies."
+msgstr "クリックしてこれらの不整合を解決します。"
+
+msgid "Close"
+msgstr "閉じる"
+
+msgid "Close Nemp"
+msgstr "Nemp を閉じる"
+
+msgid "Close browse window"
+msgstr "ブラウズウィンドウを閉じる"
+
+msgid "Close medialist window"
+msgstr "メディアリストウィンドウを閉じる"
+
+msgid "Close playlist window"
+msgstr "プレイリストウィンドウを閉じる"
+
+msgid "Close this menu"
+msgstr "このメニューを閉じる"
+
+msgid "Close this window after copying"
+msgstr "コピー後にこのウィンドウを閉じる"
+
+msgid "Close this window when the copy process is completed"
+msgstr "コピープロセスが完了したらこのウィンドウを閉じる"
+
+msgid "Close window after completion"
+msgstr "完了後にウィンドウを閉じる"
+
+msgid "Close window after completion (%d)"
+msgstr "完了後にウィンドウを閉じる (%d)"
+
+msgid "Combine tree view layers when reasonable"
+msgstr "合理的な場合にツリービューのレイヤーを結合する"
+
+msgid "Comment"
+msgstr "コメント"
+
+msgid "Complete Media Library"
+msgstr "メディアライブラリ全体"
+
+msgid "Complete path"
+msgstr "完全なパス"
+
+msgid "Completed"
+msgstr "完了"
+
+msgid "Composer"
+msgstr "作曲者"
+
+msgid "Configure Media library"
+msgstr "メディアライブラリを設定"
+
+msgid "Configure current plugin"
+msgstr "現在のプラグインを設定"
+
+msgid "Configure media library"
+msgstr "メディアライブラリを設定"
+
+msgid "Confirmation"
+msgstr "確認"
+
+msgid "Connecting to shoutcast.com ..."
+msgstr "shoutcast.com に接続中 ..."
+
+msgid "Connecting..."
+msgstr "接続中..."
+
+msgid "Constant bitrate"
+msgstr "固定ビットレート"
+
+msgid "Construction complete. Click \"Apply\" to test this setup in the real Nemp window."
+msgstr "構築が完了しました。「適用」をクリックして、実際の Nemp ウィンドウでこの設定をテストしてください。"
+
+msgid "Context menus on directories"
+msgstr "ディレクトリのコンテキストメニュー"
+
+msgid "Continue"
+msgstr "続行"
+
+msgid "Continue with the playlist after playing the birthday song"
+msgstr "バースデーソングの再生後にプレイリストを続行する"
+
+msgid "Continue with the playlist after the birthday song."
+msgstr "バースデーソングの後にプレイリストを続行します。"
+
+msgid "Controls"
+msgstr "コントロール"
+
+msgid "Convert spaces into \"_\""
+msgstr "スペースを \"_\" に変換"
+
+msgid "Copy"
+msgstr "コピー"
+
+msgid "Copy ID3v1 from ID3v2/APE"
+msgstr "ID3v1 を ID3v2/APE からコピー"
+
+msgid "Copy ID3v2/APE from ID3v1"
+msgstr "ID3v2/APE を ID3v1 からコピー"
+
+msgid "Copy URL to clipboard"
+msgstr "URL をクリップボードにコピー"
+
+msgid "Copy files"
+msgstr "ファイルをコピー"
+
+msgid "Copy files into the new category"
+msgstr "ファイルを新しいカテゴリにコピー"
+
+msgid "Copy here"
+msgstr "ここにコピー"
+
+msgid "Copy selected files to clipboard"
+msgstr "選択したファイルをクリップボードにコピー"
+
+msgid "Copy to category %1"
+msgstr "カテゴリ %1 にコピー"
+
+msgid "Copy to clipboard"
+msgstr "クリップボードにコピー"
+
+msgid "Copying file %s"
+msgstr "ファイル %s をコピー中"
+
+msgid "Copying file failed for an unknown reason (Errorcode: %d). Choose OK to continue with next file, or cancel the copying process."
+msgstr "不明な理由によりファイルのコピーに失敗しました (エラーコード : %d)。OKを選択して次のファイルに進むか、コピープロセスをキャンセルします。"
+
+msgid "Copying in progress. Do you want to cancel the copy process?"
+msgstr "コピー中です。コピープロセスをキャンセルしますか？"
+
+msgid "Copyright"
+msgstr "著作権"
+
+msgid "Copyright © 2005-2025 Daniel 'Gausi' Gaussmann"
+msgstr "Copyright © 2005-2025 Daniel 'Gausi' Gaussmann"
+
+msgid "Could not connect to server. Please check your internet configuration."
+msgstr "サーバーに接続できませんでした。インターネット設定を確認してください。"
+
+msgid "Could not find bass.dll version 2.3. Player will probably not work."
+msgstr "bass.dll バージョン 2.3 が見つかりません。プレイヤーはおそらく動作しません。"
+
+msgid "Could not get proper information from server."
+msgstr "サーバーから適切な情報を取得できませんでした。"
+
+msgid "Could not get update information from server."
+msgstr "サーバーからアップデート情報を取得できませんでした。"
+
+msgid "Could not save the playlist: %s"
+msgstr "プレイリストを保存できませんでした: %s"
+
+msgid "Count"
+msgstr "カウント"
+
+msgid "Count Ratings"
+msgstr "評価をカウント"
+
+msgid "Count how many files in the media library (or the playlist) exist with the specific rating."
+msgstr "メディアライブラリ（またはプレイリスト）内に、特定の評価が付けられたファイルがいくつあるかをカウントします。"
+
+msgid "CountInconsistentFiles"
+msgstr "不整合ファイルをカウント"
+
+msgid "Countdown length"
+msgstr "カウントダウン長"
+
+msgid "Countdown title"
+msgstr "カウントダウンタイトル"
+
+msgid "Cover"
+msgstr "カバー"
+
+msgid "Cover and Text"
+msgstr "カバーとテキスト"
+
+msgid "Cover art"
+msgstr "カバーアート"
+
+msgid "Cover art (meta data and image files)"
+msgstr "カバーアート (メタデータと画像ファイル)"
+
+msgid "Cover art for the Media library"
+msgstr "メディアライブラリのカバーアート"
+
+msgid "Cover/lyrics and details"
+msgstr "カバー/歌詞と詳細"
+
+msgid "Coverflow"
+msgstr "カバーフロー"
+
+msgid "Create a log message about missing files"
+msgstr "欠落ファイルに関するログメッセージを作成"
+
+msgid "Create a new Form Layout from scratch"
+msgstr "新規フォームレイアウトをゼロから作成"
+
+msgid "Create a new favorite playlist"
+msgstr "新しいお気に入りプレイリストを作成"
+
+msgid "Create a proper playlist-file (*.m3u) in the destination directory"
+msgstr "宛先ディレクトリに適切なプレイリストファイル (*.m3u) を作成"
+
+msgid "Create default templates"
+msgstr "デフォルトテンプレートを作成"
+
+msgid "Create random playlist"
+msgstr "ランダムプレイリストを作成"
+
+msgid "Ctrl + Shift"
+msgstr "Ctrl + Shift"
+
+msgid "Cue (Album)"
+msgstr "キューのシート (アルバム)"
+
+msgid "Cue (Title)"
+msgstr "キューのシート (タイトル)"
+
+msgid "Current Category"
+msgstr "現在のカテゴリ"
+
+msgid "Current URL in QRCode: "
+msgstr "QR コード内の現在の URL : "
+
+msgid "Current URL in QRCode: %s"
+msgstr "QR コード内の現在の URL : %s"
+
+msgid "Current category"
+msgstr "現在のカテゴリ"
+
+msgid "Current category: \"%s\""
+msgstr "現在のカテゴリ : \"%s\""
+
+msgid "Current cover"
+msgstr "現在のカバー"
+
+msgid "Current cover art"
+msgstr "現在のカバーアート"
+
+msgid "Current item ... reading ...."
+msgstr "現在のアイテム ... 読み込み中 ...."
+
+msgid "Current output on display"
+msgstr "ディスプレイ上の現在の出力"
+
+msgid "Current session"
+msgstr "現在のセッション"
+
+msgid "Current status: Close Nemp after the last file"
+msgstr "現在のステータス : 最後のファイルの後に Nemp を閉じる"
+
+msgid "Current status: Close Nemp in ~%s"
+msgstr "現在のステータス : 約 %s 後 にNemp を閉じる"
+
+msgid "Current status: Hibernate Windows after the last file"
+msgstr "現在のステータス : 最後のファイルの後に Windows を休止状態にする"
+
+msgid "Current status: Hibernate Windows in ~%s"
+msgstr "現在のステータス : 約 %s 後に Windows を休止状態にする"
+
+msgid "Current status: Off"
+msgstr "現在のステータス : オフ"
+
+msgid "Current status: On"
+msgstr "現在のステータス : オン"
+
+msgid "Current status: Shutdown Windows after the last file"
+msgstr "現在のステータス : 最後のファイルの後に Windows をシャットダウンする"
+
+msgid "Current status: Shutdown Windows in ~%s"
+msgstr "現在のステータス : 約 %s 後に Windows をシャットダウンする"
+
+msgid "Current status: Stop Nemp after the last file"
+msgstr "現在のステータス : 最後のファイルの後に Nemp を停止する"
+
+msgid "Current status: Stop Nemp in ~%s"
+msgstr "現在のステータス : 約 %s 後に Nemp を停止する"
+
+msgid "Current status: Suspend Windows after the last file"
+msgstr "現在のステータス : 最後のファイルの後に Windows をサスペンドする"
+
+msgid "Current status: Suspend Windows in ~%s"
+msgstr "現在のステータス : 約 %s 後に Windows をサスペンドする"
+
+msgid "Current status: not active"
+msgstr "現在のステータス : 無効"
+
+msgid "Current titles in main view"
+msgstr "メインビュー内の現在のタイトル"
+
+msgid "Currently displayed files"
+msgstr "現在表示されているファイル"
+
+msgid "Currently selected file in the playlist"
+msgstr "プレイリストで現在選択されているファイル"
+
+msgid "Currently selected possible duplicate"
+msgstr "現在選択されている可能性のある重複"
+
+msgid "Custom"
+msgstr "カスタム"
+
+msgid "D"
+msgstr "D"
+
+msgid "Daily"
+msgstr "毎日"
+
+msgid "Data (cover, preferences, ...)"
+msgstr "データ (カバー、設定、...)"
+
+msgid "Date"
+msgstr "日付"
+
+msgid "Deactivate"
+msgstr "無効化"
+
+msgid "Deactivate server"
+msgstr "サーバーを無効化"
+
+msgid "Decades"
+msgstr "年代"
+
+msgid "Decide individually when loading a new playlist "
+msgstr "新しいプレイリストを読み込むときに個別に決定する"
+
+msgid "Decrease rating on aborted tracks"
+msgstr "中断されたトラックの評価を下げる"
+
+msgid "Decrease volume"
+msgstr "音量を下げる"
+
+msgid "Default"
+msgstr "デフォルト"
+
+msgid "Default actions"
+msgstr "デフォルトアクション"
+
+msgid "Default background color (Windows standard only)"
+msgstr "デフォルトの背景色 (Windows標準のみ)"
+
+msgid "Default category"
+msgstr "デフォルトカテゴリ"
+
+msgid "Default cover (used when no proper cover art can be found.)"
+msgstr "デフォルトカバー (適切なカバーアートが見つからない場合に使用されます。)"
+
+msgid "Default playlist"
+msgstr "デフォルトプレイリスト"
+
+msgid "Define an \"Album\" by"
+msgstr "「アルバム」の定義基準"
+
+msgid "Delete"
+msgstr "削除"
+
+msgid "Delete \"Ignore rule\""
+msgstr "「無視ルール」を削除"
+
+msgid "Delete \"Rename rule\""
+msgstr "「置換ルール」を削除"
+
+msgid "Delete category"
+msgstr "カテゴリを削除"
+
+msgid "Delete completely played tracks from the playlist"
+msgstr "再生が完了したトラックをプレイリストから削除"
+
+msgid "Delete duplicate"
+msgstr "重複を削除"
+
+msgid "Delete files and directories (recommended)"
+msgstr "ファイルとディレクトリを削除 (推奨)"
+
+msgid "Delete layer"
+msgstr "レイヤーを削除"
+
+msgid "Delete original"
+msgstr "オリジナルを削除"
+
+msgid "Delete preset"
+msgstr "プリセットを削除"
+
+msgid "Delete selected cover from metadata"
+msgstr "選択したカバーをメタデータから削除"
+
+msgid "Delete selected duplicate"
+msgstr "選択した重複を削除"
+
+msgid "Delete template"
+msgstr "テンプレートを削除"
+
+msgid "Delete the selected \"Rename rules\""
+msgstr "選択した「置換ルール」を削除"
+
+msgid "Deleting from media library (%d%%)"
+msgstr "メディアライブラリから削除中 (%d%%)"
+
+msgid "Descending"
+msgstr "降順"
+
+msgid "Description"
+msgstr "説明"
+
+msgid "Destination directory"
+msgstr "宛先ディレクトリ"
+
+msgid "Developer version (Latest release: %s)"
+msgstr "開発版 (最新リリース : %s)"
+
+msgid "Direct repetition - no pause in between"
+msgstr "直接繰り返し - 間に休止なし"
+
+msgid "Directories"
+msgstr "ディレクトリ"
+
+msgid "Directory"
+msgstr "ディレクトリ"
+
+msgid "Directory (last part)"
+msgstr "ディレクトリ (最後の部分)"
+
+msgid "Directory itself"
+msgstr "ディレクトリ自体"
+
+msgid "Directory: %s"
+msgstr "ディレクトリ : %s"
+
+msgid "Disable A-B repeat"
+msgstr "A-B リピートを無効"
+
+msgid "Disable A-B-Repeat"
+msgstr "A-B-リピートを無効"
+
+msgid "Disable effects"
+msgstr "エフェクトを無効"
+
+msgid "Disable effects when Nemp starts"
+msgstr "Nemp 起動時にエフェクトを無効にする"
+
+msgid "Disable equalizer"
+msgstr "イコライザーを無効"
+
+msgid "Disable equalizer when Nemp starts"
+msgstr "Nemp 起動時にイコライザーを無効にする"
+
+msgid "Display as \"Coverflow\""
+msgstr "「カバーフロー」として表示"
+
+msgid "Display of Albums, Directories, ..."
+msgstr "アルバム、ディレクトリなどの表示..."
+
+msgid "Display playlists as"
+msgstr "プレイリストの表示形式"
+
+msgid "Do a fuzzy search after pressing \"enter\" (e.g. show files from \"Amy MacDonald\" when you search for \"Amy McDonald\")"
+msgstr "「Enter」押下後にあいまい検索を実行する (例 : \"Amy McDonald\" を検索したときに \"Amy MacDonald\" のファイルを表示する)"
+
+msgid "Do not change rating and playcounter on short tracks."
+msgstr "短いトラックでは評価と再生カウントを変更しない。"
+
+msgid "Do not delete after manual stop/pause/slide/next/previous"
+msgstr "手動停止/一時停止/シーク/次/前の後は削除しない"
+
+msgid "Do not show Nemp window on start - directly minimize it."
+msgstr "起動時に Nemp ウィンドウを表示せず、直接最小化する。"
+
+msgid "Do not show Nemp-Auto-Tags like artist, albumname, genre, year and decade."
+msgstr "アーティスト、アルバム名、ジャンル、年、年代などの Nemp 自動タグを表示しない。"
+
+msgid "Do not show this dialog again."
+msgstr "このダイアログを再度表示しない。"
+
+msgid "Do not stop after current title"
+msgstr "現在のタイトル後に停止しない"
+
+msgid "Do not stop after current title (Shift+Click)"
+msgstr "現在のタイトル後に停止しない (Shift+クリック)"
+
+msgid "Do you really want to add all %d titles to the playlist? Click \"No\" to add only the selected titles."
+msgstr "本当に %d 個のタイトルすべてをプレイリストに追加しますか？ 「いいえ」をクリックすると選択されたタイトルのみ追加されます。"
+
+msgid "Do you really want to delete the template \"%s\"?"
+msgstr "本当にテンプレート \"%s\" を削除しますか？"
+
+msgid ""
+"Do you want Nemp to monitor this directoy?\n"
+"\n"
+"Nemp will scan this directory for new files on startup. You can edit the monitored directorys within the preferences."
+msgstr ""
+"Nemp にこのディレクトリを監視させますか？\n"
+"\n"
+"Nemp は起動時にこのディレクトリ内の新しいファイルをスキャンします。監視するディレクトリは環境設定内で編集できます。"
+
+msgid "Do you want to save the changes in the current file?"
+msgstr "現在のファイルへの変更を保存しますか？"
+
+msgid "Don't show this dialog again"
+msgstr "このダイアログを再度表示しない"
+
+msgid "Donate"
+msgstr "寄付"
+
+msgid "Doubleclick to add a new tag"
+msgstr "ダブルクリックで新しいタグを追加"
+
+msgid "Doubleclick to show all files from the album \"%s\""
+msgstr "ダブルクリックでアルバム \"%s\" のすべてのファイルを表示"
+
+msgid "Doubleclick to show all files from the artist \"%s\""
+msgstr "ダブルクリックでアーティスト \"%s\" のすべてのファイルを表示"
+
+msgid "Doubleclick to show all files from the genre \"%s\""
+msgstr "ダブルクリックでジャンル \"%s\" のすべてのファイルを表示"
+
+msgid "Doubleclick to show all files from the year \"%s\""
+msgstr "ダブルクリックで年 \"%s\" のすべてのファイルを表示"
+
+msgid "Doubleclick to show all files in this directory"
+msgstr "ダブルクリックでこのディレクトリ内のすべてのファイルを表示"
+
+msgid "Doubleclick to show all files tagged with \"%s\""
+msgstr "ダブルクリックで \"%s\" のタグが付いたすべてのファイルを表示"
+
+msgid "Doubleclick to show all files with the title \"%s\""
+msgstr "ダブルクリックでタイトル \"%s\" のすべてのファイルを表示"
+
+msgid "Download complete."
+msgstr "ダウンロード完了。"
+
+msgid "Download denied."
+msgstr "ダウンロードが拒否されました。"
+
+msgid "Download directory"
+msgstr "ダウンロードディレクトリ"
+
+msgid "Download failed. If the stream is available in other players, disable the parsing of the playlist in the settings dialog and try again."
+msgstr "ダウンロードに失敗しました。他のプレイヤーでストリームが利用可能な場合は、設定ダイアログでプレイリストのパースを無効にして再試行してください。"
+
+msgid "Download missing cover art from last.fm"
+msgstr "last.fm から不足しているカバーアートをダウンロード"
+
+msgid "Download missing covers from LastFM"
+msgstr "LastFM から不足しているカバーをダウンロード"
+
+msgid "Download now"
+msgstr "今すぐダウンロード"
+
+msgid ""
+"Downloading a cover from LastFM cancelled.\n"
+"No proper album information found.\n"
+"Try to update the ID3-Tags."
+msgstr ""
+"LastFM からのカバーダウンロードがキャンセルされました。\n"
+"適切なアルバム情報が見つかりませんでした。\n"
+"ID3 タグの更新を試みてください。"
+
+msgid ""
+"Downloading a cover from LastFM cancelled.\n"
+"This cover was not found a short time ago.\n"
+"You can clear the cover-cache to retry."
+msgstr ""
+"LastFM からのカバーダウンロードがキャンセルされました。\n"
+"このカバーはつい最近見つかりませんでした。\n"
+"再試行するにはカバーキャッシュをクリアしてください。"
+
+msgid ""
+"Downloading a cover from LastFM failed.\n"
+"No proper cover found."
+msgstr ""
+"LastFM からのカバーダウンロードに失敗しました。\n"
+"適切なカバーが見つかりませんでした。"
+
+msgid ""
+"Downloading a cover from LastFM failed.\n"
+"There is a problem with your internet connection."
+msgstr ""
+"LastFM からのカバーダウンロードに失敗しました。\n"
+"インターネット接続に問題があります。"
+
+msgid "Drop the files into the Playlist or another Category."
+msgstr "ファイルをプレイリストまたは別のカテゴリにドロップしてください。"
+
+msgid "Drop the files into the Playlist."
+msgstr "ファイルをプレイリストにドロップしてください。"
+
+msgid "Duplicate description"
+msgstr "説明が重複"
+
+msgid "Duplicate template"
+msgstr "テンプレートを複製"
+
+msgid "Duration"
+msgstr "再生時間"
+
+msgid "Duration: %d:%.2d min"
+msgstr "再生時間 : %d:%.2d 分"
+
+msgid "Duration: %d:%.2d min (start at %d:%.2d)"
+msgstr "再生時間 : %d:%.2d 分 (開始 %d:%.2d)"
+
+msgid "Duration: -?-"
+msgstr "再生時間 : -?-"
+
+msgid "During"
+msgstr "中"
+
+msgid "E"
+msgstr "E"
+
+msgid "E-mail is invalid"
+msgstr "Eメールが無効です"
+
+msgid "Echo"
+msgstr "エコー"
+
+msgid "Echo delay"
+msgstr "エコー遅延"
+
+msgid "Echo mix"
+msgstr "エコーミックス"
+
+msgid "Edit"
+msgstr "編集"
+
+msgid "Edit category"
+msgstr "カテゴリを編集"
+
+msgid "Edit favorite playlists"
+msgstr "お気に入りプレイリストを編集"
+
+msgid "Edit favorites"
+msgstr "お気に入りを編集"
+
+msgid "Edit layer"
+msgstr "レイヤーを編集"
+
+msgid "Edit tag"
+msgstr "タグを編集"
+
+msgid "Edit template"
+msgstr "テンプレートを編集"
+
+msgid "Effects"
+msgstr "エフェクト"
+
+msgid "Effects and ReplayGain"
+msgstr "エフェクトと ReplayGain"
+
+msgid "Emphasis"
+msgstr "エンファシス"
+
+msgid "Empty playlist. Drop some files here to play."
+msgstr "プレイリストは空です。再生するファイルをここにドロップしてください。"
+
+msgid "Enable USB mode"
+msgstr "USB モードを有効化"
+
+msgid "Enable cloud mode"
+msgstr "クラウドモードを有効化"
+
+msgid "Enabled"
+msgstr "有効"
+
+msgid "English"
+msgstr "英語"
+
+msgid "Enqueue (after the current title)"
+msgstr "キューに追加 (現在のタイトルの後)"
+
+msgid "Enqueue (at the end of the playlist)"
+msgstr "キューに追加 (プレイリストの最後)"
+
+msgid "Enqueue (at the end of the prebook-list)"
+msgstr "キューに追加 (予約リストの最後)"
+
+msgid "Enqueue after current track"
+msgstr "現在のトラックの後ろにキュー追加"
+
+msgid "Enqueue all tracks from \"%s\""
+msgstr "\"%s\" のすべてのトラックをキュー追加"
+
+msgid "Enqueue all tracks from this month (at the end of the playlist)"
+msgstr "今月のすべてのトラックをキュー追加 (プレイリストの最後)"
+
+msgid "Enqueue all tracks in category \"%s\""
+msgstr "カテゴリ \"%s\" のすべてのトラックをキュー追加"
+
+msgid "Enqueue all tracks of this album (at the end of the playlist)"
+msgstr "このアルバムのすべてのトラックをキュー追加 (プレイリストの最後)"
+
+msgid "Enqueue all tracks of this artist (at the end of the playlist)"
+msgstr "このアーティストのすべてのトラックをキュー追加 (プレイリストの最後)"
+
+msgid "Enqueue all tracks of this directory (at the end of the playlist)"
+msgstr "このディレクトリのすべてのトラックをキュー追加 (プレイリストの最後)"
+
+msgid "Enqueue all tracks of this genre (at the end of the playlist)"
+msgstr "このジャンルのすべてのトラックをキュー追加 (プレイリストの最後)"
+
+msgid "Enqueue all tracks of this playlist (at the end of the playlist)"
+msgstr "このプレイリストのすべてのトラックをキュー追加 (プレイリストの最後)"
+
+msgid "Enqueue all tracks of this webradio station (at the end of the playlist)"
+msgstr "このウェブラジオ局のすべてのトラックをキュー追加 (プレイリストの最後)"
+
+msgid "Enqueue all tracks of this year (at the end of the playlist)"
+msgstr "この年のすべてのトラックをキュー追加 (プレイリストの最後)"
+
+msgid "Enqueue all tracks with this tag (at the end of the playlist)"
+msgstr "このタグを持つすべてのトラックをキュー追加 (プレイリストの最後)"
+
+msgid "Enqueue at the end of the playlist"
+msgstr "プレイリストの最後にキュー追加"
+
+msgid "Enqueue in Nemp"
+msgstr "Nemp でキューに追加"
+
+msgid "Enqueue playlist \"%s\""
+msgstr "プレイリスト \"%s\" をキュー追加"
+
+msgid "Enqueue webradio station \"%s\""
+msgstr "ウェブラジオ局 \"%s\" をキュー追加"
+
+msgid "Enter password to exit Party-Mode"
+msgstr "パーティーモードを終了するにはパスワードを入力"
+
+msgid "Equalizer"
+msgstr "イコライザー"
+
+msgid "Equalizer && Effects"
+msgstr "イコライザー && エフェクト"
+
+msgid "Equalizer and Effects"
+msgstr "イコライザーとエフェクト"
+
+msgid "Error connecting %s: %s"
+msgstr "%s への接続中にエラー: %s"
+
+msgid "Error: %s"
+msgstr "エラー : %s"
+
+msgid "Error: Failed initializing ReplayGain calculation (%s)"
+msgstr "エラー : ReplayGain 計算の初期化に失敗しました (%s)"
+
+msgid "Error: Too many channels (%s)"
+msgstr "エラー : チャンネル数が多すぎます (%s)"
+
+msgid "Example layouts"
+msgstr "レイアウト例"
+
+msgid "Exceptions for deleting a file from the playlist."
+msgstr "プレイリストからファイルを削除する際の例外。"
+
+msgid "Existing tags"
+msgstr "既存のタグ"
+
+msgid "Exit Party-Mode"
+msgstr "パーティーモードを終了"
+
+msgid "Export"
+msgstr "エクスポート"
+
+msgid "Export as csv"
+msgstr "CSV としてエクスポート"
+
+msgid "Export complete. Do you want to open the file now?"
+msgstr "エクスポートが完了しました。今すぐファイルを開きますか？"
+
+msgid "Export file save as"
+msgstr "エクスポートファイルを名前を付けて保存"
+
+msgid "Export template"
+msgstr "エクスポートテンプレート"
+
+msgid "Export: New template"
+msgstr "エクスポート : 新しいテンプレート"
+
+msgid "Extended"
+msgstr "拡張"
+
+msgid "Extended Copy&Paste failed. This method doesn't work from write-protected drives (e.g. CD/DVD)."
+msgstr "拡張コピー＆ペーストに失敗しました。この方法は書き込み保護されたドライブ (例 : CD/DVD) では動作しません。"
+
+msgid "Extended tags"
+msgstr "拡張タグ"
+
+msgid "Extended tags for tag cloud"
+msgstr "タグクラウド用の拡張タグ"
+
+msgid "Extended viewing settings"
+msgstr "拡張表示設定"
+
+msgid "ExtendedControlForm"
+msgstr "拡張コントロールフォーム"
+
+msgid "ExtendedTags"
+msgstr "拡張タグ"
+
+msgid "Extension"
+msgstr "拡張子"
+
+msgid "F"
+msgstr "F"
+
+msgid "F1"
+msgstr "F1"
+
+msgid "F10"
+msgstr "F10"
+
+msgid "F11"
+msgstr "F11"
+
+msgid "F12"
+msgstr "F12"
+
+msgid "F2"
+msgstr "F2"
+
+msgid "F3"
+msgstr "F3"
+
+msgid "F5"
+msgstr "F5"
+
+msgid "F6"
+msgstr "F6"
+
+msgid "F7"
+msgstr "F7"
+
+msgid "F8"
+msgstr "F8"
+
+msgid "F9"
+msgstr "F9"
+
+msgid "Fade in/out"
+msgstr "フェードイン/アウト"
+
+msgid "Fading"
+msgstr "フェード"
+
+msgid "Fading length between two songs."
+msgstr "2曲間のフェード長。"
+
+msgid "Fading length when scrolling inside a song."
+msgstr "曲内シーク時のフェード長。"
+
+msgid "Failed."
+msgstr "失敗しました。"
+
+msgid "Failsafe"
+msgstr "フェイルセーフ"
+
+msgid "Faster"
+msgstr "高速化"
+
+msgid "Favorite playlists"
+msgstr "お気に入りプレイリスト"
+
+msgid "Favorites"
+msgstr "お気に入り"
+
+msgid "File"
+msgstr "ファイル"
+
+msgid "File can not be opened"
+msgstr "ファイルを開けません"
+
+msgid "File created"
+msgstr "ファイルが作成されました"
+
+msgid "File management"
+msgstr "ファイル管理"
+
+msgid "File not found"
+msgstr "ファイルが見つかりません"
+
+msgid "File not found."
+msgstr "ファイルが見つかりません。"
+
+msgid "File overview"
+msgstr "ファイル概要"
+
+msgid "File overview (details)"
+msgstr "ファイル概要 (詳細)"
+
+msgid "File properties"
+msgstr "ファイルプロパティ"
+
+msgid "File types for the media library"
+msgstr "メディアライブラリのファイルタイプ"
+
+msgid "FileSize: %.2f MB"
+msgstr "ファイルサイズ: %.2f MB"
+
+msgid "Fileage"
+msgstr "ファイル経過日数"
+
+msgid "Fileage (by month)"
+msgstr "ファイル経過日数 (月別)"
+
+msgid "Filemanagement"
+msgstr "ファイル管理"
+
+msgid "Filename"
+msgstr "ファイル名"
+
+msgid "Filename(with extension)"
+msgstr "ファイル名 (拡張子付き)"
+
+msgid "Filename: %s"
+msgstr "ファイル名 : %s"
+
+msgid "Files"
+msgstr "ファイル"
+
+msgid "Files for export"
+msgstr "エクスポートするファイル"
+
+msgid "Filesize"
+msgstr "ファイルサイズ"
+
+msgid "Filetypes"
+msgstr "ファイルタイプ"
+
+msgid "Flag selected files with"
+msgstr "選択したファイルにタグ付け"
+
+msgid "Floating points channels are not supported (DirectX 9 required). "
+msgstr "浮動小数点チャンネルはサポートされていません (DirectX 9 が必要です)。"
+
+msgid "Floating-point channels"
+msgstr "浮動小数点チャンネル"
+
+msgid "Flutter playback when battery is low (\"Walkman mode\")"
+msgstr "バッテリー残量が少ないときに再生をゆがめる (ウォークマンモード)"
+
+msgid "Folder"
+msgstr "フォルダー"
+
+msgid "Folder names not forming an album of their own (comma separated)"
+msgstr "アルバムとして扱わないフォルダー名 (カンマ区切り)"
+
+msgid "Folder\\Filename"
+msgstr "フォルダー\\ファイル名"
+
+msgid "Font for constant bitrate"
+msgstr "固定ビットレート用フォント"
+
+msgid "Font for variable bitrate"
+msgstr "可変ビットレート用フォント"
+
+msgid "Font settings"
+msgstr "フォント設定"
+
+msgid "Font size"
+msgstr "フォントサイズ"
+
+msgid "Font style"
+msgstr "フォントスタイル"
+
+msgid "Fonts and Party Mode"
+msgstr "フォントとパーティーモード"
+
+msgid "Fontsizes"
+msgstr "フォントサイズ"
+
+msgid "For details visit"
+msgstr "詳細はこちらをご覧ください"
+
+msgid "Form designer"
+msgstr "フォームデザイナー"
+
+msgid "Format"
+msgstr "フォーマット"
+
+msgid "Frame content"
+msgstr "フレームの内容"
+
+msgid "Frame key/description"
+msgstr "フレームキー/説明"
+
+msgid "Fuzzy search"
+msgstr "あいまい検索"
+
+msgid "G"
+msgstr "G"
+
+msgid "General"
+msgstr "全般"
+
+msgid "General options"
+msgstr "全般オプション"
+
+msgid "General playlist settings"
+msgstr "全般プレイリスト設定"
+
+msgid "General search for"
+msgstr "全般検索"
+
+msgid "General settings"
+msgstr "全般設定"
+
+msgid "Generate random playlist"
+msgstr "ランダムプレイリストを生成"
+
+msgid "Generating windows"
+msgstr "ウィンドウを生成中"
+
+msgid "Genre"
+msgstr "ジャンル"
+
+msgid "Genre: -?-"
+msgstr "ジャンル : -?-"
+
+msgid "Genres"
+msgstr "ジャンル"
+
+msgid "Get IP-address"
+msgstr "IP アドレスを取得"
+
+msgid "Get additional tags for selected files"
+msgstr "選択したファイルの追加タグを取得"
+
+msgid "Get extended tags from last.fm"
+msgstr "last.fm から拡張タグを取得"
+
+msgid "Get titles from"
+msgstr "タイトルの取得元"
+
+msgid "Get track information from cddb/freedb"
+msgstr "cddb/freedb からトラック情報を取得"
+
+msgid "Get your Internet-IP (done via a little php-script on www.gausi.de)."
+msgstr "インターネット IP を取得 (www.gausi.de 上の小さな PHP スクリプト経由)。"
+
+msgid "Global Hotkeys"
+msgstr "グローバルホットキー"
+
+msgid "Group and sort settings"
+msgstr "グループ化とソート設定"
+
+msgid "H"
+msgstr "H"
+
+msgid "HTML files"
+msgstr "HTML ファイル"
+
+msgid "Happy Birthday song"
+msgstr "バースデーソング"
+
+msgid "Happy Birthday timer"
+msgstr "バースデータイマー"
+
+msgid "Hardware"
+msgstr "ハードウェア"
+
+msgid "Harmonic key"
+msgstr "調性"
+
+msgid "Header at "
+msgstr "ヘッダー位置 "
+
+msgid "Headphone Controls"
+msgstr "ヘッドフォンコントロール"
+
+msgid "Headphones"
+msgstr "ヘッドフォン"
+
+msgid "Headphones (no title loaded)"
+msgstr "ヘッドフォン (タイトルが読み込まれていません)"
+
+msgid "Help"
+msgstr "ヘルプ"
+
+msgid "Heuristics for obsolete character sets"
+msgstr "旧文字セットのヒューリスティック"
+
+msgid "Hibernate Windows"
+msgstr "Windowsを休止状態にする"
+
+msgid "Hibernate/standby"
+msgstr "休止状態/スタンバイ"
+
+msgid "Hide"
+msgstr "隠す"
+
+msgid "Hide Tags automatically added by Nemp"
+msgstr "Nemp が自動追加したタグを隠す"
+
+msgid "Hide selected files"
+msgstr "選択したファイルを隠す"
+
+msgid "High (750x750)"
+msgstr "高 (750x750)"
+
+msgid "Highest (1000x1000)"
+msgstr "最高 (1000x1000)"
+
+msgid "Hint:"
+msgstr "ヒント :"
+
+msgid "Hint: The file was already tagged with \"%s\"."
+msgstr "ヒント : このファイルには既に \"%s\" というタグが付いています。"
+
+msgid "Hint: The tag \"%s\" was entered more than once."
+msgstr "ヒント : タグ \"%s\" が複数回入力されました。"
+
+msgid "Hint: This audiofile is part of a playlist, but it is not part of the Media Library itself. - The marker will disappear as soon as the displayed list of audio files changes."
+msgstr "ヒント : このオーディオファイルはプレイリストの一部ですが、メディアライブラリ自体の一部ではありません。 - マーカーは表示されているオーディオファイルのリストが変更されると消えます。"
+
+msgid "Hold Nemp G15 App in foreground"
+msgstr "Nemp G15 アプリを前面に維持"
+
+msgid "Hours"
+msgstr "時間"
+
+msgid "How do you want to progress?"
+msgstr "どのように進めますか？"
+
+msgid "I"
+msgstr "I"
+
+msgid "ID3 v1"
+msgstr "ID3 v1"
+
+msgid ""
+"ID3-Tag update complete. Some unexpected errors appeared during the process.\n"
+"\n"
+"Please view the Error-Log for details."
+msgstr ""
+"ID3 タグの更新が完了しました。処理中に予期しないエラーがいくつか発生しました。\n"
+"\n"
+"詳細はエラーログを確認してください。"
+
+msgid "Identified as duplicate, because:"
+msgstr "重複と判断された理由:"
+
+msgid "Identified duplicates"
+msgstr "特定された重複"
+
+msgid "Identify live tracks by"
+msgstr "ライブトラックの識別基準"
+
+msgid "Idle"
+msgstr "アイドル"
+
+msgid "If applicable: Start playback with new file"
+msgstr "該当する場合 : 新しいファイルで再生を開始"
+
+msgid "If checked, Nemp will ignore volume keys, to allow global volume control by these keys."
+msgstr "チェックすると、Nemp は音量キーを無視し、これらのキーによるグローバル音量調整を許可します。"
+
+msgid "If no CD-Text available: Check online CDDB"
+msgstr "CD-Text が利用できない場合 : オンライン CDDB を確認"
+
+msgid "If not: Show information dialog when minor inconsistencies occur "
+msgstr "無効の場合 : 軽微な不整合が発生したときに情報ダイアログを表示"
+
+msgid "If not: Show query dialog when inconsistencies occur"
+msgstr "無効の場合 : 不整合が発生したときに確認ダイアログを表示"
+
+msgid "If present, copy also the matching cuesheet-file (*.cue)"
+msgstr "存在する場合、対応するキューのシートファイル (*.cue) もコピーする"
+
+msgid "If property ... is not available, display ... instead."
+msgstr "プロパティ ... が利用できない場合は、代わりに ... を表示します。"
+
+msgid ""
+"If you are celebrating into a birthday, or celebrating into the New Year and you don't want to miss midnight, then you can activate the Happy Birthday timer. Nemp will then pause the playlist at the specified "
+"time to play a special song."
+msgstr "誕生日や新年を祝っていて、真夜中を逃したくない場合は、バースデータイマーを有効にできます。Nemp は指定された時間にプレイリストを一時停止し、特別な曲を再生します。"
+
+msgid ""
+"If you change the artist, album, rating, ... of a title, or search for lyrics or extended tags, Nemp can save these data in the metadata (e.g. ID3-Tags) of the file. This is pretty normal for an mp3-player. "
+"However, the files will be changed by this, which may collide with your backup or filesharing strategy.#13#10Note: You can always change the metadata explicitly in the \"Properties\" window."
+msgstr ""
+"タイトルのアーティスト、アルバム、評価などを変更したり、歌詞や拡張タグを検索したりすると、Nemp はこれらのデータをファイルのメタデータ (例 ：ID3タグ) に保存できます。これはMP3プレイヤーとしてはごく普通のことで"
+"す。ただし、これによりファイルが変更されるため、バックアップやファイル共有の戦略と競合する可能性があります。#13#10注 ：メタデータはいつでも「プロパティ」ウィンドウで明示的に変更できます。"
+
+msgid ""
+"If you have a Logitech G15 keyboard, Nemp can display the current title (and some other stuff) on it.\n"
+"\n"
+"It is possible to use other apps for other keyboards. However, I only own a G15, so I can test only this one.\n"
+"If you want to create an app for your keyboard, feel free to contact me.\n"
+"\n"
+"So, do you want to start the G15 App now?"
+msgstr ""
+"Logitech G15 キーボードをお持ちの場合、Nemp は現在のタイトル (およびその他の情報) をそのディスプレイに表示できます。\n"
+"\n"
+"他のキーボード用に他のアプリを使用することも可能です。ただし、私が所有しているのは G15 のみなので、テストできるのはこれだけです。\n"
+"ご自身のキーボード用のアプリを作成したい場合は、お気軽にご連絡ください。\n"
+"\n"
+"では、G15 アプリを今すぐ起動しますか？"
+
+msgid "If you like it, please send me a postcard to "
+msgstr "気に入っていただけましたら、はがきを送ってください "
+
+msgid "If you want to use Nemp and the media library on multiple devices, then Nemp has to consider some things when managing the files. Please choose the way you share the media library on your devices."
+msgstr "Nemp とメディアライブラリを複数のデバイスで使用する場合、Nemp はファイル管理時にいくつかの点を考慮する必要があります。デバイス間でのメディアライブラリの共有方法を選択してください。"
+
+msgid "If you want to use Nemp only on one device, then these settings have no effect. Please refer to the documentation for more information."
+msgstr "Nemp を1つのデバイスでのみ使用する場合、これらの設定は影響しません。詳細についてはドキュメントを参照してください。"
+
+msgid "Ignore"
+msgstr "無視"
+
+msgid "Ignore Album-Artist \"Various Artists\""
+msgstr "アルバムアーティスト「Various Artists」を無視"
+
+msgid "Ignore Lyrics (recommended for very large  music collections)"
+msgstr "歌詞を無視 (非常に大規模な音楽コレクションに推奨)"
+
+msgid "Ignore fading on short tracks."
+msgstr "短いトラックではフェードを無視。"
+
+msgid "Ignore fading when clicking on \"Pause\"."
+msgstr "「一時停止」クリック時はフェードを無視。"
+
+msgid "Ignore fading when stopping the player."
+msgstr "プレイヤー停止時はフェードを無視。"
+
+msgid "Ignore hard failures - just stop scrobbling if something goes wrong"
+msgstr "ハードエラーを無視 - 問題が発生したら単にスクロブリングを停止"
+
+msgid "Ignore hard failures like \"no internet connection\", \"invalid username/password\", ..."
+msgstr "「インターネット接続なし」「無効なユーザー名/パスワード」などのハードエラーを無視..."
+
+msgid "Ignore on pause"
+msgstr "一時停止時は無視"
+
+msgid "Ignore on short tracks"
+msgstr "短いトラックでは無視"
+
+msgid "Ignore on stop"
+msgstr "停止時は無視"
+
+msgid "Ignore rules"
+msgstr "無視ルール"
+
+msgid "Ignore short tracks (i.e. less than 30 seconds)"
+msgstr "短いトラックを無視 (例 ：30秒未満)"
+
+msgid ""
+"Ignoring lyrics will remove all collected lyrics from the media library, but they will remain\n"
+"in the ID3-Tags. Once the lyrics have been removed from the library, they can no longer be\n"
+"used by the search function unless you rescan the files in your library.\n"
+"\n"
+"Currently there are %d files with lyrics stored in the library (out of %d total files), using \n"
+"approximately %s of memory.\n"
+"\n"
+"Do you want to continue and remove all lyrics from you media library?"
+msgstr ""
+"歌詞を無視すると、収集されたすべての歌詞がメディアライブラリから削除されますが、\n"
+"ID3 タグには残ります。歌詞がライブラリから削除されると、ライブラリ内のファイルを再スキャンしない限り、\n"
+"検索機能で使用できなくなります。\n"
+"\n"
+"現在、ライブラリには %d 個のファイルに歌詞が保存されています (全 %d ファイル中)、\n"
+"約 %s のメモリを使用しています。\n"
+"\n"
+"続行してメディアライブラリからすべての歌詞を削除しますか？"
+
+msgid "Import"
+msgstr "インポート"
+
+msgid "Import files from an existing playlist"
+msgstr "既存のプレイリストからファイルをインポート"
+
+msgid "In %s the current playlist will be interrupted for a little birthday song."
+msgstr "%s に、現在のプレイリストは小さなバースデーソングのために中断されます。"
+
+msgid "In case Scrobbling does not work (see Log below) you can try to restart the configuration."
+msgstr "スクロブリングが機能しない場合 (下のログを参照)、設定を再起動してみてください。"
+
+msgid "In case scrobbling was paused automatically and you fixed the reason: "
+msgstr "スクロブリングが自動停止され、その原因を修正した場合 : "
+
+msgid "Include \"\\admin\" in QRCode URL"
+msgstr "QR コード URL に \"\\admin\" を含める"
+
+msgid "Include comments to the accelerated search algorithms."
+msgstr "高速検索アルゴリズムにコメントを含める。"
+
+msgid "Include filenames to the accelerated search algorithms."
+msgstr "高速検索アルゴリズムにファイル名を含める。"
+
+msgid "Include genres to the accelerated search algorithms."
+msgstr "高速検索アルゴリズムにジャンルを含める。"
+
+msgid "Include the album-artist to the accelerated search algorithms."
+msgstr "高速検索アルゴリズムにアルバムアーティストを含める。"
+
+msgid "Include the composer to the accelerated search algorithms."
+msgstr "高速検索アルゴリズムに作曲者を含める。"
+
+msgid "Include titles with no information about the year"
+msgstr "年情報のないタイトルを含める"
+
+msgid "Include titles with unknown genre"
+msgstr "不明なジャンルのタイトルを含める"
+
+msgid "Include titles with year=0"
+msgstr "年=0のタイトルを含める"
+
+msgid "Including album-artist"
+msgstr "アルバムアーティストを含める"
+
+msgid "Including comments"
+msgstr "コメントを含める"
+
+msgid "Including composer"
+msgstr "作曲者を含める"
+
+msgid "Including cuesheets"
+msgstr "キューシートを含める"
+
+msgid "Including filenames"
+msgstr "ファイル名を含める"
+
+msgid "Including genre"
+msgstr "ジャンルを含める"
+
+msgid "Increase play counter"
+msgstr "再生カウントを増やす"
+
+msgid "Increase rating on played tracks"
+msgstr "再生されたトラックの評価を上げる"
+
+msgid "Increase the playcounter of a file after it was played"
+msgstr "ファイルが再生された後に再生カウントを増やす"
+
+msgid "Increase this value, if the playback stutters sometimes."
+msgstr "再生がときどき途切れる場合は、この値を増やしてください。"
+
+msgid "Increase volume"
+msgstr "音量を上げる"
+
+msgid "Index"
+msgstr "インデックス"
+
+msgid "Indivdual weights, based on rating."
+msgstr "評価に基づく個別の重み。"
+
+msgid "Information"
+msgstr "情報"
+
+msgid "Initialization of the bass.dll failed"
+msgstr "bass.dllの初期化に失敗しました"
+
+msgid "Initializing player"
+msgstr "プレイヤーを初期化中"
+
+msgid "Insert mode for files from the headset"
+msgstr "ヘッドセットからのファイルの挿入モード"
+
+msgid "Insert mode from headset to playlist"
+msgstr "ヘッドセットからプレイリストへの挿入モード"
+
+msgid "Insert mode from media list into the playlist"
+msgstr "メディアリストからプレイリストへの挿入モード"
+
+msgid "Install global hotkeys"
+msgstr "グローバルホットキーをインストール"
+
+msgid "Install global hotkeys. You should use some values that are not used as shortcuts by your favorite software."
+msgstr "グローバルホットキーをインストールします。お使いの他のソフトウェアでショートカットとして使用されていない値を選択してください。"
+
+msgid "Intended action"
+msgstr "実行予定のアクション"
+
+msgid "Intenisty"
+msgstr "強度"
+
+msgid "Invalid audiofile"
+msgstr "無効なオーディオファイル"
+
+msgid "Invalid codec"
+msgstr "無効なコーデック"
+
+msgid "Invalid device (no sound)"
+msgstr "無効なデバイス (音が出ません)"
+
+msgid "Invalid format"
+msgstr "無効なフォーマット"
+
+msgid "Invalid input. Only chars (a..z), numbers (0..9) and space ( ) are allowed. Please choose another name."
+msgstr "無効な入力です。使用できるのは文字 (a..z)、数字 (0..9)、およびスペースのみです。別の名前を選択してください。"
+
+msgid "Invalid media library-file."
+msgstr "無効なメディアライブラリファイルです。"
+
+msgid "Invalid mp3-file"
+msgstr "無効な MP3 ファイル"
+
+msgid "Invalid parameter"
+msgstr "無効なパラメータ"
+
+msgid "Invalid parameter."
+msgstr "無効なパラメータ。"
+
+msgid "Invalid password. Try again if you should know it. Or go back to the party and have some fun."
+msgstr "無効なパスワードです。知っている場合はもう一度試してください。またはパーティーに戻って楽しんでください。"
+
+msgid "Invalid speaker"
+msgstr "無効なスピーカー設定"
+
+msgid "Invalid time. Try something between 00:00 and 23:59."
+msgstr "無効な時刻です。00:00 から 23:59 の間で入力してください。"
+
+msgid "Invalid track"
+msgstr "無効なトラック"
+
+msgid "Inverse"
+msgstr "逆順"
+
+msgid "It looks like you entered a comma-separated list of tags. However, tags should be entered line by line here. Do you want Nemp to treat your input as a comma-separated list?"
+msgstr "カンマ区切りのタグリストを入力したようです。ただし、ここではタグは 1行に 1つずつ入力する必要があります。Nemp に入力をカンマ区切りリストとして処理させますか？"
+
+msgid "It looks like you entered more than one tag at once. Do you want Nemp to treat your input as a comma-separated list of tags?"
+msgstr "一度に複数のタグを入力したようです。Nemp に入力をカンマ区切りのタグリストとして処理させますか？"
+
+msgid "It seems that you are using an experimental version of Nemp. Thank you for testing it."
+msgstr "Nemp の実験的なバージョンを使用しているようです。テストにご協力いただきありがとうございます。"
+
+msgid "It seems that you deleted the playing file from the playlist. Therefore this function cannot be executed."
+msgstr "再生中のファイルがプレイリストから削除されたようです。そのため、この機能は実行できません。"
+
+msgid "J"
+msgstr "J"
+
+msgid "Jingles (playback via F9, Push-to-talk via F8)"
+msgstr "ジングル (F9で再生、F8でプッシュツートーク)"
+
+msgid "Join windows"
+msgstr "ウィンドウを結合"
+
+msgid "Jump to next entry in cuesheet on \"next\""
+msgstr "「次へ」でキューのシートの次のエントリにジャンプ"
+
+msgid "Just add playlist URL to the playlist (recommended)"
+msgstr "プレイリストURLのみをプレイリストに追加 (推奨)"
+
+msgid "Just as those cassette players did before \"mp3\" was invented."
+msgstr "「mp3」が発明される前のカセットプレーヤーのように。"
+
+msgid "Just play (don't change the playlist)"
+msgstr "単に再生 (プレイリストを変更しない)"
+
+msgid "Just play focussed file (don't change the playlist)"
+msgstr "フォーカスされたファイルを再生 (プレイリストを変更しない)"
+
+msgid "Just play focussed file (no playlist change)"
+msgstr "フォーカスされたファイルを再生 (プレイリスト変更なし)"
+
+msgid "Just play the track (don't change the playlist)"
+msgstr "トラックを再生 (プレイリストを変更しない)"
+
+msgid "Just remove an existing tag from all files in the media library, without a new \"Ignore rule\""
+msgstr "新しい「無視ルール」を作成せずに、メディアライブラリ内の全ファイルから既存のタグを削除する"
+
+msgid "Just remove tags"
+msgstr "タグを削除するだけ"
+
+msgid "Jürgen W. for a lively exchange of ideas during development"
+msgstr "開発中の活発なアイデア交換をしてくれた Jürgen W. に感謝"
+
+msgid "K"
+msgstr "K"
+
+msgid "Key"
+msgstr "キー"
+
+msgid "Keyboard display"
+msgstr "キーボードディスプレイ"
+
+msgid "Keywords"
+msgstr "キーワード"
+
+msgid "L"
+msgstr "L"
+
+msgid "L&oad (add files to current list)"
+msgstr "読み込み (現在のリストにファイルを追加)(&o)"
+
+msgid "Languages"
+msgstr "言語"
+
+msgid "LastFM"
+msgstr "LastFM"
+
+msgid "LastFM (scrobble)"
+msgstr "LastFM (スクロブル)"
+
+msgid "Latest release: %s (%s)"
+msgstr "最新リリース : %s (%s)"
+
+msgid "Latest stable release: %s"
+msgstr "最新安定版 : %s"
+
+msgid "Layer %s"
+msgstr "レイヤー %s"
+
+msgid "Layers"
+msgstr "レイヤー"
+
+msgid "Layout"
+msgstr "レイアウト"
+
+msgid "Left"
+msgstr "左"
+
+msgid "Length of the break between tracks"
+msgstr "トラック間の休止時間"
+
+msgid "Let the user control the player (play/stop/next/volume/...)"
+msgstr "ユーザーにプレイヤー操作を許可 (再生/停止/次/音量/...)"
+
+msgid "Let the user download files from your playlist and library"
+msgstr "ユーザーにプレイリストとライブラリからのファイルダウンロードを許可"
+
+msgid "Let the user play files in the browser"
+msgstr "ユーザーにブラウザでのファイル再生を許可"
+
+msgid "Let the user search and browse in your library"
+msgstr "ユーザーにライブラリ内の検索と閲覧を許可"
+
+msgid "Let the user vote for files - files with many votes will be played first"
+msgstr "ユーザーにファイルへの投票を許可 - 投票数の多いファイルが優先再生される"
+
+msgid "Library access denied."
+msgstr "ライブラリへのアクセスが拒否されました。"
+
+msgid "Library is empty"
+msgstr "ライブラリは空です"
+
+msgid "Limit amplification to prevent playback from clipping, if needed"
+msgstr "必要に応じて、クリッピングを防ぐために増幅を制限"
+
+msgid "List of supported audio files."
+msgstr "サポートされているオーディオファイルのリスト。"
+
+msgid "List of supported playlist files."
+msgstr "サポートされているプレイリストファイルのリスト。"
+
+msgid "List view settings"
+msgstr "リスト表示設定"
+
+msgid "Load"
+msgstr "読み込み"
+
+msgid "Load (add files to current list)"
+msgstr "読み込み (現在のリストにファイルを追加)"
+
+msgid "Load (and clear current list)"
+msgstr "読み込み (現在のリストをクリア)"
+
+msgid "Load a predefined Form Layout"
+msgstr "定義済みフォームレイアウトを読み込む"
+
+msgid "Load cover for Media library"
+msgstr "メディアライブラリのカバーを読み込む"
+
+msgid "Load media library on start"
+msgstr "起動時にメディアライブラリを読み込む"
+
+msgid "Load preset"
+msgstr "プリセットを読み込む"
+
+msgid "Load selected file into headset (Ctrl+H)"
+msgstr "選択したファイルをヘッドセットに読み込む (Ctrl+H)"
+
+msgid "Loading"
+msgstr "読み込み中"
+
+msgid "Loading library. Please wait..."
+msgstr "ライブラリを読み込み中。お待ちください..."
+
+msgid "Loading media library"
+msgstr "メディアライブラリを読み込み中"
+
+msgid "Loading media library (%s)"
+msgstr "メディアライブラリを読み込み中 (%s)"
+
+msgid "Loading playlist"
+msgstr "プレイリストを読み込み中"
+
+msgid "Loading preferences"
+msgstr "設定を読み込み中"
+
+msgid "Local cache for CDDB information"
+msgstr "CDDB 情報のローカルキャッシュ"
+
+msgid "Log summary about deleted files"
+msgstr "削除されたファイルに関するログ要約"
+
+msgid "Loglist (*.log)|*.log"
+msgstr "ログリスト (*.log)|*.log"
+
+msgid "Low (240x240)"
+msgstr "低 (240x240)"
+
+msgid "Low battery"
+msgstr "バッテリー残量低下"
+
+msgid "Low battery (%d%%). Click for more information."
+msgstr "バッテリー残量低下 (%d%%)。詳細はクリック。"
+
+msgid "Low battery. Click for more information."
+msgstr "バッテリー残量低下。詳細はクリック。"
+
+msgid "Lyrics"
+msgstr "歌詞"
+
+msgid "Lyrics exists"
+msgstr "歌詞あり"
+
+msgid "Lyrics in the media library"
+msgstr "メディアライブラリ内の歌詞"
+
+msgid "M"
+msgstr "M"
+
+msgid "MB per file"
+msgstr "ファイルあたりの MB"
+
+msgid "MPEG"
+msgstr "MPEG"
+
+msgid "Main"
+msgstr "メイン"
+
+msgid "Manage webradio stations"
+msgstr "ウェブラジオ局を管理"
+
+msgid "Mark 1"
+msgstr "マーク 1"
+
+msgid "Mark 2"
+msgstr "マーク 2"
+
+msgid "Mark 3"
+msgstr "マーク 3"
+
+msgid "Marker"
+msgstr "マーカー"
+
+msgid "Maximum count"
+msgstr "最大数"
+
+msgid "Maybe later"
+msgstr "後で"
+
+msgid "Media keys"
+msgstr "メディアキー"
+
+msgid "Media library"
+msgstr "メディアライブラリ"
+
+msgid "Media library configuation"
+msgstr "メディアライブラリ設定"
+
+msgid "Media library of Nemp 2.4 or earlier detected. This is not supported any more."
+msgstr "Nemp 2.4 以前のメディアライブラリが検出されました。これはサポートされなくなりました。"
+
+msgid "Medialib Configuration"
+msgstr "メディアライブラリ設定"
+
+msgid "Medialist"
+msgstr "メディアリスト"
+
+msgid "MemoScrobbleLog"
+msgstr "スクロブラーログ"
+
+msgid "Messages"
+msgstr "メッセージ"
+
+msgid "Meta data (e.g. ID3-Tags)"
+msgstr "メタデータ (例 : ID3タグ)"
+
+msgid "Meta data (e.g. ID3Tags)"
+msgstr "メタデータ (例 : ID3タグ)"
+
+msgid "MetaData Structure"
+msgstr "メタデータ構造"
+
+msgid "Metadata"
+msgstr "メタデータ"
+
+msgid "Metadata (ID3-Tags)"
+msgstr "メタデータ (ID3 タグ)"
+
+msgid "Metadata frames"
+msgstr "メタデータフレーム"
+
+msgid "Metadata overview"
+msgstr "メタデータ概要"
+
+msgid "Metadata structure"
+msgstr "メタデータ構造"
+
+msgid "Mickey-Mouse-Effect"
+msgstr "ミッキーマウス効果"
+
+msgid "Minimize Nemp"
+msgstr "Nemp を最小化"
+
+msgid "Minutes"
+msgstr "分"
+
+msgid "Minutes per file"
+msgstr "ファイルあたりの分数"
+
+msgid "Missing cover art"
+msgstr "カバーアートがありません"
+
+msgid "Missing files on the selected drive (will be removed from the library, if the drive is checked)"
+msgstr "選択したドライブ上の欠落ファイル (ドライブがチェックされていればライブラリから削除されます)"
+
+msgid "Mix"
+msgstr "シャッフル"
+
+msgid "Mix playlist after last track"
+msgstr "最終トラック後にプレイリストをシャッフル"
+
+msgid "Mixed settings"
+msgstr "その他の設定"
+
+msgid "Mixing"
+msgstr "シャッフル"
+
+msgid "Monthly"
+msgstr "毎月"
+
+msgid "Move down"
+msgstr "下へ移動"
+
+msgid "Move files into the new category"
+msgstr "ファイルを新しいカテゴリに移動"
+
+msgid "Move here"
+msgstr "ここに移動"
+
+msgid "Move to category %1"
+msgstr "カテゴリ %1 に移動"
+
+msgid "Move up"
+msgstr "上へ移動"
+
+msgid "Move/Copy files into another category"
+msgstr "ファイルを別のカテゴリに移動/コピー"
+
+msgid "Multiple albums (by tags)"
+msgstr "複数アルバム (タグ別)"
+
+msgid "Music"
+msgstr "音楽"
+
+msgid "Music files"
+msgstr "音楽ファイル"
+
+msgid "N"
+msgstr "N"
+
+msgid "N&o to All"
+msgstr "すべて「いいえ」(&o)"
+
+msgid "N/A"
+msgstr "N/A"
+
+msgid "N/A, unknown"
+msgstr "N/A、不明"
+
+msgid "Name"
+msgstr "名前"
+
+msgid "Name (e.g. \"The Hit Channel\")"
+msgstr "名前 (例 : \"The Hit Channel\")"
+
+msgid "Name for the new preset"
+msgstr "新しいプリセットの名前"
+
+msgid "Nemp"
+msgstr "Nemp"
+
+msgid "Nemp &Webserver"
+msgstr "Nemp ウェブサーバー(&W)"
+
+msgid "Nemp - Internet radio"
+msgstr "Nemp - インターネットラジオ"
+
+msgid "Nemp - Noch ein MP3-Player"
+msgstr "Nemp - もうひとつの MP3 プレイヤー"
+
+msgid "Nemp - Noch ein mp3-Player"
+msgstr "Nemp - もうひとつの MP3 プレイヤー"
+
+msgid "Nemp 4.6 comes with a new default skin. Do you want to use the new one?"
+msgstr "Nemp 4.6 には新しいデフォルトスキンが付属しています。新しいスキンを使用しますか？"
+
+msgid "Nemp Configuration Wizard"
+msgstr "Nemp 設定ウィザード"
+
+msgid "Nemp G15 Applet"
+msgstr "Nemp G15 アプレット"
+
+msgid "Nemp GUI elements"
+msgstr "Nemp GUI 要素"
+
+msgid "Nemp LastFM Scrobbler"
+msgstr "Nemp LastFM スクロブラー"
+
+msgid "Nemp Logo and default skin by Jürgen Poley"
+msgstr "Nemp ロゴとデフォルトスキン by Jürgen Poley"
+
+msgid "Nemp Party-Mode"
+msgstr "Nemp パーティーモード"
+
+msgid "Nemp Tagcloud (Ignore/Rename rules)"
+msgstr "Nemp タグクラウド (無視/置換ルール)"
+
+msgid "Nemp Walkman mode: Low battery"
+msgstr "Nemp ウォークマンモード : バッテリー低下"
+
+msgid "Nemp Webserver"
+msgstr "Nemp ウェブサーバー"
+
+msgid "Nemp Webserver: QR-Codes"
+msgstr "Nemp ウェブサーバー : QRコード"
+
+msgid "Nemp as default player"
+msgstr "Nemp をデフォルトプレイヤーに設定"
+
+msgid ""
+"Nemp can adjust the rating of your music files automatically. If you frequently play a song, it will be rated better. On the other side: If you abort a song in your playlist, its rating will be decreased a "
+"little.#13#10Note: This will be saved within the file, if you answered the previous question with \"yes\", so the files are changed quite often then."
+msgstr ""
+"Nemp は音楽ファイルの評価を自動的に調整できます。曲を頻繁に再生すると評価が上がります。逆に、プレイリスト内の曲を中断すると評価が少し下がります。#13#10注 : 前の質問に「はい」と答えた場合、これはファイル内に保"
+"存されるため、ファイルが頻繁に変更されます。"
+
+msgid ""
+"Nemp can be installed as the default audio player. If you double click a music file or a playlist in the Windows Explorer, this file will be opened with Nemp.#13#10If you want to select the file types "
+"associated with Nemp, you can do it later in the settings dialog."
+msgstr ""
+"Nemp をデフォルトのオーディオプレイヤーとしてインストールできます。Windows エクスプローラーで音楽ファイルやプレイリストをダブルクリックすると、そのファイルが Nemp で開かれます。#13#10Nemp に関連付けるファイル"
+"タイプを選択する場合は、後で設定ダイアログで行えます。"
+
+msgid ""
+"Nemp can check for updates and notify you if a newer version of Nemp is available. It will contact www.gausi.de once a week (default setting, interval can be changed) and ask for the newest version. There is "
+"no auto-installer - you have to download and install the new version by hand."
+msgstr ""
+"Nemp はアップデートを確認し、新しいバージョンが利用可能な場合は通知できます。週に 1回 (デフォルト設定、間隔は変更可能) www.gausi.de に接続し、最新バージョンを問い合わせます。自動インストーラーはありません - 新"
+"しいバージョンは手動でダウンロードしてインストールする必要があります。"
+
+msgid "Nemp can increase the speed of the quick search, but this also increases the memory usage."
+msgstr "Nemp はクイック検索の速度を向上させることができますが、これによりメモリ使用量も増加します。"
+
+msgid "Nemp can scrobble what you hear to your account on LastFM. To do this, Nemp needs your permission to access your LastFM user-profile. Click \"Start\" to begin the configuration."
+msgstr "Nemp は聴いている曲を LastFM のアカウントにスクロブルできます。これを行うには、Nemp が LastFM ユーザープロファイルにアクセスするための許可が必要です。「開始」をクリックして設定を開始してください。"
+
+msgid "Nemp can scrobble what you hear to your account on LastFM. To do this, Nemp needs your permission to access your account. Go online and click the button below to start the configuration."
+msgstr "Nemp は聴いている曲を LastFM のアカウントにスクロブルできます。これを行うには、Nemp がアカウントにアクセスするための許可が必要です。オンラインにして、下のボタンをクリックして設定を開始してください。"
+
+msgid "Nemp can't gather any further information from the file, as metadata for this type of file is not supported."
+msgstr "このファイルタイプのメタデータはサポートされていないため、Nemp はファイルからそれ以上の情報を取得できません。"
+
+msgid "Nemp can't gather any further information from the file."
+msgstr "Nemp はファイルからそれ以上の情報を取得できません。"
+
+msgid ""
+"Nemp can't write into the Users appdata path and therefore can't save any data (including settings, playlist and the media library). This is quite unusual. \n"
+"\n"
+"You may try Nemp using in \"portable mode\".\n"
+"\n"
+"Please refer to the documentation for further details."
+msgstr ""
+"Nemp は Users の appdata パスに書き込めないため、データ (設定、プレイリスト、メディアライブラリを含む) を保存できません。これは非常に珍しいことです。\n"
+"\n"
+"Nemp を「ポータブルモード」で使用してみてください。\n"
+"\n"
+"詳細についてはドキュメントを参照してください。"
+
+msgid "Nemp detected %d file(s) and %d playlist(s) on %d missing drive(s). These entries will remain in the media library until further notice."
+msgstr "Nemp は %d 個のファイルと %d 個のプレイリストが %d 個の欠落ドライブ上にあることを検出しました。これらのエントリは、特に指示があるまでメディアライブラリに残ります。"
+
+msgid "Nemp detected %d missing file(s) and %d missing playlist(s) and removed these entries from the media library."
+msgstr "Nemp は %d 個の欠落ファイルと %d 個の欠落プレイリストを検出し、これらのエントリをメディアライブラリから削除しました。"
+
+msgid ""
+"Nemp found some duplicate entries in your media library. This is not supposed to happen, unless you just added the current playlist to the media library. - If this message appears frequently, please contact "
+"me via e-mail. Thank you!"
+msgstr ""
+"Nemp はメディアライブラリに重複エントリをいくつか見つけました。これは、現在のプレイリストをメディアライブラリに追加したばかりでない限り、発生すべきではありません。 - このメッセージが頻繁に表示される場合は、"
+"メールでご連絡ください。ありがとうございます！"
+
+msgid ""
+"Nemp has a lot of cool features. Some of these features create new files on your disk or change files in the background. Some people don't like programs that mess about with their system without being asked - "
+"and so do I.#13#10#13#10This Wizard will explain these features and ask for your permission to activate them."
+msgstr ""
+"Nemp には多くのクールな機能があります。これらの機能の中には、ディスク上に新しいファイルを作成したり、バックグラウンドでファイルを変更するものもあります。許可なくシステムをいじるプログラムを嫌う人もいます - 私"
+"もそうです。#13#10#13#10このウィザードでは、これらの機能について説明し、有効化するための許可を求めます。"
+
+msgid ""
+"Nemp has detected a low battery status. As the \"Walkman mode\" is active, Nemp will flutter the playback (like these old portable cassette players). The fluttering will become worse on even lower battery "
+"status. Fluttering will end, if you start charging the battery."
+msgstr ""
+"Nemp はバッテリー残量が少ないことを検出しました。「ウォークマンモード」が有効なため、Nemp は再生をゆがめます（古いポータブルカセットプレーヤーのように）。バッテリー残量がさらに低下すると、ゆがみは悪化します。"
+"バッテリーの充電を開始すると、ゆがみは終了します。"
+
+msgid ""
+"Nemp has detected several files in your library that are currently missing.\n"
+"\n"
+"Please choose which files you want to remove from the media library (check the corresponding drive) and which files you want to keep in your media library (uncheck the corresponding drive)."
+msgstr ""
+"Nemp はライブラリ内に現在欠落しているファイルをいくつか検出しました。\n"
+"\n"
+"メディアライブラリから削除するファイル（対応するドライブにチェック）と、メディアライブラリに保持するファイル（対応するドライブのチェックを外す）を選択してください。"
+
+msgid "Nemp has no write permissions in the configured data directory. Therefore the playlist and the media library can not be saved. For instructions on how to fix this problem, click on \"Help\"."
+msgstr "Nemp には設定されたデータディレクトリへの書き込み権限がありません。そのため、プレイリストとメディアライブラリを保存できません。この問題の修正方法については、「ヘルプ」をクリックしてください。"
+
+msgid "Nemp is calculating ReplayGain values right now. This may take a while."
+msgstr "Nemp は現在 ReplayGain 値を計算中です。しばらく時間がかかる場合があります。"
+
+msgid ""
+"Nemp is calculating ReplayGain values right now. This may take a while. \n"
+"\n"
+msgstr "Nemp は現在 ReplayGain 値を計算中です。しばらく時間がかかる場合があります。\n"
+
+msgid "Nemp is currently playing a track from this CD. Playing another one at the same time is not possible."
+msgstr "Nemp は現在このCDからトラックを再生中です。同時に別のトラックを再生することはできません。"
+
+msgid "Nemp is now ready to scrobble. Have fun."
+msgstr "Nemp はスクロブルの準備ができました。お楽しみください。"
+
+msgid "Nemp is refreshing your media library."
+msgstr "Nemp がメディアライブラリを更新しています。"
+
+msgid "Nemp is removing the selected files from your media library."
+msgstr "Nemp が選択されたファイルをメディアライブラリから削除しています。"
+
+msgid "Nemp is scanning the new music files for metadata. This may take a while."
+msgstr "Nemp が新しい音楽ファイルのメタデータをスキャンしています。しばらく時間がかかる場合があります。"
+
+msgid "Nemp is scanning the new playlist files. This may take a while."
+msgstr "Nemp が新しいプレイリストファイルをスキャンしています。しばらく時間がかかる場合があります。"
+
+msgid "Nemp is searching for missing files in your media library. "
+msgstr "Nemp がメディアライブラリ内の欠落ファイルを検索しています。"
+
+msgid "Nemp is searching for new files or updating the library. Do you really want to quit now?"
+msgstr "Nemp が新しいファイルを検索中、またはライブラリを更新中です。本当に今すぐ終了しますか？"
+
+msgid "Nemp is searching for some additional tags for your music files."
+msgstr "Nemp が音楽ファイルの追加タグを検索しています。"
+
+msgid "Nemp is searching your computer for new files to add to your playlist."
+msgstr "Nemp がプレイリストに追加する新しいファイルをコンピュータ内で検索しています。"
+
+msgid "Nemp is searching your computer for new music files."
+msgstr "Nemp が新しい音楽ファイルをコンピュータ内で検索しています。"
+
+msgid "Nemp is updating the meta data (ID3tags) of your music files."
+msgstr "Nemp が音楽ファイルのメタデータ (ID3タグ) を更新しています。"
+
+msgid ""
+"Nemp is updating your Media Library right now. \n"
+"\n"
+"Some functions are disabled during this process. You can cancel the current operation at any time."
+msgstr ""
+"Nemp は現在メディアライブラリを更新中です。\n"
+"\n"
+"この処理中は一部の機能が無効になります。現在の操作はいつでもキャンセルできます。"
+
+msgid "Nemp is updating your media library right now."
+msgstr "Nemp は現在メディアライブラリを更新中です。"
+
+msgid "Nemp main window"
+msgstr "Nemp メインウィンドウ"
+
+msgid "Nemp media library"
+msgstr "Nemp メディアライブラリ"
+
+msgid "Nemp medialibrary (*.gmp)|*.gmp"
+msgstr "Nemp メディアライブラリ (*.gmp)|*.gmp"
+
+msgid "Nemp portable"
+msgstr "Nemp ポータブル"
+
+msgid ""
+"Nemp recognized and resolved some inconsistencies with the new tags (details below).\n"
+"\n"
+msgstr ""
+"Nemp は新しいタグに関するいくつかの不整合を認識し、解決しました (詳細は下記)。\n"
+"\n"
+
+msgid ""
+"Nemp recognized some inconsistencies with the new tag rules (details below).\n"
+"Click \"OK\" to resolve the inconsistencies by removing/changing the existing rules or\n"
+"Click \"Ignore\" to ignore the warnings and add the new tag rules anyway.\n"
+"\n"
+"WARNING: Ignoring these inconsistencies could lead to unpredictable behavior when adding new tags to audio files.\n"
+"\n"
+msgstr ""
+"Nemp は新しいタグルールに関するいくつかの不整合を認識しました (詳細は下記)。\n"
+"「OK」をクリックすると、既存のルールを削除/変更して不整合を解決します。\n"
+"「無視」をクリックすると、警告を無視して新しいタグルールを追加します。\n"
+"\n"
+"警告 : これらの不整合を無視すると、オーディオファイルに新しいタグを追加する際に予期しない動作が発生する可能性があります。\n"
+"\n"
+
+msgid ""
+"Nemp recognized some inconsistencies with the new tags (details below).\n"
+"Click \"OK\" to resolve the inconsistencies automatically or\n"
+"Click \"Ignore\" to ignore the warnings and set the new tags anyway.\n"
+"\n"
+msgstr ""
+"Nemp は新しいタグに関するいくつかの不整合を認識しました (詳細は下記)。\n"
+"「OK」をクリックすると不整合を自動的に解決します。\n"
+"「無視」をクリックすると、警告を無視して新しいタグを設定します。\n"
+"\n"
+
+msgid ""
+"Nemp tries to find a proper cover art for your audio files within the ID3-Tag or the directory of the file. If no cover art was found, Nemp can try to download the missing cover art from last.fm. This image "
+"will be saved within the directory of the respective audio file. "
+msgstr ""
+"Nemp は ID3 タグまたはファイルのディレクトリ内で適切なカバーアートを探します。カバーアートが見つからない場合、Nemp は last.fm から不足しているカバーアートをダウンロードしようとします。この画像は、それぞれの"
+"オーディオファイルのディレクトリ内に保存されます。"
+
+msgid "Nemp will close at the end of the playlist."
+msgstr "Nemp はプレイリストの終了時に閉じます。"
+
+msgid "Nemp will close in %s."
+msgstr "Nemp は %s 後に閉じます。"
+
+msgid "Nemp will close now."
+msgstr "Nemp は今すぐ閉じます。"
+
+msgid "Nemp will stop at the end of the playlist."
+msgstr "Nemp はプレイリストの終了時に停止します。"
+
+msgid "Nemp will stop in %s."
+msgstr "Nemp は %s 後に停止します。"
+
+msgid "Nemp will stop now."
+msgstr "Nemp は今すぐ停止します。"
+
+msgid "Nemp will stop playback after current title."
+msgstr "Nemp は現在のタイトルの後に再生を停止します。"
+
+msgid "Nemp will try to adjust drive letters, when USB drives with your music are used at different computers."
+msgstr "Nemp は、音楽が保存された USB ドライブが異なるコンピュータで使用された場合、ドライブレターを調整しようとします。"
+
+msgid "Nemp48.ico"
+msgstr "Nemp48.ico"
+
+msgid "Nemp: Add tags"
+msgstr "Nemp: タグを追加"
+
+msgid "Nemp: Calculating ReplayGain"
+msgstr "Nemp: ReplayGainを計算中"
+
+msgid "Nemp: Cleanup media library"
+msgstr "Nemp: メディアライブラリをクリーンアップ"
+
+msgid "Nemp: Cleanup update"
+msgstr "Nemp: アップデートをクリーンアップ"
+
+msgid "Nemp: Congratulations!"
+msgstr "Nemp: おめでとうございます！"
+
+msgid "Nemp: Copy playlist to USB"
+msgstr "Nemp: プレイリストをUSBにコピー"
+
+msgid "Nemp: Countdown"
+msgstr "Nemp: カウントダウン"
+
+msgid "Nemp: Edit Coverflow"
+msgstr "Nemp: カバーフローを編集"
+
+msgid "Nemp: Edit layer in tree view"
+msgstr "Nemp: ツリービューのレイヤーを編集"
+
+msgid "Nemp: Equalizer and effects"
+msgstr "Nemp: イコライザーとエフェクト"
+
+msgid "Nemp: Export"
+msgstr "Nemp: エクスポート"
+
+msgid "Nemp: Faulty installation"
+msgstr "Nemp: インストールに問題があります"
+
+msgid "Nemp: Form designer"
+msgstr "Nemp: フォームデザイナー"
+
+msgid "Nemp: Messages"
+msgstr "Nemp: メッセージ"
+
+msgid "Nemp: New category layer"
+msgstr "Nemp: 新しいカテゴリレイヤー"
+
+msgid "Nemp: New layer in tree view"
+msgstr "Nemp: ツリービューの新しいレイヤー"
+
+msgid "Nemp: Play webstream"
+msgstr "Nemp: ウェブストリームを再生"
+
+msgid "Nemp: Player logfile"
+msgstr "Nemp: プレイヤーログファイル"
+
+msgid "Nemp: Playlist duplicates"
+msgstr "Nemp: プレイリストの重複"
+
+msgid "Nemp: Playlist editor"
+msgstr "Nemp: プレイリストエディター"
+
+msgid "Nemp: Process completed."
+msgstr "Nemp: 処理が完了しました。"
+
+msgid "Nemp: Rename tag"
+msgstr "Nemp: タグを変更"
+
+msgid "Nemp: Search in the library"
+msgstr "Nemp: ライブラリ内を検索"
+
+msgid "Nemp: Update"
+msgstr "Nemp: アップデート"
+
+msgid "Nemp: Work in progress ..."
+msgstr "Nemp: 処理中 ..."
+
+msgid "Nemp_Playlist_Icons.ico"
+msgstr "Nemp_Playlist_Icons.ico"
+
+msgid "New"
+msgstr "新規"
+
+msgid "New ..."
+msgstr "新規 ..."
+
+msgid "New beta version available: %s"
+msgstr "新しいベータ版が利用可能です : %s"
+
+msgid "New category"
+msgstr "新しいカテゴリ"
+
+msgid "New data frame"
+msgstr "新しいデータフレーム"
+
+msgid "New drive connected: Collecting data."
+msgstr "新しいドライブが接続されました : データを収集中。"
+
+msgid "New favorite playlist"
+msgstr "新しいお気に入りプレイリスト"
+
+msgid "New layout"
+msgstr "新しいレイアウト"
+
+msgid "New station"
+msgstr "新しい局"
+
+msgid "New station data"
+msgstr "新しい局のデータ"
+
+msgid "New tag to add:"
+msgstr "追加する新しいタグ :"
+
+msgid "New template"
+msgstr "新しいテンプレート"
+
+msgid "New version available"
+msgstr "新しいバージョンが利用可能です"
+
+msgid "New version available: %s"
+msgstr "新しいバージョンが利用可能です : %s"
+
+msgid "Next preset"
+msgstr "次のプリセット"
+
+msgid "Next title"
+msgstr "次のタイトル"
+
+msgid "Next track"
+msgstr "次のトラック"
+
+msgid "No"
+msgstr "いいえ"
+
+msgid "No 3D-support"
+msgstr "3D 非対応"
+
+msgid "No CD drives found."
+msgstr "CD ドライブが見つかりません。"
+
+msgid "No additional Tags found."
+msgstr "追加タグは見つかりませんでした。"
+
+msgid "No additional Tags set."
+msgstr "追加タグは設定されていません。"
+
+msgid "No additional Tags set. Click here to add some."
+msgstr "追加タグは設定されていません。ここをクリックして追加してください。"
+
+msgid "No cover available"
+msgstr "カバーが利用できません"
+
+msgid "No coverfile found"
+msgstr "カバーファイルが見つかりません"
+
+msgid "No duplicate information available"
+msgstr "重複情報は利用できません"
+
+msgid "No duplicates found in the playlist."
+msgstr "プレイリストに重複は見つかりませんでした。"
+
+msgid "No fading between live tracks"
+msgstr "ライブトラック間ではフェードしない"
+
+msgid "No file selected"
+msgstr "ファイルが選択されていません"
+
+msgid "No files flagged with this marker."
+msgstr "このマーカーが付いたファイルはありません。"
+
+msgid "No files have been removed from the library."
+msgstr "ライブラリから削除されたファイルはありません。"
+
+msgid "No files to display. The playlist is empty."
+msgstr "表示するファイルがありません。プレイリストは空です。"
+
+msgid "No information available"
+msgstr "情報は利用できません"
+
+msgid "No lyrics available"
+msgstr "歌詞は利用できません"
+
+msgid "No lyrics found"
+msgstr "歌詞が見つかりません"
+
+msgid "No new messages, everything is fine. :)"
+msgstr "新しいメッセージはありません。すべて正常です。 :)"
+
+msgid "No recent searches"
+msgstr "最近の検索はありません"
+
+msgid "No search phrase"
+msgstr "検索フレーズがありません"
+
+msgid "No skins found"
+msgstr "スキンが見つかりません"
+
+msgid "No special handling of missing cover"
+msgstr "カバー欠落時の特別な処理は行わない"
+
+msgid "No title information available."
+msgstr "タイトル情報は利用できません。"
+
+msgid "No. Nemp will not add *everything* to the playlist."
+msgstr "いいえ。Nemp は*すべて*をプレイリストに追加することはありません。"
+
+msgid "Normal"
+msgstr "標準"
+
+msgid "Normal (500x500)"
+msgstr "標準 (500x500)"
+
+msgid "Normal: Joint Stereo, Bold: Full Stereo, Italic: Mono"
+msgstr "標準 : ジョイントステレオ、太字 : フルステレオ、斜体 : モノラル"
+
+msgid "Not available metadata"
+msgstr "利用できないメタデータ"
+
+msgid "Not connected"
+msgstr "接続されていません"
+
+msgid "Not enough memory"
+msgstr "メモリが不足しています"
+
+msgid "Not enough memory. Accelerated search has been disabled."
+msgstr "メモリが不足しています。高速検索は無効化されました。"
+
+msgid "Not enough memory. Choose OK to continue with next file, or cancel the copying process."
+msgstr "メモリが不足しています。OKを選択して次のファイルに進むか、コピープロセスをキャンセルします。"
+
+msgid "Not enough memory. The accelerated search for lyrics has been disabled."
+msgstr "メモリが不足しています。歌詞の高速検索は無効化されました。"
+
+msgid "Not enough memory. The settings for the accelerated search have been reduced to a minimum."
+msgstr "メモリが不足しています。高速検索の設定は最小限に抑えられました。"
+
+msgid "Not supported"
+msgstr "サポートされていません"
+
+msgid "Note that this only makes sense with mode \"Repeat off\" and no webstreams in the playlist."
+msgstr "これは「リピートオフ」モードで、プレイリストにウェブストリームがない場合にのみ意味があることに注意してください。"
+
+msgid "Note: Cover art already displayed in the player will not change until the cover art is loaded again."
+msgstr "注 : プレイヤーに既に表示されているカバーアートは、カバーアートが再度読み込まれるまで変更されません。"
+
+msgid "Note: The current skin does not support advanced skinning."
+msgstr "注 : 現在のスキンは高度なスキニングをサポートしていません。"
+
+msgid "Note: The password to exit the Nemp Party-Mode is \"%s\"."
+msgstr "注 : Nemp パーティーモードを終了するためのパスワードは \"%s\" です。"
+
+msgid "Note: You can turn off this message in the settings dialog -> File management."
+msgstr "注 : このメッセージは設定ダイアログ -> ファイル管理でオフにできます。"
+
+msgid "Nothing found. Try another search."
+msgstr "見つかりませんでした。別の検索を試してください。"
+
+msgid "Nothing to display. The library is empty."
+msgstr "表示するものはありません。ライブラリは空です。"
+
+msgid "Nothing to play ... drop a music file here to start"
+msgstr "再生するものはありません ... 開始するには音楽ファイルをここにドロップしてください"
+
+msgid "Nothing, but thank you for the information."
+msgstr "特にありませんが、情報をありがとうございます。"
+
+msgid "Notify on Beta-releases"
+msgstr "ベータリリースを通知"
+
+msgid "Notify on Beta-releases. As Beta-software is normally instable, this is recommended for advanced users only."
+msgstr "ベータリリースも通知します。ベータ版ソフトウェアは通常不安定なため、上級ユーザーのみに推奨されます。"
+
+msgid "Now Drag and Drop the above GUI-Elements to the panes you've created."
+msgstr "上記の GUI 要素を作成したペインにドラッグ＆ドロップしてください。"
+
+msgid "Number of shown tags"
+msgstr "表示するタグの数"
+
+msgid "O"
+msgstr "O"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "Obsolete directories"
+msgstr "旧ディレクトリ"
+
+msgid "Obsolete files"
+msgstr "旧ファイル"
+
+msgid "Off"
+msgstr "オフ"
+
+msgid "Ok"
+msgstr "OK"
+
+msgid "On"
+msgstr "オン"
+
+msgid "On every start"
+msgstr "起動するたび"
+
+msgid "On position change"
+msgstr "位置変更時"
+
+msgid "On title change"
+msgstr "タイトル変更時"
+
+msgid "Online help"
+msgstr "オンラインヘルプ"
+
+msgid "Only %d titles found with these settings. Take these files as new playlist?"
+msgstr "これらの設定では %d 件のタイトルしか見つかりませんでした。これらのファイルを新しいプレイリストとしますか？"
+
+msgid "Only Cover"
+msgstr "カバーのみ"
+
+msgid "Only Text"
+msgstr "テキストのみ"
+
+msgid "Only cover/lyrics"
+msgstr "カバー/歌詞のみ"
+
+msgid "Only details"
+msgstr "詳細のみ"
+
+msgid "Only selected"
+msgstr "選択のみ"
+
+msgid "Only the following types:"
+msgstr "以下のタイプのみ :"
+
+msgid "Open cloud editor"
+msgstr "クラウドエディターを開く"
+
+msgid "Open data directory"
+msgstr "データディレクトリを開く"
+
+msgid "Open install directory"
+msgstr "インストールディレクトリを開く"
+
+msgid "Open plugin directory"
+msgstr "プラグインディレクトリを開く"
+
+msgid "Open program directory"
+msgstr "プログラムディレクトリを開く"
+
+msgid "Open selected image file"
+msgstr "選択した画像ファイルを開く"
+
+msgid "Open template directory"
+msgstr "テンプレートディレクトリを開く"
+
+msgid "Operation cancelled"
+msgstr "操作がキャンセルされました"
+
+msgid "Operation complete. No new files have been added to the media library."
+msgstr "操作が完了しました。メディアライブラリに新しいファイルは追加されませんでした。"
+
+msgid "Original"
+msgstr "オリジナル"
+
+msgid "Original key"
+msgstr "元のキー"
+
+msgid "Output devices"
+msgstr "出力デバイス"
+
+msgid "Overall progress"
+msgstr "全体の進捗"
+
+msgid "Overview"
+msgstr "概要"
+
+msgid "Overwrite existing file"
+msgstr "既存のファイルを上書き"
+
+msgid "P"
+msgstr "P"
+
+msgid "Panel1"
+msgstr "パネル1"
+
+msgid "Parent directory"
+msgstr "親ディレクトリ"
+
+msgid "Parse stream playlist and add all contained streams to playlist"
+msgstr "ストリームプレイリストを解析し、含まれるすべてのストリームをプレイリストに追加"
+
+msgid "Party mode"
+msgstr "パーティーモード"
+
+msgid "Password"
+msgstr "パスワード"
+
+msgid "Password (Admin)"
+msgstr "パスワード (管理者)"
+
+msgid "Password to exit Party-Mode"
+msgstr "パーティーモード終了パスワード"
+
+msgid "Paste"
+msgstr "貼り付け"
+
+msgid "Paste from clipboard"
+msgstr "クリップボードから貼り付け"
+
+msgid "Path"
+msgstr "パス"
+
+msgid "Path && Filename"
+msgstr "パス && ファイル名"
+
+msgid "Pattern for filenames"
+msgstr "ファイル名のパターン"
+
+msgid "Pause"
+msgstr "一時停止"
+
+msgid "Pause between tracks"
+msgstr "トラック間の一時停止"
+
+msgid "Period"
+msgstr "期間"
+
+msgid "Permit Html audio"
+msgstr "HTML オーディオを許可"
+
+msgid "Permit access to the media library (read only)"
+msgstr "メディアライブラリへのアクセスを許可 (読み取り専用)"
+
+msgid "Permit downloading files"
+msgstr "ファイルのダウンロードを許可"
+
+msgid "Permit remote control of the player"
+msgstr "プレイヤーのリモート操作を許可"
+
+msgid "Permit voting for files"
+msgstr "ファイルへの投票を許可"
+
+msgid "Picture type"
+msgstr "画像タイプ"
+
+msgid "Pictures (cover art)"
+msgstr "画像 (カバーアート)"
+
+msgid "Play"
+msgstr "再生"
+
+msgid "Play (and clear current playlist)"
+msgstr "再生 (現在のプレイリストをクリア)"
+
+msgid "Play CD-Audio"
+msgstr "CD オーディオを再生"
+
+msgid "Play Now"
+msgstr "今すぐ再生"
+
+msgid "Play all tracks of this album (and delete current playlist)"
+msgstr "このアルバムのすべてのトラックを再生 (現在のプレイリストを削除)"
+
+msgid "Play all tracks of this artist (and delete current playlist)"
+msgstr "このアーティストのすべてのトラックを再生 (現在のプレイリストを削除)"
+
+msgid "Play all tracks of this directory (and delete current playlist)"
+msgstr "このディレクトリのすべてのトラックを再生 (現在のプレイリストを削除)"
+
+msgid "Play all tracks of this genre (and delete current playlist)"
+msgstr "このジャンルのすべてのトラックを再生 (現在のプレイリストを削除)"
+
+msgid "Play all tracks of this playlist (and delete current playlist)"
+msgstr "このプレイリストのすべてのトラックを再生 (現在のプレイリストを削除)"
+
+msgid "Play all tracks of this webradio station (and delete current playlist)"
+msgstr "このウェブラジオ局のすべてのトラックを再生 (現在のプレイリストを削除)"
+
+msgid "Play all tracks of this year (and delete current playlist)"
+msgstr "この年のすべてのトラックを再生 (現在のプレイリストを削除)"
+
+msgid "Play all tracks with this tag (and delete current playlist)"
+msgstr "このタグを持つすべてのトラックを再生 (現在のプレイリストを削除)"
+
+msgid "Play backwards"
+msgstr "逆再生"
+
+msgid "Play counter"
+msgstr "再生カウント"
+
+msgid "Play files"
+msgstr "ファイルを再生"
+
+msgid "Play forwards"
+msgstr "順再生"
+
+msgid "Play in Headset"
+msgstr "ヘッドセットで再生"
+
+msgid "Play in Nemp"
+msgstr "Nemp で再生"
+
+msgid "Play in headset"
+msgstr "ヘッドセットで再生"
+
+msgid "Play webstream"
+msgstr "ウェブストリームを再生"
+
+msgid "Play/Pause"
+msgstr "再生/一時停止"
+
+msgid "Playback"
+msgstr "再生"
+
+msgid "Playback direction"
+msgstr "再生方向"
+
+msgid "Playback speed"
+msgstr "再生速度"
+
+msgid "Played %d times"
+msgstr "%d 回再生"
+
+msgid "Player"
+msgstr "プレイヤー"
+
+msgid "Player and Playlist"
+msgstr "プレイヤーとプレイリスト"
+
+msgid "Playlist"
+msgstr "プレイリスト"
+
+msgid "Playlist and Controls are always visible."
+msgstr "プレイリストとコントロールは常に表示されます。"
+
+msgid "Playlist and medialist"
+msgstr "プレイリストとメディアリスト"
+
+msgid "Playlist files (e.g. http://myradio.com/tunein.pls)"
+msgstr "プレイリストファイル (例 : http://myradio.com/tunein.pls)"
+
+msgid "Playlist formats"
+msgstr "プレイリストフォーマット"
+
+msgid "Playlist formatting"
+msgstr "プレイリストフォーマット"
+
+msgid "Playlist log"
+msgstr "プレイリストログ"
+
+msgid "Playlist name"
+msgstr "プレイリスト名"
+
+msgid "Playlist parsing"
+msgstr "プレイリスト解析"
+
+msgid "Playlist saved."
+msgstr "プレイリストが保存されました。"
+
+msgid "Playlist saved: \"%s\""
+msgstr "プレイリストを保存しました : \"%s\""
+
+msgid "Playlists"
+msgstr "プレイリスト"
+
+msgid "Playlists on the selected drive"
+msgstr "選択したドライブ上のプレイリスト"
+
+msgid "Please create %d more pane(s) so you can place all GUI-Elements on the form."
+msgstr "すべての GUI 要素をフォームに配置できるように、さらに %d 個のペインを作成してください。"
+
+msgid "Please create a new favorite playlist first."
+msgstr "最初に新しいお気に入りプレイリストを作成してください。"
+
+msgid "Please enter a name for the new template"
+msgstr "新しいテンプレートの名前を入力してください"
+
+msgid "Please enter a value for the new meta data frame."
+msgstr "新しいメタデータフレームの値を入力してください。"
+
+msgid "Please enter the password to exit the Nemp Party-Mode"
+msgstr "Nemp パーティーモードを終了するためのパスワードを入力してください"
+
+msgid "Please insert a name for the new preset."
+msgstr "新しいプリセットの名前を入力してください。"
+
+msgid "Please report this error."
+msgstr "このエラーを報告してください。"
+
+msgid "Please select an option in the tree view or double click to show all files."
+msgstr "ツリービューでオプションを選択するか、ダブルクリックしてすべてのファイルを表示してください。"
+
+msgid "Please select the tag you want to ignore in the list."
+msgstr "リストから無視したいタグを選択してください。"
+
+msgid "Please select the tag you want to rename in the list."
+msgstr "リストから変更したいタグを選択してください。"
+
+msgid "Pleaser enter only one tag, and not a comma separated list of tags."
+msgstr "タグは1つだけ入力してください。カンマ区切りのリストは入力しないでください。"
+
+msgid "Pnl_CoverFlowLabel"
+msgstr "Pnl_CoverFlowLabel"
+
+msgid "Port"
+msgstr "ポート"
+
+msgid "Position in playlist: %d"
+msgstr "プレイリスト内の位置 : %d"
+
+msgid "Position of cover art (z-axis)"
+msgstr "カバーアートの位置 (Z軸)"
+
+msgid "Pre-amplification"
+msgstr "プリアンプ"
+
+msgid "Pre-amplification for tracks with ReplayGain information"
+msgstr "ReplayGain 情報があるトラックのプリアンプ"
+
+msgid "Pre-amplification for tracks without ReplayGain information"
+msgstr "ReplayGain 情報がないトラックのプリアンプ"
+
+msgid "Prefer Album-Artist when grouping by \"Artist\""
+msgstr "「アーティスト」でグループ化する際はアルバムアーティストを優先"
+
+msgid "Prefer AlbumGain"
+msgstr "アルバムゲインを優先"
+
+msgid "Prefer CDDB information over CD-Text"
+msgstr "CD-Text よりも CDDB 情報を優先"
+
+msgid "Prefer online data over CD-Text"
+msgstr "CD-Text よりもオンラインデータを優先"
+
+msgid "Preferences"
+msgstr "環境設定"
+
+msgid "Preparing media library"
+msgstr "メディアライブラリを準備中"
+
+msgid "Preparing media library..."
+msgstr "メディアライブラリを準備中..."
+
+msgid "Prevent clipping"
+msgstr "クリッピングを防止"
+
+msgid "Preview"
+msgstr "プレビュー"
+
+msgid "Previous preset"
+msgstr "前のプリセット"
+
+msgid "Previous searchs"
+msgstr "以前の検索"
+
+msgid "Previous sessions (from logfile)"
+msgstr "以前のセッション (ログファイルから)"
+
+msgid "Previous title"
+msgstr "前のタイトル"
+
+msgid "Previous track"
+msgstr "前のトラック"
+
+msgid "Program directory"
+msgstr "プログラムディレクトリ"
+
+msgid "Programmed with CodeGear Delphi 2009 - 11.3"
+msgstr "CodeGear Delphi 2009 - 11.3 で開発"
+
+msgid "Properties"
+msgstr "プロパティ"
+
+msgid "Properties \"Album\" and \"Artist\""
+msgstr "プロパティ「アルバム」と「アーティスト」"
+
+msgid "Property \"Album\""
+msgstr "プロパティ「アルバム」"
+
+msgid "Property \"Album\" and Directory"
+msgstr "プロパティ「アルバム」とディレクトリ"
+
+msgid "Property used to group the audiofiles"
+msgstr "オーディオファイルのグループ化に使用するプロパティ"
+
+msgid "Protection"
+msgstr "保護"
+
+msgid "Q"
+msgstr "Q"
+
+msgid "QRCode"
+msgstr "QR コード"
+
+msgid "Quality of cover art in the media library"
+msgstr "メディアライブラリ内のカバーアートの品質"
+
+msgid "Quick access to metadata (\"ID3-Tags\")"
+msgstr "メタデータへのクイックアクセス (「ID3 タグ」)"
+
+msgid "Quick refresh"
+msgstr "クイック更新"
+
+msgid "Quick search performance"
+msgstr "クイック検索のパフォーマンス"
+
+msgid "Quicksearch (library)"
+msgstr "クイック検索 (ライブラリ)"
+
+msgid "R"
+msgstr "R"
+
+msgid "Random mode"
+msgstr "ランダムモード"
+
+msgid "Random playback"
+msgstr "ランダム再生"
+
+msgid "Randomize playlist after the last track."
+msgstr "最終トラック後にプレイリストをランダム化。"
+
+msgid "Rating"
+msgstr "評価"
+
+msgid "Rating: %.1f of 5 stars"
+msgstr "評価 : 5つ星中 %.1f"
+
+msgid "Rating: %.1f of 5 stars, played %d times"
+msgstr "評価 : 5つ星中 %.1f、%d 回再生"
+
+msgid "Read error"
+msgstr "読み取りエラー"
+
+msgid "Read metadata from the audiofiles or just use the data stored in the playlistfile."
+msgstr "オーディオファイルからメタデータを読み取るか、プレイリストファイルに保存されたデータのみを使用します。"
+
+msgid "Reading file information ... %s"
+msgstr "ファイル情報を読み取り中 ... %s"
+
+msgid "Really random"
+msgstr "完全ランダム"
+
+msgid "Recent playlists"
+msgstr "最近のプレイリスト"
+
+msgid "Recent searches"
+msgstr "最近の検索"
+
+msgid "Recently added"
+msgstr "最近追加"
+
+msgid "Recommended"
+msgstr "推奨"
+
+msgid "Recording settings"
+msgstr "録音設定"
+
+msgid "Recording..."
+msgstr "録音中..."
+
+msgid "Recordings (webradio)"
+msgstr "録音 (ウェブラジオ)"
+
+msgid "Reduce main volume before when playing a jingle"
+msgstr "ジングル再生時にメイン音量を下げる"
+
+msgid "Reduce main volume to"
+msgstr "メイン音量を下げる"
+
+msgid "Reflection"
+msgstr "反射"
+
+msgid "Refresh"
+msgstr "更新"
+
+msgid "Refresh (Playlists only)"
+msgstr "更新 (プレイリストのみ)"
+
+msgid "Refresh (rescan all files)"
+msgstr "更新 (全ファイルを再スキャン)"
+
+msgid "Refresh Coverflow"
+msgstr "カバーフローを更新"
+
+msgid "Refresh files"
+msgstr "ファイルを更新"
+
+msgid "Refresh selected"
+msgstr "選択を更新"
+
+msgid "Refresh this form whenever you select another file in the main window."
+msgstr "メインウィンドウで別のファイルを選択するたびにこのフォームを更新します。"
+
+msgid "Refreshing file information (%d%%)"
+msgstr "ファイル情報を更新中 (%d%%)"
+
+msgid "Refreshing file information ... %s"
+msgstr "ファイル情報を更新中 ... %s"
+
+msgid "Refreshing files complete."
+msgstr "ファイルの更新が完了しました。"
+
+msgid "Refreshing files complete. Preparing media library ..."
+msgstr "ファイルの更新が完了しました。メディアライブラリを準備中 ..."
+
+msgid "Register Nemp as default application for the selected filetypes."
+msgstr "Nemp を選択したファイルタイプのデフォルトアプリケーションとして登録します。"
+
+msgid "Register Nemp as the default player"
+msgstr "Nemp をデフォルトプレイヤーとして登録"
+
+msgid "Register file types"
+msgstr "ファイルタイプを登録"
+
+msgid "Regular playlist (*.pls)|*.pls|Nemp webstream list (*.nwl)|*.nwl"
+msgstr "通常のプレイリスト (*.pls)|*.pls|Nemp ウェブストリームリスト (*.nwl)|*.nwl"
+
+msgid "Regular title"
+msgstr "通常のタイトル"
+
+msgid "Regular title (fallback)"
+msgstr "通常のタイトル (フォールバック)"
+
+msgid "Reinit player engine now"
+msgstr "プレイヤーエンジンを今すぐ再初期化"
+
+msgid "Reinit player engine now."
+msgstr "プレイヤーエンジンを今すぐ再初期化します。"
+
+msgid "Reinitialize player engine on wakeup"
+msgstr "ウェイクアップ時にプレイヤーエンジンを再初期化"
+
+msgid "Release Year"
+msgstr "リリース年"
+
+msgid "Remark"
+msgstr "備考"
+
+msgid "Remember last track position"
+msgstr "最後のトラック位置を記憶"
+
+msgid "Remember track position when playing a song directly from the library"
+msgstr "ライブラリから直接曲を再生するときにトラック位置を記憶"
+
+msgid "Remote control denied."
+msgstr "リモート操作が拒否されました。"
+
+msgid "Remove an existing tag and add a \"Ignore rule\""
+msgstr "既存のタグを削除し、「無視ルール」を追加"
+
+msgid "Remove from category"
+msgstr "カテゴリから削除"
+
+msgid "Remove from form"
+msgstr "フォームから削除"
+
+msgid "Remove log entries older than"
+msgstr "より古いログエントリを削除"
+
+msgid "Remove missing files from checked drives"
+msgstr "チェックされたドライブから欠落ファイルを削除"
+
+msgid "Remove selected"
+msgstr "選択を削除"
+
+msgid "Remove selected favorite playlist"
+msgstr "選択したお気に入りプレイリストを削除"
+
+msgid "Remove selected files"
+msgstr "選択したファイルを削除"
+
+msgid "Remove selected files from current category"
+msgstr "現在のカテゴリから選択したファイルを削除"
+
+msgid "Remove selected playlist"
+msgstr "選択したプレイリストを削除"
+
+msgid "Remove tag"
+msgstr "タグを削除"
+
+msgid "Remove tag from this file"
+msgstr "このファイルからタグを削除"
+
+msgid "Removing ReplayGain values from %d files ..."
+msgstr "%d 個のファイルからReplayGain値を削除中 ..."
+
+msgid "Removing files from the media library..."
+msgstr "メディアライブラリからファイルを削除中..."
+
+msgid "Rename \"%s\" to:"
+msgstr "\"%s\" を次の名前に変更:"
+
+msgid "Rename an existing tag and add a \"Rename rule\""
+msgstr "既存のタグを変更し、「置換ルール」を追加"
+
+msgid "Rename files"
+msgstr "ファイル名を変更"
+
+msgid "Rename rules"
+msgstr "置換ルール"
+
+msgid "Rename tag in this file"
+msgstr "このファイルのタグを変更"
+
+msgid "Rename the selected tags to:"
+msgstr "選択したタグを次の名前に変更:"
+
+msgid "Rename this file"
+msgstr "このファイル名を変更"
+
+msgid "Repeat all"
+msgstr "すべて繰り返し"
+
+msgid "Repeat current entry in cuesheet on \"Repeat title\""
+msgstr "「タイトル繰り返し」時にキューのシートの現在のエントリを繰り返す"
+
+msgid "Repeat off"
+msgstr "繰り返しなし"
+
+msgid "Repeat only the current part of a file instead of the whole track when \"Repeat title\" is selected"
+msgstr "「タイトル繰り返し」選択時、トラック全体ではなくファイルの現在の部分のみを繰り返す"
+
+msgid "Repeat title"
+msgstr "タイトル繰り返し"
+
+msgid "Replace spaces in filenames by underscores"
+msgstr "ファイル名のスペースをアンダースコアに置換"
+
+msgid "Replace with"
+msgstr "置換後"
+
+msgid "ReplayGain"
+msgstr "ReplayGain"
+
+msgid "ReplayGain (selected files)"
+msgstr "ReplayGain (選択したファイル)"
+
+msgid "ReplayGain calculation aborted by user"
+msgstr "ReplayGain 計算がユーザーにより中止されました"
+
+msgid "ReplayGain calculation complete"
+msgstr "ReplayGain 計算が完了しました"
+
+msgid "ReplayGain calculation is already running. Please wait until the current calculation is finished."
+msgstr "ReplayGain 計算は既に実行中です。現在の計算が終了するまでお待ちください。"
+
+msgid "ReplayGain values"
+msgstr "ReplayGain値"
+
+msgid "ReplayGain: %.2f dB"
+msgstr "ReplayGain : %.2f dB"
+
+msgid "ReplayGain: %.2f dB (Album %.2f dB)"
+msgstr "ReplayGain : %.2f dB (アルバム %.2f dB)"
+
+msgid "ReplayGain: not available"
+msgstr "ReplayGain : 利用不可"
+
+msgid "Reset"
+msgstr "リセット"
+
+msgid "Reset cover in Media library"
+msgstr "メディアライブラリのカバーをリセット"
+
+msgid "Reset effects on start"
+msgstr "起動時にエフェクトをリセット"
+
+msgid "Reset equalizer on start"
+msgstr "起動時にイコライザーをリセット"
+
+msgid "Reset rating and play counter"
+msgstr "評価と再生カウントをリセット"
+
+msgid "Reset rating/playcounter"
+msgstr "評価/再生カウントをリセット"
+
+msgid "Reset tag cloud"
+msgstr "タグクラウドをリセット"
+
+msgid "Reset the default cover to the Nemp default cover"
+msgstr "デフォルトカバーを Nemp のデフォルトカバーにリセット"
+
+msgid "Reset to default"
+msgstr "デフォルトにリセット"
+
+msgid "Restart scrobbling."
+msgstr "スクロブリングを再開します。"
+
+msgid "Restore"
+msgstr "復元"
+
+msgid "Restore default settings"
+msgstr "デフォルト設定を復元"
+
+msgid "Restore the Nemp default Layout"
+msgstr "Nemp のデフォルトレイアウトを復元"
+
+msgid "Restrict counting to playlist"
+msgstr "カウントをプレイリストに制限"
+
+msgid "Restrict tags"
+msgstr "タグを制限"
+
+msgid "Restrict time"
+msgstr "時間を制限"
+
+msgid "Reverb"
+msgstr "リバーブ"
+
+msgid "Revert to current layout in the Nemp window"
+msgstr "Nemp ウィンドウの現在のレイアウトに戻す"
+
+msgid "Right"
+msgstr "右"
+
+msgid "Root layer: %s"
+msgstr "ルートレイヤー : %s"
+
+msgid "Row height"
+msgstr "行の高さ"
+
+msgid "S"
+msgstr "S"
+
+msgid "Sa&ve"
+msgstr "保存(&v)"
+
+msgid "Same artist and title"
+msgstr "同じアーティストとタイトル"
+
+msgid "Same file"
+msgstr "同じファイル"
+
+msgid "Same filename (but different directories)"
+msgstr "同じファイル名 (ただし異なるディレクトリ)"
+
+msgid "Sampler"
+msgstr "サンプラー"
+
+msgid "Samplerate"
+msgstr "サンプリングレート"
+
+msgid "Save"
+msgstr "保存"
+
+msgid "Save As"
+msgstr "名前を付けて保存"
+
+msgid "Save as"
+msgstr "名前を付けて保存"
+
+msgid "Save current playlist"
+msgstr "現在のプレイリストを保存"
+
+msgid "Save current playlist as new favorite"
+msgstr "現在のプレイリストを新しいお気に入りとして保存"
+
+msgid "Save current setting as"
+msgstr "現在の設定を次の名前で保存"
+
+msgid "Save media library on close"
+msgstr "終了時にメディアライブラリを保存"
+
+msgid "Save playlist \"\""
+msgstr "プレイリスト \"\" を保存"
+
+msgid "Save playlist \"%s\""
+msgstr "プレイリスト \"%s\" を保存"
+
+msgid "Save selected cover to file"
+msgstr "選択したカバーをファイルに保存"
+
+msgid "Save selection and do not show this dialog again."
+msgstr "選択を保存し、このダイアログを再度表示しない。"
+
+msgid "Save settings"
+msgstr "設定を保存"
+
+msgid "Save settings and close wizard?"
+msgstr "設定を保存してウィザードを閉じますか？"
+
+msgid "Saving is not possible. Please select favorite playlist first or create a new one."
+msgstr "保存できません。最初にお気に入りプレイリストを選択するか、新しく作成してください。"
+
+msgid "Saving media library..."
+msgstr "メディアライブラリを保存中..."
+
+msgid "Scan files in playlists on view"
+msgstr "表示時にプレイリスト内のファイルをスキャン"
+
+msgid "Scan for duplicates"
+msgstr "重複をスキャン"
+
+msgid "Scan now"
+msgstr "今すぐスキャン"
+
+msgid "Scan now for new or missing files, according to the settings"
+msgstr "設定に従って、新しいファイルまたは欠落ファイルを今すぐスキャン"
+
+msgid "Scan the following directories for new files on start"
+msgstr "起動時に以下のディレクトリを新しいファイルについてスキャン"
+
+msgid "Scan the playlist for duplicates again"
+msgstr "プレイリストの重複を再度スキャン"
+
+msgid "Scanning file \"%s\""
+msgstr "ファイル \"%s\" をスキャン中"
+
+msgid "Scanning music files for metadata ... %d/%d"
+msgstr "音楽ファイルのメタデータをスキャン中 ... %d/%d"
+
+msgid "Scanning playlists ... %s"
+msgstr "プレイリストをスキャン中 ... %s"
+
+msgid "Scanning playlists files ... %d/%d"
+msgstr "プレイリストファイルをスキャン中 ... %d/%d"
+
+msgid "Scro&bbler"
+msgstr "スクロブラー(&b)"
+
+msgid "Scrobble Log (Status: Idle)"
+msgstr "スクロブルログ (ステータス : アイドル)"
+
+msgid "Scrobble Log (Status: Offline)"
+msgstr "スクロブルログ (ステータス : オフライン)"
+
+msgid "Scrobble Log (Status: Sending data...)"
+msgstr "スクロブルログ (ステータス : データ送信中...)"
+
+msgid "Scrobble again!"
+msgstr "再度スクロブル！"
+
+msgid "Scrobble always"
+msgstr "常にスクロブル"
+
+msgid "Scrobble log (this session only)"
+msgstr "スクロブルログ (このセッションのみ)"
+
+msgid "Scrobble settings"
+msgstr "スクロブル設定"
+
+msgid "Scrobble this session"
+msgstr "このセッションをスクロブル"
+
+msgid "Scrobbler"
+msgstr "スクロブラー"
+
+msgid "Scrobbling skipped for approx  %d minutes. "
+msgstr "スクロブリングは約 %d 分間スキップされました。"
+
+msgid "Scroll title in taskbar"
+msgstr "タスクバーでタイトルをスクロール"
+
+msgid "Search"
+msgstr "検索"
+
+msgid "Search (Library)"
+msgstr "検索 (ライブラリ)"
+
+msgid "Search (Tags)"
+msgstr "検索 (タグ)"
+
+msgid "Search Lyrics"
+msgstr "歌詞を検索"
+
+msgid "Search complete, preparing data ..."
+msgstr "検索完了、データを準備中 ..."
+
+msgid "Search cover art in ..."
+msgstr "カバーアートを検索する場所 ..."
+
+msgid "Search for '%s'"
+msgstr "'%s' を検索"
+
+msgid "Search for Updates"
+msgstr "アップデートを検索"
+
+msgid "Search for coverfiles in the parent directory of the audiofile."
+msgstr "オーディオファイルの親ディレクトリでカバーファイルを検索。"
+
+msgid "Search for coverfiles in the specified subdirectory of the parent directory."
+msgstr "親ディレクトリの指定されたサブディレクトリでカバーファイルを検索。"
+
+msgid "Search for coverfiles in the specified subdirectory."
+msgstr "指定されたサブディレクトリでカバーファイルを検索。"
+
+msgid "Search for coverfiles within the directory of the audiofile"
+msgstr "オーディオファイルのディレクトリ内でカバーファイルを検索"
+
+msgid "Search for this album"
+msgstr "このアルバムを検索"
+
+msgid "Search for this artist"
+msgstr "このアーティストを検索"
+
+msgid "Search for this title"
+msgstr "このタイトルを検索"
+
+msgid "Search in the media library"
+msgstr "メディアライブラリ内を検索"
+
+msgid "Search in the playlist"
+msgstr "プレイリスト内を検索"
+
+msgid "Search options"
+msgstr "検索オプション"
+
+msgid "Search query too short. Please enter at least 2 characters."
+msgstr "検索クエリが短すぎます。少なくとも 2文字以上入力してください。"
+
+msgid "Search settings"
+msgstr "検索設定"
+
+msgid "Searching for audio files ... %d found"
+msgstr "オーディオファイルを検索中 ... %d 件見つかりました"
+
+msgid "Searching for music files ..."
+msgstr "音楽ファイルを検索中 ..."
+
+msgid "Searching for music files ... %s"
+msgstr "音楽ファイルを検索中 ... %s"
+
+msgid "Searching for music files completed. No music files could be found."
+msgstr "音楽ファイルの検索が完了しました。音楽ファイルは見つかりませんでした。"
+
+msgid "Searching for music files completed. The new files have been added to your playlist."
+msgstr "音楽ファイルの検索が完了しました。新しいファイルがプレイリストに追加されました。"
+
+msgid "Searching for new files ..."
+msgstr "新しいファイルを検索中 ..."
+
+msgid "Searching for new files ... %s"
+msgstr "新しいファイルを検索中 ... %s"
+
+msgid "Searching for new files aborted. No new files have been added to the media library."
+msgstr "新しいファイルの検索が中止されました。新しいファイルはメディアライブラリに追加されませんでした。"
+
+msgid "Searching for new files completed. The new files have been added to your media library."
+msgstr "新しいファイルの検索が完了しました。新しいファイルがメディアライブラリに追加されました。"
+
+msgid "Searching for skins"
+msgstr "スキンを検索中"
+
+msgid "Searching lyrics for %s"
+msgstr "%s の歌詞を検索中"
+
+msgid "Searching missing files ... %s"
+msgstr "欠落ファイルを検索中 ... %s"
+
+msgid "Searching tags for %s"
+msgstr "%s のタグを検索中"
+
+msgid "Secondary sortings"
+msgstr "二次ソート"
+
+msgid "Segoe UI"
+msgstr "Segoe UI"
+
+msgid "Select"
+msgstr "選択"
+
+msgid "Select CD"
+msgstr "CD を選択"
+
+msgid "Select a file you want to use as cover art"
+msgstr "カバーアートとして使用するファイルを選択"
+
+msgid "Select all"
+msgstr "すべて選択"
+
+msgid "Select an audiofile in the main window first."
+msgstr "最初にメインウィンドウでオーディオファイルを選択してください。"
+
+msgid "Select category"
+msgstr "カテゴリを選択"
+
+msgid "Select coverflow sort parameters"
+msgstr "カバーフローのソートパラメータを選択"
+
+msgid "Select directory"
+msgstr "ディレクトリを選択"
+
+msgid "Select file"
+msgstr "ファイルを選択"
+
+msgid "Select full row in media list"
+msgstr "メディアリストで行全体を選択"
+
+msgid "Select full row or just a single cell in the library."
+msgstr "ライブラリで行全体を選択するか、単一セルのみを選択します。"
+
+msgid "Select how you want to align cover art and text in the section \"File overview\""
+msgstr "「ファイル概要」セクションでのカバーアートとテキストの配置方法を選択"
+
+msgid "Select how you want to align the two tree views in the main window"
+msgstr "メインウィンドウでの2つのツリービューの配置方法を選択"
+
+msgid "Select image"
+msgstr "画像を選択"
+
+msgid "Select recommended filetypes only"
+msgstr "推奨ファイルタイプのみ選択"
+
+msgid "Select what you want to see in the section \"File overview\""
+msgstr "「ファイル概要」セクションに表示する内容を選択"
+
+msgid "Selection in Nemp playlist"
+msgstr "Nemp プレイリスト内の選択"
+
+msgid "Set end point (B)"
+msgstr "終了点を設定 (B)"
+
+msgid "Set end point for A-B repeat"
+msgstr "A-B リピートの終了点を設定"
+
+msgid "Set rating of selected files to"
+msgstr "選択したファイルの評価を設定"
+
+msgid "Set start point (A)"
+msgstr "開始点を設定 (A)"
+
+msgid "Set start point for A-B repeat"
+msgstr "A-B  リピートの開始点を設定"
+
+msgid "Set username and password to access your library"
+msgstr "ライブラリにアクセスするためのユーザー名とパスワードを設定"
+
+msgid "Set username and password to access your library."
+msgstr "ライブラリにアクセスするためのユーザー名とパスワードを設定します。"
+
+msgid "Settings"
+msgstr "設定"
+
+msgid "Settings for birthday mode are incomplete. Edit them now?"
+msgstr "バースデーモードの設定が不完全です。今すぐ編集しますか？"
+
+msgid "Settings for birthday mode are incomplete. Please correct them first."
+msgstr "バースデーモードの設定が不完全です。最初に修正してください。"
+
+msgid "Short description for the picture"
+msgstr "画像の簡単な説明"
+
+msgid "Show Log"
+msgstr "ログを表示"
+
+msgid "Show Nemp G15 App in foreground on start"
+msgstr "起動時に Nemp G15 アプリを前面に表示"
+
+msgid "Show advanced hints"
+msgstr "高度なヒントを表示"
+
+msgid "Show all contained files recursively (always possible by double click)"
+msgstr "含まれるすべてのファイルを再帰的に表示 (常にダブルクリックで可能)"
+
+msgid "Show all files where \"Album\" is missing"
+msgstr "「アルバム」が欠落しているすべてのファイルを表示"
+
+msgid "Show all files where \"Artist\" is missing"
+msgstr "「アーティスト」が欠落しているすべてのファイルを表示"
+
+msgid "Show all files where \"Title\" is missing"
+msgstr "「タイトル」が欠落しているすべてのファイルを表示"
+
+msgid "Show all files where Artist/Title/Album is missing"
+msgstr "アーティスト/タイトル/アルバムが欠落しているすべてのファイルを表示"
+
+msgid "Show all files within this directory"
+msgstr "このディレクトリ内のすべてのファイルを表示"
+
+msgid "Show category selection"
+msgstr "カテゴリ選択を表示"
+
+msgid "Show column \"Index\""
+msgstr "「インデックス」列を表示"
+
+msgid "Show context menu"
+msgstr "コンテキストメニューを表示"
+
+msgid "Show controls for A-B-Repeat"
+msgstr "A-B-リピートのコントロールを表示"
+
+msgid "Show cover art for albums in tree view"
+msgstr "ツリービューでアルバムのカバーアートを表示"
+
+msgid "Show cover in control panel"
+msgstr "コントロールパネルにカバーを表示"
+
+msgid "Show cover on Control Panel"
+msgstr "コントロールパネルにカバーを表示"
+
+msgid "Show equalizer and effect controls"
+msgstr "イコライザーとエフェクトのコントロールを表示"
+
+msgid "Show file overview"
+msgstr "ファイル概要を表示"
+
+msgid "Show headset controls"
+msgstr "ヘッドセットコントロールを表示"
+
+msgid "Show hints in the library or not."
+msgstr "ライブラリ内のヒントを表示するかどうか。"
+
+msgid "Show hints in the playlist and the media list"
+msgstr "プレイリストとメディアリストにヒントを表示"
+
+msgid "Show hints in the playlist or not."
+msgstr "プレイリスト内のヒントを表示するかどうか。"
+
+msgid "Show in Explorer"
+msgstr "エクスプローラーで表示"
+
+msgid "Show in Windows Explorer"
+msgstr "Windows エクスプローラーで表示"
+
+msgid "Show log"
+msgstr "ログを表示"
+
+msgid "Show main player controls"
+msgstr "メインプレイヤーコントロールを表示"
+
+msgid "Show marked files only from the current preselection"
+msgstr "現在の事前選択からマークされたファイルのみを表示"
+
+msgid "Show number of contained elements"
+msgstr "含まれる要素の数を表示"
+
+msgid "Show only files flagged with one of the markers."
+msgstr "いずれかのマーカーが付いたファイルのみを表示。"
+
+msgid "Show or hide the small cover art next to the player controls"
+msgstr "プレイヤーコントロールの横にある小さなカバーアートを表示/非表示"
+
+msgid "Show password when activating the Nemp Party Mode"
+msgstr "Nemp パーティーモードを有効にするときにパスワードを表示"
+
+msgid "Show playlist"
+msgstr "プレイリストを表示"
+
+msgid "Show playlist categories"
+msgstr "プレイリストカテゴリを表示"
+
+msgid "Show playlist file in Windows Explorer"
+msgstr "プレイリストファイルを Windows エクスプローラーで表示"
+
+msgid "Show query dialog when adding new directories"
+msgstr "新しいディレクトリを追加するときに確認ダイアログを表示"
+
+msgid "Show search results in \"real time\" or just after pressing the \"enter\"-key."
+msgstr "検索結果を「リアルタイム」で表示するか、「Enter」キーを押した後に表示するか。"
+
+msgid "Show splash screen"
+msgstr "スプラッシュ画面を表示"
+
+msgid "Show title list"
+msgstr "タイトルリストを表示"
+
+msgid "Show tray icon"
+msgstr "トレイアイコンを表示"
+
+msgid "Show treeview/coverflow/tagcloud"
+msgstr "ツリービュー/カバーフロー/タグクラウドを表示"
+
+msgid "Show web radio category"
+msgstr "ウェブラジオカテゴリを表示"
+
+msgid "Show webradio category"
+msgstr "ウェブラジオカテゴリを表示"
+
+msgid "ShutDown in %d seconds"
+msgstr "%d 秒後にシャットダウン"
+
+msgid "Shutdown"
+msgstr "シャットダウン"
+
+msgid "Shutdown Windows"
+msgstr "Windows をシャットダウン"
+
+msgid "Shutdown after the last file."
+msgstr "最後のファイルの後にシャットダウン。"
+
+msgid "Shutdown in %s."
+msgstr "%s 後にシャットダウン。"
+
+msgid "Shutdown now"
+msgstr "今すぐシャットダウン"
+
+msgid "Shutting down at the end of the playlist only works with \"Repeat off\". Therefore Nemp will change the playback mode if you continue."
+msgstr "プレイリスト終了時のシャットダウンは「リピートオフ」でのみ機能します。そのため、続行すると Nemp は再生モードを変更します。"
+
+msgid "Shutting down..."
+msgstr "シャットダウン中..."
+
+msgid "Side by side"
+msgstr "横に並べる"
+
+msgid "Signalize birthday song with a countdown."
+msgstr "カウントダウンでバースデーソングを知らせる。"
+
+msgid "Silk Icon Set by [url=\"https://github.com/legacy-icons/famfamfam-silk\"]famfamfam.com[/url]"
+msgstr "Silk アイコンセット by [url=\"https://github.com/legacy-icons/famfamfam-silk\"]famfamfam.com[/url]"
+
+msgid "Single tracks"
+msgstr "単一トラック"
+
+msgid "Sister directory (name)"
+msgstr "兄弟ディレクトリ (名前)"
+
+msgid "Skins"
+msgstr "スキン"
+
+msgid "Skip silence at the end of tracks"
+msgstr "トラック末尾の無音をスキップ"
+
+msgid "Skip sort on large lists (> 5000)"
+msgstr "大規模リスト (> 5000) ではソートをスキップ"
+
+msgid "Skip this file"
+msgstr "このファイルをスキップ"
+
+msgid "Skip this sorting when the list is too large."
+msgstr "リストが大きすぎる場合はこのソートをスキップします。"
+
+msgid "Slide backward"
+msgstr "後方にシーク"
+
+msgid "Slide backwards"
+msgstr "後方にシーク"
+
+msgid "Slide forward"
+msgstr "前方にシーク"
+
+msgid "Slower"
+msgstr "低速"
+
+msgid "Software"
+msgstr "ソフトウェア"
+
+msgid "Some ID3-Tags could not been updated. There are still %d files that are inconsistent to the data in the library."
+msgstr "一部の ID3 タグを更新できませんでした。ライブラリのデータと不一致のファイルがまだ %d 個あります。"
+
+msgid "Some ID3-Tags have not been updated due to user abort. There are still %d files that are inconsistent to the data in the library."
+msgstr "ユーザーによる中止のため、一部の ID3 タグは更新されませんでした。ライブラリのデータと不一致のファイルがまだ %d 個あります。"
+
+msgid "Some duplicate tags has been removed."
+msgstr "いくつかの重複タグが削除されました。"
+
+msgid "Some error occured. Please try again."
+msgstr "エラーが発生しました。もう一度お試しください。"
+
+msgid "Some files are definitely missing."
+msgstr "一部のファイルが確実に欠落しています。"
+
+msgid "Some files have been edited."
+msgstr "一部のファイルが編集されました。"
+
+msgid "Some functions are disabled during this process. You can cancel the current operation at any time."
+msgstr "この処理中は一部の機能が無効になります。現在の操作はいつでもキャンセルできます。"
+
+msgid "Some information could be obsolete or wrong."
+msgstr "一部の情報が古いか、誤っている可能性があります。"
+
+msgid "Some of the files or directories could not be deleted. You can try to remove them manually or reinstall Nemp."
+msgstr "一部のファイルまたはディレクトリを削除できませんでした。手動で削除するか、Nemp を再インストールしてみてください。"
+
+msgid "Some settings could not be changed, because the media library is busy. Please try again later or cancel the running operation by pressing ESC."
+msgstr "メディアライブラリがビジー状態のため、一部の設定を変更できませんでした。後でもう一度試すか、ESCキーを押して実行中の操作をキャンセルしてください。"
+
+msgid ""
+"Some settings have been changed, but they have not been applied yet.\n"
+"\n"
+"Do you want to save the changes before closing this window?"
+msgstr ""
+"一部の設定が変更されましたが、まだ適用されていません。\n"
+"\n"
+"このウィンドウを閉じる前に変更を保存しますか？"
+
+msgid "Some unexpected Error occured (Errorcode: %d)"
+msgstr "予期しないエラーが発生しました (エラーコード : %d)"
+
+msgid "Some unexpected errors appeared during the process. Please view the Error-Log for details."
+msgstr "処理中にいくつかの予期しないエラーが発生しました。詳細はエラーログを確認してください。"
+
+msgid ""
+"Something is terribly wrong with scrobbling - Nemp will disable it now permanently. See the log entries within the settings dialog for details.\n"
+"If this message occurs continuously, please report this to mail@gausi.de. Thank you."
+msgstr ""
+"スクロブリングに重大な問題が発生しました - Nemp はこれを完全に無効にします。詳細は設定ダイアログ内のログエントリを確認してください。\n"
+"このメッセージが継続的に表示される場合は、mail@gausi.de まで報告してください。ありがとうございます。"
+
+msgid ""
+"Something is wrong with scrobbling. Nemp will disable it for approx %d minutes. \n"
+"See the log entries within the settings dialog for details."
+msgstr ""
+"スクロブリングに問題が発生しました。Nemp は約 %d 分間これを無効にします。\n"
+"詳細は設定ダイアログ内のログエントリを確認してください。"
+
+msgid "Sorry, for this file are no additional Tags available."
+msgstr "申し訳ありませんが、このファイルには追加タグがありません。"
+
+msgid "Sorry, some error occured while saving the new default cover art in the Nemp cover archive."
+msgstr "申し訳ありません。Nemp のカバーアーカイブに新しいデフォルトカバーアートを保存中にエラーが発生しました。"
+
+msgid "Sorry. This file does not support additional tags."
+msgstr "申し訳ありません。このファイルは追加タグをサポートしていません。"
+
+msgid "Sort \"%s\" by"
+msgstr "\"%s\" をソートする基準"
+
+msgid "Sort &by"
+msgstr "ソート基準(&b)"
+
+msgid "Sort Coverflow by"
+msgstr "カバーフローのソート基準"
+
+msgid "Sort Directories by"
+msgstr "ディレクトリのソート基準"
+
+msgid "Sort Tags by"
+msgstr "タグのソート基準"
+
+msgid "Sort by"
+msgstr "ソート基準"
+
+msgid "Sort layer \"%s\" by"
+msgstr "レイヤー \"%s\" をソートする基準"
+
+msgid "Sort layer by"
+msgstr "レイヤーのソート基準"
+
+msgid "Sort playlists by"
+msgstr "プレイリストのソート基準"
+
+msgid "Sorted by: "
+msgstr "ソート基準: "
+
+msgid "Sorting data..."
+msgstr "データをソート中..."
+
+msgid "SoundFont file for MIDI playback"
+msgstr "MIDI再生用のSoundFontファイル"
+
+msgid "Soundfonts (sf2/sf2pack)|*.sf2;*.sf2pack|All files|*.*"
+msgstr "SoundFont (sf2/sf2pack)|*.sf2;*.sf2pack|すべてのファイル|*.*"
+
+msgid "Spacing between cover art"
+msgstr "カバーアート間の間隔"
+
+msgid "Split files"
+msgstr "ファイルを分割"
+
+msgid "Split files by size"
+msgstr "ファイルをサイズで分割"
+
+msgid "Split files by time"
+msgstr "ファイルを時間で分割"
+
+msgid "Split recordings by size."
+msgstr "録音をサイズで分割。"
+
+msgid "Split recordings by time."
+msgstr "録音を時間で分割。"
+
+msgid "Split windows"
+msgstr "ウィンドウを分割"
+
+msgid "Stacked"
+msgstr "縦に重ねる"
+
+msgid "Start"
+msgstr "開始"
+
+msgid "Start Nemp G15 App when Nemp starts"
+msgstr "Nemp 起動時に Nemp G15 アプリを開始"
+
+msgid "Start a countdown before the actual time"
+msgstr "実際の時間の前にカウントダウンを開始"
+
+msgid "Start minimized (you can also use the parameter \"/minimized\")"
+msgstr "最小化して開始 (パラメータ \"/minimized\" も使用可能)"
+
+msgid "Start recording"
+msgstr "録音を開始"
+
+msgid "Starting Nemp"
+msgstr "Nemp を起動中"
+
+msgid "Status"
+msgstr "ステータス"
+
+msgid "Status: Offline"
+msgstr "ステータス : オフライン"
+
+msgid "Status: Online"
+msgstr "ステータス : オンライン"
+
+msgid "Stay on top"
+msgstr "常に手前に表示"
+
+msgid "Step 1/4. Connect your computer with the internet and click \"Next\" to contact LastFM for authorization."
+msgstr "ステップ 1/4。コンピュータをインターネットに接続し、「次へ」をクリックして認証のために LastFM に接続します。"
+
+msgid "Step 2/4. Nemp will now direct you to the LastFM-site in a browser window. Login with your LastFM username/password, click \"Yes, allow access\" and return to this window."
+msgstr "ステップ 2/4。Nemp はブラウザウィンドウで LastFM サイトに移動します。LastFM のユーザー名/パスワードでログインし、「はい、アクセスを許可」をクリックして、このウィンドウに戻ります。"
+
+msgid "Step 3/4. Click \"Next\" when you have granted Nemp permission to use your LastFM account."
+msgstr "ステップ 3/4。Nemp に LastFM アカウントの使用を許可したら、「次へ」をクリックします。"
+
+msgid "Step 4/4. Thank you. To finish the configuration Nemp will contact LastFM for your username and a sessionkey which will be used for scrobbling. Click Next to continue."
+msgstr "ステップ 4/4。ありがとうございます。設定を完了するために、Nemp はユーザー名とスクロブリングに使用されるセッションキーを LastFM に問い合わせます。「次へ」をクリックして続行します。"
+
+msgid "Stop"
+msgstr "停止"
+
+msgid "Stop Nemp"
+msgstr "Nemp を停止"
+
+msgid "Stop after current title"
+msgstr "現在のタイトルの後に停止"
+
+msgid "Stop after current title (Shift+Click)"
+msgstr "現在のタイトルの後に停止 (Shift+クリック)"
+
+msgid "Stop after title (Shift+Click)"
+msgstr "タイトルの後に停止 (Shift+クリック)"
+
+msgid "Stop current plugin"
+msgstr "現在のプラグインを停止"
+
+msgid "Stop fluttering now, I will go get a power cable as fast as I can."
+msgstr "今すぐゆがみを止めてください。できるだけ早く電源ケーブルを取りに行きます。"
+
+msgid "Stop headset when adding headset file to playlist"
+msgstr "ヘッドセットファイルをプレイリストに追加するときにヘッドセット再生を停止"
+
+msgid "Stop headset when switching to another tab"
+msgstr "別のタブに切り替えるときにヘッドセット再生を停止"
+
+msgid "Stop playback of the current file, when the user double-clicks a new file in the Windows explorer"
+msgstr "ユーザーが Windows エクスプローラーで新しいファイルをダブルクリックしたときに、現在のファイルの再生を停止"
+
+msgid "Stop player when system hibernates"
+msgstr "システムが休止状態になるときにプレイヤーを停止"
+
+msgid "Stop the \"Walkman mode\" completely."
+msgstr "「ウォークマンモード」を完全に停止します。"
+
+msgid "Stop the player when the system hibernates, so the playback is stopped when the PC is turned on again."
+msgstr "システムが休止状態になるときにプレイヤーを停止し、PC が再び起動したときに再生が停止された状態にします。"
+
+msgid "Subdirectory (name)"
+msgstr "サブディレクトリ (名前)"
+
+msgid "Summary"
+msgstr "概要"
+
+msgid "Supported files (*.jpg;*.jpeg;*.png)|*.jpg;*.jpeg;*.png;"
+msgstr "サポートされているファイル (*.jpg;*.jpeg;*.png)|*.jpg;*.jpeg;*.png;"
+
+msgid "Supported files (*.jpg;*.jpeg;*.png;*.bmp)|*.jpg;*.jpeg;*.png;*.bmp"
+msgstr "サポートされているファイル (*.jpg;*.jpeg;*.png;*.bmp)|*.jpg;*.jpeg;*.png;*.bmp"
+
+msgid "Suspend Windows"
+msgstr "Windows をサスペンド"
+
+msgid "Switch to enqueued file (even if another track is already playing)"
+msgstr "キューに追加されたファイルに切り替える (別のトラックが既に再生中でも)"
+
+msgid "Synchronize rating"
+msgstr "評価を同期"
+
+msgid "T"
+msgstr "T"
+
+msgid "Tabstop at player controls"
+msgstr "プレイヤーコントロールでタブストップ"
+
+msgid "Tabstop at tool buttons (cover, lyrics, ...)"
+msgstr "ツールボタン (カバー、歌詞など) でタブストップ"
+
+msgid "Tabulator key"
+msgstr "タブキーの動作"
+
+msgid "Tag"
+msgstr "タグ"
+
+msgid "Tag cloud"
+msgstr "タグクラウド"
+
+msgid "Tag cloud editor"
+msgstr "タグクラウドエディター"
+
+msgid "Tag search complete. Added some Tags for every file."
+msgstr "タグ検索が完了しました。すべてのファイルにいくつかのタグが追加されました。"
+
+msgid "Tag search complete. Found Tags for %d of %d files."
+msgstr "タグ検索が完了しました。%d ファイル中 %d ファイルのタグが見つかりました。"
+
+msgid ""
+"Tag search complete. Found Tags for only %d of %d files.\n"
+"\n"
+"Either the files are not properly tagged, or you have a special taste in music.\n"
+"\n"
+"Please note, that additional Tags are not supported for some audio formats."
+msgstr ""
+"タグ検索が完了しました。%d ファイル中 %d ファイルのみタグが見つかりました。\n"
+"\n"
+"ファイルのタグ付けが適切でないか、特別な音楽の好みをお持ちかもしれません。\n"
+"\n"
+"一部のオーディオフォーマットでは追加タグがサポートされていないことに注意してください。"
+
+msgid ""
+"Tag search complete. Some unexpected errors appeared during the process.\n"
+"\n"
+"Please view the Error-Log for details."
+msgstr ""
+"タグ検索が完了しました。処理中にいくつかの予期しないエラーが発生しました。\n"
+"\n"
+"詳細はエラーログを確認してください。"
+
+msgid ""
+"Tag search complete. Sorry, no additional Tags could be found.\n"
+"\n"
+"Either the files are not properly tagged, or you have a special taste in music.\n"
+"\n"
+"Please note, that additional Tags are not supported for some audio formats."
+msgstr ""
+"タグ検索が完了しました。申し訳ありませんが、追加タグは見つかりませんでした。\n"
+"\n"
+"ファイルのタグ付けが適切でないか、特別な音楽の好みをお持ちかもしれません。\n"
+"\n"
+"一部のオーディオフォーマットでは追加タグがサポートされていないことに注意してください。"
+
+msgid "Tagcloud: Editor"
+msgstr "タグクラウド : エディター"
+
+msgid "Tags"
+msgstr "タグ"
+
+msgid "Tahoma"
+msgstr "Tahoma"
+
+msgid "Thank you for beta-testing Nemp. You are using the newest version."
+msgstr "Nemp のベータテストにご協力いただきありがとうございます。最新バージョンを使用しています。"
+
+msgid "The Coverflow will update automatically when you activate it"
+msgstr "カバーフローは有効にすると自動的に更新されます"
+
+msgid "The ID3-Tags of %d files should be updated."
+msgstr "%d 個のファイルの ID3 タグを更新する必要があります。"
+
+msgid "The Nemp Partymode can't be activated, if the media library is busy. Please stop the current operation and try again."
+msgstr "メディアライブラリがビジー状態の場合は、Nemp パーティーモードを有効にできません。現在の操作を停止してから再試行してください。"
+
+msgid "The Nemp Webserver is running. The new Port is not valid until you restart it."
+msgstr "Nemp ウェブサーバーが実行中です。新しいポートは再起動するまで有効になりません。"
+
+msgid "The Player is not ready: No file was loaded."
+msgstr "プレイヤーは準備ができていません: ファイルが読み込まれていません。"
+
+msgid "The Playlist"
+msgstr "プレイリスト"
+
+msgid "The SoundFont file used for MIDI playback"
+msgstr "MIDI 再生に使用される SoundFont ファイル"
+
+msgid "The [url=\"http://www.un4seen.com\"]bass.dll[/url] and add-ons"
+msgstr "[url=\"http://www.un4seen.com\"]bass.dll[/url] とアドオン"
+
+msgid "The app for the keyboard display could not be found"
+msgstr "キーボードディスプレイ用のアプリが見つかりませんでした"
+
+msgid "The automatic search for Lyrics has been removed from Nemp."
+msgstr "歌詞の自動検索は Nemp から削除されました。"
+
+msgid "The configuration could not be changed, because the media library is busy. Please try again later or cancel the running operation by pressing ESC."
+msgstr "メディアライブラリがビジー状態のため、設定を変更できませんでした。後でもう一度試すか、ESCキーを押して実行中の操作をキャンセルしてください。"
+
+msgid "The current category doesn't contain audio files, but Playlists or Webradio. Export is not possible."
+msgstr "現在のカテゴリにはオーディオファイルではなく、プレイリストまたはウェブラジオが含まれています。エクスポートはできません。"
+
+msgid "The current cover art used in the media library"
+msgstr "メディアライブラリで使用されている現在のカバーアート"
+
+msgid "The current file can not be found. Choose OK to continue with next file, or cancel the copying process."
+msgstr "現在のファイルが見つかりません。OKを選択して次のファイルに進むか、コピープロセスをキャンセルします。"
+
+msgid ""
+"The current playlist \"%s\" has been changed since it has been saved.\n"
+"\n"
+"Do you want to save it now?"
+msgstr ""
+"現在のプレイリスト \"%s\" は保存後に変更されています。\n"
+"\n"
+"今すぐ保存しますか？"
+
+msgid ""
+"The current playlist \"%s\" has been changed since it has been saved. \n"
+"\n"
+"Do you want to reload it and go back to the previously saved version?"
+msgstr ""
+"現在のプレイリスト \"%s\" は保存後に変更されています。\n"
+"\n"
+"再読み込みして、以前保存したバージョンに戻しますか？"
+
+msgid "The current recording directory for webstreams could not be found, and could also not be created."
+msgstr "ウェブストリームの現在の録音ディレクトリが見つからず、作成もできませんでした。"
+
+msgid "The current view shows files from a playlist-file. Getting lyrics or additional tags is not possible."
+msgstr "現在のビューはプレイリストファイルからのファイルを表示しています。歌詞や追加タグの取得はできません。"
+
+msgid "The current view shows files from a playlist-file. Operation cancelled."
+msgstr "現在のビューはプレイリストファイルからのファイルを表示しています。操作をキャンセルしました。"
+
+msgid "The current view shows files from a playlist-file. You can not delete these files frome the library."
+msgstr "現在のビューはプレイリストファイルからのファイルを表示しています。これらのファイルをライブラリから削除することはできません。"
+
+msgid "The data directory could not be found."
+msgstr "データディレクトリが見つかりませんでした。"
+
+msgid "The default cover cannot be restored because the original file \"default_cover.jpg\" was not found."
+msgstr "元のファイル \"default_cover.jpg\" が見つからないため、デフォルトカバーを復元できません。"
+
+msgid "The deletion of the files that are no longer needed was successful. You can now continue to use Nemp as before."
+msgstr "不要になったファイルの削除は成功しました。これまで通り Nemp を使い続けることができます。"
+
+msgid "The destination directory does not exist. Do you want to create it?"
+msgstr "宛先ディレクトリが存在しません。作成しますか？"
+
+msgid "The destination path can not be found. Choose OK to continue with next file, or cancel the copying process."
+msgstr "宛先パスが見つかりません。OKを選択して次のファイルに進むか、コピープロセスをキャンセルします。"
+
+msgid "The download directory could not be found."
+msgstr "ダウンロードディレクトリが見つかりませんでした。"
+
+msgid "The drive is NOT available."
+msgstr "ドライブは利用できません。"
+
+msgid "The drive is available."
+msgstr "ドライブは利用可能です。"
+
+msgid "The export failed for an unexpected reason."
+msgstr "予期しない理由によりエクスポートに失敗しました。"
+
+msgid "The file was already tagged with \"%s\"."
+msgstr "ファイルには既に \"%s\" というタグが付いていました。"
+
+msgid "The file was already tagged with all the tags you entered."
+msgstr "ファイルには入力したすべてのタグが既に付いていました。"
+
+msgid ""
+"The filename for this stream is to long and automatic abbreviation failed.\n"
+"Please change the directory for webradio downloads."
+msgstr ""
+"このストリームのファイル名が長すぎ、自動的な短縮に失敗しました。\n"
+"ウェブラジオのダウンロードディレクトリを変更してください。"
+
+msgid "The following file already exists:"
+msgstr "次のファイルは既に存在します:"
+
+msgid "The following files will be removed from the library when you click on \"Cleanup library\""
+msgstr "「ライブラリをクリーンアップ」をクリックすると、次のファイルがライブラリから削除されます"
+
+msgid "The following files will remain in the library when you click on \"Cleanup library\""
+msgstr "「ライブラリをクリーンアップ」をクリックしても、次のファイルはライブラリに残ります"
+
+msgid "The form layout cannot be applied in separate window mode."
+msgstr "フォームレイアウトは個別ウィンドウモードでは適用できません。"
+
+msgid "The helpfile could not be found."
+msgstr "ヘルプファイルが見つかりませんでした。"
+
+msgid "The installation of Nemp is faulty"
+msgstr "Nemp のインストールに問題があります"
+
+msgid ""
+"The library blocked this very file by an automated background-process right now. Please try again in a few seconds.\n"
+"Note: The probability for this message is almost zero (unless Gausi made some bad mistakes). You should play Lotto this week!"
+msgstr ""
+"ライブラリは現在、自動バックグラウンドプロセスによってこのファイルをブロックしています。数秒後にもう一度試してください。\n"
+"注: このメッセージが表示される確率はほぼゼロです (Gausiが重大なミスをしない限り)。今週は宝くじを買うべきかもしれません！"
+
+msgid "The library is in a critical update-process right now. Editing files is not possible. Please try again in a few seconds."
+msgstr "ライブラリは現在、重要な更新処理中です。ファイルの編集はできません。数秒後にもう一度試してください。"
+
+msgid "The licence.txt could not be found."
+msgstr "licence.txt が見つかりませんでした。"
+
+msgid "The main device."
+msgstr "メインデバイス。"
+
+msgid "The media library is busy at the moment, so your input could not be saved. Please try again in a few seconds."
+msgstr "メディアライブラリが現在ビジー状態のため、入力内容を保存できませんでした。数秒後にもう一度試してください。"
+
+msgid "The media library is busy at the moment, so your rating could not be set there. (If the current file is not in your library at all, you can ignore this message.)"
+msgstr "メディアライブラリが現在ビジー状態のため、評価を設定できませんでした。(現在のファイルがライブラリに全くない場合は、このメッセージを無視できます。)"
+
+msgid "The media library was probably created by a newer version of Nemp. This version of Nemp doesn't know how to read this file."
+msgstr "メディアライブラリはおそらく新しいバージョンの Nemp で作成されました。このバージョンの Nemp はこのファイルの読み方がわかりません。"
+
+msgid "The network ressource is available."
+msgstr "ネットワークリソースは利用可能です。"
+
+msgid "The network ressource seems to be offline."
+msgstr "ネットワークリソースはオフラインのようです。"
+
+msgid "The operation could not be processed, because the media library is busy. Please try again later or cancel the running operation."
+msgstr "メディアライブラリがビジー状態のため、操作を処理できませんでした。後でもう一度試すか、実行中の操作をキャンセルしてください。"
+
+msgid "The playlist file \"%s\" could not be found."
+msgstr "プレイリストファイル \"%s\" が見つかりませんでした。"
+
+msgid "The playlist file could not be found."
+msgstr "プレイリストファイルが見つかりませんでした。"
+
+msgid "The playlist file doesn't exist or contains no files."
+msgstr "プレイリストファイルが存在しないか、ファイルが含まれていません。"
+
+msgid "The playlist was interrupted automatically for this special song. Congratulations to whatever you are celebrating! Have a good time with your guests and enjoy the party!"
+msgstr "この特別な曲のためにプレイリストは自動的に中断されました。お祝い事おめでとうございます！ゲストと楽しい時間を過ごし、パーティーをお楽しみください！"
+
+msgid "The plugin directory could not be found."
+msgstr "プラグインディレクトリが見つかりませんでした。"
+
+msgid "The readme.txt could not be found."
+msgstr "readme.txt が見つかりませんでした。"
+
+msgid "The recording directory for webstreams could not be found."
+msgstr "ウェブストリームの録音ディレクトリが見つかりませんでした。"
+
+msgid "The secondary device."
+msgstr "セカンダリデバイス。"
+
+msgid "The selected Layout Configuration could not be found."
+msgstr "選択したレイアウト設定が見つかりませんでした。"
+
+msgid "The selected Layout Configuration seems to be invalid. Loading default configuration instead."
+msgstr "選択したレイアウト設定は無効のようです。代わりにデフォルト設定を読み込みます。"
+
+msgid "The selected directory (or a parent directory) is already in the list."
+msgstr "選択したディレクトリ (または親ディレクトリ) は既にリストにあります。"
+
+msgid "The selected files have been removed from the media library."
+msgstr "選択したファイルはメディアライブラリから削除されました。"
+
+msgid "The specified destination directory could not be created. Please verify that the directory name is valid."
+msgstr "指定された宛先ディレクトリを作成できませんでした。ディレクトリ名が有効であることを確認してください。"
+
+msgid "The specified file can not be found. Do you want to delete it from the list?"
+msgstr "指定されたファイルが見つかりません。リストから削除しますか？"
+
+msgid "The specified file can not be found. Maybe it is on an external drive which is not connected."
+msgstr "指定されたファイルが見つかりません。接続されていない外部ドライブにある可能性があります。"
+
+msgid "The specified file is not a valid audiofile."
+msgstr "指定されたファイルは有効なオーディオファイルではありません。"
+
+msgid "The specified file with the extension \".mp3\" is not a valid mp3-file."
+msgstr "指定された拡張子 \".mp3\" のファイルは有効な MP3 ファイルではありません。"
+
+msgid "The template could not be deleted."
+msgstr "テンプレートを削除できませんでした。"
+
+msgid "Theme"
+msgstr "テーマ"
+
+msgid "There are no files directly in \"%s\". Use double click to show all files recursively."
+msgstr "\"%s\" にはファイルが直接ありません。ダブルクリックしてすべてのファイルを再帰的に表示します。"
+
+msgid "There are no files in \"%s\"."
+msgstr "\"%s\" にはファイルがありません。"
+
+msgid "There are no files in the current category."
+msgstr "現在のカテゴリにはファイルがありません。"
+
+msgid ""
+"There is a limit of 32 categories, and currently all available slots are used. \n"
+"\n"
+"If you want to reuse one of the category slots you have just deleted, you need to apply the current settings first. After Nemp has rebuilt the Media Library, there should be a category slot available again."
+msgstr ""
+"カテゴリは32個までという制限があり、現在すべてのスロットが使用されています。\n"
+"\n"
+"削除したカテゴリスロットを再利用するには、最初に現在の設定を適用する必要があります。Nemp がメディアライブラリを再構築した後、カテゴリスロットが再び利用可能になるはずです。"
+
+msgid "There is already an image with this description contained in the metadata. Please enter a different description for this image."
+msgstr "この説明を持つ画像は既にメタデータに含まれています。この画像には別の説明を入力してください。"
+
+msgid "These values are approximate values. Resulting length/size may vary."
+msgstr "これらの値は概算値です。結果の長さ/サイズは変動する可能性があります。"
+
+msgid "This audio file"
+msgstr "このオーディオファイル"
+
+msgid "This cover was just downloaded from LastFM."
+msgstr "このカバーは LastFM からダウンロードされたばかりです。"
+
+msgid "This file was played %d times. This information will be irretrievably deleted if you reset the rating."
+msgstr "このファイルは %d 回再生されました。この情報は評価をリセットすると取り返しのつかない形で削除されます。"
+
+msgid "This function (1) shouldn't be accessible now. Please report this error."
+msgstr "この機能 (1) は現在アクセス可能であるべきではありません。このエラーを報告してください。"
+
+msgid "This function (4) shouldn't be accessible now. Please report this error."
+msgstr "この機能 (4) は現在アクセス可能であるべきではありません。このエラーを報告してください。"
+
+msgid ""
+"This will activate the Nemp Party-Mode. In this mode, some features are disabled to prevent\n"
+"unwanted changes to the playlist and media library.\n"
+"However, if you don't trust your party guests, you might want to lock the computer completely\n"
+"and use the Nemp web server for remote control."
+msgstr ""
+"これにより Nemp パーティーモードが有効になります。このモードでは、プレイリストやメディアライブラリへの\n"
+"意図しない変更を防ぐために一部の機能が無効になります。\n"
+"ただし、パーティーゲストを信頼できない場合は、コンピュータを完全にロックして\n"
+"Nemp ウェブサーバーをリモートコントロールに使用することをお勧めします。"
+
+msgid ""
+"This will add an \"Ignore rule\" for the selected tags and remove them from all files in the media library.\n"
+"\n"
+"Do you want to continue?"
+msgstr ""
+"選択したタグの「無視ルール」を追加し、メディアライブラリ内のすべてのファイルからそれらを削除します。\n"
+"\n"
+"続行しますか？"
+
+msgid "This will affect up to %d files in your media library. Do you want to continue?"
+msgstr "これはメディアライブラリ内の最大 %d 個のファイルに影響します。続行しますか？"
+
+msgid ""
+"This will clear your current playlist with %d tracks and replace it with only %d new tracks. Do you really want to clear the playlist?\n"
+"\n"
+"Note: You can change the default action for adding files into the playlist within the settings dialog."
+msgstr ""
+"これは現在の %d トラックのプレイリストをクリアし、わずか %d 個の新しいトラックに置き換えます。本当にプレイリストをクリアしますか？\n"
+"\n"
+"注: プレイリストにファイルを追加する際のデフォルトの動作は、設定ダイアログで変更できます。"
+
+msgid ""
+"This will delete the playlist \"%s\" from your favorites. This cannot be undone.\n"
+"\n"
+"Are you sure you want to delete the list?"
+msgstr ""
+"お気に入りからプレイリスト \"%s\" を削除します。この操作は元に戻せません。\n"
+"\n"
+"本当にこのリストを削除しますか？"
+
+msgid "This will delete the preset \"%s\". Continue?"
+msgstr "プリセット \"%s\" を削除します。続行しますか？"
+
+msgid "This will delete your complete media library. Continue?"
+msgstr "メディアライブラリ全体を削除します。続行しますか？"
+
+msgid ""
+"This will delete your personal settings for the default presets (e.g. \"Full Bass\" or \"Reggae\").\n"
+"\n"
+" Other presets (\"New preset\") are not affected."
+msgstr ""
+"デフォルトプリセット (例 : \"Full Bass\" や \"Reggae\") の個人設定を削除します。\n"
+"\n"
+"その他のプリセット (\"New preset\") は影響を受けません。"
+
+msgid "This will overwrite the preset \"%s\" with the current settings. Continue?"
+msgstr "プリセット \"%s\" を現在の設定で上書きします。続行しますか？"
+
+msgid "This will remove all %d files from this category. Do you want to continue?"
+msgstr "このカテゴリからすべての %d 個のファイルを削除します。続行しますか？"
+
+msgid ""
+"This will remove the selected tags from all files in the media library.\n"
+"\n"
+"Do you want to continue?"
+msgstr ""
+"選択したタグをメディアライブラリ内のすべてのファイルから削除します。\n"
+"\n"
+"続行しますか？"
+
+msgid "Threshold"
+msgstr "しきい値"
+
+msgid "Threshold for \"silence\". A threshold of -5dB to -10dB will skip a lot, -40dB and below will skip only really quiet parts."
+msgstr "「無音」のしきい値。しきい値が -5dB から -10dB の場合は多くをスキップし、-40dB 以下では本当に静かな部分のみをスキップします。"
+
+msgid "Time"
+msgstr "時間"
+
+msgid "Time when the birthday song should be played. The optional countdown will end at this time."
+msgstr "バースデーソングを再生する時刻。オプションのカウントダウンはこの時刻に終了します。"
+
+msgid "Timeout"
+msgstr "タイムアウト"
+
+msgid "Title"
+msgstr "タイトル"
+
+msgid "Title, Artist"
+msgstr "タイトル、アーティスト"
+
+msgid "Title: %.2f dB, Peak: %.6f"
+msgstr "タイトル : %.2f dB、ピーク: %.6f"
+
+msgid "Title: %s"
+msgstr "タイトル : %s"
+
+msgid "Title: -?-"
+msgstr "タイトル : -?-"
+
+msgid "Titles"
+msgstr "タイトル"
+
+msgid "Toggle Cover/Lyrics"
+msgstr "カバー/歌詞を切り替え"
+
+msgid "Toggle File Overview (player only vs. selected file)"
+msgstr "ファイル概要を切り替え (プレイヤーのみ vs. 選択ファイル)"
+
+msgid "Too many open files. Choose OK to continue with next file, or cancel the copying process."
+msgstr "開いているファイルが多すぎます。OKを選択して次のファイルに進むか、コピープロセスをキャンセルします。"
+
+msgid "Track"
+msgstr "トラック"
+
+msgid "Track %d"
+msgstr "トラック %d"
+
+msgid "Track %d: %6.2f dB, Peak %6.6f (%s)"
+msgstr "トラック %d: %6.2f dB、ピーク %6.6f (%s)"
+
+msgid "Track gain"
+msgstr "トラックゲイン"
+
+msgid "Track peak"
+msgstr "トラックピーク"
+
+msgid "Tracklist"
+msgstr "トラックリスト"
+
+msgid "Tree view"
+msgstr "ツリービュー"
+
+msgid "Tree view (categories)"
+msgstr "ツリービュー (カテゴリ)"
+
+msgid "Tree view layers"
+msgstr "ツリービューレイヤー"
+
+msgid "Tree view orientation"
+msgstr "ツリービューの配置"
+
+msgid "Treeview"
+msgstr "ツリービュー"
+
+msgid "Treeview / Coverflow / Tag cloud"
+msgstr "ツリービュー / カバーフロー / タグクラウド"
+
+msgid "Tried to fill search history with playlist files. This should never occur - please report this error."
+msgstr "検索履歴をプレイリストファイルで埋めようとしました。これは発生すべきではありません - このエラーを報告してください。"
+
+msgid "Tried to fill the Quicksearchlist while displaying playlists. This should never occur - please report this error. "
+msgstr "プレイリスト表示中にクイック検索リストを埋めようとしました。これは発生すべきではありません - このエラーを報告してください。"
+
+msgid "Try to change this, if the playback is distorted."
+msgstr "再生が歪む場合は、これを変更してみてください。"
+
+msgid "Try to split the stream when a new title begins. This will work only if the station submits proper title information."
+msgstr "新しいタイトルが始まったときにストリームを分割します。これは、局が適切なタイトル情報を送信している場合にのみ機能します。"
+
+msgid "Type"
+msgstr "タイプ"
+
+msgid "U"
+msgstr "U"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "URL (e.g. \"http://myhits.com/tune_in.pls\" or \"http://123.12.34.56:5000\")"
+msgstr "URL (例: \"http://myhits.com/tune_in.pls\" または \"http://123.12.34.56:5000\")"
+
+msgid "URL: %s"
+msgstr "URL : %s"
+
+msgid "Unable to extract version information from server."
+msgstr "サーバーからバージョン情報を抽出できませんでした。"
+
+msgid "Undo"
+msgstr "元に戻す"
+
+msgid "Undo all changes"
+msgstr "すべての変更を元に戻す"
+
+msgid "Undo all changes and restore the currently used Form Layout "
+msgstr "すべての変更を元に戻し、現在使用中のフォームレイアウトを復元"
+
+msgid "Unexpected error"
+msgstr "予期しないエラー"
+
+msgid "Unknown compilation"
+msgstr "不明なコンピレーション"
+
+msgid "Unknown error"
+msgstr "不明なエラー"
+
+msgid "Unknown format"
+msgstr "不明なフォーマット"
+
+msgid "Unknown play time (only webstream)"
+msgstr "不明な再生時間 (ウェブストリームのみ)"
+
+msgid "Unmarked"
+msgstr "未マーク"
+
+msgid "Update files now"
+msgstr "今すぐファイルを更新"
+
+msgid "Update library in Mainthread"
+msgstr "メインスレッドでライブラリを更新"
+
+msgid "Update: Cleanup recommended"
+msgstr "更新 : クリーンアップ推奨"
+
+msgid "Update: No clean up necessary"
+msgstr "更新 : クリーンアップ不要"
+
+msgid "Updating ID3-Tags ... %s"
+msgstr "ID3 タグを更新中 ... %s"
+
+msgid "Use \"Album name\" instead of \"Release Year\" for sorting (where appropriate)"
+msgstr "ソートに「リリース年」の代わりに「アルバム名」を使用する (該当する場合)"
+
+msgid "Use AlbumGain values to maintain intentional loudness changes within albums"
+msgstr "アルバム内の意図的な音量変化を維持するためにアルバムゲイン値を使用"
+
+msgid "Use Internet-IP"
+msgstr "インターネットIPを使用"
+
+msgid "Use Nemp as the default player for audio files?"
+msgstr "Nemp をオーディオファイルのデフォルトプレイヤーとして使用しますか？"
+
+msgid "Use ReplayGain for a more consistent loudness during playback"
+msgstr "再生中の音量をより一定にするためにReplayGainを使用"
+
+msgid "Use ReplayGain values to achieve a more consistent loudness during playback."
+msgstr "再生中の音量をより一定にするために ReplayGain 値を使用します。"
+
+msgid "Use a uber-ingenious special method for better tag-reading in files with \"unicode-filenames\"."
+msgstr "\"Unicode ファイル名\" のファイルでより良いタグ読み取りのために、超巧妙な特別な方法を使用します。"
+
+msgid "Use advanced skinning"
+msgstr "高度なスキニングを使用"
+
+msgid "Use classic 2D coverflow"
+msgstr "クラシックな 2D カバーフローを使用"
+
+msgid "Use crossfading."
+msgstr "クロスフェードを使用します。"
+
+msgid "Use default action on double-click in Coverflow"
+msgstr "カバーフローでのダブルクリック時にデフォルトアクションを使用"
+
+msgid "Use different colors for different bitrates."
+msgstr "異なるビットレートに異なる色を使用します。"
+
+msgid "Use different fonts for files with fixed or variable bitrate."
+msgstr "固定ビットレートと可変ビットレートのファイルに異なるフォントを使用します。"
+
+msgid "Use keyboard display (Logitech G15 keyboard or compatible required)"
+msgstr "キーボードディスプレイを使用 (Logitech G15 キーボードまたは互換品が必要)"
+
+msgid "Use logfile on hard disk to log previous sessions"
+msgstr "以前のセッションを記録するためにハードディスク上のログファイルを使用"
+
+msgid "Use media keys, even if Nemp is in the background"
+msgstr "Nemp がバックグラウンドでもメディアキーを使用"
+
+msgid "Use online CDDB to get audio CD information"
+msgstr "オーディオ CD 情報を取得するためにオンライン CDDB を使用"
+
+msgid "Use relative paths in the library, if you use Nemp in a cloud drive on different computers"
+msgstr "異なるコンピュータ上のクラウドドライブで Nemp を使用する場合、ライブラリ内で相対パスを使用"
+
+msgid "Use safe playback"
+msgstr "セーフ再生を使用"
+
+msgid "Use selected cover for Media library"
+msgstr "選択したカバーをメディアライブラリに使用"
+
+msgid "Use selected file in mainwindow"
+msgstr "メインウィンドウで選択したファイルを使用"
+
+msgid "Use some tricky algorithms to accelerate the search for lyrics."
+msgstr "歌詞の検索を高速化するために、いくつかのトリッキーなアルゴリズムを使用します。"
+
+msgid "Use some tricky algorithms to accelerate the search."
+msgstr "検索を高速化するために、いくつかのトリッキーなアルゴリズムを使用します。"
+
+msgid "Use streamname as directory"
+msgstr "ストリーム名をディレクトリとして使用"
+
+msgid "Use the buttons to remove some elements and to create a new partition. Then use Drag&Drop to assign the GUI-Elements again."
+msgstr "ボタンを使用して要素を削除し、新しいパーティションを作成します。その後、ドラッグ＆ドロップでGUI要素を再割り当てします。"
+
+msgid "Use the current selected file in player as birthday song."
+msgstr "プレイヤーで現在選択されているファイルをバースデーソングとして使用します。"
+
+msgid "Use the current selected file in player as countdown."
+msgstr "プレイヤーで現在選択されているファイルをカウントダウンとして使用します。"
+
+msgid "Use this, if the playback don't work after hibernating the system."
+msgstr "システムの休止状態後に再生が動作しない場合は、これを有効にします。"
+
+msgid "Use volume up/down keys for system-wide volume control"
+msgstr "音量アップ/ダウンキーをシステム全体の音量制御に使用"
+
+msgid "Use weighted random"
+msgstr "重み付きランダムを使用"
+
+msgid "Used in combination with \"Just play focussed file\""
+msgstr "「フォーカスされたファイルを再生」と組み合わせて使用"
+
+msgid "User bigger fonts for long tracks and smaller ones for short tracks."
+msgstr "長いトラックには大きなフォントを、短いトラックには小さなフォントを使用します。"
+
+msgid "User rights"
+msgstr "ユーザー権限"
+
+msgid "Username"
+msgstr "ユーザー名"
+
+msgid "Username (Admin)"
+msgstr "ユーザー名 (管理者)"
+
+msgid "V"
+msgstr "V"
+
+msgid "Value"
+msgstr "値"
+
+msgid "Variable bitrate"
+msgstr "可変ビットレート"
+
+msgid "Various artists"
+msgstr "オムニバス"
+
+msgid "Various genres"
+msgstr "各種ジャンル"
+
+msgid "Version"
+msgstr "バージョン"
+
+msgid "Vertical gap"
+msgstr "垂直方向の間隔"
+
+msgid "Very fast"
+msgstr "非常に高速"
+
+msgid "Very slow"
+msgstr "非常に低速"
+
+msgid "View"
+msgstr "表示"
+
+msgid "Viewing position (x-axis)"
+msgstr "表示位置 (X軸)"
+
+msgid "Visible columns in the medialist"
+msgstr "メディアリストの表示列"
+
+msgid "Visible elements in Nemp"
+msgstr "Nemp の表示要素"
+
+msgid "Visualization"
+msgstr "ビジュアライゼーション"
+
+msgid "Volume"
+msgstr "音量"
+
+msgid "Volume of jingles"
+msgstr "ジングルの音量"
+
+msgid "Volume of the jingle in relation to main volume."
+msgstr "メイン音量に対するジングルの音量。"
+
+msgid "W"
+msgstr "W"
+
+msgid "Waiting for user input ..."
+msgstr "ユーザー入力を待機中 ..."
+
+msgid "Warning"
+msgstr "警告"
+
+msgid "Warning: %d file(s) need an update. Click here to start."
+msgstr "警告 : %d 個のファイルに更新が必要です。ここをクリックして開始。"
+
+msgid "Warning: AlbumGain calculation cancelled (%s)"
+msgstr "警告: アルバムゲイン計算がキャンセルされました (%s)"
+
+msgid "Warning: Duplicate files"
+msgstr "警告 : 重複ファイル"
+
+msgid "Warning: The tag \"%s\" is already on the \"Ignore list\"."
+msgstr "警告: タグ \"%s\" は既に「無視リスト」にあります。"
+
+msgid "Warning: The tag \"%s\" is already part of a \"Rename rule\" and is replaced with \"%s\"."
+msgstr "警告 : タグ \"%s\" は既に「置換ルール」の一部であり、\"%s\" に置換されます。"
+
+msgid "Warning: The tag \"%s\" is already part of a \"Rename rule\" and is the replacement for \"%s\"."
+msgstr "警告 : タグ \"%s\" は既に「置換ルール」の一部であり、\"%s\" の置換先です。"
+
+msgid "Warning: The tag \"%s\" is on the \"Ignore list\"."
+msgstr "警告: タグ \"%s\" は「無視リスト」にあります。"
+
+msgid "Warning: The tag \"%s\" is on the \"Rename list\" and should be replaced with \"%s\"."
+msgstr "警告 : タグ \"%s\" は「置換リスト」にあり、\"%s\" に置換されるべきです。"
+
+msgid "Warning: Too many files for Drag&Drop and Copy&Paste respectively. Only %d files were included."
+msgstr "警告 : ドラッグ＆ドロップおよびコピー＆ペーストに対してファイルが多すぎます。%d 個のファイルのみが含まれました。"
+
+msgid "WebServer"
+msgstr "ウェブサーバー"
+
+msgid "Webradio"
+msgstr "ウェブラジオ"
+
+msgid "Webradio: %s"
+msgstr "ウェブラジオ : %s"
+
+msgid "Webserver"
+msgstr "ウェブサーバー"
+
+msgid "Webserver URLs"
+msgstr "ウェブサーバー URL"
+
+msgid "Webserver configuration"
+msgstr "ウェブサーバー設定"
+
+msgid "Webserver: Logfile"
+msgstr "ウェブサーバー : ログファイル"
+
+msgid "Website: [url=\"https://www.gausi.de\"]https://www.gausi.de[/url]"
+msgstr "ウェブサイト: [url=\"https://www.gausi.de\"]https://www.gausi.de[/url]"
+
+msgid "Webstream"
+msgstr "ウェブストリーム"
+
+msgid "Webstream lists|*.nwl;*.pls"
+msgstr "ウェブストリームリスト|*.nwl;*.pls"
+
+msgid "Weekly"
+msgstr "毎週"
+
+msgid "Welcome to the Nemp Wizard"
+msgstr "Nemp ウィザードへようこそ"
+
+msgid "What do you want to do now?"
+msgstr "これから何をしますか？"
+
+msgid "When browsing in playlists: Get the meta-data from the included audiofiles"
+msgstr "プレイリストを閲覧するとき : 含まれるオーディオファイルからメタデータを取得"
+
+msgid "When clicking \"next\", jump to the next cuesheet (if available)"
+msgstr "「次へ」をクリックしたとき、次のキューのシートにジャンプ (利用可能な場合)"
+
+msgid "When searching for files: Add every supported file or just some special types."
+msgstr "ファイルを検索するとき: サポートされているすべてのファイルを追加するか、特定のタイプのみを追加するか。"
+
+msgid "When selecting a new directory: Show query whether it should be added to this list or not."
+msgstr "新しいディレクトリを選択するとき : このリストに追加するかどうかの確認を表示。"
+
+msgid "When starting Nemp by double-clicking a file in the Windows-Explorer: Use this file instead of the last one."
+msgstr "Windows エクスプローラーでファイルをダブルクリックして Nemp を起動するとき : 最後のファイルの代わりにこのファイルを使用。"
+
+msgid "Winamp DSP Plugins"
+msgstr "Winamp DSP プラグイン"
+
+msgid "Winamp DSP plugin active"
+msgstr "Winamp DSP プラグインがアクティブ"
+
+msgid "Windows"
+msgstr "Windows"
+
+msgid "Windows Explorer settings"
+msgstr "Windows エクスプローラー設定"
+
+msgid "Windows default"
+msgstr "Windows デフォルト"
+
+msgid "Windows properties"
+msgstr "Windows プロパティ"
+
+msgid "Windows standard"
+msgstr "Windows 標準"
+
+msgid "Windows will hibernate at the end of the playlist."
+msgstr "Windows はプレイリストの終了時に休止状態になります。"
+
+msgid "Windows will hibernate in %s."
+msgstr "Windows は %s 後に休止状態になります。"
+
+msgid "Windows will hibernate now. When you switch on your computer, the current session will be restored."
+msgstr "Windows は今すぐ休止状態になります。コンピュータの電源を入れると、現在のセッションが復元されます。"
+
+msgid "Windows will shutdown at the end of the playlist."
+msgstr "Windows はプレイリストの終了時にシャットダウンします。"
+
+msgid "Windows will shutdown in %s."
+msgstr "Windows は %s 後にシャットダウンします。"
+
+msgid "Windows will shutdown now. Unsaved data could be lost."
+msgstr "Windows は今すぐシャットダウンします。保存されていないデータは失われる可能性があります。"
+
+msgid "Windows will suspend at the end of the playlist."
+msgstr "Windows はプレイリストの終了時にサスペンドします。"
+
+msgid "Windows will suspend in %s."
+msgstr "Windows は %s 後にサスペンドします。"
+
+msgid "Windows will suspend now. When you switch on your computer, the current session will be restored."
+msgstr "Windows は今すぐサスペンドします。コンピュータの電源を入れると、現在のセッションが復元されます。"
+
+msgid "Windows: File types registration"
+msgstr "Windows : ファイルタイプ登録"
+
+msgid "With RG"
+msgstr "RG あり"
+
+msgid "With this new version of Nemp, some changes have been implemented, making some files and directories obsolete. However, there are no files left that should be deleted. Everything is ok."
+msgstr "この新しいバージョンの Nemp では、いくつかの変更が実装され、一部のファイルとディレクトリが不要になりました。ただし、削除すべきファイルは残っていません。すべて問題ありません。"
+
+msgid ""
+"With this new version of Nemp, some changes have been implemented, making some files and directories obsolete. It is recommended to delete these files to avoid possible inconsistencies. For more information "
+"click on \"Help\"."
+msgstr ""
+"この新しいバージョンの Nemp では、いくつかの変更が実装され、一部のファイルとディレクトリが不要になりました。潜在的な不整合を避けるために、これらのファイルを削除することをお勧めします。詳細については「ヘルプ」"
+"をクリックしてください。"
+
+msgid "Without RG"
+msgstr "RG なし"
+
+msgid "Wizard"
+msgstr "ウィザード"
+
+msgid "Wobble playback"
+msgstr "再生をゆがめる"
+
+msgid "Write changes directly to the metadata"
+msgstr "変更を直接メタデータに書き込む"
+
+msgid "X"
+msgstr "X"
+
+msgid "Y"
+msgstr "Y"
+
+msgid "Year"
+msgstr "年"
+
+msgid "Year: -?-"
+msgstr "年 : -?-"
+
+msgid "Years"
+msgstr "年"
+
+msgid "Yes"
+msgstr "はい"
+
+msgid "Yes to &All"
+msgstr "すべて「はい」(&A)"
+
+msgid "You are using the newest version of Nemp."
+msgstr "最新バージョンの Nemp を使用しています。"
+
+msgid "You can close this window now."
+msgstr "このウィンドウは今すぐ閉じても構いません。"
+
+msgid "You can redistribute it and/or modify it under the terms of the "
+msgstr "あなたはこれを再配布および/または修正することができます。条件は "
+
+msgid "You can't add files into this category"
+msgstr "このカテゴリにファイルを追加することはできません"
+
+msgid "You cancelled the Nemp Wizard. Some features may be disabled."
+msgstr "Nemp ウィザードをキャンセルしました。一部の機能が無効になっている可能性があります。"
+
+msgid ""
+"You denied quick access to metadata (e.g. ID3-Tags), to protect your files from unintented changes.\n"
+"However, this function only works properly, if changing metadata is allowed.\n"
+"\n"
+"Do you want to allow Nemp changing metadata in the selected files?"
+msgstr ""
+"ファイルを意図しない変更から保護するために、メタデータ (例 : ID3タグ) へのクイックアクセスを拒否しました。\n"
+"ただし、この機能はメタデータの変更が許可されている場合にのみ正しく動作します。\n"
+"\n"
+"Nemp が選択したファイルのメタデータを変更することを許可しますか？"
+
+msgid ""
+"You have changed some tags in the library, but the mp3-files have not been updated yet.\n"
+"If you close Nemp now, these files remain inconsistent to the data in the library.\n"
+"\n"
+"Do you really want to close Nemp now?"
+msgstr ""
+"ライブラリ内のいくつかのタグを変更しましたが、MP3 ファイルはまだ更新されていません。\n"
+"今 Nemp を閉じると、これらのファイルはライブラリのデータと不一致のままになります。\n"
+"\n"
+"本当に今 Nemp を閉じますか？"
+
+msgid "You have to choose a destination directory where the playlist should be copied to."
+msgstr "プレイリストのコピー先となる宛先ディレクトリを選択する必要があります。"
+
+msgid "You music library is empty. Drop some files here to start."
+msgstr "音楽ライブラリは空です。開始するにはファイルをここにドロップしてください。"
+
+msgid "You need to confirm changes on this page separately. This ensures that your Windows Registry is not changed by an oversight."
+msgstr "このページの変更は個別に確認する必要があります。これにより、Windows レジストリがうっかり変更されるのを防ぎます。"
+
+msgid "You should keep files in the library, connect the drive to your computer and try again later."
+msgstr "ファイルはライブラリに保持し、ドライブをコンピュータに接続して後でもう一度試してください。"
+
+msgid "You should keep the files in the library, check your network settings and try again later."
+msgstr "ファイルはライブラリに保持し、ネットワーク設定を確認して後でもう一度試してください。"
+
+msgid "You should remove the missing files from the library."
+msgstr "欠落ファイルをライブラリから削除する必要があります。"
+
+msgid "You've created too many panes. Please delete some of them."
+msgstr "ペインを作成しすぎました。いくつかを削除してください。"
+
+msgid "Your IP \"in the internet\". You have to configure your router and/or firewall properly (e.g. forwarding Port80 to your machine) "
+msgstr "「インターネット上の」あなたの IP。ルーターおよび/またはファイアウォールを適切に設定する必要があります (例 : ポート80 をあなたのマシンに転送する)"
+
+msgid "Your IP (Internet)"
+msgstr "あなたの IP (インターネット)"
+
+msgid "Your IP (LAN)"
+msgstr "あなたの IP (LAN)"
+
+msgid "Your IP(s) inside the local area network (LAN)."
+msgstr "ローカルエリアネットワーク (LAN) 内のあなたの IP。"
+
+msgid "Your LastFM Session Key is missing or invalid. Do you want to (re)authenticate scrobbling now?"
+msgstr "LastFM セッションキーが不足しているか無効です。今すぐスクロブリングを(再)認証しますか？"
+
+msgid "Your current version: %s"
+msgstr "現在のバージョン : %s"
+
+msgid "Your current version: x.xx"
+msgstr "現在のバージョン : x.xx"
+
+msgid "Your e-mail"
+msgstr "あなたの Eメール"
+
+msgid "Your media library"
+msgstr "あなたのメディアライブラリ"
+
+msgid "Your media library (curent search results)"
+msgstr "あなたのメディアライブラリ (現在の検索結果)"
+
+msgid "Z"
+msgstr "Z"
+
+msgid "[ A ]"
+msgstr "[ A ]"
+
+msgid "[ B ]"
+msgstr "[ B ]"
+
+msgid "[Add a tag]"
+msgstr "[タグを追加]"
+
+msgid "[Offset=\"100\"]40627 Duesseldorf"
+msgstr "[Offset=\"100\"]40627 デュッセルドルフ"
+
+msgid "[Offset=\"100\"]Daniel Gaussmann"
+msgstr "[Offset=\"100\"]Daniel Gaussmann"
+
+msgid "[Offset=\"100\"]Germany"
+msgstr "[Offset=\"100\"]ドイツ"
+
+msgid "[Offset=\"100\"]Oppelner Weg 27"
+msgstr "[Offset=\"100\"]Oppelner Weg 27"
+
+msgid "[anchor=\"gpl\"]GNU General Public License (GPL)[/anchor]."
+msgstr "[anchor=\"gpl\"]GNU General Public License (GPL)[/anchor]。"
+
+msgid "[b]Icons and Graphics[/b]"
+msgstr "[b]アイコンとグラフィック[/b]"
+
+msgid "[b]Nemp - Noch ein Mp3-Player[/b]"
+msgstr "[b]Nemp - もうひとつの MP3プレイヤー[/b]"
+
+msgid "[b]Nemp is Free Software[/b]"
+msgstr "[b]Nemp はフリーソフトウェアです[/b]"
+
+msgid "[b]Special thanks to[/b]"
+msgstr "[b]謝辞[/b]"
+
+msgid "[b]Thanks to all who helped me ...[/b]"
+msgstr "[b]私を助けてくれたすべての人に感謝 ...[/b]"
+
+msgid "[b]Used components/units[/b]"
+msgstr "[b]使用コンポーネント/ユニット[/b]"
+
+msgid "[img=\"0\"]"
+msgstr "[img=\"0\"]"
+
+msgid "[row=\"200\"]"
+msgstr "[row=\"200\"]"
+
+msgid "[row=\"250\"]"
+msgstr "[row=\"250\"]"
+
+msgid "[url=\"http://dybdahl.dk/dxgettext/\"]GNU gettext for Delphi[/url]"
+msgstr "[url=\"http://dybdahl.dk/dxgettext/\"]GNU gettext for Delphi[/url]"
+
+msgid "[url=\"http://sourceforge.net/projects/flyingcow/\"]Flying Cow[/url] by Matías Andrés Moreno"
+msgstr "[url=\"http://sourceforge.net/projects/flyingcow/\"]Flying Cow[/url] (Matías Andrés Moreno 作)"
+
+msgid "[url=\"http://www.madshi.net/\"]MadExcept[/url] by Mathias Rauen"
+msgstr "[url=\"http://www.madshi.net/\"]MadExcept[/url] (Mathias Rauen 作)"
+
+msgid "[url=\"https://gausi.de/awb.html\"]Audio Werkzeuge Bibliothek[/url]"
+msgstr "[url=\"https://gausi.de/awb.html\"]Audio Werkzeuge Bibliothek[/url]"
+
+msgid "[url=\"https://github.com/nigeltao/tango-icon-library-pngs\"]Tango Icon Library[/url]"
+msgstr "[url=\"https://github.com/nigeltao/tango-icon-library-pngs\"]Tango Icon Library[/url]"
+
+msgid "[url=\"https://www.delphi-forum.de/viewtopic.php?t=48936\"]SearchTools[/url] by Heiko Thiel"
+msgstr "[url=\"https://www.delphi-forum.de/viewtopic.php?t=48936\"]SearchTools[/url] (Heiko Thiel 作)"
+
+msgid "[url=\"https://www.delphipraxis.net/topic114228.html\"]TACredits[/url] (this scrolling thing)"
+msgstr "[url=\"https://www.delphipraxis.net/topic114228.html\"]TACredits[/url] (スクロール表示部分)"
+
+msgid "[url=\"https://www.delphipraxis.net/topic116695_kompo+twindowsversionsinfo+kompo+zur+windowserkennung.html\"]TWindowsVersionInfo[/url] by MagicAndre1981"
+msgstr "[url=\"https://www.delphipraxis.net/topic116695_kompo+twindowsversionsinfo+kompo+zur+windowserkennung.html\"]TWindowsVersionInfo[/url] (MagicAndre1981 作)"
+
+msgid "[url=\"https://www.entwickler-ecke.de/viewtopic.php?t=100088\"]FastFileStream[/url] by Flamefire et al."
+msgstr "[url=\"https://www.entwickler-ecke.de/viewtopic.php?t=100088\"]FastFileStream[/url] (Flamefire 他 作)"
+
+msgid "[url=\"https://www.facebook.com/pages/Nemp-Noch-ein-mp3-Player/172590512836097\"]Nemp on Facebook[/url]"
+msgstr "[url=\"https://www.facebook.com/pages/Nemp-Noch-ein-mp3-Player/172590512836097\"]Nemp on Facebook[/url]"
+
+msgid "[url=\"https://www.jam-software.de/virtual-treeview\"]Virtual Treeview[/url]"
+msgstr "[url=\"https://www.jam-software.de/virtual-treeview\"]Virtual Treeview[/url]"
+
+msgid "[url=\"https://www.last.fm/api/intro\"]The LastFM API[/url]"
+msgstr "[url=\"https://www.last.fm/api/intro\"]The LastFM API[/url]"
+
+msgid "aac"
+msgstr "aac"
+
+msgid "aborted"
+msgstr "中止"
+
+msgid "all files in the same directory"
+msgstr "同じディレクトリ内のすべてのファイル"
+
+msgid "all files with this cover art"
+msgstr "このカバーアートを持つすべてのファイル"
+
+msgid "all tags"
+msgstr "すべてのタグ"
+
+msgid "almost all tags"
+msgstr "ほぼすべてのタグ"
+
+msgid "bold"
+msgstr "太字"
+
+msgid "bold italic"
+msgstr "太字斜体"
+
+msgid "cbr/vbr"
+msgstr "cbr/vbr"
+
+msgid "cover"
+msgstr "カバー"
+
+msgid "dB"
+msgstr "dB"
+
+msgid "days"
+msgstr "日"
+
+msgid "days (0 for unlimited logging)."
+msgstr "日 (0は無制限ログ)。"
+
+msgid "don't care "
+msgstr "どちらでもよい "
+
+msgid "e-Mail: [url=\"mailto:mail@gausi.de\"]mail@gausi.de[/url]"
+msgstr "Eメール : [url=\"mailto:mail@gausi.de\"]mail@gausi.de[/url]"
+
+msgid "empty"
+msgstr "空"
+
+msgid "equal or better than"
+msgstr "同等以上"
+
+msgid "equal or worse than"
+msgstr "同等以下"
+
+msgid "equal to"
+msgstr "同等"
+
+msgid "files"
+msgstr "ファイル"
+
+msgid "from"
+msgstr "開始"
+
+msgid "gmp"
+msgstr "gmp"
+
+msgid "h"
+msgstr "h"
+
+msgid "hours"
+msgstr "時間"
+
+msgid "http://"
+msgstr "http://"
+
+msgid "http://localhost"
+msgstr "http://localhost"
+
+msgid "http://localhost/admin"
+msgstr "http://localhost/admin"
+
+msgid "italic"
+msgstr "斜体"
+
+msgid "jpg"
+msgstr "jpg"
+
+msgid "last.fm Scrobbler setup"
+msgstr "LastFM スクロブラー設定"
+
+msgid "live"
+msgstr "ライブ"
+
+msgid "log"
+msgstr "ログ"
+
+msgid "m"
+msgstr "m"
+
+msgid "m3u-list|*.m3u|m3u8-list (unicode-capable)|*.m3u8|pls-list|*.pls|Nemp playlists|*.npl"
+msgstr "m3uリスト|*.m3u|m3u8リスト (Unicode対応)|*.m3u8|plsリスト|*.pls|Nemp プレイリスト|*.npl"
+
+msgid "m3u8"
+msgstr "m3u8"
+
+msgid "max. number of displayed covers"
+msgstr "表示カバーの最大数"
+
+msgid "maximum length"
+msgstr "最大長"
+
+msgid "minimum length"
+msgstr "最小長"
+
+msgid "mp3"
+msgstr "mp3"
+
+msgid "ms"
+msgstr "ms"
+
+msgid "mute/unmute"
+msgstr "ミュート/ミュート解除"
+
+msgid "normal"
+msgstr "標準"
+
+msgid "ogg"
+msgstr "ogg"
+
+msgid "one tag"
+msgstr "1つのタグ"
+
+msgid "other"
+msgstr "その他"
+
+msgid "pls"
+msgstr "pls"
+
+msgid "remove a track from the playlist after it is completely played."
+msgstr "トラックが完全に再生された後にプレイリストから削除します。"
+
+msgid "required to be added to the playlist"
+msgstr "プレイリストに追加するために必要"
+
+msgid "ressourcesMp3_3248_ohneAlpha.ico"
+msgstr "ressourcesMp3_3248_ohneAlpha.ico"
+
+msgid "ressources\\How to add Winamp DSP Plugins.txt"
+msgstr "ressources\\How to add Winamp DSP Plugins.txt"
+
+msgid "ressources\\csv.nxp"
+msgstr "ressources\\csv.nxp"
+
+msgid "ressources\\empty.nxp"
+msgstr "ressources\\empty.nxp"
+
+msgid "ressources\\html.nxp"
+msgstr "ressources\\html.nxp"
+
+msgid "ressources\\json.nxp"
+msgstr "ressources\\json.nxp"
+
+msgid "ressourcesc_all.jpg"
+msgstr "ressourcesc_all.jpg"
+
+msgid "ressourcesc_nocover.jpg"
+msgstr "ressourcesc_nocover.jpg"
+
+msgid "ressourcesc_notfound.jpg"
+msgstr "ressourcesc_notfound.jpg"
+
+msgid "ressourcesc_webradio.jpg"
+msgstr "ressourcesc_webradio.jpg"
+
+msgid "ressourcesplaylist_3248_ohneAlpha.ico"
+msgstr "ressourcesplaylist_3248_ohneAlpha.ico"
+
+msgid "ressourcesslideleftright.bmp"
+msgstr "ressourcesslideleftright.bmp"
+
+msgid "ressourcesslideupdown.bmp"
+msgstr "ressourcesslideupdown.bmp"
+
+msgid "s"
+msgstr "s"
+
+msgid "some tags"
+msgstr "いくつかのタグ"
+
+msgid "this file only"
+msgstr "このファイルのみ"
+
+msgid "to"
+msgstr "終了"
+
+msgid "wma"
+msgstr "wma"
+
+msgid "www.Icecast.org"
+msgstr "www.Icecast.org"
+
+msgid "~50% of the tags"
+msgstr "タグの約 50%"
+
+msgid "Â»%d"
+msgstr "Â»%d"
+
+msgid "Â»%d:%.2d "
+msgstr "Â»%d:%.2d "
+
+msgid "âˆž "
+msgstr "âˆž "
+
+msgid "⨯"
+msgstr "⨯"
